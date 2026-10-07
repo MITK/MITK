@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mitk.org/schemas/mxn-layout-3.0.json",
+  "title": "MITK MxN Multi-Widget Layout (v3.0)",
+  "description": "Canonical layout description for QmitkMxNMultiWidgetEditor. The on-disk format of `mxnLayout_*.json` preset files and the document consumed by `QmitkMxNMultiWidget::ApplyLayout` / produced by `QmitkMxNMultiWidget::SerializeLayout`. Layout describes only the splitter tree, per-window placement state (view direction, synchronization links), and per-group state. It does NOT describe global rendering state (selected position, time, camera).\n\nv2.0 is a compatible subset of v3.0: the loader accepts both versions in one code path, a v2.0 document loads unchanged (missing `links` keys default to unsynced per-cell singleton behavior), and writers emit \"3.0\". There is no mandatory migration. The reverse does not hold - a v2-only loader refuses \"3.0\" documents at its version check, correctly, since it cannot honor the extra dimensions.\n\nWindow identity vs. display label: each window has a required `id` (the identity) and an optional `name` (a human-readable display label). The `id` is in fully-qualified form `<editor_name>__<bare_id>`, MUST be unique within the document, and is the canonical string used everywhere a window is addressed: as the engine-side render-window name, as the URL path segment in the REST `/rendering/editors/mxn/windows/{id}/...` sub-resources, as the per-renderer DataNode property context key, and in persisted state. The editor neither prepends nor strips a prefix at load or serialize time. The C++ loader enforces structural uniqueness at apply time and additionally enforces that the `<editor_name>` segment matches the loading editor's `multiWidgetName` (default `mxn`).\n\nSynchronization model: cells declare per-dimension links via `links.<dim>`. Cells with the same group for the same dimension are mutually linked and synchronized on that dimension only. Group names live in a single namespace shared across dimensions; per-group persisted state lives in the top-level `groups` dict (v3.0 knows the selection bundle's `select_all` plus the optional cosmetic `color` and `name`).\n\nLink value forms: every dimension accepts the string shorthand (a bare group name). The object form `{\"target\": <group>, ...}` carries modifiers; v3.0 knows one modifier, `offset`, accepted only by `slice` (integer, in displayed slices), `zoom` (multiplicative factor > 0), and `pan` (2D in-plane world-mm vector `[x, y]`). The offset is applied once when the cell converges to its group's reference (set when the layout is applied by the group's seed, its pre-order first member: the seed's live state minus its own offset) and is thereafter preserved by the identical deltas the group propagates (within stepper/camera bounds; the editor's re-converge action restores offsets after boundary clamping, and a pan offset is not preserved under zoom). `orientation` relays plane changes and aligns a joining cell to its group's plane; `windowing` and `lut` relay changes to every member but do not converge a joining cell, which keeps its own value until the group's next change.\n\nDimension semantics worth knowing when authoring: grouped `pan` is world-mm-locked (the same gesture shifts every member the same world distance, so a more-zoomed cell moves more pixels); grouped `zoom` locks the zoom factor/ratio, not the anatomical center; `crosshair` propagation is absolute (a click re-centers every member on the same world point, which also changes members' slices - crosshair therefore accepts no offset); a `slice` group never drives application-global time and time never drives a `slice` group (a single-slice member is simply not scrolled by group propagation, and a scroll on a single-slice cell steps the global time without moving its slice-linked peers). `time` is reserved as a future key name and not accepted by v3.0.\n\nLazy vs. strict mode: the top-level `groups` dict is OPTIONAL. When present, it is authoritative - every label appearing in any cell's `links` (any dimension) MUST be a key in `groups`; otherwise the loader throws. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include `groups` explicitly.\n\nClosure scope by version: this schema is closed (`additionalProperties: false` everywhere, including inside `links` and link objects). The C++ loader runs no JSON-schema validator; closure is enforced at runtime by its validation pre-walk, and only for `\"3.0\"` documents - an unknown link key, an unknown modifier, or an `offset` on a dimension that does not accept it (or of the wrong type) throws. `\"2.0\"` documents keep their historical lenient behavior (unknown link keys silently ignored), so existing v2 files - including files with a typo'd link key - are never newly rejected.",
+
+  "type": "object",
+  "required": ["version", "root"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "3.0",
+      "description": "Schema version. Writers MUST emit \"3.0\". The C++ loader also accepts \"2.0\" documents, which mxn-layout-v2.schema.json describes; apart from its version, a 2.0 document is a 3.0 document that uses only the selection dimension."
+    },
+    "name": {
+      "type": "string",
+      "description": "Optional human-readable preset name. Pure metadata - does not affect loading or rendering."
+    },
+    "groups": {
+      "$ref": "#/$defs/groups",
+      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative - every label appearing in any cell's `links` (any dimension) MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field.\n\nGroup seeding at load: each group's runtime state is seeded from the cell that appears first in document order whose `links.<dim>` names that group (pre-order traversal of the splitter tree). For `selection` this seeds the per-renderer node properties (visible, layer); for `slice` / `zoom` / `pan` the seed cell's live stepper/camera state, minus its own offset, is the group reference that the other members converge to (combined with their declared offset) when the layout is applied. Hand-authors who want a specific cell to be the seed should list that cell first among the group's members."
+    },
+    "root": {
+      "$ref": "#/$defs/split",
+      "description": "Root of the layout tree. Always a split, even for a single-window layout (which is a split with one window child)."
+    }
+  },
+
+  "$defs": {
+    "groups": {
+      "type": "object",
+      "description": "Map from group name to group entry. Group names are arbitrary URL-segment-safe identifiers; the same name MAY be referenced from multiple dimensions in cells' `links`.",
+      "additionalProperties": { "$ref": "#/$defs/group_entry" },
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_.-]+$"
+      }
+    },
+
+    "group_entry": {
+      "type": "object",
+      "description": "Properties shared across cells linked to this group. `select_all` is the selection bundle's UX-mode; `color` and `name` are optional cosmetic fields for the sync furniture. A group that only navigation dimensions reference may use an empty entry; it then exists only while a cell links it. Schema is closed - unknown properties are rejected at authoring time (the C++ loader tolerates unknown entry keys for compatibility).",
+      "additionalProperties": false,
+      "properties": {
+        "select_all": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode, shared by every cell whose `links.selection` names this group. Optional; defaults to true. On a group that only navigation links reference, its presence keeps the group after its last link is removed; writers emit it for every group the editor holds as its own."
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Optional group hue as a hex RGB string. Honored verbatim by the sync furniture (hardcoded, not themed), so a designed layout looks the same in dark and light styles. When absent, a session-stable default hue is assigned by group creation order. The loader ignores a malformed value (default hue applies); it never rejects the document over it."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional human-readable display name, shown identically on every surface (layout editor, window plates, sync barcode tooltips). Free text, distinct from the URL-segment-safe group id used as the dict key. When absent, surfaces display the group id."
+        }
+      }
+    },
+
+    "group_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "description": "URL-segment-safe group label; one namespace shared across all dimensions."
+    },
+
+    "link_plain": {
+      "description": "Link value for dimensions without modifiers (`selection`, `crosshair`, `orientation`, `windowing`, `lut`): a bare group name, or an object with only `target` (reserved for future modifiers).",
+      "oneOf": [
+        { "$ref": "#/$defs/group_name" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target"],
+          "properties": {
+            "target": { "$ref": "#/$defs/group_name" }
+          }
+        }
+      ]
+    },
+
+    "link_slice": {
+      "description": "Slice link: group name shorthand, or object with an integer `offset` in displayed slices - the index the navigator shows, which follows the slice axis of the window's reference (slice navigation input) geometry and can run opposite to the slice stepper. The offset view is established at converge (signed arithmetic, clamped to the member's valid slice range) and preserved while the group scrolls within bounds - the movie-frame use case (-1 / 0 / +1).",
+      "oneOf": [
+        { "$ref": "#/$defs/group_name" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target"],
+          "properties": {
+            "target": { "$ref": "#/$defs/group_name" },
+            "offset": { "type": "integer", "default": 0 }
+          }
+        }
+      ]
+    },
+
+    "link_zoom": {
+      "description": "Zoom link: group name shorthand, or object with a multiplicative factor `offset` (> 0). A member with offset 2.0 stays twice as zoomed as the group reference while the group zooms together (identical factors preserve the ratio).",
+      "oneOf": [
+        { "$ref": "#/$defs/group_name" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target"],
+          "properties": {
+            "target": { "$ref": "#/$defs/group_name" },
+            "offset": { "type": "number", "exclusiveMinimum": 0, "default": 1.0 }
+          }
+        }
+      ]
+    },
+
+    "link_pan": {
+      "description": "Pan link: group name shorthand, or object with a 2D in-plane world-mm `offset` `[x, y]`. The member stays centered a constant world distance from the group reference while the group pans together. The offset is interpreted in each member's own plane frame (unambiguous when members share orientation) and is NOT preserved under zoom (zoom re-centers on the sender's coordinate); re-converge restores it.",
+      "oneOf": [
+        { "$ref": "#/$defs/group_name" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target"],
+          "properties": {
+            "target": { "$ref": "#/$defs/group_name" },
+            "offset": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 2,
+              "maxItems": 2,
+              "default": [0, 0]
+            }
+          }
+        }
+      ]
+    },
+
+    "node": {
+      "description": "A layout-tree node. Either an interior split or a leaf window.",
+      "oneOf": [
+        { "$ref": "#/$defs/split" },
+        { "$ref": "#/$defs/window" }
+      ]
+    },
+
+    "split": {
+      "type": "object",
+      "description": "An interior splitter dividing its area among children along one axis. Maps to QSplitter.",
+      "required": ["type", "orientation", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "split" },
+        "orientation": {
+          "enum": ["horizontal", "vertical"],
+          "description": "\"horizontal\" arranges children left-to-right (Qt::Horizontal); \"vertical\" arranges children top-to-bottom (Qt::Vertical)."
+        },
+        "size": {
+          "$ref": "#/$defs/size",
+          "description": "Splitter weight assigned by this node's parent. Optional inside another split's `children` (default weight 1 applies when omitted); absent on the document root (which has no parent)."
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Ordered list of child nodes. `size` is optional on each child; omitted children take the default weight 1. Mixed siblings compute as ratios, e.g. `[size: 3, default, default]` yields 3:1:1.",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+
+    "window": {
+      "type": "object",
+      "description": "A leaf render-window. Maps to QmitkRenderWindowWidget.",
+      "required": ["type", "id", "view_direction", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "window" },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$",
+          "description": "Window identity, in fully-qualified form `<editor_name>__<bare_id>`. See the top-level description; unchanged from v2.0."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional human-readable display label. Free-form: no pattern constraint, not required to be unique within the document. Pure metadata. Omit when absent rather than emitting an empty string."
+        },
+        "view_direction": {
+          "enum": ["axial", "sagittal", "coronal", "original"],
+          "description": "Anatomical plane shown in this window. \"original\" preserves the data's native orientation."
+        },
+        "links": {
+          "$ref": "#/$defs/links",
+          "description": "Per-dimension synchronization links for this window. Required: every window MUST declare `links.selection` explicitly. Any other dimension may be omitted - a missing key means the cell is unsynced (a per-cell singleton) on that dimension, reproducing v2.0 semantics."
+        },
+        "size": {
+          "$ref": "#/$defs/size",
+          "description": "Splitter weight assigned by this window's parent split. Optional; default weight 1 applies when omitted."
+        }
+      }
+    },
+
+    "links": {
+      "type": "object",
+      "description": "Per-dimension synchronization links. Cells with the same group for the same dimension are mutually linked on exactly that dimension. The same group name MAY be referenced across multiple dimensions (one namespace). Closed: unknown keys are rejected for \"3.0\" documents (`time` is reserved but not implemented).",
+      "required": ["selection"],
+      "additionalProperties": false,
+      "properties": {
+        "selection":   { "$ref": "#/$defs/link_plain" },
+        "pan":         { "$ref": "#/$defs/link_pan" },
+        "zoom":        { "$ref": "#/$defs/link_zoom" },
+        "slice":       { "$ref": "#/$defs/link_slice" },
+        "crosshair":   { "$ref": "#/$defs/link_plain" },
+        "orientation": { "$ref": "#/$defs/link_plain" },
+        "windowing":   { "$ref": "#/$defs/link_plain" },
+        "lut":         { "$ref": "#/$defs/link_plain" }
+      }
+    },
+
+    "size": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Splitter-child weight. Only the ratio between siblings matters. Must be >= 1; 0 would collapse the pane in Qt, but the format has no documented 'hide this cell' semantics, so 0 is rejected by both the schema and the C++ loader."
+    }
+  },
+
+  "examples": [
+    {
+      "version": "3.0",
+      "name": "Movie frame: three axial cells at slice offsets -1 / 0 / +1",
+      "groups": {
+        "main": { "select_all": true },
+        "nav": {}
+      },
+      "root": {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",
+            "links": { "selection": "main", "slice": "nav" } },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "axial",
+            "links": { "selection": "main", "slice": { "target": "nav", "offset": -1 } } },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "axial",
+            "links": { "selection": "main", "slice": { "target": "nav", "offset": 1 } } }
+        ]
+      }
+    },
+    {
+      "version": "3.0",
+      "name": "Overview + detail: coupled pan/slice/crosshair, detail cell twice as zoomed",
+      "groups": {
+        "main": { "select_all": true },
+        "nav": {}
+      },
+      "root": {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__overview", "view_direction": "axial", "size": 1,
+            "links": { "selection": "main", "pan": "nav", "slice": "nav", "crosshair": "nav", "zoom": "nav" } },
+          { "type": "window", "id": "mxn__detail", "view_direction": "axial", "size": 2,
+            "links": { "selection": "main", "pan": "nav", "slice": "nav", "crosshair": "nav",
+                       "zoom": { "target": "nav", "offset": 2.0 } } }
+        ]
+      }
+    }
+  ]
+}

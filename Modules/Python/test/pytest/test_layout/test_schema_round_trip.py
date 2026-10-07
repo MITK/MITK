@@ -70,8 +70,8 @@ class TestInTreePreset:
         re_emitted = doc.to_json()
         with open(two_rows_preset_path, encoding="utf-8") as f:
             original = json.load(f)
-        # Strict-mode equality with the in-tree preset confirms wire
-        # compatibility with the engine's serializer.
+        # Strict-mode equality with the 2.0 form of the preset confirms the
+        # DSL emits the same wire shape the engine reads.
         assert re_emitted == original
 
     def test_two_rows_preset_validates_against_schema(

@@ -1,4 +1,4 @@
-MxN Layout File Format (v2.0) {#MxNLayoutFormatPage}
+MxN Layout File Format (v3.0) {#MxNLayoutFormatPage}
 =============================
 
 [TOC]
@@ -10,7 +10,9 @@ by the MxN multi-widget editor. The on-disk preset files
 `QmitkMxNMultiWidget::SerializeLayout` all share this single format.
 
 The closed, normative reference is the JSON Schema
-`Modules/QtWidgets/resource/mxn-layout-v2.schema.json` (Draft 2020-12). When
+`Modules/QtWidgets/resource/mxn-layout-v3.schema.json` (Draft 2020-12); v2.0
+documents, which remain loadable, are described by
+`Modules/QtWidgets/resource/mxn-layout-v2.schema.json`. When
 something below is ambiguous or contradicts the schema, the schema wins. This
 page focuses on intent, examples, and the everyday parts of the format; the
 schema covers the closed list of accepted enum values, exact regex patterns,
@@ -22,7 +24,7 @@ Related runtime concepts are not duplicated here; see the @ref MxNConceptPage
 which together implement the runtime side of the synchronization the layout
 document describes.
 
-## What the format describes — and what it does not
+## What the format describes, and what it does not
 
 A layout document captures:
 
@@ -30,8 +32,8 @@ A layout document captures:
   nesting, splitter weights).
 - Per-window **placement state** (window id, optional display name, view
   direction, links into synchronization groups).
-- Per-group **persisted state** (today: the `select_all` UX-mode of the
-  selection bundle).
+- Per-group **persisted state**: the `select_all` UX-mode of the selection
+  bundle, and an optional display name and color.
 
 A layout document does **not** capture global rendering state (selected
 position, current time step, camera) or the loaded data set. Those are owned
@@ -42,7 +44,7 @@ data nodes simply applies the new geometry; the data stays.
 
 ```json
 {
-  "version": "2.0",
+  "version": "3.0",
   "name": "Optional preset name",
   "groups": {
     "main": { "select_all": true }
@@ -64,12 +66,14 @@ data nodes simply applies the new geometry; the data stays.
 }
 ```
 
-- `version`: must be the exact string `"2.0"`. The C++ loader rejects any
-  other value. v1.x files are upgraded out-of-band — see "Migrating from
-  v1.x" below.
+- `version`: the exact string `"3.0"` or `"2.0"`. The C++ loader rejects any
+  other value, and `SerializeLayout` always writes `"3.0"`. A v2.0 document is
+  a v3.0 document that only uses the selection dimension and loads unchanged
+  (see "Versions and closure" below). v1.x files are upgraded out-of-band
+  (see "Migrating from v1.x" below).
 - `name`: optional human-readable preset name. Pure metadata; ignored by the
   loader and not used for routing. (The window leaves carry an optional
-  `name` of their own, used the same way — see "Window identity and display
+  `name` of their own, used the same way; see "Window identity and display
   label" below.)
 - `groups`: optional. When present, authoritative. See "Lazy vs. strict mode"
   below.
@@ -122,9 +126,10 @@ A `window` is a leaf render-window. Every window must declare:
   is `"axial"`, `"sagittal"`, `"coronal"`, `"original"` (lowercase). Unknown
   strings throw at load time; there is no silent fallback.
 - `links`: per-dimension synchronization references. v2.0 has one dimension,
-  `selection`; v3.0 will add more dimensions here additively (zoom, time,
-  crosshair, ...). Every window must declare `links.selection` explicitly --
-  there are no implicit singletons.
+  `selection`; v3.0 adds seven navigation and appearance dimensions (see
+  "Navigation and appearance links" below). Every window must declare
+  `links.selection` explicitly -- there are no implicit singletons. The other
+  dimensions are optional; a window without one is unsynchronized on it.
 
 A window may additionally declare:
 
@@ -132,7 +137,7 @@ A window may additionally declare:
   constraint, not required to be unique within the document). Pure metadata;
   the loader does not use it for routing, addressing, persisted-state
   keying, or REST URL construction (those all use `id`). Omit the field
-  entirely if the cell has no display name — empty strings are rejected.
+  entirely if the cell has no display name: empty strings are rejected.
 
 ### `size` is a ratio, not pixels
 
@@ -168,6 +173,11 @@ underscore, dot, hyphen). The same group name can be used across multiple
 dimensions in v3 (e.g. `"selection": "main", "zoom": "main"`); group names
 live in a single namespace and dimensions are orthogonal.
 
+One selection group is the *default group*: the one every fresh cell joins
+and an unlinked selection reverts to. A selection group named `main`
+becomes the default when the document declares one; otherwise the
+alphabetically first selection group referenced by any cell takes that role.
+
 Per-group persisted state lives once at the top level:
 
 ```json
@@ -177,13 +187,87 @@ Per-group persisted state lives once at the top level:
 }
 ```
 
-v2.0 declares one such property: `select_all` (the selection bundle's UX
-mode — whether the group displays every data node or a curated subset).
-v3.0 dimensions that need persisted per-group state add their properties to
-the same group entry additively.
+The properties of a group entry:
+
+- `select_all` (the selection bundle's UX mode: whether the group displays
+  every data node or a curated subset). Optional, defaults to `true`. It
+  applies to every window whose `links.selection` names the group, including
+  windows that join it later.
+- `color` (v3.0): optional hue as `"#RRGGBB"`, shown verbatim by the sync
+  furniture. Without it the editor assigns a default hue by group creation
+  order. A malformed value is ignored with a warning, never rejected.
+- `name` (v3.0): optional display name, shown instead of the group id on
+  every surface. The id (the dict key) stays the URL-safe identity.
+
+Groups referenced only by navigation dimensions may use an empty entry `{}`;
+such a group exists while some window links it and goes with its last link.
+A declared group is kept as a group of its own (shown by the layout editor
+even while empty and written back by `SerializeLayout` with its
+`select_all`) when no window references it or when its entry carries
+`select_all`.
 
 There is no per-cell `select_all`. The setting belongs to the group, not to
 any one of its members.
+
+## Navigation and appearance links
+
+v3.0 adds seven dimensions beside `selection`, each linking a window into a
+group independently of the others:
+
+| Dimension | What the group shares | Offset |
+| --- | --- | --- |
+| `slice` | the slice position | integer, in displayed slices |
+| `zoom` | the zoom factor | number > 0, a multiplicative factor |
+| `pan` | the in-plane position | `[x, y]`, in world mm along the window's own plane axes |
+| `crosshair` | the selected world position | none |
+| `orientation` | the view direction | none |
+| `windowing` | level/window | none |
+| `lut` | the colormap | none |
+
+Every dimension accepts the bare group name. `slice`, `zoom` and `pan` also
+accept an object form carrying an offset:
+
+```json
+"links": {
+  "selection": "main",
+  "slice": { "target": "nav", "offset": -1 },
+  "zoom": "nav"
+}
+```
+
+Every member's offset, the first member's included, is relative to one
+common group reference, so only the differences between the offsets carry
+meaning: offsets of `-1`, `0` and `+1` and offsets of `0`, `+1` and `+2`
+describe the same layout. The group's *seed* is its first member in document
+order. When the layout is applied, the seed stays where it is and defines
+the reference (its live state minus its own offset); every other member
+converges to the reference combined with its own offset. From then on the
+group moves together, which keeps the offsets. A member clamped at the end of
+its slice range or camera bounds can lose its offset; the editor's
+re-converge action restores it. For slices, re-converge takes the reference
+from the members that sit strictly inside their slice range, following the
+reference most of them agree on, so a clamped member is moved back rather
+than the group shifted to it. Members that cannot show the reference this
+way (fewer than three slices, or not set up yet) are left out; on a tie, the
+reference whose first member comes first in document order wins. Only when no
+member sits strictly inside its range does the seed define the reference,
+clamped or not.
+
+A slice offset counts displayed slices: the index the navigator shows, which
+follows the slice axis of the window's reference (slice navigation input)
+geometry and can run opposite to the slice stepper. Offsets of `-1`, `0` and `+1` on three members
+therefore show the previous, the same and the next slice, whatever the
+view's stepping direction.
+
+A pan offset and every shared pan move are applied in the axes of each
+window's own plane. They therefore point the same way in the patient only
+across windows that show the same plane; across planes the in-plane vector is
+applied as is.
+
+`orientation` aligns a joining window to its group's view direction.
+`windowing` and `lut` relay changes to every member but do not converge a
+joining window, which keeps its own value until the group's next change.
+`time` is reserved as a future key and rejected by v3.0.
 
 ## Lazy vs. strict mode
 
@@ -197,7 +281,7 @@ The top-level `groups` dict is optional:
   becomes an implicit group with property defaults (`select_all: true`).
   Cells still declare `links.selection` explicitly.
 
-Per-cell `links` is **always** required — laziness applies only to the
+Per-cell `links` is **always** required: laziness applies only to the
 group-properties block at the top, never to per-cell linking.
 
 `QmitkMxNMultiWidget::SerializeLayout` always emits strict mode (full
@@ -208,7 +292,7 @@ is stable and reviewer-friendly.
 
 ```json
 {
-  "version": "2.0",
+  "version": "3.0",
   "name": "Two rows; row 2 is its own selection group",
   "groups": {
     "main": { "select_all": true  },
@@ -255,16 +339,18 @@ since the omitted child defaults to `1`).
 
 ## Group seeding at load
 
-When a layout is applied, each group's runtime synchronized state for
-per-renderer node properties (today: per-node `visible`, per-node `layer`;
-future v3 keys analogously) is seeded from the cell that appears first in
-document order whose `links.<dim>` names that group. After seeding, every
-other group member is normalised to the seed cell's values for those keys.
+When a layout is applied, each selection group's runtime synchronized state
+for per-renderer node properties (per-node `visible` and `layer`) is seeded
+from the cell that appears first in document order whose `links.selection`
+names that group. After seeding, every other group member is normalised to
+the seed cell's values for those keys. The navigation dimensions use the
+same seed rule to decide which window stays put while the others converge
+(see "Navigation and appearance links" above).
 
 - **Document order** = pre-order traversal of the splitter tree (splits'
   `children` arrays in array order).
 - **Group-scoped persisted properties** stored in the top-level `groups`
-  dict (e.g. `select_all`) are not seeded from cells — the value declared
+  dict (e.g. `select_all`) are not seeded from cells: the value declared
   there wins outright.
 - **Selection-list membership** is a runtime concept not encoded in the
   layout. It is seeded from the data storage's non-helper, non-hidden
@@ -307,10 +393,12 @@ rejected up-front with a message naming the offending id. Editor-name
 constructor inputs that contain `_` or otherwise violate the editor-name
 regex are rejected at editor construction time, not at load time.
 
-The recommended default for tool-generated layouts is `mxn__widget<i>`
-where `<i>` is the leaf's pre-order traversal index (0-based, contiguous).
-`SerializeLayout` writes this form. Hand-authored presets may use any
-unique bare-id segment (e.g. `mxn__alpha`, `mxn__upper_left`) as long as
+`SerializeLayout` writes each window's id verbatim. `SetLayout` and the grid
+operations name new windows `mxn__widget<i>`, but `<i>` carries no
+positional meaning: after a row or column is added, the ids are no longer in
+reading order. Tools that generate layouts may use `mxn__widget<i>` with
+`<i>` the leaf's pre-order index (0-based, contiguous) as a readable default.
+Hand-authored presets may use any unique bare-id segment (e.g. `mxn__alpha`, `mxn__upper_left`) as long as
 the qualified id is URL-segment-safe and unique within the document.
 
 Renaming an id breaks every cached reference to it (persisted sessions,
@@ -318,7 +406,7 @@ REST clients holding URLs, scene-file context keys); treat it as
 permanent.
 
 **`name` (display label).** Optional, free-form, not required to be unique.
-Holds whatever string a user-facing surface should show for the cell —
+Holds whatever string a user-facing surface should show for the cell, such as
 "Tumor axial", "Reference T1", "Comparison view 2". Pure metadata: the
 loader does not use it for routing, addressing, persisted-state keying, or
 REST URL construction. The schema rejects an empty `name`; tools should omit
@@ -353,30 +441,36 @@ pure stdlib Python 3 script with no required external dependencies; if
 validates its own output against the v2 schema before writing.
 
 The migration is intentionally one-shot. There is no in-memory v1.x
-translation in the C++ loader — the rationale is that custom MxN presets
+translation in the C++ loader: the rationale is that custom MxN presets
 are rare and an out-of-band script is cheaper to maintain than a permanent
 in-process compatibility shim.
 
-## Closed schema and forward compatibility
+## Versions and closure
 
-The schema is closed: `additionalProperties: false` everywhere, including
-inside `links` and inside `groups` entries. This is deliberate. v2.0 only
-knows the `selection` synchronization dimension and the `select_all` group
-property. A future v3.0 schema bump will add further dimensions inside
-`links` (e.g. `zoom`, `time`, `crosshair`) and possibly further per-group
-properties inside group entries. Older loaders presented with a v3.0
-document refuse it loudly at the version check — by design. A loader that
-cannot honour the synchronization should not silently load the file and
-drop part of the contract.
+The schemas are closed: `additionalProperties: false` everywhere, including
+inside `links`, link objects and `groups` entries. This is deliberate: a
+loader that cannot honour a synchronization should not silently load the
+file and drop part of the contract.
 
-The mental-model break between v2 and v3 is "more dimension keys inside
-`links`, more group properties inside group entries" — never "selection got
-reshaped". Tooling that learns the v2 link/groups shape continues to work in
-v3 without modification.
+v2.0 to v3.0 is additive: more dimension keys inside `links`, the object
+form for offsets, and the cosmetic `color` / `name` group properties. The
+selection link and `select_all` keep their v2 shape, so tooling that learned
+the v2 shape keeps working. The loader reads both versions in one code path;
+there is no mandatory migration. A v2-only loader refuses a `"3.0"` document
+at its version check, correctly, since it cannot honour the extra
+dimensions.
+
+The C++ loader runs no JSON-schema validator. It enforces the closure of
+`links` at runtime, and only for `"3.0"` documents: an unknown link key, an
+unknown modifier, or an offset on a dimension that does not take one (or of
+the wrong type) throws. `"2.0"` documents keep their historical leniency, so
+unknown link keys in them are ignored and existing v2 files are never newly
+rejected. Unknown keys inside a group entry are tolerated in both versions.
 
 ## Where to look in the source
 
-- Normative schema: `Modules/QtWidgets/resource/mxn-layout-v2.schema.json`
+- Normative schema: `Modules/QtWidgets/resource/mxn-layout-v3.schema.json`
+  (v2.0 documents: `Modules/QtWidgets/resource/mxn-layout-v2.schema.json`)
 - Default in-tree preset: `Modules/QtWidgets/resource/mxnLayout_twoRowsEachDirection.json`
 - Migration script: `Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py`
 - Loader / serializer: `QmitkMxNMultiWidget::ApplyLayout` and

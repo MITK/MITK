@@ -155,8 +155,15 @@ namespace
    * surfaces as RenderWindowBridgeNoEditorException so the controller maps it
    * to 503 EDITOR_NOT_ACTIVE.
    *
+   * Every MxN endpoint resolves the editor here, so this is also where they
+   * are all refused while a layout is being applied: the rebuild pumps the
+   * event loop, which delivers queued REST calls against a half-built cell
+   * tree.
+   *
    * \throws mitk::RenderWindowBridgeNoEditorException if the MxN editor is
    *         not open or has no live multi-widget.
+   * \throws mitk::RenderWindowBridgeEditorBusyException while the editor is
+   *         applying a layout.
    */
   MxNEditor ResolveMxNEditor()
   {
@@ -173,6 +180,10 @@ namespace
       throw mitk::RenderWindowBridgeNoEditorException(
         "MxN editor has no live multi-widget");
 
+    if (multiWidget->IsApplyingLayout())
+      throw mitk::RenderWindowBridgeEditorBusyException(
+        "MxN editor is applying a layout; retry once it has finished");
+
     return { rwp, multiWidget };
   }
 
@@ -181,8 +192,7 @@ namespace
    *
    * Convenience over ResolveMxNEditor for callers that only need the widget.
    *
-   * \throws mitk::RenderWindowBridgeNoEditorException if the MxN editor is
-   *         not open or has no live multi-widget.
+   * \throws same as ResolveMxNEditor.
    */
   QmitkMxNMultiWidget* GetMxNMultiWidget()
   {
@@ -531,6 +541,13 @@ namespace mitk
           for (const auto& descriptor : descriptors)
             mxn.windowIds.push_back(descriptor.id.toStdString());
         }
+        catch (const mitk::RenderWindowBridgeEditorBusyException&)
+        {
+          // Open, so it is listed as active; the cell tree is being rebuilt,
+          // so windowIds stays empty rather than walking it.
+          mxn.active = true;
+          mxn.busy = true;
+        }
         catch (const mitk::RenderWindowBridgeNoEditorException&)
         {
           // MxN editor not open -- mxn.active stays false, windowIds empty.
@@ -654,7 +671,8 @@ namespace mitk
         // verified the body is valid JSON syntax, but we must still get
         // an nlohmann::json into ApplyLayout. Schema / structural failures
         // surface as mitk::Exception, which the controller catches locally
-        // and maps to 400 INVALID_REQUEST.
+        // and maps to 400 INVALID_REQUEST. A busy editor must not end up
+        // there, so its exception is translated to the bridge's own type.
         auto* const widget = GetMxNMultiWidget();
         nlohmann::json doc;
         try
@@ -669,7 +687,14 @@ namespace mitk
           // still maps to 400; the wording carries the parse detail.
           mitkThrow() << "Layout JSON parse error: " << e.what();
         }
-        widget->ApplyLayout(doc);
+        try
+        {
+          widget->ApplyLayout(doc);
+        }
+        catch (const QmitkMxNLayoutBusyException& e)
+        {
+          throw mitk::RenderWindowBridgeEditorBusyException(e.GetDescription());
+        }
         return widget->SerializeLayout().dump();
       });
 

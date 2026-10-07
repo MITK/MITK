@@ -16,11 +16,10 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 
 #include <QmitkAbstractMultiWidgetEditor.h>
+#include <QmitkMxNMultiWidget.h>
 
 // c++
 #include <memory>
-
-class QmitkMxNMultiWidget;
 
 class MXNMULTIWIDGETEDITOR_EXPORT QmitkMxNMultiWidgetEditor final : public QmitkAbstractMultiWidgetEditor
 {
@@ -42,19 +41,7 @@ public:
   /**
   * @brief Overridden from berry::IPartListener
   */
-  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
   void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   void OnLayoutSet(int row, int column) override;
   /**
@@ -63,9 +50,18 @@ public:
   */
   void OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
+  /** \brief The interaction scheme currently in effect for this editor. The
+   *         layout editor hosts the toggle for it and reads this to show the
+   *         live state. */
+  mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
+
 private Q_SLOTS:
 
   void OnLayoutChanged();
+
+  /** \brief Toggle (a cell's sync barcode) or show ("Open layout editor" in a
+   *         cell's context menu) the dockable MxN layout editor view. */
+  void OnLayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request);
 
 private:
   /**

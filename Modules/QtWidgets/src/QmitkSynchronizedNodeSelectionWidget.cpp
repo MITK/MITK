@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkRenderWindowLayerUtilities.h>
 
+#include <QKeyEvent>
+
 QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
   , m_SyncGroupIndex(-1)
@@ -160,7 +162,6 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
   dialog->SetCurrentSelection(m_StorageModel->GetCurrentSelection());
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
 
-  m_Controls->changeSelectionButton->setChecked(true);
   if (dialog->exec())
   {
     if (m_Controls->selectionModeCheckBox->isChecked())
@@ -172,8 +173,6 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
     auto selectedNodes = dialog->GetSelectedNodes();
     this->HandleChangeOfInternalSelection(selectedNodes);
   }
-
-  m_Controls->changeSelectionButton->setChecked(false);
 
   delete dialog;
 }
@@ -224,6 +223,48 @@ void QmitkSynchronizedNodeSelectionWidget::SetUpConnections()
 
   connect(m_Controls->tableView, &QTableView::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnTableClicked);
+  m_Controls->tableView->installEventFilter(this);
+}
+
+bool QmitkSynchronizedNodeSelectionWidget::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched != m_Controls->tableView || event->type() != QEvent::KeyPress)
+  {
+    return QmitkAbstractNodeSelectionWidget::eventFilter(watched, event);
+  }
+
+  const auto current = m_Controls->tableView->currentIndex();
+  if (!current.isValid())
+  {
+    return QmitkAbstractNodeSelectionWidget::eventFilter(watched, event);
+  }
+
+  switch (static_cast<QKeyEvent*>(event)->key())
+  {
+    case Qt::Key_Space:
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+      // The name cell has no action of its own; visibility is what a user
+      // toggles most, so it takes the key there.
+      this->OnTableClicked(current.column() == 0 ? current.siblingAtColumn(1) : current);
+      return true;
+    case Qt::Key_Delete:
+      this->OnTableClicked(current.siblingAtColumn(3));
+      return true;
+    default:
+      return QmitkAbstractNodeSelectionWidget::eventFilter(watched, event);
+  }
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SetScopeText(const QString& text)
+{
+  m_Controls->scopeLabel->setText(text);
+  m_Controls->scopeLabel->setVisible(!text.isEmpty());
+}
+
+QString QmitkSynchronizedNodeSelectionWidget::GetScopeText() const
+{
+  return m_Controls->scopeLabel->text();
 }
 
 void QmitkSynchronizedNodeSelectionWidget::SetSelection(const NodeList& newSelection)
@@ -543,10 +584,9 @@ void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType
                 << "'. Group index must be >= 1.";
   }
 
-  // No-op when the value is unchanged. Suppressing the signal emission here is
-  // load-bearing: it terminates the model->view feedback loop in which the
-  // owning utility widget mirrors this index back into its combobox via
-  // 'SetSyncGroup'.
+  // No-op when the value is unchanged, so 'SyncGroupIndexChanged' only ever
+  // reports a real change and a listener that writes the index back cannot
+  // start a feedback loop.
   if (m_SyncGroupIndex == index)
   {
     return;

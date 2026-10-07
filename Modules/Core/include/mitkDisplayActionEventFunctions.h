@@ -17,8 +17,12 @@ found in the LICENSE file.
 
 #include <mitkStdFunctionCommand.h>
 
+#include <functional>
+
 namespace mitk
 {
+  class BaseRenderer;
+
   /**
    * \brief Factory functions that create std::function callbacks for display action events.
    *
@@ -30,6 +34,44 @@ namespace mitk
    */
   namespace DisplayActionEventFunctions
   {
+    /**
+     * \brief Decides whether a synchronized display action propagates from the
+     *        sending renderer to a candidate target renderer.
+     *
+     * Supplied by the editor that owns the synchronization group membership
+     * (e.g. the MxN multi widget). The predicate is the sole scoping
+     * authority of a synchronized action: it gates the sender (return false
+     * for every target to ignore a foreign sender) as well as each target.
+     * Both renderers are non-null when the predicate is evaluated.
+     */
+    using TargetPredicate =
+      std::function<bool(const BaseRenderer* sender, const BaseRenderer* target)>;
+
+    /**
+     * \brief How the sender of a level-window gesture relates to the
+     *        synchronization scope of the handler observing it.
+     *
+     * Foreign: the sender is not one of the handler's renderers; the gesture
+     * is ignored (its own handler serves it). Ungrouped: the sender is the
+     * handler's own renderer but belongs to no level-window group; the
+     * gesture writes the node-global property, keeping the renderer coupled
+     * to the global level/window controls. Grouped: the sender belongs to a
+     * level-window group; the gesture writes renderer-specific values on
+     * every group member admitted by the TargetPredicate.
+     */
+    enum class LevelWindowScope
+    {
+      Foreign,
+      Ungrouped,
+      Grouped
+    };
+
+    /**
+     * \brief Classifies the sender of a level-window gesture; see
+     *        LevelWindowScope. The sender is non-null when the classifier is
+     *        evaluated.
+     */
+    using LevelWindowScopeClassifier = std::function<LevelWindowScope(const BaseRenderer* sender)>;
     /**
      * \brief Create an action that moves the sending renderer's camera.
      *
@@ -86,15 +128,17 @@ namespace mitk
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction(const std::string& prefixFilter = "");
 
     /**
-     * \brief Create an action that moves the camera of all renderers synchronously.
+     * \brief Create an action that moves the camera of a set of 2D renderers synchronously.
      *
      * Reacts to DisplayMoveEvent. The renderers must be managed by the same
-     * RenderingManager.
+     * RenderingManager. The target set is decided per event by the given
+     * predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction(TargetPredicate isTarget);
 
     /**
      * \brief Create a synchronized action that sets the crosshair position.
@@ -110,24 +154,73 @@ namespace mitk
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction(const std::string& prefixFilter = "");
 
     /**
-     * \brief Create an action that zooms the camera of all 2D renderers synchronously.
+     * \brief Create a synchronized action that sets the crosshair position for
+     *        a set of 2D renderers.
      *
-     * Reacts to DisplayZoomEvent.
+     * Reacts to DisplaySetCrosshairEvent. The target set is decided per event
+     * by the given predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction(TargetPredicate isTarget);
 
     /**
-     * \brief Create an action that scrolls the slice stepper of all 2D renderers synchronously.
+     * \brief Create an action that zooms the camera of a set of 2D renderers synchronously.
      *
-     * Reacts to DisplayScrollEvent.
+     * Reacts to DisplayZoomEvent. The target set is decided per event by the
+     * given predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction(TargetPredicate isTarget);
+
+    /**
+     * \brief Create an action that scrolls the slice stepper of a set of 2D renderers synchronously.
+     *
+     * Reacts to DisplayScrollEvent. The target set is decided per event by the
+     * given predicate.
+     *
+     * The scroll is relayed in displayed slices (see
+     * SliceNavigationHelper::IsDisplayedSliceInverted): a target whose displayed
+     * slice index runs the other way round than the sender's moves its stepper
+     * by the negated delta, so every target moves the same displayed direction.
+     * Single-slice targets are not scrolled, so group propagation never changes
+     * the application-global time. A single-slice sender scrolls the global time
+     * steps instead, the classic single-slice behavior; as no slice changes, no
+     * target is scrolled then.
+     *
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
+     * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
+     */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(TargetPredicate isTarget);
+
+    /**
+     * \brief Create an action that adjusts the level-window of the topmost visible
+     *        image as a renderer-specific property on a set of renderers.
+     *
+     * Reacts to DisplaySetLevelWindowEvent. 'classifySender' decides the
+     * write path (see LevelWindowScope): a foreign sender is ignored, an
+     * ungrouped sender gets the classic node-global property write, and a
+     * grouped sender switches to renderer-specific writes, where every target
+     * renderer admitted by 'isTarget' gets the gesture's delta applied to its
+     * own current value (renderer-specific, falling back to the node-global
+     * value). Renderer-specific values take precedence over the node-global
+     * property in the mapper, so grouped renderers detach from the global
+     * level/window controls by design.
+     *
+     * \param classifySender Sender classification. Must not be null.
+     * \param isTarget       Scoping predicate for the grouped write; see
+     *                       TargetPredicate. Must not be null.
+     * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if classifySender or isTarget is null.
+     */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowSynchronizedAction(
+      LevelWindowScopeClassifier classifySender, TargetPredicate isTarget);
 
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk

@@ -170,7 +170,7 @@ def two_rows_each_direction(
     Top row links to ``group_top``, bottom row to ``group_bottom``. By
     default the top is the ``main`` group and the bottom is its own
     ``row2`` group -- matches the in-tree preset
-    ``mxnLayout_twoRowsEachDirection.json``.
+    ``mxnLayout_twoRowsEachDirection.json`` in its 2.0 form.
     """
     counter = count(start_index)
 

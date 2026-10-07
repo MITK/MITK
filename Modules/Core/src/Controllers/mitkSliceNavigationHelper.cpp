@@ -12,12 +12,19 @@ found in the LICENSE file.
 
 #include <mitkSliceNavigationHelper.h>
 
+#include <mitkBaseRenderer.h>
+#include <mitkSliceNavigationController.h>
+
+#include <mitkExceptionMacro.h>
+
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkPoint.h>
 #include <mitkRenderingManager.h>
 #include <mitkSlicedGeometry3D.h>
 #include <mitkTimeNavigationController.h>
+
+#include <itkSpatialOrientationAdapter.h>
 
 unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry* timeGeometry,
                                                              const Point3D& point)
@@ -141,4 +148,82 @@ mitk::PlaneGeometry* mitk::SliceNavigationHelper::GetCurrentPlaneGeometry(const 
   }
 
   return slicedGeometry->GetPlaneGeometry(slicePosition);
+}
+
+bool mitk::SliceNavigationHelper::IsSliceIndexInverted(const BaseGeometry* referenceGeometry,
+                                                       const BaseGeometry* rendererWorldGeometry,
+                                                       AnatomicalPlane viewDirection)
+{
+  if (nullptr == referenceGeometry || nullptr == rendererWorldGeometry)
+  {
+    mitkThrow() << "Cannot determine the slice index direction without a reference and a renderer world geometry.";
+  }
+
+  int worldAxis = 0;
+  switch (viewDirection)
+  {
+    case AnatomicalPlane::Sagittal:
+      worldAxis = 0;
+      break;
+    case AnatomicalPlane::Coronal:
+      worldAxis = 1;
+      break;
+    case AnatomicalPlane::Axial:
+      worldAxis = 2;
+      break;
+    default:
+      mitkThrow() << "Cannot determine the slice index direction for a view direction without a fixed world axis.";
+  }
+
+  auto matrix = referenceGeometry->GetIndexToWorldTransform()->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  const auto inverseMatrix = matrix.GetInverse();
+
+  const auto dominantIndexAxis = itk::Function::Max3(
+    inverseMatrix[0][worldAxis], inverseMatrix[1][worldAxis], inverseMatrix[2][worldAxis]);
+
+  const bool referenceAxisInverted = inverseMatrix[dominantIndexAxis][worldAxis] < 0;
+  const bool rendererAxisInverted = rendererWorldGeometry->GetAxisVector(2)[worldAxis] < 0;
+
+  return referenceAxisInverted != rendererAxisInverted;
+}
+
+bool mitk::SliceNavigationHelper::IsDisplayedSliceInverted(BaseRenderer* renderer)
+{
+  if (nullptr == renderer)
+  {
+    mitkThrow() << "Cannot determine the displayed slice direction without a renderer.";
+  }
+
+  const auto* sliceNavigation = renderer->GetSliceNavigationController();
+  if (nullptr == sliceNavigation)
+  {
+    return false;
+  }
+
+  const auto viewDirection = sliceNavigation->GetViewDirection();
+  if (AnatomicalPlane::Original == viewDirection)
+  {
+    return false;
+  }
+
+  const auto* inputTimeGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  const auto* timeNavigation = RenderingManager::GetInstance()->GetTimeNavigationController();
+  if (nullptr == inputTimeGeometry || nullptr == timeNavigation)
+  {
+    return false;
+  }
+
+  // The same time step fallback CreateWorldGeometry uses to build the
+  // renderer planes.
+  const auto selectedTimeStep = timeNavigation->GetSelectedTimeStep();
+  const BaseGeometry::ConstPointer referenceGeometry = inputTimeGeometry->GetGeometryForTimeStep(
+    inputTimeGeometry->IsValidTimeStep(selectedTimeStep) ? selectedTimeStep : 0);
+  const auto* rendererGeometry = renderer->GetCurrentWorldGeometry();
+  if (referenceGeometry.IsNull() || nullptr == rendererGeometry)
+  {
+    return false;
+  }
+
+  return IsSliceIndexInverted(referenceGeometry, rendererGeometry, viewDirection);
 }

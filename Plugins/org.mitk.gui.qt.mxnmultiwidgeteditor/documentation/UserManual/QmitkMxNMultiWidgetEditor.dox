@@ -14,48 +14,50 @@
 	The MxN display is an alternative image viewer to the Standard display.
 	It is a more flexible, customizable approach to displaying images with a strong focus on displaying different images
 	simultaneously but independently.
-	Unlike than the Standard Display it allows to show a different image for each window view while also allowing independent image navigation.
+	Unlike the Standard Display it allows to show a different image for each window view while also allowing independent image navigation.
 	The number of window views can be freely chosen and anatomical view planes / view directions can be changed for each window view.
 
 \section org_mitk_editors_mxnmultiwidget_Working Working with the MxN display
 	The following sections describe how to work with the MxN display. The MxN display can be customized and several
 	properties can be set to modify the behavior.
 
-\subsection org_mitk_editors_mxnmultiwidget_Configuration Configuration Toolbar
-	The MxNDisplay is initialized with a single window view and a configuration toolbar on the right side.
-	In the toolbar you can find three icons / actions, where two buttons have an on/off state.
-	<table style="border: none;">
-		<tr><td>\imageMacro{mwLayout-dox.svg, "Layout button", 16.00}
-		<tr><td>\imageMacro{mwSynchronized-dox.svg, "Synchronize button", 16.00}
-			<td>\imageMacro{mwDesynchronized-dox.svg, "Desynchronize button", 16.00}
-		<tr><td>\imageMacro{mwMITK-dox.svg, "MITK mode button", 16.00}
-			<td>\imageMacro{mwPACS-dox.svg, "PACS mode button", 16.00}
-	</table>
-
-	<ul>
-		<li> Layout button: Choose a layout from presets or select a custom number of available window views and their layout in a grid
-		<li> Synchronization button: Enable or disable synchronized interaction across the window views
-		<li> Interaction mode button: Switch between the MITK interaction mouse mode and the PACS interaction mouse mode
-	</ul>
+\subsection org_mitk_editors_mxnmultiwidget_Configuration Configuring the display
+	The MxN display starts with a single window view. Its arrangement, the layout files and the
+	synchronization groups are configured in the MxN Layout Editor view
+	(see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Layout MxN display layout
 	There are several options to customize the MxN display layout.
 
-	Using the layout button from the configuration toolbar allows to customize the layout the following way:
+	The MxN Layout Editor offers them in two places:
 	<ul>
-		<li> By choosing the desired amount of windows and confirming via "Set multi widget layout". The window views are arranged in a rectangular grid, as specified.
-			Depending on the selected number of window views, existing window views will be removed or additional window views will be added.
-			New window views will have a sagittal view direction. Window views that stay untouched will keep their settings and continue displaying their selected data.
-		<li> By selecting one of the provided layout presets.
-		<li> By saving / loading a custom layout, either created using the previous methods and further refinement or by handcrafting a suitable file.
+		<li> Its "Layout" row at the top applies one of the presets that ship with MITK, loads a
+			layout file, or saves the current layout. A saved layout carries the synchronization
+			groups as well as the window arrangement, so saving is also how a change made purely
+			on the synchronization side is kept.
+		<li> The grid controls in the row below it add or remove a trailing row or column in
+			place, which leaves the existing window views and their settings untouched.
+		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
+			widget layout"), or for an arrangement derived from the loaded data ("Data-based
+			layout"). A new grid size re-flows the window views, in reading order, into a plain
+			grid: window views beyond the new size are removed, additional ones are added at the
+			end with a sagittal view direction, and the others keep their settings,
+			synchronization and selected data.
+			A data-based layout replaces all window views and synchronization groups, so the
+			view asks for confirmation first when synchronization goes beyond the default: a
+			second group, any link other than the default group's windowing, LUT and data
+			selection, or a window view detached from windowing or LUT. The window arrangement
+			itself is not protected; save it first if you want to keep it.
 	</ul>
 
-	\imageMacro{layoutWidget.png, "Layout widget" , 16.00}
+	\imageMacroEx{QmitkMxN_LayoutEditor.png, "The MxN Layout Editor view", 8, 360px}
 
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutFile Layout file format
-	Saved layouts are persisted as v2.0 JSON documents. The canonical reference for fields,
-	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v2.schema.json</tt>;
-	both the in-tree presets and any file produced by "Save layout" follow this schema.
+	Saved layouts are persisted as v3.0 JSON documents. The canonical reference for fields,
+	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v3.schema.json</tt>;
+	both the in-tree presets and any file produced by "Save..." follow this schema.
+	v2.0 documents remain loadable unchanged; per-dimension synchronization links and
+	per-group display names and colors are v3.0 additions.
 
 	Files written by older MITK releases use the v1.x format. The current editor does <b>not</b>
 	load v1.x files directly; loading one surfaces an error message that points at a one-shot
@@ -64,33 +66,69 @@
 	<tt>python3 Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py &lt;file.json&gt;</tt>
 
 	The script writes a v2.0 document to standard output (or to the path given via <tt>-o</tt>)
-	that the editor's "Load layout" action accepts unchanged.
-
-	By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons:
-	<ul>
-		<li> The crosshair button allows to toggle the crosshair and to fit the window to all visible data.
-		<li> The middle button expands the corresponding window to fullscreen.
-		<li> The right button allows you to choose between many different arrangements of the available windows.
-	</ul>
-
-	\imageMacro{layoutArrangements.png, "Layout arrangement", 16.00}
+	that the editor's "Load..." action accepts unchanged.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Synchronization Window synchronization
 	If data is displayed inside a window view you can interact with the window / loaded image using your mouse.
-	As long as the interaction synchronization is disabled (<img src="mwDesynchronized-dox.svg">), mouse interactions,
-	such as zooming, setting the point of interest, mouse wheel scrolling etc. will affect only the window view you click in.
-	If the interaction synchronization is enabled (<img src="mwSynchronized-dox.svg">), performing any of the mouse interactions inside a window view
-	will perform the same interaction in any other visible window view.
+	Navigation such as zooming, moving the image, setting the point of interest or scrolling through slices
+	affects the window view you interact with and every window view that shares a synchronization group with
+	it for that dimension (see \ref org_mitk_editors_mxnmultiwidget_DimSync). A window view without a group for
+	a dimension is navigated on its own. Scrolling in a window that shows a single slice steps through the
+	time steps for the whole application instead; it does not move the slice of the window's slice-linked
+	peers.
+
+	What a group keeps in step differs per dimension, and a few consequences are worth knowing:
+	<ul>
+		<li> <b>Pan is locked in world millimetres.</b> One gesture moves every member the same
+			distance in the patient, so a more zoomed-in window moves further on screen. The move
+			is applied along each window's own plane axes, so it points the same way in the patient
+			only for windows showing the same plane; across planes the in-plane vector is applied
+			as is.
+		<li> <b>Zoom is locked as a factor.</b> Members keep their zoom ratio to each other, not a
+			shared anatomical centre.
+		<li> <b>Crosshair is absolute.</b> Setting the point of interest moves every member onto the
+			same world point, which also changes their slices. A crosshair link therefore
+			cannot carry an offset.
+		<li> <b>Offsets are applied once and then kept.</b> A slice, zoom or pan offset is established
+			when a window joins its group or its offset is changed, and is kept because every later
+			change moves all members by the same amount. All offsets of a group, the first window's
+			included, count from one common reference, so setting an offset moves only that window;
+			the others stay where they are. At the end of the
+			slice range, or where the camera stops, a member can lose its offset; "Re-converge"
+			(context menu or group card) restores it. For slices it goes by the windows that are not
+			on the first or last slice, so the group stays where most of them are and only the
+			window that lost its offset moves; only when every window of the group is on an end of
+			its slice range does the group's first window decide.
+		<li> <b>A pan offset does not survive zooming.</b> A zoom centres on the point of the window
+			it was made in, which shifts each member's pan differently. Re-converge after zooming
+			a group whose members sit at a pan offset.
+		<li> <b>Windowing and LUT are per window.</b> New windows share level/window and colormap
+			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
+			taken out of windowing or LUT synchronization drops its own value and shows the image's
+			global level/window or colormap again; its controls then behave like the classic global
+			controls. The windows of a data-based layout are the
+			exception: they start without windowing and LUT synchronization.
+	</ul>
+
+	Slice and orientation links also decide which windows share a reference geometry: every
+	window connected to another through a shared slice or orientation group, directly or
+	through a chain, is fitted to one common geometry, because a slice step or a plane only
+	means the same place in the patient within one geometry. "Fit group views to visible data"
+	(context menu, or "Fit views to visible data" on a group card) re-initializes exactly that
+	connected set and re-applies its slice offsets. The application-wide actions - the Data
+	Manager's reinit and "Fit views to ..." - still reach every window, which collapses
+	per-group geometry; use the group fit or re-converge afterwards to restore it.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Interaction_Mode Mouse interaction mode
 	As mentioned before, you can use the mouse to interact with each window / loaded image.
-	There are two interaction modes which can be switched between using the interaction mode button:
+	There are two interaction modes which can be switched between with the "PACS-like mouse interaction"
+	check box of the MxN Layout Editor, or with the corresponding preference:
 	the MITK interaction mouse mode and the PACS interaction mouse mode.
 	If the PACS interaction mouse mode is selected, an interaction tool bar is added to the left side of the
 	MxN display: It allows to select the action to perform for the left mouse button.
 	The difference between the MITK and PACS mode is as follows:
 
-	MITK interaction mouse mode <img src="mwMITK-dox.svg">
+	MITK interaction mouse mode
 	<ul>
 		<li> left mouse button: setting the point of interest
 		<li> right mouse button: zooming in and out while moving the mouse
@@ -100,7 +138,7 @@
 		<li> left / right arrow key: stepping through the time steps
 	</ul>
 
-	PACS interaction mouse mode <img src="mwPACS-dox.svg">
+	PACS interaction mouse mode
 	<ul>
 		<li> left mouse button: depending on the selected mode in the interaction tool bar
 		<li> right mouse button: changing the level window for the topmost visible image under the mouse cursor
@@ -112,58 +150,286 @@
 		<li> left / right arrow key: stepping through the time steps
 	</ul>
 
-	The crosshair rotation modes are realized by the MITK interaction mouse mode. Selecting one of them
-	from the crosshair menu of a window view therefore leaves the PACS interaction mouse mode.
-
-\subsection org_mitk_editors_mxnmultiwidget_Utility Utility Menu
-	Each window view has a utility menu at the top with four UI elements that allow to perform the following actions:
+	Independent of the mode, these keys act on the window view you last clicked into:
 	<ul>
-		<li> Data selection button: Select which data should be selected and visible inside the window view
-		<li> Sync Group drop down menu: Select the current sync group to synchronize with other windows
-		<li> Slice slider: Navigate along the view direction of this window
-		<li> View direction drop down menu: Select the current anatomical view plane / view direction
+		<li> Menu key or Shift+F10: open the window's context menu (see
+			\ref org_mitk_editors_mxnmultiwidget_ContextMenu)
+		<li> Shift+F11: toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
 	</ul>
 
-	\imageMacro{utilityMenu.png, "Utility menu", 8.00}
+\subsection org_mitk_editors_mxnmultiwidget_Utility Utility Menu
+	Each window view has an MxN utility menu along its top edge. It is collapsed to a
+	thin strip by default to leave the image unobstructed and reveals - together with
+	the rest of the window's furniture - as one frame when the pointer approaches an
+	edge, without resizing the render window. It takes the place of the Standard
+	Display's built-in render-window menu: the crosshair and full-screen gestures that
+	menu offered are buttons of this strip. Its crosshair rotation modes are not offered in
+	the MxN Display.
+
+	The buttons sit together at the leading edge and the sync barcode reads as state at
+	the trailing edge, with only the maximize button beyond it, in the corner where a
+	window manager puts it. Its elements:
+	<ul>
+		<li> Data selection button: Select which data should be selected and visible inside the window view
+		<li> Navigator button: Switch the per-cell navigator between its compact and
+			expanded forms for every window at once (see \ref org_mitk_editors_mxnmultiwidget_Navigator)
+		<li> Crosshair button: Show or hide the crosshair in every window
+		<li> Clean-view button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
+		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
+			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
+			linked group's hue and left empty where the window is not synchronized. Pointing at one of its axis
+			glyphs shows the sync peek described below; clicking it opens the MxN Layout
+			Editor, or closes it if it is already visible (see
+			\ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
+		<li> Maximize button: Give this window the whole editor area, and bring the other
+			windows back
+	</ul>
+
+	Pointing at one of the barcode's axis glyphs and resting there for a moment brings
+	up a small plate in the middle of every window that has room for one. Each plate
+	shows that window's eight axes tinted by synchronization group, with the axis you
+	are pointing at enlarged, named above the row, and the window's own name below it.
+	The enlarged glyph grows in place and is outlined like a sticker, so it may overlap
+	its neighbours but never pushes them aside: the row keeps its shape wherever you point.
+	An axis the window synchronizes is drawn solid in its group's hue; one it does not
+	is faint and uncolored, whether or not it is the enlarged one - so a plate reads
+	both ways round, as the window's whole coupling and as the answer for the axis you
+	are on. Windows whose enlarged glyph carries the same hue are synchronized with
+	each other on that axis.
+
+	\imageMacroEx{QmitkMxN_SyncPeek.png, "The sync peek on the slice axis: the two upper windows share a slice group and the lower two do not synchronize slices", 16, 720px}
+
+	Where the windows are too narrow for a row of eight glyphs but tall enough, the
+	plates lay the axes out in two rows of four instead - pan, zoom, slice and crosshair
+	above orientation, windowing, LUT and data selection. The layout picks whichever
+	arrangement gives more windows a plate, and all plates use the same one, so an axis
+	is in the same place in every window.
+
+	Where the window sits at an offset from its group - a slice step away, a zoom factor
+	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value sits
+	directly beneath that axis's glyph, in the group's own hue, so the pair reads as one
+	object and the plate says both what this window is coupled to and how far it departs
+	from it. The axis you are pointing at grows its value along with its glyph, so the
+	answer is largest exactly where you are asking. Only slice, zoom and pan can be
+	offset at all, so that line is mostly empty and the few values on it are what the
+	eye lands on. On the window barcodes and the group cards, which have no room for a
+	number, the same offset shows as a filled upper-right corner on the axis box;
+	the group card marks that some member is offset without saying which.
+
+	Sliding along the row moves the emphasis as each glyph is reached and holds it over
+	the gaps in between, so the row does not flicker under the pointer. The plates stay
+	up for as long as the pointer is anywhere on the barcode and go away once it leaves
+	- nothing is pinned, and a single click still opens the layout editor. While the
+	layout editor is open the plates stay up on their own and become the place where
+	windows are arranged (see \ref org_mitk_views_mxnlayouteditor_Arrange).
+
+	Any axis answers, including one the window you are pointing from does not
+	synchronize: that is a legitimate question about the other windows. One limit is
+	worth knowing: a window too small to hold a legible plate shows none, rather than
+	shrinking the plates in every other window down to its size and making them harder
+	to read against each other.
+
+	A barcode squeezed too narrow for glyphs collapses to plain colour slots. Pointing
+	at it still brings the plates up - the answer is about the whole window, not only
+	about one axis - but a colour slot names no axis, so they come up with none
+	emphasised.
+
+	Slice scrolling lives in the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator),
+	and the view direction is changed by clicking the plane label
+	(\ref org_mitk_editors_mxnmultiwidget_View_Direction).
+
+	\imageMacroEx{QmitkMxN_UtilityMenu.png, "Utility menu of a window synchronized with two groups", 12, 560px}
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Readouts Edge readouts
+	A window view keeps navigation and intensity information on opposite sides so the
+	two never read as one. The always-on readouts are quiet and faint by default:
+	<ul>
+		<li> Bottom left (navigation): the view-plane label on the first line, and the
+			current <tt>slice/total</tt> on the second line. Time-resolved data adds a small
+			clock and <tt>time/total</tt> after the slice.
+		<li> Bottom right (intensity): the <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout,
+			beside the colorbar (see \ref org_mitk_editors_mxnmultiwidget_WindowingOverlay).
+		<li> Along the bottom edge: a thin hairline carrying the slice position as a tick;
+			for time-resolved data the current time step rides the same hairline as a small
+			triangle.
+	</ul>
+	The window's frame tells its group at a glance. It takes a group's hue when every axis
+	the window is linked on - the data selection included, which is always linked - names
+	that one group; a fresh window therefore reads in the hue of the default group.
+	A window whose linked axes name more than one group has a neutral gray frame, and the exact per-dimension coupling is read
+	from the sync barcode and the layout editor. The active window is marked by white
+	brackets in its corners, so it keeps its group hue.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Navigator The per-cell navigator
+	Each window view has its own navigator, drawn as minimal overlay sliders that reveal
+	with the window's furniture and thicken under the pointer. It has two forms, switched
+	for the whole editor by the navigator button in any utility menu:
+	<ul>
+		<li> Compact (default): a single in-plane slice slider, plus - for time-resolved
+			data - the global time slider.
+		<li> Expanded: three axis sliders in the window's own local order (the slice, then
+			in-plane horizontal and vertical; the plane itself is named by the plane label),
+			a click-to-edit coordinate offering both world-millimetre and voxel-index fields,
+			and the global time slider. Entering either unit moves the crosshair and updates
+			the other; clicking into a field selects its value, so typing replaces it.
+	</ul>
+	Which form a newly opened editor starts in is the persisted default set by the
+	"Expand the per-cell navigator by default" preference; the navigator button is the live,
+	editor-wide session toggle. Both drive this window's slice stepper and world crosshair
+	through the same path a mouse interaction uses, so a window linked on slice or crosshair
+	moves its group with it while an unlinked window moves on its own. The per-cell navigator
+	is therefore the way to slice or place the crosshair in one window independently - unlike
+	the docked Image Navigator, whose sliders track the single active window.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_ContextMenu Context menu
+	A right click into a window view (without dragging - the right-button gestures
+	keep working) opens a context menu with the view direction, entries that open the
+	data selection, the level/window entry and the coordinate entry, the sync actions
+	(re-converge, fit group views to visible data), the layout editor, and the toggles
+	maximized, show crosshair, clean view and expanded navigator, which switch the same
+	state as the strip's maximize, crosshair, clean-view and navigator buttons. With the keyboard, the Menu key or Shift+F10 opens the same menu for the window
+	you last clicked into. Shift+F11 toggles clean view while you work in the editor.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Data_Selection Data node selection
-	Using the data selection button of a window view you can open a data node selection dialog which shows the currently
-	selected data nodes for the window view.
-	"Currently selected" means that you can either decide to show all available data nodes from the data storage
-	or - for a better data node overview - only show an individually selected subset of the available data nodes.
-	You can either remove a node from the selection by clicking the "x" on a data node or use the "Change selection"
-	button to individually select data nodes.
-	The "Select all nodes" checkbox denotes which of the selection types is currently used - showing all available data nodes
-	or showing only a subset of data nodes. Checking the checkbox will reset the selection to all available data nodes.
-	
-	Selecting data nodes does not mean that this node always has to be visible in the window view (rendered). If you want to hide
-	a node, e.g. for temporarily inspecting underlying images, you can do so by clicking the "eye" icon for each selected data node.
-	
-	If you want to reset the window view to a specific node / image, you can use the "arrow" icon. This will reset the camera to focus
-	on the selected node, using default zoom and centered camera position.
-	If you want so reset the camera to focus on the whole scene / all selected nodes, you can use the window menu, see
-	\ref org_mitk_editors_mxnmultiwidget_Layout.
-	Resetting a window only affects the corresponding window view, regardless of any synchronization state.
+	The data selection button of a window view - or "Data..." in its context menu - opens the
+	list of data the window selects. The line at its top says with whom that selection is
+	shared: "Shared with main (4 windows)", or "Only this window" when no other window is in
+	the same selection group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group).
 
-\subsubsection org_mitk_editors_mxnmultiwidget_Sync_Group Sync Group
-  By default, all render windows share the same selection / visibilities, since they are all in the same sync group.
-  If you want to use individual selections for a window / group of windows, you can change the sync group by clicking on the
-  sync group dropdown and selecting either an existing group or creating a new one.
-  Any windows with the same sync group will synchronize their node selection, its order, and each node's visibility with each other.
-	This allows to show different images in different windows, or organize windows in groups that show the same data respectively.
-	It is still possible to have a synchronized mouse interaction, see \ref org_mitk_editors_mxnmultiwidget_Synchronization and
-	\ref org_mitk_editors_mxnmultiwidget_Interaction_Mode.
+	\imageMacroEx{QmitkMxN_DataSelection.png, "The data selection of a window that shares its selection with three others", 8, 320px}
 
-\subsubsection org_mitk_editors_mxnmultiwidget_Slice_Slider Slice selection slider
-	Displayed data is typically 3D data but each window view shows a 2D slice of the 3D volume. The direction in which the
-	3D volume is sliced is defined by the "view direction" (or "anatomical plane").
-	To define at which position in the view direction the 3D volume should be sliced, the slice selection slider can be used.
-	It can either be moved using the mouse or by using the appropriate mouse interaction (see above, e.g. mouse wheel scrolling).
+	A selection either takes all data, or an individually chosen subset:
+	<ul>
+		<li> "Select all data" takes every data node of the data storage, including data added
+			later. Checking it resets the selection to all data.
+		<li> "Choose data..." picks the data nodes individually, and turns "Select all data" off.
+		<li> The "x" on a row removes that node from the selection.
+	</ul>
+	The list is ordered as the data is drawn: data higher in the list is drawn on top. Drag a
+	row onto another to change the order.
+
+	Being selected does not mean being visible. The "eye" on a row hides or shows the node,
+	e.g. for inspecting the image underneath. Like the selection itself, visibility and order
+	are shared by every window in the same selection group; to hide something in one window
+	only, give that window a selection group of its own.
+
+	The "arrow" on a row fits this window to that image: default zoom, centered on it. It acts
+	on this window alone, regardless of any synchronization. To fit a group of windows to the
+	visible data, use "Fit group views to visible data" in the context menu.
+
+	The list also works from the keyboard: Space or Enter triggers the current cell - on the
+	name, it toggles visibility - and Delete removes the current row from the selection. The
+	data itself stays loaded.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Sync_Group Sharing a data selection
+	Which windows share a data selection is the eighth synchronization axis, next to the
+	seven dimensions (see \ref org_mitk_editors_mxnmultiwidget_DimSync), and it is assigned
+	the same way: in the MxN Layout Editor, on the window plates, the group cards or the
+	advanced matrix (see \ref org_mitk_views_mxnlayouteditor). Unlike the other axes, a
+	window is always in exactly one selection group. A new window joins the default group,
+	so all windows start out showing the same data. The default group is named "main" unless
+	a loaded layout names it otherwise.
+
+	Windows in the same selection group share their selection, its drawing order and each
+	node's visibility. Putting windows in different groups shows different data side by side,
+	or organizes windows into sets that each show their own data. Navigation is independent of
+	this: windows can share a selection and navigate separately, or show different data and
+	still scroll together (see \ref org_mitk_editors_mxnmultiwidget_Synchronization).
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Slice_Selection Slice selection
+	Displayed data is typically 3D but each window view shows a 2D slice of the volume,
+	sliced along the window's "view direction" (or "anatomical plane"). The slice position
+	is set with the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator) or
+	by the mouse (e.g. mouse-wheel scrolling). The current position is shown bottom-left as
+	<tt>slice/total</tt> and as a tick on the bottom hairline.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_View_Direction View direction
-	Each window view "is looking in" one of the three available view directions, namely "Axial", "Sagittal" or "Coronal".
-	You can change the view direction by switching to another anatomical plane in the view direction drop down menu.
-	Changing the view direction will reset the camera to its default for the new view direction, meaning default zoom and
-	centered camera position.
+	Each window view "is looking in" one of the three view directions, "Axial", "Sagittal"
+	or "Coronal", shown as the plane label in the window's bottom-left corner. Click that
+	label to pick another anatomical plane. Changing the view direction resets the camera to
+	its default for the new plane (default zoom, centered position). When the window is in an
+	orientation group, the change propagates to the group's other windows.
+
+\subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
+	Window views are coupled per dimension:
+	pan, zoom, slice, crosshair, orientation, windowing (level/window), and LUT (colormap).
+	Cells that share a named group for a dimension follow each other on exactly that
+	dimension. Slice, zoom, and pan links can additionally carry an offset relative to the
+	group (e.g. a movie-frame layout showing slices -1 / 0 / +1, or a detail view kept
+	twice as zoomed).
+
+	Every surface that shows synchronization - the sync barcode, the window plates, the
+	group cards and the column headers of the advanced matrix - uses one glyph per axis,
+	always in this order:
+	<table>
+		<tr><th>Axis</th><th>Glyph</th></tr>
+		<tr><td>Pan</td><td>four-way arrow</td></tr>
+		<tr><td>Zoom</td><td>magnifier</td></tr>
+		<tr><td>Slice</td><td>three stacked lines</td></tr>
+		<tr><td>Crosshair</td><td>cross with an open centre</td></tr>
+		<tr><td>Orientation</td><td>three axes meeting in one point</td></tr>
+		<tr><td>Windowing (level/window)</td><td>half-filled circle</td></tr>
+		<tr><td>LUT (colormap)</td><td>gradient bar</td></tr>
+		<tr><td>Data selection</td><td>eye</td></tr>
+	</table>
+	A glyph drawn in a group's hue is linked to that group; a faint, uncolored one is not
+	linked.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
+	The MxN Layout Editor is the authoritative view of the whole layout document: the
+	window arrangement, the layout file actions, and all synchronization groups. Open
+	it by clicking the sync barcode in any window's utility menu, with "Open layout
+	editor" from a window view's context menu, or via <i>Window &rarr; Show View</i>.
+	Clicking any window's sync barcode while the editor is visible closes it again.
+	As a dockable view it stays open during review sessions and doubles as a live
+	legend of the current coupling.
+
+	Its own manual page describes arranging windows on their plates, the group cards and the advanced
+	link matrix: \ref org_mitk_views_mxnlayouteditor.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_WindowingOverlay Level/window and colormap overlay
+	The intensity of the topmost visible image is controlled from the right edge and the
+	bottom-right corner:
+	<ul>
+		<li> The <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout sits bottom-right, beside
+			the colorbar. It is always visible by default; the preference
+			"Show level/window readout in render windows" switches it to proximity-revealed
+			instead. It highlights under the pointer; click it to open numeric level/window
+			entry.
+		<li> The colorbar along the right edge shows the image's actual colormap as a thin
+			strip. On reveal it widens into a legend with a value tick scale (the current
+			level marked in the windowing group's hue) and gains a colormap picker chip.
+			Drag the bar's body to shift the level and its ends to move the window bounds.
+	</ul>
+	For a window in a windowing or LUT group - which every new window is, through the default
+	group, except the windows of a data-based layout - these controls drive every group member (each keeping its relative
+	difference during drags) and leave other windows and the node-global values untouched;
+	the global level/window slider intentionally does not affect grouped windows. Only a
+	window taken out of windowing or LUT synchronization altogether behaves like the classic
+	global controls.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_CleanView Clean view
+	The clean-view button in a window view's utility menu, or Shift+F11, hides all MxN
+	viewport furniture in every window of the editor (readouts, colorbars, navigator, and
+	the utility strip itself), e.g. for taking clean screenshots with external tools. The
+	mode is sticky until toggled off and applies to windows added later as well. Because the
+	utility strip is hidden while clean view is active, switch it back off with Shift+F11 or
+	from the right-click context menu (see \ref org_mitk_editors_mxnmultiwidget_ContextMenu),
+	which stays available; clean view is a session state and is not saved with the layout.
+
+\subsection org_mitk_editors_mxnmultiwidget_Preferences Preferences
+	The MxN Display preference page (<i>Window &rarr; Preferences</i>) carries, besides the
+	general render-window options, these defaults:
+	<ul>
+		<li> "Show level/window readout in render windows" (default on): keep the W/L readout
+			always visible; when off it follows the proximity reveal like the rest of the
+			furniture.
+		<li> "Expand the per-cell navigator by default" (default off): start each window's
+			navigator in its expanded form (the full crosshair plus coordinate entry) instead
+			of the compact slice slider. The navigator button still toggles the mode live for the
+			whole editor at any time.
+		<li> "Use PACS like mouse interaction" (default off): start in the PACS interaction
+			mouse mode (see \ref org_mitk_editors_mxnmultiwidget_Interaction_Mode).
+	</ul>
 
 */

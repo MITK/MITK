@@ -27,7 +27,7 @@ found in the LICENSE file.
  *   - AddSynchronizationGroup is idempotent
  *   - SetSynchronizationGroup auto-creates, moves between groups, and is
  *     edge-idempotent on the same group
- *   - NextFreeSyncGroupIndex / OnCreateNewSyncGroupRequested pick gaps
+ *   - NextFreeSyncGroupIndex picks gaps
  *
  * The test surfaces the protected 'GetSyncGroupConnector' / 'GetSyncGroupCount'
  * accessors via a thin subclass to inspect connector identity and registered
@@ -51,13 +51,15 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Add_ThrowsWithoutDataStorage);
   MITK_TEST(Add_EmitsSignalOnFirstCall);
   MITK_TEST(Add_IsIdempotent);
+  MITK_TEST(Add_ExplicitNameTakenByOtherIndex_Throws);
+  MITK_TEST(Add_InvalidExplicitName_Throws);
   MITK_TEST(Set_RejectsNullWidget);
   MITK_TEST(Set_AutoCreatesMissingGroup);
   MITK_TEST(Set_AssignsWidgetToTargetGroup);
   MITK_TEST(Set_MovesWidgetBetweenGroups);
   MITK_TEST(Set_IsIdempotentOnSameGroup);
   MITK_TEST(NextFreeSyncGroupIndex_PicksLowestUnused);
-  MITK_TEST(OnCreateNewSyncGroupRequested_AssignsNextFree);
+  MITK_TEST(SetSelectedPosition_UnknownWindowIsIgnored);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -203,6 +205,33 @@ public:
                                  false, firstConnector->GetSelectionMode());
   }
 
+  void Add_ExplicitNameTakenByOtherIndex_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.AddSynchronizationGroup(1, "main");
+    AddedRecorder rec(widget);
+
+    CPPUNIT_ASSERT_THROW(widget.AddSynchronizationGroup(3, "main"), mitk::Exception);
+
+    CPPUNIT_ASSERT_MESSAGE("A rejected name must not leave a connector behind",
+                           nullptr == ConnectorOf(widget, 3));
+    CPPUNIT_ASSERT_EQUAL(std::size_t{1}, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A rejected name must not announce a group", 0, rec.count);
+  }
+
+  void Add_InvalidExplicitName_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    AddedRecorder rec(widget);
+
+    CPPUNIT_ASSERT_THROW(widget.AddSynchronizationGroup(2, "not/url safe"), mitk::Exception);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t{0}, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL(0, rec.count);
+  }
+
   // ---------- Set ----------
 
   void Set_RejectsNullWidget()
@@ -304,7 +333,7 @@ public:
       true, connector->GetSelectionMode());
   }
 
-  // ---------- NextFreeSyncGroupIndex / OnCreateNewSyncGroupRequested ----------
+  // ---------- NextFreeSyncGroupIndex ----------
 
   void NextFreeSyncGroupIndex_PicksLowestUnused()
   {
@@ -324,22 +353,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(4, widget.NextFreeSyncGroupIndex());
   }
 
-  void OnCreateNewSyncGroupRequested_AssignsNextFree()
+  void SetSelectedPosition_UnknownWindowIsIgnored()
   {
-    TestableQmitkMxNMultiWidget widget;
+    QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
 
-    widget.AddSynchronizationGroup(1);
-    widget.AddSynchronizationGroup(3);
-
-    QmitkSynchronizedNodeSelectionWidget nodeWidget(nullptr);
-    nodeWidget.SetDataStorage(m_DataStorage);
-
-    widget.OnCreateNewSyncGroupRequested(&nodeWidget);
-
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should pick gap index 2, not 4",
-                                 2, nodeWidget.GetSyncGroup());
-    CPPUNIT_ASSERT(nullptr != ConnectorOf(widget, 2));
+    mitk::Point3D position;
+    position.Fill(0.0);
+    CPPUNIT_ASSERT_NO_THROW(widget.SetSelectedPosition(position, QStringLiteral("mxn__nosuchwindow")));
+    CPPUNIT_ASSERT_EQUAL(1u, widget.GetNumberOfRenderWindowWidgets());
   }
 };
 

@@ -1,0 +1,674 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include "QmitkTestPopupProbe.h"
+#include "QmitkTestQApplication.h"
+
+#include <QmitkMxNCellOverlay.h>
+#include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowUtilityWidget.h>
+#include <QmitkRenderWindowWidget.h>
+
+#include <mitkBaseRenderer.h>
+#include <mitkDisplayActionEvents.h>
+#include <mitkImageGenerator.h>
+#include <mitkInteractionEvent.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkRenderingManager.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkStepper.h>
+
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+
+#include <QApplication>
+#include <QContextMenuEvent>
+#include <QDoubleSpinBox>
+#include <QFile>
+#include <QFrame>
+#include <QKeyEvent>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QSpinBox>
+#include <QTableView>
+#include <QTimer>
+
+#include <cmath>
+#include <memory>
+#include <vector>
+
+/**
+ * Engine-facing tests for the per-cell navigator's synchronization contract:
+ * the navigator drives the slice stepper (Slice dimension) and the world
+ * crosshair (Crosshair dimension) by firing the same display-action events an
+ * interaction would, so a linked cell follows its group and an unlinked cell
+ * moves alone. Presentation and gesture are manual acceptance.
+ */
+class QmitkMxNNavigatorTestSuite : public mitk::TestFixture
+{
+  CPPUNIT_TEST_SUITE(QmitkMxNNavigatorTestSuite);
+  MITK_TEST(CrosshairEvent_PropagatesToGroupOnly);
+  MITK_TEST(SliceEvent_PropagatesToGroupOnly);
+  MITK_TEST(NavigatorMode_TogglesEditorWide);
+  MITK_TEST(NavigatorDepthLabel_OmitsRedundantOrientation);
+  MITK_TEST(NavigatorSlice_DrivesStepperAndGroup);
+  MITK_TEST(NavigatorSlice_FollowsImageIndexDirection);
+  MITK_TEST(NavigatorInPlaneMove_MapsToLocalAxes);
+  MITK_TEST(NavigatorVoxelIndex_SetsCrosshair);
+  MITK_TEST(SyncBarcode_ReflectsMembership);
+  MITK_TEST(DataPopupScope_FollowsSelectionGroup);
+  MITK_TEST(DataPopupTable_KeyboardTogglesVisibility);
+  MITK_TEST(ContextMenu_OpensFromKeyboard);
+  MITK_TEST(ContextMenu_PressTriggerOrderOpensOnlyOnRelease);
+  MITK_TEST(ContextMenu_ReleaseTriggerOrderOpensOnce);
+  MITK_TEST(ContextMenu_RightDragOpensNothing);
+  MITK_TEST(CoordinateEntry_KeepsBothUnitsInStep);
+  MITK_TEST(SyncBarcode_LayoutFollowsGeometry);
+  MITK_TEST(LayoutEditorRequest_BarcodeTogglesContextMenuShows);
+  MITK_TEST(AxisGlyphResources_PresentAndThemeable);
+  CPPUNIT_TEST_SUITE_END();
+
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::Image::Pointer m_Image;
+  mitk::DataNode::Pointer m_ImageNode;
+  std::unique_ptr<QmitkMxNMultiWidget> m_Editor;
+
+public:
+  void setUp() override
+  {
+    EnsureQApplication();
+
+    m_DataStorage = mitk::StandaloneDataStorage::New();
+    m_Image = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f);
+
+    m_ImageNode = mitk::DataNode::New();
+    m_ImageNode->SetName("image");
+    m_ImageNode->SetData(m_Image);
+    m_ImageNode->SetIntProperty("layer", 0);
+    m_DataStorage->Add(m_ImageNode);
+
+    m_Editor = std::make_unique<QmitkMxNMultiWidget>();
+    m_Editor->SetDataStorage(m_DataStorage);
+    m_Editor->InitializeMultiWidget();
+    m_Editor->SetLayout(1, 3); // cells: mxn__widget0 .. mxn__widget2
+
+    for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        cell->GetRenderWindow()->GetVtkRenderWindow(), m_Image->GetTimeGeometry());
+    }
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      SliceStepper(i)->SetPos(4);
+    }
+  }
+
+  void tearDown() override
+  {
+    m_Editor.reset();
+    m_ImageNode = nullptr;
+    m_Image = nullptr;
+    m_DataStorage = nullptr;
+  }
+
+  static QString CellId(std::size_t index)
+  {
+    return QStringLiteral("mxn__widget") + QString::number(index);
+  }
+
+  mitk::BaseRenderer* Renderer(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    CPPUNIT_ASSERT(nullptr != cell);
+    return mitk::BaseRenderer::GetInstance(cell->GetRenderWindow()->GetVtkRenderWindow());
+  }
+
+  mitk::Stepper* SliceStepper(std::size_t index) const
+  {
+    auto* stepper = Renderer(index)->GetSliceNavigationController()->GetStepper();
+    CPPUNIT_ASSERT(nullptr != stepper);
+    return stepper;
+  }
+
+  mitk::Point3D Crosshair(std::size_t index) const
+  {
+    return m_Editor->GetSelectedPosition(CellId(index));
+  }
+
+  QmitkMxNCellOverlay* Overlay(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* overlay = cell->findChild<QmitkMxNCellOverlay*>();
+    CPPUNIT_ASSERT(nullptr != overlay);
+    return overlay;
+  }
+
+  template <typename TDisplayEvent, typename... TArgs>
+  void Fire(std::size_t senderIndex, TArgs&&... args)
+  {
+    auto interactionEvent = mitk::InteractionEvent::New(Renderer(senderIndex));
+    m_Editor->GetInteractionEventHandler()->InvokeEvent(
+      TDisplayEvent(interactionEvent, std::forward<TArgs>(args)...));
+  }
+
+  static double Distance(const mitk::Point3D& a, const mitk::Point3D& b)
+  {
+    return a.EuclideanDistanceTo(b);
+  }
+
+  void CrosshairEvent_PropagatesToGroupOnly()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Crosshair, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Crosshair, "nav");
+
+    const mitk::Point3D before2 = Crosshair(2);
+
+    // A known in-volume world point (16 mm cube, 1 mm spacing), off the
+    // current position on every axis.
+    mitk::Point3D target;
+    target[0] = 6.0;
+    target[1] = 9.0;
+    target[2] = 3.0;
+    Fire<mitk::DisplaySetCrosshairEvent>(0, target);
+
+    // The sender and its Crosshair-group peer land on the same position; the
+    // unlinked cell keeps its own.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+      "Crosshair link must move the group peer to the sender's position",
+      0.0, Distance(Crosshair(0), Crosshair(1)), 1e-3);
+    CPPUNIT_ASSERT_MESSAGE("The sender crosshair actually moved",
+      Distance(Crosshair(0), before2) > 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+      "An unlinked cell must not follow a crosshair change",
+      0.0, Distance(Crosshair(2), before2), 1e-3);
+  }
+
+  void SliceEvent_PropagatesToGroupOnly()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+
+    Fire<mitk::DisplayScrollEvent>(0, 1, false);
+
+    CPPUNIT_ASSERT_EQUAL(5u, SliceStepper(0)->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice-group peer follows", 5u, SliceStepper(1)->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlinked cell does not follow", 4u, SliceStepper(2)->GetPos());
+  }
+
+  void NavigatorMode_TogglesEditorWide()
+  {
+    m_Editor->SetNavigatorExpanded(true);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The mode toggle reaches every cell",
+        this->Overlay(i)->IsNavigatorExpanded());
+    }
+    m_Editor->SetNavigatorExpanded(false);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      CPPUNIT_ASSERT(!this->Overlay(i)->IsNavigatorExpanded());
+    }
+  }
+
+  void NavigatorDepthLabel_OmitsRedundantOrientation()
+  {
+    // The depth row is just "Slice": the orientation is already shown by the
+    // plane label, so it is not repeated here for any view direction.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    CPPUNIT_ASSERT_EQUAL(std::string("Slice"),
+      this->Overlay(0)->NavigatorDepthLabel().toStdString());
+
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
+    CPPUNIT_ASSERT_EQUAL(std::string("Slice"),
+      this->Overlay(0)->NavigatorDepthLabel().toStdString());
+  }
+
+  void NavigatorSlice_DrivesStepperAndGroup()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+
+    // The depth row drives the cell's own slice stepper (through the display
+    // broadcast, so the slice group follows and an unlinked cell does not).
+    this->Overlay(0)->NavigatorSetSlice(6);
+
+    CPPUNIT_ASSERT_EQUAL(6u, SliceStepper(0)->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Slice-group peer follows the navigator", 6u, SliceStepper(1)->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unlinked cell stays put", 4u, SliceStepper(2)->GetPos());
+  }
+
+  void NavigatorSlice_FollowsImageIndexDirection()
+  {
+    // A fresh MxN cell starts Sagittal (QmitkRenderWindowWidget's own
+    // default, not Axial), so pin the plane explicitly for each case;
+    // SetViewDirection also rebuilds the SNC geometry for the new plane
+    // (through InitializeViewByBoundingObjects), which is what gives the
+    // stepper its slice count below.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Axial slicing steps through the image's 8-voxel z extent",
+      8u, SliceStepper(0)->GetSteps());
+
+    // NavigatorSetSlice takes the displayed (image) index. For this
+    // identity-direction image an axial renderer's slice axis runs opposite
+    // the image's z index, so the displayed index 6 sits at stepper
+    // position 8-1-6 = 1.
+    this->Overlay(0)->NavigatorSetSlice(6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Axial: displayed index 6 is stepper position 1",
+      1u, SliceStepper(0)->GetPos());
+
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Sagittal slicing steps through the image's 16-voxel x extent",
+      16u, SliceStepper(1)->GetSteps());
+
+    // A sagittal renderer's slice axis runs the same direction as the image
+    // index, so the displayed index and the stepper position coincide.
+    this->Overlay(1)->NavigatorSetSlice(6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Sagittal: displayed index 6 is stepper position 6",
+      6u, SliceStepper(1)->GetPos());
+  }
+
+  void NavigatorInPlaneMove_MapsToLocalAxes()
+  {
+    const auto* plane = Renderer(0)->GetCurrentWorldPlaneGeometry();
+    CPPUNIT_ASSERT(nullptr != plane);
+    mitk::Vector3D rightUnit = plane->GetAxisVector(0);
+    mitk::Vector3D upUnit = plane->GetAxisVector(1);
+    rightUnit.Normalize();
+    upUnit.Normalize();
+
+    // A horizontal navigator move maps to the plane's own right axis (oblique-
+    // safe), leaving the in-plane vertical component unchanged.
+    const mitk::Point3D before = Crosshair(0);
+    constexpr double delta = 3.0;
+    this->Overlay(0)->NavigatorMoveInPlane(delta, 0.0);
+    const mitk::Vector3D moved = Crosshair(0) - before;
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Horizontal move follows the plane right axis",
+      delta, moved * rightUnit, 1.0);
+    CPPUNIT_ASSERT_MESSAGE("Horizontal move does not drift along the vertical axis",
+      std::abs(moved * upUnit) < 1.0);
+  }
+
+  void NavigatorVoxelIndex_SetsCrosshair()
+  {
+    mitk::Point3D index;
+    index[0] = 5.0;
+    index[1] = 6.0;
+    index[2] = 3.0;
+    this->Overlay(0)->NavigatorSetVoxelIndex(index);
+
+    mitk::Point3D expected;
+    m_Image->GetGeometry()->IndexToWorld(index, expected);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Voxel-index entry lands on the reference geometry voxel",
+      0.0, Crosshair(0).EuclideanDistanceTo(expected), 1.0);
+  }
+
+  void SyncBarcode_ReflectsMembership()
+  {
+    // The Synchronize macro links the navigation bundle (pan/zoom/slice/
+    // crosshair) editor-wide and fires SyncLinksChanged, which refreshes the
+    // per-cell utility-strip barcodes.
+    m_Editor->Synchronize(true);
+
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* utility = cell->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
+    CPPUNIT_ASSERT(nullptr != barcode);
+
+    const auto axisSlots = barcode->Slots();
+    // Seven per-dimension axes plus the selection axis.
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+                         static_cast<int>(axisSlots.size()));
+    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+    {
+      const auto dimension = QmitkMxNAllSyncDimensions[i];
+      const bool inNavigationBundle =
+        dimension == QmitkMxNSyncDimension::Pan || dimension == QmitkMxNSyncDimension::Zoom
+        || dimension == QmitkMxNSyncDimension::Slice || dimension == QmitkMxNSyncDimension::Crosshair;
+      // Synchronize links the navigation bundle to "sync"; a fresh cell also links
+      // Windowing and LUT to "main" by default. Only Orientation stays unsynced.
+      const bool expectedFilled = inNavigationBundle
+        || dimension == QmitkMxNSyncDimension::Windowing || dimension == QmitkMxNSyncDimension::Lut;
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "A linked dimension is a filled barcode slot in the group hue; an unsynced one is a gap",
+        expectedFilled, axisSlots[static_cast<int>(i)].color.isValid());
+    }
+    // The selection slot shows the cell's selection group consistently, including
+    // the default group every cell starts in (it is a real, shared selection
+    // group, not a "no sync" placeholder).
+    CPPUNIT_ASSERT_MESSAGE(
+      "The selection slot shows the cell's (default) selection group",
+      axisSlots.back().color.isValid());
+  }
+
+  QString DataScopeText(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* utility = cell->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    return utility->GetNodeSelectionWidget()->GetScopeText();
+  }
+
+  void DataPopupScope_FollowsSelectionGroup()
+  {
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every cell starts in the shared default group",
+      std::string("Shared with main (3 windows)"), DataScopeText(0).toStdString());
+
+    m_Editor->SetCellSelectionGroup(CellId(2), "solo");
+    m_Editor->RefreshSyncControls();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The remaining members report the smaller group",
+      std::string("Shared with main (2 windows)"), DataScopeText(0).toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A group of one is not presented as sharing",
+      std::string("Only this window"), DataScopeText(2).toStdString());
+  }
+
+  void DataPopupTable_KeyboardTogglesVisibility()
+  {
+    m_Editor->SetCellSelectionGroup(CellId(2), "solo");
+    m_Editor->RefreshSyncControls();
+
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    CPPUNIT_ASSERT(nullptr != cell);
+    auto* nodeSelection = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+    auto* table = nodeSelection->findChild<QTableView*>();
+    CPPUNIT_ASSERT(nullptr != table);
+    CPPUNIT_ASSERT_EQUAL(1, table->model()->rowCount());
+
+    CPPUNIT_ASSERT(m_ImageNode->IsVisible(Renderer(0)));
+    // The name cell is current, as after arrowing into the list; Space on it
+    // toggles the row's visibility.
+    table->setCurrentIndex(table->model()->index(0, 0));
+    QKeyEvent space(QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral(" "));
+    QCoreApplication::sendEvent(table, &space);
+
+    CPPUNIT_ASSERT_MESSAGE("Space hides the data in this window", !m_ImageNode->IsVisible(Renderer(0)));
+    CPPUNIT_ASSERT_MESSAGE("A window sharing the selection follows", !m_ImageNode->IsVisible(Renderer(1)));
+    CPPUNIT_ASSERT_MESSAGE("A window with its own selection is unaffected", m_ImageNode->IsVisible(Renderer(2)));
+  }
+
+  void SyncBarcode_LayoutFollowsGeometry()
+  {
+    using Layout = QmitkMxNSyncBarcodeWidget::BarcodeLayout;
+    // 'slotCount', not 'slots': the latter is the Qt macro and expands to nothing.
+    const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
+
+    // A wide, short strip (the per-cell utility row) draws a glyph row.
+    const auto strip = QmitkMxNSyncBarcodeWidget::ComputeLayout(200, 18, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("wide short strip shows glyphs", strip.mode == Layout::Mode::Glyphs);
+
+    // A narrow rect never wraps, however tall: one row has no legible box.
+    const auto narrow = QmitkMxNSyncBarcodeWidget::ComputeLayout(80, 80, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("a narrow rect collapses to the color bar", narrow.mode == Layout::Mode::ColorBar);
+
+    // Too small for a legible glyph: collapse to color slots.
+    const auto tiny = QmitkMxNSyncBarcodeWidget::ComputeLayout(40, 14, slotCount);
+    CPPUNIT_ASSERT_MESSAGE("a cramped strip collapses to the color bar",
+                           tiny.mode == Layout::Mode::ColorBar);
+  }
+
+  void LayoutEditorRequest_BarcodeTogglesContextMenuShows()
+  {
+    // A second barcode press closes the editor the first one opened; the
+    // context menu's "Open layout editor" must never close it.
+    std::vector<QmitkMxNMultiWidget::LayoutEditorRequest> requests;
+    const auto connection = QObject::connect(
+      m_Editor.get(), &QmitkMxNMultiWidget::LayoutEditorRequested,
+      [&requests](QmitkMxNMultiWidget::LayoutEditorRequest request) { requests.push_back(request); });
+
+    auto* utility = m_Editor->GetRenderWindowWidget(CellId(0))->GetUtilityWidget();
+    CPPUNIT_ASSERT(nullptr != utility);
+    emit utility->LayoutEditorRequested();
+    m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
+    QObject::disconnect(connection);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), requests.size());
+    CPPUNIT_ASSERT_MESSAGE("A barcode press toggles the editor",
+                           QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == requests[0]);
+    CPPUNIT_ASSERT_MESSAGE("A context-menu request only shows it",
+                           QmitkMxNMultiWidget::LayoutEditorRequest::Show == requests[1]);
+  }
+
+  void ContextMenu_OpensFromKeyboard()
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+
+    // The menu runs its own event loop; read it from inside that loop, then
+    // close it so the request returns.
+    QStringList entries;
+    QString cleanViewShortcut;
+    bool opened = false;
+    // Scopes the timer: if no menu loop runs it, it dies with this test.
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      opened = nullptr != menu;
+      if (!opened)
+      {
+        return;
+      }
+      for (const auto* action : menu->actions())
+      {
+        entries << action->text();
+        if (action->text() == QStringLiteral("Clean view"))
+        {
+          cleanViewShortcut = action->shortcut().toString();
+        }
+      }
+      menu->close();
+    });
+
+    // Not preceded by a right-button press: a keyboard request has none, and
+    // must not be mistaken for the release of a right-button drag.
+    QContextMenuEvent request(QContextMenuEvent::Keyboard, renderWindow->rect().center(),
+                              renderWindow->mapToGlobal(renderWindow->rect().center()));
+    QCoreApplication::sendEvent(renderWindow, &request);
+
+    CPPUNIT_ASSERT_MESSAGE("The Menu key opens the window's context menu", opened);
+    for (const auto* expected : { "Data...", "Set level/window...", "Go to coordinate..." })
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("The menu carries ") + expected,
+                             entries.contains(QString::fromLatin1(expected)));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The clean-view entry advertises its key",
+      QmitkMxNMultiWidget::CleanViewShortcut().toString().toStdString(), cleanViewShortcut.toStdString());
+  }
+
+  /** Deliver 'event' to cell 0's overlay as the render window's own stream
+   *  does. Returns whether the overlay kept it from the render window. */
+  bool FilterRenderWindowEvent(QEvent* event) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    return static_cast<QObject*>(this->Overlay(0))->eventFilter(renderWindow, event);
+  }
+
+  bool SendRightButton(QEvent::Type type, const QPoint& local) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    const Qt::MouseButton button = QEvent::MouseMove == type ? Qt::NoButton : Qt::RightButton;
+    const Qt::MouseButtons buttons = QEvent::MouseButtonRelease == type ? Qt::MouseButtons(Qt::NoButton)
+                                                                        : Qt::MouseButtons(Qt::RightButton);
+    QMouseEvent event(type, QPointF(local), QPointF(local), QPointF(renderWindow->mapToGlobal(local)), button,
+                      buttons, Qt::NoModifier);
+    return this->FilterRenderWindowEvent(&event);
+  }
+
+  bool SendMouseContextMenu(const QPoint& local) const
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+    QContextMenuEvent request(QContextMenuEvent::Mouse, local, renderWindow->mapToGlobal(local));
+    return this->FilterRenderWindowEvent(&request);
+  }
+
+  void ContextMenu_PressTriggerOrderOpensOnlyOnRelease()
+  {
+    // Where the platform synthesizes the context-menu request on the press
+    // (UNIX), it arrives before the press could have become a drag. Opening
+    // there would swallow every right-button gesture.
+    const QPoint at(20, 20);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, at);
+    CPPUNIT_ASSERT_MESSAGE("A mouse context-menu request is always consumed", this->SendMouseContextMenu(at));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("No menu opens on the press", 0, probe.Count());
+
+    CPPUNIT_ASSERT_MESSAGE("The release still reaches the render window",
+                           !this->SendRightButton(QEvent::MouseButtonRelease, at));
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The click opens the menu on its release", 1, probe.Count());
+  }
+
+  void ContextMenu_ReleaseTriggerOrderOpensOnce()
+  {
+    // Windows synthesizes the request after the release.
+    const QPoint at(20, 20);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, at);
+    this->SendRightButton(QEvent::MouseButtonRelease, at);
+    this->SendMouseContextMenu(at);
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A right click opens exactly one menu", 1, probe.Count());
+  }
+
+  void ContextMenu_RightDragOpensNothing()
+  {
+    const QPoint from(20, 20);
+    const QPoint to = from + QPoint(4 * QApplication::startDragDistance(), 0);
+    QmitkTestPopupProbe probe;
+    this->SendRightButton(QEvent::MouseButtonPress, from);
+    this->SendMouseContextMenu(from);
+    this->SendRightButton(QEvent::MouseMove, to);
+    this->SendRightButton(QEvent::MouseButtonRelease, to);
+    this->SendMouseContextMenu(to);
+    QmitkTestPopupProbe::Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A right drag is a gesture, not a menu request", 0, probe.Count());
+  }
+
+  void CoordinateEntry_KeepsBothUnitsInStep()
+  {
+    auto* renderWindow = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow();
+
+    QObject timerContext;
+    QTimer::singleShot(0, &timerContext, [&]()
+    {
+      auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+      if (nullptr == menu)
+      {
+        return;
+      }
+      for (auto* action : menu->actions())
+      {
+        if (action->text() == QStringLiteral("Go to coordinate..."))
+        {
+          action->trigger();
+        }
+      }
+      menu->close();
+    });
+    QContextMenuEvent request(QContextMenuEvent::Keyboard, renderWindow->rect().center(),
+                              renderWindow->mapToGlobal(renderWindow->rect().center()));
+    QCoreApplication::sendEvent(renderWindow, &request);
+    QCoreApplication::processEvents();  // the entry opens once the menu has closed
+
+    QFrame* popup = nullptr;
+    for (auto* frame : this->Overlay(0)->findChildren<QFrame*>())
+    {
+      if (frame->isWindow() && frame->isVisible())
+      {
+        popup = frame;
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE("The coordinate entry opened from the menu", nullptr != popup);
+    const auto worldBoxes = popup->findChildren<QDoubleSpinBox*>();
+    const auto indexBoxes = popup->findChildren<QSpinBox*>();
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(worldBoxes.size()));
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(indexBoxes.size()));
+
+    // Entering world coordinates updates the index row ...
+    mitk::Point3D targetIndex;
+    targetIndex[0] = 5.0;
+    targetIndex[1] = 6.0;
+    targetIndex[2] = 3.0;
+    mitk::Point3D targetWorld;
+    m_Image->GetGeometry()->IndexToWorld(targetIndex, targetWorld);
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      worldBoxes[axis]->setValue(targetWorld[axis]);
+    }
+    emit worldBoxes[0]->editingFinished();
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A world entry refreshes the voxel index",
+        static_cast<int>(targetIndex[axis]), indexBoxes[axis]->value());
+    }
+
+    // ... and entering an index updates the world row.
+    targetIndex[0] = 2.0;
+    targetIndex[1] = 3.0;
+    targetIndex[2] = 1.0;
+    m_Image->GetGeometry()->IndexToWorld(targetIndex, targetWorld);
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      indexBoxes[axis]->setValue(static_cast<int>(targetIndex[axis]));
+    }
+    emit indexBoxes[0]->editingFinished();
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An index entry refreshes the world position",
+        targetWorld[axis], worldBoxes[axis]->value(), 0.01);
+    }
+
+    // Clicking into a field selects its value, so typing replaces it instead of
+    // landing behind the last decimal, where the validator rejects it.
+    auto* clickedEdit = worldBoxes[1]->findChild<QLineEdit*>();
+    CPPUNIT_ASSERT(nullptr != clickedEdit);
+    clickedEdit->deselect();
+    QFocusEvent clickFocus(QEvent::FocusIn, Qt::MouseFocusReason);
+    QCoreApplication::sendEvent(worldBoxes[1], &clickFocus);
+    QCoreApplication::processEvents();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A click into a field selects its whole value",
+      clickedEdit->text().toStdString(), clickedEdit->selectedText().toStdString());
+
+    popup->close();
+  }
+
+  void AxisGlyphResources_PresentAndThemeable()
+  {
+    // Every axis glyph the barcode draws must be an embedded resource carrying
+    // the recolor placeholder, so it can be tinted to a group hue at load. The
+    // actual rasterization is a visual-acceptance concern, not asserted here.
+    const QStringList paths = {
+      QStringLiteral(":/Qmitk/mxn-axis-pan.svg"),         QStringLiteral(":/Qmitk/mxn-axis-zoom.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-slice.svg"),       QStringLiteral(":/Qmitk/mxn-axis-crosshair.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-orientation.svg"), QStringLiteral(":/Qmitk/mxn-axis-windowing.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-lut.svg"),         QStringLiteral(":/Qmitk/mxn-axis-selection.svg") };
+    for (const auto& path : paths)
+    {
+      QFile file(path);
+      CPPUNIT_ASSERT_MESSAGE(("axis glyph resource is registered: " + path).toStdString(),
+                             file.open(QIODevice::ReadOnly));
+      const QString svg = QString::fromUtf8(file.readAll());
+      CPPUNIT_ASSERT_MESSAGE(("axis glyph carries the recolor placeholder: " + path).toStdString(),
+                             svg.contains(QStringLiteral("#00ff00"), Qt::CaseInsensitive));
+    }
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(QmitkMxNNavigator)

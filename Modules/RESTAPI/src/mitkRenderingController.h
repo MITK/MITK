@@ -265,7 +265,7 @@ namespace mitk
     /**
      * \brief Handle PUT /rendering/editors/mxn/layout.
      *
-     * Applies a v2.0 layout document. Response 200 echoes the freshly
+     * Applies a layout document (2.0 or 3.0). Response 200 echoes the freshly
      * serialized layout (so callers don't need a follow-up GET to refresh
      * cached cell ids after a tear-down).
      *
@@ -375,8 +375,9 @@ namespace mitk
      * \brief Map a bridge exception thrown by a RenderWindowBridge callback to
      *        a matching HTTP status and RFC 9457 error payload.
      *
-     * Recognises the four typed bridge exceptions:
+     * Recognises the five typed bridge exceptions:
      * - RenderWindowBridgeNoEditorException              -> 503 EDITOR_NOT_ACTIVE
+     * - RenderWindowBridgeEditorBusyException            -> 503 EDITOR_BUSY
      * - RenderWindowBridgeUnknownWindowException         -> 404 RENDER_WINDOW_NOT_FOUND
      * - RenderWindowBridgeUnsupportedOperationException  -> 404 UNSUPPORTED_OPERATION
      * - RenderWindowBridgeRendererUnavailableException   -> 500 RENDERER_UNAVAILABLE

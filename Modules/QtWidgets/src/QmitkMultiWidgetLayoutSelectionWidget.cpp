@@ -10,11 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkMultiWidgetLayoutSelectionWidget.h>
+#include "QmitkMultiWidgetLayoutSelectionWidget.h"
 #include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
+#include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPalette>
+#include <QSaveFile>
+
+#include <sstream>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -36,8 +41,14 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
 {
   ui->setupUi(this);
 
-  auto stylesheet = "QTableWidget::item{background-color: white;}\nQTableWidget::item:selected{background-color: #1C97EA;}";
-  ui->tableWidget->setStyleSheet(stylesheet);
+  // The table is a grid preview, not a data view: its cells are painted flat
+  // and the picked extent is marked by the selection color. Both come from the
+  // palette so the preview follows the active theme.
+  const QPalette& palette = ui->tableWidget->palette();
+  ui->tableWidget->setStyleSheet(
+    QStringLiteral("QTableWidget::item { background-color: %1; }\n"
+                   "QTableWidget::item:selected { background-color: %2; }")
+      .arg(palette.color(QPalette::Base).name(), palette.color(QPalette::Highlight).name()));
 
   m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
   connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);
@@ -46,27 +57,39 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   connect(ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
   connect(ui->setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
   connect(ui->dataBasedLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked);
-  connect(ui->loadLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked);
-  connect(ui->saveLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked);
-  connect(ui->selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
 
-  ui->selectDefaultLayoutComboBox->addItem("Select a layout preset");
+  // The presets ship as module resources; they are read once here and offered
+  // by name, so the host can present them without knowing about the resources.
   auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
   for (const auto& resource : presetResources)
   {
     us::ModuleResourceStream jsonStream(resource);
     auto data = nlohmann::json::parse(jsonStream);
-    auto resourceName = data["name"].get<std::string>();
-    ui->selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
-    m_PresetMap[ui->selectDefaultLayoutComboBox->count() - 1] = data;
+    m_Presets.push_back({ QString::fromStdString(data["name"].get<std::string>()), data });
   }
 }
 
-void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_AutomatedDataLayoutWidget == nullptr)
     return;
   m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
+{
+  ui->tableWidget->clearSelection();
+}
+
+QStringList QmitkMultiWidgetLayoutSelectionWidget::PresetNames() const
+{
+  QStringList names;
+  names.reserve(static_cast<int>(m_Presets.size()));
+  for (const auto& preset : m_Presets)
+  {
+    names.append(preset.name);
+  }
+  return names;
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
@@ -113,18 +136,24 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
-  ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked()
 {
-  this->hide();
+  // Taken before the host reacts to DataBasedLayoutStarted, while this picker is
+  // still on screen. A popup is a top-level window, so it is placed in global
+  // coordinates.
+  const QPoint topRight = this->mapToGlobal(QPoint(this->width(), 0));
+  emit DataBasedLayoutStarted();
+
   m_AutomatedDataLayoutWidget->setWindowFlags(Qt::Popup);
-  m_AutomatedDataLayoutWidget->move(this->pos().x() - m_AutomatedDataLayoutWidget->width() + this->width(), this->pos().y());
+  // A widget that was never shown has no laid-out size yet.
+  m_AutomatedDataLayoutWidget->adjustSize();
+  m_AutomatedDataLayoutWidget->move(topRight.x() - m_AutomatedDataLayoutWidget->width(), topRight.y());
   m_AutomatedDataLayoutWidget->show();
 }
 
-void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
+void QmitkMultiWidgetLayoutSelectionWidget::RequestSave()
 {
   QString filename = QFileDialog::getSaveFileName(nullptr, "Select where to save the current layout", "", "MITK Window Layout (*.json)");
   if (filename.isEmpty())
@@ -134,67 +163,74 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
   if (!filename.endsWith(fileExt))
     filename += fileExt;
 
-  // Wrap the save emit so any failure (engine layout invariant violation,
-  // serializer pre-walk inconsistency, ...) surfaces as a user-facing
-  // message rather than escaping into the Qt event dispatcher. Symmetric
-  // with the load path below.
+  // Serialized in full before the file is touched, so a failing serializer
+  // (a layout invariant violation) leaves an existing file intact. The handler
+  // serializes synchronously, so its exceptions surface here.
+  std::ostringstream buffer;
   try
   {
-    auto outStream = std::ofstream(filename.toStdString());
-    emit SaveLayout(&outStream);
+    emit SaveLayout(&buffer);
   }
   catch (const std::exception& e)
   {
     QMessageBox::warning(this, tr("Layout save failed"),
                          QString::fromUtf8(e.what()));
+    return;
+  }
+
+  const auto content = buffer.str();
+  if (content.empty())
+  {
+    return;
+  }
+
+  QSaveFile file(filename);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)
+      || file.write(content.data(), static_cast<qint64>(content.size())) < 0
+      || !file.commit())
+  {
+    QMessageBox::warning(this, tr("Layout save failed"),
+                         tr("Cannot write %1: %2").arg(filename, file.errorString()));
   }
 }
 
-void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
+void QmitkMultiWidgetLayoutSelectionWidget::RequestLoad()
 {
   QString filename = QFileDialog::getOpenFileName(nullptr, "Load a layout file", "", "MITK Window Layouts (*.json)");
   if (filename.isEmpty())
     return;
 
-  ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
+  QFile file(filename);
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    QMessageBox::warning(this, tr("Layout load failed"),
+                         tr("Cannot read %1: %2").arg(filename, file.errorString()));
+    return;
+  }
+  const QByteArray content = file.readAll();
 
-  // Wrap parse + apply in a single catch frame so any failure (file I/O,
-  // JSON parse error, schema-shape violation, missing group reference,
-  // unknown view_direction, ...) surfaces as a user-facing message rather
-  // than letting the exception escape into the Qt event dispatcher.
+  // Only the file's JSON syntax is checked here; the receiver of LoadLayout
+  // validates and applies the document and reports its own failures.
+  nlohmann::json jsonData;
   try
   {
-    std::ifstream f(filename.toStdString());
-    auto jsonData = nlohmann::json::parse(f);
-    emit LoadLayout(&jsonData);
+    jsonData = nlohmann::json::parse(content.constData(), content.constData() + content.size());
   }
   catch (const std::exception& e)
   {
     QMessageBox::warning(this, tr("Layout load failed"),
                          QString::fromUtf8(e.what()));
+    return;
   }
+  emit LoadLayout(&jsonData);
 }
 
-void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
+void QmitkMultiWidgetLayoutSelectionWidget::ApplyPreset(int index)
 {
-  if (index == 0)
+  if (index < 0 || static_cast<std::size_t>(index) >= m_Presets.size())
   {
-    // First entry is only for description
     return;
   }
 
-  auto jsonData = m_PresetMap.at(index);
-  // Keep 'this' alive across the emit + potential error dialog; closing
-  // before emit could leave the catch block using a dangling parent if the
-  // widget ever gains 'Qt::WA_DeleteOnClose'. Close after the dialog path.
-  try
-  {
-    emit LoadLayout(&jsonData);
-  }
-  catch (const std::exception& e)
-  {
-    QMessageBox::warning(this, tr("Layout load failed"),
-                         QString::fromUtf8(e.what()));
-  }
-  close();
+  emit LoadLayout(&m_Presets[index].layout);
 }

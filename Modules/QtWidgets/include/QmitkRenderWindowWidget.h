@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 
 class vtkCornerAnnotation;
+class QGraphicsOpacityEffect;
+class QPropertyAnimation;
 
 /**
 * \brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
@@ -77,7 +79,7 @@ public:
   * \brief Optional human-readable display label.
   *
   *   Persisted as the optional `name` field of the corresponding window leaf
-  *   in the v2 layout document; empty when the layout omits that field. Pure
+  *   in the layout document (version 2.0 or 3.0); empty when the layout omits that field. Pure
   *   metadata: not used for routing, addressing, persisted-state keying, or
   *   REST URL construction (those all use the bare widget id, derivable from
   *   `GetWidgetName` via the editor-prefix strip).
@@ -93,6 +95,17 @@ public:
   void AddUtilityWidget(QWidget* utilityWidget);
   QmitkRenderWindowUtilityWidget* GetUtilityWidget();
   const QmitkRenderWindowUtilityWidget* GetUtilityWidget() const;
+
+  /**
+  * \brief Auto-hide mode for the utility widget: instead of occupying a
+  *        layout row, it floats over the render window's top edge and is
+  *        shown/hidden via 'ShowUtilityWidget' (typically on pointer
+  *        proximity), so revealing it never resizes the render window.
+  */
+  void SetUtilityWidgetAutoHide(bool autoHide);
+
+  /** \brief Reveal/collapse the utility widget while in auto-hide mode. */
+  void ShowUtilityWidget(bool show);
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -129,15 +142,24 @@ public Q_SLOTS:
 
   void OnResetGeometry();
 
+protected:
+
+  void resizeEvent(QResizeEvent* event) override;
+
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
+  void UpdateUtilityWidgetGeometry();
 
   QString m_WidgetName;
   QString m_DisplayName;
   QVBoxLayout* m_Layout;
+  QWidget* m_UtilityWidget = nullptr;
+  bool m_UtilityWidgetAutoHide = false;
+  QGraphicsOpacityEffect* m_UtilityWidgetOpacity = nullptr;
+  QPropertyAnimation* m_UtilityWidgetReveal = nullptr;
 
   mitk::DataStorage* m_DataStorage;
 

@@ -50,21 +50,26 @@ Give them a unique name and remember to only use alphanumeric characters and und
 
 Regarding images: Doxygen looks for images globally. To avoid confusion, include the plugin name into the image. E.g. "Checkboxes.png" is a bad name while "QmitkIGTTracking_Checkboxes.png" is a good name.
 
-Include images only via the image Macro! This way it is automatically included in the pdf export of the documentation.
+Include images only via the image macros! This way they are automatically included in the pdf export of the documentation.
 
 \verbatim
-  // The Macro hast he following form (note the braces!):
+  // The macros have the following form (note the braces!):
   \imageMacro{imagePath, "Image Description", Image size in cm}
+  \imageMacroEx{imagePath, "Image Description", Image size in cm, HTML width}
 
   // e.g.:
   \imageMacro{QmitkIGTTracking_Checkboxes.png, "Some beautiful Checkboxes!", 5}
+  \imageMacroEx{QmitkIGTTracking_Overview.png, "The tracking view", 10, 360px}
 
   // If you must use commas in the description, escape them!
  \imageMacro{QmitkIGTTracking_Checkboxes.png, "Some beautiful Checkboxes\, you have never seen better ones! ", 5}
 
 \endverbatim
 
-Image size is only used for the pdf export, but images won't be displayed at all if it is missing. Maximum is 16.
+The size in cm is only used for the pdf export, but images won't be displayed at all if it is missing. Maximum is 16.
+\c imageMacro shows the image at its native size in the HTML documentation and the Qt Help System. Use
+\c imageMacroEx for screenshots, where the native size depends on the screen they were taken on: its fourth
+argument sets the HTML width (e.g. \c 360px), so a high-resolution screenshot does not flood the page.
 
 The nightly generated HTML documentation and the Qt Help System documentation can contain different content using the isHTML command.
 

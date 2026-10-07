@@ -1,5 +1,9 @@
 MITK_CREATE_MODULE_TESTS()
 
+mitkAddCustomModuleTest(QmitkDataStorageListModelTest QmitkDataStorageListModelTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkDataStorageTreeModelTest QmitkDataStorageTreeModelTest
   -platform minimal
 )
@@ -9,6 +13,10 @@ mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSe
 )
 
 mitkAddCustomModuleTest(QmitkIconThemeTest QmitkIconThemeTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkButtonOverlayWidgetTest QmitkButtonOverlayWidgetTest
   -platform minimal
 )
 
@@ -24,11 +32,55 @@ mitkAddCustomModuleTest(QmitkMxNLayoutV2Test QmitkMxNLayoutV2Test
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNGeometryAuthorityTest QmitkMxNGeometryAuthorityTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNLayoutV3Test QmitkMxNLayoutV3Test
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNGridOpsTest QmitkMxNGridOpsTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNNavLinksTest QmitkMxNNavLinksTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNLayoutEditorWidgetTest QmitkMxNLayoutEditorWidgetTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNArrangeModeTest QmitkMxNArrangeModeTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNNavigatorTest QmitkMxNNavigatorTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNSynchronizeScopeTest QmitkMxNSynchronizeScopeTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNSyncPeekTest QmitkMxNSyncPeekTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkRenderWindowProximityTest QmitkRenderWindowProximityTest
   -platform minimal
 )
 

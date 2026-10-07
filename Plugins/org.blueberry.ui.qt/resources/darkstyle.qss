@@ -13,6 +13,7 @@ found in the LICENSE file.
 /*
   iconColor       = #c7c7c7 <- This line is parsed by MITK
   iconAccentColor = #d4821e <- This line is parsed by MITK
+  selectionColor  = #1c97ea <- This line is parsed by MITK
 */
 
 font.warning {
@@ -152,6 +153,17 @@ QHeaderView::section:vertical:checked {
 QHeaderView::section:vertical:pressed {
   background-color: #1c97ea;
   font-weight: bold;
+}
+
+/* A table's top-left corner is a QTableCornerButton, which the QHeaderView
+   rules above do not reach. Unstyled it falls back to the palette and reads as
+   a white block in the corner of every dark table, so it repeats the section
+   look here. */
+QTableCornerButton::section {
+  background-color: #2d2d30;
+  border: 1px solid transparent;
+  border-right: 1px solid #3f3f46;
+  border-bottom: 1px solid #3f3f46;
 }
 
 QHeaderView::down-arrow {

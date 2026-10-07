@@ -16,32 +16,98 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
+#include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandler.h>
 
 namespace mitk
 {
   /**
-   * \brief Handler that connects synchronized display actions across all renderers.
+   * \brief Handler that connects synchronized display actions across a
+   *        predicate-defined set of renderers.
    *
-   * All renderers react to the same display action events. Camera moves,
-   * zooms, and scrolls are propagated to every renderer managed by the
-   * same RenderingManager.
+   * Camera moves, zooms, slice scrolls, crosshair updates, and level-window
+   * changes are propagated to every renderer admitted by the respective
+   * dimension's target predicate (see SetPredicates). The predicates are
+   * supplied by the editor that owns the synchronization group membership;
+   * each dimension scopes independently. Without the level-window pair
+   * (levelWindowScope and levelWindow) the level-window action keeps its
+   * classic node-global property write, gated by the prefix filter passed to
+   * InitActions.
    *
    * \sa DisplayActionEventHandler DisplayActionEventFunctions
    */
   class MITKCORE_EXPORT DisplayActionEventHandlerSynchronized : public DisplayActionEventHandler
   {
+  public:
+
+    /**
+     * \brief Per-dimension target predicates for the synchronized broadcast
+     *        actions.
+     *
+     * A null member means "this dimension is not synchronized": the handler
+     * wires the classic non-propagating action for that dimension instead
+     * (sender-only for the navigation dimensions, the node-global property
+     * write for levelWindow), so the local gesture keeps working while
+     * nothing propagates. With all members null the handler behaves like
+     * DisplayActionEventHandlerDesynchronized.
+     *
+     * Level-window synchronization takes a pair: levelWindowScope classifies
+     * the gesture's sender and levelWindow admits the targets of a grouped
+     * sender (see SetLevelWindowSynchronizedAction). Both are set or both are
+     * null.
+     */
+    struct Predicates
+    {
+      DisplayActionEventFunctions::TargetPredicate pan;
+      DisplayActionEventFunctions::TargetPredicate zoom;
+      DisplayActionEventFunctions::TargetPredicate slice;
+      DisplayActionEventFunctions::TargetPredicate crosshair;
+      DisplayActionEventFunctions::LevelWindowScopeClassifier levelWindowScope;
+      DisplayActionEventFunctions::TargetPredicate levelWindow;
+    };
+
+    /**
+     * \brief Construct with the per-dimension target predicates.
+     *
+     * There is deliberately no default constructor: a handler without
+     * predicates synchronizes nothing, so that state has to be asked for
+     * explicitly with an empty Predicates.
+     *
+     * \throws mitk::Exception under the same condition as SetPredicates.
+     */
+    explicit DisplayActionEventHandlerSynchronized(const Predicates& predicates);
+
+    /**
+     * \brief Set the per-dimension target predicates.
+     *
+     * Takes effect on the next InitActions call, which re-wires all actions.
+     *
+     * \throws mitk::Exception if exactly one of levelWindowScope and
+     *         levelWindow is set.
+     */
+    void SetPredicates(const Predicates& predicates);
+
   protected:
 
     /**
-     * \brief Initialize synchronized display actions for all renderers.
+     * \brief Initialize the synchronized display actions.
+     *
+     * Each broadcast navigation dimension (pan, zoom, slice, crosshair) is
+     * wired with its synchronized action scoped by the corresponding
+     * predicate, or with the sender-only action if the predicate is null
+     * (see Predicates).
      *
      * \pre The observable broadcast must have been set.
      * \throw mitk::Exception if the observable is null.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param prefixFilter Sender gate for the non-propagating level-window
+     *                     action and for the sender-only fallback actions.
      */
     void InitActionsImpl(const std::string& prefixFilter = "") override;
+
+  private:
+
+    Predicates m_Predicates;
   };
 } // end namespace mitk
 

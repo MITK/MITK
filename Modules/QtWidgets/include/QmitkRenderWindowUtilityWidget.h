@@ -17,16 +17,15 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkSynchronizedNodeSelectionWidget.h>
-#include <QmitkSliceNavigationWidget.h>
-#include <QmitkStepperAdapter.h>
-#include <mitkRenderWindowLayerController.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
+#include <QmitkMxNSyncDimension.h>
 #include <mitkRenderWindowViewDirectionController.h>
+
+#include <QColor>
+#include <QList>
 
 // qt
 #include <QWidget>
-#include <QHBoxLayout>
-#include <QMenuBar>
-#include <QComboBox>
 
 namespace mitk
 {
@@ -34,27 +33,35 @@ namespace mitk
 }
 
 class QmitkRenderWindow;
+class QMenu;
+class QPaintEvent;
 class QToolButton;
 
 /**
 * \brief Utility widget that extends a QmitkRenderWindowWidget with window-specific controls.
 *
-* It offers to select the viewing direction of the window, as well as a QmitkSliceNavigationWidget
-* to scroll through the current view direction.
-* In addition, it contains a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
-* properties and shown nodes, as well as a synchronization-group selector to share this state with
-* other render windows.
+* It hosts the cell's strip controls and applies the cell's view direction to
+* its renderer (SetViewDirectionSelection); the plane itself is chosen on the
+* cell overlay. Slice scrolling lives in the cell's viewport navigator, not
+* here. In addition, it contains
+* a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
+* properties and shown nodes; the cell's data-selection group (shared with
+* other render windows) is stored on that widget and edited from the layout
+* editor, not here.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
 
+  /**
+  * \throws mitk::Exception if 'renderWindow' or 'dataStorage' is null.
+  */
   QmitkRenderWindowUtilityWidget(
-    QWidget* parent = nullptr,
-    QmitkRenderWindow* renderWindow = nullptr,
-    mitk::DataStorage* dataStorage = nullptr
+    QWidget* parent,
+    QmitkRenderWindow* renderWindow,
+    mitk::DataStorage* dataStorage
   );
 
   ~QmitkRenderWindowUtilityWidget() override;
@@ -62,67 +69,143 @@ public:
   using GroupSyncIndexType = int;
 
   /**
-  * \brief Select the combobox row for the given synchronization group index.
-  *
-  * \param index  The 1-based group index. Must be >= 1 and must already be
-  *               registered with this widget (i.e. 'OnSyncGroupAdded' has run
-  *               for this index, or it was added by a prior 'SetSyncGroup').
-  *
-  * \pre  index >= 1                                          (otherwise mitk::Exception)
-  * \pre  the group is present in this widget's combobox      (otherwise mitk::Exception)
-  *
-  * \throws mitk::Exception on precondition violation.
-  */
-  void SetSyncGroup(const GroupSyncIndexType index);
-
-  /**
-  * \brief Returns the currently selected group index, or '-1' when the combobox
-  *        holds no selection.
-  *
-  *   '-1' is returned only when no group has yet been registered with this
-  *   widget (the combobox is empty -- happens during initial construction
-  *   before the first 'OnSyncGroupAdded' or 'SetSyncGroup'). After at least
-  *   one group has been registered, the return value is always a valid group
-  *   index >= 1.
+  * \brief The cell's data-selection group index, read from the authoritative
+  *        node selection widget (returns -1 while the cell is unassigned).
+  *        Read by serialization (MakeWindowDescriptor) and the sync barcode.
   */
   GroupSyncIndexType GetSyncGroup() const;
 
-  void SetGeometry(const itk::EventObject& event);
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
+  /**
+  * \brief Open the data selection popup at a global position, independent of
+  *        whether the strip is revealed; the path for the keyboard and the
+  *        context menu.
+  */
+  void ShowDataSelection(const QPoint& globalPosition);
+
+  /**
+  * \brief Apply the cell's view direction to its renderer. The source cell's
+  *        plane-label picker (via MxN::SetViewDirection), an orientation-group
+  *        relay (via MxN::PropagateOrientation) and a cell joining an
+  *        orientation group (via MxN::SetSyncLink) funnel through here. Only 'AnatomicalPlane::Axial' / 'Coronal' /
+  *        'Sagittal' are supported; other planes are ignored.
+  */
+  void SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection);
+
 public Q_SLOTS:
-  void UpdateViewPlaneSelection();
-  void OnSyncGroupAdded(const GroupSyncIndexType index);
+
+  /**
+  * \brief Mirror the editor-wide clean-view state into this cell's toggle
+  *        button without re-emitting 'CleanViewToggled'.
+  */
+  void SetCleanViewChecked(bool checked);
+
+  /**
+  * \brief Mirror the editor-wide navigator mode into this cell's toggle
+  *        button without re-emitting 'NavigatorToggled'.
+  */
+  void SetNavigatorChecked(bool expanded);
+
+  /**
+  * \brief Mirror the editor-wide crosshair visibility into this cell's toggle
+  *        button without re-emitting 'CrosshairToggled'.
+  */
+  void SetCrosshairChecked(bool visible);
+
+  /**
+  * \brief Mirror whether this cell is the maximized one into its toggle button
+  *        without re-emitting 'MaximizeToggled'.
+  */
+  void SetMaximizeChecked(bool maximized);
+
+  /**
+  * \brief Set the sync barcode for this cell: one slot per axis (glyph, hue,
+  *        tooltip; an invalid color is an unsynced gap). Pushed by the owning
+  *        multi widget from the group registry.
+  */
+  void SetSyncBarcodeSlots(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots);
+
+  /** \brief The slots the sync barcode currently shows. */
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> GetSyncBarcodeSlots() const;
 
 Q_SIGNALS:
 
-  void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-  void SyncGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
   /**
-  * \brief Emitted when the user requests a new synchronization group via the '+' button.
-  *        The owning multi widget allocates a free index and assigns this cell to it.
+  * \brief Emitted when the user toggles clean-view mode in this cell. The
+  *        mode is editor-wide; the owning multi widget applies it to every
+  *        cell and mirrors it back via 'SetCleanViewChecked'.
   */
-  void CreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-  void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
+  void CleanViewToggled(bool cleanView);
 
-private Q_SLOTS:
+  /**
+  * \brief Emitted when the user toggles the navigator mode in this cell. The
+  *        mode is editor-wide; the owning multi widget applies it to every
+  *        cell and mirrors it back via 'SetNavigatorChecked'.
+  */
+  void NavigatorToggled(bool expanded);
 
-  void OnSyncGroupSelectionChanged(int index);
-  void OnNodeSelectionWidgetSyncGroupChanged(int index);
+  /**
+  * \brief Emitted when the user toggles the crosshair from this cell. Like
+  *        clean view the state is editor-wide; the owning multi widget applies
+  *        it and mirrors it back via 'SetCrosshairChecked'.
+  */
+  void CrosshairToggled(bool visible);
+
+  /**
+  * \brief Emitted when the user maximizes this cell, or restores the grid from
+  *        it. Unlike the other toggles this one is per cell; the owning multi
+  *        widget resolves which cell asked and mirrors the result back to every
+  *        strip via 'SetMaximizeChecked'.
+  */
+  void MaximizeToggled(bool maximized);
+
+  /**
+  * \brief Emitted when the user asks for the editor-wide layout editor from
+  *        this cell's sync barcode; the owning multi widget relays it to
+  *        whoever hosts the view.
+  */
+  void LayoutEditorRequested();
+
+  /**
+  * \brief Where the pointer is on this cell's sync barcode: on the strip at all,
+  *        and which axis glyph it is over (none between glyphs). The owning
+  *        multi widget turns this into the editor-wide sync peek; the strip
+  *        itself only reports.
+  */
+  void SyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis);
+
+  /**
+  * \brief Emitted while a popup owned by this strip (currently the data
+  *        selection) is open. The popup's pointer grab reads to the cell as the
+  *        pointer leaving, so the owning multi widget holds the furniture
+  *        revealed for as long as this is true.
+  */
+  void PopupVisibilityChanged(bool visible);
+
+protected:
+
+  /** \brief Paints the translucent rounded backing behind the controls. */
+  void paintEvent(QPaintEvent* event) override;
 
 private:
 
+  /** \brief Point the maximize button's icon at what the next click will do. */
+  void UpdateMaximizeIcon();
+
+  /** \brief Show either the furniture clean view hides, or the bare frame it
+   *         leaves behind, according to the current state. */
+  void UpdateCleanViewIcon();
+
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
-  QComboBox* m_SyncGroupSelector;
-  QToolButton* m_NewSyncGroupButton;
-  QmitkSliceNavigationWidget* m_SliceNavigationWidget;
-  QmitkStepperAdapter* m_StepperAdapter;
-  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
+  QMenu* m_DataMenu;
+  QToolButton* m_CleanViewButton;
+  QToolButton* m_NavigatorToggleButton;
+  QToolButton* m_CrosshairButton;
+  QToolButton* m_MaximizeButton;
+  QmitkMxNSyncBarcodeWidget* m_SyncBarcode;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
-  QComboBox* m_ViewDirectionSelector;
-
-  void ChangeViewDirection(const QString& viewDirection);
 
 };
 

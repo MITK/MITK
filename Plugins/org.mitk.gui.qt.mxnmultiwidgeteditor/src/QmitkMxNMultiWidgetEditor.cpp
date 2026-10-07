@@ -15,18 +15,15 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkLog.h>
 
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryUIException.h>
 
-// mxn multi widget editor plugin
-#include <QmitkMultiWidgetDecorationManager.h>
-
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkInteractionSchemeToolBar.h>
-#include <QmitkMultiWidgetConfigurationToolBar.h>
 
 // qt
 #include <QHBoxLayout>
@@ -42,14 +39,18 @@ struct QmitkMxNMultiWidgetEditor::Impl final
   ~Impl() = default;
 
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
-  QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
+
+  // The scheme is editor-wide state the layout editor's toggle reads back, so
+  // the two cannot disagree about which mode is live.
+  mitk::InteractionSchemeSwitcher::InteractionScheme m_InteractionScheme;
+
   /** Empty until the preferences have been read for the first time. */
   std::optional<bool> m_PACSInteraction;
 };
 
 QmitkMxNMultiWidgetEditor::Impl::Impl()
   : m_InteractionSchemeToolBar(nullptr)
-  , m_ConfigurationToolBar(nullptr)
+  , m_InteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard)
 {
   // nothing here
 }
@@ -71,19 +72,9 @@ QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 
 berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
 {
-  return Events::CLOSED | Events::OPENED | Events::HIDDEN | Events::VISIBLE;
-}
-
-void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(false);
-    }
-  }
+  // Only OPENED: the other part events serve the built-in render-window
+  // menu, which this editor never shows.
+  return Events::OPENED;
 }
 
 void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
@@ -94,31 +85,6 @@ void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference:
     if (nullptr != multiWidget)
     {
       multiWidget->EnableCrosshair();
-      multiWidget->ActivateMenuWidget(true);
-    }
-  }
-}
-
-void QmitkMxNMultiWidgetEditor::PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(false);
-    }
-  }
-}
-
-void QmitkMxNMultiWidgetEditor::PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->ActivateMenuWidget(true);
     }
   }
 }
@@ -135,16 +101,15 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
 
 void QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
-  if (nullptr != m_Impl->m_InteractionSchemeToolBar)
-  {
-    m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
-    m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
-  }
+  m_Impl->m_InteractionScheme = scheme;
+  m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
+  m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
+}
 
-  if (nullptr != m_Impl->m_ConfigurationToolBar)
-  {
-    m_Impl->m_ConfigurationToolBar->SetInteractionScheme(scheme);
-  }
+mitk::InteractionSchemeSwitcher::InteractionScheme
+QmitkMxNMultiWidgetEditor::GetInteractionScheme() const
+{
+  return m_Impl->m_InteractionScheme;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -192,32 +157,16 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     SetMultiWidget(multiWidget);
     connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutChanged,
       this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
+    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutEditorRequested,
+      this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
     connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
       this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied);
   }
 
   layout->addWidget(multiWidget);
 
-  // create right toolbar: configuration toolbar to change the render window widget layout
-  if (nullptr == m_Impl->m_ConfigurationToolBar)
-  {
-    m_Impl->m_ConfigurationToolBar = new QmitkMultiWidgetConfigurationToolBar(multiWidget);
-    m_Impl->m_ConfigurationToolBar->SetDataStorage(GetDataStorage());
-    layout->addWidget(m_Impl->m_ConfigurationToolBar);
-  }
-
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutSet,
-          this, &QmitkMxNMultiWidgetEditor::OnLayoutSet);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized,
-          this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
-          this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SetDataBasedLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SetDataBasedLayout);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SaveLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SaveLayout, Qt::DirectConnection);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LoadLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::LoadLayout);
+  // No configuration toolbar: the editor-wide controls, the interaction-scheme
+  // switch included, live in the MxN Layout Editor view.
 
   GetSite()->GetPage()->AddPartListener(this);
 
@@ -234,16 +183,20 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
     return;
   }
 
-  // update decoration preferences
-  //m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
-
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
+  if (auto* mxnMultiWidget = dynamic_cast<QmitkMxNMultiWidget*>(multiWidget))
+  {
+    mxnMultiWidget->SetLevelWindowReadoutVisible(
+      preferences->GetBool("Show level/window readout", true));
+    mxnMultiWidget->SetNavigatorExpanded(preferences->GetBool("Expanded navigator", false));
+  }
+
   // Only a change of the preference itself overrides the interaction scheme, so
-  // that the PACS tool or the crosshair rotation mode the user picked survives
-  // unrelated preference edits. A change that the active scheme already agrees
-  // with is no reason to reset it either.
+  // that the PACS tool the user picked survives unrelated preference edits. A
+  // change that the active scheme already agrees with is no reason to reset it
+  // either.
   const bool pacsInteraction = preferences->GetBool("PACS like mouse interaction", false);
   const bool preferenceChanged = m_Impl->m_PACSInteraction != pacsInteraction;
   m_Impl->m_PACSInteraction = pacsInteraction;
@@ -261,4 +214,43 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
 void QmitkMxNMultiWidgetEditor::OnLayoutChanged()
 {
   FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
+}
+
+void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request)
+{
+  // A toggle request hides an already-visible layout editor instead of
+  // re-activating it, so a second press on the barcode closes what the first
+  // opened; a show request only ever brings the editor up, a hide request only
+  // ever takes it down.
+  auto page = this->GetSite()->GetPage();
+  if (page.IsNull())
+  {
+    return;
+  }
+
+  const QString viewId = QStringLiteral("org.mitk.views.mxnlayouteditor");
+  auto view = page->FindView(viewId);
+  if (QmitkMxNMultiWidget::LayoutEditorRequest::Hide == request)
+  {
+    if (view.IsNotNull())
+    {
+      page->HideView(view);
+    }
+    return;
+  }
+  if (QmitkMxNMultiWidget::LayoutEditorRequest::Toggle == request && view.IsNotNull()
+      && page->IsPartVisible(view))
+  {
+    page->HideView(view);
+    return;
+  }
+
+  try
+  {
+    page->ShowView(viewId);
+  }
+  catch (const berry::PartInitException& e)
+  {
+    MITK_ERROR << "Could not open the MxN layout editor view: " << e.what();
+  }
 }

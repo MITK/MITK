@@ -80,6 +80,20 @@ namespace mitk
   };
 
   /**
+   * \brief Thrown by bridge callbacks when the target editor is open but
+   *        temporarily cannot serve requests (e.g. the MxN editor while it
+   *        rebuilds its layout).
+   *
+   * The condition is transient; a retry after it has cleared succeeds.
+   * Mapped by the controller layer to HTTP 503 EDITOR_BUSY.
+   */
+  class MITKRESTAPI_EXPORT RenderWindowBridgeEditorBusyException : public std::runtime_error
+  {
+  public:
+    using std::runtime_error::runtime_error;
+  };
+
+  /**
    * \brief Thrown by bridge callbacks when the window id is not known.
    *
    * Mapped by the controller layer to HTTP 404 RENDER_WINDOW_NOT_FOUND.
@@ -121,11 +135,14 @@ namespace mitk
     std::string pluginId;
     bool active = false;
     // Window identifiers exposed by the editor. For MxN, this is the
-    // canonical fully-qualified `id` field of each window leaf in the v2
+    // canonical fully-qualified `id` field of each window leaf in the MxN
     // layout document (e.g. `mxn__widget0`): the same string used as the
     // URL path segment for sub-resources. For StdMulti, the engine-fixed
-    // names (axial / sagittal / coronal / 3d). Empty when !active.
+    // names (axial / sagittal / coronal / 3d). Empty when !active or busy.
     std::vector<std::string> windowIds;
+    // Open but temporarily unable to serve requests (see
+    // RenderWindowBridgeEditorBusyException). Implies active.
+    bool busy = false;
   };
 
   /**
@@ -755,7 +772,7 @@ namespace mitk
     std::string GetMxNLayout() const;
 
     /**
-     * \brief Apply a v2.0 layout document; returns the freshly serialized layout.
+     * \brief Apply a layout document (2.0 or 3.0); returns the freshly serialized layout.
      *
      * The string boundary keeps the bridge header free of nlohmann/json.hpp.
      * Schema / structural failures escape as \c mitk::Exception (the engine's

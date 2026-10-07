@@ -50,7 +50,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(MultiGroup_RoundTrip_PreservesSelectAll);
   MITK_TEST(LayoutName_PreservedAcrossRoundTrip);
   MITK_TEST(LayoutName_AbsentStaysAbsentAcrossRoundTrip);
-  MITK_TEST(LayoutName_ClearedAfterRollback);
+  MITK_TEST(LayoutName_SurvivesRejectedApply);
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
@@ -62,11 +62,15 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
 
   // --- Engine-state semantics ---
   MITK_TEST(TearDown_DestroysAllOldCells);
-  MITK_TEST(Apply_Failure_RollsBackToDefault);
+  MITK_TEST(Apply_ShapeError_KeepsPreviousLayout);
+  MITK_TEST(Apply_ShapeErrors_KeepPreviousLayout);
+  MITK_TEST(Groups_NonObjectUnreferencedEntry_Throws);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
   MITK_TEST(Serialize_EmitsIdsVerbatim);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
+  MITK_TEST(ApplyLayout_RejectsReentrantApply);
+  MITK_TEST(LoadFeedback_CountsAsBusyUntilHidden);
 
   // --- Strict parsing and exception boundary ---
   MITK_TEST(ViewDirection_TypoSagittal_Throws);
@@ -78,7 +82,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(SetLayout_PopulatesRowAndColumn);
   MITK_TEST(ApplyLayout_InvalidatesRowAndColumn);
   MITK_TEST(ApplyLayout_AssignsActiveWidgetFromNewMap);
-  MITK_TEST(ApplyLayout_RollbackKeepsActiveWidget);
+  MITK_TEST(ApplyLayout_ShapeError_KeepsActiveWidget);
 
   // --- Group seeding rule + post-apply consistency ---
   MITK_TEST(ApplyLayout_GroupMembersAgreeOnVisibility);
@@ -160,7 +164,9 @@ public:
 
     const auto doc = editor->SerializeLayout();
 
-    CPPUNIT_ASSERT_EQUAL(std::string("2.0"), doc.at("version").get<std::string>());
+    // The writer always emits the current format version, even for state
+    // that a v2.0 document could express.
+    CPPUNIT_ASSERT_EQUAL(std::string("3.0"), doc.at("version").get<std::string>());
     CPPUNIT_ASSERT(doc.contains("groups"));
     CPPUNIT_ASSERT(doc.at("groups").contains("main"));
     CPPUNIT_ASSERT_EQUAL(true, doc.at("groups").at("main").at("select_all").get<bool>());
@@ -208,7 +214,9 @@ public:
 
     const auto roundTrip = editor->SerializeLayout();
 
-    CPPUNIT_ASSERT_EQUAL(fixture.at("version"),       roundTrip.at("version"));
+    // A loaded v2.0 document re-serializes as v3.0 (v2 is a strict subset;
+    // the content below stays identical).
+    CPPUNIT_ASSERT_EQUAL(std::string("3.0"),          roundTrip.at("version").get<std::string>());
     CPPUNIT_ASSERT_EQUAL(fixture.at("groups"),        roundTrip.at("groups"));
     // Compare the root subtree without splitter sizes (Qt may redistribute).
     CPPUNIT_ASSERT_EQUAL(fixture.at("root").at("orientation"),
@@ -486,7 +494,7 @@ public:
   void Version_RejectsAllNonV2()
   {
     auto editor = MakeEditor();
-    for (const auto& bad : { "1.0", "1.1", "100", "1abc", "3.0", "abc" })
+    for (const auto& bad : { "1.0", "1.1", "100", "1abc", "3.1", "4.0", "abc" })
     {
       auto fixture = nlohmann::json::parse(R"json({
         "version": "PLACEHOLDER",
@@ -595,9 +603,9 @@ public:
   }
 
   // ====================================================================
-  // Construction failure rolls back to single default cell
+  // A document-shape error is rejected before the current layout is touched
   // ====================================================================
-  void Apply_Failure_RollsBackToDefault()
+  void Apply_ShapeError_KeepsPreviousLayout()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -613,14 +621,68 @@ public:
 
     auto editor = MakeEditor();
     editor->SetLayout(2, 2);
+    const auto before = editor->SerializeLayout();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
-      "After a failed apply the editor must be left with exactly one default cell",
-      1u, editor->GetNumberOfRenderWindowWidgets());
-    CPPUNIT_ASSERT_MESSAGE(
-      "After rollback the editor must expose a usable active cell, "
-      "not just a dangling single-cell placeholder",
-      nullptr != editor->GetActiveRenderWindowWidget());
+      "A rejected document must leave every existing cell in place",
+      4u, editor->GetNumberOfRenderWindowWidgets());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A rejected document must leave the previous layout unchanged",
+      before.dump(), editor->SerializeLayout().dump());
+  }
+
+  // ====================================================================
+  // Every malformed 'size' is rejected before the current layout is touched
+  // ====================================================================
+  void Apply_ShapeErrors_KeepPreviousLayout()
+  {
+    for (const auto* size : { "0", "\"2\"", "1.5", "true", "2147483648" })
+    {
+      const auto fixture = nlohmann::json::parse(std::string(R"json({
+        "version": "2.0",
+        "groups": { "main": { "select_all": true } },
+        "root": {
+          "type": "split", "orientation": "horizontal",
+          "children": [
+            { "type": "window", "id": "mxn__ok",  "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__bad", "view_direction": "axial", "links": { "selection": "main" }, "size": )json")
+        + size + R"json( }
+          ]
+        }
+      })json");
+
+      auto editor = MakeEditor();
+      editor->SetLayout(2, 2);
+      const auto before = editor->SerializeLayout();
+      const std::string label = std::string("size ") + size;
+      CPPUNIT_ASSERT_THROW_MESSAGE(label, editor->ApplyLayout(fixture), mitk::Exception);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(label + ": every existing cell stays",
+                                   4u, editor->GetNumberOfRenderWindowWidgets());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(label + ": the previous layout stays",
+                                   before.dump(), editor->SerializeLayout().dump());
+    }
+  }
+
+  // ====================================================================
+  // A group entry must be an object even when no cell references it
+  // ====================================================================
+  void Groups_NonObjectUnreferencedEntry_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true }, "g": 5 },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->SetLayout(1, 2);
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL(2u, editor->GetNumberOfRenderWindowWidgets());
   }
 
   // ====================================================================
@@ -730,6 +792,128 @@ public:
     nlohmann::json nullDoc;
     CPPUNIT_ASSERT(nullDoc.is_null());
     CPPUNIT_ASSERT_THROW(editor->LoadLayout(&nullDoc), mitk::Exception);
+  }
+
+  void LoadFeedback_CountsAsBusyUntilHidden()
+  {
+    // The GUI load raises its feedback and applies from a timer; a REST layout
+    // request accepted in that gap would run into the pending apply.
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+
+    editor->ShowLayoutLoadFeedback();
+    CPPUNIT_ASSERT_MESSAGE("A load announced but not yet applied counts as busy",
+      editor->IsApplyingLayout());
+
+    editor->HideLayoutLoadFeedback();
+    CPPUNIT_ASSERT_MESSAGE("Hiding the feedback ends the busy state",
+      !editor->IsApplyingLayout());
+  }
+
+  // ====================================================================
+  // 'AddSynchronizationGroup' emits 'SyncGroupAdded' after 'TearDownAllCells'
+  // has already cleared the old cell tree but before the new one is built.
+  // A slot connected with Qt::DirectConnection therefore runs synchronously
+  // inside that half-torn window. If it calls 'ApplyLayout' again on the
+  // same editor, the nested call must be rejected as reentrant rather than
+  // being allowed to run to completion and clobber the outer call's state.
+  // ====================================================================
+  void ApplyLayout_RejectsReentrantApply()
+  {
+    const auto docA = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__docA_only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    const auto docB = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__docB_0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__docB_1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+
+    // Guards against the *nested* call's own 'AddSynchronizationGroup' also
+    // emitting 'SyncGroupAdded' and re-entering this lambda a second time.
+    bool nestedInvoked = false;
+    bool nestedThrew = false;
+    bool nestedThrewWrongType = false;
+    bool applyingInsideSlot = false;
+    auto conn = QObject::connect(editor.get(), &QmitkMxNMultiWidget::SyncGroupAdded,
+      editor.get(),
+      [&]()
+      {
+        if (nestedInvoked)
+        {
+          return;
+        }
+        nestedInvoked = true;
+        applyingInsideSlot = editor->IsApplyingLayout();
+        // Nothing may unwind through the signal emission, so every exception
+        // is caught here and judged after the outer call has returned.
+        try
+        {
+          editor->ApplyLayout(docB);
+        }
+        catch (const QmitkMxNLayoutBusyException&)
+        {
+          nestedThrew = true;
+        }
+        catch (const mitk::Exception&)
+        {
+          nestedThrewWrongType = true;
+        }
+      }, Qt::DirectConnection);
+
+    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+    editor->ApplyLayout(docA);
+    QObject::disconnect(conn);
+
+    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must hold while ApplyLayout runs",
+      applyingInsideSlot);
+    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must be cleared once ApplyLayout returns",
+      !editor->IsApplyingLayout());
+    CPPUNIT_ASSERT_MESSAGE(
+      "A nested ApplyLayout must be rejected with QmitkMxNLayoutBusyException, not a generic mitk::Exception",
+      !nestedThrewWrongType);
+    CPPUNIT_ASSERT_MESSAGE(
+      "A nested ApplyLayout invoked from a SyncGroupAdded slot mid-apply must be rejected",
+      nestedThrew);
+
+    const auto doc = editor->SerializeLayout();
+    std::set<std::string> ids;
+    std::function<void(const nlohmann::json&)> collect = [&](const nlohmann::json& n)
+    {
+      const auto type = n.at("type").get<std::string>();
+      if (type == "split")
+      {
+        for (const auto& c : n.at("children")) collect(c);
+      }
+      else
+      {
+        ids.insert(n.at("id").get<std::string>());
+      }
+    };
+    collect(doc.at("root"));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "The outer ApplyLayout(docA) must be the layout left standing",
+      std::size_t{1}, ids.size());
+    CPPUNIT_ASSERT_MESSAGE(
+      "docA's window id must be present after both calls return",
+      ids.count("mxn__docA_only") == 1);
   }
 
   // ====================================================================
@@ -943,9 +1127,8 @@ public:
     }
   }
 
-  void ApplyLayout_RollbackKeepsActiveWidget()
+  void ApplyLayout_ShapeError_KeepsActiveWidget()
   {
-    // Forces rollback via the unknown-view-direction path (strictness).
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
       "groups": { "main": { "select_all": true } },
@@ -959,10 +1142,15 @@ public:
     })json");
 
     auto editor = MakeEditor();
+    editor->SetLayout(2, 2);
+    const auto active = editor->GetRenderWindowWidget(QStringLiteral("mxn__widget3"));
+    CPPUNIT_ASSERT(nullptr != active);
+    editor->SetActiveRenderWindowWidget(active);
+
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
     CPPUNIT_ASSERT_MESSAGE(
-      "After rollback the editor must expose a usable active cell",
-      nullptr != editor->GetActiveRenderWindowWidget());
+      "A rejected document must leave the active cell as it was",
+      active == editor->GetActiveRenderWindowWidget());
   }
 
   // ====================================================================
@@ -1457,9 +1645,9 @@ public:
   }
 
   // ====================================================================
-  // After a failed apply the rolled-back state emits no 'name'.
+  // A rejected document leaves the previous layout's 'name' in place.
   // ====================================================================
-  void LayoutName_ClearedAfterRollback()
+  void LayoutName_SurvivesRejectedApply()
   {
     // First, install a named layout so m_LayoutName is non-empty.
     const auto named = nlohmann::json::parse(R"json({
@@ -1474,7 +1662,6 @@ public:
       }
     })json");
 
-    // A schema-valid-but-engine-rejected fixture that fails mid-construction.
     const auto bad = nlohmann::json::parse(R"json({
       "version": "2.0",
       "name": "Should Not Stick",
@@ -1495,9 +1682,9 @@ public:
 
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(bad), mitk::Exception);
 
-    const auto afterRollback = editor->SerializeLayout();
-    CPPUNIT_ASSERT_MESSAGE("Rollback must clear m_LayoutName so no 'name' field is emitted",
-                           !afterRollback.contains("name"));
+    const auto afterReject = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("The previous name must still be emitted", afterReject.contains("name"));
+    CPPUNIT_ASSERT_EQUAL(std::string("Stashed Name"), afterReject.at("name").get<std::string>());
   }
 
   void Construct_BadMultiWidgetName_Throws()

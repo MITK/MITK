@@ -65,8 +65,10 @@ found in the LICENSE file.
 #include <vtkPolyVertex.h>
 #include <vtkPolyData.h>
 
+#include <algorithm>
 #include <array>
 #include <optional>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -168,21 +170,42 @@ float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
 
 const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpolator::CreateActionToSlicer(const QList<QmitkRenderWindow*>& windows)
 {
-  std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
+  std::vector<std::string> labels;
+  labels.reserve(windows.size());
   for (auto* window : windows)
   {
-    std::string windowName;
-    auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
+    std::string label;
+    const auto* renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
     if (renderWindowWidget)
     {
-      windowName = renderWindowWidget->GetCornerAnnotationText();
+      label = renderWindowWidget->GetCornerAnnotationText();
+      // An editor may leave the corner annotation blank (the MxN cells label
+      // themselves elsewhere); an empty action label is indistinguishable.
+      if (label.empty())
+      {
+        label = renderWindowWidget->GetDisplayName().toStdString();
+      }
     }
-    else
+    if (label.empty())
     {
-      windowName = window->GetRenderer()->GetName();
+      label = window->GetRenderer()->GetName();
     }
-    auto slicer = window->GetSliceNavigationController();
-    actionToSliceDimension[new QAction(QString::fromStdString(windowName), nullptr)] = slicer;
+    labels.push_back(label);
+  }
+
+  std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
+  for (int i = 0; i < windows.size(); ++i)
+  {
+    auto* const window = windows[i];
+    auto label = labels[i];
+    // Display names are free text and need not be unique; the renderer name
+    // tells two equally labelled windows apart.
+    if (std::count(labels.begin(), labels.end(), label) > 1)
+    {
+      label += " (" + std::string(window->GetRenderer()->GetName()) + ")";
+    }
+    auto* const slicer = window->GetSliceNavigationController();
+    actionToSliceDimension[new QAction(QString::fromStdString(label), nullptr)] = slicer;
   }
 
   return actionToSliceDimension;

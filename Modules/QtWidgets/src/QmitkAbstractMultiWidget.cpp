@@ -497,6 +497,12 @@ void QmitkAbstractMultiWidget::ResetGridState()
   m_Impl->m_ActiveRenderWindowWidget = nullptr;
 }
 
+void QmitkAbstractMultiWidget::SetGridDimensions(int rows, int columns)
+{
+  m_Impl->m_MultiWidgetRows = rows;
+  m_Impl->m_MultiWidgetColumns = columns;
+}
+
 void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
 {
   // Walk the map in reverse and remove the lexicographically last entry.

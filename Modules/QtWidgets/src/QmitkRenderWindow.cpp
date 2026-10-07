@@ -205,17 +205,28 @@ void QmitkRenderWindow::UpdateLayoutDesignList(QmitkRenderWindowMenu::LayoutDesi
 
 void QmitkRenderWindow::UpdateCrosshairVisibility(bool visible)
 {
-  m_MenuWidget->UpdateCrosshairVisibility(visible);
+  // These mirror state into the menu, so a window without one has nothing to
+  // mirror; only a multi widget that shows the menu connects them at all.
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->UpdateCrosshairVisibility(visible);
+  }
 }
 
 void QmitkRenderWindow::UpdateCrosshair3DVisibility(bool visible)
 {
-  m_MenuWidget->UpdateCrosshair3DVisibility(visible);
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->UpdateCrosshair3DVisibility(visible);
+  }
 }
 
 void QmitkRenderWindow::UpdateCrosshairRotationMode(QmitkCrosshairRotationMode mode)
 {
-  m_MenuWidget->UpdateCrosshairRotationMode(mode);
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->UpdateCrosshairRotationMode(mode);
+  }
 }
 
 mitk::VtkPropRenderer::LightingMode QmitkRenderWindow::GetPreferredLightingMode() const
@@ -231,6 +242,14 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
   {
+    if (!state)
+    {
+      // Nothing to deactivate. Constructing the menu here would give the window
+      // one for the rest of its life, which is all a hover needs to show it.
+      m_MenuWidgetActivated = false;
+      return;
+    }
+
     m_MenuWidget = new QmitkRenderWindowMenu(this, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
@@ -397,7 +416,9 @@ void QmitkRenderWindow::enterEvent(QEnterEvent *e)
   auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow());
   this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());
 
-  if (nullptr != m_MenuWidget)
+  // Deactivating the menu must outlast the hide() that switched it off;
+  // otherwise the next hover brings a menu back that its owner disabled.
+  if (nullptr != m_MenuWidget && m_MenuWidgetActivated)
     m_MenuWidget->ShowMenu();
 
   QVTKOpenGLNativeWidget::enterEvent(e);

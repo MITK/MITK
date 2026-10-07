@@ -48,11 +48,6 @@ public slots:
    */
   void ResetPreferencesAndGUI();
 
-  void ChangeColormap(int i);
-
-protected:
-  std::string m_CurrentColormap;
-
 private:
 
   std::unique_ptr<Ui::QmitkMxNMultiWidgetEditorPreferencePage> m_Ui;

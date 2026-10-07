@@ -24,11 +24,26 @@
     <file>mm_pointer.svg</file>
     <file>mm_scroll.svg</file>
     <file>mm_zoom.svg</file>
-    <file>mwDesynchronized.svg</file>
     <file>mwLayout.svg</file>
-    <file>mwMITK.svg</file>
-    <file>mwPACS.svg</file>
-    <file>mwSynchronized.svg</file>
+    <file>mxn-axis-pan.svg</file>
+    <file>mxn-axis-zoom.svg</file>
+    <file>mxn-axis-slice.svg</file>
+    <file>mxn-axis-crosshair.svg</file>
+    <file>mxn-axis-orientation.svg</file>
+    <file>mxn-axis-windowing.svg</file>
+    <file>mxn-axis-lut.svg</file>
+    <file>mxn-axis-selection.svg</file>
+    <file>mxn-crosshair.svg</file>
+    <file>mxn-grid-column-add.svg</file>
+    <file>mxn-grid-column-remove.svg</file>
+    <file>mxn-grid-edit.svg</file>
+    <file>mxn-grid-row-add.svg</file>
+    <file>mxn-grid-row-remove.svg</file>
+    <file>mxn-maximize.svg</file>
+    <file>mxn-restore.svg</file>
+    <file>mxn-clean-off.svg</file>
+    <file>mxn-clean-on.svg</file>
+    <file>mxn-navigator.svg</file>
     <file>PlanarAngle_48.png</file>
     <file>PlanarBezierCurve_48.png</file>
     <file>PlanarCircle_48.png</file>

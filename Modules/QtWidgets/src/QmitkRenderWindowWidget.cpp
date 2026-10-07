@@ -12,9 +12,16 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindowWidget.h>
 
+#include <QmitkRenderWindowProximity.h>
+
 // vtk
 #include <vtkCornerAnnotation.h>
 #include <vtkTextProperty.h>
+
+// qt
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QStyle>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent,
                                                  const QString& widgetName,
@@ -71,28 +78,130 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
 
 void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget)
 {
+  m_UtilityWidget = utilityWidget;
   m_Layout->insertWidget(0, utilityWidget);
 }
 
 QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget()
 {
-  auto layoutItem = m_Layout->itemAt(0)->widget();
-  auto utilityWidget = dynamic_cast<QmitkRenderWindowUtilityWidget*>(layoutItem);
-  if (utilityWidget != nullptr)
-  {
-    return utilityWidget;
-  }
-  return nullptr;
+  return dynamic_cast<QmitkRenderWindowUtilityWidget*>(m_UtilityWidget);
 }
 
 const QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget() const
 {
-  if (m_Layout == nullptr)
-    return nullptr;
-  auto* const item = m_Layout->itemAt(0);
-  if (item == nullptr)
-    return nullptr;
-  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(item->widget());
+  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(m_UtilityWidget);
+}
+
+void QmitkRenderWindowWidget::SetUtilityWidgetAutoHide(bool autoHide)
+{
+  if (nullptr == m_UtilityWidget || autoHide == m_UtilityWidgetAutoHide)
+  {
+    return;
+  }
+
+  m_UtilityWidgetAutoHide = autoHide;
+  if (autoHide)
+  {
+    // Overlay mode: the row's layout slot is given back to the render
+    // window (the reveal must never resize it); the widget floats on top.
+    m_Layout->removeWidget(m_UtilityWidget);
+
+    // Reveal/collapse as a fade, matching the painted viewport furniture (same
+    // easing budget): the strip is one element of that one coordinated frame.
+    if (nullptr == m_UtilityWidgetReveal)
+    {
+      m_UtilityWidgetOpacity = new QGraphicsOpacityEffect(m_UtilityWidget);
+      m_UtilityWidget->setGraphicsEffect(m_UtilityWidgetOpacity);
+
+      m_UtilityWidgetReveal = new QPropertyAnimation(m_UtilityWidgetOpacity, "opacity", this);
+      m_UtilityWidgetReveal->setDuration(QmitkRenderWindowProximity::RevealDurationMs);
+      // Hide only once fully faded out, so a collapsed strip neither paints nor
+      // takes input. A reveal arriving mid-collapse restarts the animation
+      // (which does not emit 'finished'), so this never hides a reappearing strip.
+      connect(m_UtilityWidgetReveal, &QPropertyAnimation::finished, this, [this]() {
+        if (qFuzzyIsNull(m_UtilityWidgetReveal->endValue().toReal()))
+        {
+          m_UtilityWidget->hide();
+        }
+      });
+    }
+    m_UtilityWidgetOpacity->setOpacity(0.0);
+
+    m_UtilityWidget->hide();
+    m_UtilityWidget->raise();
+    this->UpdateUtilityWidgetGeometry();
+  }
+  else
+  {
+    // Back to a docked row: the fade must not leave it dimmed in the layout,
+    // nor a collapse in flight hide it once it finishes.
+    if (nullptr != m_UtilityWidgetReveal)
+    {
+      m_UtilityWidgetReveal->stop();
+    }
+    if (nullptr != m_UtilityWidgetOpacity)
+    {
+      m_UtilityWidgetOpacity->setOpacity(1.0);
+    }
+    m_Layout->insertWidget(0, m_UtilityWidget);
+    m_UtilityWidget->show();
+  }
+}
+
+void QmitkRenderWindowWidget::ShowUtilityWidget(bool show)
+{
+  if (nullptr == m_UtilityWidget || !m_UtilityWidgetAutoHide)
+  {
+    return;
+  }
+
+  if (show)
+  {
+    // Place and raise before fading in; the fade starts from whatever opacity
+    // a still-running collapse left, so a reveal reverses it instead of jumping.
+    this->UpdateUtilityWidgetGeometry();
+    m_UtilityWidget->show();
+    m_UtilityWidget->raise();
+  }
+
+  // Settle instantly when there is no animation yet or the active style asks
+  // for no motion (SH_Widget_Animation_Duration == 0) - matching how the
+  // painted furniture drops its easing, so the two stay coordinated.
+  const bool animate = nullptr != m_UtilityWidgetReveal
+    && this->style()->styleHint(QStyle::SH_Widget_Animation_Duration, nullptr, this) > 0;
+  if (!animate)
+  {
+    if (nullptr != m_UtilityWidgetOpacity)
+    {
+      m_UtilityWidgetOpacity->setOpacity(show ? 1.0 : 0.0);
+    }
+    if (!show)
+    {
+      m_UtilityWidget->hide();
+    }
+    return;
+  }
+
+  m_UtilityWidgetReveal->stop();
+  m_UtilityWidgetReveal->setStartValue(m_UtilityWidgetOpacity->opacity());
+  m_UtilityWidgetReveal->setEndValue(show ? 1.0 : 0.0);
+  m_UtilityWidgetReveal->start();
+}
+
+void QmitkRenderWindowWidget::UpdateUtilityWidgetGeometry()
+{
+  if (nullptr != m_UtilityWidget && m_UtilityWidgetAutoHide)
+  {
+    // Inside the frame, so the group-hue border is not dimmed under the strip.
+    const QRect area = this->contentsRect();
+    m_UtilityWidget->setGeometry(area.left(), area.top(), area.width(), m_UtilityWidget->sizeHint().height());
+  }
+}
+
+void QmitkRenderWindowWidget::resizeEvent(QResizeEvent* event)
+{
+  QFrame::resizeEvent(event);
+  this->UpdateUtilityWidgetGeometry();
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)

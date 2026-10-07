@@ -3,6 +3,7 @@ set(H_FILES
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h
+  QmitkMxNSyncDimension.h
 )
 
 set(CPP_FILES
@@ -36,7 +37,6 @@ set(CPP_FILES
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
   QmitkMultiNodeSelectionWidget.cpp
-  QmitkMultiWidgetConfigurationToolBar.cpp
   QmitkMultiWidgetLayoutManager.cpp
   QmitkMultiWidgetLayoutSelectionWidget.cpp
   QmitkNodeDescriptor.cpp
@@ -59,6 +59,7 @@ set(CPP_FILES
   QmitkRenderWindow.cpp
   QmitkRenderWindowMenu.cpp
   QmitkRenderWindowMenuBar.cpp
+  QmitkRenderWindowProximity.cpp
   QmitkRenderWindowUtilityWidget.cpp
   QmitkRenderWindowWidget.cpp
   QmitkRenderWindowContextDataStorageInspector.cpp
@@ -71,7 +72,13 @@ set(CPP_FILES
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
+  QmitkMxNArrangeMode.cpp
+  QmitkMxNAxisGlyph.cpp
+  QmitkMxNCellOverlay.cpp
+  QmitkMxNGroupJoinMode.cpp
+  QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
+  QmitkMxNSyncBarcodeWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkPropertyItem.cpp

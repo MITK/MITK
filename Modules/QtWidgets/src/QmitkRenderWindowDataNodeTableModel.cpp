@@ -201,7 +201,10 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
 
     if (role == Qt::ToolTipRole)
     {
-      return QVariant("Name of the data node.");
+      // UpdateModelData sorts by descending layer, so the row order is the
+      // drawing order.
+      return QVariant(tr("%1\nDrag onto another row to change the drawing order; "
+                         "data higher in the list is drawn on top.").arg(nodeName));
     }
 
     if (role == Qt::DecorationRole)
@@ -230,6 +233,11 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
 
       return QVariant(visibility);
     }
+
+    if (role == Qt::ToolTipRole)
+    {
+      return QVariant(tr("Show or hide in every window that shares this selection"));
+    }
   }
 
   if (index.column() == 2)  // reset geometry column
@@ -238,6 +246,11 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
     {
       return QVariant(m_ArrowIcon);
     }
+
+    if (role == Qt::ToolTipRole)
+    {
+      return QVariant(tr("Fit this window to the data"));
+    }
   }
 
   if (index.column() == 3)  // remove node column
@@ -245,6 +258,11 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
     if (role == Qt::DecorationRole)
     {
       return QVariant(m_TimesIcon);
+    }
+
+    if (role == Qt::ToolTipRole)
+    {
+      return QVariant(tr("Remove from the selection (in every window that shares it)"));
     }
   }
 

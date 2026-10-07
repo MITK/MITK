@@ -1562,8 +1562,8 @@ namespace
         // carries one.
         wj["view_direction"] = AnatomicalPlaneToV2String(*w.viewDirection);
       }
-      // links is always emitted; v2 has just one dimension (selection), v3
-      // will add more keys here additively without breaking v2 clients.
+      // links is always emitted. The window resources carry only the
+      // selection link; the layout document holds the other dimensions.
       wj["links"] = { { "selection", w.selectionGroup } };
       arr.push_back(wj);
     }
@@ -1574,8 +1574,9 @@ namespace
 void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib::Response& res) const
 {
   // Mirrors the stdmulti editor-info handler: walk the editor list, locate
-  // the mxn entry, 503 EDITOR_NOT_ACTIVE if the editor is not open, 200 with
-  // the windows list otherwise.
+  // the mxn entry, 503 EDITOR_NOT_ACTIVE if the editor is not open, 503
+  // EDITOR_BUSY while it cannot serve requests, 200 with the windows list
+  // otherwise.
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
   {
     const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
@@ -1616,6 +1617,13 @@ void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib
       {
         const auto error = ErrorResponse::EditorNotActive(
           "MxNMultiWidgetEditor is not open", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      if (ed.busy)
+      {
+        const auto error = ErrorResponse::EditorBusy(
+          "MxNMultiWidgetEditor is applying a layout", req.path);
         this->SendErrorResponse(res, 503, error);
         return;
       }
@@ -1803,7 +1811,7 @@ void RenderingController::HandlePUT_mxnLayout(const httplib::Request& req, httpl
   if (req.body.empty())
   {
     const auto error = ErrorResponse::InvalidRequest(
-      "Request body must be a v2.0 layout document.", req.path);
+      "Request body must be an MxN layout document (version 2.0 or 3.0).", req.path);
     this->SendErrorResponse(res, 400, error);
     return;
   }
@@ -1838,8 +1846,10 @@ void RenderingController::HandlePUT_mxnLayout(const httplib::Request& req, httpl
   // Layout-specific catch: every mitk::Exception from ApplyLayout is treated
   // as a document-shape failure. Caught BEFORE the generic std::exception so
   // we don't fall through to MapBridgeException, which would map it to 422.
-  // If the engine broadens ApplyLayout's failure model in the future, narrow
-  // this catch.
+  // The typed bridge exceptions (e.g. EDITOR_BUSY while a layout is already
+  // being applied) are std::runtime_error, not mitk::Exception, so they pass
+  // this catch and reach MapBridgeException. If the engine broadens
+  // ApplyLayout's failure model in the future, narrow this catch.
   catch (const mitk::Exception& e)
   {
     const auto error = ErrorResponse::InvalidRequest(
@@ -2326,6 +2336,9 @@ std::pair<int, nlohmann::json> RenderingController::MapBridgeException(
 {
   if (const auto* ne = dynamic_cast<const RenderWindowBridgeNoEditorException*>(&e))
     return {503, ErrorResponse::EditorNotActive(ne->what(), instance)};
+
+  if (const auto* eb = dynamic_cast<const RenderWindowBridgeEditorBusyException*>(&e))
+    return {503, ErrorResponse::EditorBusy(eb->what(), instance)};
 
   if (const auto* uw = dynamic_cast<const RenderWindowBridgeUnknownWindowException*>(&e))
     return {404, ErrorResponse::RenderWindowNotFound(uw->what(), instance)};

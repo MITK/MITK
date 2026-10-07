@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class BaseRenderer;
+
   namespace SliceNavigationHelper
   {
 
@@ -93,6 +95,55 @@ namespace mitk
     MITKCORE_EXPORT PlaneGeometry* GetCurrentPlaneGeometry(const TimeGeometry* timeGeometry,
                                                            TimePointType timePoint,
                                                            unsigned int slicePosition);
+
+    /**
+    * \brief Tells whether the slice index shown to the user must be flipped relative to the
+    *        slice stepper position of a renderer.
+    *
+    * A slice stepper counts along the normal of the renderer's world geometry, whose direction
+    * is fixed by how the planes were initialized, not by the image. It can therefore run opposite
+    * to the reference geometry's own index axis for that view direction (for an identity-direction
+    * image this is the case for axial and coronal views). A user-facing slice index should follow
+    * the reference geometry, so when this function returns true the displayed index is
+    * <tt>steps - 1 - stepperPosition</tt>.
+    *
+    * \param referenceGeometry      The geometry being sliced (the slice navigation controller's
+    *                               input world geometry at the relevant time step).
+    * \param rendererWorldGeometry  The renderer's current world geometry; its third axis vector
+    *                               is the stepping direction.
+    * \param viewDirection          The anatomical plane the renderer shows; it selects the world
+    *                               axis both geometries are compared along.
+    *
+    * \return True if the stepping direction and the reference geometry's index axis point in
+    *         opposite world directions.
+    *
+    * \throws mitk::Exception if a geometry is a nullptr or if viewDirection is
+    *         AnatomicalPlane::Original, which has no fixed world axis.
+    */
+    MITKCORE_EXPORT bool IsSliceIndexInverted(const BaseGeometry* referenceGeometry,
+                                              const BaseGeometry* rendererWorldGeometry,
+                                              AnatomicalPlane viewDirection);
+
+    /**
+    * \brief Tells whether a renderer's displayed slice index runs opposite to its slice stepper.
+    *
+    * The displayed slice index is the one a user-facing slice navigator shows. It follows the
+    * slice axis of the renderer's reference geometry (described below) for the renderer's view
+    * direction (see IsSliceIndexInverted), so when this function returns true the displayed
+    * index is <tt>steps - 1 - stepperPosition</tt>.
+    * Code that relates slice positions across renderers (slice offsets, relayed slice steps)
+    * must use this one definition so that every renderer agrees on which way is "next".
+    *
+    * The reference geometry is the renderer's slice navigation input geometry at the selected
+    * time step (falling back to the first one, as the renderer planes do). A renderer that is
+    * not set up yet (no input or world geometry) or shows an 'Original' view has no slice axis
+    * to follow; its displayed index is the stepper position, and the function returns false.
+    *
+    * \param renderer The renderer to query.
+    *
+    * \throws mitk::Exception if renderer is a nullptr.
+    */
+    MITKCORE_EXPORT bool IsDisplayedSliceInverted(BaseRenderer* renderer);
   } // namespace SliceNavigationHelper
 } // namespace mitk
 

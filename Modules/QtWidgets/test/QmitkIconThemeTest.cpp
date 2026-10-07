@@ -82,6 +82,8 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(ThemedSvgMatchesAllNotations);
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
+  MITK_TEST(SelectionColorIsEmptyUnlessTheThemeDefinesOne);
+  MITK_TEST(WarningColorIsReadFromTheWarningRule);
   MITK_TEST(DarkThemeHasLightIcons);
   MITK_TEST(RendersAtTheRequestedSize);
   MITK_TEST(RendersInDevicePixels);
@@ -181,6 +183,47 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::string("#123456"), QmitkIconTheme::GetColor().toStdString());
     CPPUNIT_ASSERT_EQUAL(std::string("#abcdef"), QmitkIconTheme::GetAccentColor().toStdString());
+  }
+
+  void SelectionColorIsEmptyUnlessTheThemeDefinesOne()
+  {
+    // A theme that styles selections only through item-view rules cannot be
+    // read back from them; it names the colour in the header instead, and one
+    // that does not leaves callers to the palette.
+    ApplyTheme("#123456", "#abcdef");
+    CPPUNIT_ASSERT_MESSAGE("No selection colour declared, none reported",
+                           QmitkIconTheme::GetSelectionColor().isEmpty());
+
+    qApp->setStyleSheet(QStringLiteral("/*\n  iconColor = #123456\n  iconAccentColor = #abcdef\n"
+                                       "  selectionColor = #1c97ea\n*/\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL(std::string("#1c97ea"), QmitkIconTheme::GetSelectionColor().toStdString());
+  }
+
+  void WarningColorIsReadFromTheWarningRule()
+  {
+    ApplyTheme("#123456", "#abcdef");
+    CPPUNIT_ASSERT_MESSAGE("No warning rule, no warning colour", QmitkIconTheme::GetWarningColor().isEmpty());
+
+    qApp->setStyleSheet(QStringLiteral("/*\n  iconColor = #123456\n*/\n"
+                                       "font.warning {\n  color: #ff5c33;\n  font-weight: bold;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL(std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    // The light theme names its warning colour.
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: red;\n  font-weight: bold;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A named colour is read and normalized",
+                                 std::string("#ff0000"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  background-color: #000000;\n  color: #ff5c33;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("background-color is not the text colour",
+                                 std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: nonsense;\n}\n"));
+    QmitkIconTheme::Refresh();
+    CPPUNIT_ASSERT_MESSAGE("An invalid colour reads as none", QmitkIconTheme::GetWarningColor().isEmpty());
   }
 
   void DarkThemeHasLightIcons()

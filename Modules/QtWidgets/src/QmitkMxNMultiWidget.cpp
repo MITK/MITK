@@ -13,39 +13,74 @@ found in the LICENSE file.
 #include <QmitkMxNMultiWidget.h>
 
 // mitk core
+#include <mitkBaseRenderer.h>
+#include <mitkCameraController.h>
 #include <mitkDisplayActionEventFunctions.h>
-#include <mitkDisplayActionEventHandlerDesynchronized.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
+#include <mitkSliceNavigationHelper.h>
+
+// vtk
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkMxNArrangeMode.h>
+#include <QmitkMxNCellOverlay.h>
+#include <QmitkRenderWindowProximity.h>
+#include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 // qt
 #include <QBoxLayout>
+#include <QCoreApplication>
+#include <QDialog>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include <QGridLayout>
+#include <QLabel>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QRegularExpression>
+#include <QScopedValueRollback>
+#include <QShortcut>
 #include <QSplitter>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QWindow>
 
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
 #include <functional>
+#include <limits>
+#include <numeric>
 #include <fstream>
 #include <vector>
 
 namespace
 {
+  // Where per-cell construction sits on the load dialog's bar; the ends leave
+  // room for the teardown before it and the group wiring after.
+  constexpr int LoadPercentCellsBegin = 15;
+  constexpr int LoadPercentCellsEnd = 80;
+
   // The no-underscore rule on the editor-name segment is what makes the
   // first-`__` split into editor-name and bare-id unambiguous.
   const QRegularExpression EDITOR_NAME_PATTERN(QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*$"));
 
   const QString NAMESPACE_DELIMITER = QStringLiteral("__");
 
-  // Window-id and group-name patterns mirror mxn-layout-v2.schema.json.
+  // Window-id and group-name patterns mirror the layout schemas (identical
+  // in v2 and v3).
   // Enforced by PrewalkValidate so callers that do not run a JSON-schema
   // validator still fail loudly at load rather than letting unsafe
   // characters reach REST URLs or property-context keys downstream.
@@ -54,9 +89,14 @@ namespace
   const QRegularExpression GROUP_NAME_PATTERN(
     QStringLiteral("^[A-Za-z0-9_.-]+$"));
 
+  // Persisted group hue (`groups.<id>.color`). A cosmetic field: a value
+  // failing this pattern is ignored with a warning, never a load failure.
+  const QRegularExpression GROUP_COLOR_PATTERN(
+    QStringLiteral("^#[0-9A-Fa-f]{6}$"));
 
-  // Translation helpers for the v2 layout's `view_direction` enum. Closed
-  // mapping (axial/sagittal/coronal/original); throws on anything else.
+
+  // Translation helpers for the layout document's `view_direction` enum.
+  // Closed mapping (axial/sagittal/coronal/original); throws on anything else.
 
   mitk::AnatomicalPlane ParseViewDirection(const std::string& s)
   {
@@ -68,7 +108,7 @@ namespace
                 << "' (expected 'axial', 'sagittal', 'coronal', or 'original').";
   }
 
-  std::string ViewDirectionToV2String(mitk::AnatomicalPlane plane)
+  std::string ViewDirectionToString(mitk::AnatomicalPlane plane)
   {
     switch (plane)
     {
@@ -77,23 +117,172 @@ namespace
       case mitk::AnatomicalPlane::Coronal:  return "coronal";
       case mitk::AnatomicalPlane::Original: return "original";
     }
-    mitkThrow() << "ViewDirectionToV2String: unsupported AnatomicalPlane enum value.";
+    mitkThrow() << "ViewDirectionToString: unsupported AnatomicalPlane enum value.";
   }
 
-  // Pre-walks a v2 'root' subtree to validate structural shape and collect
-  // per-window ids + referenced group labels. Throws on missing required
-  // field, type mismatch on a known field, or duplicate window id. Does
-  // not mutate engine state.
+  // Group name each Synchronize(true) macro link uses. An ordinary group in
+  // every respect (shared namespace, serialized like any other); the constant
+  // only pins the label the macro rewrites.
+  const std::string SYNCHRONIZE_MACRO_GROUP = "sync";
+
+  // Default group hues, handed out by first-registration order (wrapping).
+  // Colorblind-aware and desaturated enough to stay legible on the dark
+  // Workbench style; the only saturated colors the viewport furniture uses.
+  constexpr std::array<const char*, 8> GROUP_HUE_PALETTE{
+    "#E1707A",  // rose
+    "#6FA8DC",  // sky
+    "#93C47D",  // moss
+    "#F0B26B",  // amber
+    "#B08FD9",  // violet
+    "#76C7C0",  // teal
+    "#C9C97A",  // olive
+    "#D08FB8"   // orchid
+  };
+
+  std::size_t DimensionIndex(QmitkMxNSyncDimension dimension)
+  {
+    return static_cast<std::size_t>(dimension);
+  }
+
+  // One parsed `links.<dim>` entry of a window node (v3 object or string form).
+  struct NavLinkSpec
+  {
+    QmitkMxNSyncDimension dimension;
+    std::string group;
+    QmitkMxNMultiWidget::SyncOffset offset;
+  };
+
+  // Everything the validation pre-walk collects for the later engine passes.
+  struct PrewalkResult
+  {
+    std::set<std::string> windowIds;
+    std::set<std::string> selectionGroups;
+    // (windowId, selectionGroup) in pre-order traversal order (splits'
+    // children walked in array order); the selection seeding pass uses the
+    // first cell per group as that group's seed.
+    std::vector<std::pair<std::string, std::string>> seedingOrder;
+    // Per-window navigation links in the same pre-order; document order
+    // defines each navigation group's seed cell as well.
+    std::vector<std::pair<std::string, std::vector<NavLinkSpec>>> navLinks;
+    std::set<std::string> navGroups;
+  };
+
+  void ValidateGroupNamePattern(const std::string& windowId, const std::string& groupName)
+  {
+    if (!GROUP_NAME_PATTERN.match(QString::fromStdString(groupName)).hasMatch())
+    {
+      mitkThrow() << "Layout window '" << windowId
+                  << "' references group name '" << groupName
+                  << "' which does not match the required pattern '"
+                  << GROUP_NAME_PATTERN.pattern().toStdString()
+                  << "' (URL-segment-safe).";
+    }
+  }
+
+  // Group-name target of a link value in either the string shorthand or the
+  // object form. Only call on values whose shape has been validated.
+  std::string LinkTarget(const nlohmann::json& linkValue)
+  {
+    return linkValue.is_string() ? linkValue.get<std::string>()
+                                 : linkValue.at("target").get<std::string>();
+  }
+
+  // Validates one v3 link value and extracts (group, offset). Enforces the
+  // closed modifier set: `target` everywhere; `offset` only on slice / zoom /
+  // pan, each with its dimension-typed shape. `dimension` is empty for
+  // `selection`, which accepts no modifiers at all.
+  std::pair<std::string, QmitkMxNMultiWidget::SyncOffset> ParseV3LinkValue(
+    const std::string& windowId,
+    const std::string& key,
+    std::optional<QmitkMxNSyncDimension> dimension,
+    const nlohmann::json& value)
+  {
+    if (value.is_string())
+    {
+      const auto group = value.get<std::string>();
+      ValidateGroupNamePattern(windowId, group);
+      return { group, {} };
+    }
+    if (!value.is_object())
+    {
+      mitkThrow() << "Layout window '" << windowId << "' has a 'links." << key
+                  << "' value that is neither a group-name string nor a link object.";
+    }
+    if (!value.contains("target") || !value["target"].is_string())
+    {
+      mitkThrow() << "Layout window '" << windowId << "' has a 'links." << key
+                  << "' object without the required 'target' string.";
+    }
+    const auto group = value["target"].get<std::string>();
+    ValidateGroupNamePattern(windowId, group);
+
+    QmitkMxNMultiWidget::SyncOffset offset;
+    for (auto it = value.begin(); it != value.end(); ++it)
+    {
+      if (it.key() == "target")
+      {
+        continue;
+      }
+      if (it.key() != "offset")
+      {
+        mitkThrow() << "Layout window '" << windowId << "' has unknown modifier '"
+                    << it.key() << "' on 'links." << key << "'.";
+      }
+      if (!dimension.has_value())
+      {
+        mitkThrow() << "Layout window '" << windowId
+                    << "': 'links.selection' does not accept an 'offset' modifier.";
+      }
+      switch (*dimension)
+      {
+        case QmitkMxNSyncDimension::Slice:
+          if (!it->is_number_integer())
+          {
+            mitkThrow() << "Layout window '" << windowId
+                        << "': 'links.slice' offset must be an integer (displayed slices).";
+          }
+          offset = it->get<int>();
+          break;
+        case QmitkMxNSyncDimension::Zoom:
+          if (!it->is_number() || it->get<double>() <= 0.0)
+          {
+            mitkThrow() << "Layout window '" << windowId
+                        << "': 'links.zoom' offset must be a number > 0 (multiplicative factor).";
+          }
+          offset = it->get<double>();
+          break;
+        case QmitkMxNSyncDimension::Pan:
+          if (!it->is_array() || it->size() != 2 || !(*it)[0].is_number() || !(*it)[1].is_number())
+          {
+            mitkThrow() << "Layout window '" << windowId
+                        << "': 'links.pan' offset must be an array of two numbers (in-plane world-mm).";
+          }
+          {
+            mitk::Vector2D panOffset;
+            panOffset[0] = (*it)[0].get<double>();
+            panOffset[1] = (*it)[1].get<double>();
+            offset = panOffset;
+          }
+          break;
+        default:
+          mitkThrow() << "Layout window '" << windowId << "': dimension 'links." << key
+                      << "' does not accept an 'offset' modifier.";
+      }
+    }
+    return { group, offset };
+  }
+
+  // Pre-walks a 'root' subtree to validate structural shape and collect
+  // per-window ids, referenced group labels, and (v3) navigation links.
+  // Throws on missing required field, type mismatch on a known field, or
+  // duplicate window id. Does not mutate engine state.
   //
-  // 'seedingOrder' captures (bareWindowId, groupName) pairs in pre-order
-  // traversal order (splits' children walked in array order), used by
-  // ApplyLayout's group-seeding pass to identify each group's seed cell -
-  // the cell that appears first in document order whose links.selection
-  // names that group.
-  void PrewalkValidate(const nlohmann::json& node,
-                       std::set<std::string>& seenIds,
-                       std::set<std::string>& referencedGroups,
-                       std::vector<std::pair<std::string, std::string>>& seedingOrder)
+  // Version scope: for a "3.0" document the `links` object is closed (unknown
+  // keys, unknown modifiers, and misplaced or mistyped offsets throw). A
+  // "2.0" document keeps its historical lenient behavior - `links.selection`
+  // must be a bare string and every other link key is silently ignored - so
+  // existing v2 files load unchanged, including files with a typo'd key.
+  void PrewalkValidate(const nlohmann::json& node, bool isV3, PrewalkResult& result)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
     {
@@ -119,7 +308,19 @@ namespace
       }
       for (const auto& child : node["children"])
       {
-        PrewalkValidate(child, seenIds, referencedGroups, seedingOrder);
+        // 'size' is the weight the parent assigns, so it is checked here; a
+        // size on the root has no parent to apply it and stays ignored.
+        if (child.is_object() && child.contains("size"))
+        {
+          const auto& size = child["size"];
+          if (!size.is_number_integer() || size.get<std::int64_t>() < 1
+              || size.get<std::int64_t>() > std::numeric_limits<int>::max())
+          {
+            mitkThrow() << "Layout child has invalid 'size' " << size.dump()
+                        << "; size must be an integer >= 1.";
+          }
+        }
+        PrewalkValidate(child, isV3, result);
       }
     }
     else if (type == "window")
@@ -140,7 +341,7 @@ namespace
                     << WINDOW_ID_PATTERN.pattern().toStdString()
                     << "' (URL-segment-safe, qualified `<editor_name>__<bare_id>`).";
       }
-      if (!seenIds.insert(id).second)
+      if (!result.windowIds.insert(id).second)
       {
         mitkThrow() << "Layout document contains duplicate window id '" << id << "'.";
       }
@@ -165,27 +366,61 @@ namespace
         mitkThrow() << "Layout window '" << id
                     << "' is missing the 'view_direction' string field.";
       }
+      ParseViewDirection(node["view_direction"].get<std::string>());
       if (!node.contains("links") || !node["links"].is_object())
       {
         mitkThrow() << "Layout window '" << id << "' is missing the 'links' object.";
       }
       const auto& links = node["links"];
-      if (!links.contains("selection") || !links["selection"].is_string())
+      if (!links.contains("selection"))
       {
         mitkThrow() << "Layout window '" << id
                     << "' is missing the required 'links.selection' string.";
       }
-      const auto groupName = links["selection"].get<std::string>();
-      if (!GROUP_NAME_PATTERN.match(QString::fromStdString(groupName)).hasMatch())
+
+      std::string selectionGroup;
+      if (isV3)
       {
-        mitkThrow() << "Layout window '" << id
-                    << "' references group name '" << groupName
-                    << "' which does not match the required pattern '"
-                    << GROUP_NAME_PATTERN.pattern().toStdString()
-                    << "' (URL-segment-safe).";
+        selectionGroup = ParseV3LinkValue(id, "selection", std::nullopt, links["selection"]).first;
       }
-      referencedGroups.insert(groupName);
-      seedingOrder.emplace_back(id, groupName);
+      else
+      {
+        if (!links["selection"].is_string())
+        {
+          mitkThrow() << "Layout window '" << id
+                      << "' is missing the required 'links.selection' string.";
+        }
+        selectionGroup = links["selection"].get<std::string>();
+        ValidateGroupNamePattern(id, selectionGroup);
+      }
+      result.selectionGroups.insert(selectionGroup);
+      result.seedingOrder.emplace_back(id, selectionGroup);
+
+      std::vector<NavLinkSpec> navSpecs;
+      for (auto it = links.begin(); it != links.end(); ++it)
+      {
+        if (it.key() == "selection")
+        {
+          continue;
+        }
+        if (!isV3)
+        {
+          continue;
+        }
+        const auto dimension = QmitkMxNSyncDimensionFromLinkKey(it.key());
+        if (!dimension.has_value())
+        {
+          mitkThrow() << "Layout window '" << id << "' has unknown link key 'links."
+                      << it.key() << "'.";
+        }
+        auto [group, offset] = ParseV3LinkValue(id, it.key(), dimension, it.value());
+        result.navGroups.insert(group);
+        navSpecs.push_back({ *dimension, std::move(group), offset });
+      }
+      if (!navSpecs.empty())
+      {
+        result.navLinks.emplace_back(id, std::move(navSpecs));
+      }
     }
     else
     {
@@ -200,7 +435,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_CrosshairVisibility(false)
+  , m_CrosshairVisibility(true)
 {
   // Reject malformed names at construction; once stored, an `_` in the
   // editor name would later produce schema-invalid ids or break the
@@ -214,10 +449,105 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                 << "'. Editor names must start with a letter, contain no '_', "
                 << "and use only the alphabet [A-Za-z0-9.-].";
   }
+
+  // A cell's frame carries its group identity (mono group hue, else neutral),
+  // and the per-cell utility-strip sync barcodes track the same per-dimension
+  // membership the layout editor shows; refresh both whenever the links change
+  // or the layout (and thus the set of cells) does.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshFrameColors);
+  connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshFrameColors);
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
+  connect(this, &QmitkMxNMultiWidget::SyncLinksChanged, this, &QmitkMxNMultiWidget::RefreshSyncBarcodes);
+
+  m_SyncPeekDwell = new QTimer(this);
+  m_SyncPeekDwell->setSingleShot(true);
+  connect(m_SyncPeekDwell, &QTimer::timeout, this, [this]()
+  {
+    this->SetSyncPeek(true, m_SyncPeekPendingAxis);
+  });
+  m_SyncPeekGrace = new QTimer(this);
+  m_SyncPeekGrace->setSingleShot(true);
+  connect(m_SyncPeekGrace, &QTimer::timeout, this, [this]()
+  {
+    this->SetSyncPeek(false, std::nullopt);
+  });
+
+  // The peek answers a question about the cells as they are now: a layout
+  // change tears down the strip the gesture came from, and maximizing leaves
+  // the plates the comparison was made of hidden. Clean view already suppresses
+  // the paint, but lowering there too keeps a pending dwell from firing into a
+  // suppressed layout and leaving stale state behind.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+  connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+  connect(this, &QmitkMxNMultiWidget::CleanViewChanged, this, &QmitkMxNMultiWidget::LowerSyncPeek);
+
+  // Scoped to the editor so the key is only taken while the user works in it.
+  // It cannot be gated on the furniture being revealed: clean view hides the
+  // furniture, and the key is the way back.
+  auto* cleanViewShortcut = new QShortcut(CleanViewShortcut(), this);
+  cleanViewShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+  connect(cleanViewShortcut, &QShortcut::activated, this, [this]()
+  {
+    this->SetCleanView(!m_CleanView);
+  });
+
+  m_ArrangeMode = new QmitkMxNArrangeMode(this);
+  connect(m_ArrangeMode, &QmitkMxNArrangeMode::ActiveChanged, this, [this](bool active)
+  {
+    if (!active)
+    {
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Plate);
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Strip);
+      m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Editor);
+    }
+    this->RefreshSyncPeekPlates();
+  });
+  connect(m_ArrangeMode, &QmitkMxNArrangeMode::HighlightChanged,
+          this, &QmitkMxNMultiWidget::RefreshSyncPeekPlates);
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged,
+          m_ArrangeMode, &QmitkMxNArrangeMode::PruneToExistingCells);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 {
+  // A reopened editor takes the same cell ids again.
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+  }
+}
+
+void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
+{
+  this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
+  QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
+}
+
+void QmitkMxNMultiWidget::RemoveCellRendererProperties(const QString& windowId,
+                                                       std::initializer_list<const char*> propertyKeys)
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  // Cell ids are the renderer names, i.e. the property contexts. GetAll()
+  // returns a fresh container its smart pointer alone keeps alive, so hold it.
+  const auto context = windowId.toStdString();
+  const auto nodes = dataStorage->GetAll();
+  for (const auto& node : *nodes)
+  {
+    const auto contexts = node->GetPropertyListNames();
+    if (std::find(contexts.begin(), contexts.end(), context) == contexts.end())
+    {
+      continue;  // RemoveProperty throws for a context the node does not have
+    }
+    for (const auto* propertyKey : propertyKeys)
+    {
+      node->RemoveProperty(propertyKey, context);
+    }
+  }
 }
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
@@ -225,38 +555,158 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
 
   AddSynchronizationGroup(1);
   SetLayout(1, 1);
-  SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
-  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  this->InstallSynchronizedHandler();
+}
+
+void QmitkMxNMultiWidget::InstallSynchronizedHandler()
+{
+  auto navPredicate = [this](QmitkMxNSyncDimension dimension)
+  {
+    return mitk::DisplayActionEventFunctions::TargetPredicate(
+      [this, dimension](const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target)
+      {
+        return this->IsNavTarget(dimension, sender, target);
+      });
+  };
+  mitk::DisplayActionEventHandlerSynchronized::Predicates predicates;
+  predicates.pan = navPredicate(QmitkMxNSyncDimension::Pan);
+  predicates.zoom = navPredicate(QmitkMxNSyncDimension::Zoom);
+  predicates.slice = navPredicate(QmitkMxNSyncDimension::Slice);
+  predicates.crosshair = navPredicate(QmitkMxNSyncDimension::Crosshair);
+  predicates.levelWindowScope = [this](const mitk::BaseRenderer* sender)
+  {
+    return this->WindowingScopeOf(sender);
+  };
+  predicates.levelWindow = [this](const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target)
+  {
+    return this->IsWindowingTarget(sender, target);
+  };
+  auto handler = std::make_unique<mitk::DisplayActionEventHandlerSynchronized>(predicates);
+  this->SetDisplayActionEventHandler(std::move(handler));
+
+  auto displayActionEventHandler = this->GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
     displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
 }
 
-void QmitkMxNMultiWidget::Synchronize(bool synchronized)
+bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
+                                      const mitk::BaseRenderer* sender,
+                                      const mitk::BaseRenderer* target) const
 {
-  if (synchronized)
+  // Only this editor's cells participate, in both roles: every editor's
+  // broadcast observes every interaction event application-wide, so
+  // admitting foreign renderers here would double-handle windows that
+  // their own editor's handler already serves.
+  const auto editorPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto targetId = QString::fromUtf8(target->GetName());
+  if (!senderId.startsWith(editorPrefix) || !targetId.startsWith(editorPrefix))
   {
-    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerSynchronized>());
-  }
-  else
-  {
-    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
+    return false;
   }
 
-  std::string prefixFilter = synchronized ? "" : this->GetMultiWidgetName().toStdString();
-  auto displayActionEventHandler = GetDisplayActionEventHandler();
-  if (nullptr != displayActionEventHandler)
+  // A cell always receives its own gesture; an unlinked cell is thereby a
+  // singleton group and behaves desynchronized without extra bookkeeping.
+  if (sender == target)
   {
-    displayActionEventHandler->InitActions(prefixFilter);
+    return true;
   }
+
+  const auto senderLinks = m_CellSyncLinks.find(senderId);
+  const auto targetLinks = m_CellSyncLinks.find(targetId);
+  if (senderLinks == m_CellSyncLinks.end() || targetLinks == m_CellSyncLinks.end())
+  {
+    return false;
+  }
+  const auto& senderGroup = senderLinks->second.groups[DimensionIndex(dimension)];
+  const auto& targetGroup = targetLinks->second.groups[DimensionIndex(dimension)];
+  return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
+}
+
+mitk::DisplayActionEventFunctions::LevelWindowScope QmitkMxNMultiWidget::WindowingScopeOf(
+  const mitk::BaseRenderer* sender) const
+{
+  using mitk::DisplayActionEventFunctions::LevelWindowScope;
+
+  const auto editorPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  if (!senderId.startsWith(editorPrefix))
+  {
+    return LevelWindowScope::Foreign;
+  }
+
+  const auto senderLinks = m_CellSyncLinks.find(senderId);
+  if (senderLinks == m_CellSyncLinks.end()
+      || !senderLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)].has_value())
+  {
+    return LevelWindowScope::Ungrouped;
+  }
+  return LevelWindowScope::Grouped;
+}
+
+bool QmitkMxNMultiWidget::IsWindowingTarget(const mitk::BaseRenderer* sender,
+                                            const mitk::BaseRenderer* target) const
+{
+  const auto editorPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto targetId = QString::fromUtf8(target->GetName());
+  if (!senderId.startsWith(editorPrefix) || !targetId.startsWith(editorPrefix))
+  {
+    return false;
+  }
+
+  const auto senderLinks = m_CellSyncLinks.find(senderId);
+  const auto targetLinks = m_CellSyncLinks.find(targetId);
+  if (senderLinks == m_CellSyncLinks.end() || targetLinks == m_CellSyncLinks.end())
+  {
+    return false;
+  }
+  const auto& senderGroup = senderLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)];
+  const auto& targetGroup = targetLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)];
+  return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
+}
+
+void QmitkMxNMultiWidget::Synchronize(bool synchronized)
+{
+  // Pure membership rewrite: the handler stays installed and its predicates
+  // read the link map live, so no re-wiring is needed. Deliberately no
+  // convergence (unlike SetSyncLink) - the toggle couples views in place.
+  //
+  // The macro couples navigation only (pan/zoom/slice/crosshair to "sync"), so
+  // members keep their appearance and selection axes on their default group and
+  // therefore read a gray 'Complex' frame while synchronized - an honest split
+  // (the cell spans "sync" and its default group), not a defect. Painting a
+  // solid hue instead would require the macro to also claim
+  // windowing/lut/selection, a broader coupling than a navigation toggle
+  // should imply.
+  m_SynchronizeMacroActive = synchronized;
+  if (synchronized)
+  {
+    this->RegisterGroupForHue(SYNCHRONIZE_MACRO_GROUP);
+  }
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    auto& links = m_CellSyncLinks[windowId];
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+    {
+      links.groups[DimensionIndex(dimension)] =
+        synchronized ? std::optional<std::string>(SYNCHRONIZE_MACRO_GROUP) : std::nullopt;
+    }
+  }
+  this->RefreshSyncControls();
 }
 
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetName) const
 {
   if ("axial" == widgetName || "sagittal" == widgetName || "coronal" == widgetName || "3d" == widgetName)
   {
-    return GetActiveRenderWindowWidget()->GetRenderWindow();
+    // No active cell while a layout is being rebuilt; its event pump can still
+    // deliver a caller that asks.
+    const auto activeWidget = this->GetActiveRenderWindowWidget();
+    return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
   }
 
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
@@ -265,8 +715,10 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::AnatomicalPlane& /*orientation*/) const
 {
   // currently no mapping between plane orientation and render windows
-  // simply return the currently active render window
-  return GetActiveRenderWindowWidget()->GetRenderWindow();
+  // simply return the currently active render window, if there is one (see
+  // the name-based overload)
+  const auto activeWidget = this->GetActiveRenderWindowWidget();
+  return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
 }
 
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
@@ -277,26 +729,24 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
     return;
   }
 
-  // reset the decoration color of the previously active render window widget
-  if (nullptr != currentActiveRenderWindowWidget)
-  {
-    auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
-    QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
-    currentActiveRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
-                                                   hexColor.name(QColor::HexRgb) + "; }");
-  }
-
-  // set the new decoration color of the currently active render window widget
-  if (nullptr != activeRenderWindowWidget)
-  {
-    activeRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid #FF6464; }");
-  }
-
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);
+
+  // The frame color carries group identity, not active-ness; the active cell is
+  // marked by white corner brackets the overlay paints. Restyle every cell and
+  // repaint the overlays so the brackets follow the active-cell change.
+  this->RefreshFrameColors();
 }
 
 void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
 {
+  // A layout rebuild in progress has no active cell yet; it initializes the
+  // cells it creates itself.
+  const auto activeWidget = this->GetActiveRenderWindowWidget();
+  if (nullptr == activeWidget)
+  {
+    return;
+  }
+
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
   unsigned int imageTimeStep = 0;
@@ -314,8 +764,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   }
 
   // initialize active render window
-  renderingManager->InitializeView(
-    this->GetActiveRenderWindowWidget()->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
+  renderingManager->InitializeView(activeWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
 
   if (!resetCamera)
   {
@@ -352,12 +801,19 @@ void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
   }
   else
   {
-    renderWindowWidgets = { GetRenderWindowWidget(widgetName) };
+    auto renderWindowWidget = this->GetRenderWindowWidget(widgetName);
+    if (nullptr == renderWindowWidget)
+    {
+      MITK_ERROR << "Position can not be set for the unknown render window '"
+                 << widgetName.toStdString() << "'.";
+      return;
+    }
+    renderWindowWidgets.insert(renderWindowWidget);
   }
 
   if (renderWindowWidgets.isEmpty())
   {
-    MITK_ERROR << "Position can not be set for an unknown render window widget.";
+    MITK_ERROR << "Position can not be set: the editor has no render windows.";
     return;
   }
 
@@ -390,32 +846,35 @@ const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widg
 
 void QmitkMxNMultiWidget::SetCrosshairVisibility(bool visible)
 {
-  // get the specific render window that sent the signal
-  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
-  if (nullptr == renderWindow)
+  m_CrosshairVisibility = visible;
+
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
-    return;
+    try
+    {
+      renderWindowWidget->SetCrosshairVisibility(visible);
+    }
+    catch (const mitk::Exception& e)
+    {
+      // The crosshair node reaches the data storage when the editor part opens
+      // (EnableCrosshair); until then a cell has no crosshair to show or hide.
+      MITK_WARN << "Crosshair visibility for " << windowId.toStdString()
+                << " ignored: " << e.GetDescription();
+    }
   }
 
-  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
-  renderWindowWidget->SetCrosshairVisibility(visible);
+  emit CrosshairVisibilityChanged(visible);
 }
 
 bool QmitkMxNMultiWidget::GetCrosshairVisibility() const
 {
-  // get the specific render window that sent the signal
-  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
-  if (nullptr == renderWindow)
-  {
-    return false;
-  }
-
-  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
-  return renderWindowWidget->GetCrosshairVisibility();
+  return m_CrosshairVisibility;
 }
 
 void QmitkMxNMultiWidget::SetCrosshairGap(unsigned int gapSize)
 {
+  m_CrosshairGap = gapSize;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -466,6 +925,8 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(QmitkCrosshairRotationMode mode)
 
 void QmitkMxNMultiWidget::EnableCrosshair()
 {
+  m_CrosshairEnabled = true;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -475,6 +936,8 @@ void QmitkMxNMultiWidget::EnableCrosshair()
 
 void QmitkMxNMultiWidget::DisableCrosshair()
 {
+  m_CrosshairEnabled = false;
+
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -510,58 +973,71 @@ void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
 //////////////////////////////////////////////////////////////////////////
 void QmitkMxNMultiWidget::SetLayoutImpl()
 {
-  int requiredRenderWindowWidgets = this->GetRowCount() * this->GetColumnCount();
-  int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
+  // The maximized cell is a view state over the current grid; the grid is about
+  // to change underneath it, so drop it rather than leave siblings hidden.
+  this->SetMaximizedCell(QString());
+
+  // The grid is rebuilt in the order the user reads the current tree, with new
+  // cells appended. The window ids cannot stand in for that order: grid
+  // operations and loaded documents leave ids that do not sort the way the
+  // cells sit on screen.
+  std::vector<QString> readingOrder;
+  for (const auto& [id, rect] : this->GetNormalizedCellRects())
+  {
+    readingOrder.push_back(id);
+  }
+
+  const int requiredRenderWindowWidgets = this->GetRowCount() * this->GetColumnCount();
+  const int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
 
   int difference = requiredRenderWindowWidgets - existingRenderWindowWidgets;
   while (0 < difference)
   {
-    // more render window widgets needed
-    this->CreateRenderWindowWidget();
+    readingOrder.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
     --difference;
   }
 
-  while (0 > difference)
+  if (0 > difference)
   {
-    // Remove the highest 'widget<i>' that is registered. Routing through
-    // the name-keyed overload (rather than the no-arg lex-last variant)
-    // guarantees the right cell is removed once the editor crosses 10 cells:
-    // {widget0..widget11} sorts as widget0 < widget1 < widget10 < widget11
-    // < widget2 < ..., so lex-last would otherwise pick widget9.
-    bool removed = false;
-    for (std::size_t i = this->GetNumberOfRenderWindowWidgets(); i-- > 0; )
+    // A shrink trims from the end in reading order, so the cells the user
+    // sees first survive.
+    const auto excess = std::min<std::size_t>(-difference, readingOrder.size());
+    for (auto it = readingOrder.end() - excess; it != readingOrder.end(); ++it)
     {
-      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER + QStringLiteral("widget") + QString::number(i);
-      if (nullptr != this->GetRenderWindowWidget(id))
+      const auto cell = this->GetRenderWindowWidget(*it);
+      if (nullptr == cell)
       {
-        this->RemoveRenderWindowWidget(id);
-        removed = true;
-        break;
+        MITK_WARN << "SetLayout: reading-order cell '" << it->toStdString()
+                  << "' no longer resolves - skipping.";
+        continue;
       }
+      this->DetachAndDestroyCell(cell.get());
+      ++difference;
     }
-    if (!removed)
+    readingOrder.resize(readingOrder.size() - excess);
+
+    if (0 > difference)
     {
-      // No 'widget<i>' cell present - mixed with custom-named layout. Bail
-      // rather than spinning; the caller is expected to ApplyLayout/
-      // RollBackToSingleDefaultCell when entering an inconsistent state.
       MITK_WARN << "SetLayout: cannot shrink to " << requiredRenderWindowWidgets
                 << " cells - " << this->GetNumberOfRenderWindowWidgets()
-                << " custom-named cells remain. Layout dimensions ("
+                << " cells remain. Layout dimensions ("
                 << this->GetRowCount() << "x" << this->GetColumnCount()
                 << ") are now out of sync with the cell count. Use ApplyLayout "
                    "or RollBackToSingleDefaultCell to recover a consistent state.";
-      break;
     }
-    ++difference;
   }
 
-  auto firstRenderWindowWidget = this->GetFirstRenderWindowWidget();
-  if (nullptr != firstRenderWindowWidget)
+  this->BuildGridTree(readingOrder);
+
+  if (auto firstCell = this->FirstCellInReadingOrder())
   {
-    this->SetActiveRenderWindowWidget(firstRenderWindowWidget);
+    this->SetActiveRenderWindowWidget(firstCell);
   }
 
-  this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
+  // Layout-tracking furniture (layout editor, sync plates) follows this signal;
+  // without it a shrink leaves them rendering removed cells.
+  this->ConfigureLayoutSplitters();
+  emit LayoutChanged();
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
@@ -582,10 +1058,26 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // The positional convenience overload owns the editor's "default group 1"
   // convention: the cell is placed into engine sync-group 1 right after
   // construction. The explicit-id overload stays free of side effects so
-  // v2-layout callers can move the cell to its document-declared group
+  // ApplyLayout can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
-  auto renderWindowWidget = this->CreateRenderWindowWidget(prefix + QString::number(i));
+  const auto id = prefix + QString::number(i);
+  auto renderWindowWidget = this->CreateRenderWindowWidget(id);
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
+
+  // The default group (engine index 1) synchronizes the appearance axes by
+  // default. Linking Windowing and LUT here keeps a fresh cell's level/window
+  // and LUT changes inside that group (grouped, per-renderer) instead of
+  // writing the node property globally, which would leak to every other
+  // renderer of the node. Index 1 is registered before the first cell
+  // (InitializeMultiWidget adds it ahead of SetLayout, and the
+  // SetSynchronizationGroup call above auto-creates it otherwise), so the
+  // name always resolves. This lives in the positional overload only: the
+  // explicit-id overload stays side-effect-free so ApplyLayout honors a
+  // loaded document's links verbatim.
+  const auto defaultGroup = this->GetDefaultSyncGroupName();
+  auto& links = m_CellSyncLinks[id];
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)] = defaultGroup;
+  links.groups[DimensionIndex(QmitkMxNSyncDimension::Lut)] = defaultGroup;
   return renderWindowWidget;
 }
 
@@ -616,8 +1108,17 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   }
 
   // create the render window widget and connect signal / slot
+  // A new widget starts with no stylesheet, so any colour remembered for this
+  // id belongs to a cell that no longer exists.
+  m_CellBorderColors.erase(id);
+  this->TickLayoutLoadFeedbackCell();
+
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
-  renderWindowWidget->SetCornerAnnotationText(id.toStdString());
+  // The cell's plane label is drawn by the Qt overlay in the same layer as the
+  // slice readout (so the two align); the VTK corner annotation, which would
+  // otherwise show the internal cell id, is blanked to avoid a second, stale
+  // label in the OpenGL scene.
+  renderWindowWidget->SetCornerAnnotationText(std::string());
   this->AddRenderWindowWidget(id, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
@@ -625,53 +1126,639 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, this->GetDataStorage());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
-  connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
-    utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
-  // 'SyncGroupChanged' is wired through a lambda that catches 'mitk::Exception',
-  // because Qt slots must not let exceptions escape into the event dispatcher.
-  // The direct method 'SetSynchronizationGroup' keeps its throwing contract for
-  // direct callers; only the slot path is defensive.
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this,
-    [this](QmitkSynchronizedNodeSelectionWidget* widget, const GroupSyncIndexType index)
-    {
-      try
-      {
-        this->SetSynchronizationGroup(widget, index);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Ignoring 'SyncGroupChanged(" << index
-                  << ")': " << e.GetDescription();
-      }
-    });
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested,
-    this, &QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested);
-  connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
+  // Viewport furniture: one proximity controller and one composite overlay
+  // per cell, both children of the cell (they die with it; the editor
+  // reaches them via findChild, so no pointer bookkeeping can go stale).
+  auto* proximity = new QmitkRenderWindowProximity(renderWindowWidget.get(), renderWindowWidget.get());
+  proximity->AddEventSource(renderWindow);
+  proximity->SetSuppressed(m_CleanView);
 
-  // Replay existing groups so the freshly-created utility widget's combobox
-  // reflects the current set of registered groups (rather than relying on a
-  // contiguous 1..N seed inside the utility widget's constructor).
-  for (const auto& entry : m_SynchronizedWidgetConnectors)
+  auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
+  cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
+  cellOverlay->SetCleanView(m_CleanView);
+  cellOverlay->SetNavigatorExpanded(m_NavigatorExpanded);
+
+  // The utility row auto-hides into a top-edge strip; approaching the top
+  // reveals it as a floating panel, so the render window never resizes.
+  renderWindowWidget->SetUtilityWidgetAutoHide(true);
+  proximity->AddEventSource(utilityWidget);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::PopupVisibilityChanged,
+          proximity, &QmitkRenderWindowProximity::SetPinned);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CleanViewToggled,
+          this, &QmitkMxNMultiWidget::SetCleanView);
+  connect(this, &QmitkMxNMultiWidget::CleanViewChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetCleanViewChecked);
+  utilityWidget->SetCleanViewChecked(m_CleanView);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::NavigatorToggled,
+          this, &QmitkMxNMultiWidget::SetNavigatorExpanded);
+  connect(this, &QmitkMxNMultiWidget::NavigatorExpandedChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetNavigatorChecked);
+  utilityWidget->SetNavigatorChecked(m_NavigatorExpanded);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CrosshairToggled,
+          this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
+  connect(this, &QmitkMxNMultiWidget::CrosshairVisibilityChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetCrosshairChecked);
+  utilityWidget->SetCrosshairChecked(m_CrosshairVisibility);
+  renderWindowWidget->SetCrosshairVisibility(m_CrosshairVisibility);
+  renderWindowWidget->SetCrosshairGap(m_CrosshairGap);
+  if (m_CrosshairEnabled)
   {
-    utilityWidget->OnSyncGroupAdded(entry.first);
+    renderWindowWidget->EnableCrosshair();
   }
+
+  // Maximizing is the one per-cell toggle in the strip, so the cell's id is
+  // bound here; every strip then mirrors the single maximized cell, which is
+  // what lets any of them restore the grid.
+  const QString cellId = renderWindowWidget->GetWidgetName();
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::MaximizeToggled,
+          this, [this, cellId](bool maximized) {
+            this->SetMaximizedCell(maximized ? cellId : QString());
+          });
+  connect(this, &QmitkMxNMultiWidget::MaximizedCellChanged,
+          utilityWidget, [utilityWidget, cellId](const QString& maximizedId) {
+            utilityWidget->SetMaximizeChecked(maximizedId == cellId);
+          });
+  utilityWidget->SetMaximizeChecked(m_MaximizedCell == cellId);
 
   // Initialize the node selection widget with all nodes. The cell is left
   // unattached to any sync group; placement into a group is the caller's
-  // responsibility (the positional overload assigns group 1; the v2 layout
-  // applier assigns the document-declared target group). This keeps the
+  // responsibility (the positional overload assigns group 1; ApplyLayout
+  // assigns the document-declared target group). This keeps the
   // explicit-name path free of side-effects so it does not auto-create a
   // phantom group 1 for documents that never reference it.
   utilityWidget->GetNodeSelectionWidget()->SelectAll();
 
-  auto layoutManager = this->GetMultiWidgetLayoutManager();
-  connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
+  // LayoutDesignChanged is deliberately not connected: the layout manager's
+  // generic designs rebuild the splitter tree behind this editor's grid,
+  // maximize and layout-document state.
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
-  connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
-  connect(this, &QmitkAbstractMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow, &QmitkRenderWindow::UpdateCrosshairRotationMode);
+
+  // The cell's sync barcode toggles the editor-wide layout editor; the view
+  // hosting it lives above this module, so the request is only relayed.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested, this,
+          [this]() { emit LayoutEditorRequested(LayoutEditorRequest::Toggle); });
+
+  // Pointing at an axis in one cell's barcode asks a question about the whole
+  // layout, so the strip only reports and the editor answers in every cell.
+  // The strip also says whose barcode it is, so arrange mode can mark the
+  // cells sharing that cell's synchronization on the pointed-at axis.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncPeekHovered, this,
+          [this, id](bool overStrip, std::optional<QmitkMxNSyncAxis> axis)
+          {
+            if (overStrip)
+            {
+              m_SyncPeekHoverCell = id;
+            }
+            this->OnSyncPeekHovered(overStrip, axis);
+          });
+
+  // The Synchronize macro covers every cell of the editor, including cells
+  // created while it is active - not only those present at toggle time.
+  if (m_SynchronizeMacroActive)
+  {
+    auto& links = m_CellSyncLinks[id];
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+    {
+      links.groups[DimensionIndex(dimension)] = SYNCHRONIZE_MACRO_GROUP;
+    }
+  }
 
   return renderWindowWidget;
+}
+
+namespace
+{
+  // Even distribution for a freshly built splitter: every splitter of a
+  // SetLayout grid and the new bottom row of AddGridRow, so a grid op and a
+  // fresh SetLayout size cells identically.
+  void DistributeSplitterEvenly(QSplitter* splitter)
+  {
+    QList<int> sizes;
+    for (int i = 0; i < splitter->count(); ++i)
+    {
+      sizes.append(1000);
+    }
+    splitter->setSizes(sizes);
+  }
+
+  // Give the just-added trailing child a fair, non-zero size (matching an
+  // existing sibling) while leaving the other children's divider positions
+  // untouched - the grid ops must not move existing cells. A widget added to an
+  // unrealized (never-shown) splitter otherwise reports size 0, which
+  // SerializeLayout would emit and ApplyLayout would reject ("size must be
+  // >= 1"); blanket even re-distribution would instead discard the user's
+  // divider positions.
+  void SizeNewTrailingChild(QSplitter* splitter)
+  {
+    auto sizes = splitter->sizes();
+    if (sizes.size() >= 2)
+    {
+      sizes.last() = sizes.first();
+      splitter->setSizes(sizes);
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::BuildGridTree(const std::vector<QString>& readingOrder)
+{
+  this->GetMultiWidgetLayoutManager()->ClearLayout();
+
+  auto* hBoxLayout = new QHBoxLayout(this);
+  hBoxLayout->setContentsMargins({});
+  auto* rootSplitter = new QSplitter(Qt::Vertical);
+  hBoxLayout->addWidget(rootSplitter);
+
+  const int rows = this->GetRowCount();
+  const int columns = this->GetColumnCount();
+  auto next = readingOrder.begin();
+  for (int row = 0; row < rows && next != readingOrder.end(); ++row)
+  {
+    auto* rowSplitter = new QSplitter(Qt::Horizontal);
+    for (int column = 0; column < columns && next != readingOrder.end(); ++column, ++next)
+    {
+      const auto cell = this->GetRenderWindowWidget(*next);
+      if (nullptr == cell)
+      {
+        mitkThrow() << "BuildGridTree: no render window '" << next->toStdString() << "' in this editor.";
+      }
+      rowSplitter->addWidget(cell.get());
+      cell->show();
+    }
+    DistributeSplitterEvenly(rowSplitter);
+    rootSplitter->addWidget(rowSplitter);
+  }
+  DistributeSplitterEvenly(rootSplitter);
+}
+
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::FirstCellInReadingOrder() const
+{
+  const auto rects = this->GetNormalizedCellRects();
+  return rects.empty() ? nullptr : this->GetRenderWindowWidget(rects.front().first);
+}
+
+void QmitkMxNMultiWidget::SetMaximizedCell(const QString& windowId)
+{
+  auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    // Nothing to maximize without a tree. No maximize state can be pending
+    // here: every path that replaces the tree resets the maximize first.
+    return;
+  }
+
+  // Leave any current maximize first, so switching cells never stacks two.
+  auto restoreGrid = [this]()
+  {
+    for (const auto& [splitter, sizes] : m_PreMaximizeSizes)
+    {
+      // Every tree rebuild resets the maximize first, so the captured
+      // splitters are alive here; the guarded pointer only keeps a broken
+      // invariant from turning into a use-after-free.
+      if (nullptr == splitter)
+      {
+        continue;
+      }
+      for (int i = 0; i < splitter->count(); ++i)
+      {
+        splitter->widget(i)->show();
+      }
+      splitter->setSizes(sizes);
+    }
+    m_PreMaximizeSizes.clear();
+  };
+  restoreGrid();
+
+  const auto cells = this->GetRenderWindowWidgets();
+  const auto target = cells.find(windowId);
+  QmitkRenderWindowWidget* maximized = windowId.isEmpty() || target == cells.end()
+    ? nullptr
+    : target->second.get();
+
+  // Only the siblings along the target's ancestor chain are hidden, so only
+  // the splitters on that chain change their sizes; a hidden sibling subtree
+  // keeps its inner proportions. Hiding a child zeroes its splitter size,
+  // which would otherwise both lose the user's divider positions and put an
+  // unloadable size 0 into a saved layout, so each chain splitter's sizes are
+  // captured first.
+  for (QWidget* onPath = maximized; nullptr != onPath && onPath != root;)
+  {
+    auto* splitter = qobject_cast<QSplitter*>(onPath->parentWidget());
+    if (nullptr == splitter)
+    {
+      MITK_WARN << "SetMaximizedCell: window '" << windowId.toStdString()
+                << "' is not part of the layout tree; restoring the grid.";
+      restoreGrid();
+      maximized = nullptr;
+      break;
+    }
+
+    m_PreMaximizeSizes.emplace_back(splitter, splitter->sizes());
+    for (int i = 0; i < splitter->count(); ++i)
+    {
+      auto* child = splitter->widget(i);
+      if (child != onPath)
+      {
+        child->hide();
+      }
+    }
+    onPath = splitter;
+  }
+
+  const QString resolved = nullptr != maximized ? windowId : QString();
+  if (resolved == m_MaximizedCell)
+  {
+    return;
+  }
+
+  m_MaximizedCell = resolved;
+  emit MaximizedCellChanged(m_MaximizedCell);
+}
+
+QString QmitkMxNMultiWidget::GetMaximizedCell() const
+{
+  return m_MaximizedCell;
+}
+
+void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
+{
+  auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    return;
+  }
+
+  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* split)
+  {
+    // Signal to signal, and deliberately not a lambda: Qt honours
+    // Qt::UniqueConnection only for member-function connections, so a functor
+    // here would silently stack another connection every time the tree is
+    // re-walked, and one drag would then emit once per structural change the
+    // editor has seen. The arity difference is fine - a connection may drop
+    // trailing arguments.
+    connect(split, &QSplitter::splitterMoved,
+            this, &QmitkMxNMultiWidget::LayoutProportionsChanged, Qt::UniqueConnection);
+    split->setChildrenCollapsible(false);
+
+    for (int i = 0; i < split->count(); ++i)
+    {
+      if (auto* sub = dynamic_cast<QSplitter*>(split->widget(i)))
+      {
+        walk(sub);
+      }
+    }
+  };
+
+  walk(root);
+}
+
+std::vector<std::pair<QString, QRectF>> QmitkMxNMultiWidget::GetNormalizedCellRects() const
+{
+  std::vector<std::pair<QString, QRectF>> rects;
+
+  const auto* root = this->RootSplitter();
+  if (nullptr == root)
+  {
+    return rects;
+  }
+
+  // Recursion mirrors SerializeSplitter's walk, and reads the same sizes it
+  // serializes - including the pre-maximize capture, so a maximized editor
+  // still reports the grid it will return to instead of one full-width cell
+  // and a row of zeroes.
+  std::function<void(const QSplitter*, const QRectF&)> walk =
+    [this, &rects, &walk](const QSplitter* split, const QRectF& area)
+  {
+    QList<int> sizes = split->sizes();
+    for (const auto& [captured, capturedSizes] : m_PreMaximizeSizes)
+    {
+      if (captured == split)
+      {
+        sizes = capturedSizes;
+        break;
+      }
+    }
+
+    const int total = std::accumulate(sizes.begin(), sizes.end(), 0);
+    const bool vertical = split->orientation() == Qt::Vertical;
+    const int count = split->count();
+
+    double offset = 0.0;
+    for (int i = 0; i < count; ++i)
+    {
+      // An all-zero splitter has no proportions to read; fall back to equal
+      // shares so the map still describes the structure.
+      const double fraction = total > 0 && i < sizes.size()
+        ? static_cast<double>(sizes[i]) / total
+        : 1.0 / std::max(1, count);
+
+      const QRectF childArea = vertical
+        ? QRectF(area.x(), area.y() + offset * area.height(), area.width(), fraction * area.height())
+        : QRectF(area.x() + offset * area.width(), area.y(), fraction * area.width(), area.height());
+
+      auto* child = split->widget(i);
+      if (auto* sub = dynamic_cast<const QSplitter*>(child))
+      {
+        walk(sub, childArea);
+      }
+      else if (auto* cell = dynamic_cast<const QmitkRenderWindowWidget*>(child))
+      {
+        rects.emplace_back(cell->GetWidgetName(), childArea);
+      }
+
+      offset += fraction;
+    }
+  };
+
+  walk(root, QRectF(0.0, 0.0, 1.0, 1.0));
+  return rects;
+}
+
+QSplitter* QmitkMxNMultiWidget::RootSplitter() const
+{
+  auto* topLayout = this->layout();
+  if (nullptr == topLayout || topLayout->count() == 0)
+  {
+    return nullptr;
+  }
+  auto* item = topLayout->itemAt(0);
+  auto* widget = (nullptr == item) ? nullptr : item->widget();
+  return dynamic_cast<QSplitter*>(widget);
+}
+
+bool QmitkMxNMultiWidget::ResolveGridShape(int& rows, int& columns) const
+{
+  rows = 0;
+  columns = 0;
+
+  auto* root = this->RootSplitter();
+  if (nullptr == root || root->orientation() != Qt::Vertical)
+  {
+    return false;
+  }
+
+  const int rowCount = root->count();
+  if (0 == rowCount)
+  {
+    return false;
+  }
+
+  int columnCount = -1;
+  for (int r = 0; r < rowCount; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    if (nullptr == rowSplit || rowSplit->orientation() != Qt::Horizontal)
+    {
+      return false;
+    }
+
+    const int cells = rowSplit->count();
+    if (0 == cells)
+    {
+      return false;
+    }
+    for (int c = 0; c < cells; ++c)
+    {
+      if (nullptr == dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(c)))
+      {
+        return false;
+      }
+    }
+
+    if (columnCount < 0)
+    {
+      columnCount = cells;
+    }
+    else if (cells != columnCount)
+    {
+      return false;
+    }
+  }
+
+  rows = rowCount;
+  columns = columnCount;
+  return true;
+}
+
+void QmitkMxNMultiWidget::DetachAndDestroyCell(QmitkRenderWindowWidget* cell)
+{
+  if (nullptr == cell)
+  {
+    return;
+  }
+  const auto id = cell->GetWidgetName();
+
+  // Read the selection group index before removal: RemoveRenderWindowWidget can
+  // drop the cell's last owning reference and destroy it (and its utility
+  // widget), after which this read would be use-after-free.
+  GroupSyncIndexType selectionIndex = -1;
+  if (auto* utility = cell->GetUtilityWidget())
+  {
+    selectionIndex = utility->GetSyncGroup();
+  }
+
+  this->RemoveRenderWindowWidget(id);
+  m_CellSyncLinks.erase(id);
+  // After the map erase, so the cell is not counted as its own last member.
+  this->ReclaimSelectionGroupIfEmpty(selectionIndex);
+}
+
+void QmitkMxNMultiWidget::ResetActiveIfRemoved(const std::vector<QmitkRenderWindowWidget*>& removalSet)
+{
+  const auto active = this->GetActiveRenderWindowWidget();
+  if (nullptr == active)
+  {
+    return;
+  }
+
+  bool activeRemoved = false;
+  for (auto* cell : removalSet)
+  {
+    if (active.get() == cell)
+    {
+      activeRemoved = true;
+      break;
+    }
+  }
+  if (!activeRemoved)
+  {
+    return;
+  }
+
+  // The top-left cell (tree row 0, column 0) survives both trailing-edge
+  // removals, so it is always a valid repoint target.
+  auto* root = this->RootSplitter();
+  auto* firstRow = (nullptr == root || 0 == root->count())
+                     ? nullptr : dynamic_cast<QSplitter*>(root->widget(0));
+  auto* survivorWidget = (nullptr == firstRow || 0 == firstRow->count())
+                           ? nullptr : dynamic_cast<QmitkRenderWindowWidget*>(firstRow->widget(0));
+  if (nullptr == survivorWidget)
+  {
+    return;
+  }
+  const auto survivor = this->GetRenderWindowWidget(survivorWidget->GetWidgetName());
+  if (nullptr != survivor)
+  {
+    this->SetActiveRenderWindowWidget(survivor);
+  }
+}
+
+void QmitkMxNMultiWidget::FinalizeGridSurgery()
+{
+  int rows = 0;
+  int columns = 0;
+  if (this->ResolveGridShape(rows, columns))
+  {
+    this->SetGridDimensions(rows, columns);
+  }
+  this->ConfigureLayoutSplitters();
+  emit LayoutChanged();
+}
+
+void QmitkMxNMultiWidget::AddGridColumn()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "AddGridColumn: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+
+  this->SetMaximizedCell(QString());
+
+  auto* root = this->RootSplitter();
+  // The tree is transiently non-rectangular during this loop (already-grown rows
+  // have columns+1 cells, later rows still columns). Nothing reads
+  // ResolveGridShape mid-loop; the furniture refreshes once, on the
+  // LayoutChanged that FinalizeGridSurgery emits.
+  for (int r = 0; r < rows; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    auto cell = this->CreateRenderWindowWidget();
+    rowSplit->addWidget(cell.get());
+    cell->show();
+    SizeNewTrailingChild(rowSplit);
+  }
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::RemoveGridColumn()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "RemoveGridColumn: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+  if (columns <= 1)
+  {
+    MITK_WARN << "RemoveGridColumn: a grid must keep at least one column; no-op.";
+    return;
+  }
+
+  this->SetMaximizedCell(QString());
+
+  auto* root = this->RootSplitter();
+
+  std::vector<QmitkRenderWindowWidget*> removalSet;
+  removalSet.reserve(rows);
+  for (int r = 0; r < rows; ++r)
+  {
+    auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
+    removalSet.push_back(dynamic_cast<QmitkRenderWindowWidget*>(rowSplit->widget(rowSplit->count() - 1)));
+  }
+
+  this->ResetActiveIfRemoved(removalSet);
+  for (auto* cell : removalSet)
+  {
+    this->DetachAndDestroyCell(cell);
+  }
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::AddGridRow()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "AddGridRow: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+
+  this->SetMaximizedCell(QString());
+
+  auto* root = this->RootSplitter();
+
+  // Build the row fully before attaching it, so the tree is never observably
+  // mid-construction (a childless row-split would fail ResolveGridShape and the
+  // SerializeLayout walk). QSplitter::addWidget reparents, so the end state is
+  // identical to constructing with 'root' as parent, with the trailing
+  // placement made explicit.
+  auto* rowSplit = new QSplitter(Qt::Horizontal);
+  for (int c = 0; c < columns; ++c)
+  {
+    auto cell = this->CreateRenderWindowWidget();
+    rowSplit->addWidget(cell.get());
+    cell->show();
+  }
+  DistributeSplitterEvenly(rowSplit);
+  root->addWidget(rowSplit);
+  rowSplit->show();
+  SizeNewTrailingChild(root);
+
+  this->FinalizeGridSurgery();
+}
+
+void QmitkMxNMultiWidget::RemoveGridRow()
+{
+  int rows = 0;
+  int columns = 0;
+  if (!this->ResolveGridShape(rows, columns))
+  {
+    MITK_WARN << "RemoveGridRow: current layout is not a rectangular grid; no-op.";
+    return;
+  }
+  if (rows <= 1)
+  {
+    MITK_WARN << "RemoveGridRow: a grid must keep at least one row; no-op.";
+    return;
+  }
+
+  this->SetMaximizedCell(QString());
+
+  auto* root = this->RootSplitter();
+  auto* lastRow = dynamic_cast<QSplitter*>(root->widget(rows - 1));
+
+  std::vector<QmitkRenderWindowWidget*> removalSet;
+  removalSet.reserve(lastRow->count());
+  for (int c = 0; c < lastRow->count(); ++c)
+  {
+    removalSet.push_back(dynamic_cast<QmitkRenderWindowWidget*>(lastRow->widget(c)));
+  }
+
+  this->ResetActiveIfRemoved(removalSet);
+  for (auto* cell : removalSet)
+  {
+    this->DetachAndDestroyCell(cell);
+  }
+
+  // The removed cells' owning shared_ptrs are gone, so 'lastRow' is now
+  // childless; delete it rather than leave an empty split node. Deleting a
+  // splitter that still held cells would be undefined - cells live in shared_ptr
+  // control blocks, outside Qt's parent-delete domain.
+  delete lastRow;
+
+  this->FinalizeGridSurgery();
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWindowFromIndex(size_t index)
@@ -696,7 +1783,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWind
 }
 
 //////////////////////////////////////////////////////////////////////////
-// V2 LAYOUT FORMAT — Serialize / Apply (see mxn-layout-v2.schema.json)
+// LAYOUT FORMAT - Serialize (v3.0) / Apply (v2.0, v3.0); see mxn-layout-v3.schema.json
 //////////////////////////////////////////////////////////////////////////
 
 void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
@@ -769,9 +1856,13 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
   };
   walk(rootSplitter);
 
-  // Emit the strict-mode 'groups' dict for every group referenced by a cell.
+  // Emit the strict-mode 'groups' dict for every registered group, not only
+  // those a cell references: an empty group is still a card in the editor.
+  // Every registered group carries its select_all, whether or not a cell is
+  // in its selection: the loader registers a declared group whose entry has
+  // select_all, so a registered group stays registered across save and load.
   nlohmann::json groupsJson = nlohmann::json::object();
-  for (const auto& [idx, name] : groupNames)
+  for (const auto& [idx, name] : m_GroupNameByIndex)
   {
     bool selectAll = true;
     if (auto* connector = this->GetSyncGroupConnector(idx))
@@ -780,9 +1871,38 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
     }
     groupsJson[name] = nlohmann::json{ { "select_all", selectAll } };
   }
+  // Strict mode requires every referenced group declared, across all
+  // dimensions (shared namespace). A group only navigation links name and
+  // that is not registered has no selection state; it is declared with an
+  // empty entry, which the loader reads back as such a group.
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    for (const auto& navGroup : this->GetSyncGroupNames(dimension))
+    {
+      if (!groupsJson.contains(navGroup))
+      {
+        groupsJson[navGroup] = nlohmann::json::object();
+      }
+    }
+  }
+  // Cosmetic per-group fields, emitted only when set so a document that
+  // never carried them stays shaped as before.
+  for (auto& [name, entry] : groupsJson.items())
+  {
+    const auto color = m_GroupColors.find(name);
+    if (color != m_GroupColors.end())
+    {
+      entry["color"] = color->second;
+    }
+    const auto displayName = m_GroupDisplayNames.find(name);
+    if (displayName != m_GroupDisplayNames.end() && !displayName->second.empty())
+    {
+      entry["name"] = displayName->second;
+    }
+  }
 
   nlohmann::json doc;
-  doc["version"] = "2.0";
+  doc["version"] = "3.0";
   // Round-trip the optional `name` from the document that produced the
   // current state; emit the field only when set so empty strings never
   // land on disk.
@@ -806,7 +1926,20 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
   node["type"] = "split";
   node["orientation"] = (splitter->orientation() == Qt::Vertical) ? "vertical" : "horizontal";
 
-  const auto sizes = splitter->sizes();
+  // While a cell is maximized its siblings are hidden, so the live sizes read
+  // 0 for them - and the loader rejects size < 1. Serialize the proportions the
+  // grid had before, so a layout saved from a maximized editor still describes
+  // the grid and can be loaded back.
+  QList<int> sizes = splitter->sizes();
+  for (const auto& [captured, capturedSizes] : m_PreMaximizeSizes)
+  {
+    if (captured == splitter)
+    {
+      sizes = capturedSizes;
+      break;
+    }
+  }
+
   auto children = nlohmann::json::array();
   for (int i = 0; i < splitter->count(); ++i)
   {
@@ -838,13 +1971,59 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
         childJson["name"] = descriptor.displayName.toStdString();
       }
       childJson["view_direction"] = descriptor.viewDirection.toStdString();
-      childJson["links"] = nlohmann::json{ { "selection", descriptor.selectionGroup.toStdString() } };
+
+      nlohmann::json linksJson{ { "selection", descriptor.selectionGroup.toStdString() } };
+      const auto linksIt = m_CellSyncLinks.find(descriptor.id);
+      if (linksIt != m_CellSyncLinks.end())
+      {
+        const auto& links = linksIt->second;
+        for (const auto dimension : QmitkMxNAllSyncDimensions)
+        {
+          const auto& group = links.groups[DimensionIndex(dimension)];
+          if (!group.has_value())
+          {
+            continue;
+          }
+          // Identity offsets serialize as the string shorthand; only a real
+          // offset needs the object form.
+          nlohmann::json linkValue = *group;
+          switch (dimension)
+          {
+            case QmitkMxNSyncDimension::Slice:
+              if (0 != links.sliceOffset)
+              {
+                linkValue = nlohmann::json{ { "target", *group }, { "offset", links.sliceOffset } };
+              }
+              break;
+            case QmitkMxNSyncDimension::Zoom:
+              if (1.0 != links.zoomOffset)
+              {
+                linkValue = nlohmann::json{ { "target", *group }, { "offset", links.zoomOffset } };
+              }
+              break;
+            case QmitkMxNSyncDimension::Pan:
+              if (0.0 != links.panOffset[0] || 0.0 != links.panOffset[1])
+              {
+                linkValue = nlohmann::json{
+                  { "target", *group },
+                  { "offset", nlohmann::json::array({ links.panOffset[0], links.panOffset[1] }) } };
+              }
+              break;
+            default:
+              break;
+          }
+          linksJson[QmitkMxNSyncDimensionToLinkKey(dimension)] = linkValue;
+        }
+      }
+      childJson["links"] = linksJson;
     }
     else
     {
       mitkThrow() << "SerializeLayout: unknown child widget type at splitter index " << i << ".";
     }
-    childJson["size"] = sizes[i];
+    // A child Qt reports at 0 (collapsed, hidden, or not yet realized) would
+    // make the document unloadable: the loader and both schemas require >= 1.
+    childJson["size"] = std::max(1, sizes[i]);
     children.push_back(childJson);
   }
   node["children"] = children;
@@ -867,7 +2046,7 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   descriptor.id = cell->GetWidgetName();
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
-    ViewDirectionToV2String(
+    ViewDirectionToString(
       cell->GetSliceNavigationController()->GetDefaultViewDirection()));
 
   const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
@@ -923,7 +2102,7 @@ QmitkMxNMultiWidget::ListWindowDescriptors() const
   return result;
 }
 
-QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
+QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
   const nlohmann::json& splitNode,
   const std::map<std::string, GroupSyncIndexType>& nameToInt,
   QSplitter* parentSplitter)
@@ -948,29 +2127,22 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
       const auto type = child["type"].get<std::string>();
       // 'size' is optional; default weight 1 matches the schema default.
       // Only the ratio between siblings matters at runtime - QSplitter
-      // redistributes weights proportionally on resize. Reject size < 1
-      // (the schema also requires this): size 0 would collapse the pane
-      // in Qt, but the format has no documented 'hide this cell' semantics.
-      const int childSize = child.value("size", 1);
-      if (childSize < 1)
-      {
-        mitkThrow() << "Layout child has invalid 'size' " << childSize
-                    << "; size must be >= 1.";
-      }
-      sizes.append(childSize);
+      // redistributes weights proportionally on resize. PrewalkValidate has
+      // rejected anything but an integer >= 1.
+      sizes.append(child.value("size", 1));
 
       if (type == "split")
       {
-        auto* sub = this->BuildSplitterFromJsonV2(child, nameToInt, split.get());
+        auto* sub = this->BuildSplitterFromJson(child, nameToInt, split.get());
         split->addWidget(sub);
       }
       else  // "window"
       {
-        // Id passes through verbatim - validation already happened upstream
-        // (PrewalkValidate + ValidateIdsForThisEditor).
+        // Id and view direction pass through verbatim - validation already
+        // happened upstream (PrewalkValidate + ValidateIdsForThisEditor).
         const auto id = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
-        const auto groupName = child["links"]["selection"].get<std::string>();
+        const auto groupName = LinkTarget(child["links"]["selection"]);
         const auto targetIdx = nameToInt.at(groupName);
 
         auto window = this->CreateRenderWindowWidget(id);
@@ -996,8 +2168,9 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
     // canonical shared_ptr-drop path. Cells were 'make_shared'-allocated;
     // letting the unique_ptr's destructor cascade-delete them via Qt's
     // 'deleteChildren' would call 'operator delete' on memory that isn't a
-    // standalone heap allocation - undefined behaviour, observed as the
-    // heap corruption in 'Apply_Failure_RollsBackToDefault'.
+    // standalone heap allocation - undefined behaviour that shows up as heap
+    // corruption. Document errors never get here (PrewalkValidate rejects
+    // them before teardown); this path guards engine-side failures.
     //
     // After the drain, every cell has been destroyed via '~QmitkRenderWindow
     // Widget' (which removes the cell from its splitter's child list); the
@@ -1061,10 +2234,9 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   constexpr int kWarnCap = 16;
   int warnCount = 0;
   bool warnCapHit = false;
-  // The divergence path here is uncovered by CI today by design: fresh
-  // layouts have no divergence to detect. Once scene-after-layout reseeding
-  // is implemented, an integration test should exercise this lambda with
-  // a scene that injects per-renderer divergence after the layout was applied.
+  // The divergence path is not covered by CI: a fresh layout has no
+  // divergence to detect, so exercising it takes a scene applied after the
+  // layout that injects per-renderer divergence.
   auto emitDivergence = [&](const std::string& groupName,
                             const std::string& dim,
                             const std::string& nodeLabel,
@@ -1197,7 +2369,11 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   //   3. Remove cells one-by-one through the public name-keyed path. Each
   //      removal disconnects signals and drops the map's shared_ptr; with
   //      no other strong refs left, the cell self-destructs.
+  // The maximize is a view state over the cells about to go, and its captured
+  // sizes describe splitters that go with them.
+  this->SetMaximizedCell(QString());
   this->SetActiveRenderWindowWidget(nullptr);
+  m_CellBorderColors.clear();
 
   std::vector<QString> names;
   for ([[maybe_unused]] const auto& [name, widget] : this->GetRenderWindowWidgets())
@@ -1214,6 +2390,16 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   // needs from the document.
   m_SynchronizedWidgetConnectors.clear();
   m_GroupNameByIndex.clear();
+  m_GroupHueOrder.clear();
+  m_GroupDisplayNames.clear();
+  m_GroupColors.clear();
+  m_SelectionGroupsAllocatedForLinks.clear();
+
+  // Per-cell synchronization links die with their cells; the document (or
+  // the user) defines the links of the next cell set. The macro state does
+  // not survive either - a loaded document is authoritative for coupling.
+  m_CellSyncLinks.clear();
+  m_SynchronizeMacroActive = false;
 
   // The rolled-back single-default-cell state has no preset name to claim.
   m_LayoutName.clear();
@@ -1281,6 +2467,15 @@ void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) co
 
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
+  if (m_ApplyingLayout)
+  {
+    mitkThrowException(QmitkMxNLayoutBusyException)
+      << "A layout is already being applied to this editor; retry once it has finished.";
+  }
+  // Outside the try so the rollback in the handlers below, which pumps the
+  // event loop as well, still runs with the flag set.
+  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+
   // 'didMutate' guards rollback. As long as we are in the validation phase
   // (no engine state touched yet) a throw must rethrow without rolling back,
   // so a malformed document does not destroy the user's existing layout.
@@ -1296,10 +2491,10 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
     if (!doc.contains("version") || !doc["version"].is_string())
     {
-      mitkThrow() << "Layout document is missing the 'version' string field; only '2.0' is supported.";
+      mitkThrow() << "Layout document is missing the 'version' string field; only '2.0' and '3.0' are supported.";
     }
     const auto version = doc["version"].get<std::string>();
-    if (version != "2.0")
+    if (version != "2.0" && version != "3.0")
     {
       // Point v1.x documents at the migration documentation. This message
       // surfaces to end users via the QMessageBox load wrapper, so it stays
@@ -1311,14 +2506,15 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       if (looksV1)
       {
         mitkThrow() << "Layout document version is '" << version
-                    << "'; only '2.0' is supported. If this is a v1.x layout "
+                    << "'; only '2.0' and '3.0' are supported. If this is a v1.x layout "
                     << "from before the format change, see the MxN layout "
                     << "developer documentation for the migration tool "
                     << "(Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py).";
       }
       mitkThrow() << "Layout document version is '" << version
-                  << "'; only '2.0' is supported.";
+                  << "'; only '2.0' and '3.0' are supported.";
     }
+    const bool isV3 = ("3.0" == version);
     if (!doc.contains("root"))
     {
       mitkThrow() << "Layout document is missing the 'root' field.";
@@ -1330,17 +2526,23 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     this->ValidateIdsForThisEditor(doc);
 
     // Pre-walk: validate structural shape, collect window ids + referenced
-    // group labels, and capture document-order seeding pairs for the
-    // post-build group-seeding pass.
-    std::set<std::string> seenIds;
-    std::set<std::string> referencedGroups;
-    std::vector<std::pair<std::string, std::string>> seedingOrder;
-    PrewalkValidate(doc.at("root"), seenIds, referencedGroups, seedingOrder);
+    // group labels + navigation links, and capture document-order seeding
+    // pairs for the post-build group-seeding pass.
+    PrewalkResult prewalk;
+    PrewalkValidate(doc.at("root"), isV3, prewalk);
+    const auto& seedingOrder = prewalk.seedingOrder;
 
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode
     // (no 'groups' block) defaults every referenced label to select_all=true.
+    // The declaration requirement of strict mode covers every dimension
+    // (shared group namespace). Every declared group is registered with its
+    // select_all, except one that only navigation links reference and whose
+    // entry has no select_all: that group exists only while a cell links it.
     const bool strictMode = doc.contains("groups");
     std::map<std::string, bool> groupSelectAll;
+    std::map<std::string, std::string> groupColors;
+    std::map<std::string, std::string> groupDisplayNames;
+    std::map<std::string, bool> memberlessGroupSelectAll;
     if (strictMode)
     {
       const auto& groupsDict = doc.at("groups");
@@ -1359,25 +2561,72 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
                       << GROUP_NAME_PATTERN.pattern().toStdString()
                       << "' (URL-segment-safe).";
         }
+        if (!it.value().is_object())
+        {
+          mitkThrow() << "Layout 'groups." << it.key() << "' entry must be a JSON object.";
+        }
+        // Cosmetic per-group fields. Purely presentational, so malformed
+        // values are ignored with a warning - a color must never make a
+        // layout unloadable.
+        const auto& entry = it.value();
+        if (entry.contains("color"))
+        {
+          const auto& color = entry.at("color");
+          if (color.is_string()
+              && GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
+          {
+            groupColors[it.key()] = color.get<std::string>();
+          }
+          else
+          {
+            MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                      << ".color' (expected '#RRGGBB'); using the default hue.";
+          }
+        }
+        if (entry.contains("name"))
+        {
+          const auto& displayName = entry.at("name");
+          if (displayName.is_string() && !displayName.get<std::string>().empty())
+          {
+            groupDisplayNames[it.key()] = displayName.get<std::string>();
+          }
+          else
+          {
+            MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                      << ".name' (expected a non-empty string); using the group id.";
+          }
+        }
       }
-      for (const auto& g : referencedGroups)
+      for (const auto& g : prewalk.selectionGroups)
       {
         if (!groupsDict.contains(g))
         {
           mitkThrow() << "Layout references group '" << g
                       << "' which is not declared in the 'groups' dict.";
         }
-        const auto& entry = groupsDict.at(g);
-        if (!entry.is_object())
+        groupSelectAll[g] = groupsDict.at(g).value("select_all", true);
+      }
+      for (const auto& g : prewalk.navGroups)
+      {
+        if (!groupsDict.contains(g))
         {
-          mitkThrow() << "Layout 'groups." << g << "' entry must be a JSON object.";
+          mitkThrow() << "Layout references group '" << g
+                      << "' which is not declared in the 'groups' dict.";
         }
-        groupSelectAll[g] = entry.value("select_all", true);
+      }
+      for (auto it = groupsDict.begin(); it != groupsDict.end(); ++it)
+      {
+        const bool linkOnly = prewalk.navGroups.find(it.key()) != prewalk.navGroups.end()
+                              && !it.value().contains("select_all");
+        if (groupSelectAll.find(it.key()) == groupSelectAll.end() && !linkOnly)
+        {
+          memberlessGroupSelectAll[it.key()] = it.value().value("select_all", true);
+        }
       }
     }
     else
     {
-      for (const auto& g : referencedGroups)
+      for (const auto& g : prewalk.selectionGroups)
       {
         groupSelectAll[g] = true;
       }
@@ -1397,13 +2646,20 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // / GetColumnCount() return 0 to signal callers that the cell set must
     // be enumerated through the cell map. The rollback path also re-runs
     // SetLayout(1, 1), which restores both fields to (1, 1).
+    m_LoadCellTarget = static_cast<int>(seedingOrder.size());
+    m_LoadCellsDone = 0;
+    this->StepLayoutLoadFeedback(2, tr("Closing the previous layout"));
     this->ResetGridState();
     this->TearDownAllCells();
     m_LayoutName = stashedName;
+    // Install the cosmetic group state before any group is allocated, so
+    // 'SyncGroupAdded' already carries the document's display names.
+    m_GroupColors = std::move(groupColors);
+    m_GroupDisplayNames = std::move(groupDisplayNames);
     didMutate = true;
 
     // ----- Allocate engine-internal sync groups -----
-    // 'main' (if referenced) pins to engine index 1 to preserve the editor's
+    // 'main' (if declared) pins to engine index 1 to preserve the editor's
     // default-group convention; other names get the next free index in
     // ascending allocation order. Group properties (select_all) are written
     // to each connector before any cell is wired up.
@@ -1413,6 +2669,14 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->AddSynchronizationGroup(1, "main");
       this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at("main"));
       nameToInt["main"] = 1;
+    }
+    else if (const auto emptyMain = memberlessGroupSelectAll.find("main");
+             emptyMain != memberlessGroupSelectAll.end())
+    {
+      // A declared "main" is the default group even while no cell is in it.
+      this->AddSynchronizationGroup(1, "main");
+      this->GetSyncGroupConnector(1)->ChangeSelectionMode(emptyMain->second);
+      memberlessGroupSelectAll.erase(emptyMain);
     }
     else if (!groupSelectAll.empty())
     {
@@ -1436,12 +2700,27 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
       nameToInt[groupName] = idx;
     }
+    // A declared group no cell references is an empty group, which the editor
+    // keeps and shows. So is a group that only navigation links reach but
+    // whose entry carries select_all: it was registered when it was saved.
+    // Registering it keeps it across a save, and keeps its cosmetics bound to
+    // it rather than to whichever new group would later be given its name.
+    // After the referenced groups, so that without a declared 'main' the
+    // default group stays a referenced one.
+    for (const auto& [groupName, selectAll] : memberlessGroupSelectAll)
+    {
+      const auto idx = this->NextFreeSyncGroupIndex();
+      this->AddSynchronizationGroup(idx, groupName);
+      this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
+    }
 
     // ----- Construct the new cell tree -----
-    auto* rootSplitter = this->BuildSplitterFromJsonV2(doc.at("root"), nameToInt, /*parent=*/nullptr);
+    this->StepLayoutLoadFeedback(LoadPercentCellsBegin, tr("Creating windows"));
+    auto* rootSplitter = this->BuildSplitterFromJson(doc.at("root"), nameToInt, /*parent=*/nullptr);
     auto* hBoxLayout = new QHBoxLayout(this);
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(rootSplitter);
+    this->StepLayoutLoadFeedback(LoadPercentCellsEnd, tr("Linking synchronization groups"));
 
     // ----- Group seeding pass + divergence detection -----
     // Make the seed cell of each group authoritative for the group's runtime
@@ -1453,16 +2732,30 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // the log usable when many nodes are involved.
     this->SeedAndNormalizeGroups(seedingOrder, nameToInt);
 
+    // ----- Navigation links (v3) -----
+    // Applied in document order, so the first cell to link a group becomes
+    // its seed and every later member converges to it on joining (windows
+    // without world geometry yet defer to 'ReconvergeSyncGroup').
+    for (const auto& [windowId, specs] : prewalk.navLinks)
+    {
+      for (const auto& spec : specs)
+      {
+        this->SetSyncLink(QString::fromStdString(windowId), spec.dimension, spec.group, spec.offset);
+      }
+    }
+    this->StepLayoutLoadFeedback(92, tr("Preparing the views"));
+    this->RefreshSyncControls();
+
     // Point at the first cell so downstream code that dereferences
     // GetActive... has a sane target after a fresh load.
-    auto firstCell = this->GetFirstRenderWindowWidget();
+    auto firstCell = this->FirstCellInReadingOrder();
     if (nullptr != firstCell)
     {
       this->SetActiveRenderWindowWidget(firstCell);
     }
 
-    emit UpdateUtilityWidgetViewPlanes();
     this->EnableCrosshair();
+    this->ConfigureLayoutSplitters();
     emit LayoutChanged();
   }
   catch (const mitk::Exception&)
@@ -1494,15 +2787,19 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
   }
 }
 
+bool QmitkMxNMultiWidget::IsApplyingLayout() const
+{
+  return m_ApplyingLayout || m_LayoutLoadPending;
+}
+
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
-  // Tear the existing cell tree down first. The previous implementation
-  // tried to recycle existing 'widget<i>' cells by positional index, which
-  // misses entirely after a v2 layout with custom names is loaded
-  // (lookups return null, new cells are appended while the old custom-named
-  // ones stay in the map and are then double-deleted by 'delete this->layout()').
-  // Mirroring 'ApplyLayout's structure (tear down, allocate groups, build
-  // fresh) avoids that hazard regardless of the prior naming scheme.
+  // Tear the existing cell tree down first rather than recycling 'widget<i>'
+  // cells by positional index: after a layout with custom ids is loaded,
+  // those lookups return null, new cells are appended while the custom-named
+  // ones stay in the map, and both are then deleted twice by
+  // 'delete this->layout()'. Mirroring 'ApplyLayout's structure (tear down,
+  // allocate groups, build fresh) works whatever the prior naming scheme.
   this->ResetGridState();
   this->TearDownAllCells();
 
@@ -1514,7 +2811,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   {
     rowCounter++;
     // Pre-create the row's synchronization group via the canonical API so that
-    // every utility widget's combobox has the entry before SetSyncGroup() runs.
+    // its connector and hue exist before SetSyncGroup() binds cells to it.
     this->AddSynchronizationGroup(rowCounter);
 
     auto hSplit = new QSplitter(Qt::Horizontal);
@@ -1554,14 +2851,13 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   // Deterministic active-cell assignment after rebuild. ResetGridState()
   // nulled out the previous active pointer; without this the editor would
   // be left with a null active cell until the user clicks one.
-  if (auto firstCell = this->GetFirstRenderWindowWidget())
+  if (auto firstCell = this->FirstCellInReadingOrder())
   {
     this->SetActiveRenderWindowWidget(firstCell);
   }
 
-  emit UpdateUtilityWidgetViewPlanes();
-
   this->EnableCrosshair();
+  this->ConfigureLayoutSplitters();
   emit LayoutChanged();
 }
 
@@ -1578,6 +2874,28 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   if (m_SynchronizedWidgetConnectors.find(index) != m_SynchronizedWidgetConnectors.end())
   {
     return;
+  }
+
+  // Ids resolve to the first matching index, so a second group under the same
+  // name would be unreachable. Only the selection registry counts: a name that
+  // so far only navigation links use is the same group in the shared
+  // namespace, and registering it here is how it gains a selection bundle.
+  if (!name.empty())
+  {
+    if (!GROUP_NAME_PATTERN.match(QString::fromStdString(name)).hasMatch())
+    {
+      mitkThrow() << "Cannot create synchronization group " << index << ": name '" << name
+                  << "' does not match the required pattern '"
+                  << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
+    }
+    for (const auto& [otherIndex, otherName] : m_GroupNameByIndex)
+    {
+      if (otherName == name)
+      {
+        mitkThrow() << "Cannot create synchronization group " << index << ": name '" << name
+                    << "' is already registered under index " << otherIndex << ".";
+      }
+    }
   }
 
   const auto dataStorage = this->GetDataStorage();
@@ -1602,11 +2920,87 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   connector->ChangeSelection(currentSelection);
   m_SynchronizedWidgetConnectors[index] = std::move(connector);
 
-  m_GroupNameByIndex[index] = name.empty()
-    ? ((index == 1) ? std::string("main") : ("g_" + std::to_string(index)))
-    : name;
+  std::string resolvedName = name;
+  if (resolvedName.empty() && 1 == index)
+  {
+    resolvedName = "main";
+  }
+  else if (resolvedName.empty())
+  {
+    // Derived from the index, but a loaded layout names its groups freely and
+    // may already use "g_<index>" for a group at another index.
+    auto suffix = index;
+    do
+    {
+      resolvedName = "g_" + std::to_string(suffix++);
+    } while (this->SyncGroupExists(resolvedName));
+    // A free name can still carry the cosmetics of a group that ceased to
+    // exist; a new group starts clean.
+    m_GroupDisplayNames.erase(resolvedName);
+    m_GroupColors.erase(resolvedName);
+  }
+  m_GroupNameByIndex[index] = resolvedName;
+  this->RegisterGroupForHue(m_GroupNameByIndex[index]);
 
-  emit SyncGroupAdded(index);
+  emit SyncGroupAdded(index, QString::fromStdString(this->GetSyncGroupDisplayName(m_GroupNameByIndex[index])));
+}
+
+void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
+{
+  // Resolve the id to its engine index, if it is a registered group.
+  GroupSyncIndexType registeredIndex = 0;
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      registeredIndex = index;
+      break;
+    }
+  }
+
+  // The default group (engine index 1) is never removable.
+  if (registeredIndex == 1)
+  {
+    return;
+  }
+
+  // Clear every cell's ties to the group: each dimension link naming it, and the
+  // data selection when it names it (which reverts the cell to the default group).
+  for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto link = this->GetSyncLink(windowId, dimension);
+      if (link.has_value() && link->group == id)
+      {
+        this->ClearSyncLink(windowId, dimension);
+      }
+    }
+    if (this->GetCellSelectionGroup(windowId) == id)
+    {
+      this->ClearCellSelectionGroup(windowId);
+    }
+  }
+
+  // A group registered with no members (created empty via the layout editor's
+  // "+ Group" button) is not reclaimed by the per-member selection reclaim, so
+  // drop its registry entry here. The index-1 guard above keeps this off the
+  // default group.
+  if (registeredIndex != 0)
+  {
+    m_SynchronizedWidgetConnectors.erase(registeredIndex);
+    m_SelectionGroupsAllocatedForLinks.erase(registeredIndex);
+    m_GroupNameByIndex.erase(registeredIndex);
+  }
+
+  // The id can be reused by a later created group, which must start clean;
+  // the hue slot stays so other groups' default hues do not shift. This runs
+  // whether or not the id was registered, so a link-only group (never given
+  // an engine index) also loses its cosmetics.
+  m_GroupDisplayNames.erase(id);
+  m_GroupColors.erase(id);
+
+  this->RefreshSyncControls();
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
@@ -1675,20 +3069,1904 @@ QmitkMxNMultiWidget::GroupSyncIndexType QmitkMxNMultiWidget::NextFreeSyncGroupIn
   return candidate;
 }
 
-void QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+QmitkMxNMultiWidget::GroupSyncIndexType
+QmitkMxNMultiWidget::EnsureSelectionGroupIndex(const std::string& group)
 {
-  // Guard against the slot firing before the editor has a data storage attached
-  // (e.g. during teardown, or if SetDataStorage(nullptr) was called after init).
-  // AddSynchronizationGroup would otherwise throw, and Qt slots must not let
-  // exceptions escape into the event dispatcher.
-  if (nullptr == this->GetDataStorage())
+  // Reuse the existing selection connector for this string id if there is one
+  // (a group created with the layout editor's "+ Group" button, a document
+  // group, or one this method allocated earlier).
+  for (const auto& [index, name] : m_GroupNameByIndex)
   {
-    MITK_WARN << "Ignoring 'create new synchronization group' request: no data storage set on the multi widget.";
+    if (name == group)
+    {
+      return index;
+    }
+  }
+  // Otherwise allocate one and remember it so it can be reclaimed when empty.
+  const auto index = this->NextFreeSyncGroupIndex();
+  this->AddSynchronizationGroup(index, group);
+  m_SelectionGroupsAllocatedForLinks.insert(index);
+  return index;
+}
+
+void QmitkMxNMultiWidget::ReclaimSelectionGroupIfEmpty(GroupSyncIndexType index)
+{
+  // Only connectors this method allocated are reclaimed; a document- or
+  // default-seed group persists even when empty (it stays assignable).
+  if (m_SelectionGroupsAllocatedForLinks.find(index) == m_SelectionGroupsAllocatedForLinks.end())
+  {
+    return;
+  }
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* utility = cell->GetUtilityWidget();
+    if (nullptr != utility && utility->GetSyncGroup() == index)
+    {
+      return;  // still has a member
+    }
+  }
+  m_SynchronizedWidgetConnectors.erase(index);
+  m_GroupNameByIndex.erase(index);
+  m_SelectionGroupsAllocatedForLinks.erase(index);
+}
+
+void QmitkMxNMultiWidget::SetCellSelectionGroup(const QString& windowId, const std::string& group)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return;
+  }
+  auto* widget = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+  if (nullptr == widget)
+  {
     return;
   }
 
-  // 'SetSynchronizationGroup' auto-creates the group via 'AddSynchronizationGroup'
-  // on first reference, so a separate Add call here would be redundant.
-  const auto next = this->NextFreeSyncGroupIndex();
-  this->SetSynchronizationGroup(synchronizedWidget, next);
+  const auto newIndex = this->EnsureSelectionGroupIndex(group);
+  const auto oldIndex = widget->GetSyncGroup();
+  if (oldIndex == newIndex)
+  {
+    return;
+  }
+
+  this->SetSynchronizationGroup(widget, newIndex);
+  this->ReclaimSelectionGroupIfEmpty(oldIndex);
+}
+
+void QmitkMxNMultiWidget::ClearCellSelectionGroup(const QString& windowId)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return;
+  }
+  auto* widget = cell->GetUtilityWidget()->GetNodeSelectionWidget();
+  if (nullptr == widget)
+  {
+    return;
+  }
+
+  // Index 1 is the default selection group every cell starts in; unlinking a
+  // cell's selection means returning it to that default (there is no "no
+  // selection group" state - every cell always belongs to one).
+  constexpr GroupSyncIndexType defaultGroup = 1;
+  const auto oldIndex = widget->GetSyncGroup();
+  if (oldIndex == defaultGroup)
+  {
+    return;
+  }
+  this->SetSynchronizationGroup(widget, defaultGroup);
+  this->ReclaimSelectionGroupIfEmpty(oldIndex);
+}
+
+std::string QmitkMxNMultiWidget::GetCellSelectionGroup(const QString& windowId) const
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell || nullptr == cell->GetUtilityWidget())
+  {
+    return {};
+  }
+  const auto index = cell->GetUtilityWidget()->GetSyncGroup();
+  const auto it = m_GroupNameByIndex.find(index);
+  return (it != m_GroupNameByIndex.end()) ? it->second : std::string();
+}
+
+void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
+                                      QmitkMxNSyncDimension dimension,
+                                      const std::string& group,
+                                      const SyncOffset& offset)
+{
+  if (nullptr == this->GetRenderWindowWidget(windowId))
+  {
+    mitkThrow() << "SetSyncLink: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (!GROUP_NAME_PATTERN.match(QString::fromStdString(group)).hasMatch())
+  {
+    mitkThrow() << "SetSyncLink: group name '" << group
+                << "' does not match the required pattern '"
+                << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
+  }
+
+  // A write moves only the written cell, so the group's reference is taken
+  // before the write, from the members as they are (see FindSyncGroupAnchor).
+  // A cell already in the group takes part as one of those members, with its
+  // previous offset; when it is the anchor, the convergence applies its
+  // offset change to it.
+  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
+  const auto anchorLink = anchorId.isEmpty() ? std::nullopt : this->GetSyncLink(anchorId, dimension);
+  const auto anchorOffset = anchorLink.has_value() ? anchorLink->offset : SyncOffset{};
+
+  auto& links = m_CellSyncLinks[windowId];
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice:
+      if (std::holds_alternative<int>(offset))
+      {
+        links.sliceOffset = std::get<int>(offset);
+      }
+      else if (std::holds_alternative<std::monostate>(offset))
+      {
+        links.sliceOffset = 0;
+      }
+      else
+      {
+        mitkThrow() << "SetSyncLink: the 'Slice' offset must be an integer (displayed slices).";
+      }
+      break;
+    case QmitkMxNSyncDimension::Zoom:
+      if (std::holds_alternative<double>(offset))
+      {
+        if (std::get<double>(offset) <= 0.0)
+        {
+          mitkThrow() << "SetSyncLink: the 'Zoom' offset must be > 0 (multiplicative factor).";
+        }
+        links.zoomOffset = std::get<double>(offset);
+      }
+      else if (std::holds_alternative<std::monostate>(offset))
+      {
+        links.zoomOffset = 1.0;
+      }
+      else
+      {
+        mitkThrow() << "SetSyncLink: the 'Zoom' offset must be a number > 0 (multiplicative factor).";
+      }
+      break;
+    case QmitkMxNSyncDimension::Pan:
+      if (std::holds_alternative<mitk::Vector2D>(offset))
+      {
+        links.panOffset = std::get<mitk::Vector2D>(offset);
+      }
+      else if (std::holds_alternative<std::monostate>(offset))
+      {
+        links.panOffset = mitk::Vector2D(0.0);
+      }
+      else
+      {
+        mitkThrow() << "SetSyncLink: the 'Pan' offset must be a 2D in-plane world-mm vector.";
+      }
+      break;
+    default:
+      if (!std::holds_alternative<std::monostate>(offset))
+      {
+        mitkThrow() << "SetSyncLink: dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension)
+                    << "' does not accept an offset.";
+      }
+      break;
+  }
+  links.groups[DimensionIndex(dimension)] = group;
+  this->RegisterGroupForHue(group);
+
+  // An orientation link aligns the joining cell's plane to the group's
+  // (absolute state; joining means adopting the group's plane). Adopting a
+  // plane re-initializes the cell's stepper and camera, so a plane the cell
+  // already shows is left alone.
+  bool planeAdopted = false;
+  if (QmitkMxNSyncDimension::Orientation == dimension && !anchorId.isEmpty() && anchorId != windowId)
+  {
+    const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
+    const auto memberWidget = this->GetRenderWindowWidget(windowId);
+    if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
+    {
+      const auto groupPlane = anchorWidget->GetSliceNavigationController()->GetDefaultViewDirection();
+      if (memberWidget->GetSliceNavigationController()->GetDefaultViewDirection() != groupPlane)
+      {
+        // Silent path: adopting the group plane is a relayed change, not a
+        // new orientation gesture.
+        memberWidget->GetUtilityWidget()->SetViewDirectionSelection(groupPlane);
+        planeAdopted = true;
+      }
+    }
+  }
+
+  // Slice and orientation need a shared reference geometry (a step index or
+  // a plane name means different physical locations across divergent
+  // geometries); align the cell to its geometry-authority component and
+  // restore offsets that the alignment or an adopted plane reset.
+  if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Orientation == dimension)
+  {
+    auto reset = this->EnforceComponentGeometry(windowId);
+    if (planeAdopted)
+    {
+      reset.push_back(windowId);
+    }
+    this->ReconvergeGeometryRelativeGroups(reset);
+  }
+
+  // Converge the written cell to the group's reference. Crosshair propagation
+  // is absolute (no state to converge); a windowing / lut member keeps its
+  // own value and only later changes propagate.
+  if (!anchorId.isEmpty()
+      && (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Zoom == dimension
+          || QmitkMxNSyncDimension::Pan == dimension))
+  {
+    this->ConvergeMemberToAnchor(dimension, anchorId, anchorOffset, windowId);
+  }
+}
+
+void QmitkMxNMultiWidget::ClearSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension)
+{
+  if (nullptr == this->GetRenderWindowWidget(windowId))
+  {
+    mitkThrow() << "ClearSyncLink: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  const auto it = m_CellSyncLinks.find(windowId);
+  if (it == m_CellSyncLinks.end())
+  {
+    return;
+  }
+  auto& links = it->second;
+  links.groups[DimensionIndex(dimension)].reset();
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice: links.sliceOffset = 0; break;
+    case QmitkMxNSyncDimension::Zoom:  links.zoomOffset = 1.0; break;
+    case QmitkMxNSyncDimension::Pan:   links.panOffset = mitk::Vector2D(0.0); break;
+    case QmitkMxNSyncDimension::Windowing:
+    {
+      // An unlinked cell renders the node-global level/window again, which is
+      // what keeps it coupled to the global level/window controls.
+      this->RemoveCellRendererProperties(windowId, { "levelwindow" });
+      const auto widget = this->GetRenderWindowWidget(windowId);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
+    case QmitkMxNSyncDimension::Lut:
+    {
+      // Same coupling as windowing: back to the node-global colormap.
+      this->RemoveCellRendererProperties(windowId, { "LookupTable" });
+      const auto widget = this->GetRenderWindowWidget(windowId);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
+    default: break;
+  }
+}
+
+std::optional<QmitkMxNMultiWidget::SyncLinkState>
+QmitkMxNMultiWidget::GetSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension) const
+{
+  const auto it = m_CellSyncLinks.find(windowId);
+  if (it == m_CellSyncLinks.end())
+  {
+    return std::nullopt;
+  }
+  const auto& links = it->second;
+  const auto& group = links.groups[DimensionIndex(dimension)];
+  if (!group.has_value())
+  {
+    return std::nullopt;
+  }
+
+  SyncLinkState state;
+  state.group = *group;
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice: state.offset = links.sliceOffset; break;
+    case QmitkMxNSyncDimension::Zoom:  state.offset = links.zoomOffset; break;
+    case QmitkMxNSyncDimension::Pan:   state.offset = links.panOffset; break;
+    default: break;
+  }
+  return state;
+}
+
+std::vector<std::string> QmitkMxNMultiWidget::GetSyncGroupNames(QmitkMxNSyncDimension dimension) const
+{
+  // Only live cells count; stale map entries of removed cells must not
+  // resurface as offered group names.
+  std::set<std::string> names;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    const auto it = m_CellSyncLinks.find(windowId);
+    if (it != m_CellSyncLinks.end())
+    {
+      const auto& group = it->second.groups[DimensionIndex(dimension)];
+      if (group.has_value())
+      {
+        names.insert(*group);
+      }
+    }
+  }
+  return { names.begin(), names.end() };
+}
+
+void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, const std::string& group)
+{
+  if (QmitkMxNSyncDimension::Slice != dimension && QmitkMxNSyncDimension::Zoom != dimension
+      && QmitkMxNSyncDimension::Pan != dimension)
+  {
+    mitkThrow() << "ReconvergeSyncGroup: dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension)
+                << "' carries no convergence bookkeeping (only slice, zoom, and pan do).";
+  }
+
+  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
+  if (anchorId.isEmpty())
+  {
+    mitkThrow() << "ReconvergeSyncGroup: no cell links group '" << group
+                << "' for dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
+  }
+  this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+}
+
+void QmitkMxNMultiWidget::ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension dimension,
+                                                    const std::string& group,
+                                                    const QString& anchorId)
+{
+  const auto anchorLink = this->GetSyncLink(anchorId, dimension);
+  if (!anchorLink.has_value() || anchorLink->group != group)
+  {
+    mitkThrow() << "ConvergeSyncGroupToAnchor: cell '" << anchorId.toStdString()
+                << "' does not link group '" << group << "' for dimension '"
+                << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
+  }
+
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == anchorId)
+    {
+      continue;
+    }
+    const auto it = m_CellSyncLinks.find(descriptor.id);
+    if (it != m_CellSyncLinks.end() && it->second.groups[DimensionIndex(dimension)] == group)
+    {
+      this->ConvergeMemberToAnchor(dimension, anchorId, anchorLink->offset, descriptor.id);
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::RefreshSyncControls()
+{
+  emit SyncLinksChanged();
+}
+
+QString QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension dimension,
+                                              const SyncOffset& offset)
+{
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice:
+      if (std::holds_alternative<int>(offset))
+      {
+        const int steps = std::get<int>(offset);
+        return 0 == steps ? QString()
+                          : QStringLiteral("%1%2").arg(steps > 0 ? "+" : "").arg(steps);
+      }
+      break;
+    case QmitkMxNSyncDimension::Zoom:
+      if (std::holds_alternative<double>(offset))
+      {
+        const double factor = std::get<double>(offset);
+        return std::abs(factor - 1.0) < 1e-6 ? QString()
+                                             : QStringLiteral("x%1").arg(factor, 0, 'g', 3);
+      }
+      break;
+    case QmitkMxNSyncDimension::Pan:
+      if (std::holds_alternative<mitk::Vector2D>(offset))
+      {
+        const auto pan = std::get<mitk::Vector2D>(offset);
+        // Bracketed and bar-separated: "5,-3" reads as one number with a
+        // thousands separator, "(5|-3)" can only be a pair.
+        return pan.GetNorm() < 1e-6
+                 ? QString()
+                 : QStringLiteral("(%1|%2)").arg(pan[0], 0, 'f', 0).arg(pan[1], 0, 'f', 0);
+      }
+      break;
+    default:
+      break;
+  }
+  return {};
+}
+
+QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension,
+                                               const std::string& group,
+                                               const std::set<QString>& excluded) const
+{
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (excluded.count(descriptor.id) > 0)
+    {
+      continue;
+    }
+    const auto it = m_CellSyncLinks.find(descriptor.id);
+    if (it != m_CellSyncLinks.end() && it->second.groups[DimensionIndex(dimension)] == group)
+    {
+      return descriptor.id;
+    }
+  }
+  return {};
+}
+
+QString QmitkMxNMultiWidget::FindSyncGroupAnchor(QmitkMxNSyncDimension dimension,
+                                                 const std::string& group,
+                                                 const std::set<QString>& excluded) const
+{
+  if (QmitkMxNSyncDimension::Slice != dimension)
+  {
+    return this->FindSyncGroupSeed(dimension, group, excluded);
+  }
+
+  // A member's displayed slice is the group reference plus its offset,
+  // clamped to the member's range, and a clamp can only leave a member on the
+  // first or last slice. So only a member strictly inside its range shows
+  // where the reference is; a boundary member tells only a bound. An interior
+  // member can still be off: one that was clamped and then carried back off
+  // the boundary by the group's next scroll moved by the full delta, the
+  // others did not. Hence the reference most interior members agree on wins,
+  // and its first member in pre-order anchors the group.
+  std::vector<std::pair<QString, long>> candidates;
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (excluded.count(descriptor.id) > 0)
+    {
+      continue;
+    }
+    const auto linksIt = m_CellSyncLinks.find(descriptor.id);
+    if (linksIt == m_CellSyncLinks.end() || linksIt->second.groups[DimensionIndex(dimension)] != group)
+    {
+      continue;
+    }
+    const auto widget = this->GetRenderWindowWidget(descriptor.id);
+    auto* renderer = nullptr != widget
+      ? mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow())
+      : nullptr;
+    if (nullptr == renderer || nullptr == renderer->GetCurrentWorldGeometry())
+    {
+      continue;
+    }
+    const auto* stepper = renderer->GetSliceNavigationController()->GetStepper();
+    if (nullptr == stepper || stepper->GetSteps() < 3)
+    {
+      continue;
+    }
+    const long last = static_cast<long>(stepper->GetSteps()) - 1;
+    const long position = static_cast<long>(stepper->GetPos());
+    const long shown =
+      mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? last - position : position;
+    if (shown > 0 && shown < last)
+    {
+      candidates.emplace_back(descriptor.id, shown - linksIt->second.sliceOffset);
+    }
+  }
+
+  QString anchorId;
+  std::ptrdiff_t bestSupport = 0;
+  for (const auto& [id, reference] : candidates)
+  {
+    const auto support = std::count_if(candidates.begin(), candidates.end(),
+      [reference = reference](const auto& candidate) { return candidate.second == reference; });
+    if (support > bestSupport)
+    {
+      bestSupport = support;
+      anchorId = id;
+    }
+  }
+  return anchorId.isEmpty() ? this->FindSyncGroupSeed(dimension, group, excluded) : anchorId;
+}
+
+void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension,
+                                                 const QString& anchorId,
+                                                 const SyncOffset& anchorOffset,
+                                                 const QString& memberId)
+{
+  const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
+  const auto memberWidget = this->GetRenderWindowWidget(memberId);
+  if (nullptr == anchorWidget || nullptr == memberWidget)
+  {
+    return;
+  }
+  auto* anchorRenderer = mitk::BaseRenderer::GetInstance(anchorWidget->GetRenderWindow()->GetVtkRenderWindow());
+  auto* memberRenderer = mitk::BaseRenderer::GetInstance(memberWidget->GetRenderWindow()->GetVtkRenderWindow());
+  if (nullptr == anchorRenderer || nullptr == memberRenderer)
+  {
+    return;
+  }
+  // Unrealized windows (no world geometry yet) carry default camera/stepper
+  // state that must not be propagated as a reference; the deferred converge
+  // is covered by 'ReconvergeSyncGroup'.
+  if (nullptr == anchorRenderer->GetCurrentWorldGeometry()
+      || nullptr == memberRenderer->GetCurrentWorldGeometry())
+  {
+    return;
+  }
+
+  const auto memberLinksIt = m_CellSyncLinks.find(memberId);
+  if (memberLinksIt == m_CellSyncLinks.end())
+  {
+    return;
+  }
+  const auto& memberLinks = memberLinksIt->second;
+
+  // Every member's offset is relative to one group reference; the anchor's
+  // live state minus the anchor's own offset recovers it, so any member can
+  // serve as the anchor.
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Slice:
+    {
+      auto* anchorStepper = anchorRenderer->GetSliceNavigationController()->GetStepper();
+      auto* memberStepper = memberRenderer->GetSliceNavigationController()->GetStepper();
+      if (nullptr == anchorStepper || nullptr == memberStepper
+          || 0 == anchorStepper->GetSteps() || 0 == memberStepper->GetSteps())
+      {
+        return;
+      }
+      // The offset counts displayed slices - the index the navigator shows,
+      // which can run opposite to the stepper. Signed arithmetic: the
+      // steppers count unsigned, so a negative offset near slice 0 would
+      // wrap and clamp to the last slice instead of the first.
+      const long anchorLast = static_cast<long>(anchorStepper->GetSteps()) - 1;
+      const long anchorPos = static_cast<long>(anchorStepper->GetPos());
+      const long anchorShown = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(anchorRenderer)
+        ? anchorLast - anchorPos
+        : anchorPos;
+      const long reference = anchorShown - std::get<int>(anchorOffset);
+      const long memberLast = static_cast<long>(memberStepper->GetSteps()) - 1;
+      const long memberShown = std::clamp(reference + memberLinks.sliceOffset, 0L, memberLast);
+      const long target = mitk::SliceNavigationHelper::IsDisplayedSliceInverted(memberRenderer)
+        ? memberLast - memberShown
+        : memberShown;
+      memberStepper->SetPos(static_cast<unsigned int>(target));
+      break;
+    }
+    case QmitkMxNSyncDimension::Zoom:
+    {
+      auto* anchorCamera = anchorRenderer->GetVtkRenderer()->GetActiveCamera();
+      auto* memberCamera = memberRenderer->GetVtkRenderer()->GetActiveCamera();
+      if (nullptr == anchorCamera || nullptr == memberCamera)
+      {
+        return;
+      }
+      // A factor > 1 keeps a cell zoomed in relative to the reference;
+      // parallel scale is the inverse zoom measure, hence the division.
+      const double referenceScale = anchorCamera->GetParallelScale() * std::get<double>(anchorOffset);
+      memberCamera->SetParallelScale(referenceScale / memberLinks.zoomOffset);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
+    case QmitkMxNSyncDimension::Pan:
+    {
+      auto* anchorController = anchorRenderer->GetCameraController();
+      auto* memberController = memberRenderer->GetCameraController();
+      if (nullptr == anchorController || nullptr == memberController)
+      {
+        return;
+      }
+      const auto reference = anchorController->GetCameraPositionOnPlane() - std::get<mitk::Vector2D>(anchorOffset);
+      memberController->MoveCameraToPoint(reference + memberLinks.panOffset);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow());
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void QmitkMxNMultiWidget::SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "SetViewDirection: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (mitk::AnatomicalPlane::Axial != viewDirection && mitk::AnatomicalPlane::Coronal != viewDirection
+      && mitk::AnatomicalPlane::Sagittal != viewDirection)
+  {
+    mitkThrow() << "SetViewDirection: only the standard anatomical planes "
+                << "(axial, coronal, sagittal) are supported.";
+  }
+  auto* utilityWidget = widget->GetUtilityWidget();
+  if (nullptr == utilityWidget)
+  {
+    mitkThrow() << "SetViewDirection: cell '" << windowId.toStdString()
+                << "' has no utility widget.";
+  }
+
+  utilityWidget->SetViewDirectionSelection(viewDirection);
+  this->PropagateOrientation(windowId, viewDirection);
+}
+
+void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::AnatomicalPlane viewDirection)
+{
+  // A change that arrives while a relay is in flight is itself a relayed
+  // change; dropping it here is what makes orientation sync cycle-free.
+  if (m_OrientationPropagationDepth > 0)
+  {
+    return;
+  }
+  if (mitk::AnatomicalPlane::Axial != viewDirection && mitk::AnatomicalPlane::Coronal != viewDirection
+      && mitk::AnatomicalPlane::Sagittal != viewDirection)
+  {
+    return;
+  }
+
+  struct DepthGuard
+  {
+    unsigned int& depth;
+    explicit DepthGuard(unsigned int& d) : depth(d) { ++depth; }
+    ~DepthGuard() { --depth; }
+  } guard(m_OrientationPropagationDepth);
+
+  std::vector<QString> affected{ sourceId };
+  const auto sourceLink = this->GetSyncLink(sourceId, QmitkMxNSyncDimension::Orientation);
+  if (sourceLink.has_value())
+  {
+    for (const auto& descriptor : this->ListWindowDescriptors())
+    {
+      if (descriptor.id == sourceId)
+      {
+        continue;
+      }
+      const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Orientation);
+      if (!memberLink.has_value() || memberLink->group != sourceLink->group)
+      {
+        continue;
+      }
+      const auto memberWidget = this->GetRenderWindowWidget(descriptor.id);
+      auto* memberUtility = (nullptr != memberWidget) ? memberWidget->GetUtilityWidget() : nullptr;
+      if (nullptr == memberUtility)
+      {
+        continue;
+      }
+      memberUtility->SetViewDirectionSelection(viewDirection);
+      ++m_OrientationApplyCount;
+      affected.push_back(descriptor.id);
+    }
+  }
+
+  // A plane flip re-initializes the stepper and camera of the source (linked
+  // on orientation or not) and of each relayed member; restore the
+  // component's shared geometry and the declared offsets.
+  auto reinitialized = this->EnforceComponentGeometry(sourceId);
+  affected.insert(affected.end(), reinitialized.begin(), reinitialized.end());
+  this->ReconvergeGeometryRelativeGroups(affected);
+}
+
+std::vector<QString> QmitkMxNMultiWidget::ComputeGeometryComponent(const QString& windowId) const
+{
+  const auto descriptors = this->ListWindowDescriptors();
+
+  auto sharesGeometryGroup = [this](const QString& a, const QString& b)
+  {
+    for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Orientation })
+    {
+      const auto linkA = this->GetSyncLink(a, dimension);
+      const auto linkB = this->GetSyncLink(b, dimension);
+      if (linkA.has_value() && linkB.has_value() && linkA->group == linkB->group)
+      {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  std::set<QString> component{ windowId };
+  bool grew = true;
+  while (grew)
+  {
+    grew = false;
+    for (const auto& descriptor : descriptors)
+    {
+      if (component.count(descriptor.id) > 0)
+      {
+        continue;
+      }
+      for (const auto& member : component)
+      {
+        if (sharesGeometryGroup(descriptor.id, member))
+        {
+          component.insert(descriptor.id);
+          grew = true;
+          break;
+        }
+      }
+    }
+  }
+
+  std::vector<QString> preOrder;
+  for (const auto& descriptor : descriptors)
+  {
+    if (component.count(descriptor.id) > 0)
+    {
+      preOrder.push_back(descriptor.id);
+    }
+  }
+  return preOrder;
+}
+
+std::vector<QString> QmitkMxNMultiWidget::EnforceComponentGeometry(const QString& windowId)
+{
+  std::vector<QString> reinitialized;
+  const auto component = this->ComputeGeometryComponent(windowId);
+  if (component.size() < 2)
+  {
+    return reinitialized;
+  }
+
+  // The cell that changed adapts to the rest of its component.
+  const auto authorityIt = std::find_if(component.begin(), component.end(),
+    [&windowId](const QString& id) { return id != windowId; });
+  const auto authorityWidget = this->GetRenderWindowWidget(*authorityIt);
+  if (nullptr == authorityWidget)
+  {
+    return reinitialized;
+  }
+  const auto* referenceGeometry = authorityWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+  if (nullptr == referenceGeometry)
+  {
+    return reinitialized;
+  }
+
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  for (const auto& memberId : component)
+  {
+    const auto memberWidget = this->GetRenderWindowWidget(memberId);
+    if (nullptr == memberWidget)
+    {
+      continue;
+    }
+    auto* sliceNavigation = memberWidget->GetSliceNavigationController();
+    const auto* memberGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+    if (nullptr != memberGeometry && mitk::Equal(*memberGeometry, *referenceGeometry, mitk::eps, false))
+    {
+      continue;
+    }
+    auto* renderWindow = memberWidget->GetRenderWindow()->GetVtkRenderWindow();
+    const auto* currentPlane = sliceNavigation->GetCurrentPlaneGeometry();
+    if (nullptr == memberGeometry || nullptr == currentPlane)
+    {
+      // Nothing to keep yet: a first initialization fits the camera.
+      renderingManager->InitializeView(renderWindow, referenceGeometry);
+    }
+    else
+    {
+      // Only the reference geometry changes; zoom, pan, the slice position
+      // and the time step stay what the user set (re-initializing resets the
+      // slice stepper and the time navigation). The slice is kept by a point
+      // on its plane: the plane's bounding box is one slice thick, so its
+      // center lies half a slice off the plane and would select the next one.
+      mitk::Point3D slicePoint;
+      currentPlane->Project(currentPlane->GetCenter(), slicePoint);
+      const auto timePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+      renderingManager->InitializeView(renderWindow, referenceGeometry, false);
+      sliceNavigation->SelectSliceByPoint(slicePoint);
+      // A time point outside the reference has no step to return to.
+      if (referenceGeometry->IsValidTimePoint(timePoint))
+      {
+        renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
+          referenceGeometry->TimePointToTimeStep(timePoint));
+      }
+    }
+    reinitialized.push_back(memberId);
+  }
+  return reinitialized;
+}
+
+void QmitkMxNMultiWidget::ReconvergeGeometryRelativeGroups(const std::vector<QString>& windowIds)
+{
+  std::set<std::pair<QmitkMxNSyncDimension, std::string>> groups;
+  for (const auto& windowId : windowIds)
+  {
+    for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Pan })
+    {
+      const auto link = this->GetSyncLink(windowId, dimension);
+      if (link.has_value())
+      {
+        groups.emplace(dimension, link->group);
+      }
+    }
+  }
+
+  // The changed cells adapt to the members that kept their state; only a
+  // group that changed as a whole falls back to its pre-order first member.
+  const std::set<QString> changed(windowIds.begin(), windowIds.end());
+  for (const auto& [dimension, group] : groups)
+  {
+    auto anchorId = this->FindSyncGroupAnchor(dimension, group, changed);
+    if (anchorId.isEmpty())
+    {
+      anchorId = this->FindSyncGroupSeed(dimension, group);
+    }
+    this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+  }
+}
+
+void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "ReinitSyncGroupGeometry: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  const auto dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    mitkThrow() << "ReinitSyncGroupGeometry: no data storage set on the multi widget.";
+  }
+  auto* triggerRenderer = mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow());
+
+  // The bounding geometry a single-cell reinit would compute (nodes not
+  // excluded from the bounding box, non-helper), evaluated with the
+  // triggering cell's visibility - "last reinit wins" for the component.
+  const auto includeInBoundingBox =
+    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
+  const auto helperObject =
+    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  const auto predicate = mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(includeInBoundingBox), mitk::NodePredicateNot::New(helperObject));
+  const auto filteredNodes = dataStorage->GetSubset(predicate);
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", triggerRenderer);
+
+  const auto component = this->ComputeGeometryComponent(windowId);
+  for (const auto& memberId : component)
+  {
+    const auto memberWidget = this->GetRenderWindowWidget(memberId);
+    if (nullptr != memberWidget)
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+    }
+  }
+  this->ReconvergeGeometryRelativeGroups(component);
+}
+
+unsigned int QmitkMxNMultiWidget::GetOrientationApplyCount() const
+{
+  return m_OrientationApplyCount;
+}
+
+void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode* node, mitk::LookupTable* lookupTable)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "SetLookupTable: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (nullptr == node)
+  {
+    mitkThrow() << "SetLookupTable: node must not be null.";
+  }
+  if (nullptr == lookupTable)
+  {
+    mitkThrow() << "SetLookupTable: lookupTable must not be null.";
+  }
+
+  const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
+  if (!link.has_value())
+  {
+    // Unlinked cells keep the classic node-global write, staying coupled to
+    // the global colormap controls like an unlinked cell's level/window.
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
+  }
+
+  std::vector<QString> targets{ windowId };
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == windowId)
+    {
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
+    if (memberLink.has_value() && memberLink->group == link->group)
+    {
+      targets.push_back(descriptor.id);
+    }
+  }
+
+  for (const auto& targetId : targets)
+  {
+    const auto targetWidget = this->GetRenderWindowWidget(targetId);
+    if (nullptr == targetWidget)
+    {
+      continue;
+    }
+    auto* targetRenderer = mitk::BaseRenderer::GetInstance(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+    if (nullptr == targetRenderer)
+    {
+      continue;
+    }
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable), targetRenderer);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+void QmitkMxNMultiWidget::SetLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                         const mitk::LevelWindow& levelWindow)
+{
+  this->ApplyLevelWindow(windowId, node,
+    [&levelWindow](mitk::LevelWindow& value) { value = levelWindow; });
+}
+
+void QmitkMxNMultiWidget::AdjustLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                            mitk::ScalarType levelDelta, mitk::ScalarType windowDelta)
+{
+  this->ApplyLevelWindow(windowId, node,
+    [levelDelta, windowDelta](mitk::LevelWindow& value)
+    {
+      value.SetLevelWindow(value.GetLevel() + levelDelta, value.GetWindow() + windowDelta);
+    });
+}
+
+void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                           const std::function<void(mitk::LevelWindow&)>& modify)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "ApplyLevelWindow: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (nullptr == node)
+  {
+    mitkThrow() << "ApplyLevelWindow: node must not be null.";
+  }
+
+  const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
+  if (!link.has_value())
+  {
+    // Unlinked cells keep the classic node-global write, staying coupled to
+    // the global level/window controls like the gesture path's fallback.
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow);
+    modify(levelWindow);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
+  }
+
+  std::vector<QString> targets{ windowId };
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == windowId)
+    {
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Windowing);
+    if (memberLink.has_value() && memberLink->group == link->group)
+    {
+      targets.push_back(descriptor.id);
+    }
+  }
+
+  for (const auto& targetId : targets)
+  {
+    const auto targetWidget = this->GetRenderWindowWidget(targetId);
+    if (nullptr == targetWidget)
+    {
+      continue;
+    }
+    auto* targetRenderer = mitk::BaseRenderer::GetInstance(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+    if (nullptr == targetRenderer)
+    {
+      continue;
+    }
+    // Read renderer-specific with node-global fallback, write renderer-
+    // specific: same per-member semantics as the synchronized gesture, so the
+    // mapper prefers the member's own value from now on.
+    mitk::LevelWindow levelWindow;
+    if (!node->GetLevelWindow(levelWindow, targetRenderer))
+    {
+      continue;  // nothing to derive a member value from
+    }
+    modify(levelWindow);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow), targetRenderer);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+void QmitkMxNMultiWidget::SetCleanView(bool cleanView)
+{
+  if (cleanView == m_CleanView)
+  {
+    return;
+  }
+
+  m_CleanView = cleanView;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* proximity = renderWindowWidget->findChild<QmitkRenderWindowProximity*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      proximity->SetSuppressed(cleanView);
+    }
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetCleanView(cleanView);
+    }
+  }
+
+  emit CleanViewChanged(cleanView);
+}
+
+bool QmitkMxNMultiWidget::IsCleanView() const
+{
+  return m_CleanView;
+}
+
+QKeySequence QmitkMxNMultiWidget::CleanViewShortcut()
+{
+  // F11 is the Workbench's full screen; its shifted sibling is the
+  // distraction-free idiom, and nothing in MITK binds it.
+  return QKeySequence(Qt::SHIFT | Qt::Key_F11);
+}
+
+void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
+{
+  m_LevelWindowReadoutVisible = visible;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetReadoutVisible(visible);
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::SetNavigatorExpanded(bool expanded)
+{
+  if (expanded == m_NavigatorExpanded)
+  {
+    return;
+  }
+
+  m_NavigatorExpanded = expanded;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetNavigatorExpanded(expanded);
+    }
+  }
+
+  emit NavigatorExpandedChanged(expanded);
+}
+
+bool QmitkMxNMultiWidget::IsNavigatorExpanded() const
+{
+  return m_NavigatorExpanded;
+}
+
+void QmitkMxNMultiWidget::RequestLayoutEditor(LayoutEditorRequest request)
+{
+  emit LayoutEditorRequested(request);
+}
+
+void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
+{
+  // Busy from here on, dialog or not: the caller defers the apply, and a REST
+  // layout request accepted in between would collide with it.
+  m_LayoutLoadPending = true;
+
+  if (!this->isVisible() || !m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  auto* dialog = new QDialog(this);
+  dialog->setWindowTitle(tr("Loading layout"));
+  // Modal, and the pumping during the rebuild excludes user input, so the user
+  // cannot reach the half rebuilt cell tree. Posted events, timers and queued
+  // cross-thread calls (such as REST requests) are still delivered:
+  // 'ApplyLayout' refuses to be re-entered and the REST bindings refuse MxN
+  // requests while 'IsApplyingLayout()' holds, but other callers - a view's
+  // timer, a non-MxN REST endpoint, a DataStorage change - do reach the editor
+  // mid-rebuild. The accessors they use tolerate the missing active cell.
+  dialog->setWindowModality(Qt::ApplicationModal);
+
+  auto* label = new QLabel(tr("Reading the layout..."), dialog);
+  auto* bar = new QProgressBar(dialog);
+  bar->setRange(0, 100);
+  bar->setValue(0);
+  bar->setTextVisible(false);
+
+  auto* dialogLayout = new QVBoxLayout(dialog);
+  dialogLayout->addWidget(label);
+  dialogLayout->addWidget(bar);
+  dialog->setFixedWidth(360);
+  dialog->show();
+
+  // The caller blocks the UI thread immediately after this, and a window the
+  // platform has not exposed yet is never presented - Qt paints it into a
+  // surface nobody is showing. The first dialog of a session is the slow one
+  // (window creation plus the stylesheet cascade); a later one is instant
+  // because the first already paid for it. Waiting for the exposure here rather
+  // than trusting a fixed delay is what makes the first load behave like the
+  // rest. Safe at this point: the editor has not been touched yet, so nothing
+  // delivered can reach a half-rebuilt cell tree, and user input stays out.
+  QElapsedTimer exposeClock;
+  exposeClock.start();
+  while (exposeClock.elapsed() < 1000)
+  {
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 10);
+    auto* handle = dialog->windowHandle();
+    if (nullptr != handle && handle->isExposed())
+    {
+      break;
+    }
+  }
+
+  m_LoadDialog = dialog;
+  m_LoadLabel = label;
+  m_LoadBar = bar;
+}
+
+void QmitkMxNMultiWidget::StepLayoutLoadFeedback(int percent, const QString& label)
+{
+  if (m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  if (!m_LoadLabel.isNull())
+  {
+    m_LoadLabel->setText(label);
+  }
+  if (!m_LoadBar.isNull())
+  {
+    m_LoadBar->setValue(percent);
+  }
+
+  // The rebuild holds the UI thread, and a thread that pumps no messages gets
+  // nothing composited - so without this the bar would not move at all. User
+  // input stays excluded and the dialog is modal, but posted events, timers
+  // and queued cross-thread calls are delivered here, in the middle of the
+  // rebuild (see ShowLayoutLoadFeedback for who is kept out and who is not).
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+}
+
+void QmitkMxNMultiWidget::TickLayoutLoadFeedbackCell()
+{
+  if (m_LoadDialog.isNull() || m_LoadCellTarget <= 0)
+  {
+    return;
+  }
+
+  ++m_LoadCellsDone;
+  // Cell construction dominates a load, so it owns the middle of the bar.
+  const int span = LoadPercentCellsEnd - LoadPercentCellsBegin;
+  this->StepLayoutLoadFeedback(
+    LoadPercentCellsBegin + span * (m_LoadCellsDone - 1) / m_LoadCellTarget,
+    tr("Creating window %1 of %2").arg(m_LoadCellsDone).arg(m_LoadCellTarget));
+}
+
+void QmitkMxNMultiWidget::HideLayoutLoadFeedback()
+{
+  m_LayoutLoadPending = false;
+  m_LoadCellTarget = 0;
+  m_LoadCellsDone = 0;
+  if (m_LoadDialog.isNull())
+  {
+    return;
+  }
+
+  auto* dialog = m_LoadDialog.data();
+  m_LoadDialog = nullptr;
+  m_LoadLabel = nullptr;
+  m_LoadBar = nullptr;
+
+  // Not now: applying a layout leaves the realization of the new windows and
+  // their first render to the event loop, and that tail is as long as the
+  // blocking part. Closing when the apply returns uncovers a still-frozen
+  // editor for the rest of it.
+  QTimer::singleShot(0, dialog, [dialog]()
+  {
+    dialog->close();
+    dialog->deleteLater();
+  });
+}
+
+namespace
+{
+  // What a plate's glyphs should measure against the cell they sit in, before
+  // the cell's own ceiling and the legible range cut it down.
+  constexpr double PeekDesiredShortEdgeFraction = 0.13;
+
+  /** \brief The size a cell's peek plate is laid out against: its render
+   *         window, the same rect the cell overlay centres the plate in. */
+  QSize PeekCellSize(const QmitkRenderWindowWidget* cell)
+  {
+    auto* renderWindow = cell->GetRenderWindow();
+    return nullptr != renderWindow ? renderWindow->geometry().size() : QSize();
+  }
+}
+
+QmitkMxNMultiWidget::PeekGeometry QmitkMxNMultiWidget::ResolvePeekGeometry() const
+{
+  // Every cell inherits this widget's font, which is what lets one line height
+  // stand for all of them.
+  const int textLineHeight = QmitkMxNCellOverlay::PeekTextLineHeight(this->font());
+
+  struct Candidate
+  {
+    PeekGeometry geometry;
+    int hosts = 0;
+  };
+  const auto evaluate = [this, textLineHeight](QmitkMxNPeekRows rows)
+  {
+    Candidate candidate;
+    candidate.geometry.rows = rows;
+    int box = 0;
+    for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+    {
+      // A maximized layout keeps the hidden cells registered; sizing from a
+      // hidden sliver would shrink the one plate the user can see.
+      if (!renderWindowWidget->isVisible())
+      {
+        continue;
+      }
+
+      const QSize cellSize = PeekCellSize(renderWindowWidget.get());
+      const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight, rows);
+      if (maxBox <= 0)
+      {
+        continue;
+      }
+
+      ++candidate.hosts;
+      const int shortEdge = std::min(cellSize.width(), cellSize.height());
+      const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
+      box = box == 0 ? desired : std::min(box, desired);
+    }
+
+    // Clamping up to the floor is safe: every cell counted admits at least that
+    // much, so no eligible cell is asked for more than it can host.
+    candidate.geometry.glyphBox = box == 0
+      ? 0
+      : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
+    return candidate;
+  };
+
+  const Candidate one = evaluate(QmitkMxNPeekRows::One);
+  const Candidate two = evaluate(QmitkMxNPeekRows::Two);
+  const bool twoWins = two.hosts > one.hosts
+                       || (two.hosts == one.hosts && two.geometry.glyphBox > one.geometry.glyphBox);
+  return twoWins ? two.geometry : one.geometry;
+}
+
+void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis)
+{
+  m_SyncPeekVisible = visible;
+  m_SyncPeekAxis = visible ? axis : std::nullopt;
+
+  // In arrange mode the plates are already up, so the strip only moves the
+  // emphasis - through the arrange mode, which arbitrates between the strip
+  // and the other surfaces that point at an axis.
+  if (m_SyncPeekVisible)
+  {
+    QStringList partners;
+    QColor hue;
+    if (m_SyncPeekAxis.has_value() && !m_SyncPeekHoverCell.isEmpty())
+    {
+      const std::string group = this->ResolveCellAxisGroup(m_SyncPeekHoverCell, *m_SyncPeekAxis);
+      if (!group.empty())
+      {
+        try
+        {
+          hue = this->GetSyncGroupColor(group);
+          partners = this->CellsSharingAxis(QString::fromStdString(group), *m_SyncPeekAxis);
+        }
+        catch (const mitk::Exception&)
+        {
+          hue = QColor();
+        }
+      }
+    }
+    m_ArrangeMode->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Strip, m_SyncPeekAxis,
+                                partners, hue);
+  }
+  else
+  {
+    m_ArrangeMode->ClearHighlight(QmitkMxNArrangeMode::HighlightSource::Strip);
+  }
+  this->RefreshSyncPeekPlates();
+}
+
+QmitkMxNArrangeMode* QmitkMxNMultiWidget::GetArrangeMode() const
+{
+  return m_ArrangeMode;
+}
+
+void QmitkMxNMultiWidget::RequestSyncPeekRefresh()
+{
+  // Only arrange mode keeps plates up across a resize; the hover peek is torn
+  // down by the layout changes that resize cells.
+  if (m_SyncPeekRefreshPending || nullptr == m_ArrangeMode || !m_ArrangeMode->IsActive())
+  {
+    return;
+  }
+  m_SyncPeekRefreshPending = true;
+  QTimer::singleShot(0, this, [this]()
+  {
+    m_SyncPeekRefreshPending = false;
+    this->RefreshSyncPeekPlates();
+  });
+}
+
+void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
+{
+  const bool arranging = nullptr != m_ArrangeMode && m_ArrangeMode->IsActive();
+  const bool up = arranging || m_SyncPeekVisible;
+  const auto axis = arranging ? m_ArrangeMode->GetHighlightAxis() : m_SyncPeekAxis;
+
+  const PeekGeometry geometry = up ? this->ResolvePeekGeometry() : PeekGeometry();
+  const int box = geometry.glyphBox;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+      QString(), Qt::FindDirectChildrenOnly);
+    if (nullptr == cellOverlay)
+    {
+      continue;
+    }
+    // Only hosting and sizing are decided over the visible cells; lowering
+    // reaches every cell, or one hidden while the peek was up would come back
+    // still showing it.
+    const bool hosts = box > 0 && renderWindowWidget->isVisible();
+    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0, geometry.rows);
+  }
+}
+
+bool QmitkMxNMultiWidget::IsSyncPeekVisible() const
+{
+  return m_SyncPeekVisible;
+}
+
+std::optional<QmitkMxNSyncAxis> QmitkMxNMultiWidget::GetSyncPeekAxis() const
+{
+  return m_SyncPeekAxis;
+}
+
+void QmitkMxNMultiWidget::SetSyncPeekTimings(int dwellMs, int graceMs)
+{
+  m_SyncPeekDwellMs = std::max(0, dwellMs);
+  m_SyncPeekGraceMs = std::max(0, graceMs);
+}
+
+void QmitkMxNMultiWidget::OnSyncPeekHovered(bool overStrip, std::optional<QmitkMxNSyncAxis> axis)
+{
+  // With arrange mode on the plates are up already, so there is nothing for a
+  // dwell to guard: the strip answers at once, like a peek that is up.
+  const bool platesUp = m_SyncPeekVisible || m_ArrangeMode->IsActive();
+  if (overStrip)
+  {
+    m_SyncPeekGrace->stop();
+    if (platesUp)
+    {
+      // Once the peek is up the user is comparing axes; a per-axis delay there
+      // would feel sluggish. The dwell guards only the first engagement.
+      //
+      // The emphasis latches: the gaps between glyph boxes are an artifact of
+      // the strip's layout, not the user withdrawing the question, and letting
+      // them clear it makes a slide along the row flicker axis - none - axis at
+      // every boundary. It moves only when another glyph claims it, and is
+      // dropped only when the pointer leaves the strip.
+      this->SetSyncPeek(true, axis.has_value() ? axis : m_SyncPeekAxis);
+      return;
+    }
+
+    if (axis.has_value())
+    {
+      // A different glyph restarts the rest, which is what keeps a pointer that
+      // sweeps across the strip from raising anything.
+      m_SyncPeekPendingAxis = axis;
+      m_SyncPeekDwell->start(m_SyncPeekDwellMs);
+    }
+    else if (!m_SyncPeekDwell->isActive())
+    {
+      // Entered the strip on a gap: still an engagement, just not on an axis yet.
+      m_SyncPeekDwell->start(m_SyncPeekDwellMs);
+    }
+    return;
+  }
+
+  // The pointer left the strip. A short grace covers a clipped corner on the way
+  // along it and the crossing from one cell's strip to another's, where Qt sends
+  // the leave before the enter.
+  if (platesUp)
+  {
+    m_SyncPeekGrace->start(m_SyncPeekGraceMs);
+    return;
+  }
+  m_SyncPeekDwell->stop();
+  m_SyncPeekPendingAxis.reset();
+}
+
+void QmitkMxNMultiWidget::LowerSyncPeek()
+{
+  m_SyncPeekDwell->stop();
+  m_SyncPeekGrace->stop();
+  m_SyncPeekPendingAxis.reset();
+  this->SetSyncPeek(false, std::nullopt);
+}
+
+QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const
+{
+  QStringList result;
+  const auto groupId = group.toStdString();
+  const auto dimension = QmitkMxNSyncAxisDimension(axis);
+  try
+  {
+    for (const auto& info : this->GetSyncGroupInfos())
+    {
+      if (info.id != groupId)
+      {
+        continue;
+      }
+      if (!dimension.has_value())
+      {
+        for (const auto& windowId : info.selectionMembers)
+        {
+          result.append(windowId);
+        }
+      }
+      else
+      {
+        // 'members' is keyed only for dimensions some cell links, so a missing
+        // key is the common "nobody links this axis" case, not an error.
+        const auto it = info.members.find(*dimension);
+        if (it != info.members.end())
+        {
+          for (const auto& windowId : it->second)
+          {
+            result.append(windowId);
+          }
+        }
+      }
+      break;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    result.clear();  // transient mid-layout-change state
+  }
+  return result;
+}
+
+std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis) const
+{
+  // Selection is single-valued per cell and lives on the connector, not in the
+  // per-dimension links.
+  if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
+  {
+    return this->GetCellSelectionGroup(windowId);
+  }
+  else if (const auto link = this->GetSyncLink(windowId, *dimension))
+  {
+    return link->group;
+  }
+  return std::string();
+}
+
+QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr != cell && !cell->GetDisplayName().isEmpty())
+  {
+    return cell->GetDisplayName();
+  }
+  // A layout built by SetLayout never names its cells, so the bare tail of the
+  // id is what a window is called in the absence of a display name.
+  const auto separator = windowId.indexOf(QStringLiteral("__"));
+  return separator >= 0 ? windowId.mid(separator + 2) : windowId;
+}
+
+
+QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
+QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
+{
+  QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
+  axisSlots.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+
+  // The seven per-dimension axes: a slot carries the group hue when linked and
+  // is an unsynced gap otherwise, plus the axis glyph the barcode draws when
+  // wide enough.
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    QString label;
+    QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;
+    switch (dimension)
+    {
+      case QmitkMxNSyncDimension::Pan:         label = tr("Pan"); glyph = QmitkMxNAxisGlyph::Pan; break;
+      case QmitkMxNSyncDimension::Zoom:        label = tr("Zoom"); glyph = QmitkMxNAxisGlyph::Zoom; break;
+      case QmitkMxNSyncDimension::Slice:       label = tr("Slice"); glyph = QmitkMxNAxisGlyph::Slice; break;
+      case QmitkMxNSyncDimension::Crosshair:   label = tr("Crosshair"); glyph = QmitkMxNAxisGlyph::Crosshair; break;
+      case QmitkMxNSyncDimension::Orientation: label = tr("Orientation"); glyph = QmitkMxNAxisGlyph::Orientation; break;
+      case QmitkMxNSyncDimension::Windowing:   label = tr("Windowing"); glyph = QmitkMxNAxisGlyph::Windowing; break;
+      case QmitkMxNSyncDimension::Lut:         label = tr("LUT"); glyph = QmitkMxNAxisGlyph::Lut; break;
+    }
+
+    QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+    slot.glyph = glyph;
+    slot.label = label;
+    if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
+    {
+      try
+      {
+        slot.color = this->GetSyncGroupColor(link->group);
+        slot.offsetText = FormatSyncOffset(dimension, link->offset);
+        slot.hasOffset = !slot.offsetText.isEmpty();
+        const auto groupName = QString::fromStdString(this->GetSyncGroupDisplayName(link->group));
+        slot.tooltip = slot.hasOffset
+                         ? tr("%1 - group %2, offset %3").arg(label, groupName, slot.offsetText)
+                         : tr("%1 - group %2").arg(label, groupName);
+      }
+      catch (const mitk::Exception&)
+      {
+        // Group not registered mid-change; leave the slot a gap this round.
+      }
+    }
+    if (!slot.color.isValid())
+    {
+      slot.tooltip = tr("%1 - not linked").arg(label);
+    }
+    axisSlots.append(slot);
+  }
+
+  // The selection axis is single-valued per cell: every cell carries exactly one
+  // selection group, including the default group every cell starts in. The slot
+  // shows that group's hue - consistently with the group card and the render
+  // frame - so the default group is not treated as a special "no sync" case.
+  QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
+  selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
+  selectionSlot.label = tr("Data selection");
+  const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
+  auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
+  if (nullptr != utilityWidget)
+  {
+    const auto index = utilityWidget->GetSyncGroup();
+    if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+    {
+      try
+      {
+        selectionSlot.color = this->GetSyncGroupColor(recorded->second);
+        selectionSlot.tooltip = tr("Data selection - group %1").arg(
+          QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
+      }
+      catch (const mitk::Exception&)
+      {
+      }
+    }
+  }
+  if (!selectionSlot.color.isValid())
+  {
+    selectionSlot.tooltip = tr("Data selection - not linked");
+  }
+  axisSlots.append(selectionSlot);
+
+  return axisSlots;
+}
+
+void QmitkMxNMultiWidget::RefreshSyncBarcodes()
+{
+  std::map<QmitkRenderWindowUtilityWidget::GroupSyncIndexType, int> selectionGroupSizes;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (const auto* utilityWidget = renderWindowWidget->GetUtilityWidget(); nullptr != utilityWidget)
+    {
+      ++selectionGroupSizes[utilityWidget->GetSyncGroup()];
+    }
+  }
+
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    auto* utilityWidget = renderWindowWidget->GetUtilityWidget();
+    if (nullptr == utilityWidget)
+    {
+      continue;
+    }
+    utilityWidget->SetSyncBarcodeSlots(this->BuildBarcodeSlots(windowId));
+
+    // The Data popup states with whom its selection is shared, from the same
+    // registry the barcode's selection slot reads.
+    const auto index = utilityWidget->GetSyncGroup();
+    const int groupSize = selectionGroupSizes[index];
+    QString scopeText;
+    if (1 == groupSize)
+    {
+      scopeText = tr("Only this window");
+    }
+    else if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+    {
+      scopeText = tr("Shared with %1 (%2 windows)")
+                    .arg(QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)))
+                    .arg(groupSize);
+    }
+    utilityWidget->GetNodeSelectionWidget()->SetScopeText(scopeText);
+  }
+}
+
+QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const
+{
+  // A layout-designer-set color wins over the default hue and is honored
+  // verbatim (not themed), so a designed layout looks the same in dark and
+  // light styles.
+  const auto explicitColor = m_GroupColors.find(group);
+  if (explicitColor != m_GroupColors.end())
+  {
+    return QColor(QString::fromStdString(explicitColor->second));
+  }
+
+  const auto it = std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), group);
+  if (it == m_GroupHueOrder.end())
+  {
+    mitkThrow() << "GetSyncGroupColor: unknown group '" << group << "'.";
+  }
+
+  const auto position = static_cast<std::size_t>(std::distance(m_GroupHueOrder.begin(), it));
+  return QColor(GROUP_HUE_PALETTE[position % GROUP_HUE_PALETTE.size()]);
+}
+
+QmitkMxNMultiWidget::CellGroupIdentity
+QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
+{
+  CellGroupIdentity identity;
+
+  std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    const auto link = this->GetSyncLink(windowId, dimension);
+    if (!link.has_value())
+    {
+      continue;
+    }
+    if (std::find(distinctGroups.begin(), distinctGroups.end(), link->group) == distinctGroups.end())
+    {
+      distinctGroups.push_back(link->group);
+    }
+  }
+
+  // Data selection is the 8th axis and counts toward frame identity uniformly.
+  // A solid hue means the cell is wholly one group across all eight axes; a cell
+  // whose axes (selection included) name more than one group is an honest split
+  // and reads gray. Every cell always has a selection group (default group,
+  // engine index 1), so a fresh cell is at least Mono(default group) and
+  // 'None' is not normally reachable.
+  const auto selectionGroup = this->GetCellSelectionGroup(windowId);
+  if (!selectionGroup.empty() &&
+      std::find(distinctGroups.begin(), distinctGroups.end(), selectionGroup) == distinctGroups.end())
+  {
+    distinctGroups.push_back(selectionGroup);
+  }
+
+  if (distinctGroups.empty())
+  {
+    return identity;
+  }
+
+  // A single hue only when every linked dimension names the same group; a
+  // heterogeneous cell stays neutral rather than picking one hue that would
+  // misrepresent it (the barcode and editor carry the per-dimension detail).
+  try
+  {
+    if (distinctGroups.size() == 1)
+    {
+      identity.hue = this->GetSyncGroupColor(distinctGroups.front());
+      identity.kind = CellGroupIdentityKind::Mono;
+    }
+    else
+    {
+      identity.kind = CellGroupIdentityKind::Complex;
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    // Group not registered mid-layout-change; treat as no identity this pass.
+    return CellGroupIdentity();
+  }
+
+  return identity;
+}
+
+void QmitkMxNMultiWidget::RefreshFrameColors()
+{
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    // The border always carries group identity - the mono group hue, else a
+    // neutral gray (ungrouped or heterogeneous) - so an active grouped cell
+    // keeps its hue rather than losing it to a highlight color. Active-ness is
+    // marked by white corner brackets the cell overlay paints on top. This is
+    // the single MxN writer of the border stylesheet; it never touches the
+    // shared 'SetDecorationColor' (which would leak into StdMultiWidget).
+    // Dark-theme colors; a light theme would derive its own (deferred).
+    const auto identity = this->ResolveCellGroupIdentity(windowId);
+    const QColor border = (CellGroupIdentityKind::Mono == identity.kind) ? identity.hue : QColor(0x60, 0x60, 0x60);
+
+    // Writing the sheet repolishes the whole cell subtree, which costs
+    // milliseconds; every refresh walks all cells while a change usually
+    // touches few of them, so almost every write here would re-set a border to
+    // the colour it already has.
+    QColor& lastBorder = m_CellBorderColors[windowId];
+    if (lastBorder != border)
+    {
+      lastBorder = border;
+      renderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
+                                        border.name(QColor::HexRgb) + "; }");
+    }
+
+    // Repaint the overlay so its active-corner brackets track the active change.
+    if (auto* overlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(QString(), Qt::FindDirectChildrenOnly))
+    {
+      overlay->update();
+    }
+  }
+}
+
+std::vector<QmitkMxNMultiWidget::SyncGroupInfo> QmitkMxNMultiWidget::GetSyncGroupInfos() const
+{
+  // Registered selection groups appear even while empty (a group freshly
+  // created with the layout editor's "+ Group" button must be assignable);
+  // link groups exist exactly as long as a live cell links them.
+  std::set<std::string> selectionGroupIds;
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    selectionGroupIds.insert(name);
+  }
+
+  const auto descriptors = this->ListWindowDescriptors();
+
+  std::vector<SyncGroupInfo> infos;
+  for (const auto& id : m_GroupHueOrder)
+  {
+    SyncGroupInfo info;
+    info.id = id;
+    info.displayName = this->GetSyncGroupDisplayName(id);
+    info.color = this->GetSyncGroupColor(id);
+    info.hasExplicitColor = m_GroupColors.find(id) != m_GroupColors.end();
+
+    for (const auto& descriptor : descriptors)
+    {
+      if (descriptor.selectionGroup.toStdString() == id)
+      {
+        info.selectionMembers.push_back(descriptor.id);
+      }
+      for (const auto dimension : QmitkMxNAllSyncDimensions)
+      {
+        const auto link = this->GetSyncLink(descriptor.id, dimension);
+        if (link.has_value() && link->group == id)
+        {
+          info.members[dimension].push_back(descriptor.id);
+        }
+      }
+    }
+
+    if (info.selectionMembers.empty() && info.members.empty()
+        && selectionGroupIds.find(id) == selectionGroupIds.end())
+    {
+      continue;
+    }
+    infos.push_back(std::move(info));
+  }
+
+  return infos;
+}
+
+std::string QmitkMxNMultiWidget::GetSyncGroupDisplayName(const std::string& id) const
+{
+  const auto it = m_GroupDisplayNames.find(id);
+  return (it != m_GroupDisplayNames.end() && !it->second.empty()) ? it->second : id;
+}
+
+QString QmitkMxNMultiWidget::GetSyncGroupDisplayName(GroupSyncIndexType index) const
+{
+  const auto it = m_GroupNameByIndex.find(index);
+  if (it == m_GroupNameByIndex.end())
+  {
+    mitkThrow() << "GetSyncGroupDisplayName: no group with engine index " << index << ".";
+  }
+  return QString::fromStdString(this->GetSyncGroupDisplayName(it->second));
+}
+
+std::string QmitkMxNMultiWidget::GetSyncGroupName(GroupSyncIndexType index) const
+{
+  const auto it = m_GroupNameByIndex.find(index);
+  if (it == m_GroupNameByIndex.end())
+  {
+    mitkThrow() << "GetSyncGroupName: no group with engine index " << index << ".";
+  }
+  return it->second;
+}
+
+std::string QmitkMxNMultiWidget::GetDefaultSyncGroupName() const
+{
+  return this->GetSyncGroupName(1);
+}
+
+void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const std::string& displayName)
+{
+  if (!this->SyncGroupExists(id))
+  {
+    mitkThrow() << "SetSyncGroupDisplayName: unknown group '" << id << "'.";
+  }
+
+  if (displayName.empty())
+  {
+    m_GroupDisplayNames.erase(id);
+  }
+  else
+  {
+    m_GroupDisplayNames[id] = displayName;
+  }
+
+  // Selection groups surface the label in every cell's group selector.
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      emit SyncGroupLabelChanged(index, QString::fromStdString(this->GetSyncGroupDisplayName(id)));
+    }
+  }
+  emit SyncLinksChanged();
+}
+
+void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor& color)
+{
+  if (!this->SyncGroupExists(id))
+  {
+    mitkThrow() << "SetSyncGroupColor: unknown group '" << id << "'.";
+  }
+  if (!color.isValid())
+  {
+    mitkThrow() << "SetSyncGroupColor: invalid color for group '" << id << "'.";
+  }
+
+  m_GroupColors[id] = color.name(QColor::HexRgb).toStdString();
+  emit SyncLinksChanged();
+}
+
+void QmitkMxNMultiWidget::RegisterGroupForHue(const std::string& group)
+{
+  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), group) == m_GroupHueOrder.end())
+  {
+    m_GroupHueOrder.push_back(group);
+  }
+}
+
+bool QmitkMxNMultiWidget::SyncGroupExists(const std::string& id) const
+{
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      return true;
+    }
+  }
+  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  {
+    const auto linkedGroups = this->GetSyncGroupNames(dimension);
+    if (std::find(linkedGroups.begin(), linkedGroups.end(), id) != linkedGroups.end())
+    {
+      return true;
+    }
+  }
+  return false;
 }

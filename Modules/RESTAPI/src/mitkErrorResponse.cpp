@@ -304,6 +304,16 @@ namespace mitk
       instance);
   }
 
+  ErrorResponse::Json ErrorResponse::EditorBusy(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_EDITOR_BUSY,
+      "Editor Busy",
+      detail,
+      503,
+      instance);
+  }
+
   ErrorResponse::Json ErrorResponse::RenderWindowNotFound(const std::string& windowId, const std::string& instance)
   {
     return Create(

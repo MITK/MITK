@@ -2133,13 +2133,14 @@ Returns metadata about the MxN multi-widget editor, including the current cell i
 | `alias` | string | Always `"mxn"` |
 | `plugin_id` | string | Always `"org.mitk.editors.mxnmultiwidget"` |
 | `active` | boolean | `true` if an MxN editor instance is currently open |
-| `windows` | string[] | Cell ids from the current layout. Canonical fully-qualified form (`<editor_name>__<bare>`); the same string as the `id` field of each `window` leaf in the v2 layout document, used verbatim as `{id}` in sub-resource URLs and for the `context` query parameter on the node-properties API. |
+| `windows` | string[] | Cell ids from the current layout. Canonical fully-qualified form (`<editor_name>__<bare>`); the same string as the `id` field of each `window` leaf in the layout document, used verbatim as `{id}` in sub-resource URLs and for the `context` query parameter on the node-properties API. |
 
 **Error responses:**
 
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No editor list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2163,9 +2164,9 @@ Returns the MxN editor's cells in pre-order traversal of the current layout. Eac
 |-------|------|-------------|
 | `id` | string | Cell id (identity), in the canonical fully-qualified form `<editor_name>__<bare>`. Matches the `id` field of the corresponding `window` leaf in the layout document verbatim, used as-is for the URL path segment for sub-resources; no prefix translation. |
 | `name` | string | *Optional.* Human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf. Free-form, not unique. Omitted when the cell has no display name set. |
-| `kind` | string | `"2d"` (only value under v2; `"3d"` reserved for forward-compat) |
+| `kind` | string | `"2d"` (the only value today; `"3d"` reserved for forward-compat) |
 | `view_direction` | string | One of `"axial"`, `"sagittal"`, `"coronal"`, `"original"`. Persisted state from the layout document — *authoring intent*, not live orientation. Read live orientation from `/camera` if needed. |
-| `links` | object | Per-cell synchronisation links from the layout document. v2 has only the `selection` dimension; v3 will add more dimension keys here additively without breaking v2 clients. |
+| `links` | object | The cell's data-selection link from the layout document. Carries only the `selection` key; the per-dimension synchronization links (pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET .../layout`). |
 
 Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under crosshair rotation) and intentionally not asserted by `view_direction`.
 
@@ -2174,6 +2175,7 @@ Distinct from the StdMulti window list: MxN cells carry the persisted `view_dire
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2189,13 +2191,13 @@ Ids must match `^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$` and be unique within 
 
 **Display label (`name`) is separate from identity.** Each window leaf may also carry an optional `name` field — a free-form human-readable display label (no pattern constraint, not required to be unique). The display label is pure metadata: REST URLs, the `context` query parameter, the per-renderer DataNode property keys, and persisted-session references all use `id`, never `name`. Renaming the display label therefore never invalidates a cached client reference. Cells with no display label simply omit the field; the windows endpoint and the layout document both omit `name` for those cells rather than emitting an empty string.
 
-**Layout document is the single source of truth for MxN structure and selection sync.** `GET /api/v1/rendering/editors/mxn/layout` returns a v2.0 document that is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file: same schema (`mxn-layout-v2.schema.json`), same shape. The same document is what `PUT .../layout` accepts. Consequences:
+**Layout document is the single source of truth for MxN structure and synchronization.** `GET /api/v1/rendering/editors/mxn/layout` returns a version 3.0 document (`mxn-layout-v3.schema.json`) of the same shape as a layout file the editor saves. `PUT .../layout` accepts that document, and also version 2.0 documents (`mxn-layout-v2.schema.json`, a subset of 3.0). Consequences:
 
 - A user can dump the current layout, save the response to disk, and drop it into the preset directory unchanged.
 - Hand-authored presets are first-class REST citizens: PUT a preset directly, no translation needed.
-- Per-cell `view_direction` and `links.selection` are part of the layout document — they are *persisted authoring intent*, not live state. The MxN windows list (`GET .../windows`) reports them so REST clients don't need to fetch the full layout for a quick overview.
+- Per-cell `view_direction` and `links` are part of the layout document: they are *persisted authoring intent*, not live state. The MxN windows list (`GET .../windows`) reports them so REST clients don't need to fetch the full layout for a quick overview.
 
-**No `/sync` endpoint.** The MxN editor's "Synchronize" toolbar bool (a workbench UX setting that controls how interactive mouse/keyboard input on one cell propagates to others) is intentionally **not** exposed via REST. REST clients always operate on per-cell primitives. The Python `mitk-workbench-remote` client adds ergonomic helpers (e.g. iterate cells to apply a change to all) on top of these primitives. v3 of the layout schema will add per-cell synchronisation links for further dimensions; the layout document remains the only REST surface for sync state across v2 and v3.
+**No `/sync` endpoint.** The MxN editor's "Synchronize" toolbar bool (a workbench UX setting that controls how interactive mouse/keyboard input on one cell propagates to others) is intentionally **not** exposed via REST. REST clients always operate on per-cell primitives. The Python `mitk-workbench-remote` client adds ergonomic helpers (e.g. iterate cells to apply a change to all) on top of these primitives. The per-cell synchronization links of every dimension are part of the layout document, which is the only REST surface for synchronization state.
 
 **Per-cell selected position vs. global selected position.** Two distinct resources, two distinct concepts:
 
@@ -2208,15 +2210,16 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 
 **Selected slice on MxN cells is step-only.** `PUT .../selected-slice` accepts only `{"step": N}`. World-anchor moves on a single cell live at the per-cell `selected-position` resource; global anchor moves at `/rendering/selected-position`. Sending `position` to slice returns 400 with a hint pointing to both primitives.
 
-**Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip.
+**Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip. While the workbench GUI applies a layout (a preset, a file or a data-based layout), every MxN endpoint, this PUT included, returns 503 `EDITOR_BUSY`; the rebuild typically takes 1-2 s, and a request repeated after it succeeds. Requests that arrive while a REST PUT is being applied are not rejected: they wait and are served once it has finished.
 
-**Camera under v2 is always 2D for MxN cells.** The v2 layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A v3 cell type for 3D rendering may arrive later — at that point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
+**Camera is always 2D for MxN cells.** The layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A 3D cell type may arrive in a future version, at which point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
 
 **Concept-level errors that can surface on every MxN endpoint:**
 
 | Status | Code | When |
 |--------|------|------|
 | 503 | `EDITOR_NOT_ACTIVE` | The MxN editor is not currently open in the workbench |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | The bridge callback is not registered (headless / Qt plugin not loaded), or the registered editor list does not expose the `mxn` alias |
 | 400 | `INVALID_REQUEST` | The cell `{id}` is malformed — does not match the canonical fully-qualified form `<prefix>__<bare>` with URL-segment-safe characters. Rejected controller-side before any bridge dispatch |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | The cell `id` is well-formed but unknown to the editor |
@@ -2237,6 +2240,7 @@ Query parameters, request body, response content-types and shared error shapes a
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 
 ---
 
@@ -2254,27 +2258,31 @@ Query parameters, request body, response content-types and shared error shapes a
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 
 ---
 
 #### GET /api/v1/rendering/editors/mxn/layout
 
-Returns the current MxN layout as a v2.0 document. Strict mode: every group referenced by a cell appears in the top-level `groups` dict. The body is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file; the same schema (`mxn-layout-v2.schema.json`) validates both.
+Returns the current MxN layout as a version 3.0 document, of the same shape as a layout file the editor saves. Strict mode: every group referenced by a cell appears in the top-level `groups` dict.
 
-**Response 200 (`application/json`):** v2.0 layout document. See `mxn-layout-v2.schema.json` for the full field-level spec.
+**Response 200 (`application/json`):** version 3.0 layout document. See `mxn-layout-v3.schema.json` for the full field-level spec.
 
 ```json
 {
-  "version": "2.0",
+  "version": "3.0",
   "name": "Three Views",
-  "groups": { "main": { "select_all": true } },
+  "groups": { "main": { "select_all": true }, "nav": {} },
   "root": {
     "type": "split",
     "orientation": "horizontal",
     "children": [
-      { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-      { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
-      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+      { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",
+        "links": { "selection": "main", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
+      { "type": "window", "id": "mxn__widget1", "view_direction": "axial",
+        "links": { "selection": "main", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
+      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",
+        "links": { "selection": "main", "windowing": "main", "lut": "main" }, "size": 210 }
     ]
   }
 }
@@ -2285,6 +2293,7 @@ Returns the current MxN layout as a v2.0 document. Strict mode: every group refe
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2292,9 +2301,9 @@ Returns the current MxN layout as a v2.0 document. Strict mode: every group refe
 
 #### PUT /api/v1/rendering/editors/mxn/layout
 
-Applies a v2.0 layout document. **All existing cells are torn down and rebuilt from the document** (no positional reuse) — any cell `id` a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout, so callers can refresh their cell list from the response without an extra GET.
+Applies a layout document of version 3.0 or 2.0. **All existing cells are torn down and rebuilt from the document** (no positional reuse): any cell `id` a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout, so callers can refresh their cell list from the response without an extra GET.
 
-**Request body (required, `application/json`):** v2.0 layout document, validated against `mxn-layout-v2.schema.json`.
+**Request body (required, `application/json`):** layout document of version 3.0 (`mxn-layout-v3.schema.json`) or 2.0 (`mxn-layout-v2.schema.json`). The example is a 2.0 document.
 
 ```json
 {
@@ -2310,14 +2319,15 @@ Applies a v2.0 layout document. **All existing cells are torn down and rebuilt f
 }
 ```
 
-**Response 200 (`application/json`):** the freshly serialized layout (same shape as GET).
+**Response 200 (`application/json`):** the freshly serialized layout (same shape as GET, version 3.0 whatever version the request had).
 
 **Error responses:**
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure (version != 2.0, duplicate window ids, unknown view direction, missing group reference in strict mode, type errors). The `detail` field carries the engine's diagnostic message. |
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure (version other than 2.0 or 3.0, duplicate window ids, unknown view direction, missing group reference in strict mode, type errors). The `detail` field carries the engine's diagnostic message. |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2327,7 +2337,7 @@ Applies a v2.0 layout document. **All existing cells are torn down and rebuilt f
 
 #### GET /api/v1/rendering/editors/mxn/windows/{id}/camera
 
-Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape).
+Returns the camera state of the addressed MxN cell. Every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape).
 
 **Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
 
@@ -2348,6 +2358,7 @@ Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2355,7 +2366,7 @@ Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2
 
 #### PUT /api/v1/rendering/editors/mxn/windows/{id}/camera
 
-Partial update. At least one camera field must be present. `standard_view` is applied first and cannot be combined with explicit pose fields. Under v2 every MxN cell is 2D, so `perspective_angle` is rejected with 400 (matches the StdMulti rule for non-3D windows).
+Partial update. At least one camera field must be present. `standard_view` is applied first and cannot be combined with explicit pose fields. Every MxN cell is 2D, so `perspective_angle` is rejected with 400 (matches the StdMulti rule for non-3D windows).
 
 **Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
 
@@ -2371,10 +2382,11 @@ Partial update. At least one camera field must be present. `standard_view` is ap
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; unknown field; wrong type / shape; non-positive `parallel_scale`; `perspective_angle` (3D-only under v2); unknown `standard_view`; combination of `standard_view` with explicit pose fields |
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; unknown field; wrong type / shape; non-positive `parallel_scale`; `perspective_angle` (3D-only); unknown `standard_view`; combination of `standard_view` with explicit pose fields |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK rendering framework raised `mitk::Exception` while applying the patch |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2406,6 +2418,7 @@ Returns the cell's selected-slice state: integer step, the live world position o
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2433,6 +2446,7 @@ Returns the cell's selected-slice state: integer step, the live world position o
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK navigator raised `mitk::Exception` |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice step setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2463,6 +2477,7 @@ This is **distinct** from the global `/rendering/selected-position` resource: th
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2494,6 +2509,7 @@ No range checking — out-of-range values are clamped/snapped by MITK.
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK engine raised `mitk::Exception` (e.g., geometry validation failure) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2528,12 +2544,12 @@ Per-cell summary plus capability flags.
 |-------|------|-------------|
 | `id` | string | Echo of the path parameter |
 | `name` | string | *Optional.* Display label of the cell, mirroring the optional `name` field of the corresponding `window` leaf. Omitted when the cell has no display name set. |
-| `kind` | string | `"2d"` under v2 |
+| `kind` | string | Always `"2d"` today |
 | `view_direction` | string | Persisted view direction (see windows list note above) |
-| `links` | object | Per-cell synchronisation links from the layout document |
-| `has_camera` | boolean | Always `true` in v2 |
-| `has_selected_slice` | boolean | `true` for 2D cells; reserved `false` for v3 3D cells |
-| `has_selected_position` | boolean | Always `true` — per-cell selected position is a v2 capability, distinct from the global `/rendering/selected-position` resource |
+| `links` | object | The cell's data-selection link from the layout document (only the `selection` key; see the windows list) |
+| `has_camera` | boolean | Always `true` today |
+| `has_selected_slice` | boolean | `true` for 2D cells; reserved `false` for future 3D cells |
+| `has_selected_position` | boolean | Always `true`: per-cell selected position is available on every MxN cell, distinct from the global `/rendering/selected-position` resource |
 
 **Error responses:**
 
@@ -2542,6 +2558,7 @@ Per-cell summary plus capability flags.
 | 400 | `INVALID_REQUEST` | `{id}` is malformed (rejected controller-side before bridge dispatch) |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | `{id}` is well-formed but not a known MxN cell |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2599,6 +2616,7 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
 | 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |
+| 503 | `EDITOR_BUSY` | Addressed editor is open but temporarily cannot serve requests (e.g. the MxN editor while it applies a layout); retry once it has finished |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 
 ### 9.3 Validation Errors
@@ -2866,8 +2884,8 @@ The API is designed for extension:
 | `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice` | Set selected slice index of a 2D StdMultiWidget render window |
 | `GET` | `/api/v1/rendering/editors/mxn` | MxN multi-widget editor metadata |
 | `GET` | `/api/v1/rendering/editors/mxn/screenshot` | Composite screenshot of the MxN editor canvas |
-| `GET` | `/api/v1/rendering/editors/mxn/layout` | Get the current MxN layout (v2.0 document) |
-| `PUT` | `/api/v1/rendering/editors/mxn/layout` | Apply a v2.0 layout document to the MxN editor (response body = freshly serialized layout) |
+| `GET` | `/api/v1/rendering/editors/mxn/layout` | Get the current MxN layout (version 3.0 document) |
+| `PUT` | `/api/v1/rendering/editors/mxn/layout` | Apply a layout document (version 3.0 or 2.0) to the MxN editor (response body = freshly serialized layout) |
 | `GET` | `/api/v1/rendering/editors/mxn/windows` | List MxN cells (`id`, optional display `name`, `kind`, `view_direction`, `links`) |
 | `GET` | `/api/v1/rendering/editors/mxn/windows/{id}` | Metadata of a single MxN cell |
 | `GET` | `/api/v1/rendering/editors/mxn/windows/{id}/screenshot` | Screenshot of a single MxN cell |

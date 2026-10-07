@@ -41,6 +41,8 @@ namespace
   bool s_Parsed = false;
   QString s_Color;
   QString s_AccentColor;
+  QString s_SelectionColor;
+  QString s_WarningColor;
 
   QString ParseColor(const QString &subject, const QString &colorName, const QString &fallback)
   {
@@ -65,6 +67,19 @@ namespace
 
     s_Color = ParseColor(styleSheet, QStringLiteral("iconColor"), QStringLiteral("#000000"));
     s_AccentColor = ParseColor(styleSheet, QStringLiteral("iconAccentColor"), QStringLiteral("#ffffff"));
+    s_SelectionColor = ParseColor(styleSheet, QStringLiteral("selectionColor"), QString());
+
+    // Warnings already have a rule of their own, for rich text; reading it
+    // keeps the theme from stating the colour twice. The rule may use any CSS
+    // colour notation, so the value is normalized to the "#rrggbb" form the
+    // other theme colours have; the lookbehind keeps properties such as
+    // background-color from being taken for the text colour.
+    static const QRegularExpression warningRule(
+      QStringLiteral("font\\.warning\\s*\\{[^}]*?(?<![-\\w])color\\s*:\\s*([^;}\\s]+)"),
+      QRegularExpression::CaseInsensitiveOption);
+    const auto warning = warningRule.match(styleSheet);
+    const auto warningColor = warning.hasMatch() ? QColor::fromString(warning.captured(1)) : QColor();
+    s_WarningColor = warningColor.isValid() ? warningColor.name() : QString();
     s_Parsed = true;
   }
 
@@ -275,6 +290,18 @@ QString QmitkIconTheme::GetAccentColor()
   return s_AccentColor;
 }
 
+QString QmitkIconTheme::GetSelectionColor()
+{
+  EnsureParsed();
+  return s_SelectionColor;
+}
+
+QString QmitkIconTheme::GetWarningColor()
+{
+  EnsureParsed();
+  return s_WarningColor;
+}
+
 bool QmitkIconTheme::IsDarkTheme()
 {
   // Icons are light in the dark theme and vice versa.
@@ -285,11 +312,14 @@ void QmitkIconTheme::Refresh()
 {
   const auto color = s_Color;
   const auto accentColor = s_AccentColor;
+  const auto selectionColor = s_SelectionColor;
+  const auto warningColor = s_WarningColor;
 
   s_Parsed = false;
   EnsureParsed();
 
-  if (color == s_Color && accentColor == s_AccentColor)
+  if (color == s_Color && accentColor == s_AccentColor && selectionColor == s_SelectionColor
+      && warningColor == s_WarningColor)
     return;
 
   ++s_Generation;

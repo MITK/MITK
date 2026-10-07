@@ -1013,7 +1013,12 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
-  set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
+
+  # Respect a fortify level chosen by the packager (e.g. -D_FORTIFY_SOURCE=3):
+  # redefining it is a warning and thus fatal under -Werror.
+  if(NOT "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}" MATCHES "_FORTIFY_SOURCE")
+    set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
+  endif()
 endif()
 
 set(MITK_MODULE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})

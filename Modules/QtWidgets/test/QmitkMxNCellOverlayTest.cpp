@@ -74,6 +74,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Popup_FromTheFurnitureKeepsTheFrameUp);
   MITK_TEST(Popup_ContextMenuDoesNotRevealTheFrame);
   MITK_TEST(LostGrab_LeavesTheColorbarDragWorking);
+  MITK_TEST(LostGrab_EndsAStaleColorbarDrag);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -394,6 +395,23 @@ public:
     SendMouse(overlay, QEvent::MouseButtonRelease, onColorbar - QPoint(0, 40), Qt::LeftButton);
 
     CPPUNIT_ASSERT_MESSAGE("A colorbar drag works after a gesture lost its release", this->LevelIn(0) > before);
+  }
+
+  void LostGrab_EndsAStaleColorbarDrag()
+  {
+    this->ShowEditor();
+    auto* overlay = this->MaskOverlay(0);
+
+    // A colorbar drag whose release never arrives: the pointer comes back with
+    // no button held, and hovering must not keep dragging the level.
+    const QRect area = m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow()->geometry();
+    const QPoint onColorbar(area.right() - 2, area.center().y());
+    const double before = this->LevelIn(0);
+    SendMouse(overlay, QEvent::MouseButtonPress, onColorbar, Qt::LeftButton);
+    SendMouse(overlay, QEvent::MouseMove, onColorbar - QPoint(0, 40), Qt::NoButton);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A hover after a lost colorbar release leaves the level alone",
+                                         before, this->LevelIn(0), 1e-9);
   }
 
   void Popup_FromTheFurnitureKeepsTheFrameUp()

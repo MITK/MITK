@@ -1904,9 +1904,10 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
 
 void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
 {
-  // A gesture whose release went elsewhere (a lost grab) ends here at the latest.
-  m_ForwardingGesture = false;
-  m_RightPressArmed = false;
+  // A gesture whose release went elsewhere (a lost grab) ends here at the
+  // latest. The mask is left alone: this press is still being delivered, and
+  // its handling below sets whatever state it needs.
+  this->EndLostGesture(false);
 
   const QPoint position = event->pos();
 
@@ -2032,13 +2033,36 @@ void QmitkMxNCellOverlay::leaveEvent(QEvent* event)
   QmitkOverlayWidget::leaveEvent(event);
 }
 
+void QmitkMxNCellOverlay::EndLostGesture(bool refreshInteractivity)
+{
+  m_ForwardingGesture = false;
+  m_RightPressArmed = false;
+
+  if (m_PlatePressActive)
+  {
+    if (auto* arrangeMode = m_Editor->GetArrangeMode(); nullptr != arrangeMode)
+    {
+      arrangeMode->ReleaseCell(true);
+    }
+  }
+  m_PlatePressActive = false;
+  m_PlateDragArmed = false;
+
+  const bool dragPinned = DragMode::None != m_DragMode || m_NavDragRow >= 0;
+  m_DragMode = DragMode::None;
+  m_NavDragRow = -1;
+  if (dragPinned && refreshInteractivity)
+  {
+    this->UpdateInteractivity();
+  }
+}
+
 void QmitkMxNCellOverlay::mouseMoveEvent(QMouseEvent* event)
 {
   // No button held means no gesture, whatever release was lost on the way.
   if (Qt::NoButton == event->buttons())
   {
-    m_ForwardingGesture = false;
-    m_RightPressArmed = false;
+    this->EndLostGesture(true);
   }
 
   if (this->HandlePlateInput(QEvent::MouseMove, event, event->pos()))

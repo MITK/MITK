@@ -461,6 +461,15 @@ private:
   void UpdateInteractivity();
 
   /**
+   * rief End every gesture still marked as running: one whose release went
+   *        elsewhere (a lost grab) must neither keep the overlay interactive
+   *        nor let a plain hover drag. A pending plate press is cancelled, not
+   *        completed as a click. 'refreshInteractivity' re-evaluates the mask
+   *        when a colorbar or navigator drag was pinning it.
+   */
+  void EndLostGesture(bool refreshInteractivity);
+
+  /**
    * \brief Paint the sync peek plate over the image. Deliberately not routed
    *        through QmitkMxNSyncBarcodeWidget::PaintInto: that renderer lays out
    *        a uniform row, while the plate enlarges one glyph in place. The

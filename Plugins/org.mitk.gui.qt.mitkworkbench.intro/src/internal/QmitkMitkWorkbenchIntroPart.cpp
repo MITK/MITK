@@ -182,6 +182,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   m_Links = CreateLabel(QString());
   m_Links->setTextFormat(Qt::RichText);
   m_Links->setOpenExternalLinks(true);
+  QmitkWelcomeShowLinkTargets(m_Links);
   columnLayout->addWidget(m_Links);
 
   m_TipsPage = new QmitkWelcomeTipsPage(palette);

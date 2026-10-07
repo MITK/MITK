@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkWelcomeText.h"
 
+#include <QLabel>
+
 namespace
 {
   // A single paragraph fills the label, so Qt's default paragraph margins
@@ -24,4 +26,10 @@ QString QmitkWelcomeTextWithLineHeight(QString html)
   // Qt's rich text does not inherit the line height, so list items need it, too.
   html.replace("<li>", QString("<li %1>").arg(LINE_HEIGHT_STYLE));
   return QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(html);
+}
+
+void QmitkWelcomeShowLinkTargets(QLabel* label)
+{
+  // Empty when the mouse leaves a link, which removes the tooltip again.
+  QObject::connect(label, &QLabel::linkHovered, label, &QLabel::setToolTip);
 }

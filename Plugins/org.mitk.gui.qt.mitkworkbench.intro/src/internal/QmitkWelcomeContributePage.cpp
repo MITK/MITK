@@ -133,6 +133,7 @@ QWidget* QmitkWelcomeContributePage::CreateLinks(const std::vector<Link>& links)
 {
   auto* label = QmitkWelcomeCreateText(this->CreateLinksText(links));
   label->setOpenExternalLinks(true);
+  QmitkWelcomeShowLinkTargets(label);
   m_Links.emplace_back(label, links);
 
   return label;

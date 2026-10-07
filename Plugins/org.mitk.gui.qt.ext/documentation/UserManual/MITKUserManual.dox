@@ -84,7 +84,7 @@ The report is handed off by a program of your choice:
   <li><b>Show report file</b> saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
 </ul>
 
-The .zip file is saved in a temporary folder and is kept when the dialog closes. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
+The .zip file is saved in a temporary folder and is kept when the dialog closes. Saving again replaces the previous file. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
 
 \subsection MITKWorkbenchManualPage_Feedback_CrashDumps Reports with crash dumps
 

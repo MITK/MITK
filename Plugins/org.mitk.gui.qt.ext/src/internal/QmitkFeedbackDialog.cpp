@@ -1329,6 +1329,8 @@ void QmitkFeedbackDialog::OnBundleWritten()
     return;
   }
 
+  const auto supersededPath = m_BundlePath;
+
   m_BundlePath = m_PendingZipPath;
   m_BundleGeneration = m_PendingGeneration;
   m_BundleAttachments.clear();
@@ -1337,6 +1339,16 @@ void QmitkFeedbackDialog::OnBundleWritten()
   {
     if (attachment.included)
       m_BundleAttachments.push_back(attachment.sourcePath);
+  }
+
+  // The superseded bundle may hold content the user has removed since.
+  // Best effort: a file still held open elsewhere stays.
+  if (!supersededPath.isEmpty())
+  {
+    const auto supersededDirectory = QFileInfo(supersededPath).path();
+
+    if (supersededDirectory != QFileInfo(m_BundlePath).path())
+      QDir(supersededDirectory).removeRecursively();
   }
 
   const auto size = QFileInfo(m_BundlePath).size();

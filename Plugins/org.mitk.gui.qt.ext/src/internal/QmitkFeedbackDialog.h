@@ -97,10 +97,11 @@ public:
 
   void done(int result) override;
 
-  /** \brief The crash dumps in the last successfully written bundle if the
-   *  user asked to delete them, else none. Deleting is left to the caller
-   *  after the dialog has closed, because later hand-offs from the same
-   *  dialog may write the bundle again from the same dumps. */
+  /** \brief The crash dumps in the last successfully written bundle that are
+   *  still included, if the user asked to delete them, else none. Deleting
+   *  is left to the caller after the dialog has closed, because later
+   *  hand-offs from the same dialog may write the bundle again from the same
+   *  dumps. */
   std::vector<std::filesystem::path> GetDumpsToDelete() const;
 
 protected:
@@ -153,6 +154,7 @@ private:
   void OnReportChanged();
   void OnPhiItemIncluded(bool included);
   void OnPublicItemChanged();
+  void OnScreenshotTargetChanged();
   void OnDumpsChanged();
   void OnEnvironmentClicked();
   void OnAddImages();

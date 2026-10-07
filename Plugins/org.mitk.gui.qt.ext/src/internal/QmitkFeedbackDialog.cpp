@@ -253,7 +253,17 @@ std::vector<std::filesystem::path> QmitkFeedbackDialog::GetDumpsToDelete() const
   if (m_DeleteDumps == nullptr || !m_DeleteDumps->isChecked())
     return {};
 
-  return m_BundleAttachments;
+  // A dump excluded after the last save keeps its local copy.
+  const auto included = this->GetIncludedDumps();
+  std::vector<std::filesystem::path> dumps;
+
+  for (const auto& dump : m_BundleAttachments)
+  {
+    if (std::find(included.begin(), included.end(), dump) != included.end())
+      dumps.push_back(dump);
+  }
+
+  return dumps;
 }
 
 bool QmitkFeedbackDialog::eventFilter(QObject* watched, QEvent* event)
@@ -706,7 +716,7 @@ void QmitkFeedbackDialog::AddScreenshotRow(QVBoxLayout* layout)
 
   connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
   connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
-  connect(m_ScreenshotTarget, &QComboBox::currentIndexChanged, this, &QmitkFeedbackDialog::OnPublicItemChanged);
+  connect(m_ScreenshotTarget, &QComboBox::currentIndexChanged, this, &QmitkFeedbackDialog::OnScreenshotTargetChanged);
 }
 
 void QmitkFeedbackDialog::AddDumpsRow(QVBoxLayout* layout)
@@ -1042,6 +1052,16 @@ void QmitkFeedbackDialog::OnPublicItemChanged()
   this->OnReportChanged();
 }
 
+void QmitkFeedbackDialog::OnScreenshotTargetChanged()
+{
+  // The other target is a different image, which the sharing confirmation
+  // did not cover.
+  if (m_ScreenshotInclude->isChecked())
+    m_SharingConfirmation->setChecked(false);
+
+  this->OnPublicItemChanged();
+}
+
 void QmitkFeedbackDialog::OnDumpsChanged()
 {
   const auto includedDumpCount = this->GetIncludedDumps().size();
@@ -1073,7 +1093,14 @@ std::vector<std::filesystem::path> QmitkFeedbackDialog::GetIncludedDumps() const
 void QmitkFeedbackDialog::UpdateDumpRows()
 {
   if (m_DumpDetails != nullptr)
-    m_DumpDetails->setVisible(m_DumpsInclude->isChecked());
+  {
+    const bool offered = m_DumpsInclude->isChecked();
+    m_DumpDetails->setVisible(offered);
+
+    // A deletion that is not offered must not stay requested unseen.
+    if (!offered)
+      m_DeleteDumps->setChecked(false);
+  }
 
   const auto included = this->GetIncludedDumps();
 

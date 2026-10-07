@@ -104,11 +104,9 @@ namespace mitk
   private:
     void CalculateMask();
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMaskFromClosedPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
+    void InternalCalculateMaskFromClosedPlanarFigure(const itk::ImageRegion<2>& sliceRegion, unsigned int axis);
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMaskFromOpenPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
+    void InternalCalculateMaskFromOpenPlanarFigure(const itk::ImageRegion<2>& sliceRegion, unsigned int axis);
 
     mitk::Image::ConstPointer Extract2DImageSlice(const Image* input, unsigned int axis, unsigned int slice) const;
 

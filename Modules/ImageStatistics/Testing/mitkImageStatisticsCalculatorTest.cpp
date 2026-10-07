@@ -142,6 +142,8 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestRGBAImageUnmaskedVoxelCount);
   MITK_TEST(TestRGBAImageMaskedVoxelCount);
   MITK_TEST(TestRGBAImageIgnoreZero);
+  MITK_TEST(TestRGBAImagePlanarFigure);
+  MITK_TEST(TestRGBA2DImagePlanarFigure);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -188,6 +190,8 @@ public:
   void TestRGBAImageUnmaskedVoxelCount();
   void TestRGBAImageMaskedVoxelCount();
   void TestRGBAImageIgnoreZero();
+  void TestRGBAImagePlanarFigure();
+  void TestRGBA2DImagePlanarFigure();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -1287,6 +1291,85 @@ void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageIgnoreZero()
   CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
 
   this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 5, 15.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImagePlanarFigure()
+{
+  /*****************************
+   * 4x4x3 RGBA image and a scalar image of the same geometry; a square planar
+   * figure on slice 1 covers the voxels [1,2]x[1,2]
+   * -> 4 voxels and an area of 4 mm^2 for both images
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image planar figure:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 4;
+  size[1] = 4;
+  size[2] = 3;
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, std::vector<RGBAPixelType>(4 * 4 * 3, MakeRGBA(10, 20, 30, 255)));
+  mitk::Image::Pointer scalarImage = BuildImage<short>(size, std::vector<short>(4 * 4 * 3, 10));
+
+  mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+  mitk::Point2D pnt2; pnt2[0] = 2.5; pnt2[1] = 0.5;
+  mitk::Point2D pnt3; pnt3[0] = 2.5; pnt3[1] = 2.5;
+  mitk::Point2D pnt4; pnt4[0] = 0.5; pnt4[1] = 2.5;
+  auto figure = GeneratePlanarPolygon(image->GetSlicedGeometry()->GetPlaneGeometry(1), { pnt1, pnt2, pnt3, pnt4 });
+
+  mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  planFigMaskGen->SetInputImage(image);
+  planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, planFigMaskGen.GetPointer()));
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 4, 4.0);
+
+  mitk::PlanarFigureMaskGenerator::Pointer scalarPlanFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  scalarPlanFigMaskGen->SetInputImage(scalarImage);
+  scalarPlanFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer scalarStatisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(scalarStatisticsContainer = ComputeStatistics(scalarImage, scalarPlanFigMaskGen.GetPointer()));
+  const auto scalarStatistics = scalarStatisticsContainer->GetStatistics(1, 0);
+
+  CPPUNIT_ASSERT_EQUAL(mitk::ImageStatisticsContainer::VoxelCountType(4),
+    scalarStatistics.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+  CPPUNIT_ASSERT(std::abs(scalarStatistics.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VOLUME()) - 4.0) < mitk::eps);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBA2DImagePlanarFigure()
+{
+  /*****************************
+   * 4x4 RGBA image, which the planar figure mask uses as its slice without
+   * extraction; a square planar figure covers the pixels [1,2]x[1,2]
+   * -> 4 pixels and an area of 4 mm^2
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA 2D image planar figure:-----------------------------------------------------------------------------------";
+
+  using ImageType = itk::Image<RGBAPixelType, 2>;
+
+  ImageType::SizeType size;
+  size.Fill(4);
+
+  auto itkImage = ImageType::New();
+  itkImage->SetRegions(ImageType::RegionType(size));
+  itkImage->Allocate();
+  itkImage->FillBuffer(MakeRGBA(10, 20, 30, 255));
+
+  mitk::Image::Pointer image = mitk::GrabItkImageMemory(itkImage, nullptr, nullptr, false);
+
+  mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+  mitk::Point2D pnt2; pnt2[0] = 2.5; pnt2[1] = 0.5;
+  mitk::Point2D pnt3; pnt3[0] = 2.5; pnt3[1] = 2.5;
+  mitk::Point2D pnt4; pnt4[0] = 0.5; pnt4[1] = 2.5;
+  auto figure = GeneratePlanarPolygon(image->GetSlicedGeometry()->GetPlaneGeometry(0), { pnt1, pnt2, pnt3, pnt4 });
+
+  mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  planFigMaskGen->SetInputImage(image);
+  planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, planFigMaskGen.GetPointer()));
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 4, 4.0);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkBaseGeometry.h>
 #include <mitkITKImageImport.h>
-#include <mitkImageAccessByItk.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkImageTimeSelector.h>
@@ -75,19 +74,13 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetReferenceImage()
     return m_ReferenceImage;
 }
 
-template < typename TPixel, unsigned int VImageDimension >
 void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
-  const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
+  const itk::ImageRegion<2>& sliceRegion, unsigned int axis )
 {
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
 
-  typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
-  maskImage->SetOrigin(image->GetOrigin());
-  maskImage->SetSpacing(image->GetSpacing());
-  maskImage->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
-  maskImage->SetBufferedRegion(image->GetBufferedRegion());
-  maskImage->SetDirection(image->GetDirection());
-  maskImage->SetNumberOfComponentsPerPixel(image->GetNumberOfComponentsPerPixel());
+  MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
+  maskImage->SetRegions(sliceRegion);
   maskImage->Allocate();
   maskImage->FillBuffer(1);
 
@@ -186,7 +179,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
 
-  typename ImageExportType::Pointer itkExporter = ImageExportType::New();
+  ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( maskImage );
 //  itkExporter->SetInput( castFilter->GetOutput() );
 
@@ -220,7 +213,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
     : holeStencilFilter->GetOutputPort());
   vtkExporter->Update();
 
-  typename ImageImportType::Pointer itkImporter = ImageImportType::New();
+  ImageImportType::Pointer itkImporter = ImageImportType::New();
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
@@ -233,22 +226,16 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   m_InternalITKImageMask2D = duplicator->GetOutput();
 }
 
-template < typename TPixel, unsigned int VImageDimension >
 void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
-  const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
+  const itk::ImageRegion<2>& sliceRegion, unsigned int axis )
 {
   typedef itk::Image< unsigned short, 2 >       MaskImage2DType;
   typedef itk::LineIterator< MaskImage2DType >  LineIteratorType;
   typedef MaskImage2DType::IndexType            IndexType2D;
   typedef std::vector< IndexType2D >            IndexVecType;
 
-  typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
-  maskImage->SetOrigin(image->GetOrigin());
-  maskImage->SetSpacing(image->GetSpacing());
-  maskImage->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
-  maskImage->SetBufferedRegion(image->GetBufferedRegion());
-  maskImage->SetDirection(image->GetDirection());
-  maskImage->SetNumberOfComponentsPerPixel(image->GetNumberOfComponentsPerPixel());
+  MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
+  maskImage->SetRegions(sliceRegion);
   maskImage->Allocate();
   maskImage->FillBuffer(0);
 
@@ -392,19 +379,23 @@ void PlanarFigureMaskGenerator::CalculateMask()
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
     mitk::Image::ConstPointer inputImageSlice = Extract2DImageSlice(timePointImage, axis, slice);
+
+    // The mask is rasterized in index space and gets the geometry of the slice below,
+    // so only the extent of the slice matters, not its pixel type.
+    itk::ImageRegion<2>::SizeType sliceSize;
+    sliceSize[0] = inputImageSlice->GetDimension(0);
+    sliceSize[1] = inputImageSlice->GetDimension(1);
+    const itk::ImageRegion<2> sliceRegion(sliceSize);
+
     // Compute mask from PlanarFigure
     // rastering for open planar figure:
     if ( !m_PlanarFigure->IsClosed() )
     {
-      AccessFixedDimensionByItk_1(inputImageSlice,
-        InternalCalculateMaskFromOpenPlanarFigure,
-        2, axis)
+      this->InternalCalculateMaskFromOpenPlanarFigure(sliceRegion, axis);
     }
     else//for closed planar figure
     {
-      AccessFixedDimensionByItk_1(inputImageSlice,
-                                  InternalCalculateMaskFromClosedPlanarFigure,
-                                  2, axis)
+      this->InternalCalculateMaskFromClosedPlanarFigure(sliceRegion, axis);
     }
 
     //convert itk mask to mitk::Image::Pointer and return it

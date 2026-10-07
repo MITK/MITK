@@ -24,6 +24,8 @@ found in the LICENSE file.
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 namespace
 {
   QString LogLabel(const mitk::CrashDumpInfo& dump)
@@ -194,6 +196,21 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetCheckedDumps() con
   return checked;
 }
 
+void QmitkCrashDumpListWidget::SetAllChecked(bool checked)
+{
+  if (!m_Checkable)
+    return;
+
+  {
+    const QSignalBlocker blocker(m_Tree);
+
+    for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
+      m_Tree->topLevelItem(row)->setCheckState(KindColumn, checked ? Qt::Checked : Qt::Unchecked);
+  }
+
+  emit CheckedChanged();
+}
+
 QString QmitkCrashDumpListWidget::KindLabel(mitk::DumpKind kind)
 {
   return QmitkCrashDumpUi::KindLabel(kind);
@@ -205,6 +222,23 @@ void QmitkCrashDumpListWidget::SetColumnHidden(Column column, bool hidden)
 }
 
 void QmitkCrashDumpListWidget::FitToContents()
+{
+  const int contentWidth = this->FitColumnsAndHeight();
+  m_Tree->setMinimumWidth(contentWidth);
+}
+
+void QmitkCrashDumpListWidget::FitHeightToContents()
+{
+  const int contentWidth = this->FitColumnsAndHeight();
+
+  // Every column but the version keeps its width; the version column, which
+  // carries the long strings of development builds, elides instead.
+  const int minimumVersionWidth = m_Tree->fontMetrics().horizontalAdvance("MITK Workbench");
+  m_Tree->setMinimumWidth(
+    std::min(contentWidth, contentWidth - m_Tree->columnWidth(VersionColumn) + minimumVersionWidth));
+}
+
+int QmitkCrashDumpListWidget::FitColumnsAndHeight()
 {
   // Measured in the font and with the item margins of the style sheet,
   // which a list that has not been shown yet does not have otherwise.
@@ -223,6 +257,7 @@ void QmitkCrashDumpListWidget::FitToContents()
 
   auto* header = m_Tree->header();
   const int frame = 2 * m_Tree->frameWidth();
+  const int contentWidth = header->length() + frame;
 
   int height = header->sizeHint().height() + frame;
   for (int row = 0; row < m_Tree->topLevelItemCount(); ++row)
@@ -230,10 +265,11 @@ void QmitkCrashDumpListWidget::FitToContents()
 
   m_Tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_Tree->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_Tree->setMinimumWidth(header->length() + frame);
   m_Tree->setFixedHeight(height);
   header->setSectionResizeMode(VersionColumn, QHeaderView::Stretch);
   this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+  return contentWidth;
 }
 
 void QmitkCrashDumpListWidget::SetSelectionEnabled(bool enabled)

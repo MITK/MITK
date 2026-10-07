@@ -77,6 +77,9 @@ public:
   /** \brief The checked dumps in table order; empty unless checkable. */
   std::vector<mitk::CrashDumpInfo> GetCheckedDumps() const;
 
+  /** \brief Check or uncheck every dump of a checkable list. */
+  void SetAllChecked(bool checked);
+
   /** \brief How the kind column names \p kind. */
   static QString KindLabel(mitk::DumpKind kind);
 
@@ -89,12 +92,19 @@ public:
    *  version column. */
   void FitToContents();
 
+  /** \brief Like FitToContents(), but for a list that has to fit the width
+   *  it gets: the version column elides instead of widening the list. */
+  void FitHeightToContents();
+
 signals:
   void SelectionChanged();
   void CheckedChanged();
 
 private:
   void ApplyCheckable();
+
+  /** Fits the columns and the height; returns the width of all columns. */
+  int FitColumnsAndHeight();
 
   QTreeWidget* m_Tree;
   std::vector<mitk::CrashDumpInfo> m_Dumps;

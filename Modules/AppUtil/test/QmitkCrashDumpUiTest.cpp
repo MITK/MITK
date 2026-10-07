@@ -247,6 +247,13 @@ public:
     widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("new dumps start checked", std::size_t(3), widget.GetCheckedDumps().size());
 
+    checkedChanges = 0;
+    widget.SetAllChecked(false);
+    CPPUNIT_ASSERT(widget.GetCheckedDumps().empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("one notification for all rows", 1, checkedChanges);
+    widget.SetAllChecked(true);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), widget.GetCheckedDumps().size());
+
     CPPUNIT_ASSERT_EQUAL(std::string("Crash"), QmitkCrashDumpListWidget::KindLabel(mitk::DumpKind::Crash).toStdString());
   }
 

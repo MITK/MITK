@@ -1254,11 +1254,15 @@ add_library(MitkCompilerFlags INTERFACE)
 #    parallel-build safe, unlike /Zi) and is codegen-identical to no debug
 #    info; the linker still emits the per-DLL .pdb we archive. /O2 /Ob2 are
 #    untouched (full inlining, unlike RelWithDebInfo's /Ob1).
-#  - GCC/Clang: -gsplit-dwarf keeps debug info in .dwo files beside the
-#    objects, is codegen-neutral, and needs no link-side flag.
-#  - macOS: -g (not -gsplit-dwarf: dsymutil consumes plain DWARF, split
-#    DWARF is a Linux convention) is codegen-neutral; the .dSYM is produced
-#    at archive time.
+#  - GCC/Clang: -g1 emits line tables, function descriptions and inline
+#    entries, which is all a crash dump needs, at a quarter of the size of
+#    full -g; it is codegen-neutral and needs no link-side flag. Split
+#    DWARF is deliberately not used: binutils 2.46 dropped dwp, llvm-dwp
+#    does not cope with GCC's output in practice, and dump_syms ignores
+#    .dwo and .dwp files altogether. GCC also emits nothing with
+#    -gsplit-dwarf alone, since it only splits what -g generates.
+#  - macOS: -g is codegen-neutral; the linker leaves the DWARF in the
+#    object files and dsymutil produces the .dSYM at archive time.
 # The MSVC binary ends up marginally larger (~0.5%): /DEBUG makes /OPT:ICF
 # fold slightly fewer identical functions to keep them individually
 # debuggable. This is a code-size, not a runtime-speed, difference.
@@ -1269,7 +1273,7 @@ if(MITK_RELEASE_DEBUG_SYMBOLS)
   elseif(APPLE)
     set(_mitk_debug_symbol_flag "-g")
   else()
-    set(_mitk_debug_symbol_flag "-gsplit-dwarf")
+    set(_mitk_debug_symbol_flag "-g1")
   endif()
   string(APPEND MITK_CXX_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
   string(APPEND MITK_C_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")

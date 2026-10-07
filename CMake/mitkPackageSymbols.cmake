@@ -66,18 +66,13 @@ if(CMAKE_HOST_WIN32)
     math(EXPR _staged "${_staged} + 1")
   endforeach()
 else()
-  # Split DWARF (.dwo) lives beside the objects, not next to the binaries, so
-  # pack each binary's debug info into a self-contained sidecar: dwp (.dwp) on
-  # ELF, dsymutil (.dSYM) on macOS. Best effort - warns and skips if the tool
-  # is unavailable (e.g. the -g fallback leaves debug info embedded instead).
-  #
-  # The shipped Linux binaries are stripped, so the symbol table and the
-  # skeleton DWARF that a .dwp refers to survive only in the build-tree
-  # binary. On ELF the binary itself is archived next to its sidecar.
+  # On ELF the unstripped build-tree binary is the symbol file: it carries
+  # the DWARF that strip removes from the shipped copy, so archive it as is.
+  # On macOS the linker leaves the DWARF in the object files, so dsymutil
+  # packs it into a self-contained .dSYM here. Best effort - warns and skips
+  # if dsymutil is unavailable.
   if(CMAKE_HOST_APPLE)
     find_program(_dsymutil dsymutil)
-  else()
-    find_program(_dwp NAMES dwp)
   endif()
 
   set(_search_dirs "${_bin_dir}")
@@ -121,19 +116,8 @@ else()
     elseif(NOT CMAKE_HOST_APPLE)
       file(COPY "${_binary}" DESTINATION "${MITK_SYMBOL_STAGING_DIR}")
       math(EXPR _staged "${_staged} + 1")
-      if(_dwp)
-        execute_process(COMMAND "${_dwp}" -e "${_binary}" -o "${MITK_SYMBOL_STAGING_DIR}/${_name}.dwp"
-          RESULT_VARIABLE _result)
-        if(NOT _result EQUAL 0)
-          message(WARNING "mitkPackageSymbols: dwp failed for ${_name}; its split DWARF is not archived.")
-        endif()
-      endif()
     endif()
   endforeach()
-
-  if(NOT CMAKE_HOST_APPLE AND NOT _dwp)
-    message(WARNING "mitkPackageSymbols: dwp not found; only the binaries themselves are archived.")
-  endif()
 endif()
 
 if(_staged EQUAL 0)

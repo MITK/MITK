@@ -52,23 +52,23 @@ k                REM call stack of the crashing thread
 
 Linux binaries are shipped stripped, so the shipped files are useless for
 symbolication. The symbols archive carries the unstripped build-tree binaries
-together with their packed split DWARF sidecars (<tt>.dwp</tt>, see
-\ref CrashDumpFacilityPage_Symbols); the two share a build ID with the shipped
-binary. Keep each sidecar next to its binary when running the tools below.
-Minidumps are not a native ELF format, so a debugger does not open them
-directly - convert the debug info to a Breakpad symbol file and walk the dump
-against it.
+(see \ref CrashDumpFacilityPage_Symbols). They share their build ID with the
+shipped files, which is how a dump taken from a stripped installation is
+matched to them. Minidumps are not a native ELF format, so a debugger does not
+open them directly - convert the debug info to a Breakpad symbol file and walk
+the dump against it.
 
 The general flow (exact invocation depends on the tool you pick):
 
 \code
-# 1. Produce a Breakpad .sym from the archived binary (resolving its split DWARF).
-dump_syms libMitkCore.so > MitkCore.sym
+# 1. Produce a Breakpad .sym from the archived binary.
+dump_syms libMitkCore.so > libMitkCore.so.sym
 
-# 2. Its first line is: MODULE Linux x86_64 <BUILD-ID> MitkCore
-#    Place the file where the walker expects it:
-mkdir -p symbols/MitkCore/<BUILD-ID>
-mv MitkCore.sym symbols/MitkCore/<BUILD-ID>/MitkCore.sym
+# 2. Its first line is: MODULE Linux x86_64 <DEBUG-ID> libMitkCore.so
+#    (the debug ID is derived from the build ID). Place the file where the
+#    walker expects it:
+mkdir -p symbols/libMitkCore.so/<DEBUG-ID>
+mv libMitkCore.so.sym symbols/libMitkCore.so/<DEBUG-ID>/
 
 # 3. Walk the dump against the symbol tree.
 minidump-stackwalk crash.dmp symbols/
@@ -87,7 +87,7 @@ signal the process was finally killed with.
 
 macOS debug info lives in <tt>.dSYM</tt> bundles (see
 \ref CrashDumpFacilityPage_Symbols), carried in the symbols archive. The flow is
-the same as on Linux, reading from the <tt>.dSYM</tt> instead of split DWARF:
+the same as on Linux, reading from the <tt>.dSYM</tt> instead of the binary:
 
 \code
 dump_syms libMitkCore.dylib.dSYM > MitkCore.sym
@@ -117,8 +117,8 @@ endorsement:
 - On Windows, \c cdb / WinDbg (Windows SDK) read the PDBs directly and need no
   symbol conversion.
 
-Follow the chosen tool's own documentation for details such as how it resolves
-split DWARF or dSYM input.
+Follow the chosen tool's own documentation for details such as how it reads
+ELF or dSYM input.
 
 \section AnalyzingCrashDumpsHowTo_Reading Reading the result
 

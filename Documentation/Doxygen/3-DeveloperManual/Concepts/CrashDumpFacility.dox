@@ -398,7 +398,7 @@ application.
 A stripped Release binary produces undecodable dumps. The option
 \c MITK_RELEASE_DEBUG_SYMBOLS (default ON, forwarded from the superbuild)
 makes a Release build emit debug symbols for MITK's own code - PDBs on MSVC,
-split DWARF on GCC/Clang, dSYM on macOS - so release dumps can be walked back
+minimal DWARF (\c -g1) on GCC/Clang, dSYM on macOS - so release dumps can be walked back
 to function, file, and line. It is deliberately independent of
 \c MITK_USE_sentry: the symbols are equally useful for dumps captured by other
 means.
@@ -414,8 +414,11 @@ difference.)
   \c /O2 \c /Ob2 (full inlining, unlike RelWithDebInfo's \c /Ob1). The link
   step uses \c /DEBUG:FULL (a self-contained, shippable PDB) and restores
   \c /OPT:REF \c /OPT:ICF, which \c /DEBUG would otherwise disable.
-- GCC/Clang use \c -gsplit-dwarf, which is codegen-neutral and needs no
-  link-side flag; macOS uses \c -g plus \c dsymutil at archive time.
+- GCC/Clang use \c -g1, which emits line tables, function descriptions and
+  inline entries - all a dump needs - at a quarter of the size of full \c -g;
+  it is codegen-neutral and needs no link-side flag. Split DWARF is not used:
+  binutils 2.46 dropped \c dwp, and \c dump_syms ignores <tt>.dwo</tt> and
+  <tt>.dwp</tt> files. macOS uses \c -g plus \c dsymutil at archive time.
 
 The flags ride the \c MitkCompilerFlags interface target, which only code
 compiled by MITK's own module/plugin/application machinery links. Prebuilt
@@ -431,10 +434,10 @@ function-name-plus-offset only, while MITK frames resolve to file and line.
 
 The installers do not ship the symbols. On Windows the debug info lives in
 separate PDBs that are never installed; on Linux the shipped binaries are
-stripped (see \ref PackagingPage), which also removes the skeleton DWARF that
-refers to the split DWARF; on macOS the binaries keep their symbol tables while
-split DWARF holds the bulk of the debug info outside them. Either way the full
-symbols must be archived separately, by the \c package-symbols target:
+stripped (see \ref PackagingPage), so only the unstripped build-tree binaries
+carry the DWARF; on macOS the binaries keep their symbol tables while the
+linker leaves the DWARF in the object files. Either way the full symbols must
+be archived separately, by the \c package-symbols target:
 
 \code
 cmake --build . --config Release --target package-symbols

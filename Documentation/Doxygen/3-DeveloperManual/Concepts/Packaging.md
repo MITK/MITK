@@ -397,15 +397,15 @@ Windows and macOS packages are not stripped: MSVC has no strip step, and the mac
 
 ### Debug Symbols and Symbol Archiving
 
-Release builds emit debug symbols for MITK's own code when `MITK_RELEASE_DEBUG_SYMBOLS` is `ON` (the default, forwarded from the SuperBuild): PDBs on MSVC, split DWARF on GCC/Clang, dSYM on macOS. Optimization and inlining are unchanged. Prebuilt third-party dependencies under `ep/` (ITK, VTK, Qt, ...) are built without these flags, so a crash inside them resolves to name-plus-offset only.
+Release builds emit debug symbols for MITK's own code when `MITK_RELEASE_DEBUG_SYMBOLS` is `ON` (the default, forwarded from the SuperBuild): PDBs on MSVC, minimal DWARF (`-g1`) on GCC/Clang, dSYM on macOS. Optimization and inlining are unchanged. Prebuilt third-party dependencies under `ep/` (ITK, VTK, Qt, ...) are built without these flags, so a crash inside them resolves to name-plus-offset only.
 
-These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux the shipped binaries are stripped (see Strip Policy above), so neither their symbol tables nor the skeleton DWARF that refers to the split DWARF survive in the package. On macOS the binaries are not stripped, but split DWARF keeps the bulk of the debug info out of them as well. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
+These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux the shipped binaries are stripped (see Strip Policy above), so neither their symbol tables nor their DWARF survive in the package. On macOS the binaries are not stripped, but the linker leaves the DWARF in the object files, from which `dsymutil` builds the `.dSYM` at archive time. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
 
 ```
 cmake --build <build-tree> --config Release --target package-symbols
 ```
 
-This writes `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` (e.g. `MITK-2025.12.99-windows-x86_64-symbols.zip`) next to the other CPack artifacts, collecting from the build-tree runtime output directory (test drivers excluded) the MITK-built PDBs on Windows, the unstripped binaries together with their `.dwp` sidecars on Linux, and the `.dSYM` bundles on macOS. The archive name is paired with the release binary by construction.
+This writes `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` (e.g. `MITK-2025.12.99-windows-x86_64-symbols.zip`) next to the other CPack artifacts, collecting from the build-tree runtime output directory (test drivers excluded) the MITK-built PDBs on Windows, the unstripped binaries on Linux, and the `.dSYM` bundles on macOS. The archive name is paired with the release binary by construction.
 
 **Release / CI responsibility:** the release pipeline must run `package-symbols` for every released or tagged build, against the same build tree that produced the shipped binaries — the target globs the build-tree runtime output, so it must run after linking and before any cleanup — then archive the resulting `*-symbols.zip` for at least as long as that release is supported. A minidump is only decodable against symbols built from the exact same sources, and a missing archive cannot be reconstructed later. Nightly or throwaway builds do not need archived symbols; released binaries do.
 
@@ -682,7 +682,7 @@ The current install system replaced several legacy approaches:
 | `CMake/mitkFunctionCreateProvisioningFile.cmake` | `mitkFunctionCreateProvisioningFile()` — creates build-time and install-time provisioning files |
 | `CMake/mitkSetupCPack.cmake` | CPack generator selection, versioning, NSIS settings, strip policy; includes the symbol-archive target |
 | `CMake/mitkFunctionSymbolArchive.cmake` | Defines the opt-in `package-symbols` target that archives MITK debug symbols into `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` |
-| `CMake/mitkPackageSymbols.cmake` | Build-time `cmake -P` helper invoked by `package-symbols`: collects and flattens MITK PDBs / `.dwp` / `.dSYM` from the build tree |
+| `CMake/mitkPackageSymbols.cmake` | Build-time `cmake -P` helper invoked by `package-symbols`: collects and flattens MITK PDBs, unstripped ELF binaries and `.dSYM` bundles from the build tree |
 | `CMake/FixMacOSInstaller.cmake.in` | macOS post-CPack script: Python framework conversion, `@loader_path` fix, code signing |
 | `CMake/entitlements.plist` | macOS code signing entitlements |
 | `CMake/RunInstalledApp.bat` | Windows wrapper for regular executables |

@@ -260,7 +260,7 @@ bool QmitkFeedbackDialog::eventFilter(QObject* watched, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonRelease)
   {
-    if (const auto clickable = m_ClickableLabels.find(watched); clickable != m_ClickableLabels.end())
+    if (const auto clickable = m_ClickTargets.find(watched); clickable != m_ClickTargets.end())
     {
       if (clickable->second->isEnabled())
         clickable->second->click();
@@ -541,11 +541,20 @@ QWidget* QmitkFeedbackDialog::CreateItemRow(QWidget* title, QWidget* summary, QW
 
 QWidget* QmitkFeedbackDialog::CreateConfirmation(QCheckBox* checkBox, const QString& statement, const QString& note)
 {
+  // No tinted background: on a tint, the theme's outline of an unchecked
+  // box loses its contrast. The panel as a whole toggles the box, so the
+  // user need not aim at it.
   auto* panel = new QFrame;
   panel->setObjectName("feedbackConfirmation");
+  panel->setAttribute(Qt::WA_Hover);
+  panel->setCursor(Qt::PointingHandCursor);
   panel->setStyleSheet(QString(
-    "QFrame#feedbackConfirmation { background-color: rgba(128, 128, 128, 24); border: none; "
-    "border-left: 3px solid %1; }").arg(WarningColor()));
+    "QFrame#feedbackConfirmation { border: 1px solid rgba(128, 128, 128, 90); border-left: 3px solid %1; }"
+    "QFrame#feedbackConfirmation:hover { background-color: rgba(128, 128, 128, 20); }").arg(WarningColor()));
+  panel->installEventFilter(this);
+  m_ClickTargets[panel] = checkBox;
+
+  checkBox->setStyleSheet("QCheckBox::indicator { width: 18px; height: 18px; }");
 
   auto* text = new QVBoxLayout;
   text->setSpacing(4);
@@ -579,7 +588,7 @@ QLabel* QmitkFeedbackDialog::CreateClickableLabel(const QString& text, QAbstract
   label->setWordWrap(true);
   label->setCursor(Qt::PointingHandCursor);
   label->installEventFilter(this);
-  m_ClickableLabels[label] = button;
+  m_ClickTargets[label] = button;
 
   return label;
 }

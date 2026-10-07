@@ -235,8 +235,8 @@ private:
   QWidget* m_PublicPanel = nullptr;
   QCheckBox* m_PublicConfirmation = nullptr;
 
-  /** Labels that toggle a check box when clicked. */
-  std::map<QObject*, QAbstractButton*> m_ClickableLabels;
+  /** Labels and panels that click a button when clicked. */
+  std::map<QObject*, QAbstractButton*> m_ClickTargets;
 
   QWidget* m_PreviewPane = nullptr;
   QTextBrowser* m_Preview = nullptr;

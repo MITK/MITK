@@ -1013,9 +1013,19 @@ void QmitkImageStatisticsTreeModel::NodeChanged(const mitk::DataNode * changedNo
   }
 
   const auto* data = changedNode->GetData();
-  const bool isRelevantNode = isInputNode || (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(data));
+  const auto* statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(data);
+  const bool isRelevantNode = isInputNode || nullptr != statistics;
 
-  if (isRelevantNode && nullptr != data && m_BuildTime.GetMTime() < data->GetMTime())
+  if (!isRelevantNode || nullptr == data)
+    return;
+
+  // The generation status of statistics, e.g. a failure, is a property of the data and
+  // leaves the modification time of the data untouched.
+  const auto mTime = nullptr != statistics
+    ? std::max(data->GetMTime(), statistics->GetPropertyList()->GetMTime())
+    : data->GetMTime();
+
+  if (m_BuildTime.GetMTime() < mTime)
   {
     emit beginResetModel();
     this->UpdateByDataStorage();

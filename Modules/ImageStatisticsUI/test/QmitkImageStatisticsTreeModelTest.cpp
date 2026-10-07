@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkImageStatisticsContainer.h>
 #include <mitkImageStatisticsContainerManager.h>
 #include <mitkImageStatisticsContainerNodeHelper.h>
+#include <mitkNodePredicateData.h>
 #include <mitkProperties.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStatisticsToImageRelationRule.h>
@@ -63,6 +64,7 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(StatisticsBeingComputed_AllStatisticsAreOffered);
   MITK_TEST(FailedStatistics_ImageRowShowsErrorAndReason);
   MITK_TEST(FailedStatistics_MaskRowShowsErrorAndReason);
+  MITK_TEST(ShownComputationFails_ModelShowsTheFailure);
   CPPUNIT_TEST_SUITE_END();
 
   QLocale m_DefaultLocale;
@@ -1014,6 +1016,26 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Only the row of the failed computation shows its reason.",
       ToolTipOf(model, model.index(0, 0)).empty());
+  }
+
+  void ShownComputationFails_ModelShowsTheFailure()
+  {
+    auto imageNode = this->AddImageNode("Image");
+    auto* placeholder = this->AddStatisticsContainer(imageNode, std::nullopt);
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ imageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the placeholder was not picked up.",
+      std::string("..."), Text(model, model.index(0, 1)));
+
+    // Like QmitkDataGeneratorBase, which modifies only the node of a failed placeholder.
+    MarkAsFailed(placeholder, "Mask is off the grid");
+    m_DataStorage->GetNode(mitk::NodePredicateData::New(placeholder))->Modified();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("N/A"), Text(model, model.index(0, 1)));
+    CPPUNIT_ASSERT_EQUAL(std::string("Mask is off the grid"), ToolTipOf(model, model.index(0, 0)));
   }
 };
 

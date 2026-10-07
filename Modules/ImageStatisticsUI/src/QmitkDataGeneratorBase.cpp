@@ -88,8 +88,8 @@ void QmitkDataGeneratorBase::SetAutoUpdate(bool autoUpdate)
 void QmitkDataGeneratorBase::OnJobError(const QString& error, const QmitkDataGenerationJobBase* failedJob, mitk::DataNode* placeholderNode) const
 {
   // A failed placeholder settles its pair, so the job is not restarted over and over.
-  // Only the node itself is observed by the data storage, and observers like the
-  // statistics tree compare the modification time of the data.
+  // Its data keeps the modification time: if the inputs changed while the job ran, the
+  // placeholder has to stay outdated instead of passing off a stale failure as current.
   auto* placeholder = placeholderNode->GetData();
   placeholder->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_FAILED));
 
@@ -98,7 +98,7 @@ void QmitkDataGeneratorBase::OnJobError(const QString& error, const QmitkDataGen
   placeholder->SetProperty(mitk::STATS_GENERATION_FAILURE_REASON_PROPERTY_NAME.c_str(),
     mitk::StringProperty::New(reason.empty() ? error.toStdString() : reason));
 
-  placeholder->Modified();
+  // Only the node itself is observed by the data storage.
   placeholderNode->Modified();
 
   emit JobError(error, failedJob);

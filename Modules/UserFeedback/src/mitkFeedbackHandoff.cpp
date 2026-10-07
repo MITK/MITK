@@ -22,15 +22,34 @@ namespace
 {
   constexpr std::size_t MaxTitleLength = 80;
 
-  // GitHub rejects new-issue URLs beyond about 8 kB, and URL encoding
-  // inflates the body further.
-  constexpr std::size_t MaxIssueBodyLength = 6000;
-
-  // mailto: URLs of more than about 2 kB are cut off or refused by some mail
-  // clients.
-  constexpr std::size_t MaxMailBodyLength = 2000;
+  // The caps below apply to the percent-encoded text, which is what ends up
+  // in the URL and can be three times as long: GitHub rejects new-issue URLs
+  // beyond about 8 kB, and some mail clients cut mailto: URLs beyond about
+  // 2 kB. The rest of each URL stays well below the remainder.
+  constexpr std::size_t MaxEncodedIssueBodyLength = 6000;
+  constexpr std::size_t MaxEncodedMailLength = 1900;
 
   const std::string TruncationNote = " [...] (truncated; the full text is in report.md in the bundle)";
+
+  /** Length of \p text percent-encoded as for a URL query, i.e. with every
+   *  byte but the unreserved characters of RFC 3986 as three characters. */
+  std::size_t EncodedLength(unsigned char c)
+  {
+    const bool unreserved = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
+      c == '-' || c == '.' || c == '_' || c == '~';
+
+    return unreserved ? 1 : 3;
+  }
+
+  std::size_t EncodedLength(const std::string& text)
+  {
+    std::size_t length = 0;
+
+    for (const unsigned char c : text)
+      length += EncodedLength(c);
+
+    return length;
+  }
 
   void ValidateBundleFileName(const std::string& bundleFileName)
   {
@@ -53,13 +72,31 @@ namespace
     return text.substr(0, length);
   }
 
-  std::string Shorten(const std::string& text, std::size_t maxLength)
+  /** \p text, or its start with a truncation note, encoded at most
+   *  \p maxEncodedLength long. */
+  std::string Shorten(const std::string& text, std::size_t maxEncodedLength)
   {
-    if (text.size() <= maxLength)
+    if (EncodedLength(text) <= maxEncodedLength)
       return text;
 
-    const auto room = maxLength > TruncationNote.size() ? maxLength - TruncationNote.size() : 0;
-    return CutUtf8(text, room) + TruncationNote;
+    const auto noteLength = EncodedLength(TruncationNote);
+    const auto room = maxEncodedLength > noteLength ? maxEncodedLength - noteLength : 0;
+
+    std::size_t length = 0;
+    std::size_t encoded = 0;
+
+    while (length < text.size())
+    {
+      const auto next = encoded + EncodedLength(static_cast<unsigned char>(text[length]));
+
+      if (next > room)
+        break;
+
+      encoded = next;
+      ++length;
+    }
+
+    return CutUtf8(text, length) + TruncationNote;
   }
 
   std::string Trim(const std::string& text)
@@ -222,8 +259,8 @@ mitk::GitHubIssueFields mitk::BuildGitHubIssueFields(const FeedbackReport& repor
   fields.labels = report.category == FeedbackCategory::Bug ? "bug" : "enhancement";
 
   const auto additionalContext = AdditionalContext(report, bundleFileName);
-  const auto frame = BuildIssueBody(report, std::string(), additionalContext).size();
-  const auto room = MaxIssueBodyLength > frame ? MaxIssueBodyLength - frame : 0;
+  const auto frame = EncodedLength(BuildIssueBody(report, std::string(), additionalContext));
+  const auto room = MaxEncodedIssueBodyLength > frame ? MaxEncodedIssueBodyLength - frame : 0;
 
   fields.body = BuildIssueBody(report, Shorten(report.description, room), additionalContext);
 
@@ -240,12 +277,13 @@ mitk::MailFields mitk::BuildMailFields(const FeedbackReport& report, const std::
 
   const auto head = "Hello MITK team,\n\nplease find my " + category + " attached as " + bundleFileName + ".\n\n";
   const auto tail = "\n\n" + BundleContents(report) + "\n";
-  const auto frame = head.size() + tail.size();
-  const auto room = MaxMailBodyLength > frame ? MaxMailBodyLength - frame : 0;
-
   MailFields fields;
   fields.recipient = GetFeedbackMailRecipient();
   fields.subject = "[MITK " + ToString(report.category) + "] " + BuildTitle(report);
+
+  const auto frame = EncodedLength(fields.subject) + EncodedLength(head) + EncodedLength(tail);
+  const auto room = MaxEncodedMailLength > frame ? MaxEncodedMailLength - frame : 0;
+
   fields.body = head + Shorten(report.description, room) + tail;
 
   return fields;

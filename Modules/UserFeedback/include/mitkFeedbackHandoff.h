@@ -25,7 +25,8 @@ namespace mitk
   struct GitHubIssueFields
   {
     std::string title;  /**< First line of the description, capped. */
-    std::string body;   /**< Follows the repository's issue template. */
+    std::string body;   /**< Follows the repository's issue template; its description is
+                             shortened so that the percent-encoded body fits a URL. */
     std::string labels; /**< "bug" or "enhancement"; GitHub may ignore it. */
   };
 
@@ -51,8 +52,10 @@ namespace mitk
                                                                    const std::string& bundleFileName);
 
   /** \brief Fields for an email about \p report to GetFeedbackMailRecipient(),
-   *  with a short body that asks to attach \p bundleFileName (a bare file
-   *  name; throws mitk::Exception otherwise). */
+   *  with a body that asks to attach \p bundleFileName (a bare file name;
+   *  throws mitk::Exception otherwise). The description is shortened so that
+   *  the percent-encoded subject and body stay below the length at which
+   *  some mail clients cut mailto: URLs. */
   MITKUSERFEEDBACK_EXPORT MailFields BuildMailFields(const FeedbackReport& report, const std::string& bundleFileName);
 }
 

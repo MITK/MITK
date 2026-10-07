@@ -49,6 +49,34 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
     return text.find(part) != std::string::npos;
   }
 
+  /** Length after percent-encoding everything but the unreserved URI
+   *  characters, which is what goes into the URL. */
+  static std::size_t EncodedLength(const std::string& text)
+  {
+    std::size_t length = 0;
+
+    for (const unsigned char c : text)
+    {
+      const bool unreserved = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
+        c == '-' || c == '.' || c == '_' || c == '~';
+
+      length += unreserved ? 1 : 3;
+    }
+
+    return length;
+  }
+
+  /** About 6000 bytes of the kind of text that inflates most when encoded. */
+  static std::string LongGermanDescription()
+  {
+    std::string description;
+
+    while (description.size() < 6000)
+      description += "Fehler beim \xC3\x96" "ffnen, \xC3\xA4" "hnlich wie zuvor:\n";
+
+    return description;
+  }
+
 public:
   void GitHubIsRefusedUnlessThePublicTrackerMayBeUsed()
   {
@@ -134,10 +162,17 @@ public:
     auto report = Report();
     report.description = std::string(20000, 'x');
 
-    const auto body = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
-    CPPUNIT_ASSERT(body.size() <= 6000);
+    auto body = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
+    CPPUNIT_ASSERT(EncodedLength(body) <= 6000);
     CPPUNIT_ASSERT(Contains(body, "truncated"));
     CPPUNIT_ASSERT_MESSAGE("the bundle reference survives the cap", Contains(body, "Bundle file: " + m_Bundle));
+
+    // GitHub refuses new-issue URLs beyond about 8 kB, so the cap applies to
+    // the encoded body, which can be three times as long as the text.
+    report.description = LongGermanDescription();
+    body = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(EncodedLength(body)), EncodedLength(body) <= 6000);
+    CPPUNIT_ASSERT(Contains(body, "Bundle file: " + m_Bundle));
   }
 
   void BundleFileNameMustBeBare()
@@ -161,10 +196,17 @@ public:
     CPPUNIT_ASSERT(Contains(mail.body, "diagnostic data file"));
     CPPUNIT_ASSERT(!Contains(mail.body, "someone"));
 
-    report.description = std::string(20000, 'x');
-    mail = mitk::BuildMailFields(report, m_Bundle);
-    CPPUNIT_ASSERT(mail.body.size() <= 2000);
-    CPPUNIT_ASSERT(Contains(mail.body, m_Bundle));
+    // Some mail clients cut mailto: URLs beyond about 2 kB, so the cap
+    // applies to the encoded subject and body together.
+    for (const auto& description : { std::string(20000, 'x'), LongGermanDescription() })
+    {
+      report.description = description;
+      mail = mitk::BuildMailFields(report, m_Bundle);
+
+      const auto encoded = EncodedLength(mail.subject) + EncodedLength(mail.body);
+      CPPUNIT_ASSERT_MESSAGE(std::to_string(encoded), encoded <= 1900);
+      CPPUNIT_ASSERT(Contains(mail.body, m_Bundle));
+    }
   }
 };
 

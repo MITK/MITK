@@ -31,10 +31,10 @@ namespace mitk
 
   /** \brief Read at most \p maxLines trailing lines of the log file at \p path.
    *
-   *  Line ends are normalized to "\n". The current session's log is still
-   *  open for appending by mitk::LogBackend; each message is flushed, so
-   *  reading it concurrently yields whole lines. Throws mitk::Exception if the
-   *  file cannot be opened or read. */
+   *  CRLF line ends are normalized to "\n". The current session's log is
+   *  still open for appending by mitk::LogBackend; each message is flushed,
+   *  so reading it concurrently yields whole lines. Throws mitk::Exception if
+   *  the file cannot be opened or read. */
   MITKUSERFEEDBACK_EXPORT LogTail ReadLogTail(const std::filesystem::path& path, std::size_t maxLines = 1000);
 }
 

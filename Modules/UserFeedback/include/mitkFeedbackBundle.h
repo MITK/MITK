@@ -42,7 +42,8 @@ namespace mitk
   /** \brief Render the human-readable report as shown in the preview and
    *  written to report.md: category, description, included environment
    *  items, included logs (by sourceLabel, with an edited note), included
-   *  attachments (by description), the screenshot target, and the sharing
+   *  attachments (by description), the screenshot target, the included
+   *  images (by description and archive name), and the sharing
    *  confirmations when given. Deterministic. */
   MITKUSERFEEDBACK_EXPORT std::string BuildReportText(const FeedbackReport& report);
 

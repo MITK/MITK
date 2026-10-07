@@ -295,7 +295,8 @@ The crash-dump UI does not send anything itself. A report feature registers an
 mitk::ICrashReportService micro service; while one is registered, the
 next-start dialog, the diagnostic data manager and the "Capture diagnostics"
 result offer <i>File report...</i>, which hands the chosen dumps to the
-service and leaves them on disk. Without a registered service the button is
+service; they stay on disk unless the user chooses to delete them in the
+report flow. Without a registered service the button is
 not shown anywhere. The interface lives in \c MitkAppUtil rather than in the
 Qt-free \c MitkCrashHandling because it takes a parent widget.
 

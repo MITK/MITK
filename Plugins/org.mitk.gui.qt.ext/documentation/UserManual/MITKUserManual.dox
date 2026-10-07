@@ -63,7 +63,7 @@ The four window view of the standard display is the heart of the MITK image view
 
 <i>Help > Report a Problem / Send Feedback...</i> opens a dialog in which you can report a bug, request a feature, or share an idea. The <i>Contribute</i> tab of the welcome screen leads there as well.
 
-The report is assembled on your computer, and the dialog previews it next to your input. Under <i>Included in the report</i> you choose what goes into it; <i>Details</i> shows each item. Nothing is sent automatically. A report consists of:
+The report is assembled on your computer, and the dialog previews it next to your input; in a narrow window, <i>Show preview</i> brings it up. Under <i>Included in the report</i> you choose what goes into it; <i>Details</i> lists the environment items and shows the log excerpts. Nothing is sent automatically. A report consists of:
 
 <ul>
   <li><b>Category and description</b> - the description is required.</li>

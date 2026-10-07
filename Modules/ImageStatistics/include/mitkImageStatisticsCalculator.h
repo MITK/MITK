@@ -167,9 +167,6 @@ namespace mitk
         template < typename TPixel, unsigned int VImageDimension >
         void InternalCalculateVoxelCountStatisticsMasked(const itk::Image< TPixel, VImageDimension >* mask, TimeStepType timeStep);
 
-        template < typename TPixel, unsigned int VImageDimension >
-        double GetVoxelVolume(const itk::Image<TPixel, VImageDimension>* image) const;
-
         bool IsUpdateRequired() const;
 
         mitk::Image::ConstPointer m_Image;

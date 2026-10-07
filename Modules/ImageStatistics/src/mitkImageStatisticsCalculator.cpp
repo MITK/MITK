@@ -259,7 +259,7 @@ namespace mitk
       mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.GetDescription();
     }
 
-    auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
+    auto voxelVolume = ComputeVoxelVolume(m_ImageTimeSlice);
 
     auto numberOfPixels = image->GetLargestPossibleRegion().GetNumberOfPixels();
     auto volume = static_cast<double>(numberOfPixels) * voxelVolume;
@@ -288,18 +288,6 @@ namespace mitk
     statObj.m_Histogram = statisticsFilter->GetHistogram();
 
     m_StatisticContainer->SetStatistics(ImageStatisticsContainer::NO_MASK_LABEL_VALUE, timeStep, statObj);
-  }
-
-  template <typename TPixel, unsigned int VImageDimension>
-  double ImageStatisticsCalculator::GetVoxelVolume(const itk::Image<TPixel, VImageDimension> *image) const
-  {
-    auto spacing = image->GetSpacing();
-    double voxelVolume = 1.;
-    for (unsigned int i = 0; i < image->GetImageDimension(); i++)
-    {
-      voxelVolume *= spacing[i];
-    }
-    return voxelVolume;
   }
 
   template <typename TPixel, unsigned int VImageDimension>
@@ -449,7 +437,7 @@ namespace mitk
       statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), toImageIndex(minMaxFilter->GetMinIndex(labelValue)));
       statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), toImageIndex(minMaxFilter->GetMaxIndex(labelValue)));
 
-      auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
+      auto voxelVolume = ComputeVoxelVolume(m_ImageTimeSlice);
       auto numberOfVoxels =
         static_cast<unsigned long>(imageStatisticsFilter->GetCount(labelValue));
       auto volume = static_cast<double>(numberOfVoxels) * voxelVolume;

@@ -44,7 +44,7 @@ To focus on the statistics you need, choose the shown statistics with the "Stati
 
 \imageMacro{QmitkImageStatistics_statistics.png, "Example of parts of the statistics for different masks and timestamps", 1.00}
 
-Check "Ignore 0-value voxels" to exclude voxels with the gray value zero from the statistics and the histogram.
+Check "Ignore 0-value voxels" to exclude voxels with the gray value zero from the statistics and the histogram. A voxel with several components is excluded if all its components are zero; for RGBA images only the color counts, so black voxels are excluded regardless of their alpha value.
 
 \subsection QmitkImageStatisticHistogram Histogram
 

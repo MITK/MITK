@@ -60,7 +60,9 @@ public:
      * \brief Set the pixel value to be excluded from the mask.
      *
      * Pixels in the input image with this value will be set to 0 in the
-     * generated mask; all other pixels will be set to 1.
+     * generated mask; all other pixels will be set to 1. A pixel with several
+     * components is excluded if all of its components have this value. The
+     * alpha of an RGBA pixel is not compared, only its color components are.
      *
      * \param[in] pixelValue The intensity value to ignore.
      */
@@ -82,8 +84,9 @@ protected:
 
     mitk::Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMask(const itk::Image<TPixel, VImageDimension>* image);
+    /** Takes itk::Image as well as itk::VectorImage. */
+    template <typename TImage>
+    void InternalCalculateMask(const TImage* image);
 
 private:
     bool IsUpdateRequired() const;

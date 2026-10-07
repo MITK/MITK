@@ -141,6 +141,7 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestIncompatibleMaskThrows);
   MITK_TEST(TestRGBAImageUnmaskedVoxelCount);
   MITK_TEST(TestRGBAImageMaskedVoxelCount);
+  MITK_TEST(TestRGBAImageIgnoreZero);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -186,6 +187,7 @@ public:
   void TestIncompatibleMaskThrows();
   void TestRGBAImageUnmaskedVoxelCount();
   void TestRGBAImageMaskedVoxelCount();
+  void TestRGBAImageIgnoreZero();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -1254,6 +1256,37 @@ void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageMaskedVoxelCount()
   shiftedMaskGen->SetInputImage(image);
   shiftedMaskGen->SetImageMask(BuildImage<unsigned char>(size, maskValues, shifted));
   CPPUNIT_ASSERT_THROW(ComputeStatistics(image, shiftedMaskGen.GetPointer()), mitk::Exception);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageIgnoreZero()
+{
+  /*****************************
+   * 2x2x2 RGBA image with a voxel volume of 3 mm^3: two transparent black
+   * voxels, one opaque black voxel, one transparent blue voxel, four colored
+   * voxels
+   * -> black voxels are ignored regardless of their alpha, the transparent
+   *    blue one is kept: 5 voxels and 15 mm^3 under label 1
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image ignore zero:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  const auto transparentBlack = MakeRGBA(0, 0, 0, 0);
+  const auto opaqueBlack = MakeRGBA(0, 0, 0, 255);
+  const auto transparentBlue = MakeRGBA(0, 0, 1, 0);
+  const auto color = MakeRGBA(200, 0, 50, 128);
+  std::vector<RGBAPixelType> values{ transparentBlack, color, transparentBlack, opaqueBlack, color, transparentBlue, color, color };
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, AnisotropicGrid());
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, ignoreZeroGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 5, 15.0);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

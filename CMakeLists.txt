@@ -1277,6 +1277,17 @@ if(MITK_RELEASE_DEBUG_SYMBOLS)
   endif()
   string(APPEND MITK_CXX_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
   string(APPEND MITK_C_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
+
+  # A flag the compiler accepts but that generates nothing would only show
+  # when a crash dump cannot be decoded, so assert the outcome on the Core
+  # library. ELF only: the PDB and dSYM files are separate artifacts.
+  if(BUILD_TESTING AND LINUX AND CMAKE_OBJDUMP AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_test(NAME mitkReleaseDebugSymbolsTest
+      COMMAND "${CMAKE_COMMAND}"
+        "-DMITK_DEBUG_SYMBOLS_BINARY=$<TARGET_FILE:MitkCore>"
+        "-DMITK_DEBUG_SYMBOLS_OBJDUMP=${CMAKE_OBJDUMP}"
+        -P "${MITK_SOURCE_DIR}/CMake/mitkTestReleaseDebugSymbols.cmake")
+  endif()
 endif()
 
 # C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)

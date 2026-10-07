@@ -34,6 +34,11 @@ namespace mitk
      * maximum, RMS, skewness, kurtosis, MPP (mean of positive pixels), entropy,
      * uniformity, UPP, median, and a configurable histogram.
      *
+     * These need one scalar value per voxel. Images with several components per
+     * voxel, e.g. RGB images, only get the statistics that do not read pixel
+     * values: ImageStatisticsConstants::NUMBEROFVOXELS() and VOLUME(), without
+     * histogram.
+     *
      * Results are stored in an ImageStatisticsContainer that organizes statistics
      * by label value and time step.
      *
@@ -155,6 +160,12 @@ namespace mitk
 
         template < typename TPixel, unsigned int VImageDimension >
         void InternalCalculateStatisticsMasked(const itk::Image< TPixel, VImageDimension >* image, TimeStepType timeStep);
+
+        //Calculates the statistics that do not read pixel values, for images without scalar pixels
+        void CalculateVoxelCountStatisticsUnmasked(TimeStepType timeStep);
+
+        template < typename TPixel, unsigned int VImageDimension >
+        void InternalCalculateVoxelCountStatisticsMasked(const itk::Image< TPixel, VImageDimension >* mask, TimeStepType timeStep);
 
         template < typename TPixel, unsigned int VImageDimension >
         double GetVoxelVolume(const itk::Image<TPixel, VImageDimension>* image) const;

@@ -36,6 +36,8 @@ After selection of an image, the image statistics are calculated and displayed i
 
 An example of parts of the calculated statistical features (Mean, Median, Std. dev., RMS, Max, Max position, Min, Min position, Voxels, Volume [mm³], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
 
+Most of these features need one gray value per voxel. For images with several components per voxel, such as RGB images, only the number of voxels and the volume are calculated, and no histogram is shown.
+
 Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. Hover over a value to see it unrounded. The "Copy to clipboard" button exports the unrounded values of the shown statistics under their technical keys.
 
 To focus on the statistics you need, choose the shown statistics with the "Statistics" button above the table. The menu stays open while you check or uncheck statistics. Alternatively, right-click a column header to show only this statistic, to hide it, or to show all statistics again. While statistics are hidden, the button tells how many are shown, e.g. "Statistics (3 of 17)". Your choice is remembered across sessions.

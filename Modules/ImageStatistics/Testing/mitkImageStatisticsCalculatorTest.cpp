@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 #include <itkMath.h>
+#include <itkRGBAPixel.h>
 
 #include <cmath>
 #include <numeric>
@@ -80,6 +81,25 @@ namespace
     index[2] = z;
     return index;
   }
+
+  using RGBAPixelType = itk::RGBAPixel<unsigned char>;
+
+  RGBAPixelType MakeRGBA(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+  {
+    RGBAPixelType pixel;
+    pixel.Set(red, green, blue, alpha);
+    return pixel;
+  }
+
+  // grid with a voxel volume of 3 mm^3 and distinct spacings per axis
+  Grid AnisotropicGrid()
+  {
+    Grid grid;
+    grid.spacing[0] = 0.5;
+    grid.spacing[1] = 2.0;
+    grid.spacing[2] = 3.0;
+    return grid;
+  }
 }
 
 /**
@@ -119,6 +139,8 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestZeroImageMinMaxPosition);
   MITK_TEST(TestSubRegionMaskMinMaxPosition);
   MITK_TEST(TestIncompatibleMaskThrows);
+  MITK_TEST(TestRGBAImageUnmaskedVoxelCount);
+  MITK_TEST(TestRGBAImageMaskedVoxelCount);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -162,6 +184,8 @@ public:
   void TestZeroImageMinMaxPosition();
   void TestSubRegionMaskMinMaxPosition();
   void TestIncompatibleMaskThrows();
+  void TestRGBAImageUnmaskedVoxelCount();
+  void TestRGBAImageMaskedVoxelCount();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -300,6 +324,22 @@ private:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel count" + voxel, mitk::ImageStatisticsContainer::VoxelCountType(1), numberOfVoxelsObject);
 
     this->VerifyExtrema(stats, value, index, value, index, voxel);
+  }
+
+  // checks that the statistics of an image without scalar pixel values hold
+  // nothing but the voxel count and the volume
+  void VerifyVoxelCountAndVolumeOnly(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
+    mitk::ImageStatisticsContainer::VoxelCountType testN,
+    mitk::ImageStatisticsContainer::RealType testVolume)
+  {
+    mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject = 0;
+    mitk::ImageStatisticsContainer::RealType volumeObject = 0;
+    CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+    CPPUNIT_ASSERT_NO_THROW(volumeObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VOLUME()));
+    CPPUNIT_ASSERT_EQUAL(testN, numberOfVoxelsObject);
+    CPPUNIT_ASSERT_MESSAGE("Calculated volume is not equal to the desired value.", std::abs(volumeObject - testVolume) < mitk::eps);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), stats.GetExistingStatisticNames().size());
+    CPPUNIT_ASSERT(stats.m_Histogram.IsNull());
   }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -1153,6 +1193,67 @@ void mitkImageStatisticsCalculatorTestSuite::TestIncompatibleMaskThrows()
   coarseMaskGen->SetInputImage(image);
   coarseMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, coarse));
   CPPUNIT_ASSERT_THROW(ComputeStatistics(image, coarseMaskGen.GetPointer()), mitk::Exception);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageUnmaskedVoxelCount()
+{
+  /*****************************
+   * 3x2x2 RGBA image with a voxel volume of 3 mm^3
+   * -> 12 voxels and 36 mm^3, no other statistics and no histogram
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image unmasked voxel count:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 3;
+  size[1] = 2;
+  size[2] = 2;
+  std::vector<RGBAPixelType> values(12, MakeRGBA(10, 20, 30, 255));
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, AnisotropicGrid());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0), 12, 36.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageMaskedVoxelCount()
+{
+  /*****************************
+   * 3x2x2 RGBA image with a voxel volume of 3 mm^3 and a mask with three
+   * voxels of label 1 and one voxel of label 4
+   * -> per label voxel count and volume, background skipped; a mask off the
+   *    voxel grid is still rejected
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image masked voxel count:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 3;
+  size[1] = 2;
+  size[2] = 2;
+  const Grid grid = AnisotropicGrid();
+  std::vector<RGBAPixelType> values(12, MakeRGBA(10, 20, 30, 255));
+  std::vector<unsigned char> maskValues{ 1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1 };
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, grid);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(BuildImage<unsigned char>(size, maskValues, grid));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(2), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 3, 9.0);
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(4, 0), 1, 3.0);
+
+  Grid shifted = grid;
+  shifted.origin[0] += 0.5 * grid.spacing[0];
+
+  mitk::ImageMaskGenerator::Pointer shiftedMaskGen = mitk::ImageMaskGenerator::New();
+  shiftedMaskGen->SetInputImage(image);
+  shiftedMaskGen->SetImageMask(BuildImage<unsigned char>(size, maskValues, shifted));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, shiftedMaskGen.GetPointer()), mitk::Exception);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

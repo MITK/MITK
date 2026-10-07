@@ -68,6 +68,21 @@ namespace {
 
     return true;
   }
+
+  /** Statistics of images without scalar pixel values come without histograms. */
+  bool HasHistograms(const mitk::ImageStatisticsContainer* statistics)
+  {
+    for (const auto labelValue : statistics->GetExistingLabelValues())
+    {
+      for (const auto timeStep : statistics->GetExistingTimeSteps(labelValue))
+      {
+        if (nullptr != statistics->GetHistogram(labelValue, timeStep))
+          return true;
+      }
+    }
+
+    return false;
+  }
 } // unnamed namespace
 
 QmitkImageStatisticsView::QmitkImageStatisticsView()
@@ -225,12 +240,12 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
 
   // Histograms are only shown for one image and at most one ROI. The check boxes
   // in the statistics tree select the label histograms, so they are offered for
-  // exactly this configuration.
-  const bool singleSelection = selectedImageNodes.size() == 1 && selectedMaskNodes.size() <= 1;
-  m_Controls->widget_statistics->SetLabelsCheckable(singleSelection);
-
-  if (!singleSelection)
+  // exactly this configuration, unless the statistics come without histograms.
+  if (selectedImageNodes.size() != 1 || selectedMaskNodes.size() > 1)
+  {
+    m_Controls->widget_statistics->SetLabelsCheckable(false);
     return;
+  }
 
   auto imageNode = selectedImageNodes.front();
   const mitk::DataNode* roiNode = nullptr;
@@ -244,6 +259,13 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
     segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(roiNode->GetData());
   }
 
+  const auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
+  const auto* statistics = statisticsNode.IsNull()
+    ? nullptr
+    : dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
+
+  m_Controls->widget_statistics->SetLabelsCheckable(statistics == nullptr || HasHistograms(statistics));
+
   // An open planar figure shows the intensity profile instead of the histogram.
   if (planarFigure != nullptr && !planarFigure->IsClosed())
     return;
@@ -254,14 +276,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
   if (!timeGeometry->IsValidTimePoint(timePoint))
     return;
 
-  const auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
-
-  if (statisticsNode.IsNull())
-    return;
-
-  const auto* statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
-
-  if (statistics == nullptr || statistics->IsWIP())
+  if (statistics == nullptr || statistics->IsWIP() || !HasHistograms(statistics))
     return;
 
   const auto timeStep = timeGeometry->TimePointToTimeStep(timePoint);

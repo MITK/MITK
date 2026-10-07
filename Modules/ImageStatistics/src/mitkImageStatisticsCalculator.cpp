@@ -23,7 +23,31 @@ found in the LICENSE file.
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
 #include <mitkNodePredicateGeometry.h>
 
+#include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>
+
+#include <map>
+
+namespace
+{
+  /** The statistics filters read one scalar value per voxel. */
+  bool HasScalarPixelValues(const mitk::Image* image)
+  {
+    const auto& pixelType = image->GetPixelType();
+    return pixelType.GetPixelType() == itk::IOPixelEnum::SCALAR && pixelType.GetNumberOfComponents() == 1;
+  }
+
+  double ComputeVoxelVolume(const mitk::Image* image)
+  {
+    const auto spacing = image->GetGeometry()->GetSpacing();
+    double voxelVolume = 1.;
+
+    for (unsigned int i = 0; i < image->GetDimension(); ++i)
+      voxelVolume *= spacing[i];
+
+    return voxelVolume;
+  }
+}
 
 namespace mitk
 {
@@ -126,8 +150,31 @@ namespace mitk
 
           m_ImageTimeSlice = SelectImageByTimeStep(imageForStatistics, timeStep);
 
-          // Calculate statistics with/without mask
-          if (m_MaskGenerator.IsNull())
+          // verbose makes IsSubGeometry log the check that failed; it stays silent on success
+          if (m_InternalMask.IsNotNull() && !IsSubGeometry(*m_InternalMask->GetGeometry(), *m_ImageTimeSlice->GetGeometry(),
+                                                           NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+                                                           NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
+                                                           true))
+          {
+            mitkThrow() << "Mask is not a sub geometry of the image (see the log for the failed check): "
+                           "it has to lie on the voxel grid of the image and within its extent.";
+          }
+
+          // Decided on the input image: the slice a planar figure provides as reference image
+          // keeps only the first component of a multi-component image.
+          if (!HasScalarPixelValues(m_Image))
+          {
+            // Only the statistics that do not read pixel values, e.g. for RGB images
+            if (m_MaskGenerator.IsNull())
+            {
+              this->CalculateVoxelCountStatisticsUnmasked(timeStep);
+            }
+            else
+            {
+              AccessByItk_1(m_InternalMask, InternalCalculateVoxelCountStatisticsMasked, timeStep)
+            }
+          }
+          else if (m_MaskGenerator.IsNull())
           {
             // 1) calculate statistics unmasked:
             AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeStep)
@@ -268,16 +315,6 @@ namespace mitk
 
     const BaseGeometry* referenceGeometry = m_ImageTimeSlice->GetGeometry();
     const BaseGeometry* maskGeometry = m_InternalMask->GetGeometry();
-
-    // verbose makes IsSubGeometry log the check that failed; it stays silent on success
-    if (!IsSubGeometry(*maskGeometry, *referenceGeometry,
-                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
-                       NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
-                       true))
-    {
-      mitkThrow() << "Mask is not a sub geometry of the image (see the log for the failed check): "
-                     "it has to lie on the voxel grid of the image and within its extent.";
-    }
 
     // A mask may cover only a sub-region of the image. The filters then run on
     // that region and report indices relative to it.
@@ -438,6 +475,49 @@ namespace mitk
       statObj.AddStatistic(ImageStatisticsConstants::UNIFORMITY(), imageStatisticsFilter->GetUniformity(labelValue));
       statObj.AddStatistic(ImageStatisticsConstants::UPP(), imageStatisticsFilter->GetUPP(labelValue));
       statObj.m_Histogram = imageStatisticsFilter->GetHistogram(labelValue);
+
+      if (m_StatisticContainer->StatisticsExist(labelValue, timeStep))
+        mitkThrow() << "Invalid state/input data. Statistic for a specific label/time step pair was computed more then once. Conflicting label ID: "
+        << labelValue << " ; conflicting time step: " << timeStep;
+      m_StatisticContainer->SetStatistics(labelValue, timeStep, statObj);
+    }
+  }
+
+  void ImageStatisticsCalculator::CalculateVoxelCountStatisticsUnmasked(TimeStepType timeStep)
+  {
+    ImageStatisticsContainer::VoxelCountType numberOfVoxels = 1;
+
+    for (unsigned int i = 0; i < m_ImageTimeSlice->GetDimension(); ++i)
+      numberOfVoxels *= m_ImageTimeSlice->GetDimension(i);
+
+    ImageStatisticsContainer::ImageStatisticsObject statObj;
+    statObj.AddStatistic(ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfVoxels);
+    statObj.AddStatistic(ImageStatisticsConstants::VOLUME(), static_cast<double>(numberOfVoxels) * ComputeVoxelVolume(m_ImageTimeSlice));
+
+    m_StatisticContainer->SetStatistics(ImageStatisticsContainer::NO_MASK_LABEL_VALUE, timeStep, statObj);
+  }
+
+  template <typename TPixel, unsigned int VImageDimension>
+  void ImageStatisticsCalculator::InternalCalculateVoxelCountStatisticsMasked(
+    const itk::Image<TPixel, VImageDimension> *mask, TimeStepType timeStep)
+  {
+    std::map<LabelIndex, ImageStatisticsContainer::VoxelCountType> voxelCounts;
+
+    for (itk::ImageRegionConstIterator<itk::Image<TPixel, VImageDimension>> it(mask, mask->GetLargestPossibleRegion()); !it.IsAtEnd(); ++it)
+      ++voxelCounts[static_cast<LabelIndex>(it.Get())];
+
+    // The voxel volume of the image, as in the masked statistics of scalar images: the mask
+    // of a 2D image is a 3D image with a single slice.
+    const auto voxelVolume = ComputeVoxelVolume(m_ImageTimeSlice);
+
+    for (const auto& [labelValue, numberOfVoxels] : voxelCounts)
+    {
+      if (labelValue == ImageStatisticsContainer::NO_MASK_LABEL_VALUE)
+        continue;
+
+      ImageStatisticsContainer::ImageStatisticsObject statObj;
+      statObj.AddStatistic(ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfVoxels);
+      statObj.AddStatistic(ImageStatisticsConstants::VOLUME(), static_cast<double>(numberOfVoxels) * voxelVolume);
 
       if (m_StatisticContainer->StatisticsExist(labelValue, timeStep))
         mitkThrow() << "Invalid state/input data. Statistic for a specific label/time step pair was computed more then once. Conflicting label ID: "

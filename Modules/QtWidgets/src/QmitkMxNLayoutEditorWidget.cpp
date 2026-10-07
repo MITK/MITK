@@ -666,8 +666,7 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
           [this](const QModelIndex&) { this->ShowMatrixGroupMenu(QCursor::pos()); });
 
   // Hovering a chip lights up every window sharing that synchronization, in the
-  // map as well as here - the same resolution a tile's glyph hover runs, so the
-  // two surfaces read as one.
+  // display as well as here.
   m_Matrix->viewport()->setMouseTracking(true);
   m_Matrix->viewport()->installEventFilter(this);
   connect(m_Matrix, &QAbstractItemView::entered, this, [this](const QModelIndex& index)
@@ -1077,9 +1076,9 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, Qmi
     {
       m_EmptyGroupAxisCache.erase(groupId);
     }
-    // Repaint through the card's own refresher, whose first action re-pushes
-    // BuildGroupBarcodeSlots(groupId) into the barcode - which now reads the
-    // cache. Reusing the existing seam avoids reaching for the strip by hand.
+    // Repaint through the card's own refresher: its first action re-pushes
+    // BuildGroupBarcodeSlots(groupId), which reflects the cache, into the
+    // barcode.
     if (auto it = m_CardRefreshers.find(groupId); it != m_CardRefreshers.end() && it->second)
     {
       it->second();
@@ -1666,23 +1665,6 @@ void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkM
                                                 members, hue);
 }
 
-void QmitkMxNLayoutEditorWidget::HighlightCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)
-{
-  if (m_MultiWidget.isNull())
-  {
-    this->ClearSyncHighlight();
-    return;
-  }
-
-  const std::string group = m_MultiWidget->ResolveCellAxisGroup(windowId, axis);
-  if (group.empty())
-  {
-    this->ClearSyncHighlight();  // the cell syncs nothing on this axis
-    return;
-  }
-  this->HighlightGroupAxis(QString::fromStdString(group), axis);
-}
-
 void QmitkMxNLayoutEditorWidget::ClearSyncHighlight()
 {
   this->SetMatrixHighlight(QStringList(), -1);
@@ -2100,8 +2082,8 @@ void QmitkMxNLayoutEditorWidget::RefreshAdvancedMatrixIfVisible()
 {
   // Only while the matrix face is up. A changed cell set (a grid resize or a
   // layout load changes the rows) or group set needs the whole table back; for
-  // everything else repainting the chips in place is enough, and it leaves the
-  // measured column widths and the selection alone.
+  // everything else repainting the chips in place is enough, and it keeps the
+  // selection and never shrinks a column.
   if (!this->AdvancedFaceIsCurrent() || m_MultiWidget.isNull())
   {
     return;

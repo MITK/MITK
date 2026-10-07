@@ -363,7 +363,8 @@ private:
    *         tick scale, and colormap-chip anchor. */
   QRect RibbonRect() const;
 
-  /** \brief The `slice N/max` readout plus group dot, bottom-left line 2. */
+  /** \brief The `slice N/max` readout, followed by a clock glyph and the time
+   *         readout when there is more than one time step; bottom-left line 2. */
   QRect SliceReadoutRect() const;
 
   /** \brief The `W <window> L <level>` readout, bottom-right beside the colorbar. */

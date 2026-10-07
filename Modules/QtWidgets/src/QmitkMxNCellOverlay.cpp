@@ -909,8 +909,8 @@ QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
     return QString();
   }
 
-  // The same view direction the utility-row combobox drives, so a
-  // reorientation is reflected without a separate signal.
+  // Read from the slice navigation controller that every reorientation path
+  // writes, so a reorientation is reflected without a separate signal.
   if (auto* sliceNavigation = renderer->GetSliceNavigationController())
   {
     switch (sliceNavigation->GetDefaultViewDirection())

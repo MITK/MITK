@@ -285,8 +285,9 @@
 	A right click into a window view (without dragging - the right-button gestures
 	keep working) opens a context menu with the view direction, entries that open the
 	data selection, the level/window entry and the coordinate entry, the sync actions
-	(re-converge, fit group views to visible data), the layout editor, and the clean view
-	toggle. With the keyboard, the Menu key or Shift+F10 opens the same menu for the window
+	(re-converge, fit group views to visible data), the layout editor, and the toggles
+	maximized, show crosshair, clean view and expanded navigator, which switch the same
+	state as the strip's maximize, crosshair, clean-view and navigator buttons. With the keyboard, the Menu key or Shift+F10 opens the same menu for the window
 	you last clicked into. Shift+F11 toggles clean view while you work in the editor.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Data_Selection Data node selection

@@ -40,8 +40,10 @@ class QToolButton;
 /**
 * \brief Utility widget that extends a QmitkRenderWindowWidget with window-specific controls.
 *
-* It offers to select the viewing direction of the window (slice scrolling
-* lives in the cell's viewport navigator, not here). In addition, it contains
+* It hosts the cell's strip controls and applies the cell's view direction to
+* its renderer (SetViewDirectionSelection); the plane itself is chosen on the
+* cell overlay. Slice scrolling lives in the cell's viewport navigator, not
+* here. In addition, it contains
 * a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
 * properties and shown nodes; the cell's data-selection group (shared with
 * other render windows) is stored on that widget and edited from the layout

@@ -258,9 +258,9 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
         painter.drawPixmap(QPoint(boxRect.center().x() - inner / 2, boxRect.center().y() - inner / 2), glyph);
       }
 
-      // The offset footnote: the box's upper-right corner filled. At the sizes
-      // the boxes now reach it carries further than an outline does, and a
-      // glyph is still recognisable with one corner covered.
+      // The offset footnote: the box's upper-right corner filled. At the boxes'
+      // sizes a filled corner carries further than an outline, and a glyph
+      // stays recognisable with one corner covered.
       if (s.hasOffset && synced)
       {
         painter.setOpacity(1.0);
@@ -307,7 +307,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     }
 
     // Lit slot: a white outline mirrors the Glyphs-mode frame brightening so the
-    // editor's single-axis highlight still reads once the tile is too small for
+    // editor's single-axis highlight still reads once a strip is too small for
     // glyphs and collapses to color slots. Keyed on the per-axis hoveredSlot
     // only (not whole-strip 'hovered'), so the passive per-cell strip - which
     // never sets a hovered slot - is unaffected.

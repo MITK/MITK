@@ -214,8 +214,8 @@ private:
   bool m_Hovered = false;         // whole-strip hover (passive per-cell strip)
   int m_HoveredSlot = -1;         // single hovered axis (axis-clickable mode)
   // What a passive strip last reported. Deliberately not m_Hovered /
-  // m_HoveredSlot: those drive the paint, and the passive strip's pixels must
-  // stay exactly what they were before it began reporting.
+  // m_HoveredSlot: those drive the paint, and reporting must not change what
+  // a passive strip paints.
   bool m_ReportedOverStrip = false;
   int m_ReportedSlot = -1;
   bool m_AxisClickable = false;

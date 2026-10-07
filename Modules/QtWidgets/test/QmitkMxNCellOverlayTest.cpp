@@ -50,9 +50,11 @@ found in the LICENSE file.
  * Headless behavior tests for the MxN cell overlay's information
  * architecture: the plane label tracks the cell's view direction (and the
  * VTK cell-id annotation is blanked so the two do not double up), and the
- * group-identity dot follows the mono / complex rule over the cell's
- * per-dimension synchronization. Presentation, animation, and gesture are
- * manual acceptance, not covered here.
+ * frame's group identity follows the mono / complex rule over the cell's
+ * per-dimension synchronization. The suite also covers how masked furniture
+ * routes input (right click, wheel, lost grab, popups) and the mask's
+ * lifecycle (resize, destruction). Presentation and animation are manual
+ * acceptance.
  */
 class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
 {
@@ -600,7 +602,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The cell must have real geometry for the paint smoke to be meaningful",
       cell->GetRenderWindow()->width() > 0 && cell->GetRenderWindow()->height() > 0);
 
-    // A heterogeneous cell (complex dot bands) with a fully revealed, expanded
+    // A heterogeneous cell (a complex frame) with a fully revealed, expanded
     // navigator drives the widest set of paint branches: colorbar tick scale,
     // colormap chip, navigator slider rows, coordinate line, and barcode.
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");

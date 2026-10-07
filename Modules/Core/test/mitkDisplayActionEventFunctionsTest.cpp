@@ -47,8 +47,7 @@ found in the LICENSE file.
  * RenderingManager, geometry comes from a generated image, and events are
  * constructed directly (action functions are called with a Display*Event;
  * handler wiring is exercised by invoking the event on a
- * DisplayActionEventBroadcast). Later synchronization-dimension work builds
- * its behavior tests on this same setup.
+ * DisplayActionEventBroadcast).
  */
 class mitkDisplayActionEventFunctionsTestSuite : public mitk::TestFixture
 {

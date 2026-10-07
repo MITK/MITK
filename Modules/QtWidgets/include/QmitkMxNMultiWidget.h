@@ -1000,8 +1000,7 @@ public:
   *   horizontal splitter, each holds only 'QmitkRenderWindowWidget' cells, and
   *   all rows have the same non-zero cell count. Derived from the actual
   *   splitter tree, so it is correct even when the stored 'GetRowCount()' is 0
-  *   (a loaded layout) or stale (after a render-window layout-design-menu
-  *   change, which rebuilds the tree without touching the counts). The grid-op
+  *   (a loaded layout) or otherwise does not match the tree. The grid-op
   *   guards and the layout editor's grid buttons read this rather than the
   *   stored counts.
   */

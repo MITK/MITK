@@ -59,7 +59,8 @@ class QVBoxLayout;
  * delete). Cells join a group by selecting them on their plates and using the
  * card's menu, or by drag and drop in either direction. Joining a group that synchronizes
  * nothing yet links the navigation bundle (pan/zoom/slice/crosshair) as the
- * common-case default.
+ * common-case default, unless axes were already toggled on the empty group's
+ * card; those then apply exactly.
  *
  * "Advanced" is the power-user face: the full per-dimension matrix with
  * offset editors, the complete v3-layout link model.
@@ -108,8 +109,9 @@ public:
 
   /**
    * \brief Add every given cell to 'group' on the group's currently
-   *        synchronized dimensions (or the navigation bundle when the group
-   *        synchronizes nothing yet), per the join 'mode'. Replace (the default)
+   *        synchronized dimensions (or, when the group synchronizes nothing
+   *        yet, the axes toggled on its card, else the navigation bundle), per
+   *        the join 'mode'. Replace (the default)
    *        clears each cell's other-group ties first so it wholly joins the
    *        target; FillEmpty sets only its currently-unlinked axes;
    *        MergeOverwriteCollisions overwrites the group's axes but keeps the
@@ -255,15 +257,10 @@ public:
    * \brief Sync-highlight-on-hover. Resolve the cells sharing (group, axis),
    *        mark them in the matrix and hand them to the arrange mode, which
    *        bumps their frames in the display; ClearSyncHighlight removes the highlight.
-   *        HighlightGroupAxis is driven by a group card's glyph hover;
-   *        HighlightCellAxis by a window's glyph hover (it resolves the cell's
-   *        group for that axis first - the per-dimension link, or the selection
-   *        connector for the selection axis - then delegates, clearing when the
-   *        cell syncs nothing there). Public so the resolution is testable
-   *        headlessly.
+   *        Driven by a group card's glyph hover and a matrix chip's hover.
+   *        Public so the resolution is testable headlessly.
    */
   void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis);
-  void HighlightCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
   void ClearSyncHighlight();
 
 public Q_SLOTS:
@@ -297,9 +294,10 @@ private:
    * \brief Refresh the group cards in place, or rebuild them, depending on what
    *        changed. A card never depends on the grid arrangement, so a link or
    *        membership change (the common case, e.g. a glyph toggle) only updates
-   *        each existing card's contents - no widget teardown, no flicker. A full
-   *        rebuild happens only when the set of groups changes: a group added or
-   *        removed, or a whole layout replaced (load / REST push).
+   *        each existing card's contents - no widget teardown, no flicker. When
+   *        the set of groups changes (a group added or removed, a layout loaded
+   *        or pushed), the cards are reconciled: only the affected ones are
+   *        created or removed, the others keep their widgets.
    */
   void RefreshOrRebuild();
 
@@ -349,8 +347,9 @@ private:
   QWidget* BuildMatrixActionBar();
 
   /** \brief Repaint the matrix's chips from the engine without touching its
-   *         structure or its column widths, so an edit does not shift the grid
-   *         under the pointer and the selection survives. */
+   *         structure, so an edit does not shift the grid under the pointer
+   *         and the selection survives. A column only grows, when a chip
+   *         outgrew it, never shrinks. */
   void RefreshMatrixCells();
 
   /** \brief The selected matrix cells as (window id, axis) pairs, in row then

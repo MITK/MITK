@@ -126,7 +126,6 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
   MITK_TEST(ArrangeSelection_ARebindStopsTheOldEditorsMirror);
   MITK_TEST(ArrangeRequests_AssignAndRemoveTheirWindows);
-  MITK_TEST(SyncHighlight_CellAxisResolvesFromHoveredCell);
 
   MITK_TEST(DeleteGroup_RemovesMemberBearingGroup);
   MITK_TEST(DeleteGroup_RemovesEmptyCreatedGroup);
@@ -1523,29 +1522,6 @@ public:
                                  members.join(QStringLiteral(",")).toStdString());
   }
 
-  void SyncHighlight_CellAxisResolvesFromHoveredCell()
-  {
-    // A window's glyph hover: resolve the hovered cell's group for the axis,
-    // then highlight every cell sharing it.
-    auto* arrangeMode = m_Editor->GetArrangeMode();
-
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "g5");
-    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "g5");
-
-    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
-    QStringList highlight = arrangeMode->GetHighlightedWindowIds();
-    highlight.sort();
-    QStringList expected{ CellId(0), CellId(2) };
-    expected.sort();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Hovering a cell's linked axis highlights every cell sharing it",
-                                 expected.join(QStringLiteral(",")).toStdString(),
-                                 highlight.join(QStringLiteral(",")).toStdString());
-
-    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Orientation);
-    CPPUNIT_ASSERT_MESSAGE("Hovering an axis the cell does not link clears the highlight",
-                           arrangeMode->GetHighlightedWindowIds().isEmpty());
-  }
-
   // --- The advanced matrix -----------------------------------------------------
 
   void ArrangeHint_WarnsWhileAWindowIsMaximized()
@@ -2054,7 +2030,7 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
     Pump();
 
-    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
+    m_Widget->HighlightGroupAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
 
     CPPUNIT_ASSERT_MESSAGE("The hovered cell is marked",
                            m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
@@ -2081,7 +2057,7 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
     Pump();
 
-    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
+    m_Widget->HighlightGroupAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
     CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
 
     m_Widget->ClearSyncHighlight();
@@ -2092,7 +2068,7 @@ public:
 
     // A marking left over from before a grid change must not survive onto the
     // items the rebuild puts in its place.
-    m_Widget->HighlightCellAxis(CellId(0), QmitkMxNSyncAxis::Slice);
+    m_Widget->HighlightGroupAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
     m_Editor->SetLayout(1, 2);
     Pump();
     CPPUNIT_ASSERT_MESSAGE("A rebuild leaves no stale marking",

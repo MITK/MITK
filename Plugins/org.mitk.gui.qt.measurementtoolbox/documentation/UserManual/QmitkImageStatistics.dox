@@ -56,7 +56,7 @@ For a segmentation with several labels, each label has its own histogram, drawn 
 
 Draw a rectangle with the left mouse button to zoom in on the histogram. A right click zooms out one step, Ctrl and right click zooms out to the full range, and the mouse wheel zooms the gray value range in and out around the cursor. Pan the view by dragging with the middle mouse button. The visible gray value range is also shown in the "Zoom range" fields below the plot, where you can type an exact range or reset the zoom with the "Reset" button. The zoom is kept when the shown labels, the time step or the number of bins change. The number of histogram bins can be changed after unchecking "Use default".
 
-If the ROI is an open planar figure, such as a line or a path, an intensity profile along the figure is shown instead of the histogram.
+If the ROI is an open planar figure, such as a line or a path, an intensity profile along the figure is shown instead of the histogram. Like the histogram, it is not available for images with several components per voxel.
 
 A tooltip is available by hovering over one of the bins.
 

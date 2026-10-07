@@ -196,7 +196,8 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
 
     auto maskPlanarFigure = dynamic_cast<mitk::PlanarFigure*>(selectedROINodes.front()->GetData());
 
-    if (maskPlanarFigure != nullptr)
+    // The profile samples one gray value per voxel; mitk::ComputeIntensityProfile throws for e.g. RGB images.
+    if (maskPlanarFigure != nullptr && image->GetPixelType().GetNumberOfComponents() == 1)
     {
       if (!maskPlanarFigure->IsClosed())
       {

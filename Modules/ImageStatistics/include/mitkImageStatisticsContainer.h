@@ -213,6 +213,13 @@ namespace mitk
      */
     bool IsFailed() const;
 
+    /**
+     * \brief Return why the computation of the statistics failed.
+     * \return The reason, or an empty string if the computation did not fail or no
+     *         reason is known.
+     */
+    std::string GetFailureReason() const;
+
   protected:
     ImageStatisticsContainer();
     ImageStatisticsContainer(const ImageStatisticsContainer &other);

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsTreeItem.h"
 #include <mitkImageStatisticsConstants.h>
 #include <mitkImageStatisticsContainerManager.h>
+#include <mitkExceptionMacro.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
@@ -23,6 +24,7 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 
+#include <QFile>
 #include <QLocale>
 
 #include <algorithm>
@@ -98,6 +100,18 @@ namespace
       : 0;
 
     return std::clamp(SIGNIFICANT_DIGITS - 1 - magnitude, MIN_DECIMALS, MAX_DECIMALS);
+  }
+
+  /** In the error colors of QmitkInfoCard instead of the icon color of the theme, so that a
+  failed computation stands out in either theme. */
+  QIcon CreateErrorIcon(bool darkTheme)
+  {
+    QFile file(QStringLiteral(":/Qmitk/error.svg"));
+
+    if (!file.open(QIODevice::ReadOnly))
+      mitkThrow() << "Could not open resource \":/Qmitk/error.svg\"!";
+
+    return QmitkIconTheme::GetIcon(file.readAll(), darkTheme ? QStringLiteral("#ff6b6b") : QStringLiteral("#c62828"));
   }
 
   /** Decimal places are chosen per column instead of per value: all values of a column then
@@ -227,6 +241,8 @@ QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : 
 {
   m_RootItem = std::make_unique<QmitkImageStatisticsTreeItem>();
   m_WIPIcon = QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg"));
+  m_LightThemeErrorIcon = CreateErrorIcon(false);
+  m_DarkThemeErrorIcon = CreateErrorIcon(true);
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
@@ -299,7 +315,9 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   }
   else if (role == Qt::DecorationRole && index.column() == 0)
   {
-    if (item->isWIP() && item->childCount() == 0)
+    if (item->isFailed())
+      return QVariant(QmitkIconTheme::IsDarkTheme() ? m_DarkThemeErrorIcon : m_LightThemeErrorIcon);
+    else if (item->isWIP() && item->childCount() == 0)
       return QVariant(m_WIPIcon);
     else if (!item->isWIP())
     {
@@ -321,6 +339,9 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   }
   else if (role == Qt::ToolTipRole)
   {
+    if (item->isFailed())
+      return item->GetFailureReason();
+
     if (this->IsCheckable(index))
       return QStringLiteral("Show the histogram of this label");
 
@@ -835,6 +856,8 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   for (const auto &statistic : m_Statistics)
   {
     bool isWIP = statistic->IsWIP();
+    const bool isFailed = statistic->IsFailed();
+    const auto failureReason = QString::fromStdString(statistic->GetFailureReason());
     // get the connected image data node/mask data node
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     auto imageOfStatisticsPredicate = imageRule->GetDestinationsDetector(statistic);
@@ -862,7 +885,9 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     else
     {
       QString imageLabel = QString::fromStdString(image->GetName());
-      if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
+
+      // A failed computation has no time steps to list, so its row is the image row itself.
+      if ((statistic->GetTimeSteps() == 1 || isFailed) && maskFinding == m_MaskNodes.end())
       {
         // A pending or failed computation leaves the container without label values.
         const auto labelValues = statistic->GetExistingLabelValues();
@@ -870,6 +895,9 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
         if (labelValues.empty())
         {
           imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, true, m_RootItem.get(), image);
+
+          if (isFailed)
+            imageItem->SetFailed(failureReason);
         }
         else
         {
@@ -904,6 +932,9 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       {
         //all labels are empty -> no stats are computed
         maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, true, imageItem, image, mask);
+
+        if (isFailed)
+          maskItem->SetFailed(failureReason);
       }
       else if (statistic->GetTimeSteps() == 1 && !showLabelRows)
       {
@@ -927,7 +958,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
       imageItem->appendChild(maskItem);
     }
-    else
+    else if (!isFailed)
     {
       //no mask -> but multi time step
       const auto labelValues = statistic->GetExistingLabelValues();

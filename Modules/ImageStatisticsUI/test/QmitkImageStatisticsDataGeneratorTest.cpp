@@ -570,6 +570,8 @@ public:
     CPPUNIT_ASSERT(nullptr != statistics);
     CPPUNIT_ASSERT(statistics->IsFailed());
     CPPUNIT_ASSERT(!statistics->IsWIP());
+    CPPUNIT_ASSERT_MESSAGE("The failed placeholder must tell why the computation failed.",
+      std::string::npos != statistics->GetFailureReason().find("sub geometry"));
 
     CPPUNIT_ASSERT_MESSAGE("Error: Failed pair is not settled.", generator.Generate());
     m_TestApp->processEvents();

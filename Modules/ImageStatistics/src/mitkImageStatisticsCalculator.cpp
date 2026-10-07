@@ -256,7 +256,7 @@ namespace mitk
     }
     catch (const itk::ExceptionObject &e)
     {
-      mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+      mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.GetDescription();
     }
 
     auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);

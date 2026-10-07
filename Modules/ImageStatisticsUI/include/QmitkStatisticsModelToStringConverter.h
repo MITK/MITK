@@ -13,13 +13,15 @@ found in the LICENSE file.
 #define QmitkStatisticsModelToStringConverter_h
 
 #include <MitkImageStatisticsUIExports.h>
-#include <QmitkImageStatisticsTreeModel.h>
+
+#include <QAbstractItemModel>
 
 /**
  * \brief Converts the content of a QmitkImageStatisticsTreeModel to a delimited string.
  *
- * Iterates over all cells of a QmitkImageStatisticsTreeModel and produces a formatted string
- * suitable for clipboard export or file output. The iteration traverses the tree hierarchy
+ * Iterates over all cells of a QmitkImageStatisticsTreeModel, or of a proxy model on top of
+ * it (e.g. one that hides statistic columns), and produces a formatted string suitable for
+ * clipboard export or file output. The iteration traverses the tree hierarchy
  * recursively, prepending parent labels with " >> " separators to leaf rows.
  * Row and column delimiters are configurable (defaults: newline and comma).
  * Header data (column captions) can optionally be included.
@@ -35,10 +37,10 @@ public:
   QmitkStatisticsModelToStringConverter();
 
   /**
-   * \brief Sets the statistics tree model to convert.
-   * \param[in] model Pointer to the tree model. Must not be nullptr when GetString() is called.
+   * \brief Sets the statistics tree model, or a proxy model on top of it, to convert.
+   * \param[in] model Pointer to the model. Must not be nullptr when GetString() is called.
    */
-  void SetModel(QmitkImageStatisticsTreeModel *model);
+  void SetModel(const QAbstractItemModel *model);
 
   /**
    * \brief Sets the root index from which to start the iteration.
@@ -74,10 +76,10 @@ public:
 private:
 
   QString Iterate(const QModelIndex &index,
-                  const QmitkImageStatisticsTreeModel *model,
+                  const QAbstractItemModel *model,
                   QString label = "") const;
 
-  QmitkImageStatisticsTreeModel *m_statisticsModel = nullptr;
+  const QAbstractItemModel *m_statisticsModel = nullptr;
   QModelIndex m_rootIndex;
 
   QChar m_rowDelimiter = '\n';

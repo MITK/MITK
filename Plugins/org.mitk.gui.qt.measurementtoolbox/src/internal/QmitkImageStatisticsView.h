@@ -90,6 +90,9 @@ private:
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
   mitk::NodePredicateBase::Pointer GenerateROIPredicate() const;
 
+  void LoadHiddenStatistics();
+  void SaveHiddenStatistics();
+
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   QmitkImageStatisticsDataGenerator* m_DataGenerator = nullptr;
 

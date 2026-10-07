@@ -45,31 +45,31 @@ mitk::EnvironmentInfo mitk::CollectEnvironmentInfo()
   return info;
 }
 
-std::vector<std::pair<std::string, std::string>> mitk::ToLabeledFields(const EnvironmentInfo& info)
+std::vector<std::pair<mitk::EnvironmentField, std::string>> mitk::ToFields(const EnvironmentInfo& info)
 {
-  const std::pair<const char*, const std::string*> fields[] = {
-    { "MITK version", &info.mitkVersion },
-    { "Revision", &info.mitkRevision },
-    { "Revision description", &info.mitkRevisionDescription },
-    { "Build type", &info.buildType },
-    { "Qt version", &info.qtVersion },
-    { "VTK version", &info.vtkVersion },
-    { "ITK version", &info.itkVersion },
-    { "Operating system", &info.os },
-    { "Kernel type", &info.kernelType },
-    { "Kernel version", &info.kernelVersion },
-    { "CPU architecture", &info.cpuArchitecture },
-    { "UI locale", &info.uiLocale },
-    { "GPU renderer", &info.gpuRenderer }
+  const std::pair<EnvironmentField, const std::string*> fields[] = {
+    { EnvironmentField::MitkVersion, &info.mitkVersion },
+    { EnvironmentField::Revision, &info.mitkRevision },
+    { EnvironmentField::RevisionDescription, &info.mitkRevisionDescription },
+    { EnvironmentField::BuildType, &info.buildType },
+    { EnvironmentField::QtVersion, &info.qtVersion },
+    { EnvironmentField::VtkVersion, &info.vtkVersion },
+    { EnvironmentField::ItkVersion, &info.itkVersion },
+    { EnvironmentField::OperatingSystem, &info.os },
+    { EnvironmentField::KernelType, &info.kernelType },
+    { EnvironmentField::KernelVersion, &info.kernelVersion },
+    { EnvironmentField::CpuArchitecture, &info.cpuArchitecture },
+    { EnvironmentField::UiLocale, &info.uiLocale },
+    { EnvironmentField::GpuRenderer, &info.gpuRenderer }
   };
 
-  std::vector<std::pair<std::string, std::string>> labeled;
+  std::vector<std::pair<EnvironmentField, std::string>> result;
 
-  for (const auto& [label, value] : fields)
+  for (const auto& [field, value] : fields)
   {
     if (!value->empty())
-      labeled.emplace_back(label, *value);
+      result.emplace_back(field, *value);
   }
 
-  return labeled;
+  return result;
 }

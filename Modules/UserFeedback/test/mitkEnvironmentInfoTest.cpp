@@ -24,7 +24,8 @@ class mitkEnvironmentInfoTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkEnvironmentInfoTestSuite);
   MITK_TEST(CollectsRealValues);
   MITK_TEST(NeverContainsTheHostname);
-  MITK_TEST(LabeledFieldsAreOrderedAndSkipEmptyFields);
+  MITK_TEST(FieldsAreOrderedAndSkipEmptyFields);
+  MITK_TEST(FieldDisplayLabelsArePinned);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -50,30 +51,38 @@ public:
     if (hostname.empty())
       return;
 
-    for (const auto& [label, value] : mitk::ToLabeledFields(mitk::CollectEnvironmentInfo()))
-      CPPUNIT_ASSERT_MESSAGE(label, value.find(hostname) == std::string::npos);
+    for (const auto& [field, value] : mitk::ToFields(mitk::CollectEnvironmentInfo()))
+      CPPUNIT_ASSERT_MESSAGE(mitk::ToString(field), value.find(hostname) == std::string::npos);
   }
 
-  void LabeledFieldsAreOrderedAndSkipEmptyFields()
+  void FieldsAreOrderedAndSkipEmptyFields()
   {
     auto info = mitk::CollectEnvironmentInfo();
     info.mitkRevisionDescription.clear();
 
-    const auto fields = mitk::ToLabeledFields(info);
-    CPPUNIT_ASSERT(fields == mitk::ToLabeledFields(info));
-    CPPUNIT_ASSERT_EQUAL(std::string("MITK version"), fields.front().first);
+    const auto fields = mitk::ToFields(info);
+    CPPUNIT_ASSERT(fields == mitk::ToFields(info));
+    CPPUNIT_ASSERT(mitk::EnvironmentField::MitkVersion == fields.front().first);
 
     for (const auto& field : fields)
     {
-      CPPUNIT_ASSERT(field.first != "Revision description");
-      CPPUNIT_ASSERT(field.first != "GPU renderer");
+      CPPUNIT_ASSERT(field.first != mitk::EnvironmentField::RevisionDescription);
+      CPPUNIT_ASSERT(field.first != mitk::EnvironmentField::GpuRenderer);
     }
 
     info.gpuRenderer = "Test GPU";
-    const auto withGpu = mitk::ToLabeledFields(info);
+    const auto withGpu = mitk::ToFields(info);
     CPPUNIT_ASSERT_EQUAL(fields.size() + 1, withGpu.size());
-    CPPUNIT_ASSERT_EQUAL(std::string("GPU renderer"), withGpu.back().first);
+    CPPUNIT_ASSERT(mitk::EnvironmentField::GpuRenderer == withGpu.back().first);
     CPPUNIT_ASSERT_EQUAL(std::string("Test GPU"), withGpu.back().second);
+  }
+
+  void FieldDisplayLabelsArePinned()
+  {
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK version"), mitk::ToString(mitk::EnvironmentField::MitkVersion));
+    CPPUNIT_ASSERT_EQUAL(std::string("Revision description"), mitk::ToString(mitk::EnvironmentField::RevisionDescription));
+    CPPUNIT_ASSERT_EQUAL(std::string("Operating system"), mitk::ToString(mitk::EnvironmentField::OperatingSystem));
+    CPPUNIT_ASSERT_EQUAL(std::string("GPU renderer"), mitk::ToString(mitk::EnvironmentField::GpuRenderer));
   }
 };
 

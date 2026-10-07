@@ -603,9 +603,9 @@ void QmitkFeedbackDialog::AddEnvironmentRow(QVBoxLayout* layout)
 
   int row = 0;
 
-  for (const auto& [label, value] : mitk::ToLabeledFields(m_Input.environment))
+  for (const auto& [field, value] : mitk::ToFields(m_Input.environment))
   {
-    auto* checkBox = new QCheckBox(QString::fromStdString(label));
+    auto* checkBox = new QCheckBox(QString::fromStdString(mitk::ToString(field)));
     checkBox->setChecked(true);
 
     auto* valueLabel = new QLabel(QString::fromStdString(value));
@@ -616,7 +616,7 @@ void QmitkFeedbackDialog::AddEnvironmentRow(QVBoxLayout* layout)
     grid->addWidget(valueLabel, row, 1);
     ++row;
 
-    m_EnvironmentItems.emplace_back(checkBox, mitk::FeedbackItem{ label, value, true });
+    m_EnvironmentItems.emplace_back(checkBox, mitk::FeedbackItem{ field, value, true });
     connect(checkBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
   }
 
@@ -1119,10 +1119,20 @@ void QmitkFeedbackDialog::UpdateSummaries()
 
     ++included;
 
-    if (item.label == "MITK version")
-      values << "MITK " + QString::fromStdString(item.value);
-    else if (item.label == "Operating system" || item.label == "GPU renderer")
-      values << QString::fromStdString(item.value);
+    switch (item.field)
+    {
+      case mitk::EnvironmentField::MitkVersion:
+        values << "MITK " + QString::fromStdString(item.value);
+        break;
+
+      case mitk::EnvironmentField::OperatingSystem:
+      case mitk::EnvironmentField::GpuRenderer:
+        values << QString::fromStdString(item.value);
+        break;
+
+      default:
+        break;
+    }
   }
 
   {

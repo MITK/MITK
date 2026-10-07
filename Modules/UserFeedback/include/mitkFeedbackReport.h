@@ -37,10 +37,29 @@ namespace mitk
     EditorArea
   };
 
-  /** \brief One auto-detected fact; include-or-omit, never free-edited. */
+  /** \brief The environment facts a report can carry; see ToString() for the
+   *  display label. */
+  enum class EnvironmentField
+  {
+    MitkVersion,
+    Revision,
+    RevisionDescription,
+    BuildType,
+    QtVersion,
+    VtkVersion,
+    ItkVersion,
+    OperatingSystem,
+    KernelType,
+    KernelVersion,
+    CpuArchitecture,
+    UiLocale,
+    GpuRenderer
+  };
+
+  /** \brief One auto-detected environment fact; include-or-omit, never free-edited. */
   struct FeedbackItem
   {
-    std::string label;
+    EnvironmentField field;
     std::string value;
     bool included = true;
   };
@@ -121,6 +140,9 @@ namespace mitk
 
   /** \brief Display name of \p target, e.g. "Application window". */
   MITKUSERFEEDBACK_EXPORT std::string ToString(ScreenshotTarget target);
+
+  /** \brief Display label of \p field, e.g. "MITK version". */
+  MITKUSERFEEDBACK_EXPORT std::string ToString(EnvironmentField field);
 }
 
 #endif

@@ -89,3 +89,50 @@ std::string mitk::ToString(ScreenshotTarget target)
 
   return {};
 }
+
+std::string mitk::ToString(EnvironmentField field)
+{
+  switch (field)
+  {
+    case EnvironmentField::MitkVersion:
+      return "MITK version";
+
+    case EnvironmentField::Revision:
+      return "Revision";
+
+    case EnvironmentField::RevisionDescription:
+      return "Revision description";
+
+    case EnvironmentField::BuildType:
+      return "Build type";
+
+    case EnvironmentField::QtVersion:
+      return "Qt version";
+
+    case EnvironmentField::VtkVersion:
+      return "VTK version";
+
+    case EnvironmentField::ItkVersion:
+      return "ITK version";
+
+    case EnvironmentField::OperatingSystem:
+      return "Operating system";
+
+    case EnvironmentField::KernelType:
+      return "Kernel type";
+
+    case EnvironmentField::KernelVersion:
+      return "Kernel version";
+
+    case EnvironmentField::CpuArchitecture:
+      return "CPU architecture";
+
+    case EnvironmentField::UiLocale:
+      return "UI locale";
+
+    case EnvironmentField::GpuRenderer:
+      return "GPU renderer";
+  }
+
+  return {};
+}

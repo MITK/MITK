@@ -70,7 +70,7 @@ class mitkFeedbackBundleTestSuite : public mitk::TestFixture
   {
     mitk::FeedbackReport report;
     report.description = "Crash when saving.";
-    report.environment = { { "MITK version", "2026.06", true } };
+    report.environment = { { mitk::EnvironmentField::MitkVersion, "2026.06", true } };
     report.logs = {
       { "logs/current-session.log", "This session", "current log\n", true, false },
       { "logs/crash.log", "Session log of the crash", "crash log\n", false, false }

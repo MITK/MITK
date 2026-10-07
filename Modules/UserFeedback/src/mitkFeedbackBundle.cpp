@@ -214,7 +214,7 @@ std::string mitk::BuildReportText(const FeedbackReport& report)
     for (const auto& item : report.environment)
     {
       if (item.included)
-        text << "- " << item.label << ": " << item.value << '\n';
+        text << "- " << ToString(item.field) << ": " << item.value << '\n';
     }
   }
 

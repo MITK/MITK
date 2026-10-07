@@ -131,12 +131,12 @@ namespace
     return mitk::ToString(report.category);
   }
 
-  /** The included environment value labeled \p label, or empty. */
-  std::string IncludedValue(const mitk::FeedbackReport& report, const std::string& label)
+  /** The included environment value of \p field, or empty. */
+  std::string IncludedValue(const mitk::FeedbackReport& report, mitk::EnvironmentField field)
   {
     for (const auto& item : report.environment)
     {
-      if (item.included && item.label == label)
+      if (item.included && item.field == field)
         return item.value;
     }
 
@@ -214,7 +214,7 @@ namespace
         context << "\nEnvironment:\n";
 
       hasEnvironment = true;
-      context << "- " << item.label << ": " << item.value << '\n';
+      context << "- " << mitk::ToString(item.field) << ": " << item.value << '\n';
     }
 
     return context.str();
@@ -223,8 +223,8 @@ namespace
   std::string BuildBugBody(const mitk::FeedbackReport& report, const std::string& description,
     const std::string& additionalContext)
   {
-    auto version = IncludedValue(report, "MITK version");
-    const auto revision = IncludedValue(report, "Revision description");
+    auto version = IncludedValue(report, mitk::EnvironmentField::MitkVersion);
+    const auto revision = IncludedValue(report, mitk::EnvironmentField::RevisionDescription);
 
     if (!version.empty() && !revision.empty())
       version += " (" + revision + ')';
@@ -232,7 +232,7 @@ namespace
     std::ostringstream body;
     body << "**Describe the bug**\n" << description << "\n\n"
          << "**MITK version**\n" << OrNotIncluded(version) << "\n\n"
-         << "**Operating system**\n" << OrNotIncluded(IncludedValue(report, "Operating system")) << "\n\n"
+         << "**Operating system**\n" << OrNotIncluded(IncludedValue(report, mitk::EnvironmentField::OperatingSystem)) << "\n\n"
          << "**To Reproduce**\nSee the description above.\n\n"
          << "**Expected behavior**\nSee the description above.\n\n"
          << "**Screenshots**\n" << ScreenshotsLine(report) << "\n\n"

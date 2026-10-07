@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef mitkEnvironmentInfo_h
 #define mitkEnvironmentInfo_h
 
+#include <mitkFeedbackReport.h>
+
 #include <MitkUserFeedbackExports.h>
 
 #include <string>
@@ -52,8 +54,8 @@ namespace mitk
   /** \brief Collect every field except gpuRenderer. Never reads the hostname. */
   MITKUSERFEEDBACK_EXPORT EnvironmentInfo CollectEnvironmentInfo();
 
-  /** \brief Fixed-order (label, value) pairs for every non-empty field. */
-  MITKUSERFEEDBACK_EXPORT std::vector<std::pair<std::string, std::string>> ToLabeledFields(const EnvironmentInfo& info);
+  /** \brief Fixed-order (field, value) pairs for every non-empty field. */
+  MITKUSERFEEDBACK_EXPORT std::vector<std::pair<EnvironmentField, std::string>> ToFields(const EnvironmentInfo& info);
 }
 
 #endif

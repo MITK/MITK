@@ -32,7 +32,8 @@ class mitkFeedbackReportTestSuite : public mitk::TestFixture
   {
     mitk::FeedbackReport report;
     report.description = "The viewer freezes when scrolling.";
-    report.environment = { { "MITK version", "2026.06", true }, { "Operating system", "Test OS", false } };
+    report.environment = { { mitk::EnvironmentField::MitkVersion, "2026.06", true },
+                          { mitk::EnvironmentField::OperatingSystem, "Test OS", false } };
     return report;
   }
 

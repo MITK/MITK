@@ -38,10 +38,10 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
     report.category = category;
     report.description = "\n  Crash when saving a scene  \nSteps: open, save.";
     report.environment = {
-      { "MITK version", "2026.06", true },
-      { "Revision description", "v2026.06-1-gabc", true },
-      { "Operating system", "Test OS 1", true },
-      { "CPU architecture", "x86_64", false }
+      { mitk::EnvironmentField::MitkVersion, "2026.06", true },
+      { mitk::EnvironmentField::RevisionDescription, "v2026.06-1-gabc", true },
+      { mitk::EnvironmentField::OperatingSystem, "Test OS 1", true },
+      { mitk::EnvironmentField::CpuArchitecture, "x86_64", false }
     };
     return report;
   }

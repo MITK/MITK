@@ -11,15 +11,52 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkIgnorePixelMaskGenerator.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageAccessByItk.h>
-#include <itkDefaultConvertPixelTraits.h>
-#include <itkImageRegionConstIterator.h>
-#include <itkImageRegionIterator.h>
-#include <itkRGBAPixel.h>
-#include <mitkITKImageImport.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 
-#include <type_traits>
+#include <algorithm>
+
+namespace
+{
+  /** Sets a mask voxel to 0 if all compared components of the image voxel have the ignored
+  value, and to 1 otherwise. Reads the raw components, so it covers every kind of pixel, e.g.
+  RGB of any component type, vectors, or tensors. */
+  template <typename TComponent>
+  void CalculateMask(const mitk::PixelType& pixelType, const mitk::Image* image, double ignoredValue, mitk::Image::Pointer& mask)
+  {
+    std::size_t numberOfVoxels = 1;
+    for (unsigned int i = 0; i < image->GetDimension(); ++i)
+      numberOfVoxels *= image->GetDimension(i);
+
+    const auto numberOfComponents = pixelType.GetNumberOfComponents();
+
+    // The alpha is no color, so black RGBA voxels are ignored regardless of their opacity.
+    const auto numberOfComparedComponents = itk::IOPixelEnum::RGBA == pixelType.GetPixelType()
+      ? 3u
+      : numberOfComponents;
+
+    const auto ignoredComponentValue = static_cast<TComponent>(ignoredValue);
+    const auto isIgnored = [ignoredComponentValue](TComponent component) { return component == ignoredComponentValue; };
+
+    auto result = mitk::Image::New();
+    result->Initialize(mitk::MakeScalarPixelType<unsigned short>(), image->GetDimension(), image->GetDimensions());
+
+    {
+      mitk::ImageReadAccessor imageAccessor(image);
+      mitk::ImageWriteAccessor resultAccessor(result);
+
+      const auto* voxel = static_cast<const TComponent*>(imageAccessor.GetData());
+      auto* maskVoxel = static_cast<unsigned short*>(resultAccessor.GetData());
+
+      for (std::size_t i = 0; i < numberOfVoxels; ++i, voxel += numberOfComponents)
+        maskVoxel[i] = std::all_of(voxel, voxel + numberOfComparedComponents, isIgnored) ? 0 : 1;
+    }
+
+    mask = result;
+  }
+}
 
 namespace mitk
 {
@@ -55,72 +92,21 @@ mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int)
 
         if (timeSliceImage.IsNull()) mitkThrow() << "Cannot generate mask. Passed time point is not supported by input image. Invalid time point: "<< m_TimePoint;
 
-        // update m_InternalMask
-        switch (timeSliceImage->GetPixelType().GetPixelType())
-        {
-          case itk::IOPixelEnum::SCALAR:
-            AccessByItk(timeSliceImage, InternalCalculateMask);
-            break;
+        const auto pixelType = timeSliceImage->GetPixelType();
+        mitk::Image::Pointer mask;
+        mitkPixelTypeMultiplex3(CalculateMask, pixelType, timeSliceImage.GetPointer(), m_IgnoredPixelValue, mask);
 
-          case itk::IOPixelEnum::VECTOR:
-            AccessVectorPixelTypeByItk(timeSliceImage, InternalCalculateMask);
-            break;
+        // mitkPixelTypeMultiplex calls nothing for a component type it does not know.
+        if (mask.IsNull())
+          mitkThrow() << "Cannot generate mask. Unsupported component type: " << pixelType.GetComponentTypeAsString();
 
-          default:
-            AccessFixedPixelTypeByItk(timeSliceImage, InternalCalculateMask, MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ);
-            break;
-        }
-
+        m_InternalMask = mask;
         m_InternalMask->SetGeometry(timeSliceImage->GetGeometry());
 
         this->Modified();
     }
     m_InternalMaskUpdateTime = m_InternalMask->GetMTime();
     return m_InternalMask;
-}
-
-template <typename TImage>
-void IgnorePixelMaskGenerator::InternalCalculateMask(const TImage* image)
-{
-    using PixelType = typename TImage::PixelType;
-    using PixelTraits = itk::DefaultConvertPixelTraits<PixelType>;
-    using ComponentType = typename PixelTraits::ComponentType;
-    using MaskType = itk::Image<unsigned short, TImage::ImageDimension>;
-
-    // The alpha is no color, so black RGBA voxels are ignored regardless of their opacity.
-    constexpr bool isRGBA = std::is_same_v<PixelType, itk::RGBAPixel<ComponentType>>;
-
-    typename MaskType::Pointer mask = MaskType::New();
-    mask->SetOrigin(image->GetOrigin());
-    mask->SetSpacing(image->GetSpacing());
-    mask->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
-    mask->SetBufferedRegion(image->GetBufferedRegion());
-    mask->SetDirection(image->GetDirection());
-    mask->Allocate();
-    mask->FillBuffer(1);
-
-    const auto ignoredComponentValue = static_cast<ComponentType>(m_IgnoredPixelValue);
-
-    // iterate over image and mask and set mask=0 if all compared components of the image pixel equal m_IgnoredPixelValue
-    itk::ImageRegionConstIterator<TImage> imageIterator(image, image->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<MaskType> maskIterator(mask, mask->GetLargestPossibleRegion());
-
-    for (imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator, ++maskIterator)
-    {
-        const auto pixel = imageIterator.Get();
-        const unsigned int numberOfComparedComponents = isRGBA ? 3 : PixelTraits::GetNumberOfComponents(pixel);
-        bool ignored = true;
-
-        for (unsigned int i = 0; ignored && i < numberOfComparedComponents; ++i)
-          ignored = PixelTraits::GetNthComponent(i, pixel) == ignoredComponentValue;
-
-        if (ignored)
-        {
-            maskIterator.Set(0);
-        }
-    }
-
-    m_InternalMask = GrabItkImageMemory(mask);
 }
 
 bool IgnorePixelMaskGenerator::IsUpdateRequired() const

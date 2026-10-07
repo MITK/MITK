@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <MitkImageStatisticsExports.h>
 #include <mitkMaskGenerator.h>
 #include <limits>
-#include <itkImage.h>
 
 
 namespace mitk
@@ -83,10 +82,6 @@ protected:
     ~IgnorePixelMaskGenerator() = default;
 
     mitk::Image::ConstPointer DoGetMask(unsigned int maskID) override;
-
-    /** Takes itk::Image as well as itk::VectorImage. */
-    template <typename TImage>
-    void InternalCalculateMask(const TImage* image);
 
 private:
     bool IsUpdateRequired() const;

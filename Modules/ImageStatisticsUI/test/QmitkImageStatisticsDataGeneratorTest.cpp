@@ -572,6 +572,8 @@ public:
     CPPUNIT_ASSERT(!statistics->IsWIP());
     CPPUNIT_ASSERT_MESSAGE("The failed placeholder must tell why the computation failed.",
       std::string::npos != statistics->GetFailureReason().find("sub geometry"));
+    CPPUNIT_ASSERT_MESSAGE("The reason is shown to users and must not reveal the source location.",
+      std::string::npos == statistics->GetFailureReason().find("mitkImageStatisticsCalculator.cpp"));
 
     CPPUNIT_ASSERT_MESSAGE("Error: Failed pair is not settled.", generator.Generate());
     m_TestApp->processEvents();

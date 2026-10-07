@@ -26,6 +26,20 @@ found in the LICENSE file.
 #include <mitkImageStatisticsContainerManager.h>
 #include <mitkProperties.h>
 
+#include <itkMacro.h>
+
+namespace
+{
+  /** The error message is shown to users, e.g. as tooltip of the statistics table. The source
+  location that what() of itk::ExceptionObject, and thereby of mitk::Exception, puts in front of
+  the description is of no use to them and stays in the log. */
+  std::string GetUserMessage(const std::exception& e)
+  {
+    const auto* itkException = dynamic_cast<const itk::ExceptionObject*>(&e);
+    return nullptr != itkException ? itkException->GetDescription() : e.what();
+  }
+}
+
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()
   : QmitkDataGenerationJobBase()
   , m_StatisticsImage(nullptr)
@@ -141,7 +155,7 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   catch (const std::exception &e)
   {
     MITK_ERROR << "Error while configuring the statistics calculator: " << e.what();
-    m_LastErrorMessage = e.what();
+    m_LastErrorMessage = GetUserMessage(e);
     statisticCalculationSuccessful = false;
   }
 
@@ -179,8 +193,8 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   }
   catch (const std::exception &e)
   {
-    m_LastErrorMessage = "Failure while calculating the statistics: " + std::string(e.what());
-    MITK_ERROR << m_LastErrorMessage;
+    MITK_ERROR << "Failure while calculating the statistics: " << e.what();
+    m_LastErrorMessage = "Failure while calculating the statistics: " + GetUserMessage(e);
     statisticCalculationSuccessful = false;
   }
 

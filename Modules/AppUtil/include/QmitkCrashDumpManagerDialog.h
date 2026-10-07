@@ -48,6 +48,9 @@ public:
    *  manager returns to its previous parent when that modal dialog finishes. */
   static void ShowManager(QWidget* parent = nullptr);
 
+  /** \brief Re-read the dumps if the manager is open; does nothing otherwise. */
+  static void RefreshIfOpen();
+
   /** \brief Re-read the dumps from disk. */
   void Refresh();
 

@@ -88,6 +88,12 @@ void QmitkCrashDumpManagerDialog::ShowManager(QWidget* parent)
   s_Instance->activateWindow();
 }
 
+void QmitkCrashDumpManagerDialog::RefreshIfOpen()
+{
+  if (!s_Instance.isNull())
+    s_Instance->Refresh();
+}
+
 QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
   : QDialog(parent),
     m_List(new QmitkCrashDumpListWidget),

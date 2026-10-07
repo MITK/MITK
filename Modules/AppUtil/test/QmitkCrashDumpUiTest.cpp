@@ -103,6 +103,7 @@ class QmitkCrashDumpUiTestSuite : public mitk::TestFixture
   MITK_TEST(ManagerIsSingleInstanceAndReportsTheSelection);
   MITK_TEST(ManagerReturnsToItsParentWhenTheModalFinishes);
   MITK_TEST(ManagerRefreshesAfterTheReportFlow);
+  MITK_TEST(RefreshIfOpenUpdatesAnOpenManager);
   MITK_TEST(NextStartDialogKeepAcknowledges);
   MITK_TEST(NextStartDialogCloseRemoves);
   MITK_TEST(NextStartDialogFileReportKeepsTheDumps);
@@ -341,6 +342,23 @@ public:
 
     CPPUNIT_ASSERT(!std::filesystem::exists(m_OnDemandDump));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("dumps the report flow deleted leave the open manager", 2, tree->topLevelItemCount());
+  }
+
+  void RefreshIfOpenUpdatesAnOpenManager()
+  {
+    CPPUNIT_ASSERT_MESSAGE("no manager is open", VisibleManagers().empty());
+    QmitkCrashDumpManagerDialog::RefreshIfOpen();
+    CPPUNIT_ASSERT(VisibleManagers().empty());
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* tree = VisibleManagers().front()->findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(m_OnDemandDump));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("the list is not live", 3, tree->topLevelItemCount());
+
+    QmitkCrashDumpManagerDialog::RefreshIfOpen();
+    CPPUNIT_ASSERT_EQUAL(2, tree->topLevelItemCount());
   }
 
   void NextStartDialogKeepAcknowledges()

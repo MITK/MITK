@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpListWidget.h>
+#include <QmitkCrashDumpManagerDialog.h>
 #endif
 
 #include <berryIWorkbench.h>
@@ -262,6 +263,9 @@ void QmitkRunFeedbackDialog(const QmitkFeedbackDialog::Input& input, QWidget* pa
     if (!mitk::CrashDumpFacility::DeleteDump(dump))
       failed << QString::fromStdU16String(dump.filename().u16string());
   }
+
+  if (!dumpsToDelete.empty())
+    QmitkCrashDumpManagerDialog::RefreshIfOpen();
 
   if (!failed.isEmpty())
   {

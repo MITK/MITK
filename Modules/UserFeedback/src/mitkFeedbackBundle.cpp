@@ -76,18 +76,21 @@ namespace
         ValidateArchiveName(log.archiveName, usedNames);
     }
 
-    for (const auto& attachment : report.attachments)
+    for (const auto* files : { &report.images, &report.attachments })
     {
-      if (!attachment.included)
-        continue;
-
-      ValidateArchiveName(attachment.archiveName, usedNames);
-
-      std::error_code error;
-      if (!std::filesystem::is_regular_file(attachment.sourcePath, error))
+      for (const auto& file : *files)
       {
-        mitkThrowException(mitk::FeedbackBundleException)
-          << "Missing file for archive entry \"" << attachment.archiveName << "\"";
+        if (!file.included)
+          continue;
+
+        ValidateArchiveName(file.archiveName, usedNames);
+
+        std::error_code error;
+        if (!std::filesystem::is_regular_file(file.sourcePath, error))
+        {
+          mitkThrowException(mitk::FeedbackBundleException)
+            << "Missing file for archive entry \"" << file.archiveName << "\"";
+        }
       }
     }
   }
@@ -158,20 +161,23 @@ namespace
     if (report.includeScreenshot)
       writer.Add(ScreenshotEntry, std::string(report.screenshotPng.begin(), report.screenshotPng.end()));
 
-    for (const auto& attachment : report.attachments)
+    for (const auto* files : { &report.images, &report.attachments })
     {
-      if (!attachment.included)
-        continue;
-
-      std::ifstream file(attachment.sourcePath, std::ios::binary);
-
-      if (!file.is_open())
+      for (const auto& attachment : *files)
       {
-        mitkThrowException(mitk::FeedbackBundleException)
-          << "Cannot open file for archive entry \"" << attachment.archiveName << "\"";
-      }
+        if (!attachment.included)
+          continue;
 
-      writer.Add(attachment.archiveName, file, std::filesystem::file_size(attachment.sourcePath));
+        std::ifstream file(attachment.sourcePath, std::ios::binary);
+
+        if (!file.is_open())
+        {
+          mitkThrowException(mitk::FeedbackBundleException)
+            << "Cannot open file for archive entry \"" << attachment.archiveName << "\"";
+        }
+
+        writer.Add(attachment.archiveName, file, std::filesystem::file_size(attachment.sourcePath));
+      }
     }
 
     writer.Finish(report);
@@ -229,8 +235,19 @@ std::string mitk::BuildReportText(const FeedbackReport& report)
     }
   }
 
-  if (report.includeScreenshot)
-    text << "\n## Screenshot\n\n" << ToString(report.screenshotTarget) << " (" << ScreenshotEntry << ")\n";
+  if (report.includeScreenshot || AnyIncluded(report.images))
+  {
+    text << "\n## Screenshots\n\n";
+
+    if (report.includeScreenshot)
+      text << "- " << ToString(report.screenshotTarget) << " (" << ScreenshotEntry << ")\n";
+
+    for (const auto& image : report.images)
+    {
+      if (image.included)
+        text << "- " << image.description << " (" << image.archiveName << ")\n";
+    }
+  }
 
   if (report.sharingConfirmed || report.publicSharingConfirmed)
   {

@@ -162,6 +162,14 @@ namespace
     if (report.includeScreenshot)
       contents << ", a screenshot";
 
+    const auto images = std::count_if(report.images.begin(), report.images.end(),
+      [](const auto& image) { return image.included; });
+
+    if (images == 1)
+      contents << ", an image";
+    else if (images > 1)
+      contents << ", " << images << " images";
+
     const auto attachments = std::count_if(report.attachments.begin(), report.attachments.end(),
       [](const auto& attachment) { return attachment.included; });
 
@@ -172,6 +180,18 @@ namespace
 
     contents << '.';
     return contents.str();
+  }
+
+  std::string ScreenshotsLine(const mitk::FeedbackReport& report)
+  {
+    const auto images = std::count_if(report.images.begin(), report.images.end(),
+      [](const auto& image) { return image.included; });
+    const auto total = images + (report.includeScreenshot ? 1 : 0);
+
+    if (total == 0)
+      return "None.";
+
+    return total == 1 ? "One is in the bundle." : std::to_string(total) + " are in the bundle.";
   }
 
   /** Everything below the description, which is the part of the body that
@@ -215,8 +235,7 @@ namespace
          << "**Operating system**\n" << OrNotIncluded(IncludedValue(report, "Operating system")) << "\n\n"
          << "**To Reproduce**\nSee the description above.\n\n"
          << "**Expected behavior**\nSee the description above.\n\n"
-         << "**Screenshots**\n"
-         << (report.includeScreenshot ? "A screenshot is in the bundle." : std::string("None.")) << "\n\n"
+         << "**Screenshots**\n" << ScreenshotsLine(report) << "\n\n"
          << additionalContext;
 
     return body.str();

@@ -35,6 +35,7 @@ class mitkFeedbackBundleTestSuite : public mitk::TestFixture
   MITK_TEST(SameInputGivesSameEntries);
   MITK_TEST(MissingAttachmentThrowsAndLeavesNoZip);
   MITK_TEST(UnsafeArchiveNamesThrow);
+  MITK_TEST(UserImagesAreCopiedAndListed);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_Directory;
@@ -176,6 +177,32 @@ public:
     CPPUNIT_ASSERT_EQUAL("dumps/crash.dmp\t" + std::to_string(m_DumpContent.size()) + " bytes", line("dumps/crash.dmp"));
     CPPUNIT_ASSERT(manifest.find("Sharing confirmed: yes") != std::string::npos);
     CPPUNIT_ASSERT(manifest.find("Public sharing confirmed: no") != std::string::npos);
+  }
+
+  void UserImagesAreCopiedAndListed()
+  {
+    const auto image = m_Directory / "my picture.png";
+    std::ofstream(image, std::ios::binary) << "\x89PNG user image";
+
+    auto report = this->FullReport();
+    report.images = { { image, "images/1-my picture.png", "my picture.png", true },
+      { m_Directory / "missing-but-excluded.png", "images/2-missing.png", "missing.png", false } };
+
+    mitk::WriteFeedbackBundle(report, m_Zip);
+    const auto entries = ReadZip(m_Zip);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("\x89PNG user image"), entries.at("images/1-my picture.png"));
+    CPPUNIT_ASSERT(entries.count("images/2-missing.png") == 0);
+    CPPUNIT_ASSERT(entries.at("manifest.txt").find("images/1-my picture.png\t") != std::string::npos);
+
+    report.images.back().included = true;
+    CPPUNIT_ASSERT_THROW_MESSAGE("an included image must exist", mitk::WriteFeedbackBundle(report, m_Zip),
+      mitk::FeedbackBundleException);
+
+    report.images.back().sourcePath = image;
+    report.images.back().archiveName = "../escape.png";
+    CPPUNIT_ASSERT_THROW_MESSAGE("image names are validated", mitk::WriteFeedbackBundle(report, m_Zip),
+      mitk::FeedbackBundleException);
   }
 
   void SameInputGivesSameEntries()

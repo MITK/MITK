@@ -47,7 +47,8 @@ namespace mitk
    * - each included log under its archiveName; its first line marks it as
    *   edited if it was
    * - screenshot.png: only if includeScreenshot
-   * - each included attachment under its archiveName, copied verbatim
+   * - each included image, then each included attachment, under its
+   *   archiveName, copied verbatim
    * - manifest.txt: always; the entries with their sizes, edited flags, and
    *   whether the sharing confirmations were given
    *

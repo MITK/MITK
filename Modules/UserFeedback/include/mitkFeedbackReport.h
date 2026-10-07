@@ -55,7 +55,8 @@ namespace mitk
     bool edited = false;     /**< True if the user changed the text. */
   };
 
-  /** \brief A file copied verbatim into the bundle (e.g. a crash dump). */
+  /** \brief A file copied verbatim into the bundle (e.g. a crash dump or an
+   *  image the user picked). */
   struct FeedbackAttachment
   {
     std::filesystem::path sourcePath; /**< Read when the bundle is written; never emitted. */
@@ -76,7 +77,14 @@ namespace mitk
     std::string description; /**< Required (non-empty). */
     std::vector<FeedbackItem> environment;
     std::vector<FeedbackLog> logs;
+
+    /** Files the user cannot review, such as crash dumps; they keep the
+     *  report off public trackers. */
     std::vector<FeedbackAttachment> attachments;
+
+    /** Image files the user picked and reviewed; like the screenshot, they
+     *  may go to a public tracker once publicSharingConfirmed is set. */
+    std::vector<FeedbackAttachment> images;
 
     bool includeScreenshot = false;
     ScreenshotTarget screenshotTarget = ScreenshotTarget::ApplicationWindow;
@@ -89,12 +97,13 @@ namespace mitk
     bool publicSharingConfirmed = false;
 
     /** \brief True if any included item may carry patient data (an attachment,
-     *  a log, or the screenshot); then sharingConfirmed is required. */
+     *  a log, the screenshot, or an image); then sharingConfirmed is
+     *  required. */
     bool NeedsSharingConfirmation() const;
 
     /** \brief Whether the report may go to a public tracker: no attachment is
      *  included (attachments such as crash dumps cannot be reviewed by the
-     *  user), and if a log or the screenshot is included,
+     *  user), and if a log, the screenshot, or an image is included,
      *  publicSharingConfirmed is set. */
     bool CanUsePublicTracker() const;
   };

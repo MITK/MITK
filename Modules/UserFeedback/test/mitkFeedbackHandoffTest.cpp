@@ -26,6 +26,7 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
   MITK_TEST(GitHubBodyIsCapped);
   MITK_TEST(BundleFileNameMustBeBare);
   MITK_TEST(MailGoesToTheTeamWithAShortBody);
+  MITK_TEST(UserImagesMayGoToGitHub);
   CPPUNIT_TEST_SUITE_END();
 
   const std::string m_Bundle = "mitk-report-20261006-120000.zip";
@@ -173,6 +174,20 @@ public:
     body = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
     CPPUNIT_ASSERT_MESSAGE(std::to_string(EncodedLength(body)), EncodedLength(body) <= 6000);
     CPPUNIT_ASSERT(Contains(body, "Bundle file: " + m_Bundle));
+  }
+
+  void UserImagesMayGoToGitHub()
+  {
+    auto report = Report();
+    report.images = { { "C:/Users/someone/shot.png", "images/1-shot.png", "shot.png", true },
+      { "C:/Users/someone/other.png", "images/2-other.png", "other.png", true } };
+    CPPUNIT_ASSERT_THROW(mitk::BuildGitHubIssueFields(report, m_Bundle), mitk::Exception);
+
+    report.publicSharingConfirmed = true;
+    const auto body = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
+    CPPUNIT_ASSERT(Contains(body, "2 images"));
+    CPPUNIT_ASSERT(!Contains(body, "someone"));
+    CPPUNIT_ASSERT(!Contains(body, "**Screenshots**\nNone."));
   }
 
   void BundleFileNameMustBeBare()

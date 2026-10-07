@@ -25,6 +25,7 @@ class mitkFeedbackReportTestSuite : public mitk::TestFixture
   MITK_TEST(ReportTextStatesTheConfirmationOnlyWhenGiven);
   MITK_TEST(SharingConfirmationIsNeededForEveryPhiCapableItem);
   MITK_TEST(PublicTrackerGate);
+  MITK_TEST(UserImagesAreReviewableScreenshots);
   CPPUNIT_TEST_SUITE_END();
 
   static mitk::FeedbackReport TextOnlyReport()
@@ -155,6 +156,28 @@ public:
 
     report.attachments = { Attachment(false) };
     CPPUNIT_ASSERT(report.CanUsePublicTracker());
+  }
+
+  void UserImagesAreReviewableScreenshots()
+  {
+    auto report = TextOnlyReport();
+    report.images = { { "C:/Users/someone/Pictures/wrong-overlay.png", "images/1-wrong-overlay.png", "wrong-overlay.png",
+      false } };
+    CPPUNIT_ASSERT(!report.NeedsSharingConfirmation());
+    CPPUNIT_ASSERT(!Contains(mitk::BuildReportText(report), "wrong-overlay"));
+
+    report.images.front().included = true;
+    CPPUNIT_ASSERT_MESSAGE("an image can show patient data", report.NeedsSharingConfirmation());
+    CPPUNIT_ASSERT_MESSAGE("an image needs the public confirmation", !report.CanUsePublicTracker());
+
+    report.publicSharingConfirmed = true;
+    CPPUNIT_ASSERT_MESSAGE("unlike a dump, a reviewed image may be published", report.CanUsePublicTracker());
+
+    const auto text = mitk::BuildReportText(report);
+    CPPUNIT_ASSERT(Contains(text, "## Screenshots"));
+    CPPUNIT_ASSERT(Contains(text, "images/1-wrong-overlay.png"));
+    CPPUNIT_ASSERT_MESSAGE("never the source path", !Contains(text, "someone"));
+    CPPUNIT_ASSERT_MESSAGE("images are not diagnostic data", !Contains(text, "## Diagnostic Data"));
   }
 };
 

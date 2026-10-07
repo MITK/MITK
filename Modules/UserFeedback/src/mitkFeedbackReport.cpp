@@ -21,35 +21,41 @@ namespace
     return std::any_of(report.logs.begin(), report.logs.end(), [](const auto& log) { return log.included; });
   }
 
-  bool IsAnyAttachmentIncluded(const mitk::FeedbackReport& report)
+  bool IsAnyIncluded(const std::vector<mitk::FeedbackAttachment>& attachments)
   {
-    return std::any_of(report.attachments.begin(), report.attachments.end(),
-      [](const auto& attachment) { return attachment.included; });
+    return std::any_of(attachments.begin(), attachments.end(), [](const auto& attachment) { return attachment.included; });
+  }
+
+  /** Whether a log, the screenshot, or an image is included: items that may
+   *  show patient data, but that the user could review. */
+  bool IsAnyReviewableItemIncluded(const mitk::FeedbackReport& report)
+  {
+    return report.includeScreenshot || IsAnyLogIncluded(report) || IsAnyIncluded(report.images);
   }
 }
 
 bool mitk::FeedbackReport::NeedsSharingConfirmation() const
 {
-  return this->includeScreenshot || IsAnyLogIncluded(*this) || IsAnyAttachmentIncluded(*this);
+  return IsAnyReviewableItemIncluded(*this) || IsAnyIncluded(this->attachments);
 }
 
 bool mitk::FeedbackReport::CanUsePublicTracker() const
 {
-  if (IsAnyAttachmentIncluded(*this))
+  if (IsAnyIncluded(this->attachments))
     return false;
 
-  return this->publicSharingConfirmed || !(this->includeScreenshot || IsAnyLogIncluded(*this));
+  return this->publicSharingConfirmed || !IsAnyReviewableItemIncluded(*this);
 }
 
 std::string mitk::GetSharingConfirmationStatement()
 {
-  return "I am permitted to share the included logs, screenshots, and crash dumps: doing so complies with "
+  return "I am permitted to share the included logs, screenshots, images, and crash dumps: doing so complies with "
          "the data-protection and other rules that apply to the data handled in the sessions concerned.";
 }
 
 std::string mitk::GetPublicSharingConfirmationStatement()
 {
-  return "I have checked the included log and screenshot, and they may be published: GitHub issues are "
+  return "I have checked the included logs and images, and they may be published: GitHub issues are "
          "public and can be read by anyone.";
 }
 

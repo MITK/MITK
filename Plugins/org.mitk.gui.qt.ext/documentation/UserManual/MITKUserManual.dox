@@ -63,27 +63,28 @@ The four window view of the standard display is the heart of the MITK image view
 
 <i>Help > Report a Problem / Send Feedback...</i> opens a dialog in which you can report a bug, request a feature, or share an idea. The <i>Contribute</i> tab of the welcome screen leads there as well.
 
-The report is assembled on your computer, and the dialog shows it next to your input exactly as it will be sent. Nothing is sent automatically. A report consists of:
+The report is assembled on your computer, and the dialog previews it next to your input. Under <i>Included in the report</i> you choose what goes into it; <i>Details</i> shows each item. Nothing is sent automatically. A report consists of:
 
 <ul>
   <li><b>Category and description</b> - the description is required.</li>
   <li><b>Environment</b> - the MITK version and revision, the build type, the versions of Qt, VTK and ITK, the operating system, the processor architecture, the language of the user interface, and the graphics adapter. You can leave out each of them. The name of your computer is never collected.</li>
   <li><b>Log</b> - off by default. The last 1000 lines of the log of this session. You can edit the excerpt before including it; an edited excerpt is marked as such in the report.</li>
   <li><b>Screenshot</b> - off by default. Of the application window or of the display area, taken just before the dialog opened.</li>
+  <li><b>Images from files</b> - images of your own, for example a screenshot of something you saw earlier. Each is shown as a thumbnail and can be removed again.</li>
   <li><b>Crash dumps</b> - only in a report filed with <i>File report...</i> from the crash dump dialogs (see below).</li>
 </ul>
 
-Logs, screenshots, and crash dumps can contain patient-related information, such as file paths, names, images, or parts of the application's memory. As soon as one of them is included, you have to confirm that you are permitted to share it before the report can be handed off.
+Logs, screenshots, images, and crash dumps can contain patient-related information, such as file paths, names, images, or parts of the application's memory. As soon as one of them is included, you have to confirm that you are permitted to share it before the report can be handed off.
 
 The report is handed off by a program of your choice:
 
 <ul>
-  <li><b>Open email</b> saves the report as a .zip file and opens your mail program with a message to the MITK team. Attach the .zip file to the message before sending it.</li>
-  <li><b>Open GitHub issue</b> saves the .zip file and opens a prefilled issue on GitHub in your web browser. Attach the .zip file there. GitHub issues are public, so this is only available without crash dumps, and an included log or screenshot needs your additional confirmation that it may be published.</li>
-  <li><b>Reveal bundle</b> saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
+  <li><b>Email to the MITK team...</b> saves the report as a .zip file and opens your mail program with a message to the MITK team. Attach the .zip file to the message before sending it.</li>
+  <li><b>Open GitHub issue...</b> saves the .zip file and opens a prefilled issue on GitHub in your web browser. Attach the .zip file there. GitHub issues are public, so this is only available without crash dumps, and an included log, screenshot, or image needs your additional confirmation that it may be published.</li>
+  <li><b>Show report file</b> saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
 </ul>
 
-The .zip file is saved in a temporary folder and is kept when the dialog closes. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and can be revealed. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
+The .zip file is saved in a temporary folder and is kept when the dialog closes. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
 
 \subsection MITKWorkbenchManualPage_Feedback_CrashDumps Reports with crash dumps
 

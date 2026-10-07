@@ -26,7 +26,6 @@ endif()
 
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
-  src/internal/QmitkFeedbackDialog.ui
 )
 
 set(MOC_H_FILES

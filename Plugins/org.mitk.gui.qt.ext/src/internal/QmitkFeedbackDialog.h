@@ -26,26 +26,28 @@ found in the LICENSE file.
 
 #include <filesystem>
 #include <functional>
-#include <memory>
+#include <map>
 #include <vector>
 
+class QAbstractButton;
+class QButtonGroup;
 class QCheckBox;
-class QmitkCrashDumpListWidget;
+class QComboBox;
 class QLabel;
 class QPlainTextEdit;
-
-namespace Ui
-{
-  class QmitkFeedbackDialog;
-}
+class QProgressBar;
+class QPushButton;
+class QTextBrowser;
+class QVBoxLayout;
+class QmitkCrashDumpListWidget;
 
 /**
  * \brief Lets the user assemble, review, and hand off a feedback report.
  *
- * Every item that may go into the report is shown with its own include
- * choice, and the preview shows the exact report text that a hand-off
- * emits. A hand-off writes the bundle to a temporary folder and opens the
- * user's browser, mail program, or file manager; the dialog itself sends
+ * Every item that may go into the report is listed with its own include
+ * choice, and the preview shows the report text that a hand-off emits. A
+ * hand-off writes the bundle to a temporary folder and opens the user's
+ * mail program, web browser, or file manager; the dialog itself sends
  * nothing.
  */
 class QmitkFeedbackDialog : public QDialog
@@ -93,19 +95,39 @@ public:
    *  dialog may write the bundle again from the same dumps. */
   std::vector<std::filesystem::path> GetDumpsToDelete() const;
 
+protected:
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
-  struct LogSourceWidgets
+  struct LogRow
   {
     QCheckBox* include = nullptr;
     QPlainTextEdit* text = nullptr;
-    QLabel* editedLabel = nullptr;
+    QLabel* summary = nullptr;
     QString originalText;
+    QString originalSummary;
   };
 
-  void AddEnvironmentItems(const mitk::EnvironmentInfo& environment);
-  void AddLogSources();
-  void SetUpScreenshot();
-  void SetUpDumps();
+  QWidget* CreateHeader();
+  QWidget* CreateForm();
+  QWidget* CreatePreview();
+  QWidget* CreateFooter();
+
+  /** A row of the list of included items: \p title (a check box or a
+   *  label) with \p summary below it, an optional \p trailing widget, and,
+   *  if given, \p details that a Details button shows and hides. */
+  QWidget* CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
+    bool detailsShown = false);
+
+  /** A framed panel with a check box for \p statement and an explanatory
+   *  \p note below it. Clicking the statement toggles the check box. */
+  QWidget* CreateConfirmation(QCheckBox* checkBox, const QString& statement, const QString& note);
+
+  void AddEnvironmentRow(QVBoxLayout* layout);
+  void AddLogRows(QVBoxLayout* layout);
+  void AddScreenshotRow(QVBoxLayout* layout);
+  void AddDumpsRow(QVBoxLayout* layout);
+  void AddImagesRow(QVBoxLayout* layout);
 
   /** Exactly what the preview shows and a hand-off emits. */
   mitk::FeedbackReport AssembleReport() const;
@@ -114,8 +136,14 @@ private:
   void OnPhiItemIncluded(bool included);
   void OnPublicItemChanged();
   void OnDumpsChanged();
+  void OnEnvironmentClicked();
+  void OnAddImages();
+  void OnRemoveImage(const QString& path);
 
-  void UpdatePreview();
+  void UpdateHeaderIcon();
+  void UpdateImageList();
+
+  void UpdateSummaries();
   void UpdateConfirmations(const mitk::FeedbackReport& report);
   void UpdateHandoffEnabled(const mitk::FeedbackReport& report);
   void UpdateScreenshotPreview();
@@ -130,19 +158,64 @@ private:
 
   void OnOpenIssue();
   void OnOpenEmail();
-  void OnRevealBundle();
+  void OnShowBundle();
 
   /** Tells the user that \p application could not be started and offers to
-   *  reveal the bundle instead. */
-  void OfferReveal(const QString& application, const QString& zipPath);
+   *  show the bundle instead. */
+  void OfferShowBundle(const QString& application, const QString& zipPath);
 
-  std::unique_ptr<Ui::QmitkFeedbackDialog> m_Controls;
   Input m_Input;
 
+  QLabel* m_HeaderIcon = nullptr;
+  QButtonGroup* m_CategoryGroup = nullptr;
+  QPlainTextEdit* m_Description = nullptr;
+
+  QCheckBox* m_EnvironmentInclude = nullptr;
+  QLabel* m_EnvironmentSummary = nullptr;
   std::vector<std::pair<QCheckBox*, mitk::FeedbackItem>> m_EnvironmentItems;
-  std::vector<LogSourceWidgets> m_LogWidgets;
+
+  std::vector<LogRow> m_LogRows;
+
+  struct UserImage
+  {
+    QString path;
+    QPixmap thumbnail;
+  };
+
+  /** Image files the user added, all included. */
+  std::vector<UserImage> m_Images;
+  QLabel* m_ImagesSummary = nullptr;
+  QVBoxLayout* m_ImageList = nullptr;
+  QString m_ImageDirectory;
+
+  QCheckBox* m_ScreenshotInclude = nullptr;
+  QComboBox* m_ScreenshotTarget = nullptr;
+  QLabel* m_ScreenshotPreview = nullptr;
   mutable std::vector<unsigned char> m_WindowPng;
   mutable std::vector<unsigned char> m_EditorPng;
+
+  QmitkCrashDumpListWidget* m_DumpList = nullptr;
+  QLabel* m_DumpSummary = nullptr;
+  QCheckBox* m_DeleteDumps = nullptr;
+  std::size_t m_IncludedDumpCount = 0;
+
+  QWidget* m_SharingPanel = nullptr;
+  QCheckBox* m_SharingConfirmation = nullptr;
+  QWidget* m_PublicPanel = nullptr;
+  QCheckBox* m_PublicConfirmation = nullptr;
+
+  /** Labels that toggle a check box when clicked. */
+  std::map<QObject*, QAbstractButton*> m_ClickableLabels;
+
+  QTextBrowser* m_Preview = nullptr;
+
+  QProgressBar* m_BusyIndicator = nullptr;
+  QLabel* m_Status = nullptr;
+  QLabel* m_GitHubReason = nullptr;
+  QPushButton* m_EmailButton = nullptr;
+  QPushButton* m_IssueButton = nullptr;
+  QPushButton* m_ShowBundleButton = nullptr;
+  QPushButton* m_CloseButton = nullptr;
 
   /** Incremented on every change of the report; a bundle is reusable only
    *  for the generation it was written for. */
@@ -156,10 +229,6 @@ private:
   unsigned int m_PendingGeneration = 0;
   mitk::FeedbackReport m_PendingReport;
   Handoff m_PendingHandoff;
-
-  QmitkCrashDumpListWidget* m_DumpList = nullptr;
-  QCheckBox* m_DeleteDumpsCheckBox = nullptr;
-  std::size_t m_IncludedDumpCount = 0;
 };
 
 #endif

@@ -14,39 +14,101 @@ found in the LICENSE file.
 
 #include "QmitkFeedbackInput.h"
 
-#include <ui_QmitkFeedbackDialog.h>
-
 #ifdef MITK_HAS_CRASHHANDLING
 #include <QmitkCrashDumpListWidget.h>
 #endif
+
+#include <QmitkIconTheme.h>
 
 #include <mitkException.h>
 #include <mitkFeedbackBundle.h>
 #include <mitkFeedbackHandoff.h>
 
-#include <algorithm>
-
 #include <QBuffer>
+#include <QButtonGroup>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>
+#include <QEvent>
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QFontDatabase>
+#include <QFrame>
+#include <QGridLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLocale>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSignalBlocker>
+#include <QSplitter>
 #include <QTemporaryDir>
+#include <QTextBlock>
+#include <QTextBrowser>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QtConcurrentRun>
+
+#include <algorithm>
 
 namespace
 {
   // GitHub's attachment limit for issues; many mail servers reject larger
   // messages as well.
   constexpr qint64 LargeBundleSize = 25 * 1024 * 1024;
+
+  constexpr int IconSize = 40;
+
+  // Check boxes are indented by this much in rows, so that summaries line
+  // up with the check box text.
+  constexpr int SummaryIndent = 24;
+
+  // The themes style widgets through the application style sheet only, so
+  // the palette cannot tell light from dark. These match the themes' text
+  // colors at reduced emphasis and their "font.warning" class.
+  QString MutedColor()
+  {
+    return QmitkIconTheme::IsDarkTheme() ? "#a6a6a6" : "#5f5f5f";
+  }
+
+  QString WarningColor()
+  {
+    return QmitkIconTheme::IsDarkTheme() ? "#ff5c33" : "#d00000";
+  }
+
+  QLabel* CreateMutedLabel(const QString& text = QString())
+  {
+    auto* label = new QLabel(text);
+    label->setWordWrap(true);
+    label->setStyleSheet(QString("color: %1;").arg(MutedColor()));
+    return label;
+  }
+
+  /** A heading in the text rather than a larger widget font, which the
+   *  application's style sheet would override. */
+  QLabel* CreateHeading(const QString& text)
+  {
+    auto* label = new QLabel(QString("<b>%1</b>").arg(text.toHtmlEscaped()));
+    label->setTextFormat(Qt::RichText);
+    return label;
+  }
+
+  QFrame* CreateDivider()
+  {
+    auto* divider = new QFrame;
+    divider->setFixedHeight(1);
+    divider->setStyleSheet("background-color: rgba(128, 128, 128, 70); border: none;");
+    return divider;
+  }
 
   std::vector<unsigned char> EncodePng(const QPixmap& pixmap)
   {
@@ -83,46 +145,80 @@ namespace
       return QString::fromStdString(e.what());
     }
   }
+
+  /** Markdown headings come out several sizes larger than the text, which
+   *  in a narrow pane leaves little room for the content; a slight
+   *  increase over the body text keeps them distinct. */
+  void ScaleHeadings(QTextDocument* document, qreal bodyPointSize)
+  {
+    for (auto block = document->begin(); block.isValid(); block = block.next())
+    {
+      const auto level = block.blockFormat().headingLevel();
+
+      if (level == 0)
+        continue;
+
+      QTextCursor cursor(block);
+      cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+
+      QTextCharFormat format;
+      format.setProperty(QTextFormat::FontSizeAdjustment, 0);
+      format.setFontPointSize(bodyPointSize * (level == 1 ? 1.3 : 1.1));
+      format.setFontWeight(QFont::Bold);
+      cursor.mergeCharFormat(format);
+
+      auto blockFormat = block.blockFormat();
+      blockFormat.setTopMargin(level == 1 ? 0 : 10);
+      blockFormat.setBottomMargin(4);
+      cursor.setBlockFormat(blockFormat);
+    }
+  }
+
+  /** "The last 1000 lines" or "All 345 lines", taken from the first line
+   *  that QmitkReadFeedbackLog() puts in front of every log excerpt. */
+  QString LogSummary(const QString& text)
+  {
+    const auto firstLine = text.section('\n', 0, 0);
+
+    if (!firstLine.startsWith('['))
+      return {};
+
+    auto summary = firstLine.mid(1).section(" of the log", 0, 0);
+    return summary.isEmpty() ? summary : summary.at(0).toUpper() + summary.mid(1);
+  }
 }
 
 QmitkFeedbackDialog::QmitkFeedbackDialog(const Input& input, QWidget* parent)
   : QDialog(parent),
-    m_Controls(std::make_unique<Ui::QmitkFeedbackDialog>()),
     m_Input(input)
 {
-  m_Controls->setupUi(this);
-  m_Controls->splitter->setStretchFactor(0, 3);
-  m_Controls->splitter->setStretchFactor(1, 2);
+  this->setWindowTitle("Report a Problem / Send Feedback");
+  this->resize(1100, 780);
 
-  m_Controls->sharingConfirmationLabel->setText(QString::fromStdString(mitk::GetSharingConfirmationStatement()));
-  m_Controls->publicSharingConfirmationLabel->setText(
-    QString::fromStdString(mitk::GetPublicSharingConfirmationStatement()));
+  auto* splitter = new QSplitter(Qt::Horizontal);
+  splitter->setChildrenCollapsible(false);
+  splitter->addWidget(this->CreateForm());
+  splitter->addWidget(this->CreatePreview());
+  splitter->setStretchFactor(0, 3);
+  splitter->setStretchFactor(1, 2);
+  splitter->setSizes({ 640, 460 });
 
-  for (const auto category : { mitk::FeedbackCategory::Bug, mitk::FeedbackCategory::Feature, mitk::FeedbackCategory::Idea })
-    m_Controls->categoryComboBox->addItem(QString::fromStdString(mitk::ToString(category)), static_cast<int>(category));
+  auto* layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(this->CreateHeader());
+  // A horizontal splitter keeps its preferred height unless it is given the
+  // stretch, which would hand the spare height to the footer instead.
+  layout->addWidget(splitter, 1);
+  layout->addWidget(CreateDivider());
+  layout->addWidget(this->CreateFooter());
 
-  this->AddEnvironmentItems(m_Input.environment);
-  this->AddLogSources();
-  this->SetUpScreenshot();
-  this->SetUpDumps();
-
-  connect(m_Controls->categoryComboBox, &QComboBox::currentIndexChanged, this, &QmitkFeedbackDialog::OnReportChanged);
-  connect(m_Controls->descriptionEdit, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnReportChanged);
-  connect(m_Controls->sharingConfirmationCheckBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
-  connect(m_Controls->publicSharingConfirmationCheckBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
-
-  connect(m_Controls->logToggleButton, &QToolButton::toggled, this, [this](bool expanded) {
-    m_Controls->logTabs->setVisible(expanded);
-    m_Controls->logToggleButton->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
-  });
-
-  connect(m_Controls->openIssueButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenIssue);
-  connect(m_Controls->openEmailButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenEmail);
-  connect(m_Controls->revealBundleButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnRevealBundle);
-  connect(m_Controls->closeButton, &QPushButton::clicked, this, &QDialog::reject);
   connect(&m_BundleWatcher, &QFutureWatcher<QString>::finished, this, &QmitkFeedbackDialog::OnBundleWritten);
 
+  this->UpdateHeaderIcon();
+  this->UpdateImageList();
   this->OnReportChanged();
+  m_Description->setFocus();
 }
 
 QmitkFeedbackDialog::~QmitkFeedbackDialog() = default;
@@ -139,20 +235,301 @@ void QmitkFeedbackDialog::done(int result)
 
 std::vector<std::filesystem::path> QmitkFeedbackDialog::GetDumpsToDelete() const
 {
-  if (m_DeleteDumpsCheckBox == nullptr || !m_DeleteDumpsCheckBox->isChecked())
+  if (m_DeleteDumps == nullptr || !m_DeleteDumps->isChecked())
     return {};
 
   return m_BundleAttachments;
 }
 
-void QmitkFeedbackDialog::AddEnvironmentItems(const mitk::EnvironmentInfo& environment)
+bool QmitkFeedbackDialog::eventFilter(QObject* watched, QEvent* event)
 {
-  auto* layout = m_Controls->environmentLayout;
-  layout->setColumnStretch(1, 1);
+  if (event->type() == QEvent::MouseButtonRelease)
+  {
+    if (const auto clickable = m_ClickableLabels.find(watched); clickable != m_ClickableLabels.end())
+    {
+      if (clickable->second->isEnabled())
+        clickable->second->click();
+
+      return true;
+    }
+  }
+
+  return QDialog::eventFilter(watched, event);
+}
+
+QWidget* QmitkFeedbackDialog::CreateHeader()
+{
+  auto* header = new QFrame;
+  header->setObjectName("feedbackHeader");
+  header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  // Translucent grey instead of a palette color reads as a band on the
+  // light and the dark theme; the accent bar matches the crash dump dialogs.
+  header->setStyleSheet(QString(
+    "QFrame#feedbackHeader { background-color: rgba(128, 128, 128, 28); border: none; "
+    "border-left: 4px solid %1; border-bottom: 1px solid rgba(128, 128, 128, 90); }")
+    .arg(QmitkIconTheme::GetAccentColor()));
+
+  m_HeaderIcon = new QLabel;
+  m_HeaderIcon->setFixedSize(IconSize, IconSize);
+
+  auto* title = new QLabel("<h3 style=\"margin: 0;\">Report a problem or share an idea</h3>");
+  title->setTextFormat(Qt::RichText);
+
+  auto* subtitle = new QLabel(
+    "Nothing leaves your computer until you send it yourself. Choose what to include, then how to send it.");
+  subtitle->setWordWrap(true);
+
+  auto* text = new QVBoxLayout;
+  text->setSpacing(2);
+  text->addWidget(title);
+  text->addWidget(subtitle);
+
+  auto* layout = new QHBoxLayout(header);
+  layout->setContentsMargins(14, 12, 16, 12);
+  layout->setSpacing(14);
+  layout->addWidget(m_HeaderIcon, 0, Qt::AlignVCenter);
+  layout->addLayout(text, 1);
+
+  return header;
+}
+
+QWidget* QmitkFeedbackDialog::CreateForm()
+{
+  auto* form = new QWidget;
+  auto* layout = new QVBoxLayout(form);
+  layout->setContentsMargins(16, 14, 12, 14);
+  layout->setSpacing(10);
+
+  m_CategoryGroup = new QButtonGroup(this);
+  auto* categories = new QHBoxLayout;
+  categories->setSpacing(6);
+
+  for (const auto category : { mitk::FeedbackCategory::Bug, mitk::FeedbackCategory::Feature, mitk::FeedbackCategory::Idea })
+  {
+    auto* button = new QPushButton(QString::fromStdString(mitk::ToString(category)));
+    button->setCheckable(true);
+    button->setChecked(category == mitk::FeedbackCategory::Bug);
+    m_CategoryGroup->addButton(button, static_cast<int>(category));
+    categories->addWidget(button);
+  }
+
+  categories->addStretch(1);
+  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::UpdateHeaderIcon);
+  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::OnReportChanged);
+
+  m_Description = new QPlainTextEdit;
+  m_Description->setPlaceholderText(
+    "What happened, and what did you expect instead? How can we reproduce it? Or: what would you like MITK to do?");
+  m_Description->setMinimumHeight(90);
+  m_Description->setMaximumHeight(120);
+  connect(m_Description, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnReportChanged);
+
+  auto* items = new QVBoxLayout;
+  items->setSpacing(0);
+  // In a crash report the dumps are what the report is about.
+  this->AddDumpsRow(items);
+  this->AddEnvironmentRow(items);
+  this->AddLogRows(items);
+  this->AddScreenshotRow(items);
+  this->AddImagesRow(items);
+  items->addWidget(CreateDivider());
+
+  m_SharingConfirmation = new QCheckBox;
+  m_SharingPanel = this->CreateConfirmation(m_SharingConfirmation,
+    QString::fromStdString(mitk::GetSharingConfirmationStatement()),
+    "Logs, screenshots, images, and crash dumps can contain patient-related information, such as file paths, names, "
+    "image data, or parts of the application's memory.");
+  connect(m_SharingConfirmation, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
+
+  m_PublicConfirmation = new QCheckBox;
+  m_PublicPanel = this->CreateConfirmation(m_PublicConfirmation,
+    QString::fromStdString(mitk::GetPublicSharingConfirmationStatement()),
+    "Needed only to open a GitHub issue. Email goes to the MITK team alone.");
+  connect(m_PublicConfirmation, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
+
+  layout->addLayout(categories);
+  layout->addSpacing(4);
+  layout->addWidget(CreateHeading("Description"));
+  layout->addWidget(m_Description);
+  layout->addSpacing(8);
+  layout->addWidget(CreateHeading("Included in the report"));
+  layout->addLayout(items);
+  layout->addWidget(m_SharingPanel);
+  layout->addWidget(m_PublicPanel);
+  layout->addStretch(1);
+
+  auto* scrollArea = new QScrollArea;
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setWidget(form);
+
+  return scrollArea;
+}
+
+QWidget* QmitkFeedbackDialog::CreatePreview()
+{
+  m_Preview = new QTextBrowser;
+  m_Preview->setOpenLinks(false);
+  m_Preview->setStyleSheet("QTextBrowser { border: 1px solid rgba(128, 128, 128, 90); }");
+  m_Preview->document()->setIndentWidth(18);
+  m_Preview->document()->setDocumentMargin(10);
+
+  auto* note = CreateMutedLabel("Attached files are listed, not shown. Their contents are what you included on the left.");
+
+  auto* pane = new QWidget;
+  auto* layout = new QVBoxLayout(pane);
+  layout->setContentsMargins(12, 14, 16, 14);
+  layout->setSpacing(8);
+  layout->addWidget(CreateHeading("Report preview"));
+  layout->addWidget(m_Preview, 1);
+  layout->addWidget(note);
+
+  return pane;
+}
+
+QWidget* QmitkFeedbackDialog::CreateFooter()
+{
+  m_BusyIndicator = new QProgressBar;
+  m_BusyIndicator->setRange(0, 0);
+  m_BusyIndicator->setTextVisible(false);
+  m_BusyIndicator->setFixedWidth(80);
+  m_BusyIndicator->setVisible(false);
+
+  m_Status = new QLabel;
+  m_Status->setTextFormat(Qt::RichText);
+  m_Status->setWordWrap(true);
+
+  m_GitHubReason = CreateMutedLabel();
+
+  auto* text = new QVBoxLayout;
+  text->setSpacing(2);
+  text->addWidget(m_Status);
+  text->addWidget(m_GitHubReason);
+
+  m_EmailButton = new QPushButton("Email to the MITK team...");
+  m_EmailButton->setDefault(true);
+  m_EmailButton->setToolTip("Saves the report as a .zip file and opens your mail program. Attach the file before sending.");
+
+  m_IssueButton = new QPushButton("Open GitHub issue...");
+  m_IssueButton->setToolTip("Saves the report as a .zip file and opens a prefilled, public GitHub issue in your browser.");
+
+  m_ShowBundleButton = new QPushButton("Show report file");
+  m_ShowBundleButton->setToolTip("Saves the report as a .zip file and shows it in your file manager.");
+
+  m_CloseButton = new QPushButton("Close");
+  m_CloseButton->setAutoDefault(false);
+
+  connect(m_EmailButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenEmail);
+  connect(m_IssueButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenIssue);
+  connect(m_ShowBundleButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnShowBundle);
+  connect(m_CloseButton, &QPushButton::clicked, this, &QDialog::reject);
+
+  auto* footer = new QWidget;
+  auto* layout = new QHBoxLayout(footer);
+  layout->setContentsMargins(16, 10, 16, 12);
+  layout->setSpacing(8);
+  layout->addWidget(m_BusyIndicator, 0, Qt::AlignVCenter);
+  layout->addLayout(text, 1);
+  layout->addSpacing(12);
+  layout->addWidget(m_EmailButton);
+  layout->addWidget(m_IssueButton);
+  layout->addWidget(m_ShowBundleButton);
+  layout->addSpacing(12);
+  layout->addWidget(m_CloseButton);
+
+  return footer;
+}
+
+QWidget* QmitkFeedbackDialog::CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
+  bool detailsShown)
+{
+  auto* top = new QHBoxLayout;
+  top->setSpacing(8);
+  top->addWidget(title);
+  top->addStretch(1);
+
+  if (trailing != nullptr)
+    top->addWidget(trailing);
+
+  auto* row = new QWidget;
+  auto* layout = new QVBoxLayout(row);
+  layout->setContentsMargins(0, 8, 0, 8);
+  layout->setSpacing(4);
+  layout->addLayout(top);
+
+  if (summary != nullptr)
+  {
+    summary->setContentsMargins(SummaryIndent, 0, 0, 0);
+    layout->addWidget(summary);
+  }
+
+  if (details != nullptr)
+  {
+    auto* toggle = new QToolButton;
+    toggle->setText(detailsShown ? "Hide details" : "Details");
+    toggle->setAutoRaise(true);
+    toggle->setCursor(Qt::PointingHandCursor);
+    top->addWidget(toggle);
+
+    details->setContentsMargins(SummaryIndent, 4, 0, 0);
+    details->setVisible(detailsShown);
+    layout->addWidget(details);
+
+    connect(toggle, &QToolButton::clicked, details, [toggle, details] {
+      details->setVisible(!details->isVisible());
+      toggle->setText(details->isVisible() ? "Hide details" : "Details");
+    });
+  }
+
+  auto* container = new QWidget;
+  auto* containerLayout = new QVBoxLayout(container);
+  containerLayout->setContentsMargins(0, 0, 0, 0);
+  containerLayout->setSpacing(0);
+  containerLayout->addWidget(CreateDivider());
+  containerLayout->addWidget(row);
+
+  return container;
+}
+
+QWidget* QmitkFeedbackDialog::CreateConfirmation(QCheckBox* checkBox, const QString& statement, const QString& note)
+{
+  auto* panel = new QFrame;
+  panel->setObjectName("feedbackConfirmation");
+  panel->setStyleSheet(QString(
+    "QFrame#feedbackConfirmation { background-color: rgba(128, 128, 128, 24); border: none; "
+    "border-left: 3px solid %1; }").arg(WarningColor()));
+
+  auto* statementLabel = new QLabel(statement);
+  statementLabel->setWordWrap(true);
+  statementLabel->setCursor(Qt::PointingHandCursor);
+  statementLabel->installEventFilter(this);
+  m_ClickableLabels[statementLabel] = checkBox;
+
+  auto* text = new QVBoxLayout;
+  text->setSpacing(4);
+  text->addWidget(statementLabel);
+  text->addWidget(CreateMutedLabel(note));
+
+  auto* layout = new QHBoxLayout(panel);
+  layout->setContentsMargins(12, 10, 12, 10);
+  layout->setSpacing(8);
+  layout->addWidget(checkBox, 0, Qt::AlignTop);
+  layout->addLayout(text, 1);
+
+  return panel;
+}
+
+void QmitkFeedbackDialog::AddEnvironmentRow(QVBoxLayout* layout)
+{
+  auto* details = new QWidget;
+  auto* grid = new QGridLayout(details);
+  grid->setHorizontalSpacing(16);
+  grid->setVerticalSpacing(2);
+  grid->setColumnStretch(1, 1);
 
   int row = 0;
 
-  for (const auto& [label, value] : mitk::ToLabeledFields(environment))
+  for (const auto& [label, value] : mitk::ToLabeledFields(m_Input.environment))
   {
     auto* checkBox = new QCheckBox(QString::fromStdString(label));
     checkBox->setChecked(true);
@@ -161,84 +538,100 @@ void QmitkFeedbackDialog::AddEnvironmentItems(const mitk::EnvironmentInfo& envir
     valueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     valueLabel->setWordWrap(true);
 
-    layout->addWidget(checkBox, row, 0, Qt::AlignTop);
-    layout->addWidget(valueLabel, row, 1);
+    grid->addWidget(checkBox, row, 0, Qt::AlignTop);
+    grid->addWidget(valueLabel, row, 1);
     ++row;
 
     m_EnvironmentItems.emplace_back(checkBox, mitk::FeedbackItem{ label, value, true });
     connect(checkBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
   }
+
+  m_EnvironmentInclude = new QCheckBox("System information");
+  m_EnvironmentInclude->setChecked(true);
+  m_EnvironmentSummary = CreateMutedLabel();
+  connect(m_EnvironmentInclude, &QCheckBox::clicked, this, &QmitkFeedbackDialog::OnEnvironmentClicked);
+
+  layout->addWidget(this->CreateItemRow(m_EnvironmentInclude, m_EnvironmentSummary, nullptr, details));
 }
 
-void QmitkFeedbackDialog::AddLogSources()
+void QmitkFeedbackDialog::AddLogRows(QVBoxLayout* layout)
 {
   for (const auto& source : m_Input.logs)
   {
-    auto* page = new QWidget;
-    auto* layout = new QVBoxLayout(page);
+    LogRow row;
+    const auto title = source.log.sourceLabel == "This session"
+      ? QString("Log of this session")
+      : QString::fromStdString(source.log.sourceLabel);
 
-    LogSourceWidgets widgets;
+    row.include = new QCheckBox(title);
+    row.include->setObjectName("logInclude");
 
     if (!source.unavailableReason.isEmpty())
     {
-      auto* reason = new QLabel(source.unavailableReason);
-      reason->setWordWrap(true);
-      layout->addWidget(reason);
-      layout->addStretch(1);
-    }
-    else
-    {
-      widgets.include = new QCheckBox("Include this log excerpt");
-      widgets.editedLabel = new QLabel("<i>edited</i>");
-      widgets.editedLabel->setVisible(false);
-
-      auto* header = new QHBoxLayout;
-      header->addWidget(widgets.include);
-      header->addStretch(1);
-      header->addWidget(widgets.editedLabel);
-      layout->addLayout(header);
-
-      widgets.text = new QPlainTextEdit(QString::fromStdString(source.log.text));
-      widgets.text->setLineWrapMode(QPlainTextEdit::NoWrap);
-      widgets.text->setMinimumHeight(200);
-      widgets.text->setToolTip("Remove or change anything you do not want to share.");
-      widgets.originalText = widgets.text->toPlainText();
-      layout->addWidget(widgets.text);
-
-      connect(widgets.include, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
-      connect(widgets.include, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
-      connect(widgets.text, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnPublicItemChanged);
+      row.include->setEnabled(false);
+      row.summary = CreateMutedLabel(source.unavailableReason);
+      layout->addWidget(this->CreateItemRow(row.include, row.summary, nullptr, nullptr));
+      m_LogRows.push_back(row);
+      continue;
     }
 
-    m_LogWidgets.push_back(widgets);
-    m_Controls->logTabs->addTab(page, QString::fromStdString(source.log.sourceLabel));
+    row.text = new QPlainTextEdit(QString::fromStdString(source.log.text));
+    row.text->setLineWrapMode(QPlainTextEdit::NoWrap);
+    row.text->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    row.text->setMinimumHeight(220);
+    row.text->setPlaceholderText("The excerpt is empty.");
+    row.originalText = row.text->toPlainText();
+    row.originalSummary = LogSummary(row.originalText) + ". Open the details to review it, and remove anything you do not want to share.";
+    row.summary = CreateMutedLabel(row.originalSummary);
+
+    connect(row.include, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
+    connect(row.include, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
+    connect(row.text, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnPublicItemChanged);
+
+    layout->addWidget(this->CreateItemRow(row.include, row.summary, nullptr, row.text));
+    m_LogRows.push_back(row);
   }
-
-  m_Controls->logGroup->setVisible(!m_Input.logs.empty());
 }
 
-void QmitkFeedbackDialog::SetUpScreenshot()
+void QmitkFeedbackDialog::AddScreenshotRow(QVBoxLayout* layout)
 {
-  m_Controls->screenshotTargetComboBox->addItem(
-    QString::fromStdString(mitk::ToString(mitk::ScreenshotTarget::ApplicationWindow)).toLower(),
-    static_cast<int>(mitk::ScreenshotTarget::ApplicationWindow));
+  if (m_Input.windowShot.isNull())
+    return;
+
+  m_ScreenshotInclude = new QCheckBox("Screenshot of the");
+  m_ScreenshotInclude->setObjectName("screenshotInclude");
+
+  m_ScreenshotTarget = new QComboBox;
+  m_ScreenshotTarget->addItem("application window", static_cast<int>(mitk::ScreenshotTarget::ApplicationWindow));
 
   if (!m_Input.editorShot.isNull())
-  {
-    m_Controls->screenshotTargetComboBox->addItem(
-      QString::fromStdString(mitk::ToString(mitk::ScreenshotTarget::EditorArea)).toLower(),
-      static_cast<int>(mitk::ScreenshotTarget::EditorArea));
-  }
+    m_ScreenshotTarget->addItem("display area", static_cast<int>(mitk::ScreenshotTarget::EditorArea));
 
-  m_Controls->screenshotGroup->setVisible(!m_Input.windowShot.isNull());
+  auto* title = new QWidget;
+  auto* titleLayout = new QHBoxLayout(title);
+  titleLayout->setContentsMargins(0, 0, 0, 0);
+  titleLayout->setSpacing(6);
+  titleLayout->addWidget(m_ScreenshotInclude);
+  titleLayout->addWidget(m_ScreenshotTarget);
 
-  connect(m_Controls->screenshotCheckBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
-  connect(m_Controls->screenshotCheckBox, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
-  connect(m_Controls->screenshotTargetComboBox, &QComboBox::currentIndexChanged, this,
-    &QmitkFeedbackDialog::OnPublicItemChanged);
+  m_ScreenshotPreview = new QLabel;
+  m_ScreenshotPreview->setVisible(false);
+
+  auto* summary = new QWidget;
+  auto* summaryLayout = new QVBoxLayout(summary);
+  summaryLayout->setContentsMargins(0, 0, 0, 0);
+  summaryLayout->setSpacing(6);
+  summaryLayout->addWidget(CreateMutedLabel("Taken just before this dialog opened."));
+  summaryLayout->addWidget(m_ScreenshotPreview, 0, Qt::AlignLeft);
+
+  layout->addWidget(this->CreateItemRow(title, summary, nullptr, nullptr));
+
+  connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
+  connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
+  connect(m_ScreenshotTarget, &QComboBox::currentIndexChanged, this, &QmitkFeedbackDialog::OnPublicItemChanged);
 }
 
-void QmitkFeedbackDialog::SetUpDumps()
+void QmitkFeedbackDialog::AddDumpsRow(QVBoxLayout* layout)
 {
 #ifdef MITK_HAS_CRASHHANDLING
   if (m_Input.dumps.empty())
@@ -252,27 +645,181 @@ void QmitkFeedbackDialog::SetUpDumps()
   m_DumpList->FitToContents();
   m_IncludedDumpCount = m_Input.dumps.size();
 
-  m_DeleteDumpsCheckBox = new QCheckBox("Delete the included crash dumps from this computer when I close this dialog");
-  m_DeleteDumpsCheckBox->setToolTip("Only dumps that are in a saved report bundle are deleted. "
-    "The bundle in the temporary folder is then their only copy.");
+  m_DeleteDumps = new QCheckBox("Delete the included crash dumps from this computer when I close this dialog");
+  m_DeleteDumps->setToolTip("Only dumps that are in a saved report file are deleted. "
+    "That file in the temporary folder is then their only copy.");
 
-  auto* note = new QLabel("They can also be deleted later under Help > Diagnostic Data.");
-  note->setWordWrap(true);
+  auto* details = new QWidget;
+  auto* detailsLayout = new QVBoxLayout(details);
+  detailsLayout->setSpacing(6);
+  detailsLayout->addWidget(m_DumpList);
+  detailsLayout->addWidget(m_DeleteDumps);
+  detailsLayout->addWidget(CreateMutedLabel("You can also delete them later under Help > Diagnostic Data."));
 
-  m_Controls->dumpsLayout->addWidget(m_DumpList);
-  m_Controls->dumpsLayout->addWidget(m_DeleteDumpsCheckBox);
-  m_Controls->dumpsLayout->addWidget(note);
-  m_Controls->dumpsGroup->setVisible(true);
+  m_DumpSummary = CreateMutedLabel();
+
+  layout->addWidget(this->CreateItemRow(CreateHeading("Crash dumps"), m_DumpSummary, nullptr, details, true));
 
   connect(m_DumpList, &QmitkCrashDumpListWidget::CheckedChanged, this, &QmitkFeedbackDialog::OnDumpsChanged);
+#else
+  Q_UNUSED(layout)
 #endif
+}
+
+void QmitkFeedbackDialog::AddImagesRow(QVBoxLayout* layout)
+{
+  auto* addButton = new QPushButton("Add images...");
+  connect(addButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnAddImages);
+
+  m_ImagesSummary = CreateMutedLabel();
+
+  auto* summary = new QWidget;
+  auto* summaryLayout = new QVBoxLayout(summary);
+  summaryLayout->setContentsMargins(0, 0, 0, 0);
+  summaryLayout->setSpacing(6);
+  summaryLayout->addWidget(m_ImagesSummary);
+
+  m_ImageList = new QVBoxLayout;
+  m_ImageList->setSpacing(6);
+  summaryLayout->addLayout(m_ImageList);
+
+  layout->addWidget(this->CreateItemRow(new QLabel("Images from files"), summary, addButton, nullptr));
+}
+
+void QmitkFeedbackDialog::OnAddImages()
+{
+  if (m_ImageDirectory.isEmpty())
+    m_ImageDirectory = QDir::homePath();
+
+  const auto paths = QFileDialog::getOpenFileNames(this, "Add images", m_ImageDirectory,
+    "Images (*.png *.jpg *.jpeg *.bmp *.gif *.webp)");
+
+  if (paths.isEmpty())
+    return;
+
+  m_ImageDirectory = QFileInfo(paths.front()).path();
+
+  QStringList unreadable;
+  bool added = false;
+
+  for (const auto& path : paths)
+  {
+    if (std::any_of(m_Images.begin(), m_Images.end(), [&path](const auto& image) { return image.path == path; }))
+      continue;
+
+    const QPixmap pixmap(path);
+
+    if (pixmap.isNull())
+    {
+      unreadable << QFileInfo(path).fileName();
+      continue;
+    }
+
+    const auto ratio = this->devicePixelRatioF();
+    auto thumbnail = pixmap.scaled(QSize(120, 80) * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    thumbnail.setDevicePixelRatio(ratio);
+
+    m_Images.push_back({ path, thumbnail });
+    added = true;
+  }
+
+  if (!unreadable.isEmpty())
+  {
+    QMessageBox::warning(this, this->windowTitle(),
+      "These files could not be read as images and were not added:\n\n" + unreadable.join('\n'));
+  }
+
+  if (!added)
+    return;
+
+  this->UpdateImageList();
+
+  // Like any other image, these may show patient data and may be published
+  // only once confirmed.
+  m_SharingConfirmation->setChecked(false);
+  this->OnPublicItemChanged();
+}
+
+void QmitkFeedbackDialog::OnRemoveImage(const QString& path)
+{
+  m_Images.erase(std::remove_if(m_Images.begin(), m_Images.end(), [&path](const auto& image) { return image.path == path; }),
+    m_Images.end());
+
+  this->UpdateImageList();
+  this->OnPublicItemChanged();
+}
+
+void QmitkFeedbackDialog::UpdateImageList()
+{
+  // Deferred: a row's Remove button may be the sender of the click that got
+  // here.
+  while (auto* item = m_ImageList->takeAt(0))
+  {
+    item->widget()->hide();
+    item->widget()->deleteLater();
+    delete item;
+  }
+
+  m_ImagesSummary->setText(m_Images.empty()
+    ? QString("Add images of your own, for example a screenshot of something you saw earlier.")
+    : QString(m_Images.size() == 1 ? "1 image" : "%1 images").arg(m_Images.size()));
+
+  for (const auto& image : m_Images)
+  {
+    auto* thumbnail = new QLabel;
+    thumbnail->setPixmap(image.thumbnail);
+    thumbnail->setFixedSize(image.thumbnail.deviceIndependentSize().toSize());
+
+    auto* name = new QLabel(QFileInfo(image.path).fileName());
+    name->setToolTip(image.path);
+
+    auto* remove = new QToolButton;
+    remove->setText("Remove");
+    remove->setAutoRaise(true);
+    remove->setCursor(Qt::PointingHandCursor);
+    connect(remove, &QToolButton::clicked, this, [this, path = image.path] { this->OnRemoveImage(path); });
+
+    auto* row = new QWidget;
+    auto* rowLayout = new QHBoxLayout(row);
+    rowLayout->setContentsMargins(0, 0, 0, 0);
+    rowLayout->setSpacing(10);
+    rowLayout->addWidget(thumbnail);
+    rowLayout->addWidget(name, 1);
+    rowLayout->addWidget(remove);
+
+    m_ImageList->addWidget(row);
+  }
+}
+
+void QmitkFeedbackDialog::UpdateHeaderIcon()
+{
+  QString pictogram;
+
+  switch (static_cast<mitk::FeedbackCategory>(m_CategoryGroup->checkedId()))
+  {
+    case mitk::FeedbackCategory::Feature:
+      pictogram = "feature";
+      break;
+
+    case mitk::FeedbackCategory::Idea:
+      pictogram = "idea";
+      break;
+
+    case mitk::FeedbackCategory::Bug:
+    default:
+      pictogram = "bug";
+      break;
+  }
+
+  m_HeaderIcon->setPixmap(QmitkIconTheme::GetIcon(":/org.mitk.gui.qt.ext/feedback/" + pictogram + ".svg")
+    .pixmap(QSize(IconSize, IconSize), this->devicePixelRatioF()));
 }
 
 mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
 {
   mitk::FeedbackReport report;
-  report.category = static_cast<mitk::FeedbackCategory>(m_Controls->categoryComboBox->currentData().toInt());
-  report.description = m_Controls->descriptionEdit->toPlainText().trimmed().toStdString();
+  report.category = static_cast<mitk::FeedbackCategory>(m_CategoryGroup->checkedId());
+  report.description = m_Description->toPlainText().trimmed().toStdString();
 
   for (const auto& [checkBox, item] : m_EnvironmentItems)
   {
@@ -280,14 +827,14 @@ mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
     report.environment.back().included = checkBox->isChecked();
   }
 
-  for (std::size_t i = 0; i < m_LogWidgets.size(); ++i)
+  for (std::size_t i = 0; i < m_LogRows.size(); ++i)
   {
-    const auto& widgets = m_LogWidgets[i];
+    const auto& row = m_LogRows[i];
 
-    if (widgets.text == nullptr)
+    if (row.text == nullptr)
       continue;
 
-    const auto text = widgets.text->toPlainText();
+    const auto text = row.text->toPlainText();
 
     auto log = m_Input.logs[i].log;
     log.text = text.toStdString();
@@ -295,16 +842,15 @@ mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
     if (!log.text.empty() && log.text.back() != '\n')
       log.text += '\n';
 
-    log.included = widgets.include->isChecked();
-    log.edited = text != widgets.originalText;
+    log.included = row.include->isChecked();
+    log.edited = text != row.originalText;
     report.logs.push_back(log);
   }
 
-  if (!m_Input.windowShot.isNull() && m_Controls->screenshotCheckBox->isChecked())
+  if (m_ScreenshotInclude != nullptr && m_ScreenshotInclude->isChecked())
   {
     report.includeScreenshot = true;
-    report.screenshotTarget =
-      static_cast<mitk::ScreenshotTarget>(m_Controls->screenshotTargetComboBox->currentData().toInt());
+    report.screenshotTarget = static_cast<mitk::ScreenshotTarget>(m_ScreenshotTarget->currentData().toInt());
 
     // Encoded on first use: a full-window PNG takes long enough to be felt
     // on every keystroke.
@@ -353,8 +899,20 @@ mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
   }
 #endif
 
-  report.sharingConfirmed = m_Controls->sharingConfirmationCheckBox->isChecked();
-  report.publicSharingConfirmed = m_Controls->publicSharingConfirmationCheckBox->isChecked();
+  for (std::size_t i = 0; i < m_Images.size(); ++i)
+  {
+    const auto fileName = QFileInfo(m_Images[i].path).fileName();
+
+    mitk::FeedbackAttachment image;
+    image.sourcePath = m_Images[i].path.toStdU16String();
+    // Numbered, since files from different folders may share a name.
+    image.archiveName = QString("images/%1-%2").arg(i + 1).arg(fileName).toStdString();
+    image.description = fileName.toStdString();
+    report.images.push_back(image);
+  }
+
+  report.sharingConfirmed = m_SharingConfirmation->isChecked();
+  report.publicSharingConfirmed = m_PublicConfirmation->isChecked();
 
   return report;
 }
@@ -363,15 +921,14 @@ void QmitkFeedbackDialog::OnReportChanged()
 {
   ++m_Generation;
 
-  for (const auto& widgets : m_LogWidgets)
-  {
-    if (widgets.editedLabel != nullptr)
-      widgets.editedLabel->setVisible(widgets.text->toPlainText() != widgets.originalText);
-  }
-
   const auto report = this->AssembleReport();
 
-  m_Controls->previewEdit->setPlainText(QString::fromStdString(mitk::BuildReportText(report)));
+  const auto scroll = m_Preview->verticalScrollBar()->value();
+  m_Preview->setMarkdown(QString::fromStdString(mitk::BuildReportText(report)));
+  ScaleHeadings(m_Preview->document(), m_Preview->font().pointSizeF());
+  m_Preview->verticalScrollBar()->setValue(scroll);
+
+  this->UpdateSummaries();
   this->UpdateConfirmations(report);
   this->UpdateHandoffEnabled(report);
   this->UpdateScreenshotPreview();
@@ -381,14 +938,14 @@ void QmitkFeedbackDialog::OnPhiItemIncluded(bool included)
 {
   // A confirmation covers what was included when it was given.
   if (included)
-    m_Controls->sharingConfirmationCheckBox->setChecked(false);
+    m_SharingConfirmation->setChecked(false);
 
   this->OnReportChanged();
 }
 
 void QmitkFeedbackDialog::OnPublicItemChanged()
 {
-  m_Controls->publicSharingConfirmationCheckBox->setChecked(false);
+  m_PublicConfirmation->setChecked(false);
   this->OnReportChanged();
 }
 
@@ -398,63 +955,162 @@ void QmitkFeedbackDialog::OnDumpsChanged()
   const auto includedDumpCount = m_DumpList->GetCheckedDumps().size();
 
   if (includedDumpCount > m_IncludedDumpCount)
-    m_Controls->sharingConfirmationCheckBox->setChecked(false);
+    m_SharingConfirmation->setChecked(false);
 
   m_IncludedDumpCount = includedDumpCount;
   this->OnReportChanged();
 #endif
 }
 
+void QmitkFeedbackDialog::OnEnvironmentClicked()
+{
+  const bool include = m_EnvironmentInclude->checkState() != Qt::Unchecked;
+
+  for (const auto& [checkBox, item] : m_EnvironmentItems)
+  {
+    const QSignalBlocker blocker(checkBox);
+    checkBox->setChecked(include);
+  }
+
+  this->OnReportChanged();
+}
+
+void QmitkFeedbackDialog::UpdateSummaries()
+{
+  std::size_t included = 0;
+  QStringList values;
+
+  for (const auto& [checkBox, item] : m_EnvironmentItems)
+  {
+    if (!checkBox->isChecked())
+      continue;
+
+    ++included;
+
+    if (item.label == "MITK version")
+      values << "MITK " + QString::fromStdString(item.value);
+    else if (item.label == "Operating system" || item.label == "GPU renderer")
+      values << QString::fromStdString(item.value);
+  }
+
+  {
+    const QSignalBlocker blocker(m_EnvironmentInclude);
+
+    if (included == 0)
+      m_EnvironmentInclude->setCheckState(Qt::Unchecked);
+    else if (included == m_EnvironmentItems.size())
+      m_EnvironmentInclude->setCheckState(Qt::Checked);
+    else
+      m_EnvironmentInclude->setCheckState(Qt::PartiallyChecked);
+  }
+
+  if (included == 0)
+  {
+    m_EnvironmentSummary->setText("None included.");
+  }
+  else
+  {
+    auto summary = values.join(", ");
+
+    if (included > static_cast<std::size_t>(values.size()))
+      summary += QString(values.isEmpty() ? "%1 items" : " and %1 more").arg(included - values.size());
+
+    if (included < m_EnvironmentItems.size())
+      summary += QString(" (%1 of %2 included)").arg(included).arg(m_EnvironmentItems.size());
+
+    m_EnvironmentSummary->setText(summary);
+  }
+
+  for (const auto& row : m_LogRows)
+  {
+    if (row.text == nullptr)
+      continue;
+
+    if (row.text->toPlainText() != row.originalText)
+    {
+      row.summary->setText(QString("%1 <span style=\"color: %2;\">Edited by you.</span>")
+        .arg(row.originalSummary.toHtmlEscaped(), QmitkIconTheme::GetAccentColor()));
+    }
+    else
+    {
+      row.summary->setText(row.originalSummary.toHtmlEscaped());
+    }
+  }
+
+#ifdef MITK_HAS_CRASHHANDLING
+  if (m_DumpSummary != nullptr)
+  {
+    m_DumpSummary->setText(QString("%1 of %2 included. A report with crash dumps goes by email only, since "
+      "they cannot be reviewed before sending.")
+      .arg(m_DumpList->GetCheckedDumps().size()).arg(m_Input.dumps.size()));
+  }
+#endif
+}
+
 void QmitkFeedbackDialog::UpdateConfirmations(const mitk::FeedbackReport& report)
 {
-  m_Controls->sharingConfirmationWidget->setVisible(report.NeedsSharingConfirmation());
+  m_SharingPanel->setVisible(report.NeedsSharingConfirmation());
 
   const bool hasAttachment = std::any_of(report.attachments.begin(), report.attachments.end(),
     [](const auto& attachment) { return attachment.included; });
   const bool hasLog = std::any_of(report.logs.begin(), report.logs.end(), [](const auto& log) { return log.included; });
 
-  m_Controls->publicSharingConfirmationWidget->setVisible(!hasAttachment && (hasLog || report.includeScreenshot));
+  m_PublicPanel->setVisible(!hasAttachment && (hasLog || report.includeScreenshot || !report.images.empty()));
 }
 
 void QmitkFeedbackDialog::UpdateHandoffEnabled(const mitk::FeedbackReport& report)
 {
   const bool writing = m_BundleWatcher.isRunning();
-  const bool ready = !writing && !report.description.empty() &&
-    (!report.NeedsSharingConfirmation() || report.sharingConfirmed);
+  const bool confirmed = !report.NeedsSharingConfirmation() || report.sharingConfirmed;
+  const bool ready = !writing && !report.description.empty() && confirmed;
 
-  m_Controls->openEmailButton->setEnabled(ready);
-  m_Controls->revealBundleButton->setEnabled(ready);
-  m_Controls->openIssueButton->setEnabled(ready && report.CanUsePublicTracker());
-  m_Controls->closeButton->setEnabled(!writing);
+  m_EmailButton->setEnabled(ready);
+  m_ShowBundleButton->setEnabled(ready);
+  m_IssueButton->setEnabled(ready && report.CanUsePublicTracker());
+  m_CloseButton->setEnabled(!writing);
 
-  QString reason;
+  QString hint;
 
-  if (!report.CanUsePublicTracker())
+  if (report.description.empty())
+  {
+    hint = "Describe the problem or idea to continue.";
+  }
+  else if (!confirmed)
+  {
+    hint = "Confirm that you may share the included items to continue.";
+  }
+  else if (!report.CanUsePublicTracker())
   {
     const bool hasAttachment = std::any_of(report.attachments.begin(), report.attachments.end(),
       [](const auto& attachment) { return attachment.included; });
 
-    reason = hasAttachment
+    hint = hasAttachment
       ? QString("Reports with crash dumps are sent by email.")
-      : QString("Confirm that the included log or screenshot may be published, or send by email.");
+      : QString("To open a GitHub issue, confirm that the included logs and images may be published.");
   }
 
-  m_Controls->gitHubReasonLabel->setText(reason);
+  m_GitHubReason->setText(hint);
+  m_GitHubReason->setVisible(!hint.isEmpty());
 }
 
 void QmitkFeedbackDialog::UpdateScreenshotPreview()
 {
-  const bool show = m_Controls->screenshotCheckBox->isChecked();
-  m_Controls->screenshotPreviewLabel->setVisible(show);
+  if (m_ScreenshotInclude == nullptr)
+    return;
+
+  const bool show = m_ScreenshotInclude->isChecked();
+  m_ScreenshotPreview->setVisible(show);
 
   if (!show)
     return;
 
-  const auto target = static_cast<mitk::ScreenshotTarget>(m_Controls->screenshotTargetComboBox->currentData().toInt());
+  const auto target = static_cast<mitk::ScreenshotTarget>(m_ScreenshotTarget->currentData().toInt());
   const auto& shot = target == mitk::ScreenshotTarget::EditorArea ? m_Input.editorShot : m_Input.windowShot;
 
-  m_Controls->screenshotPreviewLabel->setPixmap(
-    shot.scaled(QSize(360, 240), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  const auto ratio = this->devicePixelRatioF();
+  auto thumbnail = shot.scaled(QSize(320, 200) * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  thumbnail.setDevicePixelRatio(ratio);
+  m_ScreenshotPreview->setPixmap(thumbnail);
 }
 
 void QmitkFeedbackDialog::WriteBundleThen(Handoff handoff)
@@ -484,8 +1140,8 @@ void QmitkFeedbackDialog::WriteBundleThen(Handoff handoff)
   m_PendingReport = this->AssembleReport();
   m_PendingHandoff = std::move(handoff);
 
-  m_Controls->bundleProgressBar->setVisible(true);
-  m_Controls->bundleStatusLabel->setText("Saving the report bundle...");
+  m_BusyIndicator->setVisible(true);
+  m_Status->setText("Saving the report file...");
 
   m_BundleWatcher.setFuture(QtConcurrent::run(WriteBundle, m_PendingReport, m_PendingZipPath));
   this->UpdateHandoffEnabled(m_PendingReport);
@@ -493,7 +1149,7 @@ void QmitkFeedbackDialog::WriteBundleThen(Handoff handoff)
 
 void QmitkFeedbackDialog::OnBundleWritten()
 {
-  m_Controls->bundleProgressBar->setVisible(false);
+  m_BusyIndicator->setVisible(false);
 
   const auto error = m_BundleWatcher.result();
   const auto handoff = std::move(m_PendingHandoff);
@@ -504,8 +1160,8 @@ void QmitkFeedbackDialog::OnBundleWritten()
   if (!error.isEmpty())
   {
     QDir(QFileInfo(m_PendingZipPath).path()).removeRecursively();
-    m_Controls->bundleStatusLabel->setText("The report bundle could not be saved.");
-    QMessageBox::warning(this, this->windowTitle(), "The report bundle could not be saved.\n\n" + error);
+    m_Status->setText("The report file could not be saved.");
+    QMessageBox::warning(this, this->windowTitle(), "The report file could not be saved.\n\n" + error);
     return;
   }
 
@@ -525,11 +1181,11 @@ void QmitkFeedbackDialog::OnBundleWritten()
 
   if (size > LargeBundleSize)
   {
-    status += " The bundle is larger than 25 MB: GitHub and many mail servers reject attachments that large."
-              " Reveal it to pass it on another way.";
+    status += QString(" <span style=\"color: %1;\">It is larger than 25 MB, which GitHub and many mail servers "
+      "reject. Use Show report file to pass it on another way.</span>").arg(WarningColor());
   }
 
-  m_Controls->bundleStatusLabel->setText(status);
+  m_Status->setText(status);
 
   handoff(m_BundlePath, m_PendingReport);
 }
@@ -553,7 +1209,7 @@ void QmitkFeedbackDialog::OnOpenIssue()
       "&body=" + EncodeQueryValue(fields.body) + "&labels=" + EncodeQueryValue(fields.labels));
 
     if (!QDesktopServices::openUrl(url))
-      this->OfferReveal("your web browser", zipPath);
+      this->OfferShowBundle("your web browser", zipPath);
   });
 }
 
@@ -567,27 +1223,27 @@ void QmitkFeedbackDialog::OnOpenEmail()
       EncodeQueryValue(fields.subject) + "&body=" + EncodeQueryValue(fields.body));
 
     if (!QDesktopServices::openUrl(url))
-      this->OfferReveal("your mail program", zipPath);
+      this->OfferShowBundle("your mail program", zipPath);
   });
 }
 
-void QmitkFeedbackDialog::OnRevealBundle()
+void QmitkFeedbackDialog::OnShowBundle()
 {
   this->WriteBundleThen([](const QString& zipPath, const mitk::FeedbackReport&) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(zipPath).path()));
   });
 }
 
-void QmitkFeedbackDialog::OfferReveal(const QString& application, const QString& zipPath)
+void QmitkFeedbackDialog::OfferShowBundle(const QString& application, const QString& zipPath)
 {
   QMessageBox box(QMessageBox::Warning, this->windowTitle(),
-    QString("MITK could not start %1. The report bundle %2 has been saved; you can send it in another way.")
+    QString("MITK could not start %1. The report file %2 has been saved; you can send it in another way.")
       .arg(application, QFileInfo(zipPath).fileName()),
     QMessageBox::Close, this);
 
-  auto* revealButton = box.addButton("Reveal bundle", QMessageBox::AcceptRole);
+  auto* showButton = box.addButton("Show report file", QMessageBox::AcceptRole);
   box.exec();
 
-  if (box.clickedButton() == revealButton)
+  if (box.clickedButton() == showButton)
     QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(zipPath).path()));
 }

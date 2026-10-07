@@ -265,7 +265,10 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
     ? nullptr
     : dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
 
-  m_Controls->widget_statistics->SetLabelsCheckable(statistics == nullptr || HasHistograms(statistics));
+  // While statistics are computed, the check boxes keep their state instead of appearing until
+  // statistics without histograms arrive.
+  if (statistics != nullptr)
+    m_Controls->widget_statistics->SetLabelsCheckable(HasHistograms(statistics));
 
   // An open planar figure shows the intensity profile instead of the histogram.
   if (planarFigure != nullptr && !planarFigure->IsClosed())

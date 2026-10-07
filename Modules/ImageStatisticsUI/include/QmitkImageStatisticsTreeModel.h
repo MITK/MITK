@@ -315,6 +315,10 @@ private:
     /** @sa m_TimeStepResolvedImageNodes */
     std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
+    /** True once m_StatisticNames stem from complete statistics of the current inputs. Computing
+    them again, e.g. after an edit of the mask, does not change which statistics they have, so the
+    columns are kept meanwhile. Reset whenever the inputs change. */
+    bool m_InputStatisticNamesKnown = false;
     /** Decimal places of each statistic column, in the order of m_StatisticNames. Chosen per
     column so that the values of a column line up at the decimal point. */
     std::vector<int> m_ColumnDecimals;

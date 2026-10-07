@@ -254,6 +254,7 @@ QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
 void QmitkImageStatisticsTreeModel::DataStorageChanged()
 {
   emit beginResetModel();
+  m_InputStatisticNamesKnown = false;
   UpdateByDataStorage();
   emit endResetModel();
   emit modelChanged();
@@ -527,6 +528,7 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
   emit beginResetModel();
   m_TimeStepResolvedImageNodes = std::move(tempNodes);
   m_ImageNodes = nodes;
+  m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
@@ -558,6 +560,7 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
   emit beginResetModel();
   m_TimeStepResolvedMaskNodes = std::move(tempNodes);
   m_MaskNodes = nodes;
+  m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
@@ -575,6 +578,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   m_MaskNodes.clear();
   m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
+  m_InputStatisticNamesKnown = false;
   m_ColumnDecimals.clear();
   m_CheckedLabelValues.reset();
   emit endResetModel();
@@ -710,11 +714,18 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
     }
   }
 
+  const auto expectedStatisticsCount = m_ImageNodes.size() * std::max<std::size_t>(1, m_MaskNodes.size());
+  const bool isComplete = newStatistics.size() == expectedStatisticsCount &&
+    std::none_of(newStatistics.cbegin(), newStatistics.cend(), [](const auto& statistics) { return statistics->IsWIP(); });
+
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
 
-    m_StatisticNames = GetOfferedStatisticNames(m_Statistics);
+    if (isComplete || !m_InputStatisticNamesKnown)
+      m_StatisticNames = GetOfferedStatisticNames(m_Statistics);
+
+    m_InputStatisticNamesKnown = m_InputStatisticNamesKnown || isComplete;
     BuildHierarchicalModel();
     m_BuildTime.Modified();
   }

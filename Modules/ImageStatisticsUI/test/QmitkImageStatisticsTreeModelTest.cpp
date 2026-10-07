@@ -65,6 +65,7 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(FailedStatistics_ImageRowShowsErrorAndReason);
   MITK_TEST(FailedStatistics_MaskRowShowsErrorAndReason);
   MITK_TEST(ShownComputationFails_ModelShowsTheFailure);
+  MITK_TEST(SameInputsComputedAgain_ColumnsAreKept);
   CPPUNIT_TEST_SUITE_END();
 
   QLocale m_DefaultLocale;
@@ -1036,6 +1037,32 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::string("N/A"), Text(model, model.index(0, 1)));
     CPPUNIT_ASSERT_EQUAL(std::string("Mask is off the grid"), ToolTipOf(model, model.index(0, 0)));
+  }
+
+  void SameInputsComputedAgain_ColumnsAreKept()
+  {
+    auto imageNode = this->AddImageNode("RGB image");
+    this->AddStatisticsContainer(imageNode, CreateVoxelCountStatistics());
+
+    QmitkImageStatisticsTreeModel model;
+    model.SetDataStorage(m_DataStorage);
+    model.SetImageNodes({ imageNode.GetPointer() });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the result was not picked up.", 3, model.columnCount());
+
+    // An edit outdates the statistics before the computation of new ones starts.
+    imageNode->GetData()->Modified();
+    imageNode->Modified();
+    CPPUNIT_ASSERT_EQUAL(3, model.columnCount());
+
+    this->AddStatisticsContainer(imageNode, std::nullopt);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition failed: the placeholder was not picked up.",
+      std::string("..."), Text(model, model.index(0, 1)));
+    CPPUNIT_ASSERT_EQUAL(3, model.columnCount());
+
+    this->AddStatisticsContainer(imageNode, CreateVoxelCountStatistics());
+    CPPUNIT_ASSERT_EQUAL(std::string("1000"), Text(model, model.index(0, 1)));
+    CPPUNIT_ASSERT_EQUAL(3, model.columnCount());
   }
 };
 

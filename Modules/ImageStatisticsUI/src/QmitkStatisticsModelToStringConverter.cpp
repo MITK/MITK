@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 QmitkStatisticsModelToStringConverter::QmitkStatisticsModelToStringConverter() {}
 
-void QmitkStatisticsModelToStringConverter::SetModel(QmitkImageStatisticsTreeModel *model)
+void QmitkStatisticsModelToStringConverter::SetModel(const QAbstractItemModel *model)
 {
   m_statisticsModel = model;
 }
@@ -70,7 +70,7 @@ void QmitkStatisticsModelToStringConverter::SetIncludeHeaderData(bool includeHea
 }
 
 QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
-                                                       const QmitkImageStatisticsTreeModel *model,
+                                                       const QAbstractItemModel *model,
                                                        QString label) const
 {
   QString content;

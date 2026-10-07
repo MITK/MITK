@@ -37,11 +37,16 @@ found in the LICENSE file.
 #include <QColor>
 
 #include <mitkImageStatisticsContainerManager.h>
+#include <mitkIPreferences.h>
 #include <mitkPlanarFigureInteractor.h>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
 namespace {
+  /** Preferences node whose keys are the statistics hidden in the table. Statistic keys
+  are stored as preference keys, so they need no escaping, unlike in a delimited list. */
+  const std::string HIDDEN_STATISTICS_NODE = "hidden statistics";
+
   bool CheckPlanarFigureMatchesGeometry(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry)
   {
     if (!planarFigure || !imageGeometry)
@@ -77,6 +82,8 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls->setupUi(parent);
+  m_Controls->groupBox_histogram->installEventFilter(this);
+  m_Controls->groupBox_intensityProfile->installEventFilter(this);
   m_Controls->widget_intensityProfile->SetTheme(GetColorTheme());
   m_Controls->groupBox_histogram->setVisible(false);
   m_Controls->groupBox_intensityProfile->setVisible(false);
@@ -90,6 +97,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_DataGenerator->SetDataStorage(this->GetDataStorage());
   m_DataGenerator->SetAutoUpdate(true);
   m_Controls->widget_statistics->SetDataStorage(this->GetDataStorage());
+  this->LoadHiddenStatistics();
 
   m_Controls->imageNodesSelector->SetDataStorage(this->GetDataStorage());
   m_Controls->imageNodesSelector->SetNodePredicate(mitk::GetImageStatisticsImagePredicate());
@@ -135,6 +143,8 @@ void QmitkImageStatisticsView::CreateConnections()
     this, &QmitkImageStatisticsView::UpdateHistogramWidget);
   connect(m_Controls->widget_statistics, &QmitkImageStatisticsWidget::InputDisplayChanged,
     this, &QmitkImageStatisticsView::UpdateHistogramWidget);
+  connect(m_Controls->widget_statistics, &QmitkImageStatisticsWidget::HiddenStatisticsChanged,
+    this, &QmitkImageStatisticsView::SaveHiddenStatistics);
 
   connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]
   {
@@ -296,6 +306,44 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
 
   m_Controls->widget_histogram->SetHistograms(series);
   m_Controls->groupBox_histogram->setVisible(true);
+}
+
+void QmitkImageStatisticsView::LoadHiddenStatistics()
+{
+  auto* preferences = this->GetPreferences();
+
+  if (nullptr == preferences)
+    return;
+
+  const auto keys = preferences->Node(HIDDEN_STATISTICS_NODE)->Keys();
+  m_Controls->widget_statistics->SetHiddenStatistics({ keys.begin(), keys.end() });
+}
+
+void QmitkImageStatisticsView::SaveHiddenStatistics()
+{
+  auto* preferences = this->GetPreferences();
+
+  if (nullptr == preferences)
+    return;
+
+  auto* node = preferences->Node(HIDDEN_STATISTICS_NODE);
+  node->Clear();
+
+  for (const auto& key : m_Controls->widget_statistics->GetHiddenStatistics())
+    node->PutBool(key, true);
+
+  node->Flush();
+}
+
+bool QmitkImageStatisticsView::eventFilter(QObject* watched, QEvent* event)
+{
+  if (QEvent::ShowToParent == event->type() || QEvent::HideToParent == event->type())
+  {
+    m_Controls->widget_plots->setVisible(!m_Controls->groupBox_histogram->isHidden()
+      || !m_Controls->groupBox_intensityProfile->isHidden());
+  }
+
+  return QmitkAbstractView::eventFilter(watched, event);
 }
 
 QmitkPlotStyle QmitkImageStatisticsView::GetColorTheme() const

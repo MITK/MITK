@@ -264,8 +264,6 @@ namespace mitk
 
     for (const auto &container : containers)
     {
-      std::set<std::string> customKeys;
-
       auto labelValues = container->GetExistingLabelValues();
 
       for (const auto labelValue : labelValues)
@@ -278,13 +276,11 @@ namespace mitk
           customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
         }
       }
-
-      names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
     }
 
     names.insert(names.end(), customKeys.begin(), customKeys.end());
 
     return names;
-  };
+  }
 
 } // namespace mitk

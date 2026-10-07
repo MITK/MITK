@@ -20,8 +20,10 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <memory>
+#include <set>
+#include <string>
 
-class QSortFilterProxyModel;
+class QMenu;
 class QmitkImageStatisticsTreeModel;
 
 namespace Ui
@@ -32,9 +34,10 @@ namespace Ui
 /**
  * \brief Widget for displaying image statistics in a tree view with clipboard export.
  *
- * This widget wraps a QmitkImageStatisticsTreeModel in a sortable tree view and provides
- * controls for ignoring zero-valued voxels and copying statistics to the clipboard.
- * It automatically enables its controls when statistics data becomes available.
+ * This widget wraps a QmitkImageStatisticsTreeModel in a tree view and provides controls for
+ * ignoring zero-valued voxels, choosing the shown statistics, and copying the shown
+ * statistics to the clipboard. It automatically enables its controls when statistics data
+ * becomes available.
  *
  * \sa QmitkImageStatisticsTreeModel
  * \sa QmitkHistogramVisualizationWidget
@@ -114,9 +117,22 @@ public:
    */
   bool IsLabelChecked(mitk::ImageStatisticsContainer::LabelValueType labelValue) const;
 
+  /**
+   * \brief Hides the columns of the given statistics in the table and in the clipboard export.
+   *
+   * Keys that none of the current statistics has are kept, so the choice also holds for
+   * inputs that are selected later.
+   *
+   * \param[in] keys Statistic keys as used by mitk::ImageStatisticsConstants.
+   */
+  void SetHiddenStatistics(const std::set<std::string>& keys);
+
+  /** \brief Returns the keys of the hidden statistics. \sa SetHiddenStatistics */
+  std::set<std::string> GetHiddenStatistics() const;
+
 signals:
   /**
-   * \brief Emitted when the user toggles the "ignore zero-valued voxels" checkbox.
+   * \brief Emitted when the user toggles the "Ignore 0-value voxels" checkbox.
    * \param[in] status The new checkbox state.
    */
   void IgnoreZeroValuedVoxelStateChanged(Qt::CheckState status);
@@ -130,15 +146,30 @@ signals:
    */
   void InputDisplayChanged();
 
+  /** \brief Emitted when the user changed which statistics are hidden. */
+  void HiddenStatisticsChanged();
+
 private:
+  class StatisticsFilterProxyModel;
+
   void CreateConnections();
   void OnDataAvailable();
 
   /** \brief  Saves the image statistics to the clipboard */
   void OnClipboardButtonClicked();
 
+  /** Fills the menu with the statistics to show or hide. If tableColumn denotes a statistic
+  column of the table, the menu starts with actions that act on just this statistic. */
+  void PopulateStatisticsMenu(QMenu* menu, int tableColumn = 0);
+
+  /** Hides the given statistics, updates the dependent controls and notifies listeners. */
+  void ChangeHiddenStatistics(const std::set<std::string>& keys);
+
+  void ResizeColumnsToContents();
+  void UpdateStatisticsFilterButton();
+
   std::unique_ptr<Ui::QmitkImageStatisticsControls> m_Controls;
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
-  QSortFilterProxyModel *m_ProxyModel;
+  StatisticsFilterProxyModel *m_ProxyModel;
 };
 #endif

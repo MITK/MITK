@@ -36,15 +36,17 @@ After selection of an image, the image statistics are calculated and displayed i
 
 An example of parts of the calculated statistical features (Mean, Median, Std. dev., RMS, Max, Max position, Min, Min position, Voxels, Volume [mm³], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
 
-Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. Hover over a value to see it unrounded. The "Copy to clipboard" button exports the unrounded values under the technical keys of the statistics.
+Hover over a column header to see what the column stands for. The values of a column share a fixed number of decimal places, chosen so that the largest value of the column is shown with a useful precision. Hover over a value to see it unrounded. The "Copy to clipboard" button exports the unrounded values of the shown statistics under their technical keys.
+
+To focus on the statistics you need, choose the shown statistics with the "Statistics" button above the table. The menu stays open while you check or uncheck statistics. Alternatively, right-click a column header to show only this statistic, to hide it, or to show all statistics again. While statistics are hidden, the button tells how many are shown, e.g. "Statistics (3 of 17)". Your choice is remembered across sessions.
 
 \imageMacro{QmitkImageStatistics_statistics.png, "Example of parts of the statistics for different masks and timestamps", 1.00}
 
-Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
+Check "Ignore 0-value voxels" to exclude voxels with the gray value zero from the statistics and the histogram.
 
 \subsection QmitkImageStatisticHistogram Histogram
 
-Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
+Beneath the statistics window is the histogram window, which shows the histogram of the current selection. Drag the boundary between the two windows to give the histogram more or less height. The histogram keeps its height when the view is resized, while the statistics window takes the remaining space.
 
 The histogram is only available for a single image with no or one ROI. When multiple images or multiple ROIs are selected, the histogram section is hidden.
 
@@ -60,6 +62,7 @@ A tooltip is available by hovering over one of the bins.
 
 The "Statistics" and "Histogram" sections each have a "Copy to clipboard" button, allowing to copy the respective data in tabular text format to the clipboard.
 Be aware of the following information regarding this functionality:
+\li Only the statistics shown in the table are copied.
 \li The values are separated by tabulator.
 \li  Numeric values will be converted using the system language (e.g. with German as system language the decimal separator will be ",", with English it will be '.').
 \li  One can directly copy'n'paste into Excel (and alike) as long as Excel supports/is configured to the system language

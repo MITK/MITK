@@ -46,7 +46,8 @@ private:
     QString Text;
   };
 
-  QWidget* CreateCard(const QString& pictogram, const QString& title, const QString& text, QWidget* action);
+  /** A card with the pictogram at resource \p path. */
+  QWidget* CreateCard(const QString& path, const QString& title, const QString& text, QWidget* action);
   QWidget* CreateButton(const QString& text, void (QmitkWelcomeContributePage::*onClicked)());
   QWidget* CreateLinks(const std::vector<Link>& links);
   QString CreateLinksText(const std::vector<Link>& links) const;

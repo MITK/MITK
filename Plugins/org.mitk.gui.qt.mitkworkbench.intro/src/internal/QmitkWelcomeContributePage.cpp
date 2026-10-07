@@ -39,26 +39,27 @@ QmitkWelcomeContributePage::QmitkWelcomeContributePage(const QmitkWelcomePalette
 {
   std::vector<QWidget*> cards;
 
-  cards.push_back(this->CreateCard("feedback.svg", "Report a bug or an idea",
+  // The feedback dialog's own pictogram, from org.mitk.gui.qt.ext.
+  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.ext/feedback/bug.svg", "Report a bug or an idea",
     "Something not working, or a feature missing? Tell us in a few clicks. "
     "You see everything before it leaves your computer.",
     this->CreateButton("Send Feedback...", &QmitkWelcomeContributePage::OnSendFeedback)));
 
 #ifdef MITK_HAS_CRASHHANDLING
-  cards.push_back(this->CreateCard("diagnostics.svg", "Share crash data",
+  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.welcomescreen/img/contribute/diagnostics.svg", "Share crash data",
     "If MITK crashed or froze, the saved diagnostic data shows us what went wrong. "
     "It stays on your computer until you decide to share it.",
     this->CreateButton("Diagnostic Data...", &QmitkWelcomeContributePage::OnShowDiagnosticData)));
 #endif
 
-  cards.push_back(this->CreateCard("code.svg", "Contribute code or docs",
+  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.welcomescreen/img/contribute/code.svg", "Contribute code or docs",
     "MITK is open source. Fix a bug, add a feature, or improve the documentation with us.",
     this->CreateLinks({
       { "https://github.com/MITK/MITK/blob/master/CONTRIBUTING.md", "Contribution guide" },
       { "https://docs.mitk.org/nightly/DeveloperManualPortal.html", "Developer manual" } })));
 
   // GitHub renders the repository's CITATION.cff as "Cite this repository".
-  cards.push_back(this->CreateCard("cite.svg", "Cite MITK",
+  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.welcomescreen/img/contribute/cite.svg", "Cite MITK",
     "Does MITK support your research? A citation helps us keep it going.",
     this->CreateLinks({
       { "https://doi.org/10.1007/s11548-013-0840-8", "Paper (IJCARS 2013)" },
@@ -96,9 +97,8 @@ void QmitkWelcomeContributePage::SetPalette(const QmitkWelcomePalette& palette)
     label->setText(this->CreateLinksText(links));
 }
 
-QWidget* QmitkWelcomeContributePage::CreateCard(const QString& pictogram, const QString& title, const QString& text, QWidget* action)
+QWidget* QmitkWelcomeContributePage::CreateCard(const QString& path, const QString& title, const QString& text, QWidget* action)
 {
-  const auto path = ":/org.mitk.gui.qt.welcomescreen/img/contribute/" + pictogram;
 
   auto* pictogramLabel = new QLabel;
   pictogramLabel->setFixedSize(PictogramSize, PictogramSize);

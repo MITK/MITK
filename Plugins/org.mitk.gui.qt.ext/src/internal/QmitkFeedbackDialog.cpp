@@ -1330,6 +1330,7 @@ void QmitkFeedbackDialog::OnBundleWritten()
       "reject. Use Show report file to pass it on another way.</span>").arg(WarningColor());
   }
 
+  m_BundleStatus = status;
   m_Status->setText(status);
 
   handoff(m_BundlePath, m_PendingReport);
@@ -1353,7 +1354,9 @@ void QmitkFeedbackDialog::OnOpenIssue()
     const auto url = QUrl::fromEncoded("https://github.com/MITK/MITK/issues/new?title=" + EncodeQueryValue(fields.title) +
       "&body=" + EncodeQueryValue(fields.body) + "&labels=" + EncodeQueryValue(fields.labels));
 
-    if (!QDesktopServices::openUrl(url))
+    if (QDesktopServices::openUrl(url))
+      this->ShowBundleForAttaching(zipPath, "Drag it into the issue text before submitting.");
+    else
       this->OfferShowBundle("your web browser", zipPath);
   });
 }
@@ -1367,7 +1370,9 @@ void QmitkFeedbackDialog::OnOpenEmail()
     const auto url = QUrl::fromEncoded("mailto:" + QByteArray::fromStdString(fields.recipient) + "?subject=" +
       EncodeQueryValue(fields.subject) + "&body=" + EncodeQueryValue(fields.body));
 
-    if (!QDesktopServices::openUrl(url))
+    if (QDesktopServices::openUrl(url))
+      this->ShowBundleForAttaching(zipPath, "Attach it to the mail before sending.");
+    else
       this->OfferShowBundle("your mail program", zipPath);
   });
 }
@@ -1377,6 +1382,14 @@ void QmitkFeedbackDialog::OnShowBundle()
   this->WriteBundleThen([](const QString& zipPath, const mitk::FeedbackReport&) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(zipPath).path()));
   });
+}
+
+void QmitkFeedbackDialog::ShowBundleForAttaching(const QString& zipPath, const QString& instruction)
+{
+  // Neither a mailto: nor a new-issue URL can carry a file. The bundle is
+  // alone in its folder, so opening the folder shows the file to drag.
+  QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(zipPath).path()));
+  m_Status->setText(m_BundleStatus + " <b>" + instruction.toHtmlEscaped() + "</b>");
 }
 
 void QmitkFeedbackDialog::OfferShowBundle(const QString& application, const QString& zipPath)

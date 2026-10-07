@@ -27,6 +27,7 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
   MITK_TEST(BundleFileNameMustBeBare);
   MITK_TEST(MailGoesToTheTeamWithAShortBody);
   MITK_TEST(UserImagesMayGoToGitHub);
+  MITK_TEST(BodiesOpenWithAReminderToAttachTheBundle);
   CPPUNIT_TEST_SUITE_END();
 
   const std::string m_Bundle = "mitk-report-20261006-120000.zip";
@@ -142,7 +143,7 @@ public:
     CPPUNIT_ASSERT(Contains(bug, "2026.06 (v2026.06-1-gabc)"));
     CPPUNIT_ASSERT(Contains(bug, "Test OS 1"));
     CPPUNIT_ASSERT(!Contains(bug, "x86_64"));
-    CPPUNIT_ASSERT(Contains(bug, "Bundle file: " + m_Bundle + " - please attach it to this issue"));
+    CPPUNIT_ASSERT(Contains(bug, "Bundle file: " + m_Bundle + "\n"));
     CPPUNIT_ASSERT(Contains(bug, "This session"));
     CPPUNIT_ASSERT_MESSAGE("logs never go into the URL", !Contains(bug, "secret log line"));
 
@@ -222,6 +223,19 @@ public:
       CPPUNIT_ASSERT_MESSAGE(std::to_string(encoded), encoded <= 1900);
       CPPUNIT_ASSERT(Contains(mail.body, m_Bundle));
     }
+  }
+
+  void BodiesOpenWithAReminderToAttachTheBundle()
+  {
+    // Neither hand-off can attach a file, so the body is the last place
+    // that reminds the user to do so before sending.
+    auto report = Report();
+    const auto issue = mitk::BuildGitHubIssueFields(report, m_Bundle).body;
+    CPPUNIT_ASSERT_MESSAGE(issue, issue.rfind("**Before submitting:** drag " + m_Bundle + " ", 0) == 0);
+
+    report.description = std::string(20000, 'x');
+    const auto mail = mitk::BuildMailFields(report, m_Bundle).body;
+    CPPUNIT_ASSERT_MESSAGE(mail, mail.rfind("[Before sending: attach " + m_Bundle + " ", 0) == 0);
   }
 };
 

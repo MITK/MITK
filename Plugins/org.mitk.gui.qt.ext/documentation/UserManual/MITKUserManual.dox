@@ -79,8 +79,8 @@ Logs, screenshots, images, and crash dumps can contain patient-related informati
 The report is handed off by a program of your choice:
 
 <ul>
-  <li><b>Email to the MITK team...</b> saves the report as a .zip file and opens your mail program with a message to the MITK team. Attach the .zip file to the message before sending it.</li>
-  <li><b>Open GitHub issue...</b> saves the .zip file and opens a prefilled issue on GitHub in your web browser. Attach the .zip file there. GitHub issues are public, so this is only available without crash dumps, and an included log, screenshot, or image needs your additional confirmation that it may be published.</li>
+  <li><b>Email to the MITK team...</b> saves the report as a .zip file and opens your mail program with a message to the MITK team, and the folder that contains the file. Mail programs cannot be handed a file this way, so drag the .zip file into the message before sending it; a note at the top of the message reminds you and can then be deleted.</li>
+  <li><b>Open GitHub issue...</b> saves the .zip file and opens a prefilled issue on GitHub in your web browser. It also opens the folder that contains the file: drag the .zip file into the issue text before submitting. GitHub issues are public, so this is only available without crash dumps, and an included log, screenshot, or image needs your additional confirmation that it may be published.</li>
   <li><b>Show report file</b> saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
 </ul>
 

@@ -185,6 +185,10 @@ private:
   void OnOpenEmail();
   void OnShowBundle();
 
+  /** Opens the folder of the bundle at \p zipPath and adds \p instruction
+   *  to the status line. */
+  void ShowBundleForAttaching(const QString& zipPath, const QString& instruction);
+
   /** Tells the user that \p application could not be started and offers to
    *  show the bundle instead. */
   void OfferShowBundle(const QString& application, const QString& zipPath);
@@ -251,6 +255,7 @@ private:
   unsigned int m_Generation = 0;
   unsigned int m_BundleGeneration = 0;
   QString m_BundlePath;
+  QString m_BundleStatus;
   std::vector<std::filesystem::path> m_BundleAttachments;
 
   QFutureWatcher<QString> m_BundleWatcher;

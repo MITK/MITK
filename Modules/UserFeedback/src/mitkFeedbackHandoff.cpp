@@ -200,7 +200,7 @@ namespace
   {
     std::ostringstream context;
     context << "**Additional context**\n"
-            << "Bundle file: " << bundleFileName << " - please attach it to this issue\n"
+            << "Bundle file: " << bundleFileName << '\n'
             << BundleContents(report) << '\n';
 
     bool hasEnvironment = false;
@@ -253,11 +253,16 @@ namespace
   }
 
   std::string BuildIssueBody(const mitk::FeedbackReport& report, const std::string& description,
-    const std::string& additionalContext)
+    const std::string& bundleFileName, const std::string& additionalContext)
   {
-    return report.category == mitk::FeedbackCategory::Bug
+    // On top, because a prefilled issue cannot carry the bundle and the
+    // user may not read down to the additional context before submitting.
+    const auto reminder = "**Before submitting:** drag " + bundleFileName +
+      " from the folder MITK opened into this text box to attach it, then delete this note.\n\n";
+
+    return reminder + (report.category == mitk::FeedbackCategory::Bug
       ? BuildBugBody(report, description, additionalContext)
-      : BuildFeatureBody(description, additionalContext);
+      : BuildFeatureBody(description, additionalContext));
   }
 }
 
@@ -278,10 +283,10 @@ mitk::GitHubIssueFields mitk::BuildGitHubIssueFields(const FeedbackReport& repor
   fields.labels = report.category == FeedbackCategory::Bug ? "bug" : "enhancement";
 
   const auto additionalContext = AdditionalContext(report, bundleFileName);
-  const auto frame = EncodedLength(BuildIssueBody(report, std::string(), additionalContext));
+  const auto frame = EncodedLength(BuildIssueBody(report, std::string(), bundleFileName, additionalContext));
   const auto room = MaxEncodedIssueBodyLength > frame ? MaxEncodedIssueBodyLength - frame : 0;
 
-  fields.body = BuildIssueBody(report, Shorten(report.description, room), additionalContext);
+  fields.body = BuildIssueBody(report, Shorten(report.description, room), bundleFileName, additionalContext);
 
   return fields;
 }
@@ -294,7 +299,11 @@ mitk::MailFields mitk::BuildMailFields(const FeedbackReport& report, const std::
   std::transform(category.begin(), category.end(), category.begin(),
     [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
-  const auto head = "Hello MITK team,\n\nplease find my " + category + " attached as " + bundleFileName + ".\n\n";
+  // A mailto: URL cannot carry the bundle, so the body reminds the user to
+  // attach it.
+  const auto head = "[Before sending: attach " + bundleFileName +
+    " from the folder MITK opened, then delete this note.]\n\n"
+    "Hello MITK team,\n\nplease find my " + category + " attached as " + bundleFileName + ".\n\n";
   const auto tail = "\n\n" + BundleContents(report) + "\n";
   MailFields fields;
   fields.recipient = GetFeedbackMailRecipient();

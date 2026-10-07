@@ -391,19 +391,21 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Stripping is **disabled** globally (`CPACK_STRIP_FILES OFF`). See the \ref CppMicroServicesResourcesSection section for the detailed explanation of why this is necessary and how it could be improved in the future.
+Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it.
+
+Windows and macOS packages are not stripped: MSVC has no strip step, and the macOS bundle post-processing has not been verified with stripped binaries yet.
 
 ### Debug Symbols and Symbol Archiving
 
 Release builds emit debug symbols for MITK's own code when `MITK_RELEASE_DEBUG_SYMBOLS` is `ON` (the default, forwarded from the SuperBuild): PDBs on MSVC, split DWARF on GCC/Clang, dSYM on macOS. Optimization and inlining are unchanged. Prebuilt third-party dependencies under `ep/` (ITK, VTK, Qt, ...) are built without these flags, so a crash inside them resolves to name-plus-offset only.
 
-These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux and macOS the binaries are not stripped (see Strip Policy above), so they retain their symbol tables, but split DWARF keeps the bulk of the debug info out of the shipped binary. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
+These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux the shipped binaries are stripped (see Strip Policy above), so neither their symbol tables nor the skeleton DWARF that refers to the split DWARF survive in the package. On macOS the binaries are not stripped, but split DWARF keeps the bulk of the debug info out of them as well. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
 
 ```
 cmake --build <build-tree> --config Release --target package-symbols
 ```
 
-This writes `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` (e.g. `MITK-2025.12.99-windows-x86_64-symbols.zip`) next to the other CPack artifacts, collecting the MITK-built PDBs / `.dwp` / `.dSYM` from the build-tree runtime output directory (test drivers excluded). The archive name is paired with the release binary by construction.
+This writes `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` (e.g. `MITK-2025.12.99-windows-x86_64-symbols.zip`) next to the other CPack artifacts, collecting from the build-tree runtime output directory (test drivers excluded) the MITK-built PDBs on Windows, the unstripped binaries together with their `.dwp` sidecars on Linux, and the `.dSYM` bundles on macOS. The archive name is paired with the release binary by construction.
 
 **Release / CI responsibility:** the release pipeline must run `package-symbols` for every released or tagged build, against the same build tree that produced the shipped binaries — the target globs the build-tree runtime output, so it must run after linking and before any cleanup — then archive the resulting `*-symbols.zip` for at least as long as that release is supported. A minidump is only decodable against symbols built from the exact same sources, and a missing archive cannot be reconstructed later. Nightly or throwaway builds do not need archived symbols; released binaries do.
 

@@ -117,6 +117,33 @@ if(MITK_USE_Qt6 AND _mitk_executable_targets)
 endif()
 
 #-----------------------------------------------------------------------------
+# Strip MITK's own libraries again after the Qt deployment.
+#
+# On Linux, qt_deploy_runtime_dependencies() resolves the dependencies of the
+# build-tree executable and copies them into the package, which replaces the
+# stripped copies of MITK's own libraries with the unstripped build-tree
+# files. Excluding them from that resolution is not an option: the exclusion
+# also stops the search below them, so Qt modules reached only through MITK
+# libraries would lose their plugins. CMake strips only what install(TARGETS)
+# installs, hence the second pass.
+#-----------------------------------------------------------------------------
+
+if(LINUX AND CMAKE_STRIP)
+  install(CODE "
+    if(CMAKE_INSTALL_DO_STRIP)
+      file(GLOB _mitk_libraries \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so\")
+      foreach(_library \${_mitk_libraries})
+        get_filename_component(_name \"\${_library}\" NAME)
+        set(_installed \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${MITK_INSTALL_BINDIR}/\${_name}\")
+        if(EXISTS \"\${_installed}\")
+          execute_process(COMMAND \"${CMAKE_STRIP}\" \"\${_installed}\")
+        endif()
+      endforeach()
+    endif()
+  ")
+endif()
+
+#-----------------------------------------------------------------------------
 # Reset RUNPATH of bundled CTK core libraries on Linux.
 #
 # CTK has INSTALL_COMMAND "" in CMakeExternals/CTK.cmake, so CTK_DIR points

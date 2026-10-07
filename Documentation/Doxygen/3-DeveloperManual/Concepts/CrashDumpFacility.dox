@@ -430,8 +430,9 @@ function-name-plus-offset only, while MITK frames resolve to file and line.
 \subsection CrashDumpFacilityPage_Symbols_Archive Archiving symbols
 
 The installers do not ship the symbols. On Windows the debug info lives in
-separate PDBs that are never installed; on Linux and macOS the binaries are
-not stripped (see \ref PackagingPage), so they keep their symbol tables while
+separate PDBs that are never installed; on Linux the shipped binaries are
+stripped (see \ref PackagingPage), which also removes the skeleton DWARF that
+refers to the split DWARF; on macOS the binaries keep their symbol tables while
 split DWARF holds the bulk of the debug info outside them. Either way the full
 symbols must be archived separately, by the \c package-symbols target:
 

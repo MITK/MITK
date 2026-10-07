@@ -85,9 +85,18 @@ void QmitkDataGeneratorBase::SetAutoUpdate(bool autoUpdate)
   m_AutoUpdate = autoUpdate;
 }
 
-void QmitkDataGeneratorBase::OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const
+void QmitkDataGeneratorBase::OnJobError(const QString& error, const QmitkDataGenerationJobBase* failedJob, mitk::DataNode* placeholderNode) const
 {
+  // A failed placeholder settles its pair, so the job is not restarted over and over.
+  // Only the node itself is observed by the data storage, and observers like the
+  // statistics tree compare the modification time of the data.
+  placeholderNode->GetData()->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_FAILED));
+  placeholderNode->GetData()->Modified();
+  placeholderNode->Modified();
+
   emit JobError(error, failedJob);
+
+  this->EnsureRecheckingAndGeneration();
 }
 
 void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const
@@ -234,35 +243,43 @@ bool QmitkDataGeneratorBase::DoGenerate() const
     {
       this->IndicateFutureResults(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
 
-      if (everythingValid)
-      {
-        m_WIP = true;
-        everythingValid = false;
-      }
-
       MITK_DEBUG << "No valid result available. Requesting next necessary job." << imageAndSeg.first->GetName();
       auto nextJob = this->GetNextMissingGenerationJob(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
 
-      //other jobs are pending, nothing has to be done
-      if (nextJob.first==nullptr && nextJob.second.IsNotNull())
+      // Without a placeholder the pair is settled, e.g. because its generation failed.
+      if (nextJob.second.IsNotNull())
       {
-        MITK_DEBUG << "Last generation job still running, pass on till job is finished...";
-      }
-      else if(nextJob.first != nullptr && nextJob.second.IsNotNull())
-      {
-        MITK_DEBUG << "Next generation job started...";
-        nextJob.first->setAutoDelete(true);
-        nextJob.second->GetData()->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
-        connect(nextJob.first, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError, Qt::BlockingQueuedConnection);
-        connect(nextJob.first, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable, Qt::BlockingQueuedConnection);
-        emit DataGenerationStarted(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer(), nextJob.first);
-        threadPool->start(nextJob.first);
+        if (everythingValid)
+        {
+          m_WIP = true;
+          everythingValid = false;
+        }
+
+        //other jobs are pending, nothing has to be done
+        if (nextJob.first == nullptr)
+        {
+          MITK_DEBUG << "Last generation job still running, pass on till job is finished...";
+        }
+        else
+        {
+          MITK_DEBUG << "Next generation job started...";
+          nextJob.first->setAutoDelete(true);
+          nextJob.second->GetData()->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
+          connect(nextJob.first, &QmitkDataGenerationJobBase::Error, this,
+            [this, placeholderNode = nextJob.second](QString error, const QmitkDataGenerationJobBase* failedJob)
+            {
+              this->OnJobError(error, failedJob, placeholderNode);
+            }, Qt::BlockingQueuedConnection);
+          connect(nextJob.first, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable, Qt::BlockingQueuedConnection);
+          emit DataGenerationStarted(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer(), nextJob.first);
+          threadPool->start(nextJob.first);
+        }
+
+        continue;
       }
     }
-    else
-    {
-      this->RemoveObsoleteDataNodes(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
-    }
+
+    this->RemoveObsoleteDataNodes(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
   }
 
   if (everythingValid && m_WIP)

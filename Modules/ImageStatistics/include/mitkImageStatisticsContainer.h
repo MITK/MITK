@@ -202,9 +202,16 @@ namespace mitk
 
     /**
      * \brief Check whether this container is a work-in-progress placeholder.
-     * \return True if the statistics are still being computed.
+     * \return True if the statistics are pending or still being computed.
      */
     bool IsWIP() const;
+
+    /**
+     * \brief Check whether this container is the placeholder of a failed computation.
+     * \return True if the statistics could not be computed; the container then holds
+     *         no statistics.
+     */
+    bool IsFailed() const;
 
   protected:
     ImageStatisticsContainer();

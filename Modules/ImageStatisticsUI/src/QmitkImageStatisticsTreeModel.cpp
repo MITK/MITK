@@ -830,11 +830,18 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       QString imageLabel = QString::fromStdString(image->GetName());
       if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
       {
-        auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
+        // A pending or failed computation leaves the container without label values.
+        const auto labelValues = statistic->GetExistingLabelValues();
 
-        auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValue, 0);
-        // create the final statistics tree item
-        imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, isWIP, m_RootItem.get(), image);
+        if (labelValues.empty())
+        {
+          imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, true, m_RootItem.get(), image);
+        }
+        else
+        {
+          // create the final statistics tree item
+          imageItem = new QmitkImageStatisticsTreeItem(statistic->GetStatistics(labelValues.front(), 0), m_StatisticNames, imageLabel, isWIP, m_RootItem.get(), image);
+        }
       }
       else
       {
@@ -889,7 +896,8 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     else
     {
       //no mask -> but multi time step
-      auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
+      const auto labelValues = statistic->GetExistingLabelValues();
+      auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
 
       AddTimeStepTreeItems(statistic, image, nullptr, labelValue, m_StatisticNames, isWIP, imageItem);
     }

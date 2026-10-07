@@ -78,6 +78,7 @@ class QmitkImageStatisticsDataGeneratorTestSuite : public mitk::TestFixture
   MITK_TEST(InputChangedTest);
   MITK_TEST(SettingsChangedTest);
   MITK_TEST(DataStorageModificationTest);
+  MITK_TEST(FailedJobTest);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -530,6 +531,51 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
+  }
+
+  void FailedJobTest()
+  {
+    // A segmentation off the voxel grid of the image lets the computation fail.
+    auto shiftedImage = m_Image1->Clone();
+    auto origin = shiftedImage->GetGeometry()->GetOrigin();
+    origin[0] += 0.5 * shiftedImage->GetGeometry()->GetSpacing()[0];
+    shiftedImage->GetGeometry()->SetOrigin(origin);
+
+    auto segmentation = mitk::MultiLabelSegmentation::New();
+    segmentation->Initialize(shiftedImage);
+
+    auto segmentationNode = mitk::DataNode::New();
+    segmentationNode->SetName("Shifted segmentation");
+    segmentationNode->SetData(segmentation);
+    m_DataStorage->Add(segmentationNode);
+
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ segmentationNode };
+
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_EQUAL(size_t(1), generator.m_JobErrorEmited_error.size());
+    CPPUNIT_ASSERT(generator.m_NewDataAvailable.empty());
+
+    const auto resultNode = generator.GetLatestResult(m_ImageNode1, segmentationNode, true, false);
+    CPPUNIT_ASSERT(resultNode.IsNotNull());
+
+    const auto* statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(resultNode->GetData());
+    CPPUNIT_ASSERT(nullptr != statistics);
+    CPPUNIT_ASSERT(statistics->IsFailed());
+    CPPUNIT_ASSERT(!statistics->IsWIP());
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Failed pair is not settled.", generator.Generate());
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Failed computation was restarted.", 1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
   }
 
 };

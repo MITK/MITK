@@ -365,13 +365,15 @@ void QmitkImageStatisticsView::ResetGUI()
 void QmitkImageStatisticsView::OnGenerationStarted(const mitk::DataNode* /*imageNode*/, const mitk::DataNode* /*roiNode*/, const QmitkDataGenerationJobBase* /*job*/)
 {
   m_Controls->label_currentlyComputingStatistics->setVisible(true);
+
+  // Clears the error of a previous failed computation. Not done when the generation
+  // finishes, because a failure finishes it right away and its error has to stay.
+  mitk::StatusBar::GetInstance()->Clear();
 }
 
 void QmitkImageStatisticsView::OnGenerationFinished()
 {
   m_Controls->label_currentlyComputingStatistics->setVisible(false);
-
-  mitk::StatusBar::GetInstance()->Clear();
 
   this->UpdateIntensityProfile();
   this->UpdateHistogramWidget();

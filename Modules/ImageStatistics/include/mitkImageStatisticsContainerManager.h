@@ -35,7 +35,7 @@ namespace mitk
   /** \brief Status value indicating statistics computation is pending. */
   static const std::string STATS_GENERATION_STATUS_VALUE_PENDING = "pending";
   /** \brief Status value indicating statistics computation failed. */
-  static const std::string STATS_GENERATION_STATUS_VALUE_BASE_DATA_FAILED = "failed";
+  static const std::string STATS_GENERATION_STATUS_VALUE_FAILED = "failed";
 
   /**
    * \brief Manages lookup of ImageStatisticsContainer nodes in a DataStorage.

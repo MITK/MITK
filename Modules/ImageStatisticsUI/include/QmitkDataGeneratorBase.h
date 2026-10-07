@@ -87,7 +87,11 @@ public:
    * The generation is performed asynchronously using a thread pool. To detect when all
    * jobs have completed, connect to the GenerationFinished signal.
    *
-   * \return True if all results are already valid; false if new generation was triggered.
+   * A pair whose generation failed counts as settled: it is not generated again until
+   * its inputs or the generation settings change.
+   *
+   * \return True if all pairs are settled, i.e. have a valid or a failed result; false if
+   *         generation jobs are pending or running.
    */
   bool Generate() const;
 
@@ -114,12 +118,6 @@ public slots:
 
 protected slots:
   /**
-   * \brief Handles error signals from generation jobs and re-emits JobError.
-   * \param[in] error The error message.
-   * \param[in] failedJob Pointer to the job that failed.
-   */
-  void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const;
-  /**
    * \brief Handles completed job results, adds them to the data storage, and emits NewDataAvailable.
    * \param[in] results The result map from the completed job.
    * \param[in] job Pointer to the job that produced the results.
@@ -143,7 +141,8 @@ signals:
   void NewDataAvailable(mitk::DataStorage::SetOfObjects::ConstPointer data) const;
 
   /**
-   * \brief Emitted when all generation jobs have finished and all results are up to date.
+   * \brief Emitted when all generation jobs have finished and all pairs are settled,
+   * i.e. have an up-to-date valid or failed result.
    */
   void GenerationFinished() const;
 
@@ -254,9 +253,17 @@ protected:
 
   /**
    * \brief Core generation loop that checks validity and launches jobs for all image/ROI pairs.
-   * \return True if all results are valid; false if new jobs were triggered.
+   * \return True if all pairs are settled; false if jobs are pending or running.
    */
   bool DoGenerate() const;
+
+  /**
+   * \brief Marks the placeholder of a failed job as failed, re-emits JobError and rechecks.
+   * \param[in] error The error message.
+   * \param[in] failedJob Pointer to the job that failed.
+   * \param[in] placeholderNode The placeholder node the job was started for.
+   */
+  void OnJobError(const QString& error, const QmitkDataGenerationJobBase* failedJob, mitk::DataNode* placeholderNode) const;
 
   /**
    * \brief Ensures generation is (re)started, either immediately or by flagging a restart if already running.

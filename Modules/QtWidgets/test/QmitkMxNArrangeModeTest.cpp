@@ -164,6 +164,16 @@ public:
     return ids.join(QLatin1Char(',')).toStdString();
   }
 
+  static QDragEnterEvent DragEnter(const QMimeData* mime)
+  {
+    // Qt 6.12 added the QPointF constructor and deprecated the QPoint one.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 12, 0)
+    return QDragEnterEvent(QPointF(10, 10), Qt::CopyAction, mime, Qt::LeftButton, Qt::NoModifier);
+#else
+    return QDragEnterEvent(QPoint(10, 10), Qt::CopyAction, mime, Qt::LeftButton, Qt::NoModifier);
+#endif
+  }
+
   /** Show a 2x2 editor large enough for plates and enter arrange mode. */
   void ShowArranging()
   {
@@ -726,7 +736,7 @@ public:
     mime.setData(QmitkMxNGroupMimeType, QByteArray("g1"));
     auto* filter = static_cast<QObject*>(this->Overlay(4));
 
-    QDragEnterEvent enter(QPoint(10, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    auto enter = DragEnter(&mime);
     CPPUNIT_ASSERT(filter->eventFilter(this->Cell(4), &enter));
     CPPUNIT_ASSERT_MESSAGE("A group drag is accepted anywhere on the cell", enter.isAccepted());
     CPPUNIT_ASSERT_MESSAGE("...and marks the cell's frame as the target", this->Overlay(4)->IsArrangeFrameBumped());
@@ -750,7 +760,7 @@ public:
     {
       QMimeData mime;
       mime.setData(format, QByteArray("x"));
-      QDragEnterEvent enter(QPoint(10, 10), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+      auto enter = DragEnter(&mime);
       filter->eventFilter(this->Cell(0), &enter);
       CPPUNIT_ASSERT_MESSAGE("Only group drags are taken on a cell", !enter.isAccepted());
     }

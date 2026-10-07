@@ -999,7 +999,7 @@ mitk::FeedbackReport QmitkFeedbackDialog::AssembleReport() const
     mitk::FeedbackAttachment image;
     image.sourcePath = m_Images[i].path.toStdU16String();
     // Numbered, since files from different folders may share a name.
-    image.archiveName = QString("images/%1-%2").arg(i + 1).arg(fileName).toStdString();
+    image.archiveName = "images/" + std::to_string(i + 1) + "-" + mitk::MakeArchiveElement(fileName.toStdString());
     image.description = fileName.toStdString();
     report.images.push_back(image);
   }

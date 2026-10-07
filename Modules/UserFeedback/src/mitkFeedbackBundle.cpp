@@ -184,6 +184,20 @@ namespace
   }
 }
 
+std::string mitk::MakeArchiveElement(std::string_view fileName)
+{
+  std::string element(fileName);
+
+  // Byte-wise is safe on UTF-8: every replaced character is ASCII.
+  for (auto& c : element)
+  {
+    if (static_cast<unsigned char>(c) < 0x20 || std::string_view("/\\:*?\"<>|").find(c) != std::string_view::npos)
+      c = '_';
+  }
+
+  return element;
+}
+
 std::string mitk::BuildReportText(const FeedbackReport& report)
 {
   std::ostringstream text;

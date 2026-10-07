@@ -36,6 +36,7 @@ class mitkFeedbackBundleTestSuite : public mitk::TestFixture
   MITK_TEST(MissingAttachmentThrowsAndLeavesNoZip);
   MITK_TEST(UnsafeArchiveNamesThrow);
   MITK_TEST(UserImagesAreCopiedAndListed);
+  MITK_TEST(ImageNamesWithReservedCharactersAreWritten);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_Directory;
@@ -203,6 +204,23 @@ public:
     report.images.back().archiveName = "../escape.png";
     CPPUNIT_ASSERT_THROW_MESSAGE("image names are validated", mitk::WriteFeedbackBundle(report, m_Zip),
       mitk::FeedbackBundleException);
+  }
+
+  void ImageNamesWithReservedCharactersAreWritten()
+  {
+    CPPUNIT_ASSERT_EQUAL(std::string("my picture.png"), mitk::MakeArchiveElement("my picture.png"));
+    CPPUNIT_ASSERT_EQUAL(std::string("Screenshot 12_30 a_b_c_.png"),
+      mitk::MakeArchiveElement("Screenshot 12:30 a\\b/c?.png"));
+
+    const auto image = m_Directory / "picture.png";
+    std::ofstream(image, std::ios::binary) << "\x89PNG user image";
+
+    auto report = this->FullReport();
+    report.images = { { image, "images/1-" + mitk::MakeArchiveElement("Screenshot 12:30.png"), "Screenshot 12:30.png",
+      true } };
+
+    CPPUNIT_ASSERT_NO_THROW(mitk::WriteFeedbackBundle(report, m_Zip));
+    CPPUNIT_ASSERT(ReadZip(m_Zip).count("images/1-Screenshot 12_30.png") == 1);
   }
 
   void SameInputGivesSameEntries()

@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include <filesystem>
 #include <string>
+#include <string_view>
 
 namespace mitk
 {
@@ -31,6 +32,12 @@ namespace mitk
   public:
     mitkExceptionClassMacro(FeedbackBundleException, Exception);
   };
+
+  /** \brief Make \p fileName usable as one element of an archive name:
+   *  path separators, ':', the other characters Windows forbids in file
+   *  names, and control characters become '_'. The result can still be
+   *  empty, "." or "..", so callers combine it with a prefix of their own. */
+  MITKUSERFEEDBACK_EXPORT std::string MakeArchiveElement(std::string_view fileName);
 
   /** \brief Render the human-readable report as shown in the preview and
    *  written to report.md: category, description, included environment

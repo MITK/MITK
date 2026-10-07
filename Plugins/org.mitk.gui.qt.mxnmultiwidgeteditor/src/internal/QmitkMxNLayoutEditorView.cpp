@@ -334,9 +334,9 @@ void QmitkMxNLayoutEditorView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
   if (nullptr != multiWidgetEditor
       && m_LayoutEditorWidget->GetMultiWidget() == multiWidgetEditor->GetMultiWidget())
   {
-    this->DisconnectLayoutControls();
-    m_LayoutEditorWidget->SetMultiWidget(nullptr);
-    this->UpdateArrangeMode();
+    // A closed part is never followed by an activation, so the view falls back
+    // to its no-display state here.
+    this->RenderWindowPartActivated(nullptr);
   }
 }
 

@@ -163,7 +163,7 @@ QmitkCrashDumpManagerDialog::QmitkCrashDumpManagerDialog(QWidget* parent)
   layout->addWidget(header);
   layout->addLayout(content);
 
-  this->resize(760, 420);
+  this->resize(760, 500);
   this->Refresh();
 }
 

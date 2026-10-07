@@ -308,14 +308,19 @@ public:
   *   A call moves only 'windowId': on joining, or on an offset change, the
   *   cell is converged to the group's reference (taken before the call from
   *   the member a re-converge would anchor on, see ReconvergeSyncGroup)
-  *   combined with the given offset; the other members stay put. Convergence
+  *   combined with the given offset; the other members stay put, except as a
+  *   `Slice` or `Orientation` link aligns them (below). Convergence
   *   is skipped while the involved render windows have no world geometry
   *   yet; use 'ReconvergeSyncGroup' once they do. `Crosshair` links carry no
   *   convergence bookkeeping (propagation is absolute: the crosshair is one
   *   world point that every member resolves into its own slice, so an offset
-  *   has nothing to be relative to). An `Orientation` join aligns the cell to
-  *   the group's plane. `Windowing` / `Lut` joins do not converge: the cell
-  *   keeps its own value until the group's next change propagates.
+  *   has nothing to be relative to). An `Orientation` join adopts the group's
+  *   plane unless the cell already shows it. A `Slice` or `Orientation` link
+  *   also aligns the cell's geometry-authority component to one reference
+  *   geometry: members whose geometry differs are re-initialized to it,
+  *   keeping their slice position, zoom and pan, and their slice, zoom and pan
+  *   groups are re-converged. `Windowing` / `Lut` joins do not converge: the
+  *   cell keeps its own value until the group's next change propagates.
   *
   * \param windowId   Canonical window id of the cell. Must name an existing cell.
   * \param dimension  The synchronization dimension to link.

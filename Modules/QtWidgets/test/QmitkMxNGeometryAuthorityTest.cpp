@@ -57,6 +57,8 @@ class QmitkMxNGeometryAuthorityTestSuite : public mitk::TestFixture
   MITK_TEST(Orientation_UnlinkedCellDoesNotPropagate);
   MITK_TEST(OrientationLink_AlignsJoiningCellToSeedPlane);
   MITK_TEST(OrientationLink_JoinFromEarlierCell_AdoptsGroupPlane);
+  MITK_TEST(OrientationLink_JoinOnSamePlane_KeepsSliceOffset);
+  MITK_TEST(OrientationLink_JoinAdoptingPlane_ReconvergesSliceOffset);
   MITK_TEST(PlaneChange_UnlinkedOrientation_ReconvergesSliceOffset);
   MITK_TEST(PlaneChange_UnlinkedOrientationOnSeed_KeepsGroup);
   MITK_TEST(SliceLink_GeometryAlignment_KeepsMemberZoom);
@@ -153,6 +155,18 @@ public:
     return inverted ? last - stepper->GetPos() : stepper->GetPos();
   }
 
+  /** Re-initialize every cell from the bounding geometry of the data, as a
+   *  global reinit does. A plane change re-initializes from the same geometry,
+   *  so the cells then share it and are not re-aligned to each other. */
+  void InitializeCellsByBoundingObjects() const
+  {
+    for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(
+        cell->GetRenderWindow()->GetVtkRenderWindow(), m_DataStorage);
+    }
+  }
+
   /** A plane different from every cell's current default, so a change is observable. */
   mitk::AnatomicalPlane OtherPlane() const
   {
@@ -215,6 +229,46 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A joiner earlier in the layout adopts the group's plane",
                                  target, Plane(0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The group keeps its plane", target, Plane(2));
+  }
+
+  void OrientationLink_JoinOnSamePlane_KeepsSliceOffset()
+  {
+    InitializeCellsByBoundingObjects();
+    // Off the middle slice, so a reset is told apart.
+    Snc(0)->GetStepper()->SetPos(5);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s", 1);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "o");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the joiner already shows the group's plane", Plane(2), Plane(1));
+    const unsigned int anchorPos = Snc(0)->GetStepper()->GetPos();
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "o");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The slice group does not move for a member's orientation join",
+                                 anchorPos, Snc(0)->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The joiner keeps its slice offset",
+                                 ShownSlice(0) + 1, ShownSlice(1));
+  }
+
+  void OrientationLink_JoinAdoptingPlane_ReconvergesSliceOffset()
+  {
+    InitializeCellsByBoundingObjects();
+    // Off the middle slice, so a reset is told apart.
+    Snc(0)->GetStepper()->SetPos(5);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "s");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "s", 1);
+    const auto target = OtherPlane();
+    m_Editor->SetViewDirection(CellId(2), target); // unlinked: local only
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "o");
+    const unsigned int anchorPos = Snc(0)->GetStepper()->GetPos();
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "o");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the joiner adopted the group's plane", target, Plane(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The slice group does not move for a member's orientation join",
+                                 anchorPos, Snc(0)->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The joiner is re-converged to its offset after adopting the plane",
+                                 ShownSlice(0) + 1, ShownSlice(1));
   }
 
   void PlaneChange_UnlinkedOrientation_ReconvergesSliceOffset()

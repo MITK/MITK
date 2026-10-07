@@ -3260,28 +3260,39 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
   this->RegisterGroupForHue(group);
 
   // An orientation link aligns the joining cell's plane to the group's
-  // (absolute state; joining means adopting the group's plane).
+  // (absolute state; joining means adopting the group's plane). Adopting a
+  // plane re-initializes the cell's stepper and camera, so a plane the cell
+  // already shows is left alone.
+  bool planeAdopted = false;
   if (QmitkMxNSyncDimension::Orientation == dimension && !anchorId.isEmpty() && anchorId != windowId)
   {
     const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
     const auto memberWidget = this->GetRenderWindowWidget(windowId);
     if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
     {
-      // Silent path: adopting the group plane is a relayed change, not a
-      // new orientation gesture.
-      memberWidget->GetUtilityWidget()->SetViewDirectionSelection(
-        anchorWidget->GetSliceNavigationController()->GetDefaultViewDirection());
+      const auto groupPlane = anchorWidget->GetSliceNavigationController()->GetDefaultViewDirection();
+      if (memberWidget->GetSliceNavigationController()->GetDefaultViewDirection() != groupPlane)
+      {
+        // Silent path: adopting the group plane is a relayed change, not a
+        // new orientation gesture.
+        memberWidget->GetUtilityWidget()->SetViewDirectionSelection(groupPlane);
+        planeAdopted = true;
+      }
     }
   }
 
   // Slice and orientation need a shared reference geometry (a step index or
   // a plane name means different physical locations across divergent
   // geometries); align the cell to its geometry-authority component and
-  // restore offsets that the alignment reset.
+  // restore offsets that the alignment or an adopted plane reset.
   if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Orientation == dimension)
   {
-    const auto reinitialized = this->EnforceComponentGeometry(windowId);
-    this->ReconvergeGeometryRelativeGroups(reinitialized);
+    auto reset = this->EnforceComponentGeometry(windowId);
+    if (planeAdopted)
+    {
+      reset.push_back(windowId);
+    }
+    this->ReconvergeGeometryRelativeGroups(reset);
   }
 
   // Converge the written cell to the group's reference. Crosshair propagation

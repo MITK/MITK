@@ -16,10 +16,15 @@ found in the LICENSE file.
 
 void QmitkFeedback::OpenDialog(QWidget* parent)
 {
-  if (parent == nullptr)
-    parent = QmitkGetActiveWorkbenchWindowWidget();
-
   // Collected before the dialog exists, so that no screenshot shows it.
-  QmitkFeedbackDialog dialog(QmitkCollectFeedbackInput(), parent);
-  dialog.exec();
+#ifdef MITK_HAS_CRASHHANDLING
+  // Saved dumps are offered for the user to pick, since a report started
+  // here may still be about a crash.
+  auto input = QmitkCollectCrashReportInput(mitk::CrashDumpFacility::ListAllDumps());
+  input.dumpsIncluded = false;
+#else
+  const auto input = QmitkCollectFeedbackInput();
+#endif
+
+  QmitkRunFeedbackDialog(input, parent);
 }

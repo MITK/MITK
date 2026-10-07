@@ -35,6 +35,12 @@ QmitkFeedbackDialog::Input QmitkCollectFeedbackInput();
 QmitkFeedbackDialog::LogSource QmitkReadFeedbackLog(const std::filesystem::path& path, const std::string& archiveName,
   const std::string& sourceLabel, const std::string& session);
 
+/** \brief Run the feedback dialog for \p input modally, then delete the
+ *  crash dumps the user asked to delete, telling the user about any that
+ *  could not be deleted. \p parent may be null, in which case the active
+ *  workbench window is used. */
+void QmitkRunFeedbackDialog(const QmitkFeedbackDialog::Input& input, QWidget* parent);
+
 #ifdef MITK_HAS_CRASHHANDLING
 /** \brief QmitkCollectFeedbackInput() plus \p dumps and, for each dump with
  *  a kept session log, the tail of that log. */

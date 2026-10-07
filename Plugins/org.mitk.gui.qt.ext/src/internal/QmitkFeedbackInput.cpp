@@ -35,6 +35,8 @@ found in the LICENSE file.
 
 #include <QDateTime>
 #include <QFileInfo>
+#include <QMessageBox>
+#include <QStringList>
 #include <QWidget>
 
 #include <algorithm>
@@ -223,8 +225,10 @@ QmitkFeedbackDialog::Input QmitkCollectCrashReportInput(const std::vector<mitk::
     const auto label = QString("Session log (%1, %2)").arg(QmitkCrashDumpListWidget::KindLabel(dump.Kind), time);
     const auto stem = QString::fromStdU16String(dump.Path.stem().u16string());
 
-    input.logs.push_back(QmitkReadFeedbackLog(dump.SessionLog, ("logs/" + stem + ".log").toStdString(),
-      label.toStdString(), ("the session of the dump of " + time).toStdString()));
+    auto source = QmitkReadFeedbackLog(dump.SessionLog, ("logs/" + stem + ".log").toStdString(),
+      label.toStdString(), ("the session of the dump of " + time).toStdString());
+    source.dump = dump.Path;
+    input.logs.push_back(source);
   }
 
   return input;
@@ -236,3 +240,34 @@ QString QmitkFeedbackDumpTime(const mitk::CrashDumpInfo& dump)
   return QFileInfo(path).lastModified().toString("yyyy-MM-dd HH:mm");
 }
 #endif
+
+void QmitkRunFeedbackDialog(const QmitkFeedbackDialog::Input& input, QWidget* parent)
+{
+  if (parent == nullptr)
+    parent = QmitkGetActiveWorkbenchWindowWidget();
+
+  std::vector<std::filesystem::path> dumpsToDelete;
+
+  {
+    QmitkFeedbackDialog dialog(input, parent);
+    dialog.exec();
+    dumpsToDelete = dialog.GetDumpsToDelete();
+  }
+
+#ifdef MITK_HAS_CRASHHANDLING
+  QStringList failed;
+
+  for (const auto& dump : dumpsToDelete)
+  {
+    if (!mitk::CrashDumpFacility::DeleteDump(dump))
+      failed << QString::fromStdU16String(dump.filename().u16string());
+  }
+
+  if (!failed.isEmpty())
+  {
+    QMessageBox::warning(parent, "Report a Problem / Send Feedback",
+      "These crash dumps could not be deleted:\n\n" + failed.join('\n') +
+      "\n\nYou can delete them later under Help > Diagnostic Data.");
+  }
+#endif
+}

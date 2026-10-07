@@ -38,6 +38,7 @@ class QPlainTextEdit;
 class QProgressBar;
 class QPushButton;
 class QTextBrowser;
+class QToolButton;
 class QVBoxLayout;
 class QmitkCrashDumpListWidget;
 
@@ -63,6 +64,10 @@ public:
 
     /** Shown instead of the text when there is no log to offer. */
     QString unavailableReason;
+
+    /** The crash dump whose session wrote this log, empty for the log of
+     *  this session. Such a log is offered only while its dump is included. */
+    std::filesystem::path dump;
   };
 
   /** \brief Everything gathered before the dialog is shown. */
@@ -78,9 +83,12 @@ public:
     QPixmap editorShot;
 
 #ifdef MITK_HAS_CRASHHANDLING
-    /** Offered for inclusion, all included initially; their session logs
-     *  are among the log sources. */
+    /** Offered for inclusion; their session logs are among the log sources. */
     std::vector<mitk::CrashDumpInfo> dumps;
+
+    /** Whether the dumps start included, as when the report was filed for
+     *  them, or are left for the user to pick. */
+    bool dumpsIncluded = true;
 #endif
   };
 
@@ -101,6 +109,8 @@ protected:
 private:
   struct LogRow
   {
+    QWidget* row = nullptr;
+    std::filesystem::path dump;
     QCheckBox* include = nullptr;
     QPlainTextEdit* text = nullptr;
     QLabel* summary = nullptr;
@@ -111,6 +121,7 @@ private:
   QWidget* CreateHeader();
   QWidget* CreateForm();
   QWidget* CreatePreview();
+  void SetPreviewVisible(bool visible);
   QWidget* CreateFooter();
 
   /** A row of the list of included items: \p title (a check box or a
@@ -122,6 +133,13 @@ private:
   /** A framed panel with a check box for \p statement and an explanatory
    *  \p note below it. Clicking the statement toggles the check box. */
   QWidget* CreateConfirmation(QCheckBox* checkBox, const QString& statement, const QString& note);
+
+  /** \p checkBox (without text of its own) followed by \p text, which wraps
+   *  where a check box text would widen the form. */
+  QWidget* CreateWrappingCheckBox(QCheckBox* checkBox, const QString& text);
+
+  /** A word-wrapped label that clicks \p button when clicked. */
+  QLabel* CreateClickableLabel(const QString& text, QAbstractButton* button);
 
   void AddEnvironmentRow(QVBoxLayout* layout);
   void AddLogRows(QVBoxLayout* layout);
@@ -139,6 +157,13 @@ private:
   void OnEnvironmentClicked();
   void OnAddImages();
   void OnRemoveImage(const QString& path);
+
+  /** The dumps the report includes: checked in the list while the dumps
+   *  row is checked. */
+  std::vector<std::filesystem::path> GetIncludedDumps() const;
+
+  /** Shows the dump list and the logs of the included dumps only. */
+  void UpdateDumpRows();
 
   void UpdateHeaderIcon();
   void UpdateImageList();
@@ -194,6 +219,8 @@ private:
   mutable std::vector<unsigned char> m_WindowPng;
   mutable std::vector<unsigned char> m_EditorPng;
 
+  QCheckBox* m_DumpsInclude = nullptr;
+  QWidget* m_DumpDetails = nullptr;
   QmitkCrashDumpListWidget* m_DumpList = nullptr;
   QLabel* m_DumpSummary = nullptr;
   QCheckBox* m_DeleteDumps = nullptr;
@@ -207,7 +234,9 @@ private:
   /** Labels that toggle a check box when clicked. */
   std::map<QObject*, QAbstractButton*> m_ClickableLabels;
 
+  QWidget* m_PreviewPane = nullptr;
   QTextBrowser* m_Preview = nullptr;
+  QToolButton* m_PreviewToggle = nullptr;
 
   QProgressBar* m_BusyIndicator = nullptr;
   QLabel* m_Status = nullptr;

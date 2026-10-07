@@ -71,7 +71,7 @@ The report is assembled on your computer, and the dialog previews it next to you
   <li><b>Log</b> - off by default. The last 1000 lines of the log of this session. You can edit the excerpt before including it; an edited excerpt is marked as such in the report.</li>
   <li><b>Screenshot</b> - off by default. Of the application window or of the display area, taken just before the dialog opened.</li>
   <li><b>Images from files</b> - images of your own, for example a screenshot of something you saw earlier. Each is shown as a thumbnail and can be removed again.</li>
-  <li><b>Crash dumps</b> - only in a report filed with <i>File report...</i> from the crash dump dialogs (see below).</li>
+  <li><b>Crash dumps</b> - off by default, and offered only if crash dumps are saved on your computer (see below).</li>
 </ul>
 
 Logs, screenshots, images, and crash dumps can contain patient-related information, such as file paths, names, images, or parts of the application's memory. As soon as one of them is included, you have to confirm that you are permitted to share it before the report can be handed off.
@@ -88,7 +88,7 @@ The .zip file is saved in a temporary folder and is kept when the dialog closes.
 
 \subsection MITKWorkbenchManualPage_Feedback_CrashDumps Reports with crash dumps
 
-A report filed with <i>File report...</i> from the crash dump dialogs is a bug report that lists the passed dumps. Each of them is included unless you uncheck it, and a copy of the log of the session that produced a dump is offered as a further log excerpt. A crash dump is a snapshot of parts of the application's memory that you cannot review before sending it, so a report with crash dumps is sent by email to the MITK team and never to the public issue tracker. GitHub remains available for feature requests, ideas, and bugs without crash dumps.
+A report filed with <i>File report...</i> from the crash dump dialogs is a bug report that includes the passed dumps; you can uncheck any of them. A report started from the Help menu or the welcome screen offers all saved dumps instead: check <i>Crash dumps</i> and then the dumps that belong to the problem. For each included dump, a copy of the log of the session that produced it is offered as a further log excerpt. A crash dump is a snapshot of parts of the application's memory that you cannot review before sending it, so a report with crash dumps is sent by email to the MITK team and never to the public issue tracker. GitHub remains available for feature requests, ideas, and bugs without crash dumps.
 
 You can choose to delete the included dumps from this computer when you close the dialog. They are deleted only if a report containing them was saved, and the saved .zip file is then their only copy.
 

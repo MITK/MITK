@@ -93,6 +93,11 @@ private:
   void LoadHiddenStatistics();
   void SaveHiddenStatistics();
 
+  /** Shows the lower splitter pane only while the histogram or the intensity profile is
+  shown, since an empty pane would still take its height. Both share one pane, so that
+  either of them gets the height the user dragged the pane to. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   QmitkImageStatisticsDataGenerator* m_DataGenerator = nullptr;
 

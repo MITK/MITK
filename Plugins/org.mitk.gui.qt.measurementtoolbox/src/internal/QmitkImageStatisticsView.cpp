@@ -82,6 +82,8 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls->setupUi(parent);
+  m_Controls->groupBox_histogram->installEventFilter(this);
+  m_Controls->groupBox_intensityProfile->installEventFilter(this);
   m_Controls->widget_intensityProfile->SetTheme(GetColorTheme());
   m_Controls->groupBox_histogram->setVisible(false);
   m_Controls->groupBox_intensityProfile->setVisible(false);
@@ -331,6 +333,17 @@ void QmitkImageStatisticsView::SaveHiddenStatistics()
     node->PutBool(key, true);
 
   node->Flush();
+}
+
+bool QmitkImageStatisticsView::eventFilter(QObject* watched, QEvent* event)
+{
+  if (QEvent::ShowToParent == event->type() || QEvent::HideToParent == event->type())
+  {
+    m_Controls->widget_plots->setVisible(!m_Controls->groupBox_histogram->isHidden()
+      || !m_Controls->groupBox_intensityProfile->isHidden());
+  }
+
+  return QmitkAbstractView::eventFilter(watched, event);
 }
 
 QmitkPlotStyle QmitkImageStatisticsView::GetColorTheme() const

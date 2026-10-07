@@ -46,7 +46,7 @@ Check "Ignore 0-value voxels" to exclude voxels with the gray value zero from th
 
 \subsection QmitkImageStatisticHistogram Histogram
 
-Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
+Beneath the statistics window is the histogram window, which shows the histogram of the current selection. Drag the boundary between the two windows to give the histogram more or less height. The histogram keeps its height when the view is resized, while the statistics window takes the remaining space.
 
 The histogram is only available for a single image with no or one ROI. When multiple images or multiple ROIs are selected, the histogram section is hidden.
 

@@ -1,0 +1,208 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <QmitkLineCompletionTextEdit.h>
+
+#include <QAbstractItemView>
+#include <QCompleter>
+#include <QKeyEvent>
+#include <QStringListModel>
+#include <QTextBlock>
+
+namespace
+{
+  // A single character is contained in too many completions to be of help.
+  constexpr qsizetype MIN_CONTAINED_LENGTH = 2;
+
+  constexpr qsizetype MAX_COMPLETIONS = 100;
+}
+
+QmitkLineCompletionTextEdit::QmitkLineCompletionTextEdit(QWidget* parent)
+  : QPlainTextEdit(parent),
+    m_Completer(new QCompleter(this)),
+    m_Model(new QStringListModel(this))
+{
+  // The completions are matched here, so the completer lists them as they are.
+  m_Completer->setModel(m_Model);
+  m_Completer->setWidget(this);
+  m_Completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+  m_Completer->setMaxVisibleItems(10);
+
+  this->setTabChangesFocus(true);
+
+  connect(m_Completer, qOverload<const QString&>(&QCompleter::activated), this, &QmitkLineCompletionTextEdit::InsertCompletion);
+}
+
+QmitkLineCompletionTextEdit::~QmitkLineCompletionTextEdit() = default;
+
+void QmitkLineCompletionTextEdit::SetCompletions(const QStringList& completions)
+{
+  m_Completions = completions;
+  m_LowerCaseCompletions.clear();
+  m_LowerCaseCompletions.reserve(completions.size());
+
+  for (const auto& completion : completions)
+    m_LowerCaseCompletions << completion.toLower();
+
+  m_Completer->popup()->hide();
+}
+
+bool QmitkLineCompletionTextEdit::event(QEvent* event)
+{
+  if (event->type() == QEvent::KeyPress && m_Completer->popup()->isVisible())
+  {
+    // The completer sends the key to this edit first and chooses the current
+    // suggestion only if the edit leaves the key alone.
+    const auto key = static_cast<const QKeyEvent*>(event)->key();
+
+    if (key == Qt::Key_Tab || key == Qt::Key_Backtab)
+    {
+      event->ignore();
+      return false;
+    }
+  }
+
+  return QPlainTextEdit::event(event);
+}
+
+void QmitkLineCompletionTextEdit::keyPressEvent(QKeyEvent* event)
+{
+  auto* popup = m_Completer->popup();
+
+  if (popup->isVisible())
+  {
+    // The completer handles these on its popup and then passes them on to
+    // this edit, where they must not take effect a second time.
+    switch (event->key())
+    {
+      case Qt::Key_Enter:
+      case Qt::Key_Return:
+      case Qt::Key_Escape:
+        event->ignore();
+        return;
+
+      default:
+        break;
+    }
+  }
+
+  QPlainTextEdit::keyPressEvent(event);
+
+  if (event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier))
+  {
+    popup->hide();
+    return;
+  }
+
+  // Typing opens the list. Moving the cursor only updates a list that is open
+  // already, so that walking through the lines does not open it at every end.
+  const bool edits = !event->text().isEmpty() || event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete;
+
+  if (edits || popup->isVisible())
+    this->UpdateCompletionPopup();
+}
+
+void QmitkLineCompletionTextEdit::UpdateCompletionPopup()
+{
+  auto* popup = m_Completer->popup();
+  const auto cursor = this->textCursor();
+
+  // The suggestions are for the line being typed, so only at its end.
+  if (cursor.hasSelection() || !cursor.atBlockEnd())
+  {
+    popup->hide();
+    return;
+  }
+
+  const auto line = cursor.block().text().trimmed();
+  const auto completions = this->FindCompletions(line);
+
+  const bool onlyLine = completions.size() == 1 && completions.front().compare(line, Qt::CaseInsensitive) == 0;
+
+  if (completions.isEmpty() || onlyLine)
+  {
+    popup->hide();
+    return;
+  }
+
+  m_Model->setStringList(completions);
+
+  // In the size of the text they complete. In a style sheet, as the application
+  // can set its font size in one, which a font set on the popup would not
+  // override.
+  if (const auto fontSize = this->font().pointSizeF(); fontSize > 0)
+  {
+    const auto styleSheet = QString("QAbstractItemView { font-size: %1pt; }").arg(fontSize);
+
+    if (popup->styleSheet() != styleSheet)
+      popup->setStyleSheet(styleSheet);
+  }
+
+  // Below the line and as wide as the edit, since a completion replaces the
+  // whole line.
+  auto lineStart = cursor;
+  lineStart.movePosition(QTextCursor::StartOfBlock);
+
+  auto rect = this->cursorRect(lineStart);
+  rect.translate(this->viewport()->pos());
+  rect.setWidth(this->viewport()->width());
+
+  m_Completer->complete(rect);
+  popup->setCurrentIndex(m_Completer->completionModel()->index(0, 0));
+}
+
+QStringList QmitkLineCompletionTextEdit::FindCompletions(const QString& line) const
+{
+  if (line.isEmpty())
+    return {};
+
+  const auto needle = line.toLower();
+  const bool matchContained = needle.size() >= MIN_CONTAINED_LENGTH;
+
+  // A completion that equals the line comes first, so that Enter keeps the
+  // line while the list stays open for the longer completions.
+  QStringList equal;
+  QStringList startingWith;
+  QStringList containing;
+
+  for (qsizetype i = 0; i < m_LowerCaseCompletions.size(); ++i)
+  {
+    const auto& lowerCaseCompletion = m_LowerCaseCompletions[i];
+
+    if (lowerCaseCompletion == needle)
+      equal << m_Completions[i];
+    else if (lowerCaseCompletion.startsWith(needle))
+      startingWith << m_Completions[i];
+    else if (matchContained && lowerCaseCompletion.contains(needle))
+      containing << m_Completions[i];
+  }
+
+  equal << startingWith << containing;
+
+  if (equal.size() > MAX_COMPLETIONS)
+    equal.resize(MAX_COMPLETIONS);
+
+  return equal;
+}
+
+void QmitkLineCompletionTextEdit::InsertCompletion(const QString& completion)
+{
+  auto cursor = this->textCursor();
+  cursor.beginEditBlock();
+  cursor.movePosition(QTextCursor::StartOfBlock);
+  cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+  cursor.insertText(completion);
+  cursor.insertBlock();
+  cursor.endEditBlock();
+
+  this->setTextCursor(cursor);
+}

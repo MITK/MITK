@@ -29,9 +29,10 @@ namespace mitk
  *
  * Shown when the crash-dump database contains dumps the user has not seen
  * yet. Disposition is keep-only-if-explicit: the dumps are deleted unless
- * the user actively chooses to keep them (and is shown their location for
- * handing them in). Closing the dialog counts as discarding. Either way
- * the dumps are acknowledged and never surface again.
+ * the user actively keeps them or files a report with them (offered only
+ * while an mitk::ICrashReportService is registered). Closing the dialog
+ * counts as removing. Either way the dumps are acknowledged and never
+ * surface again; kept ones remain available in QmitkCrashDumpManagerDialog.
  */
 class MITKAPPUTIL_EXPORT QmitkCrashDumpDialog : public QDialog
 {
@@ -40,11 +41,22 @@ class MITKAPPUTIL_EXPORT QmitkCrashDumpDialog : public QDialog
 public:
   /** \brief Show the dialog if the previous run left unacknowledged dumps.
    *  Logs a warning instead when a crash is indicated but no dump exists.
-   *  No-op when the crash-dump facility was never initialized. */
+   *  Also records this session's log file with the crash-dump facility, so
+   *  call it once the log is open. No-op when the crash-dump facility was
+   *  never initialized. */
   static void ShowIfCrashedLastRun(QWidget* parent = nullptr);
 
 private:
+  enum Choice
+  {
+    Remove,
+    Keep,
+    FileReport
+  };
+
   QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent);
+
+  Choice m_Choice = Remove;
 };
 
 #endif

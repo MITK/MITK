@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkLookupTable.h>
 #include <mitkFileSystem.h>
+#include <mitkProgressTask.h>
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -67,6 +68,7 @@ mitk::TotalSegmentatorTool::TotalSegmentatorTool()
   this->KeepActiveAfterAcceptOn();
   this->RequiresExistingLabelsOff();
   this->RequiresVolumetricReferenceOn();
+  this->RequiresReferenceGeometryOn();
 }
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
@@ -85,6 +87,20 @@ void mitk::TotalSegmentatorTool::Activated()
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
   this->SetLabelTransferMode(LabelTransferMode::AddLabel);
+}
+
+void mitk::TotalSegmentatorTool::Deactivated()
+{
+  // The command runner polls this while the process runs.
+  if (this->IsUpdating())
+    m_AbortRequested = true;
+
+  Superclass::Deactivated();
+}
+
+bool mitk::TotalSegmentatorTool::IsCancelable() const
+{
+  return true;
 }
 
 us::ModuleResource mitk::TotalSegmentatorTool::GetIconResource() const
@@ -147,8 +163,8 @@ std::vector<std::string> mitk::TotalSegmentatorTool::BuildArguments(const std::s
 void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
-  auto preview = this->GetPreviewSegmentation();
-  preview->RemoveLabels(preview->GetAllLabelValues());
+  m_AbortRequested = false;
+  this->RemoveAllPreviewLabels();
 }
 
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
@@ -158,10 +174,10 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   m_LastErrorMessage.clear();
 
-  // The base UpdatePreview catches itk::ExceptionObject (what mitkThrow produces)
-  // and only forwards it to ErrorMessage, which no GUI here listens to. So catch
-  // every failure locally and record it in m_LastErrorMessage; the GUI shows that
-  // instead of the generic "cancelled or produced no result".
+  // The base UpdatePreview would forward a failure to ErrorMessage, whose
+  // listeners present it in a message box apart from the tool. So catch every
+  // failure locally and record it in m_LastErrorMessage; the GUI shows that in
+  // its status instead of the generic "cancelled or produced no result".
   try
   {
     // Programmer-guarantee guards: the GUI always injects both before running.
@@ -192,7 +208,18 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     IOUtil::Save(inputAtTimeStep, inputImagePath);
 
     const auto args = this->BuildArguments(inputImagePath, outputImagePath);
-    const bool success = m_CommandRunner(m_ExecutablePath, args);
+    auto* task = m_ProgressCommand->GetProgressTask();
+
+    const RunControl control{
+      [this, task]() { return m_AbortRequested || (task != nullptr && task->IsCancelRequested()); },
+      [task](const std::string& phase)
+      {
+        if (task != nullptr)
+          task->SetName(phase);
+      }
+    };
+
+    const bool success = m_CommandRunner(m_ExecutablePath, args, control);
 
     if (!success)
       return; // Cancelled by the user or the process failed: leave the preview empty.
@@ -214,12 +241,12 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   {
     // Leave no half-populated preview behind: an empty preview is how the GUI
     // tells a failure apart from a successful run.
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_LastErrorMessage = e.GetDescription();
   }
   catch (const std::exception& e)
   {
-    previewImage->RemoveLabels(previewImage->GetAllLabelValues());
+    this->RemoveAllPreviewLabels();
     m_LastErrorMessage = e.what();
   }
 }

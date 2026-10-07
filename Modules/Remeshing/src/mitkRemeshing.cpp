@@ -19,10 +19,10 @@ found in the LICENSE file.
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
 #include <vtkIsotropicDiscreteRemeshing.h>
+#include <vtkNew.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricTools.h>
-#include <vtkSMPThreadLocalObject.h>
 #include <vtkSMPTools.h>
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
@@ -165,10 +165,9 @@ namespace
     }
 
     std::vector<std::array<double, 3>> points(numClusters);
-    vtkSMPThreadLocalObject<vtkIdList> faceLists;
 
     vtkSMPTools::For(0, numClusters, [&](vtkIdType begin, vtkIdType end) {
-      vtkIdList* faceList = faceLists.Local();
+      vtkNew<vtkIdList> faceList;
 
       for (vtkIdType cluster = begin; cluster < end; ++cluster)
       {

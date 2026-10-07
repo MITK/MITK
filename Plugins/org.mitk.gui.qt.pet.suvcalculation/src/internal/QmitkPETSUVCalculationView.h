@@ -230,6 +230,11 @@ private:
    *  return \c nullptr if none is selected / not an Image. */
   mitk::Image* CurrentInputImage() const;
 
+  /** The read policy the user has selected. Probes that read DICOM
+   *  directly use it rather than assuming Lenient, so a value the
+   *  strict policy refused is never prefilled as if accepted. */
+  mitk::DICOMReadPolicy CurrentReadPolicy() const;
+
   /** Compose the "Auto-detected" summary text shown in the diagnostics
    *  widget: pixel semantics, vendor, activity / prenorm scale, decay
    *  strategy, nuclide, tracer index, force-flags. Returns an empty

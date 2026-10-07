@@ -3,6 +3,7 @@ set(H_FILES
 )
 
 set(CPP_FILES
+  mitkPETModuleActivator.cpp
   mitkSUVCalculationHelper.cpp
   mitkSUVCalculation.cpp
   mitkSUVFunctorPolicy.cpp

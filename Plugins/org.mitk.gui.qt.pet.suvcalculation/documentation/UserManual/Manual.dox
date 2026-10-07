@@ -138,20 +138,29 @@ state.
 
 \section PETSUV_Diagnostics Diagnostics widget
 
-The diagnostics widget below the validation group renders two
-blocks:
+The diagnostics widget below the validation group renders up to four
+blocks, in this order:
 
 -# An <em>Auto-detected</em> summary of what the filter deduced from
    the input: vendor, pixel semantics, injected dose, half-life,
    decay-correction strategy, tracer index, and the active policy
    / overrides.
+-# The IBSI-SUV recommended adaptations the filter had to apply to
+   make the input usable, one line per adaptation with the original
+   and the used value. Warning-styled, because each of them changes
+   the resulting numbers. Supply an explicit override to avoid them,
+   or tick \b Strict \b DICOM \b input \b policy to refuse them
+   outright. Absent under the strict policy, which refuses the
+   adaptations instead of applying them.
+-# Rescale values worth a second look: a Rescale Slope (0028,1053)
+   that is absent or not positive, or a Rescale Intercept
+   (0028,1052) that is absent or not zero. An absent slope means the
+   stored values are used as if already scaled, and a non-zero
+   intercept offsets every voxel. Reported, not adapted: the strict
+   policy does not refuse them.
 -# An actionable message: either \b Configuration \b OK or a
    per-category hint mapped from the typed exception raised by the
-   filter (missing DICOM property, invalid DICOM property,
-   ambiguous decay timing, missing variant input, unsupported
-   units, missing Philips scale, vendor-empirical decay refused,
-   implausible dose, ambiguous-sex adaptation refused, generic
-   benchmark adaptation required).
+   filter.
 
 The \b Calculate \b SUV button is enabled exactly when the
 configuration is OK.

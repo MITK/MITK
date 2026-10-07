@@ -33,6 +33,7 @@ The Preferences dialogue allows you to adjust and save your general and view-spe
 \subsection MITKWorkbenchManualPage_Menu_Help Help
 
 This dialogue contains the user manuals view with the view-specific documentation, the welcome screen and information about MITK.
+"Diagnostic Data..." opens the list of saved crash dumps and diagnostic snapshots (see \ref MITKWorkbenchManualPage_CrashDumpDialog).
 
 \section MITKWorkbenchManualPage_Views Views
 
@@ -59,15 +60,34 @@ The four window view of the standard display is the heart of the MITK image view
 
 \section MITKWorkbenchManualPage_CrashDumpDialog Diagnostic Data After a Crash
 
-If MITK closed unexpectedly, a diagnostic snapshot (crash dump) of that session is saved on your computer. On the next start, a dialog lists the saved dumps and asks what to do with them:
+If MITK closed unexpectedly, or had to be terminated while it was not responding, a diagnostic snapshot (crash dump) of that session is saved on your computer. On the next start, a dialog lists the saved dumps with their kind and the MITK version that produced them, and asks what to do with them:
 
 <ul>
-  <li><b>Keep / Show in Folder</b> keeps the dumps and opens the folder they are stored in, so you can attach them to a problem report. This is the only way a dump is kept.</li>
-  <li><b>Discard</b> (the default, also chosen when you simply close the dialog) deletes them immediately.</li>
+  <li><b>Keep for later</b> keeps the dumps, so you can hand them in with a problem report. They can be found later under <i>Help > Diagnostic Data...</i>.</li>
+  <li><b>Remove</b> (the default, also chosen when you simply close the dialog) deletes them immediately.</li>
+  <li><b>File report...</b> appears only when a problem-report feature is installed. It keeps the dumps and passes them on to that feature.</li>
 </ul>
 
-A crash dump contains parts of the application's memory from the crashed session and may therefore include patient data. MITK never uploads crash dumps; they stay on your computer until you delete them or pass them on yourself. Kept dumps are not shown again on later starts, and only the 10 most recent dumps are retained.
+Either way, the dialog does not show these dumps again.
 
-If you do not want MITK to write crash dumps at all, start the application with the command-line option <tt>\--MITK.no-crash-dumps</tt> or set the environment variable <tt>MITK_NO_CRASH_DUMPS</tt>.
+A crash dump contains parts of the application's memory from the crashed session. If at any time during that session you opened, browsed or queried data about real people that was not fully anonymized (including in the DICOM browser or a PACS query), the dump may contain such data and must be handled through your usual process for patient or study-participant data. Other rules of your organisation may also restrict sharing a dump, for example for confidential or unpublished data. Please check before you pass a dump on, and send one to the MITK developers only if you are permitted to share it. MITK never uploads crash dumps on its own; they stay on your computer until you delete them or pass them on yourself, for example with a problem report.
+
+\subsection MITKWorkbenchManualPage_CrashDumpDialog_Manager Diagnostic Data
+
+<i>Help > Diagnostic Data...</i> lists all saved dumps: crash dumps, dumps of terminated unresponsive sessions, and snapshots captured with "Capture diagnostics" from an error message. For each dump it shows when it was written, its size, the MITK version, whether a copy of that session's log file was kept with it, and whether it is new or was already shown. You can show a dump in the file manager, open its log, copy its path, and delete selected or all dumps. Deleting cannot be undone.
+
+\subsection MITKWorkbenchManualPage_CrashDumpDialog_Preferences Preferences
+
+The page <i>Reports and Diagnostics > Crash Dumps</i> in the preferences controls:
+
+<ul>
+  <li><b>Record crash dumps</b> - whether dumps are written at all.</li>
+  <li><b>Dumps kept per kind</b> - how many of the most recent dumps of each kind are kept (1 to 10). A dump's copy of its session log is deleted together with it.</li>
+  <li><b>Watchdog for unresponsive sessions</b> - takes a snapshot when the user interface stops responding for the given time. The snapshot is deleted again if MITK recovers and is kept only if MITK has to be terminated. Not available on macOS.</li>
+</ul>
+
+The settings take effect at the next start and apply to every installation of the application on this computer, since all of them share one folder for diagnostic data.
+
+If you do not want MITK to write crash dumps for a session, start the application with the command-line option <tt>\--MITK.no-crash-dumps</tt> or set the environment variable <tt>MITK_NO_CRASH_DUMPS</tt>. Both take precedence over the preference, and existing dumps can still be handled under <i>Help > Diagnostic Data...</i>.
 
 */

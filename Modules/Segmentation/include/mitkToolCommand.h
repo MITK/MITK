@@ -81,6 +81,16 @@ namespace mitk
      */
     void SetShare(unsigned int index, unsigned int count);
 
+    /**
+     * \brief Report a fraction of the current run, mapped onto its share of the task.
+     *
+     * For tools whose work is not an ITK filter and therefore sends no
+     * itk::ProgressEvent. Does nothing if there is no task to report into.
+     *
+     * \param[in] fraction How much of the current run is done, from 0 to 1.
+     */
+    void ReportFraction(float fraction);
+
   protected:
     ToolCommand();
 

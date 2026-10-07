@@ -11,6 +11,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkAbstractNodeSelectionWidgetTest.cpp
   QmitkButtonOverlayWidgetTest.cpp
   QmitkIconThemeTest.cpp
+  QmitkLineCompletionTextEditTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNGeometryAuthorityTest.cpp
   QmitkMxNLayoutV2Test.cpp

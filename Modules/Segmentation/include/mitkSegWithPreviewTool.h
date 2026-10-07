@@ -66,7 +66,11 @@ namespace mitk
     itkGetMacro(KeepActiveAfterAccept, bool);
     itkBooleanMacro(KeepActiveAfterAccept);
 
-    /** \brief If true, the tool reacts to time point changes and updates the preview. */
+    /** \brief If true, the tool reacts to time point changes and updates the preview.
+     *
+     * If false, the preview of a tool with lazy dynamic previews stays at the time point of
+     * its last update, and ConfirmSegmentation() transfers that time point.
+     */
     itkSetMacro(IsTimePointChangeAware, bool);
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
@@ -156,6 +160,16 @@ namespace mitk
      */
     void SetLabelTransferMode(LabelTransferMode labelTransferMode);
     itkGetMacro(LabelTransferMode, LabelTransferMode);
+
+    /**
+     * \brief Whether the labels of all groups of the preview are transferred, or only those of its active group.
+     *
+     * If true, a label of the preview goes into the group of the segmentation
+     * that has the index of its group in the preview, and groups that the
+     * segmentation lacks are added to it. Otherwise the labels of the active
+     * group of the preview go into the active group of the segmentation.
+     */
+    itkGetConstMacro(TransfersAllPreviewGroups, bool);
 
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
@@ -262,6 +276,23 @@ namespace mitk
     itkGetConstMacro(RequiresVolumetricReference, bool);
     itkBooleanMacro(RequiresVolumetricReference);
 
+    /** \brief If true, CanHandle() rejects segmentations whose geometry differs from that
+     * of the reference image, such as a segmentation of a part of the image.
+     *
+     * For tools that compute their result on the grid of the reference image.
+     */
+    itkSetMacro(RequiresReferenceGeometry, bool);
+    itkGetConstMacro(RequiresReferenceGeometry, bool);
+    itkBooleanMacro(RequiresReferenceGeometry);
+
+    /** \brief See GetTransfersAllPreviewGroups(). False by default.
+     *
+     * Only for tools whose preview holds nothing but their results, as the
+     * preview starts as a clone of the segmentation with all its labels.
+     */
+    itkSetMacro(TransfersAllPreviewGroups, bool);
+    itkBooleanMacro(TransfersAllPreviewGroups);
+
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimeStep(const Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
@@ -299,7 +330,8 @@ namespace mitk
      * \brief Called before the preview content is transferred to the segmentation on confirmation.
      *
      * Default implementation ensures that all labels to be transferred exist in the segmentation.
-     * Missing labels are added by cloning label information from the preview.
+     * Missing labels are added by cloning label information from the preview, into the groups
+     * that GetTransfersAllPreviewGroups() describes.
      *
      * \param[in] labelMapping The mapping used for transferring labels from preview to result.
      */
@@ -311,9 +343,12 @@ namespace mitk
      * \param[in] labelMapping Indicates which labels to copy and optional label value remapping.
      * \param[in] source The source segmentation containing the label information.
      * \param[in,out] target The target segmentation that receives the label information.
+     * \param[in] intoSourceGroups If true, a label goes into the group of the target that has the
+     *            index of its group in the source, and missing groups are added to the target.
+     *            Otherwise all labels go into the active group of the target.
      */
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
-      const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
+      const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target, bool intoSourceGroups = false);
 
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
@@ -347,6 +382,12 @@ namespace mitk
     /** Resets only the image content of the specified timeStep of the preview image. If the preview image or the specified
     time step does not exist, nothing happens.*/
     void ResetPreviewContentAtTimeStep(unsigned int timeStep);
+
+    /** Removes all labels of the preview image together with their pixel content.
+    * For a tool that replaces the labels of the preview on every update, as
+    * opposed to writing into the labels it inherits from the segmentation.
+    * Nothing happens without a preview image.*/
+    void RemoveAllPreviewLabels();
 
     TimePointType GetLastTimePointOfUpdate() const;
 
@@ -405,8 +446,8 @@ namespace mitk
     /** Relevant if the working data / preview image has multiple time steps (dynamic segmentations).
      * This flag has to be set by derived classes accordingly to there way to generate dynamic previews.
      * If LazyDynamicPreview is true, the tool generates only the preview for the current time step.
-     * Therefore it always has to update the preview if current time point has changed and it has to (re)compute
-     * all timeframes if ConfirmSegmentation() is called.*/
+     * Therefore it always has to update the preview if current time point has changed and it has to compute
+     * all timeframes if ConfirmSegmentation() is called while all time steps are to be created.*/
     bool m_LazyDynamicPreviews = false;
 
     bool m_IsTimePointChangeAware = true;
@@ -467,6 +508,8 @@ namespace mitk
     bool m_RequiresExistingLabels = true;
     bool m_RequiresScalarReference = true;
     bool m_RequiresVolumetricReference = false;
+    bool m_RequiresReferenceGeometry = false;
+    bool m_TransfersAllPreviewGroups = false;
   };
 
 } // namespace

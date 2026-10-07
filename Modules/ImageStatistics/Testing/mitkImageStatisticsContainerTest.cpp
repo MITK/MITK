@@ -340,6 +340,11 @@ public:
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatistics(1,0).HasStatistic("Test"), true);
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatistics(1,1).HasStatistic("Test2"), true);
+
+        // Custom statistics shared by several containers must be listed once.
+        containers.push_back(m_StatisticsContainer.GetPointer());
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Shared custom statistic names are listed more than once.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
     }
 
     void Reset()

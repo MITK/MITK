@@ -102,19 +102,6 @@ namespace
     return name;
   }
 
-  // In the colors of the progress notification cards.
-  QString GetInfoCardStyleSheet()
-  {
-    const auto darkTheme = QmitkIconTheme::IsDarkTheme();
-
-    const auto surface = darkTheme ? QStringLiteral("#3f3f46") : QStringLiteral("palette(base)");
-    const auto border = darkTheme ? QStringLiteral("#54545a") : QStringLiteral("palette(mid)");
-
-    return QStringLiteral(
-      "#infoFrame { background-color: %1; border: 1px solid %2; border-radius: 4px; }"
-      "#infoFrame QLabel { background-color: transparent; border: none; }").arg(surface, border);
-  }
-
   void ReportRemeshingError(const std::exception_ptr& error)
   {
     try
@@ -179,20 +166,7 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
   m_Controls->remeshPushButton->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
   m_Controls->densityMemoryBar->SetSlider(m_Controls->densitySlider);
 
-  // Neither the style sheet nor a pixmap follows a theme switch on its own.
-  const auto updateInfoStyle = [this]()
-  {
-    auto* iconLabel = m_Controls->infoIconLabel;
-    const auto icon = QmitkIconTheme::GetIcon(QStringLiteral(":/Remeshing/info.svg"));
-
-    m_Controls->infoFrame->setStyleSheet(GetInfoCardStyleSheet());
-    iconLabel->setPixmap(icon.pixmap(QSize(16, 16), iconLabel->devicePixelRatioF()));
-  };
-
-  updateInfoStyle();
-  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, m_Controls->infoFrame, updateInfoStyle);
-
-  m_Controls->infoFrame->setVisible(false);
+  m_Controls->infoCard->setVisible(false);
   this->SetUpHoverInfo(parent);
 
   m_Controls->selectionWidget->SetDataStorage(this->GetDataStorage());
@@ -270,16 +244,16 @@ bool QmitkRemeshingView::eventFilter(QObject* watched, QEvent* event)
   {
     if (auto info = m_HoverInfo.find(watched); info != m_HoverInfo.end())
     {
-      m_Controls->infoLabel->setText(info->second);
-      m_Controls->infoFrame->setVisible(!info->second.isEmpty());
+      m_Controls->infoCard->SetMessage(info->second);
+      m_Controls->infoCard->setVisible(!info->second.isEmpty());
     }
   }
   else if (event->type() == QEvent::Leave && watched == m_Parent)
   {
     // Only here: crossing the gaps between the widgets of a row keeps what is
     // shown, which would otherwise flicker.
-    m_Controls->infoLabel->clear();
-    m_Controls->infoFrame->setVisible(false);
+    m_Controls->infoCard->SetMessage(QString());
+    m_Controls->infoCard->setVisible(false);
   }
 
   return QmitkAbstractView::eventFilter(watched, event);

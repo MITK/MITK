@@ -132,6 +132,18 @@ signals:
    */
   void PostInstallStepStarted(const QString& displayName);
 
+  /** \brief Emitted when the running post-install step reports its progress.
+   *
+   * The lines of the step that carry the report are not passed on through
+   * OutputReceived.
+   *
+   * \param[in] done How much of the step is done.
+   * \param[in] total How much there is to do, or 0 if the step cannot tell.
+   *
+   * \sa mitk::PostInstallStepProgress
+   */
+  void PostInstallStepProgressChanged(quint64 done, quint64 total);
+
   /** \brief Emitted when the installation terminates.
    *
    * Fires exactly once per StartInstall() call, covering both success and
@@ -159,8 +171,9 @@ signals:
    *
    * Fires during the Installing state for each resolved package as the
    * installer advances through the combined resolved list. Not emitted
-   * during virtual-env creation, pip upgrade, resolve, or model
-   * download - those phases are treated as indeterminate by the dialog.
+   * during virtual-env creation, pip upgrade, resolve, or post-install
+   * steps. A post-install step reports through PostInstallStepProgressChanged
+   * instead.
    *
    * \param[in] current Number of packages finished so far in the install phase.
    * \param[in] total Total number of resolved packages across all groups.

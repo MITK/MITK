@@ -36,8 +36,8 @@ namespace mitk
     To stay free of any Qt dependency, this class does not spawn the process
     itself: the GUI injects the resolved executable path (SetExecutablePath), a
     label-id-to-name lookup for the selected task (SetLabelNameLookup) and a
-    CommandRunner that actually runs the process while showing progress and
-    offering cancellation.
+    CommandRunner that actually runs the process. Progress and cancellation go
+    through the progress notification of the tool.
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl
@@ -59,13 +59,24 @@ namespace mitk
       Fastest
     };
 
+    /** \brief What a CommandRunner gets from the tool to carry out a run. */
+    struct RunControl
+    {
+      /** \brief Whether to stop the process: the user cancelled the run, or the tool was deactivated. */
+      std::function<bool()> IsStopRequested;
+
+      /** \brief Names the phase that the run is in, in the progress notification. */
+      std::function<void(const std::string& phase)> SetPhase;
+    };
+
     /** \brief Runs \p executable with \p args, returning \c true on success (exit 0)
      *         and \c false on cancellation or failure.
      *
      * Injected by the GUI so the long-running CLI call can keep the application
-     * responsive and cancellable while this core module stays free of Qt.
+     * responsive while this core module stays free of Qt. It polls
+     * RunControl::IsStopRequested() and stops the process when asked to.
      */
-    using CommandRunner = std::function<bool(const std::string& executable, const std::vector<std::string>& args)>;
+    using CommandRunner = std::function<bool(const std::string& executable, const std::vector<std::string>& args, const RunControl& control)>;
 
     const char *GetName() const override;
 
@@ -74,6 +85,12 @@ namespace mitk
 
     us::ModuleResource GetIconResource() const override;
     void Activated() override;
+
+    /** \brief Stops a run that is in progress, so it does not go on without the tool. */
+    void Deactivated() override;
+
+    /** \brief Tells that a run can be cancelled. */
+    bool IsCancelable() const override;
 
     itkSetMacro(Task, std::string);
     itkGetConstMacro(Task, std::string);
@@ -99,11 +116,10 @@ namespace mitk
     /** \brief Human-readable reason the last run produced no result, or empty if
      *         it succeeded or was cancelled by the user.
      *
-     * The SegWithPreviewTool base catches itk::ExceptionObject (which mitkThrow
-     * produces) and only forwards it to ErrorMessage, so such a throw never
-     * reaches the GUI's handler. DoUpdatePreview therefore catches its failures
-     * internally and records them here, letting the GUI tell a genuine failure
-     * from a user cancellation and show a meaningful message.
+     * The SegWithPreviewTool base forwards an exception to ErrorMessage, whose
+     * listeners present it in a message box apart from the tool. The tool
+     * therefore records the failure of a run here instead, letting the GUI
+     * tell a genuine failure from a user cancellation and present the reason.
      */
     const std::string& GetLastErrorMessage() const;
 
@@ -136,6 +152,7 @@ namespace mitk
     std::map<mitk::Label::PixelType, std::string> m_LabelNameLookup;
     CommandRunner m_CommandRunner;
     std::string m_LastErrorMessage;
+    bool m_AbortRequested = false;
   };
 } // namespace mitk
 #endif

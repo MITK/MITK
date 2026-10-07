@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cctype>
 #include <cmath>
 #include <functional>
+#include <iomanip>
+#include <locale>
+#include <map>
+#include <sstream>
 
 #include <dcmtk/dcmdata/dcvrdt.h>
 
@@ -31,10 +35,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyProvider.h>
 #include <mitkLog.h>
 #include <mitkSlicedGeometry3D.h>
+#include <nlohmann/json.hpp>
+
+#include "mitkSUVEnhancedPETGuards.h"
+#include "mitkSUVFunctionalGroupAccess.h"
 
 #include <chrono>
 namespace
 {
+  // DS (Decimal String) allows at most 16 characters. Ten significant digits
+  // in general format stay within that for every positive finite double
+  // ("1.234567891e-100" is 16) while keeping the value to ~5e-11 relative,
+  // far below the float32 precision of the SUV output. The classic locale
+  // keeps the decimal separator a '.' regardless of the process locale.
+  std::string FormatDecimalString(const double value)
+  {
+    std::ostringstream oss;
+    oss.imbue(std::locale::classic());
+    oss << std::setprecision(10) << value;
+    return oss.str();
+  }
+
   // String helpers used for the (0054,1102) value comparison.
   std::string TrimAsciiWhitespace(const std::string& s)
   {
@@ -99,98 +120,298 @@ namespace
     return mitk::ComputeMiliSecDuration(injection, reference) / 1000.0;
   }
 
-  // Resolve the radiopharmaceutical injection time into an absolute OFDateTime.
-  // Returns (parsed time, derivedFromTimeOnlyTag). The bool tells the caller
-  // whether the rollover guard may safely subtract 24 h to recover an
-  // ambiguous timing situation.
-  std::pair<OFDateTime, bool> ResolveInjectionDateTime(
-    const mitk::IPropertyProvider* provider,
-    const std::string& fallbackAcquisitionDate)
+  // Seconds since midnight of the instant \a time denotes, on the same
+  // normalization ConvertOFDateTimeToTimePoint applies: a stamp carrying a
+  // UTC offset is shifted by it, a stamp without one is taken as local to
+  // itself. Both halves of the administration-time rule below must agree on
+  // this or they measure different things -- and no benchmark DRO mixes the
+  // two forms, so nothing but this comment and its unit test guards it.
+  double SecondsOfDayUTC(const OFDateTime& time)
   {
-    // Prefer the unambiguous DateTime tag.
+    constexpr long long kMsPerDay = 24LL * 60LL * 60LL * 1000LL;
+    const auto ms = mitk::ConvertOFDateTimeToTimePoint(time).time_since_epoch().count();
+    // Floor-modulo, not truncating: anonymized inputs carry pre-1970 dates
+    // (DRO_4_4 uses 1960-01-01), where a truncating % yields a negative
+    // time of day.
+    long long remainder = ms % kMsPerDay;
+    if (remainder < 0)
+    {
+      remainder += kMsPerDay;
+    }
+    return static_cast<double>(remainder) / 1000.0;
+  }
+
+  double NormalizeSecondsOfDay(double seconds)
+  {
+    constexpr double kSecondsPerDay = 24.0 * 60.0 * 60.0;
+    double normalized = std::fmod(seconds, kSecondsPerDay);
+    if (normalized < 0.0)
+    {
+      normalized += kSecondsPerDay;
+    }
+    return normalized;
+  }
+
+  /** The two radiopharmaceutical administration-time tags, read once.
+   *
+   * Both are image-level, so they are resolved outside the per-slice loop.
+   * Either may be absent -- that combination is a refusal condition the
+   * consumer reports, not something this function pre-validates. A tag that
+   * is present but unparseable is an error rather than an absence: falling
+   * through to the other tag would silently compute from a different
+   * instant than the one the input names. */
+  struct AdministrationTimeTags
+  {
+    bool       haveStartDateTime = false;   // (0018,1078) present and parsed
+    OFDateTime startDateTime;
+    bool       haveStartTime = false;       // (0018,1072) present and parsed
+    double     startTimeOfDaySeconds = 0.0; // valid only if haveStartTime
+
+    // Stored strings, kept for the adaptation record.
+    std::string startDateTimeStored;
+    std::string startTimeStored;
+  };
+
+  AdministrationTimeTags ResolveAdministrationTimeTags(const mitk::IPropertyProvider* provider)
+  {
+    AdministrationTimeTags tags;
+
     mitk::DICOMTagPath startDateTimePath;
     startDateTimePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1078);
-    const auto* startDateTimeProp = FindFirstDICOMProperty(provider, startDateTimePath);
-
-    if (startDateTimeProp != nullptr)
+    if (const auto* prop = FindFirstDICOMProperty(provider, startDateTimePath))
     {
-      OFDateTime parsed;
-      // (0018,1078) is a DT VR — date and time are already encoded together.
-      if (!ConvertDICOMDateTimeString("", startDateTimeProp->GetValue(0, 0, true, true), parsed))
+      const std::string raw = prop->GetValue(0, 0, true, true);
+      // (0018,1078) is a DT VR -- date and time are already encoded together.
+      if (!ConvertDICOMDateTimeString("", raw, tags.startDateTime))
       {
         mitkThrowException(mitk::InvalidDICOMPropertyValueException)
           << "Cannot parse Radiopharmaceutical Start DateTime (0018,1078) value '"
-          << startDateTimeProp->GetValue(0, 0, true, true) << "'.";
+          << raw << "'.";
       }
-      return { parsed, false };
+      tags.startDateTimeStored = raw;
+      tags.haveStartDateTime = true;
     }
 
     mitk::DICOMTagPath startTimePath;
     startTimePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1072);
-    const auto* startTimeProp = FindFirstDICOMProperty(provider, startTimePath);
-
-    if (startTimeProp != nullptr)
+    if (const auto* prop = FindFirstDICOMProperty(provider, startTimePath))
     {
-      if (fallbackAcquisitionDate.empty())
-      {
-        mitkThrowException(mitk::MissingDICOMPropertyException)
-          << "Radiopharmaceutical Start Time (0018,1072) is present but no "
-             "fallback acquisition date is available to construct an absolute "
-             "injection timestamp.";
-      }
+      const std::string raw = prop->GetValue(0, 0, true, true);
       OFDateTime parsed;
-      if (!ConvertDICOMDateTimeString(fallbackAcquisitionDate,
-                                      startTimeProp->GetValue(0, 0, true, true),
-                                      parsed))
+      // (0018,1072) is a TM VR and carries no date. Any date parses it into
+      // an absolute instant; only its time of day is ever read back.
+      if (!ConvertDICOMDateTimeString("19700101", raw, parsed))
       {
         mitkThrowException(mitk::InvalidDICOMPropertyValueException)
           << "Cannot parse Radiopharmaceutical Start Time (0018,1072) value '"
-          << startTimeProp->GetValue(0, 0, true, true)
-          << "' with fallback date '" << fallbackAcquisitionDate << "'.";
+          << raw << "'.";
       }
-      return { parsed, true };
+      tags.startTimeOfDaySeconds = SecondsOfDayUTC(parsed);
+      tags.startTimeStored = raw;
+      tags.haveStartTime = true;
+    }
+
+    return tags;
+  }
+
+  // Above this half-life an administration date that is wrong by a whole
+  // day still produces a plausible SUV, so the substitution below is not
+  // permitted and the input has to be refused outright.
+  constexpr double kDateSubstitutionHalfLifeLimitSeconds = 41400.0;
+
+  // The substitution never forms a datetime -- it works on time of day only
+  // (see SubstituteAdministrationDate) -- and the date it implies may differ
+  // per slice, so the record states the rule applied rather than a value.
+  constexpr const char* kAdministrationDateSubstitutionUsedValue =
+    "stored time of day, date from the decay-correction reference datetime";
+
+  // Announce an adaptation once per deduction rather than once per slice.
+  // ResolveDecayDurationSeconds runs for every (timestep, slice), so without
+  // this a 20-slice volume repeats an identical warning 20 times and fills
+  // the record with duplicates carrying no extra information. Returns
+  // whether the rule was newly recorded, so the caller can gate its log line
+  // on the same condition.
+  //
+  // The record therefore states that a rule fired, not how many slices it
+  // fired on. Where only some slices adapt, the first one speaks for them;
+  // the alternative -- a per-slice record -- would be unreadable and no
+  // caller has asked to distinguish the cases.
+  bool RecordAdaptationOnce(std::vector<mitk::SUVAdaptation>& adaptations,
+                            mitk::DICOMReadPolicy policy,
+                            mitk::SUVAdaptationRule rule,
+                            const std::string& dicomTag,
+                            const std::string& originalValue,
+                            const std::string& usedValue)
+  {
+    const bool alreadyRecorded =
+      std::any_of(adaptations.cbegin(), adaptations.cend(),
+                  [rule](const mitk::SUVAdaptation& entry) { return rule == entry.rule; });
+    if (alreadyRecorded)
+    {
+      return false;
+    }
+    mitk::RecordAdaptation(&adaptations, policy, rule, dicomTag, originalValue, usedValue);
+    return true;
+  }
+
+  // Reconstruct the decay duration when the stored administration date
+  // cannot be trusted: keep the stored time of day, take the date from the
+  // reference instant. Because the two then share a date by construction,
+  // "reference minus administration" collapses to plain time-of-day
+  // arithmetic -- and subtracting a day from the administration datetime is
+  // the same operation as adding one to the difference. That equivalence is
+  // what lets this avoid calendar arithmetic entirely, and with it a whole
+  // class of month- and year-boundary bugs.
+  double SubstituteAdministrationDate(double referenceTimeOfDaySeconds,
+                                      double administrationTimeOfDaySeconds,
+                                      mitk::DICOMReadPolicy policy,
+                                      std::vector<mitk::SUVAdaptation>& adaptations)
+  {
+    constexpr double kSecondsPerDay = 24.0 * 60.0 * 60.0;
+
+    double duration = referenceTimeOfDaySeconds - administrationTimeOfDaySeconds;
+    if (duration < mitk::kEarliestDecayDurationSeconds)
+    {
+      duration += kSecondsPerDay;
+      if (RecordAdaptationOnce(adaptations, policy,
+                               mitk::SUVAdaptationRule::AdministrationTimeShiftedBackOneDay,
+                               "", "", FormatDecimalString(duration)))
+      {
+        MITK_WARN << "Reconstructed administration datetime falls after the "
+                     "decay-correction reference time; moving it back one day "
+                     "per the IBSI-SUV recommendation. Decay duration: "
+                  << duration << " s.";
+      }
+    }
+    return duration;
+  }
+
+  /** Residual decay duration for one (timestep, slice), per IBSI-SUV v3.0.1.
+   *
+   * The reference instant arrives as a stored datetime plus an offset in
+   * seconds rather than as a single OFDateTime, because two of the four
+   * call sites compute it as "acquisition datetime + a correction" and
+   * DCMTK offers no datetime-plus-duration arithmetic. */
+  double ResolveDecayDurationSeconds(const AdministrationTimeTags& admin,
+                                     const OFDateTime& referenceBase,
+                                     double referenceOffsetSeconds,
+                                     double halfLifeSeconds,
+                                     mitk::DICOMReadPolicy policy,
+                                     std::vector<mitk::SUVAdaptation>& adaptations)
+  {
+    if (!std::isfinite(halfLifeSeconds) || halfLifeSeconds <= 0.0)
+    {
+      // Every branch below is keyed on the half-life -- even the one that
+      // uses (0018,1078) verbatim, whose acceptance window is 2 * T_half.
+      // Without it there is no rule to apply, so refuse rather than invent
+      // a window.
+      mitkThrowException(mitk::MissingDICOMPropertyException)
+        << "Resolving the radiopharmaceutical administration time requires a "
+           "positive radionuclide half-life (got " << halfLifeSeconds
+        << " s). Provide it via an explicit override or supply DICOM "
+           "(0018,1075).";
+    }
+
+    const double referenceTimeOfDay =
+      NormalizeSecondsOfDay(SecondsOfDayUTC(referenceBase) + referenceOffsetSeconds);
+
+    if (admin.haveStartDateTime)
+    {
+      const double offset =
+        DurationInSeconds(admin.startDateTime, referenceBase) + referenceOffsetSeconds;
+
+      if (offset >= mitk::kEarliestDecayDurationSeconds && offset < 2.0 * halfLifeSeconds)
+      {
+        return offset;
+      }
+
+      if (halfLifeSeconds >= kDateSubstitutionHalfLifeLimitSeconds)
+      {
+        mitkThrowException(mitk::UnrecoverableAdministrationDateException)
+          << "(0018,1078) Radiopharmaceutical Start DateTime yields a decay "
+             "duration of " << offset << " s, outside the plausible window "
+             "[" << mitk::kEarliestDecayDurationSeconds << " s, 2 * half-life). "
+             "Reconstructing the administration date from the reference "
+             "datetime is only permitted below a half-life of "
+          << kDateSubstitutionHalfLifeLimitSeconds << " s, and this "
+             "radionuclide's is " << halfLifeSeconds
+          << " s. Re-export the data with a correct administration date.";
+      }
+
+      if (mitk::DICOMReadPolicy::Strict == policy)
+      {
+        mitkThrowException(mitk::AdministrationDateSubstitutionRefusedException)
+          << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
+             "implausible decay duration of " << offset << " s. The IBSI-SUV "
+             "recommendation reconstructs the administration date from the "
+             "decay-correction reference datetime, but "
+             "DICOMReadPolicy::Strict is active. Re-export the data with a "
+             "correct administration date or relax the policy.";
+      }
+
+      if (RecordAdaptationOnce(adaptations, policy,
+                               mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime,
+                               "(0018,1078)", admin.startDateTimeStored,
+                               kAdministrationDateSubstitutionUsedValue))
+      {
+        MITK_WARN << "(0018,1078) Radiopharmaceutical Start DateTime yields an "
+                     "implausible decay duration of " << offset
+                  << " s; keeping its time of day and taking the date from the "
+                     "decay-correction reference datetime per the IBSI-SUV "
+                     "recommendation.";
+      }
+
+      return SubstituteAdministrationDate(referenceTimeOfDay,
+                                          SecondsOfDayUTC(admin.startDateTime),
+                                          policy, adaptations);
+    }
+
+    if (admin.haveStartTime)
+    {
+      if (halfLifeSeconds >= kDateSubstitutionHalfLifeLimitSeconds)
+      {
+        mitkThrowException(mitk::UnrecoverableAdministrationDateException)
+          << "Only (0018,1072) Radiopharmaceutical Start Time is available, "
+             "which carries no date. Reconstructing one from the "
+             "decay-correction reference datetime is only permitted below a "
+             "half-life of " << kDateSubstitutionHalfLifeLimitSeconds
+          << " s, and this radionuclide's is " << halfLifeSeconds
+          << " s -- an uptake longer than a day would be indistinguishable "
+             "from a short one. Re-export the data with (0018,1078) "
+             "Radiopharmaceutical Start DateTime.";
+      }
+
+      if (mitk::DICOMReadPolicy::Strict == policy)
+      {
+        mitkThrowException(mitk::AdministrationDateSubstitutionRefusedException)
+          << "Only (0018,1072) Radiopharmaceutical Start Time is available. "
+             "The IBSI-SUV recommendation reconstructs the administration "
+             "date from the decay-correction reference datetime, but "
+             "DICOMReadPolicy::Strict is active. Re-export the data with "
+             "(0018,1078) Radiopharmaceutical Start DateTime or relax the "
+             "policy.";
+      }
+
+      if (RecordAdaptationOnce(adaptations, policy,
+                               mitk::SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime,
+                               "(0018,1072)", admin.startTimeStored,
+                               kAdministrationDateSubstitutionUsedValue))
+      {
+        MITK_WARN << "Only (0018,1072) Radiopharmaceutical Start Time is "
+                     "available; taking the administration date from the "
+                     "decay-correction reference datetime per the IBSI-SUV "
+                     "recommendation.";
+      }
+
+      return SubstituteAdministrationDate(referenceTimeOfDay,
+                                          admin.startTimeOfDaySeconds,
+                                          policy, adaptations);
     }
 
     mitkThrowException(mitk::MissingDICOMPropertyException)
       << "No radiopharmaceutical injection time available: neither "
          "(0018,1078) Radiopharmaceutical Start DateTime nor (0018,1072) "
          "Radiopharmaceutical Start Time was found.";
-  }
-
-  // Numeric rollover guard for a precomputed (reference - injection)
-  // duration in seconds; it does not compute the difference itself.
-  // - If the result is negative AND the injection time was derived from
-  //   the (0018,1072) TM-only tag (whose date had to be assembled from the
-  //   acquisition date), subtract 24 h from the injection and try once more.
-  //   This recovers the typical "injected last night, scanned this morning"
-  //   ambiguity.
-  // - If the result is still outside [0, 24 h], throw
-  //   AmbiguousDecayTimingException.
-  // - For (0018,1078)-derived data, no rollover correction is applied; any
-  //   negative duration throws.
-  double GuardDecayDurationSeconds(double durationSeconds,
-                                   bool injectionFromTimeOnlyTag)
-  {
-    constexpr double kSecondsIn24h = 24.0 * 60.0 * 60.0;
-
-    double seconds = durationSeconds;
-
-    if (seconds < 0.0 && injectionFromTimeOnlyTag)
-    {
-      seconds += kSecondsIn24h;
-    }
-
-    if (seconds < 0.0 || seconds > kSecondsIn24h)
-    {
-      mitkThrowException(mitk::AmbiguousDecayTimingException)
-        << "Cannot reconcile radiopharmaceutical injection time and "
-           "acquisition / series reference time. Computed decay duration: "
-        << seconds << " s. Please re-export the data with "
-           "(0018,1078) Radiopharmaceutical Start DateTime to remove the "
-           "ambiguity.";
-    }
-
-    return seconds;
   }
 
   // Pull a named property (attached out-of-band — e.g. the lifted vendor
@@ -214,13 +435,14 @@ namespace
   }
 
   // Read a numeric DICOM tag at (timestep, slice). Returns NaN if the tag
-  // is absent at that slot or cannot be parsed.
+  // is absent at that slot or cannot be parsed. The lookup is exact: a slot
+  // that lacks the tag must not answer with a neighbouring slot's value.
   double ReadNumericTagAt(const mitk::DICOMProperty* prop,
                           mitk::TimeStepType t,
                           mitk::SlicedData::IndexValueType s)
   {
     if (nullptr == prop) return std::numeric_limits<double>::quiet_NaN();
-    const std::string raw = prop->GetValue(t, s, true, true);
+    const std::string raw = mitk::SUVFunctionalGroupAccess::ValueAt(prop, t, s);
     if (raw.empty()) return std::numeric_limits<double>::quiet_NaN();
     return mitk::ConvertDICOMStrToValue<double>(raw);
   }
@@ -290,9 +512,137 @@ namespace
   }
 }
 
+const char* mitk::SUVAdaptationRuleToString(mitk::SUVAdaptationRule rule)
+{
+  switch (rule)
+  {
+    case SUVAdaptationRule::DoseReinterpretedAsMBq:
+      return "DoseReinterpretedAsMBq";
+    case SUVAdaptationRule::VendorEmpiricalDecayFallback:
+      return "VendorEmpiricalDecayFallback";
+    case SUVAdaptationRule::UnrecognizedManufacturer:
+      return "UnrecognizedManufacturer";
+    case SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale:
+      return "AmbiguousPatientSexMeanOfMaleAndFemale";
+    case SUVAdaptationRule::AdministrationDateFromReferenceWithStartDateTime:
+      return "AdministrationDateFromReferenceWithStartDateTime";
+    case SUVAdaptationRule::AdministrationDateFromReferenceWithStartTime:
+      return "AdministrationDateFromReferenceWithStartTime";
+    case SUVAdaptationRule::AdministrationTimeShiftedBackOneDay:
+      return "AdministrationTimeShiftedBackOneDay";
+    case SUVAdaptationRule::WeightReinterpretedAsGrams:
+      return "WeightReinterpretedAsGrams";
+  }
+
+  // No default, so adding a rule without a name is a compiler warning
+  // rather than a silent "Unknown" in every persisted record.
+  return "Unknown";
+}
+
+void mitk::RecordAdaptation(std::vector<mitk::SUVAdaptation>* adaptations,
+                            mitk::DICOMReadPolicy policy,
+                            mitk::SUVAdaptationRule rule,
+                            const std::string& dicomTag,
+                            const std::string& originalValue,
+                            const std::string& usedValue)
+{
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(BenchmarkAdaptationRequiredException)
+      << "The IBSI-SUV recommendation '" << SUVAdaptationRuleToString(rule)
+      << "' was applied under DICOMReadPolicy::Strict, which forbids it. "
+         "This rule reached the adaptation record without a rule-specific "
+         "refusal, which is an implementation defect -- please report it. "
+         "Re-export the input so no adaptation is needed, or relax the "
+         "policy to Lenient.";
+  }
+
+  if (nullptr == adaptations)
+  {
+    return;
+  }
+
+  const SUVAdaptation entry{rule, dicomTag, originalValue, usedValue};
+  if (std::find(adaptations->cbegin(), adaptations->cend(), entry) == adaptations->cend())
+  {
+    adaptations->push_back(entry);
+  }
+}
+
+std::string mitk::FormatAdaptationSummary(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  if (adaptations.empty())
+  {
+    return std::string();
+  }
+
+  std::ostringstream summary;
+  summary << "IBSI-SUV input adaptations applied (" << adaptations.size() << "):";
+
+  for (const auto& adaptation : adaptations)
+  {
+    summary << "\n  - " << SUVAdaptationRuleToString(adaptation.rule);
+    if (!adaptation.dicomTag.empty())
+    {
+      summary << " " << adaptation.dicomTag;
+    }
+
+    if (!adaptation.originalValue.empty() && !adaptation.usedValue.empty())
+    {
+      summary << ": " << adaptation.originalValue << " -> " << adaptation.usedValue;
+    }
+    else if (!adaptation.usedValue.empty())
+    {
+      summary << ": " << adaptation.usedValue;
+    }
+    else if (!adaptation.originalValue.empty())
+    {
+      summary << ": " << adaptation.originalValue;
+    }
+  }
+
+  return summary.str();
+}
+
+std::string mitk::SerializeAdaptations(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  auto entries = nlohmann::json::array();
+
+  for (const auto& adaptation : adaptations)
+  {
+    entries.push_back({{"rule", SUVAdaptationRuleToString(adaptation.rule)},
+                       {"dicomTag", adaptation.dicomTag},
+                       {"originalValue", adaptation.originalValue},
+                       {"usedValue", adaptation.usedValue}});
+  }
+
+  return entries.dump();
+}
+
+std::string mitk::FormatDerivationDescription(const std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  // (0008,2111) is LO: 64 characters, and DICOM forbids exceeding them.
+  constexpr std::string::size_type kLongStringLimit = 64u;
+
+  std::ostringstream description;
+  description << "MITK SUV";
+  if (!adaptations.empty())
+  {
+    description << "; " << adaptations.size() << " IBSI-SUV input adaptation"
+                << (1u == adaptations.size() ? "" : "s") << " applied";
+  }
+
+  std::string text = description.str();
+  if (text.size() > kLongStringLimit)
+  {
+    text.resize(kLongStringLimit);
+  }
+
+  return text;
+}
+
 std::vector<mitk::RadiopharmaceuticalInfo>
-mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
-                                  mitk::DICOMReadPolicy policy)
+mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider)
 {
   using IndexedMap = std::map<DICOMTagPath::ItemSelectionIndex, RadiopharmaceuticalInfo>;
   IndexedMap byIndex;
@@ -331,36 +681,14 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
   // cluster around 4e2 (MBq) and 4e8 (Bq), with no plausible value in
   // between. Per the IBSI-SUV recommendation, values strictly below the
   // 1e4 threshold are interpreted as MBq and converted to Bq.
-  // DICOMReadPolicy controls the response: Lenient applies the
-  // conversion with a WARN; Strict refuses it and raises a dedicated
-  // exception so callers can surface the input issue.
   DICOMTagPath dosePath;
   dosePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
-  enumerate(dosePath, [policy](RadiopharmaceuticalInfo& info, const std::string& v)
+  enumerate(dosePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
   {
     const double raw = ConvertDICOMStrToValue<double>(v);
-    if (raw > 0.0 && raw < 1.0e4)
-    {
-      if (policy == DICOMReadPolicy::Strict)
-      {
-        mitkThrowException(ImplausibleRadionuclideDoseException)
-          << "Radionuclide Total Dose (0018,1074) value " << raw
-          << " is below the 1e4 plausibility threshold and would be "
-             "reinterpreted as MBq under the IBSI-SUV recommendation, "
-             "but DICOMReadPolicy::Strict is active. Re-export the "
-             "input with a Bq-magnitude value or rerun in lenient mode.";
-      }
-      const double converted = raw * 1.0e6;
-      MITK_WARN << "Radionuclide Total Dose (0018,1074) value " << raw
-                << " is below the 1e4 plausibility threshold; "
-                   "interpreting as MBq and converting to Bq (= "
-                << converted << " Bq) per IBSI-SUV recommendation.";
-      info.totalDoseBq = converted;
-    }
-    else
-    {
-      info.totalDoseBq = raw;
-    }
+    info.totalDoseStored = v;
+    info.totalDoseReinterpretedAsMBq = (raw > 0.0 && raw < 1.0e4);
+    info.totalDoseBq = info.totalDoseReinterpretedAsMBq ? raw * 1.0e6 : raw;
   });
 
   // Radionuclide code meaning, nested in (0054,0300). The outer index we
@@ -391,7 +719,50 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
   return result;
 }
 
-double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
+mitk::DICOMTagPath mitk::RadiopharmaceuticalDoseTagPath(const int item)
+{
+  DICOMTagPath path;
+  path.AddSelection(0x0054, 0x0016, item).AddElement(0x0018, 0x1074);
+  return path;
+}
+
+void mitk::ApplyDosePlausibilityPolicy(const mitk::RadiopharmaceuticalInfo& info,
+                                       const int item,
+                                       const mitk::DICOMReadPolicy policy,
+                                       std::vector<mitk::SUVAdaptation>& adaptations)
+{
+  if (!info.totalDoseReinterpretedAsMBq)
+  {
+    return;
+  }
+
+  // DICOMReadPolicy controls the response: Lenient applies the conversion
+  // with a WARN; Strict refuses it and raises a dedicated exception so
+  // callers can surface the input issue. The dedicated exception has to be
+  // thrown here, because RecordAdaptation would refuse under Strict with a
+  // generic one.
+  const std::string tagPath = RadiopharmaceuticalDoseTagPath(item).ToStr();
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(ImplausibleRadionuclideDoseException)
+      << "Radionuclide Total Dose " << tagPath << " value " << info.totalDoseStored
+      << " is below the 1e4 plausibility threshold and would be "
+         "reinterpreted as MBq under the IBSI-SUV recommendation, "
+         "but DICOMReadPolicy::Strict is active. Re-export the "
+         "input with a Bq-magnitude value or rerun in lenient mode.";
+  }
+
+  MITK_WARN << "Radionuclide Total Dose " << tagPath << " value " << info.totalDoseStored
+            << " is below the 1e4 plausibility threshold; "
+               "interpreting as MBq and converting to Bq (= "
+            << info.totalDoseBq << " Bq) per IBSI-SUV recommendation.";
+  RecordAdaptation(&adaptations, policy, SUVAdaptationRule::DoseReinterpretedAsMBq,
+                   tagPath, info.totalDoseStored, FormatDecimalString(info.totalDoseBq));
+}
+
+double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider,
+                               mitk::DICOMReadPolicy policy,
+                               std::vector<mitk::SUVAdaptation>& adaptations)
 {
   if (nullptr == provider)
   {
@@ -409,7 +780,37 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
          "(0010,1030) Patient Weight was found.";
   }
 
-  return ConvertDICOMStrToValue<double>(props.begin()->second->GetValueAsString());
+  const std::string raw = props.begin()->second->GetValueAsString();
+  const double stored = ConvertDICOMStrToValue<double>(raw);
+
+  // DICOM prescribes kilograms, and no human weighs 1000 of them, so a value
+  // at or above the threshold is a gram-encoded export rather than a very
+  // large patient. Taken at face value it makes every SUV 1000x too small.
+  constexpr double kGramEncodingThresholdKg = 1000.0;
+  if (!std::isfinite(stored) || stored < kGramEncodingThresholdKg)
+  {
+    return stored;
+  }
+
+  if (DICOMReadPolicy::Strict == policy)
+  {
+    mitkThrowException(ImplausiblePatientWeightException)
+      << "(0010,1030) Patient's Weight is " << stored << ", which is not a "
+         "plausible weight in the kilograms DICOM prescribes. The IBSI-SUV "
+         "recommendation reads values at or above "
+      << kGramEncodingThresholdKg << " as grams, but DICOMReadPolicy::Strict "
+         "is active. Re-export with the weight in kilograms or relax the "
+         "policy.";
+  }
+
+  const double weightKg = stored / 1000.0;
+  MITK_WARN << "(0010,1030) Patient's Weight is " << stored << ", which is not "
+               "a plausible weight in kilograms; interpreting it as grams ("
+            << weightKg << " kg) per the IBSI-SUV recommendation.";
+  RecordAdaptation(&adaptations, policy, SUVAdaptationRule::WeightReinterpretedAsGrams,
+                   "(0010,1030)", raw, FormatDecimalString(weightKg));
+
+  return weightKg;
 }
 
 double mitk::GetPatientsHeight(const mitk::IPropertyProvider* provider)
@@ -493,6 +894,120 @@ mitk::ManufacturerFamily mitk::GetManufacturerFamily(const mitk::IPropertyProvid
   return ManufacturerFamily::Other;
 }
 
+bool mitk::IsEnhancedPETInput(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    return false;
+  }
+  const std::string sopClassUID =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0008, 0x0016)));
+  return ENHANCED_PET_SOP_CLASS_UID == sopClassUID;
+}
+
+void mitk::RequireEnhancedPETFramesResolved(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    return;
+  }
+
+  const std::string rawFrames =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x0008)));
+  int frames = 0;
+  try
+  {
+    frames = std::stoi(rawFrames);
+  }
+  catch (const std::exception&)
+  {
+    return;
+  }
+  if (frames <= 1)
+  {
+    return;
+  }
+
+  // The reader publishes the functional-group attributes of a file together
+  // or not at all, so any one of the macros the pipeline reads is evidence
+  // that the frames were mapped.
+  const DICOMTagPath probes[] = {
+    DICOMTagPath().AddAnySelection(0x0040, 0x9096).AddAnySelection(0x0040, 0x08EA).AddElement(0x0008, 0x0100),
+    DICOMTagPath().AddAnySelection(0x0040, 0x9096).AddElement(0x0040, 0x9225),
+    DICOMTagPath().AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1053),
+    DICOMTagPath().AddAnySelection(0x0028, 0x9145).AddElement(0x0028, 0x1054),
+    DICOMTagPath().AddAnySelection(0x0020, 0x9111).AddElement(0x0018, 0x9151),
+    DICOMTagPath().AddAnySelection(0x0020, 0x9111).AddElement(0x0018, 0x9074),
+  };
+  for (const auto& probe : probes)
+  {
+    if (!mitk::GetPropertyByDICOMTagPath(provider, probe).empty())
+    {
+      return;
+    }
+  }
+
+  mitkThrowException(EnhancedPETFramesUnresolvedException)
+    << "This Enhanced PET object has " << frames << " frames but none of its "
+       "functional-group values reached MITK, so its per-frame values cannot "
+       "be resolved per slice. The DICOM reader maps functional groups to "
+       "frames only when the Per-Frame Functional Groups Sequence carries one "
+       "item per frame; see the reader's warning for this file.";
+}
+
+std::vector<std::string> mitk::CheckRescalePlausibility(const mitk::IPropertyProvider* provider)
+{
+  std::vector<std::string> findings;
+
+  if (nullptr == provider || IsEnhancedPETInput(provider))
+  {
+    return findings;
+  }
+
+  const std::string rawSlope =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1053)));
+  if (rawSlope.empty())
+  {
+    findings.push_back(
+      "(0028,1053) Rescale Slope is absent or empty. The IBSI-SUV "
+      "recommendations require it to be present; the reader has treated the "
+      "stored values as already scaled.");
+  }
+  else
+  {
+    const double slope = ConvertDICOMStrToValue<double>(rawSlope);
+    if (!std::isfinite(slope) || slope <= 0.0)
+    {
+      findings.push_back(
+        "(0028,1053) Rescale Slope is " + rawSlope +
+        ". The IBSI-SUV recommendations expect a positive value; a "
+        "non-positive slope inverts or flattens the activity scale.");
+    }
+  }
+
+  const std::string rawIntercept =
+    TrimAsciiWhitespace(mitk::GetFirstDICOMValueAsString(provider, DICOMTagPath(0x0028, 0x1052)));
+  if (rawIntercept.empty())
+  {
+    findings.push_back(
+      "(0028,1052) Rescale Intercept is absent or empty. The IBSI-SUV "
+      "recommendations require it to be present.");
+  }
+  else
+  {
+    const double intercept = ConvertDICOMStrToValue<double>(rawIntercept);
+    if (!std::isfinite(intercept) || 0.0 != intercept)
+    {
+      findings.push_back(
+        "(0028,1052) Rescale Intercept is " + rawIntercept +
+        ". The IBSI-SUV recommendations expect zero for PET; a non-zero "
+        "intercept offsets every voxel of the activity concentration.");
+    }
+  }
+
+  return findings;
+}
+
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)
 {
   const DICOMTagPath decayCorrPath(0x0054, 0x1102);
@@ -518,7 +1033,8 @@ mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IProp
 
 namespace
 {
-  // For ADMIN and START, every (timestep, slice) entry holds the same value.
+  // One value for every (timestep, slice), for an object whose pixels share a
+  // single decay reference.
   // The iteration source is purely the SlicedData time geometry; no DICOM
   // acquisition tag is required for the iteration.
   void FillUniformDecayMap(const mitk::SlicedData* data,
@@ -571,6 +1087,93 @@ namespace
     }
     return infos[0].halfLifeSeconds;
   }
+
+  // Fill the decay map of an Enhanced PET object whose pixels are not decay
+  // corrected: the reference is the moment each frame was measured, so every
+  // slice resolves its own instant from (0018,9151) Frame Reference DateTime,
+  // or from (0018,9074) plus T_ave when a frame carries no reference instant.
+  // The precedence is per frame, as the manual states it, so a file may mix
+  // the two.
+  void FillPerFrameDecayMap(const mitk::SlicedData* data,
+                            const AdministrationTimeTags& admin,
+                            double halfLifeSeconds,
+                            mitk::DICOMReadPolicy policy,
+                            mitk::DecayCorrectionInfo& info)
+  {
+    using mitk::SUVFunctionalGroupAccess::FirstMatch;
+    using mitk::SUVFunctionalGroupAccess::MacroAttribute;
+    using mitk::SUVFunctionalGroupAccess::ValueAt;
+    const auto frameReferenceProp = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9151));
+    const auto acquisitionProp    = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9074));
+    const auto durationProp       = FirstMatch(data, MacroAttribute(0x0020, 0x9111, 0x0018, 0x9220));
+
+    const auto timeSteps = data->GetTimeSteps();
+    for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
+    {
+      const auto* sliced = data->GetSlicedGeometry(t);
+      const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+      auto& sliceMap = info.decayTimes[t];
+      for (unsigned int s = 0; s < slices; ++s)
+      {
+        const auto z = static_cast<mitk::SlicedData::IndexValueType>(s);
+
+        const std::string frameReference =
+          TrimAsciiWhitespace(ValueAt(frameReferenceProp, t, z));
+        if (!frameReference.empty())
+        {
+          OFDateTime reference;
+          if (!ParseDICOMDateTime(frameReference, reference))
+          {
+            mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+              << "Cannot parse (0018,9151) Frame Reference DateTime value '"
+              << frameReference << "' at timestep " << t << " slice " << s << ".";
+          }
+          sliceMap[z] = ResolveDecayDurationSeconds(admin, reference, 0.0, halfLifeSeconds,
+                                                    policy, info.adaptations);
+          continue;
+        }
+
+        const std::string acquisition =
+          TrimAsciiWhitespace(ValueAt(acquisitionProp, t, z));
+        if (acquisition.empty())
+        {
+          mitkThrowException(mitk::MissingDICOMPropertyException)
+            << "Enhanced PET declares (0018,9758) Decay Corrected = NO, so each "
+               "frame needs its measurement instant, but timestep " << t
+            << " slice " << s << " carries neither (0018,9151) Frame Reference "
+               "DateTime nor (0018,9074) Frame Acquisition DateTime.";
+        }
+        OFDateTime acquired;
+        if (!ParseDICOMDateTime(acquisition, acquired))
+        {
+          mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+            << "Cannot parse (0018,9074) Frame Acquisition DateTime value '"
+            << acquisition << "' at timestep " << t << " slice " << s << ".";
+        }
+
+        const std::string duration =
+          TrimAsciiWhitespace(ValueAt(durationProp, t, z));
+        if (duration.empty())
+        {
+          mitkThrowException(mitk::MissingDICOMPropertyException)
+            << "Enhanced PET without (0018,9151) Frame Reference DateTime needs "
+               "(0018,9220) Frame Acquisition Duration to place the measurement "
+               "instant inside the frame; it is absent at timestep " << t
+            << " slice " << s << ".";
+        }
+        const double durationMs = mitk::ConvertDICOMStrToValue<double>(duration);
+        if (!std::isfinite(durationMs) || durationMs <= 0.0)
+        {
+          mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+            << "(0018,9220) Frame Acquisition Duration is not a positive value "
+               "(got " << duration << ") at timestep " << t << " slice " << s << ".";
+        }
+        sliceMap[z] = ResolveDecayDurationSeconds(admin, acquired,
+                                                  ComputeTAveSeconds(durationMs / 1000.0, halfLifeSeconds),
+                                                  halfLifeSeconds, policy, info.adaptations);
+      }
+    }
+  }
 }
 
 // "Step 1" .. "Step 4" in the comments below refer to the canonical
@@ -587,6 +1190,67 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
   }
 
   DecayCorrectionInfo info;
+
+  // ---- Enhanced PET ------------------------------------------------------
+  //
+  // An Enhanced PET object carries no (0054,1102) Decay Correction at all, so
+  // the strategy chain below cannot classify it. (0018,9758) Decay Corrected
+  // answers the same question and the reference instant follows from it, after
+  // which the administration-time rule is the classic one, unchanged.
+  //
+  // YES reports Start: the pixels are corrected to the scanner-chosen
+  // (0018,9701). NO reports None: the pixels are not corrected, and each
+  // frame's own measurement instant is the reference.
+  if (IsEnhancedPETInput(data))
+  {
+    // Ahead of the (0018,9758) branch: unmapped frames also mean the reader
+    // could not apply the per-frame rescale, which no decay path repairs.
+    RequireEnhancedPETFramesResolved(data);
+
+    const auto admin = ResolveAdministrationTimeTags(data);
+    const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
+
+    const std::string decayCorrected =
+      ToUpperAscii(TrimAsciiWhitespace(
+        mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0018, 0x9758))));
+
+    if ("YES" == decayCorrected)
+    {
+      info.strategy = DecayCorrectionStrategy::Start;
+      // The pixels are corrected to one scanner-chosen instant, (0018,9701),
+      // and the per-frame acquisition times say nothing about that
+      // correction. DRO_7_3_0 and DRO_7_3_1 carry identical, non-uniform
+      // frame times and differ only in (0018,9758): reading the frame times
+      // here would mis-scale the one that is perfectly computable.
+      const std::string raw = TrimAsciiWhitespace(
+        mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0018, 0x9701)));
+      OFDateTime reference;
+      if (raw.empty() || !ParseDICOMDateTime(raw, reference))
+      {
+        mitkThrowException(MissingDICOMPropertyException)
+          << "Enhanced PET declares (0018,9758) Decay Corrected = YES, so the "
+             "reference instant is (0018,9701) Decay Correction DateTime, but "
+             "it is absent or unparseable (got '" << raw << "').";
+      }
+      const double duration = ResolveDecayDurationSeconds(admin, reference, 0.0, halfLife,
+                                                          policy, info.adaptations);
+      FillUniformDecayMap(data, duration, info.decayTimes);
+      return info;
+    }
+
+    if ("NO" == decayCorrected)
+    {
+      info.strategy = DecayCorrectionStrategy::None;
+      FillPerFrameDecayMap(data, admin, halfLife, policy, info);
+      return info;
+    }
+
+    mitkThrowException(MissingDICOMPropertyException)
+      << "Enhanced PET requires (0018,9758) Decay Corrected to say whether the "
+         "pixels are already decay corrected; it is absent or holds an "
+         "unsupported value (got '" << decayCorrected << "'). Expected YES or NO.";
+  }
+
   info.strategy = GetDecayCorrectionStrategy(data);
 
   switch (info.strategy)
@@ -625,8 +1289,13 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
           << "Cannot parse Series Date+Time '" << referenceDate << seriesTime << "'.";
       }
 
-      const auto injection = ResolveInjectionDateTime(data, referenceDate);
+      const auto admin = ResolveAdministrationTimeTags(data);
       const auto manuf = GetManufacturerFamily(data);
+      // Hoisted above Step 1: every reference-time rule now feeds
+      // ResolveDecayDurationSeconds, whose acceptance window is keyed on the
+      // half-life, so it is needed before the first candidate is evaluated
+      // rather than only by the T_ave formula further down.
+      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
 
       // ---- Step 1: vendor private datetime (per slice via lifted property) ----
       // The PET reader (BaseDICOMReaderService) lifts these values out of
@@ -634,9 +1303,10 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       // as a TemporoSpatialStringProperty keyed by (timestep, slice). See
       // issue #783 for the design discussion. We read per-(t, s) so that
       // multi-bed acquisitions whose private datetime varies per file are
-      // handled correctly; uniform-across-files data degenerates to the
-      // same value for every slot via the property's default-context
-      // fallback, yielding a uniform decay map without special-casing.
+      // handled correctly. The reader lifts the value from every file or
+      // from none, so each slot is read exactly; a property missing a slot
+      // does not lend another slot's datetime and the series falls through
+      // to Step 2.
       if (ManufacturerFamily::Siemens == manuf || ManufacturerFamily::GE == manuf)
       {
         const auto* privateProp = FindNamedDICOMProperty(data,
@@ -646,38 +1316,53 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         if (nullptr != privateProp)
         {
           const auto timeSteps = data->GetTimeSteps();
-          DecayTimeMapType candidateMap;
+          std::map<TimeStepType, std::map<SlicedData::IndexValueType, OFDateTime>> privateDateTimes;
           bool allSlicesValid = true;
 
+          // Step 1 applies only if every slot carries a usable private
+          // datetime, so all of them are parsed before any is resolved.
+          // Resolving can record an administration-time adaptation or refuse
+          // one; doing either for a series that Step 1 then rejects would
+          // leave a record, or an exception, for a rule the returned decay
+          // times never used.
           for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
           {
             const auto* sliced = data->GetSlicedGeometry(t);
             const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-            auto& sliceMap = candidateMap[t];
+            auto& slotDateTimes = privateDateTimes[t];
 
-            for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
+            for (unsigned int s = 0; s < slices; ++s)
             {
-              const std::string privateDt = privateProp->GetValue(t, s, true, true);
+              const std::string privateDt =
+                TrimAsciiWhitespace(SUVFunctionalGroupAccess::ValueAt(privateProp, t, s));
               OFDateTime ofPrivate;
               if (privateDt.empty() || !ParseDICOMDateTime(privateDt, ofPrivate))
               {
                 allSlicesValid = false;
                 break;
               }
-              const double base = DurationInSeconds(injection.first, ofPrivate);
-              if (base < 0.0)
-              {
-                // Spec's "non-negative" precondition not met for this slice.
-                allSlicesValid = false;
-                break;
-              }
-              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                GuardDecayDurationSeconds(base, injection.second);
+              slotDateTimes[static_cast<SlicedData::IndexValueType>(s)] = ofPrivate;
             }
           }
 
           if (allSlicesValid)
           {
+            DecayTimeMapType candidateMap;
+            for (const auto& [t, slotDateTimes] : privateDateTimes)
+            {
+              auto& sliceMap = candidateMap[t];
+              for (const auto& [s, ofPrivate] : slotDateTimes)
+              {
+                // The vendor private datetime carries no plausibility
+                // precondition in the recommendation: "the dose should be
+                // corrected to the datetime stored in the private scan start
+                // datetime if it is present". Once this rule applies we commit
+                // to it; tolerance for a slightly negative offset lives in
+                // the administration-time window, where it belongs.
+                sliceMap[s] = ResolveDecayDurationSeconds(admin, ofPrivate, 0.0, halfLife,
+                                                          policy, info.adaptations);
+              }
+            }
             info.decayTimes = std::move(candidateMap);
             return info;
           }
@@ -685,173 +1370,210 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         }
       }
 
-      // ---- Per-slice acquisition-time tags (Steps 2/3/4) ----
+      // ---- Steps 2/3/4, evaluated per (timestep, slice) ----
+      // The scanner corrected the whole series to one instant, so every
+      // slot has to arrive at that same instant. Step 2 identifies it only
+      // on the slots that start at SeriesTime -- typically the first bed of
+      // a whole-body scan or the first frame of a dynamic one -- while every
+      // other slot has to reach it through its own frame timing. A
+      // series-level decision would correct a later bed to its own start and
+      // count the inter-bed decay twice, and would tie the outcome to
+      // slice order, which need not follow acquisition order.
+      //
+      // The first pass only classifies, so that an unresolvable slot and
+      // the Strict refusal are both reported before these steps record or
+      // refuse any adaptation of the administration time.
       const auto* acqDateProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0022));
       const auto* acqTimeProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0032));
-      const bool haveAcqTags = (nullptr != acqDateProp) && (nullptr != acqTimeProp);
+      const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
+      const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
 
-      const bool stepVendorMatches =
-           (ManufacturerFamily::Siemens == manuf)
-        || (ManufacturerFamily::GE      == manuf)
-        || (ManufacturerFamily::Philips == manuf);
+      // Only the GE rule is manufacturer-specific. Siemens, Philips and any
+      // manufacturer we cannot classify share the general T_ave form, so the
+      // split is "GE versus everything else" rather than an allow-list.
+      const bool isGE = (ManufacturerFamily::GE == manuf);
+      const bool halfLifeOK = std::isfinite(halfLife) && halfLife > 0.0;
+      const char* const formulaName = isGE
+        ? "Step 4 (AcquisitionTime - FrameReferenceTime)"
+        : "Step 3 (AcquisitionTime + T_ave - FrameReferenceTime)";
 
-      // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
-      // Spec preconditions: vendor in {Siemens, GE, Philips}, per-slice
-      // AcqTime non-negative, AcqTime equals SeriesTime in seconds. The
-      // condition is evaluated at slice 0 (single-bed scans, or first bed
-      // of multi-bed scans, per the spec).
-      if (haveAcqTags && stepVendorMatches)
+      struct SlotReference
       {
-        const std::string firstAcqDate = acqDateProp->GetValue(0, 0, true, true);
-        const std::string firstAcqTime = acqTimeProp->GetValue(0, 0, true, true);
-        OFDateTime firstAcq;
-        if (ConvertDICOMDateTimeString(firstAcqDate, firstAcqTime, firstAcq)
-            && EqualAtSecondResolution(firstAcq, ofSeriesTime))
+        OFDateTime base;
+        double offsetSeconds = 0.0;
+      };
+      std::map<TimeStepType, std::map<SlicedData::IndexValueType, SlotReference>> references;
+      unsigned int seriesTimeSlots = 0;
+      unsigned int formulaSlots = 0;
+
+      const auto timeSteps = data->GetTimeSteps();
+      for (TimeStepType t = 0; t < timeSteps; ++t)
+      {
+        const auto* sliced = data->GetSlicedGeometry(t);
+        const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+        for (unsigned int s = 0; s < slices; ++s)
         {
-          const auto timeSteps = data->GetTimeSteps();
-          for (TimeStepType t = 0; t < timeSteps; ++t)
+          const auto z = static_cast<SlicedData::IndexValueType>(s);
+          auto& reference = references[t][z];
+
+          const std::string acqDate = SUVFunctionalGroupAccess::ValueAt(acqDateProp, t, z);
+          const std::string acqTime = SUVFunctionalGroupAccess::ValueAt(acqTimeProp, t, z);
+
+          bool resolved = false;
+          if (!acqDate.empty() && !acqTime.empty())
           {
-            const auto* sliced = data->GetSlicedGeometry(t);
-            const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-            auto& sliceMap = info.decayTimes[t];
-            for (unsigned int s = 0; s < slices; ++s)
+            if (!ConvertDICOMDateTimeString(acqDate, acqTime, reference.base))
             {
-              const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-              const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
-              OFDateTime ofAcq;
-              if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
+              mitkThrowException(InvalidDICOMPropertyValueException)
+                << "Cannot parse acquisition Date+Time '" << acqDate << acqTime
+                << "' at timestep " << t << " slice " << s << ".";
+            }
+
+            // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
+            // No manufacturer condition: an AcquisitionTime that already
+            // equals the SeriesTime identifies the reference instant
+            // directly, whoever built the scanner. Such a slot needs no
+            // frame timing, so its absence must not refuse it.
+            if (EqualAtSecondResolution(reference.base, ofSeriesTime))
+            {
+              ++seriesTimeSlots;
+              resolved = true;
+            }
+            else
+            {
+              // ---- Steps 3/4: general T_ave formula, or the GE offset ----
+              // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
+              // ActualFrameDuration are stored in milliseconds per DICOM.
+              // Spec precondition: FrameReferenceTime non-negative.
+              //
+              // Step 3 (general): t_ref = AcqTime + T_ave - FrameReferenceTime
+              // Step 4 (GE):      t_ref = AcqTime - FrameReferenceTime
+              // The -FrameReferenceTime term undoes the scanner-applied
+              // offset from the per-frame midpoint back to the start of
+              // acquisition; T_ave additionally compensates for the average
+              // count-rate time inside the frame. Without the
+              // FrameReferenceTime term, Step 3 diverges from IBSI-SUV
+              // expectations by exactly that offset (verified against
+              // DRO_3_2_0 / DRO_3_2_2).
+              //
+              // ActualFrameDuration is read only on the Step 3 branch: it
+              // feeds T_ave and nothing else, so requiring it on the GE path
+              // would refuse inputs that the GE rule resolves perfectly well.
+              const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
+              if (std::isfinite(frameRefMs) && frameRefMs >= 0.0)
               {
-                mitkThrowException(InvalidDICOMPropertyValueException)
-                  << "Cannot parse acquisition Date+Time '" << acqDate << acqTime
-                  << "' at timestep " << t << " slice " << s << ".";
+                const double frameRefSec = frameRefMs / 1000.0;
+                if (isGE)
+                {
+                  reference.offsetSeconds = -frameRefSec;
+                  resolved = true;
+                }
+                else
+                {
+                  const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+                  // Spec precondition: ActualFrameDuration strictly positive.
+                  if (halfLifeOK && std::isfinite(frameDurMs) && frameDurMs > 0.0)
+                  {
+                    reference.offsetSeconds =
+                      ComputeTAveSeconds(frameDurMs / 1000.0, halfLife) - frameRefSec;
+                    resolved = true;
+                  }
+                }
               }
-              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-                GuardDecayDurationSeconds(
-                  DurationInSeconds(injection.first, ofAcq), injection.second);
+              if (resolved)
+              {
+                ++formulaSlots;
+              }
             }
           }
-          return info;
+
+          if (!resolved)
+          {
+            // ---- Step 5: spec is silent. Refuse to extend a vendor formula
+            //              to an unclassifiable input or to silently fall
+            //              back to SeriesTime. One such slot refuses the
+            //              series: resolving the others says nothing about
+            //              when this one was corrected to.
+            mitkThrowException(AmbiguousDecayTimingException)
+              << "DC=START fallback chain exhausted at timestep " << t << " slice " << s
+              << ": manufacturer '"
+              << mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070))
+              << "' / available DICOM input does not match any of the "
+                 "IBSI-SUV-recommended reference-time paths. Required tags for "
+                 "the vendor-aware paths: Siemens (0071,0x22) / GE (0009,0x0D) "
+                 "private datetime, or per-slice (0008,0032) AcquisitionTime "
+                 "equal to (0008,0031) SeriesTime, or per-slice (0008,0032) + "
+                 "(0054,0x1300) + (0018,0x1242) (GE: (0008,0032) + "
+                 "(0054,0x1300)). Supply --decay-time / a manual decay-time "
+                 "override at the consuming layer to bypass DICOM-derived "
+                 "computation.";
+          }
         }
       }
 
-      // ---- Steps 3/4: vendor T_ave (Siemens/Philips) or -Δt (GE) per slice ----
-      // Both require per-slice (0008,0032) AcqTime, (0054,0x1300)
-      // FrameReferenceTime, (0018,0x1242) ActualFrameDuration, and a known
-      // half-life (for T_ave; GE needs only the half-life-independent Δt).
-      // We require all preconditions across all slices; if any slice is
-      // incomplete we fall through rather than mix per-slice formulas with
-      // a partial result.
-      const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
-      const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
-      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
-
-      const bool isStep3 = (ManufacturerFamily::Siemens == manuf
-                         || ManufacturerFamily::Philips == manuf);
-      const bool isStep4 = (ManufacturerFamily::GE      == manuf);
-      // Step 3 needs T_ave -> half-life. Step 4 needs only -Δt.
-      const bool halfLifeOK = std::isfinite(halfLife) && halfLife > 0.0;
-      const bool step3Possible = isStep3 && halfLifeOK;
-      const bool step4Possible = isStep4;
-
       // Steps 3 and 4 are vendor-specific empirical formulas (not derivable
-      // from the DICOM spec alone). Under Strict policy we refuse them and
-      // surface the input ambiguity so the caller can supply timing
-      // out-of-band; under Lenient policy we apply them with the
-      // benchmark-recommended formula.
-      if (haveAcqTags && (step3Possible || step4Possible)
-          && nullptr != frameRefProp && nullptr != frameDurProp
-          && DICOMReadPolicy::Strict == policy)
+      // from the DICOM spec alone). Under Strict policy we refuse them as
+      // soon as one slot actually needs them, and surface the input
+      // ambiguity so the caller can supply timing out-of-band; under Lenient
+      // policy we apply them with the benchmark-recommended formula.
+      if (formulaSlots > 0 && DICOMReadPolicy::Strict == policy)
       {
         mitkThrowException(VendorEmpiricalDecayFallbackRefusedException)
-          << "DC=START Steps 1 and 2 do not apply to this input "
+          << "DC=START Steps 1 and 2 do not resolve " << formulaSlots << " of "
+          << (formulaSlots + seriesTimeSlots) << " slices of this input "
              "(no vendor private decay datetime, AcquisitionTime != "
-             "SeriesTime). Steps 3 / 4 would resolve the reference time "
-             "via a vendor-specific empirical formula, but "
+             "SeriesTime). " << formulaName << " would resolve their "
+             "reference time via a vendor-specific empirical formula, but "
              "DICOMReadPolicy::Strict is active. Re-export the data with "
              "an unambiguous reference (vendor private datetime, or "
              "AcquisitionTime aligned with SeriesTime), or supply timing "
              "via --decay-time / a manual decay-time override.";
       }
 
-      if (haveAcqTags && (step3Possible || step4Possible)
-          && nullptr != frameRefProp && nullptr != frameDurProp)
+      for (const auto& [t, sliceReferences] : references)
       {
-        const auto timeSteps = data->GetTimeSteps();
-        DecayTimeMapType candidateMap;
-        bool allSlicesValid = true;
-
-        for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
+        auto& sliceMap = info.decayTimes[t];
+        for (const auto& [z, reference] : sliceReferences)
         {
-          const auto* sliced = data->GetSlicedGeometry(t);
-          const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-          auto& sliceMap = candidateMap[t];
-
-          for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
-          {
-            const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-            const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
-            OFDateTime ofAcq;
-            if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
-            {
-              allSlicesValid = false;
-              break;
-            }
-
-            const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
-            const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
-            // Spec preconditions: ActualFrameDuration positive,
-            // FrameReferenceTime non-negative.
-            if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0
-                || !std::isfinite(frameRefMs) || frameRefMs < 0.0)
-            {
-              allSlicesValid = false;
-              break;
-            }
-
-            // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
-            // ActualFrameDuration are stored in milliseconds per DICOM.
-            const double frameDurSec = frameDurMs / 1000.0;
-            const double frameRefSec = frameRefMs / 1000.0;
-
-            // Step 3 (Siemens/Philips): t_ref = AcqTime + T_ave - FrameReferenceTime
-            // Step 4 (GE):                t_ref = AcqTime - FrameReferenceTime
-            // The -FrameReferenceTime term undoes the scanner-applied offset
-            // from the per-frame midpoint back to the start of acquisition;
-            // T_ave additionally compensates for the average count-rate time
-            // inside the frame. Without the FrameReferenceTime term, Step 3
-            // diverges from IBSI-SUV expectations by exactly that offset
-            // (verified against DRO_3_2_0 / DRO_3_2_2).
-            const double offset = step3Possible
-              ? (ComputeTAveSeconds(frameDurSec, halfLife) - frameRefSec)  // Step 3
-              : -frameRefSec;                                              // Step 4 (Δt)
-
-            const double base = DurationInSeconds(injection.first, ofAcq);
-            sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-              GuardDecayDurationSeconds(base + offset, injection.second);
-          }
-        }
-
-        if (allSlicesValid)
-        {
-          info.decayTimes = std::move(candidateMap);
-          return info;
+          sliceMap[z] = ResolveDecayDurationSeconds(admin, reference.base, reference.offsetSeconds,
+                                                    halfLife, policy, info.adaptations);
         }
       }
 
-      // ---- Step 5: spec is silent. Refuse to extend a vendor formula to
-      //              an unclassifiable input or to silently fall back to
-      //              SeriesTime.
-      mitkThrowException(AmbiguousDecayTimingException)
-        << "DC=START fallback chain exhausted: manufacturer '"
-        << mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070))
-        << "' / available DICOM input does not match any of the "
-           "IBSI-SUV-recommended reference-time paths. Required tags for "
-           "the vendor-aware paths: Siemens (0071,0x22) / GE (0009,0x0D) "
-           "private datetime, or per-slice (0008,0032) AcquisitionTime "
-           "equal to (0008,0031) SeriesTime, or per-slice (0008,0032) + "
-           "(0054,0x1300) + (0018,0x1242). Supply --decay-time / a "
-           "manual decay-time override at the consuming layer to bypass "
-           "DICOM-derived computation.";
+      if (formulaSlots > 0)
+      {
+        // Announce the adaptation only once it has actually been applied.
+        // Warning earlier would cry wolf on inputs whose administration
+        // time is refused above.
+        std::ostringstream split;
+        split << " for " << formulaSlots << " of " << (formulaSlots + seriesTimeSlots) << " slices";
+        if (seriesTimeSlots > 0)
+        {
+          split << "; the remaining " << seriesTimeSlots << " use AcquisitionTime == SeriesTime";
+        }
+        MITK_WARN << "DC=START reference time resolved via " << formulaName << split.str()
+                  << ". This formula is derived from observed scanner behaviour, "
+                     "not from the DICOM specification; the strict DICOM read "
+                     "policy refuses it.";
+        RecordAdaptation(&info.adaptations, policy,
+                         SUVAdaptationRule::VendorEmpiricalDecayFallback,
+                         "", "", formulaName);
+
+        if (ManufacturerFamily::Other == manuf)
+        {
+          const std::string rawManufacturer =
+            mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070));
+          MITK_WARN << "(0008,0070) Manufacturer '" << rawManufacturer
+                    << "' is not one of the manufacturers this formula was "
+                       "validated against. The general rule was applied; "
+                       "treat the resulting decay timing with caution.";
+          RecordAdaptation(&info.adaptations, policy,
+                           SUVAdaptationRule::UnrecognizedManufacturer,
+                           "(0008,0070)", rawManufacturer, formulaName);
+        }
+      }
+
+      return info;
     }
 
     case DecayCorrectionStrategy::None:
@@ -897,9 +1619,9 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
              "or supply DICOM (0018,1075).";
       }
 
-      // Injection time is image-level; resolve once and reuse across all slices/timesteps.
-      const std::string firstSliceAcqDate = acqDateProp->GetValue(0, 0, true, true);
-      const auto injection = ResolveInjectionDateTime(data, firstSliceAcqDate);
+      // Administration tags are image-level; resolve once and reuse across
+      // all slices / timesteps.
+      const auto admin = ResolveAdministrationTimeTags(data);
 
       const auto timeSteps = data->GetTimeSteps();
       for (TimeStepType t = 0; t < timeSteps; ++t)
@@ -909,8 +1631,18 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         auto& sliceMap = info.decayTimes[t];
         for (unsigned int s = 0; s < slices; ++s)
         {
-          const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
-          const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
+          const auto z = static_cast<SlicedData::IndexValueType>(s);
+          const std::string acqDate = SUVFunctionalGroupAccess::ValueAt(acqDateProp, t, z);
+          const std::string acqTime = SUVFunctionalGroupAccess::ValueAt(acqTimeProp, t, z);
+          if (acqDate.empty() || acqTime.empty())
+          {
+            mitkThrowException(MissingDICOMPropertyException)
+              << "Strategy NONE requires (0008,0022) Acquisition Date and "
+                 "(0008,0032) Acquisition Time at every slice. Missing:"
+              << (acqDate.empty() ? " (0008,0022)" : "")
+              << (acqTime.empty() ? " (0008,0032)" : "")
+              << " at timestep " << t << " slice " << s << ".";
+          }
 
           OFDateTime ofAcq;
           if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
@@ -920,6 +1652,14 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               << "' at timestep " << t << " slice " << s << ".";
           }
 
+          if (SUVFunctionalGroupAccess::ValueAt(frameDurProp, t, z).empty())
+          {
+            mitkThrowException(MissingDICOMPropertyException)
+              << "Strategy NONE requires (0018,0x1242) Actual Frame Duration "
+                 "at every slice. Missing at timestep " << t << " slice " << s
+              << ".";
+          }
+
           // (0018,0x1242) ActualFrameDuration is stored in milliseconds.
           const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
           if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0)
@@ -927,14 +1667,13 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
             mitkThrowException(InvalidDICOMPropertyValueException)
               << "Strategy NONE: (0018,0x1242) Actual Frame Duration at "
                  "timestep " << t << " slice " << s
-              << " is missing or non-positive (got " << frameDurMs << " ms).";
+              << " is unparseable or non-positive (got " << frameDurMs << " ms).";
           }
           const double tAveSec = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife);
 
           sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-            GuardDecayDurationSeconds(
-              DurationInSeconds(injection.first, ofAcq) + tAveSec,
-              injection.second);
+            ResolveDecayDurationSeconds(admin, ofAcq, tAveSec, halfLife,
+                                        policy, info.adaptations);
         }
       }
       return info;

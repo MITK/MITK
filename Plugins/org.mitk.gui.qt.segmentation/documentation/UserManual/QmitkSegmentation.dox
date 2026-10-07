@@ -571,6 +571,42 @@ Confirming a segmentation is recorded as a single step on the application-wide u
 While you have an unconfirmed result in progress, the application-wide <b>Undo</b> does not affect your current interactions; it reverts a previously confirmed label or an earlier operation instead.
 In short, press <tt>U</tt> to take back your last interaction and <tt>CTRL+Z</tt> to take back a confirmed label.
 
+\subsection org_mitk_views_segmentationVoxTell VoxTell Tool
+
+VoxTell segments anatomical structures in a 3D image from free-text descriptions, called prompts. Instead of placing points or choosing from a fixed list of structures, you type what you are looking for, for example <i>liver</i> or <i>left kidney</i>, and VoxTell outlines it. The tool works with CT and MR images of any format that MITK can load. For more information on the model, refer to https://github.com/MIC-DKFZ/VoxTell
+
+VoxTell runs in a Python virtual environment that MITK creates and manages for you using its own embedded Python; no separate system Python installation is required. The installation needs several gigabytes of disk space for PyTorch and the model. A CUDA-enabled GPU is strongly recommended; on a CPU, a run can take many minutes.
+
+The model that VoxTell downloads by default is licensed for non-commercial use only (CC BY-NC-SA 4.0). Please review the model card of VoxTell at https://huggingface.co/mrokuss/VoxTell before you use it.
+
+\subsubsection org_mitk_views_segmentationVoxTellWorkflow Workflow
+
+-# Select the VoxTell tool in the Segmentation View. If VoxTell is not installed yet, the first button reads "Install VoxTell". Click it, decide whether to download the text model for unknown prompts right away (see below), and confirm the installation dialog. This downloads PyTorch, VoxTell and its model, several gigabytes in total, and may take a while, but it is a one-time step.
+-# Click "Initialize" to load the model onto the compute device. This takes several seconds, during which MITK does not respond. If the model has not been downloaded yet, a progress notification shows the download first and offers to cancel it. While the model is loaded, the button reads "Uninitialize"; click it to release the memory without leaving the tool. If no suitable GPU is found, a warning tells you that VoxTell runs on the CPU, which is significantly slower.
+-# Type the structures you want to segment into the text field, one prompt per line, and click "Segment" (or press Ctrl+Enter). All prompts are computed in one run. A progress notification shows how far it has come and offers to cancel it.
+-# The result has one label per prompt, named like the prompt. With "Auto-confirm on success" checked, as it is by default, the labels are added to your segmentation as soon as the run succeeds; Undo (Ctrl+Z) removes them again. Otherwise the result is shown as a preview: choose whether to transfer all labels or only selected ones, then confirm the preview to add the labels to your segmentation. With "Transfer selected labels", the preview waits for your selection even if auto-confirm is checked. The tool stays active, so you can continue with other prompts.
+
+Prompts that VoxTell finds nothing for get no label in the preview, so they cannot end up in your segmentation as empty labels. The info card below the Segment button lists them after the run. The image may not show these structures; if it does, try a different wording.
+
+Results can overlap, for example <i>heart</i> and <i>left ventricle</i>, or <i>lung</i> and <i>left lung</i>. With "Create groups as needed" checked, as it is by default, each result goes into the first group in which it overlaps neither an existing label nor another result: the active group, another group of your segmentation, or a new group. Neighboring structures that share just a few voxels at their border do not count as overlapping; those voxels stay with the label that has them. Existing labels are never changed. Without the option, all results go into the active group, where a later prompt takes the voxels of an earlier one, and confirming overwrites existing labels that are not locked.
+
+\subsubsection org_mitk_views_segmentationVoxTellPrompts Prompts
+
+VoxTell understands free text. It ships with prepared descriptions of a large number of anatomical terms, and prompts that match one of them run right away. While you type a prompt, the tool suggests the terms VoxTell knows that contain what you typed; choose one with the arrow keys and Enter or Tab to complete the line and start the next one, or keep typing. Any other wording needs an additional text model of about 8 GB. Before a run that needs it, the tool lists the prompts that VoxTell does not know and asks whether to use the text model. You can also continue with the known prompts only, or cancel. Prompts are not case sensitive, and a prompt that appears twice is segmented once.
+
+The text model is downloaded during the installation if you ask for it there, or otherwise the first time it is needed, with a progress notification that offers to cancel the download. Loading it into memory for the first time in a session can take a minute, during which MITK does not respond. It needs about 8 GB of memory on the GPU, or about 16 GB on the CPU.
+
+\subsubsection org_mitk_views_segmentationVoxTellImages Image requirements
+
+- VoxTell relies on the orientation of the image to tell left from right, for example the left kidney from the right one. MITK derives the orientation from the geometry of the image, so the geometry has to be correct. If a simple prompt like <i>liver</i> segments parts of the spleen instead, the orientation of the image is probably wrong.
+- VoxTell does not resample the image. For images with a very uncommon voxel spacing, for example brain MR images of very high resolution, resample the image to a typical clinical spacing of about 1.5 mm before you segment it.
+- The image must be a three-dimensional scalar image. For a dynamic image, the currently selected time step is segmented. To segment all time steps, check "Process all time steps" before you confirm, or before you segment if auto-confirm is checked; the result of every time step is then computed, which can take long.
+- A region of interest is not supported.
+
+\subsubsection org_mitk_views_segmentationVoxTellSettings Settings
+
+Click "Settings" in the tool (or open Preferences (Ctrl+P) > Segmentation > VoxTell) to choose the compute device (automatic, a specific GPU, or the CPU), to use a model folder on your computer instead of the download, to check for a newer version of VoxTell, or to uninstall the managed environment. The device and the model are part of what is loaded, so changing one of them unloads the model; initialize it again to apply the change. The downloaded model stays in the cache of Hugging Face when you uninstall VoxTell.
+
 \subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png,"TotalSegmentator tool",2.00}
@@ -583,7 +619,7 @@ TotalSegmentator runs in a Python virtual environment that MITK creates and mana
 
 -# Select the TotalSegmentator tool in the Segmentation View. If TotalSegmentator is not installed yet, click "Install TotalSegmentator". A dialog shows the installation progress; it downloads several packages and may take a while, but this is a one-time step.
 -# Once installed, choose a task from the drop-down. The default "total" segments the whole body. For the "total" and "total_mr" tasks, faster lower-resolution variants ("fast", 3 mm, and "fastest", 6 mm) are offered as separate entries. Tasks that require a (free, non-commercial) TotalSegmentator license are marked "License required:" and cannot be run until a license is set (see below).
--# Click "Run TotalSegmentator" to compute a preview. On the first run of a task, the required model weights are downloaded automatically. The run executes in a background process, so the application stays responsive and can be cancelled.
+-# Click "Run TotalSegmentator" to compute a preview. On the first run of a task, the required model weights are downloaded automatically. The run executes in a background process, so the application stays responsive. A progress notification shows the run, says when model weights are being downloaded, and offers to cancel the run. Selecting another image or segmentation stops the run as well.
 -# Confirm the preview to transfer it into your segmentation.
 
 Click "Settings" in the tool (or open Preferences (Ctrl+P) > TotalSegmentator) to choose the compute device (a specific GPU, or CPU), enter a TotalSegmentator license to unlock the licensed tasks, clear the downloaded model weights, or uninstall the managed environment.

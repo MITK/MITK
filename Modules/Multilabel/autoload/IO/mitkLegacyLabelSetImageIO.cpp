@@ -185,14 +185,12 @@ namespace mitk
       {
         const auto setValues = MultiLabelSegmentation::ExtractLabelValuesFromLabelVector(labelset);
 
-        //generate mapping table;
+        //generate mapping table; old and new values may overlap, as TransferLabelContent maps all values at once.
         std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping;
-        for (auto vIter = setValues.crbegin(); vIter != setValues.crend(); vIter++)
-        { //have to use reverse loop because TransferLabelContent (used to adapt content in the same image; see below)
-          //would potentially corrupt otherwise the content due to "value collision between old values still present
-          //and already adapted values. By going from highest value to lowest, we avoid that.
-          if (MultiLabelSegmentation::UNLABELED_VALUE != *vIter)
-            labelMapping.push_back({*vIter, *vIter + maxValue});
+        for (const auto value : setValues)
+        {
+          if (MultiLabelSegmentation::UNLABELED_VALUE != value)
+            labelMapping.push_back({value, value + maxValue});
         }
 
         if (MultiLabelSegmentation::UNLABELED_VALUE != maxValue)

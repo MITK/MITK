@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkVoxTellPreferencePage</class>
+ <widget class="QWidget" name="QmitkVoxTellPreferencePage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>360</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="computationGroupBox">
+     <property name="title">
+      <string>Computation</string>
+     </property>
+     <layout class="QFormLayout" name="computationLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="deviceLabel">
+        <property name="text">
+         <string>Device:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="deviceComboBox">
+        <property name="toolTip">
+         <string>Device VoxTell runs on. A GPU is strongly recommended; the CPU is significantly slower. Automatic uses the first GPU if it is suitable and the CPU otherwise.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="modelGroupBox">
+     <property name="title">
+      <string>Model</string>
+     </property>
+     <layout class="QVBoxLayout" name="modelLayout">
+      <item>
+       <widget class="QRadioButton" name="huggingFaceRadioButton">
+        <property name="toolTip">
+         <string>Download the model from Hugging Face on first use and keep it in the cache of Hugging Face.</string>
+        </property>
+        <property name="text">
+         <string>Download from Hugging Face</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="localRadioButton">
+        <property name="toolTip">
+         <string>Use a model that is already on this computer.</string>
+        </property>
+        <property name="text">
+         <string>Local folder</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="localPathLayout">
+        <item>
+         <widget class="QLineEdit" name="localPathLineEdit">
+          <property name="toolTip">
+           <string>Folder of the model, containing plans.json and the folder fold_0.</string>
+          </property>
+          <property name="placeholderText">
+           <string>Folder with plans.json and fold_0</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseButton">
+          <property name="text">
+           <string>Browse...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="modelInfoLabel">
+        <property name="text">
+         <string>The default model is licensed for non-commercial use only (CC BY-NC-SA 4.0). See the model card of VoxTell on Hugging Face for details.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="maintenanceGroupBox">
+     <property name="title">
+      <string>Maintenance</string>
+     </property>
+     <layout class="QHBoxLayout" name="maintenanceLayout">
+      <item>
+       <widget class="QPushButton" name="checkForUpdatesButton">
+        <property name="toolTip">
+         <string>Check whether a newer VoxTell that this application supports is available, and update to it.</string>
+        </property>
+        <property name="text">
+         <string>Check for updates</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="uninstallButton">
+        <property name="toolTip">
+         <string>Remove the virtual environment of VoxTell. The downloaded model stays in the cache of Hugging Face.</string>
+        </property>
+        <property name="text">
+         <string>Uninstall VoxTell</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="maintenanceSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

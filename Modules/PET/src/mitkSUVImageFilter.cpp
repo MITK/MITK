@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include <mitkSUVImageFilter.h>
 
+#include "mitkSUVEnhancedPETGuards.h"
+
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -27,6 +30,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkPixelType.h>
 #include <mitkProperties.h>
+#include <mitkStringProperty.h>
 
 #include <itkIndexedUnaryFunctorImageFilter.h>
 #include <itkUnaryFunctorImageFilter.h>
@@ -84,6 +88,7 @@ namespace
       case mitk::SUVVariant::BW:                return "BW";
       case mitk::SUVVariant::LBM_Janmahasatian: return "LBM-Janmahasatian";
       case mitk::SUVVariant::LBM_James128:      return "LBM-James128";
+      case mitk::SUVVariant::LBM_Morgan:        return "LBM-Morgan";
       case mitk::SUVVariant::IBW:               return "IBW (Sugawara)";
       case mitk::SUVVariant::BSA:               return "BSA (DuBois)";
     }
@@ -125,7 +130,8 @@ namespace
     const mitk::SUVNormalizationInputs&    inputs,
     mitk::DICOMReadPolicy                  policy,
     const char*                            role,
-    bool                                   emitWarnings = true)
+    bool                                   emitWarnings = true,
+    std::vector<mitk::SUVAdaptation>*      adaptations  = nullptr)
   {
     if (!IsSexSpecificVariant(strategy.Variant()))
     {
@@ -161,6 +167,12 @@ namespace
                    "scale numerators for the " << role << " variant "
                 << variantName << " (DICOMReadPolicy::Lenient).";
     }
+
+    mitk::RecordAdaptation(adaptations, policy,
+                           mitk::SUVAdaptationRule::AmbiguousPatientSexMeanOfMaleAndFemale,
+                           "(0010,0040)",
+                           inputs.sex.has_value() ? "O" : "",
+                           "mean of male- and female-specific scale numerators");
 
     auto inputsCopy = inputs;
     inputsCopy.sex  = mitk::Sex::Male;
@@ -299,13 +311,15 @@ namespace
                "slice " << zEntry.first << " for timestep " << tEntry.first
             << " (timestep has " << slices << " slice(s)).";
         }
-        if (!std::isfinite(zEntry.second) || zEntry.second < 0.0)
+        if (!std::isfinite(zEntry.second)
+            || zEntry.second < mitk::kEarliestDecayDurationSeconds)
         {
           mitkThrowException(mitk::InvalidDecayTimeMapException)
             << "Per-slice decay-time override map has an invalid decay time "
             << zEntry.second << " s for timestep " << tEntry.first
             << ", slice " << zEntry.first
-            << " (must be finite and non-negative).";
+            << " (must be finite and at least "
+            << mitk::kEarliestDecayDurationSeconds << " s).";
         }
       }
     }
@@ -379,14 +393,20 @@ void mitk::SUVImageFilter::SetDecayTimeOverrideInSec(double value)
          "ClearDecayTimeOverrideMap() before engaging the uniform "
          "override.";
   }
-  // Zero is valid (ADMIN-style: residual decay factor 2^0 = 1); a NaN would
-  // propagate to an all-NaN output and a negative duration would scale the
-  // dose upward, both silently. Reject them at the boundary.
-  if (!std::isfinite(value) || value < 0.0)
+  // Zero is valid (ADMIN-style: residual decay factor 2^0 = 1), and so is a
+  // small negative duration: a dynamic scan may begin up to an hour before
+  // administration, which is exactly what the DICOM-derived path now
+  // computes. Beyond that floor a negative duration scales the dose upward
+  // instead of down, and a NaN propagates to an all-NaN output -- both
+  // silently, so both are rejected here. The bound deliberately matches the
+  // deduced path: an override a user cannot express is an override that
+  // cannot reproduce what the pipeline did.
+  if (!std::isfinite(value) || value < mitk::kEarliestDecayDurationSeconds)
   {
     mitkThrowException(InvalidDecayTimeOverrideException)
       << "SUVImageFilter::SetDecayTimeOverrideInSec: decay time must be a "
-         "finite, non-negative duration in seconds (got " << value << ").";
+         "finite duration of at least "
+      << mitk::kEarliestDecayDurationSeconds << " s (got " << value << ").";
   }
   m_DecayTimeOverrideInSec = value;
   this->Modified();
@@ -515,6 +535,19 @@ const mitk::DecayCorrectionInfo& mitk::SUVImageFilter::GetEffectiveDecayCorrecti
   return m_EffectiveDecayCorrection.value();
 }
 
+const std::vector<mitk::SUVAdaptation>& mitk::SUVImageFilter::GetAdaptations() const
+{
+  // Deliberately no RequireConfigured: an unconfigured filter has applied
+  // nothing, and "nothing was adapted" is the honest answer rather than an
+  // error. It is also what a caller polling this on the Strict path sees.
+  return m_Adaptations;
+}
+
+const std::vector<std::string>& mitk::SUVImageFilter::GetRescaleFindings() const
+{
+  return m_RescaleFindings;
+}
+
 void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* props)
 {
   if (nullptr == props)
@@ -535,6 +568,9 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   const auto prevHalfLife   = m_EffectiveHalfLifeInSec;
   const auto prevDecay      = m_EffectiveDecayCorrection;
   const auto prevInputModel = m_EffectiveInputModel;
+  const auto prevTracerIndex = m_EffectiveTracerIndex;
+  const auto prevAdaptations = m_Adaptations;
+  const auto prevRescaleFindings = m_RescaleFindings;
   const auto prevConf       = m_Configured;
 
   m_Configured = false;
@@ -545,6 +581,10 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   m_EffectiveHalfLifeInSec.reset();
   m_EffectiveDecayCorrection.reset();
   m_EffectiveInputModel.reset();
+  m_EffectiveTracerIndex.reset();
+  // Cleared on entry so a reconfigure reports this input's
+  // adaptations rather than accumulating across calls.
+  m_Adaptations.clear();
 
   // Reset on entry but, unlike the effective fields above, deliberately not
   // snapshotted for rollback: the detection slot must reflect this call's
@@ -556,9 +596,29 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   {
     // ---- Input pixel semantics ------------------------------------------
 
+    // An Enhanced PET object whose functional groups the reader could not map
+    // to frames carries one frame's rescale in every frame's pixels. No input
+    // model or decay override repairs that, so it is refused before any
+    // override is consulted.
+    const bool isEnhancedPET = IsEnhancedPETInput(props);
+    if (isEnhancedPET)
+    {
+      RequireEnhancedPETFramesResolved(props);
+    }
+
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()
-      : ClassifyPETInput(props, m_DICOMReadPolicy);
+      : (isEnhancedPET ? ClassifyEnhancedPETInput(image, m_DICOMReadPolicy)
+                       : ClassifyPETInput(props, m_DICOMReadPolicy));
+
+    // Diagnostic only, and deliberately after classification so it runs
+    // once per configure on an input the pipeline has accepted. Kept as
+    // well as logged so a front end can put them in front of the operator.
+    m_RescaleFindings = CheckRescalePlausibility(props);
+    for (const auto& finding : m_RescaleFindings)
+    {
+      MITK_WARN << finding;
+    }
 
     // Sticky detection slot: keep the classification result across
     // subsequent validation failures in this same Configure call so
@@ -577,8 +637,19 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     if (needsRadioPharma)
     {
-      auto rpiInfos      = GetRadiopharmaceuticalInfos(props, m_DICOMReadPolicy);
-      const int tracerIx = SelectTracerIndex(rpiInfos, m_TracerIndex);
+      const auto rpiInfos = GetRadiopharmaceuticalInfos(props);
+      const int tracerIx  = SelectTracerIndex(rpiInfos, m_TracerIndex);
+
+      // Only the dose the computation consumes is subject to the read policy
+      // and recorded: other items' doses and a dose that an explicit
+      // activity replaces never reach the result. Applied before the
+      // activity is used so Strict refuses ahead of any computation.
+      if (tracerIx >= 0 && !m_InjectedActivityInBq.has_value())
+      {
+        ApplyDosePlausibilityPolicy(rpiInfos[tracerIx], tracerIx, m_DICOMReadPolicy, m_Adaptations);
+        m_EffectiveTracerIndex = tracerIx;
+      }
+
       const RadiopharmaceuticalInfo tracer = (tracerIx >= 0) ? rpiInfos[tracerIx]
                                                              : RadiopharmaceuticalInfo{};
 
@@ -621,7 +692,7 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     // renormalization path. Always required.
     const double weightG = m_PatientWeightInGram.has_value()
       ? m_PatientWeightInGram.value()
-      : GetPatientsWeight(props) * 1000.0;
+      : GetPatientsWeight(props, m_DICOMReadPolicy, m_Adaptations) * 1000.0;
     if (!std::isfinite(weightG) || weightG <= 0.0)
     {
       mitkThrowException(InvalidDICOMPropertyValueException)
@@ -690,6 +761,8 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
         m_EffectiveDecayCorrection = DeduceDecayCorrection(image,
                                                            m_EffectiveHalfLifeInSec.value(),
                                                            m_DICOMReadPolicy);
+        const auto& deduced = m_EffectiveDecayCorrection.value().adaptations;
+        m_Adaptations.insert(m_Adaptations.end(), deduced.begin(), deduced.end());
       }
     }
 
@@ -710,17 +783,24 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
       normInputs.sex = m_EffectivePatientSex.value();
     }
     {
+      // This pass owns the adaptation record; the GenerateData pass owns
+      // the log line. Splitting them avoids double-logging while keeping
+      // both driven by the one predicate inside
+      // ResolveScaleNumeratorUnderSexPolicy, so they cannot disagree about
+      // whether the mean was applied.
       auto targetStrategy = MakeSUVNormalizationStrategy(m_TargetVariant);
       (void)ResolveScaleNumeratorUnderSexPolicy(*targetStrategy, normInputs,
                                                 m_DICOMReadPolicy, "target",
-                                                /*emitWarnings=*/false);
+                                                /*emitWarnings=*/false,
+                                                &m_Adaptations);
       if (sourceNeedsRenormPatientData)
       {
         auto sourceStrategy = MakeSUVNormalizationStrategy(sourceVariant);
         (void)ResolveScaleNumeratorUnderSexPolicy(*sourceStrategy, normInputs,
                                                   m_DICOMReadPolicy,
                                                   "source (pre-normalized input)",
-                                                  /*emitWarnings=*/false);
+                                                  /*emitWarnings=*/false,
+                                                  &m_Adaptations);
       }
     }
 
@@ -735,6 +815,9 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_EffectiveHalfLifeInSec        = prevHalfLife;
     m_EffectiveDecayCorrection      = prevDecay;
     m_EffectiveInputModel           = prevInputModel;
+    m_EffectiveTracerIndex          = prevTracerIndex;
+    m_Adaptations                   = prevAdaptations;
+    m_RescaleFindings               = prevRescaleFindings;
     m_Configured                    = prevConf;
     throw;
   }
@@ -867,6 +950,7 @@ namespace
       case mitk::SUVVariant::BW:
       case mitk::SUVVariant::LBM_Janmahasatian:
       case mitk::SUVVariant::LBM_James128:
+      case mitk::SUVVariant::LBM_Morgan:
       case mitk::SUVVariant::IBW:
         return "GML";
       case mitk::SUVVariant::BSA:
@@ -875,27 +959,44 @@ namespace
     return nullptr;
   }
 
-  // Both LBM variants share the standard SUV Type code "LBM"; the
-  // specific formula is recorded externally (e.g. via filename or in a
-  // study log).
+  // DICOM defines a distinct SUV Type for each lean-body-mass formula, so
+  // the specific one is written out rather than collapsed to the generic
+  // "LBM". Collapsing made the output unreadable by this module's own
+  // classifier, which accepts the specific codes: re-reading an SUV image
+  // to renormalize it -- the pre-normalized input path DRO_2_1_x and
+  // DRO_2_6_x exercise -- would pick the wrong formula, and Morgan differs
+  // from James-128 by about 2 % of lean body mass in male patients.
   const char* OutputSUVTypeValue(mitk::SUVVariant target)
   {
     switch (target)
     {
       case mitk::SUVVariant::BW:                return "BW";
-      case mitk::SUVVariant::LBM_Janmahasatian: return "LBM";
-      case mitk::SUVVariant::LBM_James128:      return "LBM";
+      case mitk::SUVVariant::LBM_Janmahasatian: return "LBMJANMA";
+      case mitk::SUVVariant::LBM_James128:      return "LBMJAMES128";
+      case mitk::SUVVariant::LBM_Morgan:        return "LBM";
       case mitk::SUVVariant::IBW:               return "IBW";
       case mitk::SUVVariant::BSA:               return "BSA";
     }
     return nullptr;
   }
 
+  // The entry of \p adaptations for \p rule, or nullptr.
+  const mitk::SUVAdaptation* FindAdaptation(const std::vector<mitk::SUVAdaptation>& adaptations,
+                                            mitk::SUVAdaptationRule rule)
+  {
+    const auto hit = std::find_if(adaptations.cbegin(), adaptations.cend(),
+                                  [rule](const mitk::SUVAdaptation& entry)
+                                  { return rule == entry.rule; });
+    return adaptations.cend() == hit ? nullptr : &(*hit);
+  }
+
   // Set / overwrite the output's PET-image-module DICOM tags so they
   // describe the produced SUV image rather than the (now-stale) input.
   // RescaleIntercept and RescaleSlope are reset because SUV is already
   // in physical units; the filter applies no further rescale.
-  void ApplyOutputTagPolicy(mitk::Image* output, mitk::SUVVariant target)
+  void ApplyOutputTagPolicy(mitk::Image* output, mitk::SUVVariant target,
+                            const std::vector<mitk::SUVAdaptation>& adaptations,
+                            const std::optional<int> tracerIndex)
   {
     auto setStr = [output](const mitk::DICOMTagPath& path, const char* value) {
       if (nullptr == value) return;
@@ -908,6 +1009,31 @@ namespace
     setStr(mitk::DICOMTagPath(0x0054, 0x1006), OutputSUVTypeValue(target));
     setStr(mitk::DICOMTagPath(0x0028, 0x1052), "0.0");
     setStr(mitk::DICOMTagPath(0x0028, 0x1053), "1.0");
+
+    // Where an adaptation rescaled a scalar tag, the output carries the value
+    // the computation used. Without this the output inherits the input's
+    // misleading original -- a reader taking (0010,1030) at face value would
+    // conclude the SUV was computed from a one-tonne patient. An
+    // administration-date substitution is not mirrored onto (0018,1078): the
+    // computation never forms that datetime and its date may differ per
+    // slice, so the adaptation record is the only faithful place for it.
+    const auto* dose = FindAdaptation(adaptations, mitk::SUVAdaptationRule::DoseReinterpretedAsMBq);
+    if (nullptr != dose && tracerIndex.has_value())
+    {
+      setStr(mitk::RadiopharmaceuticalDoseTagPath(tracerIndex.value()), dose->usedValue.c_str());
+    }
+    if (const auto* weight = FindAdaptation(adaptations, mitk::SUVAdaptationRule::WeightReinterpretedAsGrams))
+    {
+      setStr(mitk::DICOMTagPath(0x0010, 0x1030), weight->usedValue.c_str());
+    }
+
+    // The record itself, in both the place a DICOM viewer shows and the
+    // place a program can parse. (0008,2111) is LO and holds only the
+    // count; mitk.pet.suv.adaptations holds the entries.
+    setStr(mitk::DICOMTagPath(0x0008, 0x2111),
+           mitk::FormatDerivationDescription(adaptations).c_str());
+    output->SetProperty(mitk::SUV_ADAPTATIONS_PROPERTY_NAME,
+                        mitk::StringProperty::New(mitk::SerializeAdaptations(adaptations)));
   }
 }
 
@@ -1028,5 +1154,5 @@ void mitk::SUVImageFilter::GenerateData()
     }
   }
 
-  ApplyOutputTagPolicy(outputImage, m_TargetVariant);
+  ApplyOutputTagPolicy(outputImage, m_TargetVariant, m_Adaptations, m_EffectiveTracerIndex);
 }

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <QmitkPipInstaller.h>
 
 #include <mitkLog.h>
+#include <mitkPostInstallStepProgress.h>
 #include <mitkPythonHelper.h>
 
 #include <nlohmann/json.hpp>
@@ -217,8 +218,24 @@ const std::vector<mitk::PipPackageInfo>& QmitkPipInstaller::GetResolvedPackages(
 
 void QmitkPipInstaller::OnStandardOutputReady()
 {
-  const auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
-  emit OutputReceived(output, false);
+  if (m_State != State::RunningPostInstall)
+  {
+    const auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
+    emit OutputReceived(output, false);
+    return;
+  }
+
+  // A post-install step reports its progress in lines of their own. A line
+  // that is not complete yet stays in the buffer until it is.
+  while (m_Process->canReadLine())
+  {
+    const auto line = m_Process->readLine();
+
+    if (const auto progress = mitk::ParsePostInstallStepProgress(line.toStdString()); progress.has_value())
+      emit PostInstallStepProgressChanged(progress->Done, progress->Total);
+    else
+      emit OutputReceived(QString::fromLocal8Bit(line), false);
+  }
 }
 
 void QmitkPipInstaller::OnStandardErrorReady()
@@ -365,6 +382,10 @@ void QmitkPipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus exi
 
   case State::RunningPostInstall:
   {
+    // The last line of a step may lack its line break.
+    if (const auto rest = m_Process->readAllStandardOutput(); !rest.isEmpty())
+      emit OutputReceived(QString::fromLocal8Bit(rest), false);
+
     const auto& step = m_Spec.postInstallSteps[m_CurrentPostInstallStep];
 
     if (!success && !step.optional)
@@ -691,13 +712,16 @@ void QmitkPipInstaller::StartPostInstallStep()
   // a QStringList handles argument quoting on Windows. Any imports must be
   // satisfied by packages installed in the preceding groups; stdout/stderr
   // (including tqdm progress) flows to the UI details view via
-  // OnStandardOutputReady / OnStandardErrorReady -> OutputReceived.
+  // OnStandardOutputReady / OnStandardErrorReady -> OutputReceived, except
+  // for the progress reports of the step.
   const auto script = QString::fromStdString(step.pythonCode);
 
   emit PostInstallStepStarted(displayName);
 
+  // The code of a step can be long, so the log names the step instead.
+  MITK_INFO << "Run post-install step \"" << displayName.toStdString() << "\" with " << python.toStdString();
+
   QStringList args = { "-c", script };
-  MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
 }
 

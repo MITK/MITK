@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 /**
   \brief Widget that offers a simple list that displays all labels (color and name) in the active
-  layer of a MultiLabelSegmentation.
+  layer, or in all layers, of a MultiLabelSegmentation.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSimpleLabelSetListWidget : public QWidget
 {
@@ -38,6 +38,9 @@ public:
   LabelVectorType SelectedLabels() const;
   /** \brief Returns the MultiLabelSegmentation currently displayed. */
   const mitk::MultiLabelSegmentation* GetLabelSetImage() const;
+
+  /** \brief Sets whether the labels of all layers are listed. By default only those of the active layer are. */
+  void SetShowsAllLayers(bool showsAllLayers);
 
 signals:
   void SelectedLabelsChanged(const LabelVectorType& selectedLabels);
@@ -60,6 +63,7 @@ protected:
   mitk::MultiLabelSegmentation::ConstPointer m_LabelSetImage;
   QListWidget* m_LabelList;
   bool m_Emmiting;
+  bool m_ShowsAllLayers = false;
 
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelModifiedObserver;

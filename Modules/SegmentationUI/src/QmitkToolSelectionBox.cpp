@@ -113,6 +113,10 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
+  // Unlike the other tool messages this one fires on every preview update, so
+  // it must not outlive the box.
+  this->ObserveToolBusyState(false);
+
   if (IsEnabledByItself(this))
   {
     m_ToolManager->UnregisterClient();
@@ -134,6 +138,9 @@ void QmitkToolSelectionBox::SetToolManager(
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
+
+  this->ObserveToolBusyState(false);
+  m_IsToolBusy = false;
 
   if (IsEnabledByItself(this))
   {
@@ -383,7 +390,7 @@ void QmitkToolSelectionBox::UpdateButtonsEnabledState()
     const auto tool = m_ToolManager->GetToolById(toolID);
 
     const bool canHandle = tool->CanHandle(refData, workingData);
-    button->setEnabled(canHandle);
+    button->setEnabled(canHandle && !m_IsToolBusy);
 
     QString tooltip = tool->GetName();
     if (!canHandle)
@@ -408,6 +415,10 @@ void QmitkToolSelectionBox::RecreateButtons()
     m_ToolButtonGroup->removeButton(btn);
     delete btn;
   }
+
+  // All tools of the manager, not only the displayed ones: the manager is
+  // shared with the other boxes, and a click in any of them switches the tool.
+  this->ObserveToolBusyState(true);
 
   mitk::ToolManager::ToolVectorTypeConst allPossibleTools = m_ToolManager->GetTools();
   mitk::ToolManager::ToolVectorTypeConst allTools;
@@ -602,6 +613,31 @@ void QmitkToolSelectionBox::RecreateButtons()
 void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
 {
   qApp->processEvents();
+}
+
+void QmitkToolSelectionBox::OnToolBusyStateChanged(bool isBusy)
+{
+  if (m_IsToolBusy == isBusy)
+    return;
+
+  // A tool that pumps the event loop while it computes would otherwise be
+  // deactivated mid-run by a click on another tool button.
+  m_IsToolBusy = isBusy;
+  this->UpdateButtonsEnabledState();
+}
+
+void QmitkToolSelectionBox::ObserveToolBusyState(bool observe)
+{
+  const auto delegate =
+    mitk::MessageDelegate1<QmitkToolSelectionBox, bool>(this, &QmitkToolSelectionBox::OnToolBusyStateChanged);
+
+  for (const auto& tool : m_ToolManager->GetTools())
+  {
+    if (observe)
+      tool->CurrentlyBusy += delegate;
+    else
+      tool->CurrentlyBusy -= delegate;
+  }
 }
 
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)

@@ -1350,9 +1350,13 @@ endif()
 # and COMDAT folding and bloat the binary versus a plain Release; /OPT:REF
 # /OPT:ICF restore them. Codegen is unchanged, though /DEBUG keeps ICF
 # slightly more conservative, leaving the binary marginally larger.
+# /PDBALTPATH records only the PDB's file name in the binary instead of its
+# absolute path on the build host; debuggers match the PDB by its GUID. The
+# linker's own %_PDB% placeholder does not survive the escaping of the Visual
+# Studio generators, so the name comes from the consuming target instead.
 if(MITK_RELEASE_DEBUG_SYMBOLS AND MSVC)
   target_link_options(MitkCompilerFlags INTERFACE
-    $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>)
+    $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF;/PDBALTPATH:$<TARGET_PDB_FILE_NAME:$<TARGET_PROPERTY:NAME>>>)
 endif()
 
 # Linker flags remain global

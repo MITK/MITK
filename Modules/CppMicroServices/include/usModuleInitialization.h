@@ -47,9 +47,9 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 
 // The module hands a linked resource archive to the resource container as a
 // memory range, and tells it whether its file may carry appended resources;
-// only such files are searched. A static module keeps the file search: its
-// resources are merged into the archive of the module that imports it, which
-// it does not know.
+// only such files are searched. On ELF and Mach-O, a static module keeps the
+// file search: its resources are merged into the archive of the module that
+// imports it, which it does not know.
 //
 // ELF: usFunctionEmbedResources gives a linked archive the module-unique
 // symbols us_resources_start_<name> and us_resources_end_<name>, and a module
@@ -62,13 +62,17 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 // being linked, and to an empty range if the section does not exist, so the
 // archive section (__TEXT,us_resources) and the marker section
 // (__DATA,us_appended) need no renaming.
+//
+// Windows: the archive is a resource of the binary, found through the address
+// of a symbol in it. That is also the binary a static module is linked into,
+// so static modules find the merged archive this way, too.
 #if defined(__ELF__) && !defined(US_STATIC_MODULE)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
 extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME)[] __attribute__((weak)); \
 extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME)[] __attribute__((weak));   \
 extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attribute__((weak));
 
-#define US_SET_MODULE_RESOURCES(info)                                                        \
+#define US_SET_MODULE_RESOURCES(info, symbol)                                                \
   if (US_CONCAT(us_resources_start_, US_MODULE_NAME) != nullptr)                             \
   {                                                                                          \
     info->resourceData = US_CONCAT(us_resources_start_, US_MODULE_NAME);                     \
@@ -83,7 +87,7 @@ extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME) __asm("sectio
 extern "C" const char US_CONCAT(us_appended_start_, US_MODULE_NAME) __asm("section$start$__DATA$us_appended");   \
 extern "C" const char US_CONCAT(us_appended_end_, US_MODULE_NAME) __asm("section$end$__DATA$us_appended");
 
-#define US_SET_MODULE_RESOURCES(info)                                                        \
+#define US_SET_MODULE_RESOURCES(info, symbol)                                                \
   info->resourceSize = us::ModuleResourceRangeSize(                                          \
     &US_CONCAT(us_resources_start_, US_MODULE_NAME), &US_CONCAT(us_resources_end_, US_MODULE_NAME)); \
   if (info->resourceSize != 0)                                                               \
@@ -92,9 +96,12 @@ extern "C" const char US_CONCAT(us_appended_end_, US_MODULE_NAME) __asm("section
   }                                                                                          \
   info->resourcesInFile = us::ModuleResourceRangeSize(                                       \
     &US_CONCAT(us_appended_start_, US_MODULE_NAME), &US_CONCAT(us_appended_end_, US_MODULE_NAME)) != 0;
+#elif defined(_WIN32)
+#define US_DECLARE_MODULE_RESOURCES
+#define US_SET_MODULE_RESOURCES(info, symbol) us::ModuleUtils::GetLinkedResources(symbol, info);
 #else
 #define US_DECLARE_MODULE_RESOURCES
-#define US_SET_MODULE_RESOURCES(info)
+#define US_SET_MODULE_RESOURCES(info, symbol)
 #endif
 
 
@@ -139,7 +146,7 @@ public:                                                                         
     std::memcpy(&moduleInfoSym, &moduleInfoPtr, sizeof(void*));                              \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfoSym);                       \
     moduleInfoPtr()->location = location;                                                    \
-    US_SET_MODULE_RESOURCES(moduleInfoPtr())                                                 \
+    US_SET_MODULE_RESOURCES(moduleInfoPtr(), moduleInfoSym)                                  \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \

@@ -110,6 +110,32 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
   void* addr = (void*)GetProcAddress(handle, symbol);
   return addr;
 }
+
+void GetLinkedResources_impl(void* symbol, ModuleInfo* moduleInfo)
+{
+  HMODULE handle = nullptr;
+  if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                         static_cast<LPCTSTR>(symbol), &handle))
+  {
+    return;
+  }
+
+  // The resource type and name that CMake/us_resources.rc.in assigns.
+  HRSRC resource = FindResource(handle, MAKEINTRESOURCE(101), MAKEINTRESOURCE(200));
+  if (resource == nullptr)
+  {
+    return;
+  }
+
+  HGLOBAL loadedResource = LoadResource(handle, resource);
+  const void* data = loadedResource != nullptr ? LockResource(loadedResource) : nullptr;
+  const DWORD size = SizeofResource(handle, resource);
+  if (data != nullptr && size != 0)
+  {
+    moduleInfo->resourceData = data;
+    moduleInfo->resourceSize = size;
+  }
+}
 #else
 std::string GetLibraryPath_impl(void*)
 {
@@ -130,6 +156,16 @@ std::string ModuleUtils::GetLibraryPath(void* symbol)
 void* ModuleUtils::GetSymbol(const ModuleInfo& module, const char* symbol)
 {
   return GetSymbol_impl(module, symbol);
+}
+
+void ModuleUtils::GetLinkedResources(void* symbol, ModuleInfo* moduleInfo)
+{
+#ifdef _WIN32
+  GetLinkedResources_impl(symbol, moduleInfo);
+#else
+  (void)symbol;
+  (void)moduleInfo;
+#endif
 }
 
 }

@@ -11,11 +11,10 @@
 #! changed default: it would keep the old suffix in the source lists while the
 #! embed step produces the other one, which silently drops every resource.
 #!
-#! LINK is the default wherever it is available, except on Windows. Appended
-#! resources sit behind the end of the ELF or Mach-O structure, so strip
-#! discards them and macOS code signing rejects them; linked resources live in
-#! a regular section. Windows keeps APPEND until its resource-compiler path has
-#! been verified.
+#! LINK is the default wherever it is available. Appended resources sit behind
+#! the end of the binary's structure, so strip discards them and macOS code
+#! signing rejects them; linked resources live in a regular section, or in a
+#! PE resource on Windows, and the module reads them from memory.
 #!
 #! \sa usFunctionEmbedResources
 function(usFunctionCheckResourceLinking)
@@ -53,9 +52,7 @@ function(usFunctionCheckResourceLinking)
   set(_default_mode "APPEND")
   if(_linking_available)
     set(_success "yes")
-    if(NOT WIN32)
-      set(_default_mode "LINK")
-    endif()
+    set(_default_mode "LINK")
   endif()
 
   message(STATUS "Checking for CppMicroServices resource linking capability...${_success} (default mode: ${_default_mode})")

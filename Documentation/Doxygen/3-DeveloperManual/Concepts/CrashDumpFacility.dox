@@ -416,7 +416,9 @@ difference.)
   \c /OPT:REF \c /OPT:ICF, which \c /DEBUG would otherwise disable.
 - GCC/Clang use \c -g1, which emits line tables, function descriptions and
   inline entries - all a dump needs - at a quarter of the size of full \c -g;
-  it is codegen-neutral and needs no link-side flag. Split DWARF is not used:
+  it is codegen-neutral and needs no link-side flag. GCC 14 and newer drop
+  the inline entries of some vectorized loops at \c -g1: such a frame shows
+  the caller's name with the callee's file and line. Split DWARF is not used:
   binutils 2.46 dropped \c dwp, and \c dump_syms ignores <tt>.dwo</tt> and
   <tt>.dwp</tt> files. macOS uses \c -g plus \c dsymutil at archive time.
 

@@ -1265,7 +1265,10 @@ add_library(MitkCompilerFlags INTERFACE)
 #    untouched (full inlining, unlike RelWithDebInfo's /Ob1).
 #  - GCC/Clang: -g1 emits line tables, function descriptions and inline
 #    entries, which is all a crash dump needs, at a quarter of the size of
-#    full -g; it is codegen-neutral and needs no link-side flag. Split
+#    full -g; it is codegen-neutral and needs no link-side flag. GCC 14 and
+#    newer drop the inline entries of some vectorized loops at -g1, so such
+#    a frame shows the caller's name with the callee's file and line.
+#    Split
 #    DWARF is deliberately not used: binutils 2.46 dropped dwp, llvm-dwp
 #    does not cope with GCC's output in practice, and dump_syms ignores
 #    .dwo and .dwp files altogether.

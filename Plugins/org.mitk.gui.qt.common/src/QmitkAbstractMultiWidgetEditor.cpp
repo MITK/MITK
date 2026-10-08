@@ -207,17 +207,25 @@ void QmitkAbstractMultiWidgetEditor::SetSelectedPosition(const mitk::Point3D& po
 
 void QmitkAbstractMultiWidgetEditor::EnableDecorations(bool enable, const QStringList& decorations)
 {
-  m_Impl->m_MultiWidgetDecorationManager->ShowDecorations(enable, decorations);
+  // The manager exists only once a multi widget has been set; an editor can
+  // fail to create its widget and stay without one.
+  if (nullptr != m_Impl->m_MultiWidgetDecorationManager)
+  {
+    m_Impl->m_MultiWidgetDecorationManager->ShowDecorations(enable, decorations);
+  }
 }
 
 bool QmitkAbstractMultiWidgetEditor::IsDecorationEnabled(const QString& decoration) const
 {
-  return m_Impl->m_MultiWidgetDecorationManager->IsDecorationVisible(decoration);
+  return nullptr != m_Impl->m_MultiWidgetDecorationManager
+    && m_Impl->m_MultiWidgetDecorationManager->IsDecorationVisible(decoration);
 }
 
 QStringList QmitkAbstractMultiWidgetEditor::GetDecorations() const
 {
-  return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
+  return nullptr != m_Impl->m_MultiWidgetDecorationManager
+    ? m_Impl->m_MultiWidgetDecorationManager->GetDecorations()
+    : QStringList();
 }
 
 QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindowByIndex(int index) const

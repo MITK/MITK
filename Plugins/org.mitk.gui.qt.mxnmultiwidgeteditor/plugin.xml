@@ -3,9 +3,14 @@
   <extension point="org.blueberry.ui.editors">
     <editor id="org.mitk.editors.mxnmultiwidget"
 			name="MxN Display"
-			class="QmitkMxNMultiWidgetEditor"
 			extensions="mitk"
-			icon="resources/MxNMultiWidgetEditor.svg"/>
+			icon="resources/MxNMultiWidgetEditor.svg">
+      <class class="QmitkMxNMultiWidgetEditor">
+        <!-- The stock editor's legacy widget name: saved layouts and the REST
+             alias carry window IDs with this prefix. -->
+        <parameter name="widgetName" value="mxn"/>
+      </class>
+    </editor>
   </extension>
 
   <extension point="org.blueberry.ui.views">

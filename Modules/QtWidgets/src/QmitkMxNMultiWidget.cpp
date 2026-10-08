@@ -431,6 +431,41 @@ namespace
 
 }  // namespace
 
+QmitkMxNLayoutLocks QmitkMxNParseLayoutLocks(const QString& tokens)
+{
+  QmitkMxNLayoutLocks locks;
+  if (tokens.trimmed().isEmpty())
+  {
+    return locks;
+  }
+
+  for (const auto& rawToken : tokens.split(QLatin1Char(',')))
+  {
+    const auto token = rawToken.trimmed();
+    if (token == QLatin1String("structure"))
+      locks |= QmitkMxNLayoutLock::Structure;
+    else if (token == QLatin1String("direction"))
+      locks |= QmitkMxNLayoutLock::Direction;
+    else if (token == QLatin1String("proportions"))
+      locks |= QmitkMxNLayoutLock::Proportions;
+    else if (token == QLatin1String("content"))
+      locks |= QmitkMxNLayoutLock::Content;
+    else
+    {
+      mitkThrow() << "Unknown layout lock token '" << token.toStdString() << "' in '"
+                  << tokens.toStdString()
+                  << "' (expected a comma-separated list of 'structure', 'direction', "
+                  << "'proportions', 'content').";
+    }
+  }
+  return locks;
+}
+
+bool QmitkMxNIsValidMultiWidgetName(const QString& name)
+{
+  return EDITOR_NAME_PATTERN.match(name).hasMatch();
+}
+
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
@@ -440,7 +475,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   // Reject malformed names at construction; once stored, an `_` in the
   // editor name would later produce schema-invalid ids or break the
   // first-`__` split rule that separates editor-name from bare-id segments.
-  if (!EDITOR_NAME_PATTERN.match(multiWidgetName).hasMatch())
+  if (!QmitkMxNIsValidMultiWidgetName(multiWidgetName))
   {
     mitkThrow() << "QmitkMxNMultiWidget: multiWidgetName '"
                 << multiWidgetName.toStdString()
@@ -587,7 +622,10 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   auto displayActionEventHandler = this->GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
+    // The prefix only scopes the sender-only fallback actions the handler
+    // installs for a dimension without a predicate. With the delimiter, a
+    // widget named 'mxn' cannot match the windows of a widget named 'mxn2'.
+    displayActionEventHandler->InitActions((this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString());
   }
 }
 
@@ -2790,6 +2828,22 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 bool QmitkMxNMultiWidget::IsApplyingLayout() const
 {
   return m_ApplyingLayout || m_LayoutLoadPending;
+}
+
+void QmitkMxNMultiWidget::SetLayoutLocks(QmitkMxNLayoutLocks locks)
+{
+  if (locks == m_LayoutLocks)
+  {
+    return;
+  }
+
+  m_LayoutLocks = locks;
+  emit LayoutLocksChanged(m_LayoutLocks);
+}
+
+QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const
+{
+  return m_LayoutLocks;
 }
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)

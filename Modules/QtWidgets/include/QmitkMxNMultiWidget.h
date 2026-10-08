@@ -74,6 +74,51 @@ public:
 };
 
 /**
+* \brief A user-facing interaction that can be locked on an MxN widget.
+*
+*   A lock gates only the widget's own chrome and the MxN Layout Editor view;
+*   programmatic calls ('ApplyLayout', 'SetSyncLink', 'SetViewDirection', node
+*   selection, ...) are never blocked, so the plugin that owns a locked widget
+*   keeps full control.
+*/
+enum class QmitkMxNLayoutLock
+{
+  /** Grid shape, synchronization and selection groups, sync links, and layout
+      load: everything the Layout Editor view and arrange mode change. The view
+      does not bind to the widget and the widget does not request it. */
+  Structure = 0x1,
+  /** A cell's view direction. */
+  Direction = 0x2,
+  /** The proportions between cells (splitter handles). */
+  Proportions = 0x4,
+  /** The data a cell shows through the cell's own chrome (its node selection,
+      which propagates to its selection group). Without 'Structure', the Layout
+      Editor view can still change content through a data-based layout or a
+      layout load. */
+  Content = 0x8
+};
+Q_DECLARE_FLAGS(QmitkMxNLayoutLocks, QmitkMxNLayoutLock)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QmitkMxNLayoutLocks)
+
+/**
+* \brief Parses a comma-separated list of lock tokens ('structure', 'direction',
+*        'proportions', 'content').
+*
+*   Tokens are trimmed and case-sensitive; an empty or blank string yields no
+*   lock.
+*
+* \throws mitk::Exception on an unknown or empty token (e.g. "structure,,").
+*/
+MITKQTWIDGETS_EXPORT QmitkMxNLayoutLocks QmitkMxNParseLayoutLocks(const QString& tokens);
+
+/**
+* \brief True if 'name' is accepted as an MxN multi-widget name, i.e. it matches
+*        '^[A-Za-z][A-Za-z0-9.-]*$'. The same check the 'QmitkMxNMultiWidget'
+*        constructor enforces.
+*/
+MITKQTWIDGETS_EXPORT bool QmitkMxNIsValidMultiWidgetName(const QString& name);
+
+/**
 * \brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
 *        is done by using the 'SetLayout'-function to define a layout. This will automatically add or remove
@@ -90,6 +135,12 @@ class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
 
 public:
 
+  /**
+  * \param multiWidgetName Prefix of every render-window ID of this widget; must
+  *        satisfy 'QmitkMxNIsValidMultiWidgetName' and be unique among the MxN
+  *        widgets alive at the same time.
+  * \throws mitk::Exception if 'multiWidgetName' is not a valid name.
+  */
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = {},
                       const QString& multiWidgetName = "mxn");
@@ -993,6 +1044,18 @@ public:
   bool IsApplyingLayout() const;
 
   /**
+  * \brief Sets the interactions users cannot perform on this widget.
+  *
+  *   Takes effect at once in every existing cell and in cells created later;
+  *   may be called at any time, before or after 'InitializeMultiWidget'. Emits
+  *   'LayoutLocksChanged' only if the set changes.
+  */
+  void SetLayoutLocks(QmitkMxNLayoutLocks locks);
+
+  /** \brief The interactions currently locked for users on this widget. */
+  QmitkMxNLayoutLocks GetLayoutLocks() const;
+
+  /**
   * \brief True (and 'rows' / 'columns' filled) when the current layout is a
   *        rectangular grid.
   *
@@ -1144,6 +1207,9 @@ Q_SIGNALS:
   *        editor part) acts on the request; the module only relays it.
   */
   void LayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request);
+
+  /** \brief The lock set changed; 'locks' is the new set. */
+  void LayoutLocksChanged(QmitkMxNLayoutLocks locks);
 
 protected:
 
@@ -1647,6 +1713,8 @@ private:
 
   /** \brief Sticky clean-view state; applied to cells created later, too. */
   bool m_CleanView = false;
+
+  QmitkMxNLayoutLocks m_LayoutLocks;
 
   /** \brief Window id of the maximized cell, empty while the grid is shown. */
   QString m_MaximizedCell;

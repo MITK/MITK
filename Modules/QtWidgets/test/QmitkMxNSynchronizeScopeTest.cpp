@@ -43,6 +43,8 @@ found in the LICENSE file.
  *     this editor are neither driven by the editor's gestures nor able to
  *     drive the editor's cells.
  *   - Synchronize(false) restores sender-only behavior.
+ *   - Two MxN widgets whose names are prefixes of each other ('mxn' and
+ *     'mxn2') stay apart: no gesture in one reaches the other's cells.
  *
  * The display-action pipeline is driven synthetically: the multi widget's
  * DisplayActionEventBroadcast is an itk::Object holding the handler's
@@ -61,6 +63,11 @@ class QmitkMxNSynchronizeScopeTestSuite : public mitk::TestFixture
   MITK_TEST(Crosshair_Synchronized_CouplesEditorCells_NotForeign);
   MITK_TEST(LevelWindow_ForeignSender_DoesNotChangeTheImage);
   MITK_TEST(Desynchronized_ScrollMovesOnlySender);
+  MITK_TEST(TwoWidgets_Slice_DoesNotCrossOver);
+  MITK_TEST(TwoWidgets_Pan_DoesNotCrossOver);
+  MITK_TEST(TwoWidgets_Zoom_DoesNotCrossOver);
+  MITK_TEST(TwoWidgets_Crosshair_DoesNotCrossOver);
+  MITK_TEST(TwoWidgets_LevelWindow_DoesNotCrossOver);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -68,6 +75,10 @@ class QmitkMxNSynchronizeScopeTestSuite : public mitk::TestFixture
   mitk::Image::Pointer m_Image;
 
   std::unique_ptr<QmitkMxNMultiWidget> m_Editor;
+
+  // A second MxN widget whose name extends the first one's, so a scope check
+  // that compared names without the delimiter would mistake one for the other.
+  std::unique_ptr<QmitkMxNMultiWidget> m_Second;
 
   vtkRenderWindow* m_ForeignVtkWindow = nullptr;
   mitk::VtkPropRenderer::Pointer m_ForeignRenderer;
@@ -85,6 +96,11 @@ public:
     m_Editor->InitializeMultiWidget();
     m_Editor->SetLayout(1, 2); // cells: mxn__widget0, mxn__widget1
 
+    m_Second = std::make_unique<QmitkMxNMultiWidget>(nullptr, Qt::WindowFlags(), QStringLiteral("mxn2"));
+    m_Second->SetDataStorage(m_DataStorage);
+    m_Second->InitializeMultiWidget();
+    m_Second->SetLayout(1, 2); // cells: mxn2__widget0, mxn2__widget1
+
     // A render window that is registered with the same (global) rendering
     // manager but does not belong to the editor - stand-in for another
     // editor's window in the same application.
@@ -95,21 +111,27 @@ public:
 
     // Give every window a valid slice geometry so steppers and cameras
     // carry real state.
-    for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
+    for (const auto* widget : { m_Editor.get(), m_Second.get() })
     {
-      mitk::RenderingManager::GetInstance()->InitializeView(
-        cell->GetRenderWindow()->GetVtkRenderWindow(), m_Image->GetTimeGeometry());
+      for (const auto& [name, cell] : widget->GetRenderWindowWidgets())
+      {
+        mitk::RenderingManager::GetInstance()->InitializeView(
+          cell->GetRenderWindow()->GetVtkRenderWindow(), m_Image->GetTimeGeometry());
+      }
     }
     mitk::RenderingManager::GetInstance()->InitializeView(m_ForeignVtkWindow, m_Image->GetTimeGeometry());
 
     // Non-boundary baseline so both scroll directions stay in range.
     SetSlicePos(CellRenderer(0), 2);
     SetSlicePos(CellRenderer(1), 2);
+    SetSlicePos(SecondRenderer(0), 2);
+    SetSlicePos(SecondRenderer(1), 2);
     SetSlicePos(m_ForeignRenderer, 2);
   }
 
   void tearDown() override
   {
+    m_Second.reset();
     m_Editor.reset();
 
     mitk::RenderingManager::GetInstance()->RemoveRenderWindow(m_ForeignVtkWindow);
@@ -122,12 +144,22 @@ public:
     m_DataStorage = nullptr;
   }
 
-  mitk::BaseRenderer* CellRenderer(std::size_t index) const
+  static mitk::BaseRenderer* RendererOf(const QmitkMxNMultiWidget& widget, std::size_t index)
   {
-    const auto name = QStringLiteral("mxn__widget") + QString::number(index);
-    const auto cell = m_Editor->GetRenderWindowWidget(name);
+    const auto name = widget.GetMultiWidgetName() + QStringLiteral("__widget") + QString::number(index);
+    const auto cell = widget.GetRenderWindowWidget(name);
     CPPUNIT_ASSERT_MESSAGE("Editor cell must exist: " + name.toStdString(), nullptr != cell);
     return mitk::BaseRenderer::GetInstance(cell->GetRenderWindow()->GetVtkRenderWindow());
+  }
+
+  mitk::BaseRenderer* CellRenderer(std::size_t index) const
+  {
+    return RendererOf(*m_Editor, index);
+  }
+
+  mitk::BaseRenderer* SecondRenderer(std::size_t index) const
+  {
+    return RendererOf(*m_Second, index);
   }
 
   static mitk::Stepper* SliceStepper(mitk::BaseRenderer* renderer)
@@ -162,6 +194,18 @@ public:
     auto interactionEvent = mitk::InteractionEvent::New(sender);
     m_Editor->GetInteractionEventHandler()->InvokeEvent(
       TDisplayEvent(interactionEvent, std::forward<TArgs>(args)...));
+  }
+
+  /** Fire a display action event on both widgets' broadcasts, as the
+   *  application does: every broadcast observes every interaction event. */
+  template <typename TDisplayEvent, typename... TArgs>
+  void FireOnBoth(mitk::BaseRenderer* sender, TArgs&&... args)
+  {
+    auto interactionEvent = mitk::InteractionEvent::New(sender);
+    for (auto* widget : { m_Editor.get(), m_Second.get() })
+    {
+      widget->GetInteractionEventHandler()->InvokeEvent(TDisplayEvent(interactionEvent, args...));
+    }
   }
 
   void Slice_Synchronized_CouplesEditorCells()
@@ -307,6 +351,145 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Desynchronized cells must not follow a sibling's scroll",
                                  2u, SlicePos(CellRenderer(1)));
     CPPUNIT_ASSERT_EQUAL(2u, SlicePos(m_ForeignRenderer));
+  }
+
+  void TwoWidgets_Slice_DoesNotCrossOver()
+  {
+    m_Editor->Synchronize(true);
+    m_Second->Synchronize(true);
+
+    FireOnBoth<mitk::DisplayScrollEvent>(CellRenderer(0), 1, false);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the gesture must scroll its own widget's linked cell",
+                                 3u, SlicePos(CellRenderer(1)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A gesture in 'mxn' must not scroll the cells of 'mxn2'",
+                                 2u, SlicePos(SecondRenderer(0)));
+    CPPUNIT_ASSERT_EQUAL(2u, SlicePos(SecondRenderer(1)));
+
+    FireOnBoth<mitk::DisplayScrollEvent>(SecondRenderer(0), 1, false);
+
+    CPPUNIT_ASSERT_EQUAL(3u, SlicePos(SecondRenderer(1)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A gesture in 'mxn2' must not scroll the cells of 'mxn'",
+                                 3u, SlicePos(CellRenderer(0)));
+    CPPUNIT_ASSERT_EQUAL(3u, SlicePos(CellRenderer(1)));
+  }
+
+  void TwoWidgets_Pan_DoesNotCrossOver()
+  {
+    m_Editor->Synchronize(true);
+    m_Second->Synchronize(true);
+
+    double ownBefore[3];
+    double secondBefore[3];
+    Camera(CellRenderer(1))->GetPosition(ownBefore);
+    Camera(SecondRenderer(0))->GetPosition(secondBefore);
+
+    mitk::Vector2D moveVector;
+    moveVector[0] = 5.0;
+    moveVector[1] = 5.0;
+    FireOnBoth<mitk::DisplayMoveEvent>(CellRenderer(0), moveVector);
+
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the gesture must pan its own widget's linked cell",
+                           Moved(ownBefore, Camera(CellRenderer(1))));
+    CPPUNIT_ASSERT_MESSAGE("A pan in 'mxn' must not move the cells of 'mxn2'",
+                           !Moved(secondBefore, Camera(SecondRenderer(0))));
+
+    double firstBefore[3];
+    Camera(CellRenderer(0))->GetPosition(firstBefore);
+    FireOnBoth<mitk::DisplayMoveEvent>(SecondRenderer(0), moveVector);
+
+    CPPUNIT_ASSERT_MESSAGE("A pan in 'mxn2' must not move the cells of 'mxn'",
+                           !Moved(firstBefore, Camera(CellRenderer(0))));
+  }
+
+  void TwoWidgets_Zoom_DoesNotCrossOver()
+  {
+    m_Editor->Synchronize(true);
+    m_Second->Synchronize(true);
+
+    const double ownBefore = Camera(CellRenderer(1))->GetParallelScale();
+    const double secondBefore = Camera(SecondRenderer(0))->GetParallelScale();
+
+    mitk::Point2D startCoordinate;
+    startCoordinate.Fill(8.0);
+    FireOnBoth<mitk::DisplayZoomEvent>(CellRenderer(0), 2.0f, startCoordinate);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: the gesture must zoom its own widget's linked cell",
+      ownBefore / 2.0, Camera(CellRenderer(1))->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A zoom in 'mxn' must not change the cells of 'mxn2'",
+      secondBefore, Camera(SecondRenderer(0))->GetParallelScale(), 1e-6);
+
+    const double firstBefore = Camera(CellRenderer(0))->GetParallelScale();
+    FireOnBoth<mitk::DisplayZoomEvent>(SecondRenderer(0), 2.0f, startCoordinate);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A zoom in 'mxn2' must not change the cells of 'mxn'",
+      firstBefore, Camera(CellRenderer(0))->GetParallelScale(), 1e-6);
+  }
+
+  void TwoWidgets_Crosshair_DoesNotCrossOver()
+  {
+    m_Editor->Synchronize(true);
+    m_Second->Synchronize(true);
+
+    mitk::Point3D position;
+    position[0] = 8.0;
+    position[1] = 8.0;
+    position[2] = 6.0;
+    FireOnBoth<mitk::DisplaySetCrosshairEvent>(CellRenderer(0), position);
+
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the crosshair must move its own widget's linked cell",
+                           2u != SlicePos(CellRenderer(1)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A crosshair move in 'mxn' must not move the cells of 'mxn2'",
+                                 2u, SlicePos(SecondRenderer(0)));
+    CPPUNIT_ASSERT_EQUAL(2u, SlicePos(SecondRenderer(1)));
+
+    const auto firstPos = SlicePos(CellRenderer(0));
+    position[2] = 1.0;
+    FireOnBoth<mitk::DisplaySetCrosshairEvent>(SecondRenderer(0), position);
+
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the crosshair must move its own widget's cell",
+                           2u != SlicePos(SecondRenderer(0)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A crosshair move in 'mxn2' must not move the cells of 'mxn'",
+                                 firstPos, SlicePos(CellRenderer(0)));
+  }
+
+  void TwoWidgets_LevelWindow_DoesNotCrossOver()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("image");
+    node->SetData(m_Image);
+    node->SetIntProperty("layer", 0);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 50.0)));
+    m_DataStorage->Add(node);
+
+    // Display/world conversion needs a viewport with an extent, so the gesture
+    // position hits the image in the sending cell.
+    auto* sender = SecondRenderer(0);
+    sender->GetRenderWindow()->SetSize(64, 64);
+    mitk::Point2D displayPoint;
+    sender->WorldToDisplay(m_Image->GetGeometry()->GetCenter(), displayPoint);
+
+    auto interactionEvent = mitk::InteractionPositionEvent::New(sender, displayPoint);
+    for (auto* widget : { m_Editor.get(), m_Second.get() })
+    {
+      widget->GetInteractionEventHandler()->InvokeEvent(
+        mitk::DisplaySetLevelWindowEvent(interactionEvent, 10.0, 20.0));
+    }
+
+    mitk::LevelWindow senderLevelWindow;
+    node->GetLevelWindow(senderLevelWindow, sender);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the gesture must change the level/window its own cell shows",
+                           std::abs(senderLevelWindow.GetLevel() - 100.0) > 1e-6);
+
+    for (const std::size_t index : { std::size_t{0}, std::size_t{1} })
+    {
+      mitk::LevelWindow levelWindow;
+      node->GetLevelWindow(levelWindow, CellRenderer(index));
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+        "A level/window gesture in 'mxn2' must not change what the cells of 'mxn' show",
+        100.0, levelWindow.GetLevel(), 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(50.0, levelWindow.GetWindow(), 1e-6);
+    }
   }
 
 private:

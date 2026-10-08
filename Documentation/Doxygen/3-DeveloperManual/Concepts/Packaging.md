@@ -391,7 +391,7 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it.
+Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH.
 
 Windows and macOS packages are not stripped: MSVC has no strip step, and the macOS bundle post-processing has not been verified with stripped binaries yet.
 

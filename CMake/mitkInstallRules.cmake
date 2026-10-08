@@ -125,10 +125,12 @@ endif()
 # files. Excluding them from that resolution is not an option: the exclusion
 # also stops the search below them, so Qt modules reached only through MITK
 # libraries would lose their plugins. CMake strips only what install(TARGETS)
-# installs, hence the second pass.
+# installs, hence the second pass. The build-tree copies also carry the
+# absolute build RUNPATH, so the install RUNPATH is restored as well.
 #-----------------------------------------------------------------------------
 
 if(LINUX AND CMAKE_STRIP)
+  string(REPLACE ";" ":" _mitk_install_rpath "${CMAKE_INSTALL_RPATH}")
   install(CODE "
     if(CMAKE_INSTALL_DO_STRIP)
       file(GLOB _mitk_libraries \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so\")
@@ -137,6 +139,7 @@ if(LINUX AND CMAKE_STRIP)
         set(_installed \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${MITK_INSTALL_BINDIR}/\${_name}\")
         if(EXISTS \"\${_installed}\")
           execute_process(COMMAND \"${CMAKE_STRIP}\" \"\${_installed}\")
+          file(RPATH_SET FILE \"\${_installed}\" NEW_RPATH \"${_mitk_install_rpath}\")
         endif()
       endforeach()
     endif()

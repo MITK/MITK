@@ -243,7 +243,7 @@ The bindings are used in two ways, and both have to work from the package:
 - **Embedded**: an MITK executable hosts the interpreter through `mitk::PythonContext`. The auto-load module `PreloadPython`, which loads together with `MitkCore`, locates the bundled Python (`mitk::PythonHelper::GetHomePath()`) and loads its library first.
 - **External**: the bundled interpreter imports `mitk` on its own. MITK's libraries are not loaded yet then, so the module has to resolve them itself.
 
-For the external case, `mitkInstallRules.cmake` gives the module an install RPATH that reaches the libraries next to the executables (`$ORIGIN/../../../../bin` on Linux, the corresponding `@loader_path` entries for `Contents/MacOS` and `Contents/Frameworks` on macOS). Windows has no RPATH, and Python resolves the DLLs of an extension module only from registered directories, so the package's `__init__.py` registers `bin/` with `os.add_dll_directory()` when it finds MITK's DLLs there. The wheel configuration handles all of this through its own repair tools instead.
+For the external case, `mitkInstallRules.cmake` gives the module an install RPATH that reaches the libraries next to the executables (`$ORIGIN/../../../../../bin` on Linux, the corresponding `@loader_path` entries for `Contents/MacOS` and `Contents/Frameworks` on macOS). Windows has no RPATH, and Python resolves the DLLs of an extension module only from registered directories, so the package's `__init__.py` registers `bin/` with `os.add_dll_directory()` when it finds MITK's DLLs there. The wheel configuration handles all of this through its own repair tools instead.
 
 ## Qt Deployment
 

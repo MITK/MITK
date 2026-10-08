@@ -353,7 +353,7 @@ The `mitk` package of an installed MITK is used in two ways, and a change to pac
 
 How the extension module finds the libraries in the external case:
 
-- **Linux**: its install RPATH reaches `bin/` (`$ORIGIN/../../../../bin`), set in `mitkInstallRules.cmake`.
+- **Linux**: its install RPATH reaches `bin/` (`$ORIGIN/../../../../../bin`), set in `mitkInstallRules.cmake`.
 - **macOS**: its install RPATH reaches `Contents/MacOS` and `Contents/Frameworks`. `macdeployqt` writes all references of the bundle relative to `@loader_path` instead of `@executable_path`, so they do not depend on which executable hosts the process.
 - **Windows**: Python resolves the DLLs of an extension module only from directories registered with `os.add_dll_directory()`, not from `PATH`. `mitk/__init__.py` registers `bin/` when it finds MITK's DLLs there and also prepends it to `PATH`, through which CppMicroServices loads the auto-load modules.
 

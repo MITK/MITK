@@ -17,20 +17,54 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkLog.h>
 
-namespace
-{
-  mitk::IPreferences* GetPreferences()
-  {
-    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
-    return preferencesService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID.toStdString());
-  }
-}
+#include <berryIConfigurationElement.h>
+#include <berryIContributor.h>
+#include <berryObjectStringMap.h>
 
 QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
   : m_Ui(std::make_unique<Ui::QmitkMxNMultiWidgetEditorPreferencePage>())
+  , m_EditorId(QmitkMxNMultiWidgetEditor::EDITOR_ID)
 {
   // nothing here
+}
+
+void QmitkMxNMultiWidgetEditorPreferencePage::SetInitializationData(const berry::IConfigurationElement::Pointer& config,
+                                                                    const QString& /*propertyName*/,
+                                                                    const berry::Object::Pointer& data)
+{
+  const auto* parameters = dynamic_cast<const berry::ObjectStringMap*>(data.GetPointer());
+  if (nullptr == parameters)
+  {
+    return;
+  }
+
+  const auto context = QStringLiteral("Preference page '%1' declared by plugin '%2'")
+    .arg(config->GetAttribute("id"), config->GetContributor()->GetName());
+
+  for (auto it = parameters->cbegin(); it != parameters->cend(); ++it)
+  {
+    if (it.key() != QLatin1String("editorId"))
+    {
+      MITK_WARN << context.toStdString() << ": ignoring unknown parameter '" << it.key().toStdString() << "'.";
+      continue;
+    }
+    if (it.value().trimmed().isEmpty())
+    {
+      MITK_WARN << context.toStdString() << ": empty 'editorId'; editing the preferences of '"
+                << QmitkMxNMultiWidgetEditor::EDITOR_ID.toStdString() << "'.";
+      continue;
+    }
+    m_EditorId = it.value().trimmed();
+  }
+}
+
+mitk::IPreferences* QmitkMxNMultiWidgetEditorPreferencePage::GetPreferences() const
+{
+  // An editor reads the node named after its own editor ID.
+  auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+  return preferencesService->GetSystemPreferences()->Node(m_EditorId.toStdString());
 }
 
 QmitkMxNMultiWidgetEditorPreferencePage::~QmitkMxNMultiWidgetEditorPreferencePage()
@@ -61,7 +95,7 @@ QWidget* QmitkMxNMultiWidgetEditorPreferencePage::GetQtControl() const
 
 bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
 {
-  auto* prefs = GetPreferences();
+  auto* prefs = this->GetPreferences();
 
   prefs->PutBool("Show level/window readout", m_Ui->m_ShowLevelWindowReadout->isChecked());
   prefs->PutBool("Expanded navigator", m_Ui->m_ExpandedNavigator->isChecked());
@@ -79,7 +113,7 @@ void QmitkMxNMultiWidgetEditorPreferencePage::PerformCancel()
 
 void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 {
-  auto* prefs = GetPreferences();
+  auto* prefs = this->GetPreferences();
 
   m_Ui->m_ShowLevelWindowReadout->setChecked(prefs->GetBool("Show level/window readout", true));
   m_Ui->m_ExpandedNavigator->setChecked(prefs->GetBool("Expanded navigator", false));
@@ -90,7 +124,7 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  auto prefs = GetPreferences();
+  auto prefs = this->GetPreferences();
   prefs->Clear();
 
   this->Update();

@@ -109,6 +109,16 @@ public:
       QString id = (*prefPagesIt)->GetAttribute("id");
       QString name = (*prefPagesIt)->GetAttribute("name");
       QString className = (*prefPagesIt)->GetAttribute("class");
+      if (className.isEmpty())
+      {
+        // A page may name its class in a <class> child to pass <parameter>s
+        // to it; page creation through CreateExecutableExtension("class")
+        // handles that form, so the filter has to accept it too. Mirrors
+        // berry::RegistryReader::GetClassValue, which is not exported.
+        const auto classElements = (*prefPagesIt)->GetChildren("class");
+        if (!classElements.isEmpty())
+          className = classElements.front()->GetAttribute("class");
+      }
       if(!id.isEmpty() && !name.isEmpty() && !className.isEmpty())
       {
         QString keywordLabels;

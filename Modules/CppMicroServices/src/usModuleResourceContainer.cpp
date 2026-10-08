@@ -79,11 +79,17 @@ ModuleResourceContainer::ModuleResourceContainer(const ModuleInfo* moduleInfo)
 
 ModuleResourceContainer::~ModuleResourceContainer()
 {
-  if (IsValid())
+  this->Invalidate();
+  delete d;
+}
+
+void ModuleResourceContainer::Invalidate()
+{
+  if (this->IsValid())
   {
     us_mz_zip_reader_end(&d->m_ZipArchive);
+    d->m_IsValid = false;
   }
-  delete d;
 }
 
 bool ModuleResourceContainer::IsValid() const
@@ -133,6 +139,10 @@ bool ModuleResourceContainer::GetStat(int index, ModuleResourceContainer::Stat& 
 
 void* ModuleResourceContainer::GetData(int index) const
 {
+  if (!this->IsValid())
+  {
+    return nullptr;
+  }
   return us_mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, nullptr, 0);
 }
 
@@ -144,6 +154,10 @@ const ModuleInfo*ModuleResourceContainer::GetModuleInfo() const
 void ModuleResourceContainer::GetChildren(const std::string& resourcePath, bool relativePaths,
                                           std::vector<std::string>& names, std::vector<uint32_t>& indices) const
 {
+  if (!this->IsValid())
+  {
+    return;
+  }
   d->InitSortedEntries();
 
   ModuleResourceContainerPrivate::SetType::const_iterator iter =

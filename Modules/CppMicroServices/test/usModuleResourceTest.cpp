@@ -435,7 +435,20 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   ModuleResource foo = moduleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
   libR.Unload();
-  US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
+  // The archive was unmapped with the module, so the resource must not
+  // pretend to be readable.
+  US_TEST_CONDITION(foo.IsValid() == false, "Invalid resource after unload")
+  US_TEST_CONDITION(foo.GetSize() == 0, "No size after unload")
+  ModuleResourceStream unloadedStream(foo);
+  std::string unloadedContent;
+  std::getline(unloadedStream, unloadedContent);
+  US_TEST_CONDITION(unloadedContent.empty(), "No data after unload")
+
+  libR.Load();
+  moduleR = ModuleRegistry::GetModule("TestModuleR");
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Module reloaded")
+  US_TEST_CONDITION(moduleR->GetResource("foo.txt").IsValid() == true, "Valid resource after reload")
+  libR.Unload();
 
   US_TEST_END()
 }

@@ -36,7 +36,7 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)
-  , resourceContainer(info)
+  , resourceContainer(&this->info)
   , moduleContext(nullptr)
   , moduleActivator(nullptr)
   , q(qq)

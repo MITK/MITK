@@ -2193,8 +2193,21 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
         // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
-        window->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
-        window->GetSliceNavigationController()->Update();
+        // With data loaded, the new cell has already initialized itself in its
+        // constructor's default direction, so the plane, slice and camera all
+        // belong to that one. Re-initializing on the geometry it holds makes
+        // the declared direction current and fits the slice and camera to it.
+        auto* sliceNavigation = window->GetSliceNavigationController();
+        sliceNavigation->SetDefaultViewDirection(viewDirection);
+        if (const auto* cellGeometry = sliceNavigation->GetInputWorldTimeGeometry(); nullptr != cellGeometry)
+        {
+          mitk::RenderingManager::GetInstance()->InitializeView(
+            window->GetRenderWindow()->GetVtkRenderWindow(), cellGeometry);
+        }
+        else
+        {
+          sliceNavigation->Update();
+        }
         // Optional display label (free-form, non-unique). Pre-walk has
         // already validated type and non-emptiness.
         if (child.contains("name"))

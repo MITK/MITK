@@ -71,7 +71,9 @@ function(mitk_macho_read file)
   endforeach()
 endfunction()
 
-# Expands a leading @loader_path or @executable_path of a path.
+# Expands a leading @loader_path or @executable_path of a path. The result
+# has no trailing slash, so directories compare equal however they were
+# written.
 function(mitk_macho_expand out_var path loader executable_dir)
   get_filename_component(_loader_dir "${loader}" DIRECTORY)
   if(path MATCHES "^@loader_path(.*)$")
@@ -80,6 +82,7 @@ function(mitk_macho_expand out_var path loader executable_dir)
     set(path "${executable_dir}${CMAKE_MATCH_1}")
   endif()
   cmake_path(NORMAL_PATH path)
+  string(REGEX REPLACE "(.)/$" "\\1" path "${path}")
   set(${out_var} "${path}" PARENT_SCOPE)
 endfunction()
 

@@ -19,11 +19,19 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QDir>
+
+#include <fstream>
 #include <vector>
 
 /**
  * Tests the MxN layout lock: the declaration parsers that turn plugin.xml
  * values into a lock set and a widget name, and the lock state on the widget.
+ *
+ * Also applies the layouts the example plugin org.mitk.example.gui.mxneditor
+ * ships, whose resource directory is the last command-line argument. Nothing
+ * starts that example automatically, so this is what catches window-ID or
+ * schema drift in its files.
  */
 class QmitkMxNLayoutLockTestSuite : public mitk::TestFixture
 {
@@ -39,6 +47,7 @@ class QmitkMxNLayoutLockTestSuite : public mitk::TestFixture
   MITK_TEST(InvalidName_Rejected);
   MITK_TEST(Locks_DefaultToNone);
   MITK_TEST(Signal_FiresOncePerActualChange);
+  MITK_TEST(ExampleLayouts_ApplyToTheDemoEditor);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -140,6 +149,34 @@ public:
     widget.SetLayoutLocks(QmitkMxNLayoutLocks());
     CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emitted.size());
     CPPUNIT_ASSERT(QmitkMxNLayoutLocks() == emitted[1]);
+  }
+
+  void ExampleLayouts_ApplyToTheDemoEditor()
+  {
+    CPPUNIT_ASSERT_MESSAGE("The example's resource directory must be passed as the last argument",
+                           !globalCmdLineArgs.empty());
+    const QDir resources(QString::fromStdString(globalCmdLineArgs.back()));
+
+    // Named and locked as the example's declaration does.
+    QmitkMxNMultiWidget widget(nullptr, {}, QStringLiteral("org.mitk.example.editors.mxndemo"));
+    widget.SetDataStorage(m_DataStorage);
+    widget.SetLayoutLocks(QmitkMxNParseLayoutLocks("structure,direction,proportions,content"));
+    widget.InitializeMultiWidget();
+
+    const std::pair<const char*, unsigned int> layouts[] = {
+      { "MxNDemoLayout.json", 2 },
+      { "MxNDemoLayoutAlt.json", 3 }
+    };
+    for (const auto& [fileName, cellCount] : layouts)
+    {
+      const auto path = resources.filePath(QString::fromUtf8(fileName)).toStdString();
+      std::ifstream file(path);
+      CPPUNIT_ASSERT_MESSAGE("Example layout must exist: " + path, file.good());
+
+      const auto document = nlohmann::json::parse(file);
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE("Example layout must apply: " + path, widget.ApplyLayout(document));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(path, cellCount, widget.GetNumberOfRenderWindowWidgets());
+    }
   }
 };
 

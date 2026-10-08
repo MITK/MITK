@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <!-- A plugin-owned MxN editor: the stock editor class under an ID of its own.
+       Without 'widgetName' its render windows are named after the editor ID.
+       No 'extensions', so it never becomes the default editor for a file. -->
+  <extension point="org.blueberry.ui.editors">
+    <editor id="org.mitk.example.editors.mxndemo"
+            name="MxN Demo Display">
+      <class class="QmitkMxNMultiWidgetEditor">
+        <parameter name="layoutLock" value="structure,direction,proportions,content"/>
+        <parameter name="initialLayout" value="resources/MxNDemoLayout.json"/>
+      </class>
+    </editor>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.example.views.mxndemo"
+          name="MxN Demo"
+          category="General"
+          class="QmitkMxNDemoView"/>
+  </extension>
+
+  <!-- The demo editor reads the preference node named after its own ID; this
+       page edits that node by reusing the stock MxN page class. -->
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.example.MxNDemoDisplayPreferencePage"
+          name="MxN Demo Display"
+          category="org.mitk.EditorsPreferencePage">
+      <class class="QmitkMxNMultiWidgetEditorPreferencePage">
+        <parameter name="editorId" value="org.mitk.example.editors.mxndemo"/>
+      </class>
+      <keywordreference id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+</plugin>

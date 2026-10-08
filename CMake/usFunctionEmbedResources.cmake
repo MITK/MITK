@@ -160,13 +160,11 @@ function(usFunctionEmbedResources)
        )
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
       # The resource object above is assembled from a raw ZIP blob via `ld -r -b
-      # binary`, so it has no `.note.GNU-stack` section. Modern GNU ld treats a
-      # missing `.note.GNU-stack` as "executable stack required" and warns
-      # accordingly. Mark PT_GNU_STACK as non-executable on the consuming target
-      # to silence the linker warning without making the stack executable.
-      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        target_link_options(${US_RESOURCE_TARGET} PRIVATE "LINKER:-z,noexecstack")
-      endif()
+      # binary`, so it has no `.note.GNU-stack` section. Older GNU ld versions
+      # take a missing note as a request for an executable stack, and glibc
+      # 2.41 and newer refuse to dlopen such a module, so mark the stack
+      # non-executable explicitly.
+      target_link_options(${US_RESOURCE_TARGET} PRIVATE "LINKER:-z,noexecstack")
     else()
       message(WARNING "Internal error: Resource linking not available. Falling back to APPEND mode.")
       set(US_RESOURCE_LINK 0)

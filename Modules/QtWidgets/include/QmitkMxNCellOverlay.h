@@ -462,7 +462,7 @@ private:
   void UpdateInteractivity();
 
   /**
-   * rief End every gesture still marked as running: one whose release went
+   * \brief End every gesture still marked as running: one whose release went
    *        elsewhere (a lost grab) must neither keep the overlay interactive
    *        nor let a plain hover drag. A pending plate press is cancelled, not
    *        completed as a click. 'refreshInteractivity' re-evaluates the mask

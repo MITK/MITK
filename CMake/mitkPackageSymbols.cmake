@@ -69,8 +69,8 @@ else()
   # On ELF the unstripped build-tree binary is the symbol file: it carries
   # the DWARF that strip removes from the shipped copy, so archive it as is.
   # On macOS the linker leaves the DWARF in the object files, so dsymutil
-  # packs it into a self-contained .dSYM here. Best effort - warns and skips
-  # if dsymutil is unavailable.
+  # packs it into a self-contained .dSYM here. Without dsymutil nothing is
+  # staged and the archive step below fails.
   if(CMAKE_HOST_APPLE)
     find_program(_dsymutil dsymutil)
   endif()
@@ -114,8 +114,12 @@ else()
         math(EXPR _staged "${_staged} + 1")
       endif()
     elseif(NOT CMAKE_HOST_APPLE)
-      file(COPY "${_binary}" DESTINATION "${MITK_SYMBOL_STAGING_DIR}")
-      math(EXPR _staged "${_staged} + 1")
+      # The extensionless candidates include scripts and data files.
+      file(READ "${_binary}" _magic LIMIT 4 HEX)
+      if(_magic STREQUAL "7f454c46")
+        file(COPY "${_binary}" DESTINATION "${MITK_SYMBOL_STAGING_DIR}")
+        math(EXPR _staged "${_staged} + 1")
+      endif()
     endif()
   endforeach()
 endif()

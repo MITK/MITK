@@ -158,14 +158,11 @@ void* ModuleUtils::GetSymbol(const ModuleInfo& module, const char* symbol)
   return GetSymbol_impl(module, symbol);
 }
 
+#ifdef _WIN32
 void ModuleUtils::GetLinkedResources(void* symbol, ModuleInfo* moduleInfo)
 {
-#ifdef _WIN32
   GetLinkedResources_impl(symbol, moduleInfo);
-#else
-  (void)symbol;
-  (void)moduleInfo;
-#endif
 }
+#endif
 
 }

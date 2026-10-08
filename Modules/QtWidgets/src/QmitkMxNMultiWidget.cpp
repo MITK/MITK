@@ -1255,6 +1255,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
             this->OnSyncPeekHovered(overStrip, axis);
           });
 
+  this->ApplyLayoutLocksToCell(*renderWindowWidget);
+
   // The Synchronize macro covers every cell of the editor, including cells
   // created while it is active - not only those present at toggle time.
   if (m_SynchronizeMacroActive)
@@ -1431,7 +1433,10 @@ void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
     return;
   }
 
-  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* split)
+  // Every rebuild of the splitter tree ends here, so this is where the
+  // Proportions lock reaches handles that did not exist before.
+  const bool handlesEnabled = !m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Proportions);
+  std::function<void(QSplitter*)> walk = [this, &walk, handlesEnabled](QSplitter* split)
   {
     // Signal to signal, and deliberately not a lambda: Qt honours
     // Qt::UniqueConnection only for member-function connections, so a functor
@@ -1445,6 +1450,7 @@ void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
 
     for (int i = 0; i < split->count(); ++i)
     {
+      split->handle(i)->setEnabled(handlesEnabled);
       if (auto* sub = dynamic_cast<QSplitter*>(split->widget(i)))
       {
         walk(sub);
@@ -2837,8 +2843,35 @@ void QmitkMxNMultiWidget::SetLayoutLocks(QmitkMxNLayoutLocks locks)
     return;
   }
 
+  // Locks gate only the user-facing seams (cell chrome, the cell overlay's
+  // menus and plane label, the splitter handles, the layout editor view),
+  // never the mutating API: ApplyLayout and the plugin owning the widget call
+  // those same setters, and both must keep working on a locked widget.
+  const auto changed = m_LayoutLocks ^ locks;
   m_LayoutLocks = locks;
+
+  // Maximize-hidden cells stay in the map, so they are re-gated as well.
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    this->ApplyLayoutLocksToCell(*cell);
+  }
+  if (changed.testFlag(QmitkMxNLayoutLock::Proportions))
+  {
+    this->ConfigureLayoutSplitters();
+  }
+
   emit LayoutLocksChanged(m_LayoutLocks);
+}
+
+void QmitkMxNMultiWidget::ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell)
+{
+  auto* utility = cell.GetUtilityWidget();
+  if (nullptr == utility)
+  {
+    return;
+  }
+  utility->SetSyncBarcodeClickable(!m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Structure));
+  utility->SetDataSelectionVisible(!m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Content));
 }
 
 QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const

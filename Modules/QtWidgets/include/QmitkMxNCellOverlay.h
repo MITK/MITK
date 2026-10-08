@@ -39,6 +39,7 @@ found in the LICENSE file.
 #include <vector>
 
 class QmitkMxNMultiWidget;
+enum class QmitkMxNLayoutLock;
 class QmitkRenderWindowWidget;
 class QFont;
 class QMenu;
@@ -460,6 +461,10 @@ private:
    *        state so a mid-drag collapse cannot break the implicit grab.
    */
   void UpdateInteractivity();
+
+  /** \brief Whether the editor locks 'lock' for users; read per event, so a
+   *         live lock change needs no cached state here. */
+  bool IsLocked(QmitkMxNLayoutLock lock) const;
 
   /**
    * \brief End every gesture still marked as running: one whose release went

@@ -1315,6 +1315,15 @@ private:
   void ConfigureLayoutSplitters();
 
   /**
+  * \brief Applies the current layout locks to one cell's chrome (sync barcode
+  *        click, Data button).
+  *
+  *   Cell creation and 'SetLayoutLocks' both go through here, so a cell
+  *   created later and a cell re-gated by a live change end up alike.
+  */
+  void ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell);
+
+  /**
   * \brief Tear down a single cell during grid surgery: capture its selection
   *        group index (before removal, see below), remove it from the
   *        render-window registry, erase its 'm_CellSyncLinks' entry, and reclaim

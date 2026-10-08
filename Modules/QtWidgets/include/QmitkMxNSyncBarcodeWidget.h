@@ -40,7 +40,7 @@ class QPainter;
  * it.
  *
  * The whole strip doubles as a button: it emits Clicked so the owner can open
- * the layout editor.
+ * the layout editor. 'SetClickable' withdraws that button.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 {
@@ -128,6 +128,15 @@ public:
    *        so each axis glyph toggles that axis for the group.
    */
   void SetAxisClickable(bool clickable);
+
+  /**
+   * \brief Whether a click on the passive strip is offered. When false,
+   *        'Clicked' is not emitted, and the click tooltip, the pointing-hand
+   *        cursor and the whole-strip hover highlight are not shown. A change
+   *        takes effect at once, also while the pointer rests on the strip.
+   *        'PeekHovered' keeps firing either way. Default: true.
+   */
+  void SetClickable(bool clickable);
 
   /**
    * \brief Ask for the width the glyph rendering needs instead of the compact
@@ -219,6 +228,7 @@ private:
   bool m_ReportedOverStrip = false;
   int m_ReportedSlot = -1;
   bool m_AxisClickable = false;
+  bool m_Clickable = true;
   bool m_PreferGlyphWidth = false;
   QPoint m_PressPos;
 };

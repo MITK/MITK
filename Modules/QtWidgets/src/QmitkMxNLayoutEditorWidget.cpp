@@ -1773,7 +1773,9 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
       const auto text = QInputDialog::getText(
         this, tr("Rename group"), tr("Display name:"), QLineEdit::Normal,
         QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(groupId)), &ok);
-      if (ok)
+      // The modal runs an event loop in which the widget can be unbound, e.g.
+      // by its plugin locking the structure, or closed.
+      if (ok && !m_MultiWidget.isNull())
       {
         try
         {

@@ -40,6 +40,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QmitkRenderWindow* renderWindow,
   mitk::DataStorage* dataStorage)
   : m_NodeSelectionWidget(nullptr)
+  , m_DataButton(nullptr)
   , m_DataMenu(nullptr)
   , m_CleanViewButton(nullptr)
   , m_NavigatorToggleButton(nullptr)
@@ -105,22 +106,22 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
     "QToolButton:focus { border-color: %1; }"
     "QToolButton::menu-indicator { image: none; }").arg(QmitkIconTheme::GetAccentColor()));
 
-  auto* dataButton = new QToolButton(this);
-  dataButton->setAutoRaise(true);
-  dataButton->setText(tr("Data"));
-  dataButton->setToolTip(tr("Select the data shown in this render window"));
-  dataButton->setPopupMode(QToolButton::InstantPopup);
-  m_DataMenu = new QMenu(dataButton);
+  m_DataButton = new QToolButton(this);
+  m_DataButton->setAutoRaise(true);
+  m_DataButton->setText(tr("Data"));
+  m_DataButton->setToolTip(tr("Select the data shown in this render window"));
+  m_DataButton->setPopupMode(QToolButton::InstantPopup);
+  m_DataMenu = new QMenu(m_DataButton);
   auto* dataAction = new QWidgetAction(m_DataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
   m_DataMenu->addAction(dataAction);
-  dataButton->setMenu(m_DataMenu);
+  m_DataButton->setMenu(m_DataMenu);
   // The menu grabs the pointer, which reads to the cell as the pointer leaving
   // and would collapse the strip the user just clicked; report it so the owner
   // can hold the furniture open for as long as the popup lives.
   connect(m_DataMenu, &QMenu::aboutToShow, this, [this]() { emit PopupVisibilityChanged(true); });
   connect(m_DataMenu, &QMenu::aboutToHide, this, [this]() { emit PopupVisibilityChanged(false); });
-  layout->addWidget(dataButton);
+  layout->addWidget(m_DataButton);
 
   // The direction controller applies a reorientation, from the plane label or a
   // relayed orientation-group change, to this cell's renderer via
@@ -314,4 +315,14 @@ void QmitkRenderWindowUtilityWidget::SetSyncBarcodeSlots(const QList<QmitkMxNSyn
 QList<QmitkMxNSyncBarcodeWidget::AxisSlot> QmitkRenderWindowUtilityWidget::GetSyncBarcodeSlots() const
 {
   return m_SyncBarcode->Slots();
+}
+
+void QmitkRenderWindowUtilityWidget::SetSyncBarcodeClickable(bool clickable)
+{
+  m_SyncBarcode->SetClickable(clickable);
+}
+
+void QmitkRenderWindowUtilityWidget::SetDataSelectionVisible(bool visible)
+{
+  m_DataButton->setVisible(visible);
 }

@@ -31,14 +31,39 @@ function(mitkFunctionDeployQt _target)
   get_target_property(_is_bundle ${_target} MACOSX_BUNDLE)
 
   if(APPLE AND _is_bundle)
-    # For macOS bundles, Qt handles the .app bundle layout
-    qt_generate_deploy_app_script(
+    # macdeployqt rewrites the library references of the bundle executable
+    # only. The other executables installed into the bundle, such as the
+    # command-line apps, have to be named explicitly, or they keep references
+    # to the libraries of the build host. Naming any makes macdeployqt write
+    # all references of the bundle relative to @loader_path instead of
+    # @executable_path, so they also resolve when another executable, such
+    # as the bundled Python, loads the libraries.
+    set(_additional_executables "")
+    get_property(_executable_targets GLOBAL PROPERTY MITK_EXECUTABLE_TARGETS)
+    foreach(_executable_target IN LISTS _executable_targets)
+      if(_executable_target STREQUAL _target)
+        continue()
+      endif()
+      get_target_property(_no_install ${_executable_target} NO_INSTALL)
+      get_target_property(_is_other_bundle ${_executable_target} MACOSX_BUNDLE)
+      if(_no_install OR _is_other_bundle)
+        continue()
+      endif()
+      list(APPEND _additional_executables
+        "\"$<TARGET_FILE_NAME:${_target}>.app/Contents/MacOS/$<TARGET_FILE_NAME:${_executable_target}>\"")
+    endforeach()
+    list(JOIN _additional_executables " " _additional_executables)
+
+    qt_generate_deploy_script(
       TARGET ${_target}
       OUTPUT_SCRIPT _deploy_script
-      NO_TRANSLATIONS
-      EXCLUDE_PLUGIN_TYPES ${_exclude_plugin_types}
-      EXCLUDE_PLUGINS ${_exclude_plugins}
-      INCLUDE_PLUGINS ${_include_plugins}
+      CONTENT "
+qt_deploy_runtime_dependencies(
+  EXECUTABLE \"$<TARGET_FILE_NAME:${_target}>.app\"
+  ADDITIONAL_EXECUTABLES ${_additional_executables}
+  NO_TRANSLATIONS
+)
+"
     )
   else()
     # For Windows/Linux, deploy Qt into bin/ with plugins in bin/plugins/

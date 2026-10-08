@@ -241,6 +241,8 @@ if(LINUX)
         if(IS_SYMLINK "${_binary}" OR IS_DIRECTORY "${_binary}")
           continue()
         endif()
+        # READ_ELF leaves a variable untouched when the file has no such entry
+        # or reads fine, so values from the previous file would carry over.
         set(_runpath "")
         set(_rpath "")
         set(_error "")

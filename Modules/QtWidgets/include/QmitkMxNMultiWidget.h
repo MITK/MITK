@@ -136,6 +136,8 @@ class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
 public:
 
   /**
+  * \param parent Parent widget.
+  * \param f Window flags, as for QWidget.
   * \param multiWidgetName Prefix of every render-window ID of this widget; must
   *        satisfy 'QmitkMxNIsValidMultiWidgetName' and be unique among the MxN
   *        widgets alive at the same time.

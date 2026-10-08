@@ -14,6 +14,9 @@
 	Clicking any window's sync barcode while the editor is visible closes it again.
 	As a dockable view it stays open during review sessions and doubles as a live
 	legend of the current coupling.
+	A display shown by another plugin can have its layout managed by that plugin. While
+	such a display is in front, the view shows <i>The active display's layout is managed
+	by its plugin</i> instead of its controls.
 
 	The windows themselves are arranged where they are, in the display: while the view is
 	visible, every window shows its sync plate, and the plates are where windows are

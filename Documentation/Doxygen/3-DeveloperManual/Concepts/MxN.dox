@@ -75,4 +75,119 @@ human-friendly walkthrough lives on a dedicated page:
 \ref MxNLayoutFormatPage. The closed, normative reference is the JSON Schema
 `Modules/QtWidgets/resource/mxn-layout-v2.schema.json`.
 
+
+\section MxNConceptPage_PluginEditors Plugin-owned MxN editors
+
+A plugin can ship its own MxN editor, running next to the stock MxN display without
+sharing its state and without the generic MxN tooling taking it over. It does not
+subclass anything: it declares a new editor ID for the stock editor class
+`QmitkMxNMultiWidgetEditor` and drives the editor's \ref QmitkMxNMultiWidget from its
+own view. The example plugin `org.mitk.example.gui.mxneditor`
+(\ref BlueBerryExampleMxNEditor) is the complete, compiled reference. Start it from the
+`BlueBerryExampleLauncher` with the `MxNEditor` configuration.
+
+\subsection MxNConceptPage_PluginEditors_Declaration Declaration
+
+\code{.xml}
+<extension point="org.blueberry.ui.editors">
+  <editor id="org.mitk.editors.longitrack" name="LongiTrack Display">
+    <class class="QmitkMxNMultiWidgetEditor">
+      <parameter name="layoutLock" value="structure,direction,proportions,content"/>
+      <parameter name="initialLayout" value="resources/LongiTrackLayout.json"/>
+    </class>
+  </editor>
+</extension>
+\endcode
+
+The declaring plugin lists `org.mitk.gui.qt.mxnmultiwidgeteditor` in its `Require-Plugin`.
+All parameters are optional:
+ - `widgetName`: the prefix of the editor's render-window IDs, `<widgetName>__<cellId>`.
+   It defaults to the editor ID, which keeps the names unique without a naming rule. It
+   must match `^[A-Za-z][A-Za-z0-9.-]*$`. An override must be unique among the MxN
+   editors open at the same time; this is not enforced. The stock editor sets `mxn`.
+ - `layoutLock`: a comma-separated list of the aspects users cannot change
+   (see \ref MxNConceptPage_PluginEditors_Locks).
+ - `initialLayout`: a layout file (\ref MxNLayoutFormatPage) embedded in the declaring
+   plugin through `CACHED_RESOURCE_FILES`, with a path relative to that plugin, like the
+   `icon` attribute. Its window IDs must carry the editor's widget name. It is applied
+   before the editor is first shown, so the first frame already shows it.
+
+Do not declare `extensions`: an editor declaring them can become the default editor for
+those files.
+
+A broken declaration does not fail silently. This covers an unknown parameter, an
+invalid name or lock token, and an initial layout that is missing, not valid JSON, or
+rejected by `ApplyLayout`. The editor opens with an error panel that names the plugin,
+the parameter and the problem, and logs the same message. No MxN widget of that editor
+stays alive.
+
+\subsection MxNConceptPage_PluginEditors_Code Declaration and code
+
+The declared locks and layout are starting values. `QmitkMxNMultiWidget::SetLayoutLocks`
+and `QmitkMxNMultiWidget::ApplyLayout` change them at any time, and `LayoutLocksChanged`
+reports lock changes. Declare what is static, so the first frame is right, and use code
+for what depends on the data or on the workflow, for example a layout that depends on the
+number of time points.
+
+The view finds the editor's widget by editor ID (`FindEditors` with `MATCH_ID`). It holds
+the widget only as a guarded pointer and looks it up again on part events, because every
+reopened editor builds a new widget. Open the editor with `MATCH_ID` too: an editor input
+of the data storage alone would also match an open stock MxN editor. For the same reason,
+opening data while the plugin's editor is the active one shows the data there instead of
+raising the stock MxN editor.
+
+\subsection MxNConceptPage_PluginEditors_Locks Layout locks
+
+A lock withdraws one aspect from users:
+ - `structure`: the grid, the synchronization and selection groups, the sync links and
+   layout loading. The cells' sync barcodes do not open the MxN Layout Editor, and the view
+   does not bind to the editor; it says that the plugin manages the layout instead.
+ - `direction`: a cell's view direction, from the context menu and the plane label.
+ - `proportions`: the splitter handles between cells.
+ - `content`: the data a cell shows through its own Data button and "Data..." entry, which
+   would also change the cell's selection group.
+
+Locks never block programmatic calls: `ApplyLayout`, `SetSyncLink`, `SetCellSelectionGroup`,
+`SetViewDirection`, `SetMaximizedCell` and a cell's node selection all keep working, so the
+owning plugin keeps full control. Maximizing a cell stays available to users.
+Views that act on whichever editor is active are not covered: the Render Window Manager
+can still change per-window visibility and layers, and the Data Manager changes node
+properties globally.
+
+\subsection MxNConceptPage_PluginEditors_Preferences Preferences
+
+Each MxN editor reads the preference node named after its own editor ID, so a plugin
+editor starts from defaults and does not follow the user's stock MxN settings. To expose
+its display preferences, a plugin declares a page with the stock page class and an
+`editorId`:
+
+\code{.xml}
+<extension point="org.blueberry.ui.preferencePages">
+  <page id="org.mitk.LongiTrackDisplayPreferencePage" name="Display"
+        category="org.mitk.LongiTrackPreferencePage">
+    <class class="QmitkMxNMultiWidgetEditorPreferencePage">
+      <parameter name="editorId" value="org.mitk.editors.longitrack"/>
+    </class>
+    <keywordreference id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords"/>
+  </page>
+</extension>
+\endcode
+
+The page's Reset clears every key at the root of the editor's node. Keep a plugin's own
+settings in a child node of the editor node (e.g. `org.mitk.editors.longitrack/backend`)
+or in the plugin's own node, never as root keys of the editor node.
+
+\subsection MxNConceptPage_PluginEditors_Tooling Generic tooling
+
+ - The MxN Layout Editor view binds to an MxN editor when it becomes visible, not when it
+   is activated. With two editors side by side, clicking from one into the other does not
+   rebind the view.
+ - MovieMaker disables itself for every MxN editor, as for the stock one.
+ - Views that follow the active editor, such as Segmentation and the Render Window Manager,
+   work on the plugin's editor like on any other.
+ - The REST API does not see a second MxN editor: its editor list and the
+   `/rendering/editors/mxn/...` endpoints address the stock editor only.
+ - A slice scroll in one editor re-renders the visible windows of the other one as well.
+   The state stays separate.
+
 */

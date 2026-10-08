@@ -186,6 +186,12 @@ void QmitkMxNDemoView::SwitchLayout()
 void QmitkMxNDemoView::SetMultiWidget(QmitkMxNMultiWidget* multiWidget)
 {
   QObject::disconnect(m_LocksConnection);
+
+  // A new widget starts on the layout its declaration names.
+  if (multiWidget != m_MultiWidget.data())
+  {
+    m_ShowsAltLayout = false;
+  }
   m_MultiWidget = multiWidget;
 
   // Follows lock changes from anywhere, not only from this view's boxes.

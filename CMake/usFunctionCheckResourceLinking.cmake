@@ -34,7 +34,7 @@ function(usFunctionCheckResourceLinking)
   elseif(UNIX AND CMAKE_OBJCOPY)
     set(_test_object "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o")
     execute_process(
-      COMMAND ${CMAKE_LINKER} -r -b binary -o "${_test_object}" "${CMAKE_COMMAND}"
+      COMMAND ${CMAKE_LINKER} -r -b binary -o "${_test_object}" "${CMAKE_CURRENT_FUNCTION_LIST_FILE}"
       RESULT_VARIABLE _result
       OUTPUT_QUIET
       ERROR_QUIET

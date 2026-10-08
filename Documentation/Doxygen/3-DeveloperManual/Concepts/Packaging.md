@@ -391,15 +391,15 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). Where resource linking is unavailable and the resources are appended instead, stripping stays off. CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH.
+Linux and macOS packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into a regular section, `.rodata` on Linux and `__TEXT,us_resources` on macOS (see \ref CppMicroServicesResourcesSection). Where resource linking is unavailable and the resources are appended instead, stripping stays off. CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH. On macOS CMake strips with `strip -x`, which keeps the exported symbols, and the bundle is signed only afterwards, in `FixMacOSInstaller.cmake`.
 
-Windows and macOS packages are not stripped: MSVC has no strip step, and the macOS bundle post-processing has not been verified with stripped binaries yet.
+Windows packages are not stripped: MSVC has no strip step.
 
 ### Debug Symbols and Symbol Archiving
 
 Release builds emit debug symbols for MITK's own code when `MITK_RELEASE_DEBUG_SYMBOLS` is `ON` (the default, forwarded from the SuperBuild): PDBs on MSVC, minimal DWARF (`-g1`) on GCC/Clang, dSYM on macOS. Optimization and inlining are unchanged. Prebuilt third-party dependencies under `ep/` (ITK, VTK, Qt, ...) are built without these flags, so a crash inside them resolves to name-plus-offset only.
 
-These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux the shipped binaries are stripped (see Strip Policy above), so neither their symbol tables nor their DWARF survive in the package. On macOS the binaries are not stripped, but the linker leaves the DWARF in the object files, from which `dsymutil` builds the `.dSYM` at archive time. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
+These symbols are **not** part of the installers. On Windows the debug info lives in separate `.pdb` files that are never `install()`d, so the shipped DLLs carry none. On Linux the shipped binaries are stripped (see Strip Policy above), so neither their symbol tables nor their DWARF survive in the package. On macOS the linker leaves the DWARF in the object files, from which `dsymutil` builds the `.dSYM` at archive time; the shipped binaries are stripped as well and match their `.dSYM` through the UUID. In all cases the full symbols are collected into a separate archive by the **opt-in `package-symbols` target** — which is *not* built by the default `package` / CPack target:
 
 ```
 cmake --build <build-tree> --config Release --target package-symbols
@@ -637,7 +637,7 @@ An existing build tree picks a changed default up on its next configure. The res
 
 When `strip` processes an ELF binary, it rewrites the file based on the section and program headers. Everything beyond that structure, including an appended ZIP archive, is discarded. The stripped binary loads fine, but all CppMicroServices resources are gone. Distribution packaging tools such as `dh_strip` and `brp-strip` strip unconditionally, so CPack settings alone cannot prevent this.
 
-LINK mode survives stripping because the archive sits in `.rodata`, an allocated section that `strip` has to keep.
+LINK mode survives stripping because the archive sits in a regular section (`.rodata` on Linux, `__TEXT,us_resources` on macOS) that `strip` has to keep.
 
 On Linux the linked resource object has no `.note.GNU-stack` section, which older linkers take as a request for an executable stack. `usFunctionEmbedResources()` therefore passes `-z noexecstack` to the consuming target: glibc 2.41 and newer refuse to `dlopen` a shared object that requires an executable stack.
 
@@ -662,8 +662,6 @@ The current install system replaced several legacy approaches:
 | Per-target Qt deployment calls | Centralized loop in `mitkInstallRules.cmake` | Qt deployment must run after all dependencies are in place |
 
 ## Known Issues and Future Work
-
-- **macOS packages are not stripped**: The resources are linked on macOS as well, so stripping is possible in principle, but the bundle post-processing (`macdeployqt`, code signing) has not been verified with stripped binaries yet.
 
 - **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
 

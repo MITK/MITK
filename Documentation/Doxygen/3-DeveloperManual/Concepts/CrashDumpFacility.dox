@@ -435,7 +435,7 @@ function-name-plus-offset only, while MITK frames resolve to file and line.
 The installers do not ship the symbols. On Windows the debug info lives in
 separate PDBs that are never installed; on Linux the shipped binaries are
 stripped (see \ref PackagingPage), so only the unstripped build-tree binaries
-carry the DWARF; on macOS the binaries keep their symbol tables while the
+carry the DWARF; on macOS the shipped binaries are stripped as well, and the
 linker leaves the DWARF in the object files. Either way the full symbols must
 be archived separately, by the \c package-symbols target:
 

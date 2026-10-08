@@ -117,6 +117,57 @@ if(MITK_USE_Qt6 AND _mitk_executable_targets)
 endif()
 
 #-----------------------------------------------------------------------------
+# Drop absolute LC_RPATH entries of the bundled binaries on macOS.
+#
+# Libraries copied in from the superbuild or a package manager, such as CTK
+# (used from its build tree) or Homebrew and MacPorts libraries, keep their
+# absolute LC_RPATH entries, and macdeployqt only removes the ones it used.
+# dyld searches them before the bundle, so on a machine that has libraries at
+# these paths, the bundle loads foreign ones, for example a second Qt. Replace
+# them by an entry relative to the binary that reaches Contents/Frameworks.
+#
+# This is the last step that changes binaries, so it also re-signs those
+# whose signature the changes before invalidated.
+#-----------------------------------------------------------------------------
+
+if(APPLE AND MACOSX_BUNDLE_NAMES)
+  foreach(_bundle IN LISTS MACOSX_BUNDLE_NAMES)
+    install(CODE "
+      set(_mitk_macho_tools \"${MITK_SOURCE_DIR}/CMake/mitkMachOTools.cmake\")
+      set(_mitk_bundle \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_bundle}.app\")
+    ")
+    install(CODE [[
+      include("${_mitk_macho_tools}")
+      mitk_macho_files(_binaries "${_mitk_bundle}")
+      foreach(_binary IN LISTS _binaries)
+        mitk_macho_read("${_binary}" RPATHS _rpaths)
+        set(_args "")
+        foreach(_rpath IN LISTS _rpaths)
+          if(NOT _rpath MATCHES "^@")
+            list(APPEND _args -delete_rpath "${_rpath}")
+          endif()
+        endforeach()
+        if(NOT _args)
+          continue()
+        endif()
+        get_filename_component(_dir "${_binary}" DIRECTORY)
+        file(RELATIVE_PATH _to_frameworks "${_dir}" "${_mitk_bundle}/Contents/Frameworks")
+        set(_frameworks_rpath "@loader_path/${_to_frameworks}")
+        string(REGEX REPLACE "/$" "" _frameworks_rpath "${_frameworks_rpath}")
+        if(NOT _frameworks_rpath IN_LIST _rpaths)
+          list(APPEND _args -add_rpath "${_frameworks_rpath}")
+        endif()
+        execute_process(COMMAND install_name_tool ${_args} "${_binary}" RESULT_VARIABLE _result)
+        if(NOT _result EQUAL 0)
+          message(FATAL_ERROR "install_name_tool failed on ${_binary}")
+        endif()
+      endforeach()
+      mitk_macho_resign_invalid(${_binaries})
+    ]])
+  endforeach()
+endif()
+
+#-----------------------------------------------------------------------------
 # Strip MITK's own libraries again after the Qt deployment.
 #
 # On Linux, qt_deploy_runtime_dependencies() resolves the dependencies of the

@@ -161,7 +161,7 @@ Third-party (imported) CTK plugins are installed via `install(FILES ...)` since 
 
 Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux and `INSTALL_RPATH "@loader_path/.."` on macOS to resolve libraries in the parent directory (`bin/` or `Contents/MacOS/`).
 
-The CTK *core* libraries (`libCTKCore`, `libCTKWidgets`, `libCTKPluginFramework`, `libCTKDICOMCore`, `libCTKDICOMWidgets`, `libCTKXNATCore`) are not installed by any of the CTK-aware helpers above. They are pulled into the package as transitive dependencies of MITK plugins by `install(RUNTIME_DEPENDENCY_SET)`. Because CTK has `INSTALL_COMMAND ""` (see `CMakeExternals/CTK.cmake`), `CTK_DIR` points directly at the CTK build tree, and those libraries retain their build-tree RPATH — which on Linux contains absolute paths from the build host (Qt install prefix and the CTK build directory itself). `install(RUNTIME_DEPENDENCY_SET)` does not rewrite RPATHs on copied files, so without further action the packaged bundle is non-relocatable: on another machine, the loader may follow the baked-in paths into unrelated library trees and trigger ABI mismatches. To prevent this, `mitkInstallRules.cmake` runs a post-install `install(CODE ...)` step on Linux that globs `libCTK*.so*` in each bundle's `bin/` and resets their RUNPATH to `$ORIGIN` using `file(RPATH_SET)`. macOS does not need the equivalent because `macdeployqt` rewrites library references during Qt deployment, and Windows has no RPATH.
+The CTK *core* libraries (`libCTKCore`, `libCTKWidgets`, `libCTKPluginFramework`, `libCTKDICOMCore`, `libCTKDICOMWidgets`, `libCTKXNATCore`) are not installed by any of the CTK-aware helpers above. They are pulled into the package as transitive dependencies of MITK plugins by `install(RUNTIME_DEPENDENCY_SET)`. Because CTK has `INSTALL_COMMAND ""` (see `CMakeExternals/CTK.cmake`), `CTK_DIR` points directly at the CTK build tree, and those libraries retain their build-tree RPATH — which on Linux contains absolute paths from the build host (Qt install prefix and the CTK build directory itself). `install(RUNTIME_DEPENDENCY_SET)` does not rewrite RPATHs on copied files, so without further action the packaged bundle is non-relocatable: on another machine, the loader may follow the baked-in paths into unrelated library trees and trigger ABI mismatches. The same holds for the other external projects, whose install RPATH carries the Qt install prefix (see SuperBuild RPATH below). To prevent this, `mitkInstallRules.cmake` runs a post-install step on Linux that keeps only the `$ORIGIN`-relative RUNPATH entries of every binary in `bin/`, or `$ORIGIN` alone if none are left. On macOS, an equivalent step replaces absolute `LC_RPATH` entries (see Qt Deployment). Windows has no RPATH.
 
 ### Executables
 
@@ -238,6 +238,13 @@ endforeach()
 
 On macOS, the destination is `${_fwdir}/Python.framework` which resolves to `<Bundle>.app/Contents/Frameworks/Python.framework` for each bundle.
 
+The bindings are used in two ways, and both have to work from the package:
+
+- **Embedded**: an MITK executable hosts the interpreter through `mitk::PythonContext`. The auto-load module `PreloadPython`, which loads together with `MitkCore`, locates the bundled Python (`mitk::PythonHelper::GetHomePath()`) and loads its library first.
+- **External**: the bundled interpreter imports `mitk` on its own. MITK's libraries are not loaded yet then, so the module has to resolve them itself.
+
+For the external case, `mitkInstallRules.cmake` gives the module an install RPATH that reaches the libraries next to the executables (`$ORIGIN/../../../../bin` on Linux, the corresponding `@loader_path` entries for `Contents/MacOS` and `Contents/Frameworks` on macOS). Windows has no RPATH, and Python resolves the DLLs of an extension module only from registered directories, so the package's `__init__.py` registers `bin/` with `os.add_dll_directory()` when it finds MITK's DLLs there. The wheel configuration handles all of this through its own repair tools instead.
+
 ## Qt Deployment
 
 Qt deployment is handled by `mitkFunctionDeployQt()` in `mitkFunctionDeployQt.cmake`. It runs **after** the runtime dependency resolution, so that tools like `windeployqt` can see all MITK DLLs already present in `bin/` and correctly trace their transitive Qt dependencies.
@@ -251,7 +258,7 @@ Qt provides two deployment entry points:
 - **qt_generate_deploy_app_script()** — designed for structured application layouts, specifically macOS `.app` bundles. It handles the `Contents/Frameworks/`, `Contents/PlugIns/`, `Contents/Resources/` layout automatically.
 - **qt_generate_deploy_script()** — a lower-level function that generates a custom CMake install script. It accepts a `CONTENT` parameter with arbitrary CMake code, giving full control over deployment behavior.
 
-MITK uses `qt_generate_deploy_app_script()` only on macOS (for `.app` bundles). On Windows and Linux, MITK uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()` embedded in the `CONTENT` because:
+MITK uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()` embedded in the `CONTENT` on all platforms. On macOS, `qt_generate_deploy_app_script()` would generate the same call but offers no way to pass further executables (see below). On Windows and Linux:
 
 1. There are no app bundles on these platforms — the install layout is a flat `bin/` directory.
 2. Qt's default FHS-style paths (`lib/`, `libexec/`, `plugins/`) do not match MITK's portable `bin/`-centric layout.
@@ -259,7 +266,15 @@ MITK uses `qt_generate_deploy_app_script()` only on macOS (for `.app` bundles). 
 
 ### Platform-Specific Behavior
 
-**macOS**: Uses `qt_generate_deploy_app_script()` which delegates to `macdeployqt`. This tool scans all binaries in the bundle, copies their non-system dependencies into `Contents/Frameworks/`, rewrites library references, and deploys Qt plugins to `Contents/PlugIns/`. Because `macdeployqt` hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs (with no option to override this), the `install(RUNTIME_DEPENDENCY_SET)` resolution also targets `Contents/Frameworks/` via `LIBRARY DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}`. This way `macdeployqt` overwrites (via `-always-overwrite`) rather than creating duplicates. Qt frameworks are excluded from `install(RUNTIME_DEPENDENCY_SET)` via `POST_EXCLUDE_REGEXES` to avoid conflicting with `macdeployqt`'s framework deployment.
+**macOS**: `qt_deploy_runtime_dependencies()` delegates to `macdeployqt`. This tool scans all binaries in the bundle, copies their non-system dependencies into `Contents/Frameworks/`, rewrites library references, and deploys Qt plugins to `Contents/PlugIns/`. It rewrites the references of the bundle executable and of every `.dylib` and `.so` in the bundle, but not those of other executables, so the command-line apps in `Contents/MacOS/` are passed as `ADDITIONAL_EXECUTABLES` (`-executable=`); otherwise they keep references to libraries of the build host, such as a package manager's `libfreetype`. Passing any makes `macdeployqt` write all references of the bundle relative to `@loader_path` instead of `@executable_path`, so they also resolve when another executable, such as the bundled Python, loads the libraries. Because `macdeployqt` hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs (with no option to override this), the `install(RUNTIME_DEPENDENCY_SET)` resolution also targets `Contents/Frameworks/` via `LIBRARY DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}`. This way `macdeployqt` overwrites (via `-always-overwrite`) rather than creating duplicates. Qt frameworks are excluded from `install(RUNTIME_DEPENDENCY_SET)` via `POST_EXCLUDE_REGEXES` to avoid conflicting with `macdeployqt`'s framework deployment.
+
+`macdeployqt` changes between Qt versions without much notice, so these differences matter:
+
+- Since Qt 6.11 it signs everything ad hoc by default; before, it signed nothing. A binary whose load commands change afterwards needs a new signature, or arm64 kills the process that loads it. The last install step that changes binaries therefore re-signs every binary whose signature is invalid.
+- Since Qt 6.12 it writes no `qt.conf`; Qt finds the plugins through the bundle layout instead.
+- It ignores the plugin selection (`EXCLUDE_PLUGINS`, `EXCLUDE_PLUGIN_TYPES`, `INCLUDE_PLUGINS`), so `mitkFunctionDeployQt()` removes the excluded plugins after the deployment. A deployed plugin whose dependencies are not bundled, such as the SQL drivers of database clients, fails to load on other machines. The generic deployment on Linux ignores the exclusion by name before Qt 6.12, so the same step runs there.
+
+Absolute `LC_RPATH` entries are not rewritten by `macdeployqt` unless it used them. Libraries copied in from the superbuild or a package manager, such as CTK from its build tree, keep them, and dyld searches them before the bundle. `mitkInstallRules.cmake` therefore replaces them with an entry relative to the binary that reaches `Contents/Frameworks/`, like it drops the absolute RUNPATH entries on Linux.
 
 **Windows**: Uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()`. The `--no-opengl-sw` option is passed to `windeployqt` to skip the software OpenGL fallback. If OpenSSL is available, its root directory is passed via `--openssl-root`.
 
@@ -416,8 +431,11 @@ See \ref CrashDumpFacilityPage for how a minidump is symbolicated against such a
 On macOS, CPack runs `FixMacOSInstaller.cmake` (generated from `FixMacOSInstaller.cmake.in`) as a post-build step. This script:
 
 1. Converts the Python directory into a proper `Python.framework` (required for code signing)
-2. Fixes `@executable_path` references in the mitk Python module to use `@loader_path`
-3. Signs the app bundle with `codesign`
+2. Re-anchors the `@loader_path` references of the moved Python binaries
+3. Checks that every binary loads on the oldest supported macOS (`CMAKE_OSX_DEPLOYMENT_TARGET`) and that every reference resolves inside the bundle or the system, and fails otherwise
+4. Signs the app bundle with `codesign`
+
+The check in step 3 catches what would otherwise only fail on other machines: a library from a package manager that an update rebuilt for a newer macOS, or a reference back into the build host.
 
 ## Library Search Paths
 
@@ -570,9 +588,9 @@ All app bundles are signed with `codesign` using the identity specified by `MITK
 - `com.apple.security.cs.disable-library-validation` — allows loading unsigned or differently-signed shared libraries (needed for plugins and Python modules)
 - `com.apple.security.cs.allow-jit` — allows JIT compilation (needed for some Python operations)
 
-### Python Module `@loader_path` Fix
+### Re-Anchoring Python References
 
-The `FixMacOSInstaller.cmake` script fixes library dependency paths in the mitk Python module. `macdeployqt` rewrites dependency references to use `@executable_path/../MacOS/`, which works for binaries loaded by the main application but breaks when the Python interpreter in `Frameworks/Python.framework/Versions/A/bin` tries to load the `mitk` package. The fix rewrites these paths to use `@loader_path` instead.
+The framework conversion moves `bin/` and `lib/` into `Versions/A/`, two directories deeper. A reference relative to `@loader_path` that leaves the moved directories, such as the RPATH entries of the mitk module that reach `Contents/MacOS/`, misses its target afterwards, so `FixMacOSInstaller.cmake` recomputes these references for the new location. `mitk::PythonHelper::GetHomePath()` accepts both layouts, so the embedded interpreter also works from a plain `cmake --install` without CPack.
 
 ## Provisioning Files
 
@@ -667,14 +685,14 @@ The current install system replaced several legacy approaches:
 
 ## Known Issues and Future Work
 
-- **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
+- **Two copies of the Python library on macOS**: `MitkPythonHelper` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks/`, while `PreloadPython` loads `Python.framework/Versions/A/Python`. Both end up in an MITK process.
 
 ## File Reference
 
 | File | Purpose |
 |---|---|
 | `CMake/mitkInstallRules.cmake` | Central install orchestration: CppMicroServices, Python, dependency resolution, Qt deployment loop |
-| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt plugin and qt.conf deployment |
+| `CMake/mitkFunctionDeployQt.cmake` | `mitkFunctionDeployQt()` — Qt deployment, removal of excluded Qt plugins, qt.conf |
 | `CMake/mitkFunctionCreateModule.cmake` | `mitk_create_module()` — module install rules and RPATH overrides |
 | `CMake/mitkMacroCreateExecutable.cmake` | `mitk_create_executable()` — executable install rules and wrapper scripts |
 | `CMake/mitkFunctionCreateCommandLineApp.cmake` | `mitkFunctionCreateCommandLineApp()` — wraps `mitk_create_executable()` with MitkCommandLine dependency |
@@ -689,7 +707,8 @@ The current install system replaced several legacy approaches:
 | `CMake/mitkSetupCPack.cmake` | CPack generator selection, versioning, NSIS settings, strip policy; includes the symbol-archive target |
 | `CMake/mitkFunctionSymbolArchive.cmake` | Defines the opt-in `package-symbols` target that archives MITK debug symbols into `<CPACK_PACKAGE_FILE_NAME>-symbols.zip` |
 | `CMake/mitkPackageSymbols.cmake` | Build-time `cmake -P` helper invoked by `package-symbols`: collects and flattens MITK PDBs, unstripped ELF binaries and `.dSYM` bundles from the build tree |
-| `CMake/FixMacOSInstaller.cmake.in` | macOS post-CPack script: Python framework conversion, `@loader_path` fix, code signing |
+| `CMake/FixMacOSInstaller.cmake.in` | macOS post-CPack script: Python framework conversion, re-anchoring of Python references, binary checks, code signing |
+| `CMake/mitkMachOTools.cmake` | Helpers that read and re-sign the Mach-O binaries of a bundle, used by the install rules and `FixMacOSInstaller.cmake` |
 | `CMake/entitlements.plist` | macOS code signing entitlements |
 | `CMake/RunInstalledApp.bat` | Windows wrapper for regular executables |
 | `CMake/RunInstalledWin32App.bat` | Windows wrapper for BlueBerry (GUI) applications |

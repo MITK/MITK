@@ -2,9 +2,13 @@
 # Mach-O binaries of an app bundle. Included by install(CODE) snippets and by
 # FixMacOSInstaller.cmake; requires otool, install_name_tool and codesign.
 
+# The generated install script sets no policy version, so the policies these
+# helpers and their callers rely on are set here.
 # Do not descend into symlinked directories, such as Versions/Current of a
 # framework, which would list the same binaries twice.
 cmake_policy(SET CMP0009 NEW)
+# if(IN_LIST)
+cmake_policy(SET CMP0057 NEW)
 
 # Lists the Mach-O files below a directory, skipping symlinks.
 function(mitk_macho_files out_var dir)

@@ -11,6 +11,10 @@ endif()
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
+# The wheel has no crash handler and no symbol archive, and it is not
+# stripped, so release debug symbols would only inflate it.
+set(MITK_RELEASE_DEBUG_SYMBOLS OFF CACHE BOOL "" FORCE)
+
 set(MITK_USE_BLUEBERRY OFF CACHE BOOL "" FORCE)
 set(MITK_USE_CTK OFF CACHE BOOL "" FORCE)
 set(MITK_USE_Qt6 OFF CACHE BOOL "" FORCE)

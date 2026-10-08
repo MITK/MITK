@@ -128,10 +128,72 @@ foreach(bundle_path IN LISTS bundle_paths)
 
   endif() # MITK_USE_Python3
 
+  ###################
+  # Check binaries  #
+  ###################
+
+  # Every binary must load on the oldest supported macOS, and every reference
+  # must resolve inside the bundle or the system. A library from a package
+  # manager that was updated with a newer deployment target, or a reference
+  # back into the build host, would otherwise only fail on other machines.
+
+  message("    Checking binaries")
+  set(problems "")
+  set(executable_dir "${bundle_path}/Contents/MacOS")
+  mitk_macho_read("${app_path}" RPATHS app_rpaths)
+  mitk_macho_files(binaries "${bundle_path}")
+  foreach(binary IN LISTS binaries)
+    file(RELATIVE_PATH binary_rel "${bundle_path}" "${binary}")
+    mitk_macho_read("${binary}" ID id MINOS minos DEPENDENCIES deps RPATHS rpaths)
+    if(minos AND NOT "@CMAKE_OSX_DEPLOYMENT_TARGET@" STREQUAL "" AND minos VERSION_GREATER "@CMAKE_OSX_DEPLOYMENT_TARGET@")
+      list(APPEND problems "${binary_rel}: requires macOS ${minos}")
+    endif()
+    foreach(rpath IN LISTS rpaths)
+      if(NOT rpath MATCHES "^@")
+        list(APPEND problems "${binary_rel}: absolute LC_RPATH ${rpath}")
+      endif()
+    endforeach()
+    set(search_dirs "")
+    foreach(rpath IN LISTS rpaths)
+      mitk_macho_expand(dir "${rpath}" "${binary}" "${executable_dir}")
+      list(APPEND search_dirs "${dir}")
+    endforeach()
+    foreach(rpath IN LISTS app_rpaths)
+      mitk_macho_expand(dir "${rpath}" "${app_path}" "${executable_dir}")
+      list(APPEND search_dirs "${dir}")
+    endforeach()
+    foreach(dep IN LISTS deps)
+      if(dep STREQUAL id OR dep MATCHES "^/(usr/lib|System)/")
+        continue()
+      endif()
+      set(resolved FALSE)
+      if(dep MATCHES "^@rpath/(.+)$")
+        set(name "${CMAKE_MATCH_1}")
+        foreach(dir IN LISTS search_dirs)
+          if(EXISTS "${dir}/${name}")
+            set(resolved TRUE)
+            break()
+          endif()
+        endforeach()
+      elseif(dep MATCHES "^@")
+        mitk_macho_expand(path "${dep}" "${binary}" "${executable_dir}")
+        if(EXISTS "${path}")
+          set(resolved TRUE)
+        endif()
+      endif()
+      if(NOT resolved)
+        list(APPEND problems "${binary_rel}: ${dep} does not resolve inside the bundle")
+      endif()
+    endforeach()
+  endforeach()
+  if(problems)
+    list(JOIN problems "\n  " problems)
+    message(FATAL_ERROR "Binaries of ${bundle_name} do not load from the bundle:\n  ${problems}")
+  endif()
+
   # The bundle signature below covers only the code that codesign finds in
   # the standard locations, not the binaries inside site-packages, which the
   # steps above may have changed.
-  mitk_macho_files(binaries "${bundle_path}")
   mitk_macho_resign_invalid(${binaries})
 
   ############

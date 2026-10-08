@@ -86,13 +86,19 @@ signal the process was finally killed with.
 \section AnalyzingCrashDumpsHowTo_macOS macOS
 
 macOS debug info lives in <tt>.dSYM</tt> bundles (see
-\ref CrashDumpFacilityPage_Symbols), carried in the symbols archive. The flow is
-the same as on Linux, reading from the <tt>.dSYM</tt> instead of the binary:
+\ref CrashDumpFacilityPage_Symbols), carried in the symbols archive. The shipped
+binaries are stripped; a dSYM matches its binary through the UUID, which strip
+keeps. The flow is the same as on Linux, reading from the DWARF file inside the
+<tt>.dSYM</tt> instead of the binary:
 
 \code
-dump_syms libMitkCore.dylib.dSYM > MitkCore.sym
+dump_syms libMitkCore.dylib.dSYM/Contents/Resources/DWARF/libMitkCore.dylib > libMitkCore.dylib.sym
 # then the same symbol-tree layout and walker as on Linux
 \endcode
+
+Pass the DWARF file, not the bundle: given the bundle, \c dump_syms names the
+module <tt>libMitkCore.dylib.dSYM</tt>, which matches no module in the dump, so
+the walker finds no symbols.
 
 Two macOS specifics:
 

@@ -33,5 +33,9 @@ struct CMakeResourceDependencies
 }
 
 #ifdef US_RESOURCES_APPENDED_SYMBOL
+#ifdef __APPLE__
+extern "C" __attribute__((used, section("__DATA,us_appended"))) const char US_RESOURCES_APPENDED_SYMBOL = 0;
+#else
 extern "C" const char US_RESOURCES_APPENDED_SYMBOL = 0;
+#endif
 #endif

@@ -201,9 +201,9 @@ function(usFunctionEmbedResources)
       VERBATIM
      )
 
-    # On ELF platforms the runtime searches only module files that define
-    # this marker for appended resources (see usModuleInitialization.h).
-    if(UNIX AND NOT APPLE)
+    # The runtime searches only module files that define this marker for
+    # appended resources (see usModuleInitialization.h).
+    if(UNIX)
       set_source_files_properties(${_source_output} PROPERTIES
         COMPILE_DEFINITIONS "US_RESOURCES_APPENDED_SYMBOL=us_resources_appended_${US_RESOURCE_MODULE_NAME}")
     endif()

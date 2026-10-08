@@ -23,18 +23,45 @@ found in the LICENSE file.
 #include <usModuleInfo.h>
 #include <usModuleUtils_p.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 
-// On ELF platforms, usFunctionEmbedResources gives a linked resource archive
-// the module-unique symbols us_resources_start_<name> and
-// us_resources_end_<name>, and a module with appended resources the marker
-// us_resources_appended_<name>. The weak references resolve to nullptr where
-// these are missing, so the resource container reads a linked archive from
-// memory and only searches module files that may carry appended resources.
-// The symbol names have to be unique: identically named exported symbols
-// would let a module resolve another module's archive. A static module keeps
-// the file search: its resources are merged into the archive of the module
-// that imports it, which it does not know.
+namespace us {
+
+/**
+ * \brief Size of the range between two linker-provided addresses.
+ *
+ * The volatile copies keep the compiler from assuming that distinct symbols
+ * have distinct addresses, which does not hold for linker-provided section
+ * boundaries: the start and end of an empty section coincide.
+ */
+inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
+{
+  const char* volatile first = begin;
+  const char* volatile last = end;
+  return static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(last) - reinterpret_cast<std::uintptr_t>(first));
+}
+
+}
+
+// The module hands a linked resource archive to the resource container as a
+// memory range, and tells it whether its file may carry appended resources;
+// only such files are searched. A static module keeps the file search: its
+// resources are merged into the archive of the module that imports it, which
+// it does not know.
+//
+// ELF: usFunctionEmbedResources gives a linked archive the module-unique
+// symbols us_resources_start_<name> and us_resources_end_<name>, and a module
+// with appended resources the marker us_resources_appended_<name>. The weak
+// references resolve to nullptr where these are missing. The names have to be
+// unique: identically named exported symbols would let a module resolve
+// another module's archive.
+//
+// Mach-O: the linker resolves section$start and section$end within the image
+// being linked, and to an empty range if the section does not exist, so the
+// archive section (__TEXT,us_resources) and the marker section
+// (__DATA,us_appended) need no renaming.
 #if defined(__ELF__) && !defined(US_STATIC_MODULE)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
 extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME)[] __attribute__((weak)); \
@@ -45,10 +72,26 @@ extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attrib
   if (US_CONCAT(us_resources_start_, US_MODULE_NAME) != nullptr)                             \
   {                                                                                          \
     info->resourceData = US_CONCAT(us_resources_start_, US_MODULE_NAME);                     \
-    info->resourceSize = static_cast<std::size_t>(                                           \
-      US_CONCAT(us_resources_end_, US_MODULE_NAME) - US_CONCAT(us_resources_start_, US_MODULE_NAME)); \
+    info->resourceSize = us::ModuleResourceRangeSize(                                        \
+      US_CONCAT(us_resources_start_, US_MODULE_NAME), US_CONCAT(us_resources_end_, US_MODULE_NAME)); \
   }                                                                                          \
   info->resourcesInFile = &US_CONCAT(us_resources_appended_, US_MODULE_NAME) != nullptr;
+#elif defined(__APPLE__) && !defined(US_STATIC_MODULE)
+#define US_DECLARE_MODULE_RESOURCES                                                          \
+extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME) __asm("section$start$__TEXT$us_resources"); \
+extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME) __asm("section$end$__TEXT$us_resources");     \
+extern "C" const char US_CONCAT(us_appended_start_, US_MODULE_NAME) __asm("section$start$__DATA$us_appended");   \
+extern "C" const char US_CONCAT(us_appended_end_, US_MODULE_NAME) __asm("section$end$__DATA$us_appended");
+
+#define US_SET_MODULE_RESOURCES(info)                                                        \
+  info->resourceSize = us::ModuleResourceRangeSize(                                          \
+    &US_CONCAT(us_resources_start_, US_MODULE_NAME), &US_CONCAT(us_resources_end_, US_MODULE_NAME)); \
+  if (info->resourceSize != 0)                                                               \
+  {                                                                                          \
+    info->resourceData = &US_CONCAT(us_resources_start_, US_MODULE_NAME);                    \
+  }                                                                                          \
+  info->resourcesInFile = us::ModuleResourceRangeSize(                                       \
+    &US_CONCAT(us_appended_start_, US_MODULE_NAME), &US_CONCAT(us_appended_end_, US_MODULE_NAME)) != 0;
 #else
 #define US_DECLARE_MODULE_RESOURCES
 #define US_SET_MODULE_RESOURCES(info)

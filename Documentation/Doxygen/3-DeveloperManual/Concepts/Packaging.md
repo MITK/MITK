@@ -643,11 +643,15 @@ On Linux the linked resource object has no `.note.GNU-stack` section, which olde
 
 ### Locating the Archive at Runtime {#CppMicroServicesResourceLookupSection}
 
-An appended archive can only be found by scanning the module file backwards for the ZIP end-of-central-directory record. Doing the same for a linked archive would read everything behind `.rodata`, which in an unstripped binary includes the symbol tables and all debug information, and a byte sequence in there that happens to look like such a record would end the search early.
+An appended archive can only be found by scanning the module file backwards for the ZIP end-of-central-directory record. Doing the same for a linked archive would read everything behind it, which in an unstripped Linux binary includes the symbol tables and all debug information, and a byte sequence in there that happens to look like such a record would end the search early.
 
-On Linux the runtime therefore never scans for a linked archive. `usFunctionEmbedResources()` renames the symbols that `ld -r -b binary` emits to `us_resources_start_<module>` and `us_resources_end_<module>`, and `US_INITIALIZE_MODULE` references them weakly, so the module hands its archive to CppMicroServices as a memory range. The names have to be unique per module: with the generic names every module would export the same symbols, and a module could resolve another module's archive. APPEND mode defines the marker `us_resources_appended_<module>` instead, and only modules with that marker are scanned. A module with neither has no resources, and its file is not read at all.
+The runtime therefore never scans for a linked archive on Linux and macOS; the module hands its archive to CppMicroServices as a memory range instead. Static modules are the exception: their resources are merged into the archive of the importing module, so they keep the scan.
 
-On macOS and Windows the module file is scanned as before. Their debug information lives in separate `.dSYM` and `.pdb` files, so little follows the archive.
+On Linux, `usFunctionEmbedResources()` renames the symbols that `ld -r -b binary` emits to `us_resources_start_<module>` and `us_resources_end_<module>`, and `US_INITIALIZE_MODULE` references them weakly. The names have to be unique per module: with the generic names every module would export the same symbols, and a module could resolve another module's archive. APPEND mode defines the marker `us_resources_appended_<module>` instead, and only modules with that marker are scanned. A module with neither has no resources, and its file is not read at all.
+
+On macOS, `US_INITIALIZE_MODULE` uses the linker-provided `section$start` and `section$end` symbols of `__TEXT,us_resources`, which resolve within the image being linked, and to an empty range for a module without the section. APPEND mode places its marker in the section `__DATA,us_appended`.
+
+On Windows the module file is scanned as before. Its debug information lives in separate `.pdb` files, so little follows the archive.
 
 ## Changes from Legacy System
 

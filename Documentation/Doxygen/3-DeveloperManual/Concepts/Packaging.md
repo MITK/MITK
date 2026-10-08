@@ -683,9 +683,34 @@ The current install system replaced several legacy approaches:
 | Manual DLL copying scripts | `RUNTIME_DEPENDENCY_SET` with `DIRECTORIES` | CMake resolves transitive dependencies automatically |
 | Per-target Qt deployment calls | Centralized loop in `mitkInstallRules.cmake` | Qt deployment must run after all dependencies are in place |
 
+## Verifying a Package
+
+Packaging changes break easily, and the breakage often shows only on other machines: on the build host, references resolve into the build tree, the Qt installation or a package manager's prefix, none of which a user's machine has. Check a change on all three platforms against the actual package, with these locations unreachable.
+
+Static checks on the unpacked package:
+
+- **Linux**: no absolute RUNPATH entry in any ELF file (`readelf -d`), and no unresolved dependency with an empty environment (`env -i ldd`), including the binaries in the Qt plugin subdirectories. Dependencies of BlueBerry plugins on other plugins are expected to stay unresolved there; the plugin framework loads plugins in dependency order.
+- **macOS**: every dependency of every Mach-O file outside `/usr/lib` and `/System` resolves inside the bundle through `@loader_path`, `@executable_path` or the binary's `LC_RPATH` entries, no `LC_RPATH` entry is absolute, and no binary requires a newer macOS than `CMAKE_OSX_DEPLOYMENT_TARGET` (`otool -l`). `FixMacOSInstaller.cmake` checks the same for packages, but not for a plain `cmake --install`.
+
+Runtime scenarios, each with the build tree, the Qt installation, the sources and package-manager prefixes unreachable (a tmpfs over them with `bwrap` on Linux, a deny profile with `sandbox-exec` on macOS, `PATH` reduced to the system directories on Windows):
+
+1. The command-line apps start, and a conversion with `MitkFileConverter` loads the IO auto-load modules.
+2. The bundled interpreter runs a script that imports `mitk`, finds the auto-load modules in `mitk.get_loaded_modules()` and loads an image.
+3. A small executable next to `MitkWorkbench` embeds Python through `mitk::PythonContext` and does the same.
+4. The Workbench starts and runs Python; this one needs a display.
+
+On macOS, run them on the CPack package and on a plain install, which differ in layout and signing.
+
+Pitfalls of these checks:
+
+- On macOS, SIP strips `DYLD_*` variables whenever it runs a protected binary such as `env` or `sandbox-exec`, so `DYLD_PRINT_LIBRARIES` only works on a run without them.
+- The working directory must not lie inside a hidden location: an embedded interpreter resolves the empty `sys.path` entry through it and fails with a `PermissionError`.
+- `codesign --verify` on the main executable or a framework binary also checks the resource seal of the bundle, which only a package has.
+- On Windows, a test executable that links `MitkPython` needs the Python DLL at process start, whereas the Workbench loads `MitkPython` only after `PreloadPython` loaded the DLL from its full path. Load `MitkCore` first and delay-load `MitkPython` to behave the same.
+
 ## Known Issues and Future Work
 
-- **Two copies of the Python library on macOS**: `MitkPythonHelper` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks/`, while `PreloadPython` loads `Python.framework/Versions/A/Python`. Both end up in an MITK process.
+- **Two copies of the Python library on macOS**: `MitkPython` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks/`, while `PreloadPython` loads `Python.framework/Versions/A/Python`. Both end up in an MITK process.
 
 ## File Reference
 

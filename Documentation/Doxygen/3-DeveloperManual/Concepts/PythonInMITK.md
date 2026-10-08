@@ -81,7 +81,7 @@ Developers should instead use the `RelWithDebInfo` configuration for debugging.
 Leaving Python wrapping aside for now, the Python integration in MITK is split into three modules:
 
 1. **MitkPythonHelper**: This module **does not** link against the Python library.
-It primarily offers utility functions for retrieving paths such as the Python home directory, the Python library, and the Python executable — all of which can differ between the build tree and installed versions of MITK.
+It primarily offers utility functions for retrieving paths such as the Python home directory, the Python library, and the Python executable — all of which can differ between the build tree and installed versions of MITK, and on macOS also between a plain install and a package (see the quirks below).
 It also includes functions to create, locate, and activate virtual environments.
 
 2. **MitkPreloadPython**: This module **does not** depend on the Python library at link time.
@@ -340,12 +340,25 @@ To sign an application bundle on macOS with `codesign`, the bundle must follow c
 Therefore, we convert the `python` directory from `MITK-build` into `Python.framework` for packaging.
 This conversion is handled in the `MITK-build/FixMacOSInstaller.cmake` script, which CPack executes as a post-build step.
 
-### Importing mitk in the Python interpreter of an installed MITK on macOS
+The conversion moves `bin/` and `lib/` into `Versions/A/`, two directories deeper, after `macdeployqt` and the install rules have already written references relative to `@loader_path`.
+`FixMacOSInstaller.cmake` therefore recomputes every such reference that leaves the moved directories, including the RPATH entries of the `mitk` module, and re-signs the binaries it changed: the bundle signature does not reach into `site-packages`.
+A plain `cmake --install` keeps the original layout, and `mitk::PythonHelper::GetHomePath()` accepts both.
 
-Application bundles on macOS are deployed with `macdeployqt`, driven by `qt_generate_deploy_app_script()` (see \ref PackagingPage).
-It rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
-However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `mitk` package.
+### Using the Python of an installed MITK
 
-To fix this, we adjust the runtime dependency paths of the `mitk` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after deployment has finished modifying all paths.
-This fix currently does not cover autoload-modules, which is why they cannot be loaded in this scenario.
-Running the Python interpreter as subprocess of an MITK application, however, will load autoload-modules correctly.
+The `mitk` package of an installed MITK is used in two ways, and a change to packaging has to keep both working on all three platforms:
+
+- **Embedded**: an MITK executable hosts the interpreter through `mitk::PythonContext`. `MitkPreloadPython` has loaded the Python library already, and MITK's own libraries are loaded, so `import mitk` finds everything in the process.
+- **External**: the interpreter shipped with MITK runs a script that imports `mitk`. Nothing of MITK is loaded yet, so the extension module has to find MITK's libraries on its own, and through them the auto-load modules, which resolve their dependencies relative to themselves.
+
+How the extension module finds the libraries in the external case:
+
+- **Linux**: its install RPATH reaches `bin/` (`$ORIGIN/../../../../bin`), set in `mitkInstallRules.cmake`.
+- **macOS**: its install RPATH reaches `Contents/MacOS` and `Contents/Frameworks`. `macdeployqt` writes all references of the bundle relative to `@loader_path` instead of `@executable_path`, so they do not depend on which executable hosts the process.
+- **Windows**: Python resolves the DLLs of an extension module only from directories registered with `os.add_dll_directory()`, not from `PATH`. `mitk/__init__.py` registers `bin/` when it finds MITK's DLLs there and also prepends it to `PATH`, through which CppMicroServices loads the auto-load modules.
+
+The wheel solves the same problem with its own repair tools and keeps its own RPATH; none of this applies to it.
+
+On macOS, an MITK process currently loads the Python library twice: `MitkPython` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks`, while `MitkPreloadPython` loads `Python.framework/Versions/A/Python`.
+
+\ref PackagingPage describes how to verify these scenarios on a package.

@@ -1,35 +1,33 @@
 #! \ingroup MicroServicesCMake
-#! \brief Detect resource linking support and choose the default resource mode.
+#! \brief Check that resources can be linked into binaries.
 #!
-#! Sets the cache-internal variables US_RESOURCE_LINKING_AVAILABLE,
-#! US_DEFAULT_RESOURCE_MODE (LINK or APPEND), US_RESOURCE_SOURCE_SUFFIX,
-#! US_RESOURCE_SOURCE_SUFFIX_LINK and US_RESOURCE_SOURCE_SUFFIX_APPEND, which
-#! usFunctionGetResourceSource and usFunctionEmbedResources rely on.
+#! Sets the cache-internal variable US_RESOURCE_SOURCE_SUFFIX, the extension
+#! of the resource source that usFunctionGetResourceSource and
+#! usFunctionEmbedResources generate: an object file assembled from the ZIP
+#! archive on Linux and macOS, a resource script on Windows.
 #!
-#! The detection runs on every configure. The mode and the source suffix must
-#! always agree, and a build tree that cached them once would never follow a
-#! changed default: it would keep the old suffix in the source lists while the
-#! embed step produces the other one, which silently drops every resource.
+#! Resources are always linked into a regular section of the binary, or into a
+#! PE resource on Windows, where they survive strip and code signing and the
+#! module reads them from memory. A toolchain that cannot do this is not
+#! supported, so the check fails the configuration instead of building modules
+#! without resources.
 #!
-#! LINK is the default wherever it is available. Appended resources sit behind
-#! the end of the binary's structure, so strip discards them and macOS code
-#! signing rejects them; linked resources live in a regular section, or in a
-#! PE resource on Windows, and the module reads them from memory.
+#! The check runs on every configure, so a build tree follows a changed
+#! toolchain.
 #!
 #! \sa usFunctionEmbedResources
 function(usFunctionCheckResourceLinking)
-  set(_suffix )
-  set(_linking_available 0)
+  set(_suffix "")
   if(APPLE)
     set(_result )
     usFunctionCheckCompilerFlags("-Wl,-sectcreate,__TEXT,us_resources,CMakeLists.txt" _result)
     if(_result)
-      set(_linking_available 1)
+      set(_suffix .o)
     endif()
-    set(_suffix .o)
-  elseif(WIN32 AND CMAKE_RC_COMPILER)
-    set(_linking_available 1)
-    set(_suffix .rc)
+  elseif(WIN32)
+    if(CMAKE_RC_COMPILER)
+      set(_suffix .rc)
+    endif()
   elseif(UNIX AND CMAKE_OBJCOPY)
     set(_test_object "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o")
     execute_process(
@@ -40,28 +38,16 @@ function(usFunctionCheckResourceLinking)
     )
     file(REMOVE "${_test_object}")
     if(_result EQUAL 0)
-      set(_linking_available 1)
+      set(_suffix .o)
     endif()
-    set(_suffix .o)
   endif()
 
-  set(US_RESOURCE_SOURCE_SUFFIX_LINK ${_suffix} CACHE INTERNAL "CppMicroServices resource source suffix (link)" FORCE)
-  set(US_RESOURCE_SOURCE_SUFFIX_APPEND ".cpp" CACHE INTERNAL "CppMicroServices resource source suffix (append)" FORCE)
-
-  set(_success "no")
-  set(_default_mode "APPEND")
-  if(_linking_available)
-    set(_success "yes")
-    set(_default_mode "LINK")
+  if(NOT _suffix)
+    message(FATAL_ERROR "CppMicroServices resources cannot be linked with this toolchain: "
+      "it requires the linker to embed a binary file (-sectcreate on macOS, "
+      "ld -r -b binary plus objcopy on Linux) or a resource compiler on Windows.")
   endif()
 
-  message(STATUS "Checking for CppMicroServices resource linking capability...${_success} (default mode: ${_default_mode})")
-
-  set(US_RESOURCE_LINKING_AVAILABLE ${_linking_available} CACHE INTERNAL "CppMicroServices resource linking" FORCE)
-  set(US_DEFAULT_RESOURCE_MODE ${_default_mode} CACHE INTERNAL "CppMicroServices default resource mode" FORCE)
-  if(_default_mode STREQUAL "LINK")
-    set(US_RESOURCE_SOURCE_SUFFIX ${US_RESOURCE_SOURCE_SUFFIX_LINK} CACHE INTERNAL "CppMicroServices resource source suffix" FORCE)
-  else()
-    set(US_RESOURCE_SOURCE_SUFFIX ${US_RESOURCE_SOURCE_SUFFIX_APPEND} CACHE INTERNAL "CppMicroServices resource source suffix" FORCE)
-  endif()
+  message(STATUS "Checking for CppMicroServices resource linking capability...yes")
+  set(US_RESOURCE_SOURCE_SUFFIX ${_suffix} CACHE INTERNAL "CppMicroServices resource source suffix" FORCE)
 endfunction()

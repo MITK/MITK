@@ -22,18 +22,15 @@ The following conventions and limitations apply:
  * Resource entries are stored with case-insensitive names. On case-sensitive file systemes,
    adding resources with the same name but different capitalization will lead to an error.
  * Looking up resources by name at runtime *is* case sensitive.
- * CppMicroServices will search for a valid zip file inside a shared library,
-   starting from the end of the file. If other zip files are embedded in the module as
-   well (e.g. as an additional resource embedded via the Windows RC compiler or using
-   other techniques), it will stop at the first valid zip file and use it a the resource
-   container.
+ * The archive is linked into the module's binary, into a section of its own on Linux and
+   macOS and as a resource on Windows. A module reads it from memory and never opens its file.
 
 Embedding Resources in a %Module
 --------------------------------
 
 Resources are embedded into a module's shared library (or into an executable)
-by using the `usResourceCompiler` executable. It will create a ZIP archive of all input
-files and can append it to the module file.
+by using the `usResourceCompiler` executable. It creates a ZIP archive of all input
+files, which is then linked into the module.
 
 If you are using CMake, consider using the provided `usFunctionEmbedResources` CMake macro which
 handles the invocation of the `usResourceCompiler` executable and sets up the correct file

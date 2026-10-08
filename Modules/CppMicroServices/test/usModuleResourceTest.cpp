@@ -391,28 +391,6 @@ void testResourceFromExecutable(Module* module)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
-void testResourcesFrom(const std::string& moduleName)
-{
-  SharedLibrary libR(LIB_PATH, moduleName);
-  try
-  {
-    libR.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
-  }
-
-  Module* moduleR = ModuleRegistry::GetModule(moduleName);
-  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module")
-
-  US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
-
-  US_TEST_CONDITION(moduleR->FindResources("", "*.txt", true).size() == 2, "Resource count")
-
-  libR.Unload();
-}
-
 } // end unnamed namespace
 
 
@@ -458,9 +436,6 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
   libR.Unload();
   US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
-
-  testResourcesFrom("TestModuleRL");
-  testResourcesFrom("TestModuleRA");
 
   US_TEST_END()
 }

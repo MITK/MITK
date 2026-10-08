@@ -45,61 +45,49 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 
 }
 
-// The module hands a linked resource archive to the resource container as a
-// memory range, and tells it whether its file may carry appended resources;
-// only such files are searched.
+// The module hands the resource archive linked into its binary (see
+// usFunctionEmbedResources) to the resource container as a memory range.
 //
-// ELF: usFunctionEmbedResources puts a linked archive into the section
-// us_resources, whose bounds the linker provides for each binary as
-// __start_us_resources and __stop_us_resources, and gives a module with
-// appended resources the marker us_resources_appended_<name>. The weak
-// references resolve to nullptr where these are missing. They are hidden, so
-// they bind only within the binary being linked: linkers may export the
-// section bounds, and a module without resources would otherwise resolve
-// another module's archive.
+// ELF: the archive is the section us_resources, whose bounds the linker
+// provides for each binary as __start_us_resources and __stop_us_resources.
+// The weak references resolve to nullptr in a binary without the section.
+// They are hidden, so they bind only within the binary being linked: linkers
+// may export the section bounds, and a module without resources would
+// otherwise resolve another module's archive.
 //
-// Mach-O: the linker resolves section$start and section$end within the image
-// being linked, and to an empty range if the section does not exist, so the
-// archive section (__TEXT,us_resources) and the marker section
-// (__DATA,us_appended) need no renaming.
+// Mach-O: the archive is the section __TEXT,us_resources. The linker resolves
+// section$start and section$end within the image being linked, and to an
+// empty range if the section does not exist.
 //
 // Windows: the archive is a resource of the binary, found through the address
 // of a symbol in it.
 #if defined(__ELF__)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
 extern "C" const char __start_us_resources[] __attribute__((weak, visibility("hidden")));    \
-extern "C" const char __stop_us_resources[] __attribute__((weak, visibility("hidden")));     \
-extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attribute__((weak));
+extern "C" const char __stop_us_resources[] __attribute__((weak, visibility("hidden")));
 
 #define US_SET_MODULE_RESOURCES(info, symbol)                                                \
   if (__start_us_resources != nullptr)                                                       \
   {                                                                                          \
     info->resourceData = __start_us_resources;                                               \
     info->resourceSize = us::ModuleResourceRangeSize(__start_us_resources, __stop_us_resources); \
-  }                                                                                          \
-  info->resourcesInFile = &US_CONCAT(us_resources_appended_, US_MODULE_NAME) != nullptr;
+  }
 #elif defined(__APPLE__)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
-extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME) __asm("section$start$__TEXT$us_resources"); \
-extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME) __asm("section$end$__TEXT$us_resources");     \
-extern "C" const char US_CONCAT(us_appended_start_, US_MODULE_NAME) __asm("section$start$__DATA$us_appended");   \
-extern "C" const char US_CONCAT(us_appended_end_, US_MODULE_NAME) __asm("section$end$__DATA$us_appended");
+extern "C" const char us_resources_section_start __asm("section$start$__TEXT$us_resources"); \
+extern "C" const char us_resources_section_end __asm("section$end$__TEXT$us_resources");
 
 #define US_SET_MODULE_RESOURCES(info, symbol)                                                \
-  info->resourceSize = us::ModuleResourceRangeSize(                                          \
-    &US_CONCAT(us_resources_start_, US_MODULE_NAME), &US_CONCAT(us_resources_end_, US_MODULE_NAME)); \
+  info->resourceSize = us::ModuleResourceRangeSize(&us_resources_section_start, &us_resources_section_end); \
   if (info->resourceSize != 0)                                                               \
   {                                                                                          \
-    info->resourceData = &US_CONCAT(us_resources_start_, US_MODULE_NAME);                    \
-  }                                                                                          \
-  info->resourcesInFile = us::ModuleResourceRangeSize(                                       \
-    &US_CONCAT(us_appended_start_, US_MODULE_NAME), &US_CONCAT(us_appended_end_, US_MODULE_NAME)) != 0;
+    info->resourceData = &us_resources_section_start;                                        \
+  }
 #elif defined(_WIN32)
 #define US_DECLARE_MODULE_RESOURCES
 #define US_SET_MODULE_RESOURCES(info, symbol) us::ModuleUtils::GetLinkedResources(symbol, info);
 #else
-#define US_DECLARE_MODULE_RESOURCES
-#define US_SET_MODULE_RESOURCES(info, symbol)
+#error CppMicroServices resources require ELF, Mach-O or Windows binaries
 #endif
 
 

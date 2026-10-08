@@ -198,7 +198,7 @@ endif()
 # absolute build RUNPATH, so the install RUNPATH is restored as well.
 #-----------------------------------------------------------------------------
 
-if(LINUX AND CMAKE_STRIP AND US_DEFAULT_RESOURCE_MODE STREQUAL "LINK")
+if(LINUX AND CMAKE_STRIP)
   string(REPLACE ";" ":" _mitk_install_rpath "${CMAKE_INSTALL_RPATH}")
   install(CODE "
     if(CMAKE_INSTALL_DO_STRIP)

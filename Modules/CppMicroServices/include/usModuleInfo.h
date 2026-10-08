@@ -45,13 +45,6 @@ struct MITKCPPMICROSERVICES_EXPORT ModuleInfo
 
   /** \brief The size of the resource archive in bytes. */
   std::size_t resourceSize = 0;
-
-  /** \brief Whether resources may be appended to the module file.
-   *
-   * Without a linked archive, only a module file that may carry appended
-   * resources is searched for them.
-   */
-  bool resourcesInFile = true;
 };
 
 }

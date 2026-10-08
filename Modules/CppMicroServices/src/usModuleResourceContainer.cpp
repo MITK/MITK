@@ -75,10 +75,6 @@ ModuleResourceContainer::ModuleResourceContainer(const ModuleInfo* moduleInfo)
   {
     d->m_IsValid = us_mz_zip_reader_init_mem(&d->m_ZipArchive, moduleInfo->resourceData, moduleInfo->resourceSize, 0);
   }
-  else if (moduleInfo->resourcesInFile)
-  {
-    d->m_IsValid = us_mz_zip_reader_init_file(&d->m_ZipArchive, moduleInfo->location.c_str(), 0);
-  }
 }
 
 ModuleResourceContainer::~ModuleResourceContainer()

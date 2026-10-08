@@ -10,7 +10,6 @@
 #!     RESOURCES foo.txt icons/logo.png
 #!     BINARY_RESOURCES generated.txt
 #!     RESOURCES_ROOT resources
-#!     LINK_RESOURCES | APPEND_RESOURCES
 #!   )
 
 macro(_us_create_test_module_helper)
@@ -35,7 +34,7 @@ macro(_us_create_test_module_helper)
                            FILES ${_bin_res_files})
   endif()
 
-  usFunctionEmbedResources(TARGET ${name} ${_mode})
+  usFunctionEmbedResources(TARGET ${name})
 
   set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
 endmacro()
@@ -45,27 +44,19 @@ function(usFunctionCreateTestModule name)
   set(_res_files)
   set(_bin_res_files)
   set(_res_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
-  set(_mode)
   usFunctionGenerateModuleInit(_srcs)
   _us_create_test_module_helper()
 endfunction()
 
 function(usFunctionCreateTestModuleWithResources name)
   cmake_parse_arguments(US_TEST
-    "LINK_RESOURCES;APPEND_RESOURCES"
+    ""
     "RESOURCES_ROOT"
     "SOURCES;RESOURCES;BINARY_RESOURCES"
     ${ARGN})
 
-  set(_mode)
-  if(US_TEST_LINK_RESOURCES)
-    set(_mode LINK)
-  elseif(US_TEST_APPEND_RESOURCES)
-    set(_mode APPEND)
-  endif()
-
   set(_srcs ${US_TEST_SOURCES})
-  usFunctionGetResourceSource(TARGET ${name} OUT _srcs ${_mode})
+  usFunctionGetResourceSource(TARGET ${name} OUT _srcs)
   set(_res_files ${US_TEST_RESOURCES})
   set(_bin_res_files ${US_TEST_BINARY_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)

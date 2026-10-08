@@ -406,7 +406,7 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Linux and macOS packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into a regular section, `.rodata` on Linux and `__TEXT,us_resources` on macOS (see \ref CppMicroServicesResourcesSection). Where resource linking is unavailable and the resources are appended instead, stripping stays off. CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH. On macOS CMake strips with `strip -x`, which keeps the exported symbols, and the bundle is signed only afterwards, in `FixMacOSInstaller.cmake`.
+Linux and macOS packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into a section of their own, `us_resources` on Linux and `__TEXT,us_resources` on macOS (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH. On macOS CMake strips with `strip -x`, which keeps the exported symbols, and the bundle is signed only afterwards, in `FixMacOSInstaller.cmake`.
 
 Windows packages are not stripped: MSVC has no strip step.
 
@@ -614,62 +614,29 @@ START file://@EXECUTABLE_DIR/plugins/liborg_mitk_gui_qt_common.so
 
 ## CppMicroServices Resource Embedding {#CppMicroServicesResourcesSection}
 
-CppMicroServices allows modules to embed resources (XML descriptors, icons, etc.) as ZIP archives inside the shared library file itself. Where that archive sits in the file decides whether the binary can be stripped.
+CppMicroServices allows modules to embed resources (XML descriptors, icons, etc.) as a ZIP archive inside the binary itself. `usFunctionEmbedResources()` in `CMake/usFunctionEmbedResources.cmake` links the archive into the binary with platform-specific techniques:
 
-### Two Embedding Modes: APPEND vs LINK
-
-The `usFunctionEmbedResources()` function in `CMake/usFunctionEmbedResources.cmake` supports two modes:
-
-**APPEND mode** (default on Windows):
-
-The ZIP archive is appended as raw bytes **after** the end of the PE or ELF binary structure by `usResourceCompiler --append` in a post-build step of the target.
-
-**LINK mode** (default on Linux and macOS):
-
-The ZIP archive becomes part of a regular section of the binary using platform-specific linker techniques:
-
-| Platform | Technique | Section |
+| Platform | Technique | Location |
 |---|---|---|
-| macOS | `ld -r -sectcreate __TEXT us_resources <zip> stub.o` | `__TEXT/us_resources` |
-| Linux | `ld -r -b binary` + `objcopy --rename-section .data=.rodata` | `.rodata` |
-| Windows | Windows Resource Compiler (`.rc` file with `US_RESOURCE` type) | PE resource section |
+| macOS | `ld -r -sectcreate __TEXT us_resources <zip> stub.o` | section `__TEXT,us_resources` |
+| Linux | `ld -r -b binary` + `objcopy --rename-section .data=us_resources` | section `us_resources` |
+| Windows | resource compiler (`.rc` file with resource type 200, ID 101) | PE resource |
 
-The resulting `.o` or `.rc` file is linked into the target as a regular object file, making the ZIP part of the binary's official section table.
+The resulting `.o` or `.rc` file is linked into the target like any other object. `usFunctionCheckResourceLinking.cmake` checks on every configure that the toolchain can do this and fails the configuration otherwise.
 
-Appended and linked modules mix freely within one process; see \ref CppMicroServicesResourceLookupSection for how the runtime finds either kind.
-
-### Default Mode Selection
-
-`usFunctionCheckResourceLinking.cmake` detects on every configure whether linking is available (`ld -r -b binary` plus `objcopy` on Linux, `-sectcreate` on macOS, the resource compiler on Windows) and sets `US_DEFAULT_RESOURCE_MODE`:
-
-- **Linux and macOS**: LINK mode. On macOS `codesign` rejects appended data, on Linux `strip` discards it.
-- **Windows**: APPEND mode. The resource-compiler path exists but has not been verified in MITK yet.
-
-Individual targets can still pass `APPEND` or `LINK` to `usFunctionEmbedResources()`.
-
-The mode and the suffix of the generated resource source (`us_resources.o` in LINK mode, `us_resources.cpp` in APPEND mode) have to agree, which is why both are recomputed together on every configure instead of being read from the cache. Switching only one of them, for example by passing `LINK` to `usFunctionEmbedResources()` while the module still lists the source returned by `usFunctionGetResourceSource()` without a mode, leaves a stale stub in the target: it compiles, the resource object is never linked, and every resource is silently missing.
-
-An existing build tree picks a changed default up on its next configure. The resource-bearing modules relink; with the Makefile generators the ones using a precompiled header also recompile once, because their flags file changes.
-
-### Why Stripping Breaks APPEND Mode
-
-When `strip` processes an ELF binary, it rewrites the file based on the section and program headers. Everything beyond that structure, including an appended ZIP archive, is discarded. The stripped binary loads fine, but all CppMicroServices resources are gone. Distribution packaging tools such as `dh_strip` and `brp-strip` strip unconditionally, so CPack settings alone cannot prevent this.
-
-LINK mode survives stripping because the archive sits in a regular section (`.rodata` on Linux, `__TEXT,us_resources` on macOS) that `strip` has to keep.
+The archive is never appended behind the end of the binary: `strip` discards everything behind the ELF structure, distribution packaging tools (`dh_strip`, `brp-strip`) strip unconditionally, macOS code signing rejects appended data, and an appended archive could only be found by scanning the file.
 
 On Linux the linked resource object has no `.note.GNU-stack` section, which older linkers take as a request for an executable stack. `usFunctionEmbedResources()` therefore passes `-z noexecstack` to the consuming target: glibc 2.41 and newer refuse to `dlopen` a shared object that requires an executable stack.
 
 ### Locating the Archive at Runtime {#CppMicroServicesResourceLookupSection}
 
-An appended archive can only be found by scanning the module file backwards for the ZIP end-of-central-directory record. Doing the same for a linked archive would read everything behind it, which in an unstripped Linux binary includes the symbol tables and all debug information, and a byte sequence in there that happens to look like such a record would end the search early.
+A module never searches its file for the archive. `US_INITIALIZE_MODULE` hands it to CppMicroServices as a memory range, found through the binary that contains the module's code:
 
-The runtime therefore never scans for a linked archive on Linux and macOS; the module hands its archive to CppMicroServices as a memory range instead. Static modules are the exception: their resources are merged into the archive of the importing module, so they keep the scan.
+- **Linux**: the linker provides the bounds of the `us_resources` section of each binary as `__start_us_resources` and `__stop_us_resources`. The module references them weakly and with hidden visibility. Weak, because a module without resources has no such section, and the references then resolve to null. Hidden, because GNU ld exports these symbols: a default-visibility reference in a module without resources would bind to another module's archive at runtime.
+- **macOS**: the linker resolves `section$start` and `section$end` of `__TEXT,us_resources` within the image being linked, and to an empty range for a module without the section. Compared directly, the compiler may assume that the two distinct symbols never share an address, so the range is computed through volatile copies (`us::ModuleResourceRangeSize()`).
+- **Windows**: `FindResource()` on the binary that contains a symbol of the module.
 
-On Linux, `usFunctionEmbedResources()` renames the symbols that `ld -r -b binary` emits to `us_resources_start_<module>` and `us_resources_end_<module>`, and `US_INITIALIZE_MODULE` references them weakly. The names have to be unique per module: with the generic names every module would export the same symbols, and a module could resolve another module's archive. APPEND mode defines the marker `us_resources_appended_<module>` instead, and only modules with that marker are scanned. A module with neither has no resources, and its file is not read at all.
-
-On macOS, `US_INITIALIZE_MODULE` uses the linker-provided `section$start` and `section$end` symbols of `__TEXT,us_resources`, which resolve within the image being linked, and to an empty range for a module without the section. APPEND mode places its marker in the section `__DATA,us_appended`.
-
-On Windows the module file is scanned as before. Its debug information lives in separate `.pdb` files, so little follows the archive.
+Scanning would read everything behind the archive, which in an unstripped Linux binary includes the symbol tables and all debug information, and a byte sequence in there that happens to look like an end-of-central-directory record would end the search early.
 
 ## Changes from Legacy System
 
@@ -740,7 +707,8 @@ Pitfalls of these checks:
 | `CMake/RunInstalledCmdLineApp.bat` | Windows wrapper for command-line apps |
 | `CMake/RunInstalledApp.sh` | Linux wrapper for regular executables and BlueBerry apps |
 | `CMake/RunInstalledCmdLineApp.sh` | Linux wrapper for command-line apps |
-| `Modules/CppMicroServices/cmake/usFunctionEmbedResources.cmake` | APPEND and LINK mode resource embedding into shared libraries |
-| `Modules/CppMicroServices/cmake/usFunctionAddResources.cmake` | Creates ZIP archives from resource files for embedding |
-| `Modules/CppMicroServices/cmake/usFunctionCheckResourceLinking.cmake` | Platform capability detection for LINK mode; sets `US_DEFAULT_RESOURCE_MODE` |
+| `CMake/usFunctionEmbedResources.cmake` | Links the resource archive into shared libraries and executables |
+| `CMake/usFunctionAddResources.cmake` | Creates ZIP archives from resource files for embedding |
+| `CMake/usFunctionCheckResourceLinking.cmake` | Checks that the toolchain can link resources; sets `US_RESOURCE_SOURCE_SUFFIX` |
+| `Modules/CppMicroServices/include/usModuleInitialization.h` | Hands the linked archive to CppMicroServices from memory |
 | `SuperBuild.cmake` | SuperBuild RPATH configuration for external projects |

@@ -54,10 +54,9 @@ string(REPLACE "/" "_" CPACK_PACKAGE_VERSION_MAJOR "${MITK_REVISION_DESC}")
 
 # Strip the installed binaries on Linux and macOS. MITK's own modules keep
 # their CppMicroServices resources through strip because the resources are
-# linked into a regular section (see usFunctionCheckResourceLinking). Where
-# linking is unavailable, the resources are appended and strip would discard
-# them. MSVC has no strip step.
-if(UNIX AND US_DEFAULT_RESOURCE_MODE STREQUAL "LINK")
+# linked into a regular section (see usFunctionCheckResourceLinking). MSVC has
+# no strip step.
+if(UNIX)
   set(CPACK_STRIP_FILES ON)
 else()
   set(CPACK_STRIP_FILES OFF)

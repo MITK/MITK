@@ -40,8 +40,9 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
 
-# project() defaults the macOS deployment target to the running macOS, so
-# whether one was specified is only known before.
+# project() creates the macOS deployment target cache entry itself (CMake 3
+# fills it with the running macOS, CMake 4 leaves it empty), so whether one
+# was specified is only known before.
 if(DEFINED CACHE{CMAKE_OSX_DEPLOYMENT_TARGET} OR NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
   set(_mitk_osx_deployment_target_specified TRUE)
 else()

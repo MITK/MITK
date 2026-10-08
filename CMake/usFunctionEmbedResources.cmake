@@ -83,9 +83,16 @@ function(usFunctionEmbedResources)
   get_filename_component(_zip_archive_path ${_zip_archive} PATH)
 
   if(APPLE)
+    # The stub must carry the deployment target of the other objects, or the
+    # linker warns about mixed versions. Without a target, the compiler
+    # derives it from the SDK like CMake does for the rest of the build.
+    set(_version_min "")
+    if(CMAKE_OSX_DEPLOYMENT_TARGET)
+      set(_version_min "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    endif()
     add_custom_command(
       OUTPUT ${_source_output}
-      COMMAND ${CMAKE_CXX_COMPILER} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -c ${_us_embed_cmake_dir}/usCMakeResourceDependencies.cpp -o stub.o
+      COMMAND ${CMAKE_CXX_COMPILER} ${_version_min} -c ${_us_embed_cmake_dir}/usCMakeResourceDependencies.cpp -o stub.o
       COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
       DEPENDS ${_zip_archive}
       WORKING_DIRECTORY ${_zip_archive_path}

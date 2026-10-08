@@ -6,7 +6,8 @@
 #! A target chosen this way follows a later change of Qt in the same build
 #! tree, while an explicit target is kept and only warned about if it is lower
 #! than Qt's minimum. Without Qt, an empty target defaults to the major
-#! version of the SDK.
+#! version of the SDK, which is what the compiler assumes anyway and gives
+#! the build steps that need an explicit value one.
 #!
 #! Call it after find_package(Qt6).
 #!
@@ -44,9 +45,23 @@ function(mitkFunctionCheckMacOSDeploymentTarget)
       set(CMAKE_OSX_DEPLOYMENT_TARGET "${_qt_minos}" CACHE STRING "Deployment target version for macOS" FORCE)
     endif()
     set(MITK_OSX_DEPLOYMENT_TARGET_FROM_QT "${_qt_minos}" CACHE INTERNAL "")
-  elseif(NOT _target AND CMAKE_OSX_SYSROOT)
-    get_filename_component(_sdk_name "${CMAKE_OSX_SYSROOT}" NAME)
-    string(REGEX REPLACE "^MacOSX([0-9]+)\\..*" "\\1" _sdk_major "${_sdk_name}")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "${_sdk_major}.0" CACHE STRING "Deployment target version for macOS" FORCE)
+  elseif(NOT _target)
+    # The SDK directory name is not reliable: the default SDK is the
+    # unversioned MacOSX.sdk, and CMake 4 leaves CMAKE_OSX_SYSROOT empty.
+    set(_sdk_args "")
+    if(CMAKE_OSX_SYSROOT)
+      set(_sdk_args --sdk "${CMAKE_OSX_SYSROOT}")
+    endif()
+    execute_process(
+      COMMAND xcrun ${_sdk_args} --show-sdk-version
+      OUTPUT_VARIABLE _sdk_version
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET
+      RESULT_VARIABLE _result)
+    if(_result EQUAL 0 AND _sdk_version MATCHES "^([0-9]+)")
+      set(CMAKE_OSX_DEPLOYMENT_TARGET "${CMAKE_MATCH_1}.0" CACHE STRING "Deployment target version for macOS" FORCE)
+    else()
+      message(WARNING "The macOS SDK version could not be determined; set CMAKE_OSX_DEPLOYMENT_TARGET explicitly.")
+    endif()
   endif()
 endfunction()

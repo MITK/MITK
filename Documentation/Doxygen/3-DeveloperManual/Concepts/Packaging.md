@@ -437,6 +437,8 @@ On macOS, CPack runs `FixMacOSInstaller.cmake` (generated from `FixMacOSInstalle
 
 The check in step 3 catches what would otherwise only fail on other machines: a library from a package manager that an update rebuilt for a newer macOS, or a reference back into the build host.
 
+Each Qt release tends to raise its minimum macOS (Qt 6.10 and 6.11 support macOS 13.0, Qt 6.12 macOS 14.4), so a fixed deployment target fails this check after a Qt upgrade. `mitkFunctionCheckMacOSDeploymentTarget.cmake` therefore reads the minimum from QtCore at configure time. Without an explicit `CMAKE_OSX_DEPLOYMENT_TARGET`, it uses Qt's minimum and follows later Qt changes in the same build tree. Whether a target was given is recorded before `project()`, because `project()` itself defaults the target to the running macOS whenever the SDK is newer, which would silently exclude every older macOS. An explicit target lower than Qt's minimum gets a configure warning. Other dependencies are not checked at configure time, so a library that requires a newer macOS than Qt still surfaces only in step 3.
+
 ## Library Search Paths
 
 `mitkFunctionGetLibrarySearchPaths()` serves a dual purpose:
@@ -701,6 +703,7 @@ Pitfalls of these checks:
 | `CMake/mitkPackageSymbols.cmake` | Build-time `cmake -P` helper invoked by `package-symbols`: collects and flattens MITK PDBs, unstripped ELF binaries and `.dSYM` bundles from the build tree |
 | `CMake/FixMacOSInstaller.cmake.in` | macOS post-CPack script: Python framework conversion, re-anchoring of Python references, binary checks, code signing |
 | `CMake/mitkMachOTools.cmake` | Helpers that read and re-sign the Mach-O binaries of a bundle, used by the install rules and `FixMacOSInstaller.cmake` |
+| `CMake/mitkFunctionCheckMacOSDeploymentTarget.cmake` | `mitkFunctionCheckMacOSDeploymentTarget()`: defaults `CMAKE_OSX_DEPLOYMENT_TARGET` to Qt's minimum macOS, warns about a lower explicit target |
 | `CMake/entitlements.plist` | macOS code signing entitlements |
 | `CMake/RunInstalledApp.bat` | Windows wrapper for regular executables |
 | `CMake/RunInstalledWin32App.bat` | Windows wrapper for BlueBerry (GUI) applications |

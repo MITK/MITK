@@ -40,6 +40,14 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
 
+# project() defaults the macOS deployment target to the running macOS, so
+# whether one was specified is only known before.
+if(DEFINED CACHE{CMAKE_OSX_DEPLOYMENT_TARGET} OR NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
+  set(_mitk_osx_deployment_target_specified TRUE)
+else()
+  set(_mitk_osx_deployment_target_specified FALSE)
+endif()
+
 if(MITK_USE_SUPERBUILD)
   project(MITK-superbuild)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
@@ -212,12 +220,6 @@ if(APPLE)
     endif()
 
     set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
-  endif()
-
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_SYSROOT)
-    get_filename_component(macosx_sdk_name "${CMAKE_OSX_SYSROOT}" NAME)
-    string(REGEX REPLACE "^MacOSX([0-9]+)\\..*" "\\1" macosx_sdk_version_major "${macosx_sdk_name}")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "${macosx_sdk_version_major}.0" CACHE STRING "Deployment target version for macOS" FORCE)
   endif()
 
   if(NOT MITK_CODESIGN_IDENTITY)
@@ -423,6 +425,11 @@ endif()
 if(Qt6_DIR)
   list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}/../../..")
   list(REMOVE_DUPLICATES CMAKE_PREFIX_PATH)
+endif()
+
+if(APPLE)
+  include(mitkFunctionCheckMacOSDeploymentTarget)
+  mitkFunctionCheckMacOSDeploymentTarget(SPECIFIED ${_mitk_osx_deployment_target_specified})
 endif()
 
 # -----------------------------------------

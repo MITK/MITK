@@ -6,7 +6,7 @@ module's shared library (the size limitation per resource is 2GB, due to the use
 
 The following features are supported:
 
- * Embed arbitrary data into shared or static modules or executables.
+ * Embed arbitrary data into shared modules or executables.
  * Data is embedded in a compressed format (zip) with a configurable compression level.
  * Resources are accessed via a Module instance, providing individual resource lookup and access
    for each module.
@@ -31,15 +31,13 @@ The following conventions and limitations apply:
 Embedding Resources in a %Module
 --------------------------------
 
-Resources are embedded into a module's shared or static library (or into an executable)
+Resources are embedded into a module's shared library (or into an executable)
 by using the `usResourceCompiler` executable. It will create a ZIP archive of all input
 files and can append it to the module file.
 
 If you are using CMake, consider using the provided `usFunctionEmbedResources` CMake macro which
 handles the invocation of the `usResourceCompiler` executable and sets up the correct file
-dependencies. Otherwise, you also need to make sure that the set of static modules linked
-into a shared module or executable is also in the input file list of your `usResourceCompiler`
-call for that shared module or executable.
+dependencies.
 
 Accessing Resources at Runtime
 ------------------------------

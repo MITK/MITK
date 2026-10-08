@@ -18,8 +18,6 @@ set(MODULE_TESTS
   usServiceTemplateTest.cpp
   usServiceTrackerTest.cpp
   usSharedLibraryTest.cpp
-  usStaticModuleResourceTest.cpp
-  usStaticModuleTest.cpp
 )
 
 set(CPP_FILES

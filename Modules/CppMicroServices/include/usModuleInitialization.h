@@ -47,9 +47,7 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 
 // The module hands a linked resource archive to the resource container as a
 // memory range, and tells it whether its file may carry appended resources;
-// only such files are searched. On ELF and Mach-O, a static module keeps the
-// file search: its resources are merged into the archive of the module that
-// imports it, which it does not know.
+// only such files are searched.
 //
 // ELF: usFunctionEmbedResources puts a linked archive into the section
 // us_resources, whose bounds the linker provides for each binary as
@@ -66,9 +64,8 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 // (__DATA,us_appended) need no renaming.
 //
 // Windows: the archive is a resource of the binary, found through the address
-// of a symbol in it. That is also the binary a static module is linked into,
-// so static modules find the merged archive this way, too.
-#if defined(__ELF__) && !defined(US_STATIC_MODULE)
+// of a symbol in it.
+#if defined(__ELF__)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
 extern "C" const char __start_us_resources[] __attribute__((weak, visibility("hidden")));    \
 extern "C" const char __stop_us_resources[] __attribute__((weak, visibility("hidden")));     \
@@ -81,7 +78,7 @@ extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attrib
     info->resourceSize = us::ModuleResourceRangeSize(__start_us_resources, __stop_us_resources); \
   }                                                                                          \
   info->resourcesInFile = &US_CONCAT(us_resources_appended_, US_MODULE_NAME) != nullptr;
-#elif defined(__APPLE__) && !defined(US_STATIC_MODULE)
+#elif defined(__APPLE__)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
 extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME) __asm("section$start$__TEXT$us_resources"); \
 extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME) __asm("section$end$__TEXT$us_resources");     \
@@ -164,30 +161,10 @@ public:                                                                         
                                                                                              \
 };                                                                                           \
                                                                                              \
-                                                                                             \
-US_DEFINE_MODULE_INITIALIZER                                                                 \
+/* Registers the module during static initialization of the shared library. */               \
+static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
 }                                                                                            \
                                                                                              \
-}                                                                             \
-                                                                                             \
-/* A helper function which is called by the US_IMPORT_MODULE macro to initialize             \
-   static modules */                                                                         \
-extern "C" void US_ABI_LOCAL US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()     \
-{                                                                                            \
-  static us::US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
 }
-
-// Create a file-scoped static object for registering the module
-// during static initialization of the shared library
-#define US_DEFINE_MODULE_INITIALIZER \
-static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME);
-
-// Static modules don't create a file-scoped static object for initialization
-// (it would be discarded during static linking anyway). The initialization code
-// is triggered by the US_IMPORT_MODULE macro instead.
-#if defined(US_STATIC_MODULE)
-#undef US_DEFINE_MODULE_INITIALIZER
-#define US_DEFINE_MODULE_INITIALIZER
-#endif
 
 #endif // USMODULEINITIALIZATION_H

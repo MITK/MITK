@@ -156,16 +156,18 @@ function(usFunctionEmbedResources)
         VERBATIM
        )
     elseif(UNIX)
-      # `ld -r -b binary` names the symbols after the input file, so every
-      # module would export the same ones. US_INITIALIZE_MODULE expects the
-      # module-unique names instead (see usModuleInitialization.h).
+      # `ld -r -b binary` puts the archive into .data. Move it into a read-only
+      # section of its own, whose bounds the linker provides for each binary as
+      # __start_us_resources and __stop_us_resources (see
+      # usModuleInitialization.h). The generic _binary_* symbols named after
+      # the input file would otherwise be exported by every module.
       string(MAKE_C_IDENTIFIER "${_zip_archive_name}" _zip_symbol)
       add_custom_command(
         OUTPUT ${_source_output}
         COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
-        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.rodata,alloc,load,readonly,data,contents
-          --redefine-sym _binary_${_zip_symbol}_start=us_resources_start_${US_RESOURCE_MODULE_NAME}
-          --redefine-sym _binary_${_zip_symbol}_end=us_resources_end_${US_RESOURCE_MODULE_NAME}
+        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=us_resources,alloc,load,readonly,data,contents
+          --strip-symbol _binary_${_zip_symbol}_start
+          --strip-symbol _binary_${_zip_symbol}_end
           --strip-symbol _binary_${_zip_symbol}_size
           ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}

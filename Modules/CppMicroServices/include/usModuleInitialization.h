@@ -51,11 +51,13 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 // file search: its resources are merged into the archive of the module that
 // imports it, which it does not know.
 //
-// ELF: usFunctionEmbedResources gives a linked archive the module-unique
-// symbols us_resources_start_<name> and us_resources_end_<name>, and a module
-// with appended resources the marker us_resources_appended_<name>. The weak
-// references resolve to nullptr where these are missing. The names have to be
-// unique: identically named exported symbols would let a module resolve
+// ELF: usFunctionEmbedResources puts a linked archive into the section
+// us_resources, whose bounds the linker provides for each binary as
+// __start_us_resources and __stop_us_resources, and gives a module with
+// appended resources the marker us_resources_appended_<name>. The weak
+// references resolve to nullptr where these are missing. They are hidden, so
+// they bind only within the binary being linked: linkers may export the
+// section bounds, and a module without resources would otherwise resolve
 // another module's archive.
 //
 // Mach-O: the linker resolves section$start and section$end within the image
@@ -68,16 +70,15 @@ inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
 // so static modules find the merged archive this way, too.
 #if defined(__ELF__) && !defined(US_STATIC_MODULE)
 #define US_DECLARE_MODULE_RESOURCES                                                          \
-extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME)[] __attribute__((weak)); \
-extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME)[] __attribute__((weak));   \
+extern "C" const char __start_us_resources[] __attribute__((weak, visibility("hidden")));    \
+extern "C" const char __stop_us_resources[] __attribute__((weak, visibility("hidden")));     \
 extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attribute__((weak));
 
 #define US_SET_MODULE_RESOURCES(info, symbol)                                                \
-  if (US_CONCAT(us_resources_start_, US_MODULE_NAME) != nullptr)                             \
+  if (__start_us_resources != nullptr)                                                       \
   {                                                                                          \
-    info->resourceData = US_CONCAT(us_resources_start_, US_MODULE_NAME);                     \
-    info->resourceSize = us::ModuleResourceRangeSize(                                        \
-      US_CONCAT(us_resources_start_, US_MODULE_NAME), US_CONCAT(us_resources_end_, US_MODULE_NAME)); \
+    info->resourceData = __start_us_resources;                                               \
+    info->resourceSize = us::ModuleResourceRangeSize(__start_us_resources, __stop_us_resources); \
   }                                                                                          \
   info->resourcesInFile = &US_CONCAT(us_resources_appended_, US_MODULE_NAME) != nullptr;
 #elif defined(__APPLE__) && !defined(US_STATIC_MODULE)

@@ -238,7 +238,8 @@ option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 option(MITK_PCH "Enable precompiled headers" ON)
 
 # Emit debug symbols for MITK's own code in Release builds (PDBs on MSVC,
-# split DWARF on GCC/Clang) so release crash dumps are decodable, with no
+# minimal DWARF on Linux, dSYM bundles on macOS) so release crash dumps are
+# decodable, with no
 # execution-speed cost (optimization and inlining are preserved; the MSVC
 # binary ends up marginally larger).
 # Declared here, before the superbuild include, so it can be forwarded to
@@ -1259,8 +1260,7 @@ add_library(MitkCompilerFlags INTERFACE)
 #    full -g; it is codegen-neutral and needs no link-side flag. Split
 #    DWARF is deliberately not used: binutils 2.46 dropped dwp, llvm-dwp
 #    does not cope with GCC's output in practice, and dump_syms ignores
-#    .dwo and .dwp files altogether. GCC also emits nothing with
-#    -gsplit-dwarf alone, since it only splits what -g generates.
+#    .dwo and .dwp files altogether.
 #  - macOS: -g is codegen-neutral; the linker leaves the DWARF in the
 #    object files and dsymutil produces the .dSYM at archive time.
 # The MSVC binary ends up marginally larger (~0.5%): /DEBUG makes /OPT:ICF

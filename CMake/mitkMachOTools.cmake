@@ -26,17 +26,19 @@ function(mitk_macho_files out_var dir)
   set(${out_var} "${_files}" PARENT_SCOPE)
 endfunction()
 
-# Reads the load commands of a Mach-O file: the dylibs it depends on (weak
-# ones separately), its LC_RPATH entries, its own install name and its
+# Reads the header and load commands of a Mach-O file: whether it is an
+# executable (as opposed to a library or bundle), the dylibs it depends on
+# (weak ones separately), its LC_RPATH entries, its own install name and its
 # deployment target.
 function(mitk_macho_read file)
-  cmake_parse_arguments(PARSE_ARGV 1 _arg "" "ID;MINOS" "DEPENDENCIES;WEAK_DEPENDENCIES;RPATHS")
-  execute_process(COMMAND otool -l "${file}" OUTPUT_VARIABLE _output RESULT_VARIABLE _result)
+  cmake_parse_arguments(PARSE_ARGV 1 _arg "" "EXECUTABLE;ID;MINOS" "DEPENDENCIES;WEAK_DEPENDENCIES;RPATHS")
+  execute_process(COMMAND otool -h -l "${file}" OUTPUT_VARIABLE _output RESULT_VARIABLE _result)
   if(NOT _result EQUAL 0)
-    message(FATAL_ERROR "otool -l failed on ${file}")
+    message(FATAL_ERROR "otool -h -l failed on ${file}")
   endif()
   string(REPLACE "\n" ";" _lines "${_output}")
   set(_command "")
+  set(_executable FALSE)
   set(_dependencies "")
   set(_weak_dependencies "")
   set(_rpaths "")
@@ -44,7 +46,13 @@ function(mitk_macho_read file)
   set(_minos "")
   foreach(_line IN LISTS _lines)
     string(STRIP "${_line}" _line)
-    if(_line MATCHES "^cmd (.+)$")
+    # The header line: magic cputype cpusubtype caps filetype ncmds ...
+    # with MH_EXECUTE being filetype 2.
+    if(_line MATCHES "^0x[0-9a-f]+ +[0-9]+ +[0-9]+ +0x[0-9a-f]+ +([0-9]+) ")
+      if(CMAKE_MATCH_1 EQUAL 2)
+        set(_executable TRUE)
+      endif()
+    elseif(_line MATCHES "^cmd (.+)$")
       set(_command "${CMAKE_MATCH_1}")
     elseif(_line MATCHES "^name (.+) \\(offset [0-9]+\\)$")
       set(_name "${CMAKE_MATCH_1}")
@@ -63,7 +71,7 @@ function(mitk_macho_read file)
       set(_minos "${CMAKE_MATCH_1}")
     endif()
   endforeach()
-  foreach(_kind ID MINOS DEPENDENCIES WEAK_DEPENDENCIES RPATHS)
+  foreach(_kind EXECUTABLE ID MINOS DEPENDENCIES WEAK_DEPENDENCIES RPATHS)
     if(_arg_${_kind})
       string(TOLOWER "${_kind}" _local)
       set(${_arg_${_kind}} "${_${_local}}" PARENT_SCOPE)

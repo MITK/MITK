@@ -18,6 +18,7 @@ function(mitkFunctionDeployQt _target)
   set(_exclude_plugins
     qsqlibase
     qsqlmimer
+    qsqlmysql
     qsqloci
     qsqlodbc
     qsqlpsql
@@ -93,6 +94,30 @@ qt_deploy_runtime_dependencies(
     )
   endif()
   install(SCRIPT ${_deploy_script})
+
+  # macdeployqt ignores the plugin selection, and the generic deployment of Qt
+  # before 6.12 also ignores the exclusion by name, so remove the excluded
+  # plugins afterwards. A deployed plugin whose dependencies are not bundled
+  # fails to load on other machines.
+  if((APPLE AND _is_bundle) OR LINUX)
+    if(APPLE)
+      set(_plugins_dir "$<TARGET_FILE_NAME:${_target}>.app/Contents/PlugIns")
+    else()
+      set(_plugins_dir "bin/plugins")
+    endif()
+    install(CODE "
+      set(_plugins_dir \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_plugins_dir}\")
+      foreach(_type ${_exclude_plugin_types})
+        file(REMOVE_RECURSE \"\${_plugins_dir}/\${_type}\")
+      endforeach()
+      foreach(_plugin ${_exclude_plugins})
+        file(GLOB _files \"\${_plugins_dir}/*/lib\${_plugin}.*\")
+        if(_files)
+          file(REMOVE \${_files})
+        endif()
+      endforeach()
+    ")
+  endif()
 
   # On Linux, write qt.conf with a relative prefix so the deployed bin/ layout
   # stays relocatable: Qt then resolves plugins at bin/plugins/, QML at

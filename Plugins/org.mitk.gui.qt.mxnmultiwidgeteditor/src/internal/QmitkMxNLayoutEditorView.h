@@ -84,6 +84,17 @@ private:
    *         is the trivial default. */
   bool ConfirmDestructiveLayoutChange();
 
+  /** \brief Whether 'multiWidget' is this view's to configure: an MxN widget
+   *         whose plugin has not locked its structure. */
+  static bool IsBindable(const QmitkMxNMultiWidget* multiWidget);
+
+  /** \brief After a modal or a deferred step: whether 'multiWidget' is still
+   *         the bound widget, so a change confirmed before can still go to it. */
+  bool IsStillBoundTo(const QmitkMxNMultiWidget* multiWidget) const;
+
+  /** \brief Show the overlay that explains why nothing is bound, or hide it. */
+  void ShowUnboundOverlay(bool show, bool locked);
+
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;
 
   /** \brief Editor-wide mouse-interaction scheme toggle, live only while an MxN
@@ -105,6 +116,12 @@ private:
 
   /** \brief The editor currently in arrange mode on this view's behalf. */
   QPointer<QmitkMxNMultiWidget> m_ArrangedMultiWidget;
+
+  /** \brief The part the view shows, bound or locked; null for none. Kept so
+   *         a lock change re-runs the binding decision on it, and so its
+   *         closing returns the view to the no-display state. */
+  mitk::IRenderWindowPart* m_ShownPart = nullptr;
+  QPointer<QmitkMxNMultiWidget> m_ShownMultiWidget;
 
 };
 

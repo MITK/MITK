@@ -117,10 +117,6 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
   // at that moment. Covering the part also covers the scheme box, which is
   // equally inert without a display.
   m_NoDisplayOverlay = new QmitkButtonOverlayWidget(parent);
-  m_NoDisplayOverlay->SetOverlayText(tr(
-    "<b>No MxN display is active.</b><br/>This view configures the window "
-    "arrangement and the synchronization of an MxN display. Bring one to the "
-    "front, or open one."));
   m_NoDisplayOverlay->SetButtonText(tr(" Open MxN display"));
   m_NoDisplayOverlay->SetButtonIcon(
     QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/mwLayout.svg")));
@@ -172,21 +168,41 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   }
 
   auto* multiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(renderWindowPart);
-  auto* multiWidget = nullptr != multiWidgetEditor
+  auto* shownMultiWidget = nullptr != multiWidgetEditor
     ? dynamic_cast<QmitkMxNMultiWidget*>(multiWidgetEditor->GetMultiWidget())
     : nullptr;
 
   this->DisconnectLayoutControls();
-  m_LayoutEditorWidget->SetMultiWidget(multiWidget);
-  this->UpdateArrangeMode();
-  if (nullptr != m_NoDisplayOverlay)
+  m_ShownPart = nullptr != shownMultiWidget ? renderWindowPart : nullptr;
+  m_ShownMultiWidget = shownMultiWidget;
+
+  // Made on the real widget before any early return, and kept with the other
+  // per-attachment connections, so every re-evaluation replaces it rather than
+  // stacking another. Locking unbinds the view, unlocking binds it again.
+  if (nullptr != shownMultiWidget)
   {
-    m_NoDisplayOverlay->setVisible(nullptr == multiWidget);
+    m_LayoutConnections.push_back(connect(
+      shownMultiWidget, &QmitkMxNMultiWidget::LayoutLocksChanged, m_LayoutEditorWidget, [this]()
+      {
+        this->RenderWindowPartActivated(m_ShownPart);
+      }));
   }
 
-  // The scheme toggle belongs to the MxN editor part, so it is only live while
-  // one is active; it shows the scheme already in effect rather than a default.
-  auto* mxnEditor = dynamic_cast<QmitkMxNMultiWidgetEditor*>(multiWidgetEditor);
+  // A structure-locked widget is configured by its plugin alone, so the view
+  // treats it like no MxN widget at all.
+  const bool locked = nullptr != shownMultiWidget && !IsBindable(shownMultiWidget);
+  auto* multiWidget = locked ? nullptr : shownMultiWidget;
+
+  m_LayoutEditorWidget->SetMultiWidget(multiWidget);
+  this->UpdateArrangeMode();
+  this->ShowUnboundOverlay(nullptr == multiWidget, locked);
+
+  // The scheme toggle belongs to the bound MxN editor part, so it is only live
+  // while one is bound; it shows the scheme already in effect rather than a
+  // default. An editor without a widget (an invalid declaration) or with a
+  // locked one gets no toggle: a locked editor's scheme is set through its
+  // preference page.
+  auto* mxnEditor = nullptr != multiWidget ? dynamic_cast<QmitkMxNMultiWidgetEditor*>(multiWidgetEditor) : nullptr;
   m_PacsSchemeBox->setEnabled(nullptr != mxnEditor);
   if (nullptr != mxnEditor)
   {
@@ -241,7 +257,7 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout,
     m_LayoutEditorWidget, [this, multiWidget](const QList<mitk::DataNode::Pointer>& nodes)
     {
-      if (!this->ConfirmDestructiveLayoutChange())
+      if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
       {
         return;
       }
@@ -263,7 +279,7 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LoadLayout,
     m_LayoutEditorWidget, [this, multiWidget](const nlohmann::json* jsonData)
     {
-      if (!this->ConfirmDestructiveLayoutChange())
+      if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
       {
         return;
       }
@@ -287,6 +303,14 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
       const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
       QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, document]()
       {
+        // Its plugin may have locked the structure while the load waited; the
+        // confirmed load is then dropped without a change.
+        if (!IsBindable(multiWidget))
+        {
+          multiWidget->HideLayoutLoadFeedback();
+          return;
+        }
+
         std::optional<QString> failure;
         try
         {
@@ -306,6 +330,32 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
         }
       });
     }));
+}
+
+bool QmitkMxNLayoutEditorView::IsBindable(const QmitkMxNMultiWidget* multiWidget)
+{
+  return nullptr != multiWidget && !multiWidget->GetLayoutLocks().testFlag(QmitkMxNLayoutLock::Structure);
+}
+
+bool QmitkMxNLayoutEditorView::IsStillBoundTo(const QmitkMxNMultiWidget* multiWidget) const
+{
+  // Compares pointers only: the widget may be gone by now.
+  return nullptr != m_LayoutEditorWidget && m_LayoutEditorWidget->GetMultiWidget() == multiWidget;
+}
+
+void QmitkMxNLayoutEditorView::ShowUnboundOverlay(bool show, bool locked)
+{
+  if (nullptr == m_NoDisplayOverlay)
+  {
+    return;
+  }
+  m_NoDisplayOverlay->SetOverlayText(locked
+    ? tr("<b>The active display's layout is managed by its plugin.</b><br/>This view cannot "
+         "change it. Bring an MxN display to the front, or open one.")
+    : tr("<b>No MxN display is active.</b><br/>This view configures the window "
+         "arrangement and the synchronization of an MxN display. Bring one to the "
+         "front, or open one."));
+  m_NoDisplayOverlay->setVisible(show);
 }
 
 bool QmitkMxNLayoutEditorView::ConfirmDestructiveLayoutChange()
@@ -330,12 +380,13 @@ void QmitkMxNLayoutEditorView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
     return;
   }
 
+  // The shown part, not only the bound one: a locked part's overlay text must
+  // not outlive it. A closed part is never followed by an activation, so the
+  // view falls back to its no-display state here.
   auto* multiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(renderWindowPart);
-  if (nullptr != multiWidgetEditor
-      && m_LayoutEditorWidget->GetMultiWidget() == multiWidgetEditor->GetMultiWidget())
+  if (nullptr != multiWidgetEditor && !m_ShownMultiWidget.isNull()
+      && m_ShownMultiWidget.data() == multiWidgetEditor->GetMultiWidget())
   {
-    // A closed part is never followed by an activation, so the view falls back
-    // to its no-display state here.
     this->RenderWindowPartActivated(nullptr);
   }
 }

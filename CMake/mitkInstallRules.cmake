@@ -24,6 +24,24 @@ if(MITK_USE_Python3)
       RUNTIME_DEPENDENCY_SET ${_depset}
       RUNTIME DESTINATION ${_python_dest}/${_rel_sitearch}/mitk
       LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
+
+    # The install RPATH of MITK's binaries is relative to the directory of the
+    # executables and does not reach their libraries from inside the Python
+    # installation. Without entries of its own, the module resolves its
+    # dependencies only while an MITK executable is the host process, not in
+    # the bundled interpreter. The wheel configuration sets its own RPATH.
+    if(NOT WIN32 AND NOT MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
+      set(_module_dir "${_python_dest}/${_rel_sitearch}/mitk")
+      file(RELATIVE_PATH _to_bindir "/${_module_dir}" "/${_bindir}")
+      if(APPLE)
+        file(RELATIVE_PATH _to_fwdir "/${_module_dir}" "/${_fwdir}")
+        set_property(TARGET mitk_python_bindings PROPERTY INSTALL_RPATH
+          "@loader_path/${_to_bindir}" "@loader_path/${_to_fwdir}")
+      else()
+        set_property(TARGET mitk_python_bindings PROPERTY INSTALL_RPATH
+          "$ORIGIN/${_to_bindir}")
+      endif()
+    endif()
   endforeach()
 endif()
 

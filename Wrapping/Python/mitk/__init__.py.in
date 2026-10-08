@@ -33,6 +33,16 @@ if _is_wheel:
         _os.environ["PATH"] = _libs_dir + _os.pathsep + _os.environ.get("PATH", "")
     # Linux: auditwheel sets the extension RPATH to the sibling .libs dir.
     # macOS: delocate rewrites @loader_path references.
+elif _sys.platform == "win32":
+    # In an MITK installation, the package lives in python/Lib/site-packages
+    # and MITK's DLLs in bin/. Python resolves the DLLs of an extension module
+    # only from registered directories, and CppMicroServices loads auto-load
+    # modules from bin/ through PATH. Within an MITK executable both are
+    # already loaded, so this only matters for the bundled interpreter.
+    _bin_dir = _os.path.normpath(_os.path.join(_pkg_dir, "..", "..", "..", "..", "bin"))
+    if _os.path.isfile(_os.path.join(_bin_dir, "MitkCore.dll")):
+        _os.add_dll_directory(_bin_dir)
+        _os.environ["PATH"] = _bin_dir + _os.pathsep + _os.environ.get("PATH", "")
 
 from .mitk import *
 

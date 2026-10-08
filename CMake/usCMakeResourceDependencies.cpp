@@ -31,3 +31,7 @@ struct CMakeResourceDependencies
 };
 
 }
+
+#ifdef US_RESOURCES_APPENDED_SYMBOL
+extern "C" const char US_RESOURCES_APPENDED_SYMBOL = 0;
+#endif

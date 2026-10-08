@@ -25,6 +25,35 @@ found in the LICENSE file.
 
 #include <cstring>
 
+// On ELF platforms, usFunctionEmbedResources gives a linked resource archive
+// the module-unique symbols us_resources_start_<name> and
+// us_resources_end_<name>, and a module with appended resources the marker
+// us_resources_appended_<name>. The weak references resolve to nullptr where
+// these are missing, so the resource container reads a linked archive from
+// memory and only searches module files that may carry appended resources.
+// The symbol names have to be unique: identically named exported symbols
+// would let a module resolve another module's archive. A static module keeps
+// the file search: its resources are merged into the archive of the module
+// that imports it, which it does not know.
+#if defined(__ELF__) && !defined(US_STATIC_MODULE)
+#define US_DECLARE_MODULE_RESOURCES                                                          \
+extern "C" const char US_CONCAT(us_resources_start_, US_MODULE_NAME)[] __attribute__((weak)); \
+extern "C" const char US_CONCAT(us_resources_end_, US_MODULE_NAME)[] __attribute__((weak));   \
+extern "C" const char US_CONCAT(us_resources_appended_, US_MODULE_NAME) __attribute__((weak));
+
+#define US_SET_MODULE_RESOURCES(info)                                                        \
+  if (US_CONCAT(us_resources_start_, US_MODULE_NAME) != nullptr)                             \
+  {                                                                                          \
+    info->resourceData = US_CONCAT(us_resources_start_, US_MODULE_NAME);                     \
+    info->resourceSize = static_cast<std::size_t>(                                           \
+      US_CONCAT(us_resources_end_, US_MODULE_NAME) - US_CONCAT(us_resources_start_, US_MODULE_NAME)); \
+  }                                                                                          \
+  info->resourcesInFile = &US_CONCAT(us_resources_appended_, US_MODULE_NAME) != nullptr;
+#else
+#define US_DECLARE_MODULE_RESOURCES
+#define US_SET_MODULE_RESOURCES(info)
+#endif
+
 
 /**
  * \ingroup MicroServices
@@ -46,6 +75,7 @@ found in the LICENSE file.
  * <code>usFunctionGenerateModuleInit()</code>.
  */
 #define US_INITIALIZE_MODULE                                                                 \
+US_DECLARE_MODULE_RESOURCES                                                                  \
 namespace us {                                                                           \
 namespace {                                                                                  \
                                                                                              \
@@ -66,6 +96,7 @@ public:                                                                         
     std::memcpy(&moduleInfoSym, &moduleInfoPtr, sizeof(void*));                              \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfoSym);                       \
     moduleInfoPtr()->location = location;                                                    \
+    US_SET_MODULE_RESOURCES(moduleInfoPtr())                                                 \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \

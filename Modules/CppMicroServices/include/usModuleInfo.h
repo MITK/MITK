@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <usGlobalConfig.h>
 #include <MitkCppMicroServicesExports.h>
 
+#include <cstddef>
 #include <string>
 
 namespace us {
@@ -38,6 +39,19 @@ struct MITKCPPMICROSERVICES_EXPORT ModuleInfo
   std::string location;   ///< \brief The file system location of the module.
   std::string autoLoadDir; ///< \brief The auto-load directory for the module.
   long id;                ///< \brief The unique module identifier.
+
+  /** \brief The resource archive linked into the module, or nullptr. */
+  const void* resourceData = nullptr;
+
+  /** \brief The size of the resource archive in bytes. */
+  std::size_t resourceSize = 0;
+
+  /** \brief Whether resources may be appended to the module file.
+   *
+   * Without a linked archive, only a module file that may carry appended
+   * resources is searched for them.
+   */
+  bool resourcesInFile = true;
 };
 
 }

@@ -618,7 +618,7 @@ The ZIP archive becomes part of a regular section of the binary using platform-s
 
 The resulting `.o` or `.rc` file is linked into the target as a regular object file, making the ZIP part of the binary's official section table.
 
-At runtime, CppMicroServices does not care which mode produced a module. It opens the module file, scans backwards from the end of the file for the ZIP end-of-central-directory record and derives the archive start from the offsets stored in it. Appended and linked modules therefore mix freely within one process, and modules of external projects built in either mode keep working.
+Appended and linked modules mix freely within one process; see \ref CppMicroServicesResourceLookupSection for how the runtime finds either kind.
 
 ### Default Mode Selection
 
@@ -641,9 +641,13 @@ LINK mode survives stripping because the archive sits in `.rodata`, an allocated
 
 On Linux the linked resource object has no `.note.GNU-stack` section, which older linkers take as a request for an executable stack. `usFunctionEmbedResources()` therefore passes `-z noexecstack` to the consuming target: glibc 2.41 and newer refuse to `dlopen` a shared object that requires an executable stack.
 
-### Cost of LINK Mode
+### Locating the Archive at Runtime {#CppMicroServicesResourceLookupSection}
 
-The archive sits in front of the sections that follow `.rodata` (`.eh_frame`, `.data.rel.ro` and, in unstripped binaries, the symbol tables), so the backward scan reads a few megabytes more per resource-bearing module than in APPEND mode, where the archive is the last thing in the file. Modules without resources have always been scanned completely. Loading the Core module together with its autoload modules takes roughly ten percent longer on Linux with a warm page cache.
+An appended archive can only be found by scanning the module file backwards for the ZIP end-of-central-directory record. Doing the same for a linked archive would read everything behind `.rodata`, which in an unstripped binary includes the symbol tables and all debug information, and a byte sequence in there that happens to look like such a record would end the search early.
+
+On Linux the runtime therefore never scans for a linked archive. `usFunctionEmbedResources()` renames the symbols that `ld -r -b binary` emits to `us_resources_start_<module>` and `us_resources_end_<module>`, and `US_INITIALIZE_MODULE` references them weakly, so the module hands its archive to CppMicroServices as a memory range. The names have to be unique per module: with the generic names every module would export the same symbols, and a module could resolve another module's archive. APPEND mode defines the marker `us_resources_appended_<module>` instead, and only modules with that marker are scanned. A module with neither has no resources, and its file is not read at all.
+
+On macOS and Windows the module file is scanned as before. Their debug information lives in separate `.dSYM` and `.pdb` files, so little follows the archive.
 
 ## Changes from Legacy System
 

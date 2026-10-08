@@ -71,12 +71,13 @@ struct ModuleResourceContainerPrivate
 ModuleResourceContainer::ModuleResourceContainer(const ModuleInfo* moduleInfo)
   : d(new ModuleResourceContainerPrivate(moduleInfo))
 {
-  if (us_mz_zip_reader_init_file(&d->m_ZipArchive, moduleInfo->location.c_str(), 0))
+  if (moduleInfo->resourceData != nullptr)
   {
-    d->m_IsValid = true;
+    d->m_IsValid = us_mz_zip_reader_init_mem(&d->m_ZipArchive, moduleInfo->resourceData, moduleInfo->resourceSize, 0);
   }
-  else
+  else if (moduleInfo->resourcesInFile)
   {
+    d->m_IsValid = us_mz_zip_reader_init_file(&d->m_ZipArchive, moduleInfo->location.c_str(), 0);
   }
 }
 

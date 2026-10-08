@@ -70,6 +70,13 @@ function(usFunctionEmbedResources)
     return()
   endif()
 
+  if(NOT US_RESOURCE_MODULE_NAME)
+    get_target_property(US_RESOURCE_MODULE_NAME ${US_RESOURCE_TARGET} US_MODULE_NAME)
+    if(NOT US_RESOURCE_MODULE_NAME)
+      message(SEND_ERROR "Either the MODULE_NAME argument or the US_MODULE_NAME target property is required.")
+    endif()
+  endif()
+
   if(US_RESOURCE_APPEND AND US_RESOURCE_LINK)
     message(WARNING "Both APPEND and LINK options specified. Falling back to default behaviour.")
     set(US_RESOURCE_APPEND 0)
@@ -149,10 +156,18 @@ function(usFunctionEmbedResources)
         VERBATIM
        )
     elseif(UNIX)
+      # `ld -r -b binary` names the symbols after the input file, so every
+      # module would export the same ones. US_INITIALIZE_MODULE expects the
+      # module-unique names instead (see usModuleInitialization.h).
+      string(MAKE_C_IDENTIFIER "${_zip_archive_name}" _zip_symbol)
       add_custom_command(
         OUTPUT ${_source_output}
         COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
-        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.rodata,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.rodata,alloc,load,readonly,data,contents
+          --redefine-sym _binary_${_zip_symbol}_start=us_resources_start_${US_RESOURCE_MODULE_NAME}
+          --redefine-sym _binary_${_zip_symbol}_end=us_resources_end_${US_RESOURCE_MODULE_NAME}
+          --strip-symbol _binary_${_zip_symbol}_size
+          ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
@@ -181,10 +196,17 @@ function(usFunctionEmbedResources)
     add_custom_command(
       OUTPUT ${_source_output}
       COMMAND ${CMAKE_COMMAND} -E copy ${_us_embed_cmake_dir}/usCMakeResourceDependencies.cpp ${_source_output}
-      DEPENDS ${_zip_archive}
+      DEPENDS ${_zip_archive} ${_us_embed_cmake_dir}/usCMakeResourceDependencies.cpp
       COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
       VERBATIM
      )
+
+    # On ELF platforms the runtime searches only module files that define
+    # this marker for appended resources (see usModuleInitialization.h).
+    if(UNIX AND NOT APPLE)
+      set_source_files_properties(${_source_output} PROPERTIES
+        COMPILE_DEFINITIONS "US_RESOURCES_APPENDED_SYMBOL=us_resources_appended_${US_RESOURCE_MODULE_NAME}")
+    endif()
 
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}

@@ -696,7 +696,7 @@ namespace mitk
     // qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
 #endif
 
-#ifdef Q_OS_MACOSOS
+#ifdef Q_OS_MACOS
     // macOS reports 72 logical DPI, so point-based font sizes render about
     // 25% smaller than on Windows and Linux (96 DPI). Pin the font DPI to 96
     // for a consistent cross-platform text size. Respect an explicit user
@@ -909,7 +909,7 @@ namespace mitk
       defaultFormat.setSamples(0);
       QSurfaceFormat::setDefaultFormat(defaultFormat);
 
-#ifdef Q_OS_MACOSOS
+#ifdef Q_OS_MACOS
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 

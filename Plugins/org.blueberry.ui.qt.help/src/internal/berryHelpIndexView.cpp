@@ -228,7 +228,7 @@ bool HelpIndexView::eventFilter(QObject *obj, QEvent *e)
       }
     }
   }
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
   else if (obj == m_IndexWidget && e->type() == QEvent::KeyPress)
   {
     QKeyEvent *ke = static_cast<QKeyEvent*>(e);

@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 
 #include <QCheckBox>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPointer>
 #include <QTimer>
@@ -94,6 +95,11 @@ void QmitkMxNLayoutEditorView::CreateQtPartControl(QWidget* parent)
   // The style's default margins, as the other MITK views use; the editor
   // widget itself adds none, so this is the view's one border padding.
   auto* layout = new QVBoxLayout(parent);
+
+  m_BoundDisplayLabel = new QLabel(parent);
+  m_BoundDisplayLabel->setTextFormat(Qt::PlainText);
+  m_BoundDisplayLabel->setVisible(false);
+  layout->addWidget(m_BoundDisplayLabel);
 
   // Editor-wide mouse-interaction scheme. It lives here rather than in a
   // toolbar of its own because it is the only editor-wide control left outside
@@ -196,6 +202,11 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   m_LayoutEditorWidget->SetMultiWidget(multiWidget);
   this->UpdateArrangeMode();
   this->ShowUnboundOverlay(nullptr == multiWidget, locked);
+
+  // Unbound, the overlay already says why, so the label goes with it.
+  auto* boundPart = nullptr != multiWidget ? dynamic_cast<berry::IWorkbenchPart*>(renderWindowPart) : nullptr;
+  m_BoundDisplayLabel->setVisible(nullptr != boundPart);
+  m_BoundDisplayLabel->setText(nullptr != boundPart ? tr("Display: %1").arg(boundPart->GetPartName()) : QString());
 
   // The scheme toggle belongs to the bound MxN editor part, so it is only live
   // while one is bound; it shows the scheme already in effect rather than a

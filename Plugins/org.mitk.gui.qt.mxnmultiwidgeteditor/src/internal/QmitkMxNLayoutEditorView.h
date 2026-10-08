@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <vector>
 
 class QCheckBox;
+class QLabel;
 class QmitkButtonOverlayWidget;
 class QmitkMxNLayoutEditorWidget;
 class QmitkMxNMultiWidget;
@@ -100,6 +101,11 @@ private:
   /** \brief Editor-wide mouse-interaction scheme toggle, live only while an MxN
    *         editor part is active. */
   QCheckBox* m_PacsSchemeBox = nullptr;
+
+  /** \brief Names the display the view is bound to. The view follows
+   *         visibility, not focus, so with several displays on screen the
+   *         focused one need not be the one being configured. */
+  QLabel* m_BoundDisplayLabel = nullptr;
 
   /** Covers the editor while no MxN display is open: with nothing to configure
    *  the controls would otherwise sit there greyed out and unexplained. Carries

@@ -147,21 +147,17 @@ if(LINUX AND CMAKE_STRIP AND US_DEFAULT_RESOURCE_MODE STREQUAL "LINK")
 endif()
 
 #-----------------------------------------------------------------------------
-# Reset RUNPATH of bundled CTK core libraries on Linux.
+# Drop absolute RUNPATH entries of the bundled binaries on Linux.
 #
-# CTK has INSTALL_COMMAND "" in CMakeExternals/CTK.cmake, so CTK_DIR points
-# directly at the build tree. install(RUNTIME_DEPENDENCY_SET) copies libCTK*.so*
-# in as a transitive dependency of MITK plug-ins but does not rewrite RPATHs,
-# so the bundled CTK libraries retain absolute build-host paths in their
-# RUNPATH (e.g. the Qt install prefix, and the CTK build dir itself as the
-# first entry — which shadows $ORIGIN). That makes the bundle non-relocatable:
-# on a machine that happens to have a different CTK build tree or Qt install
-# at the baked-in paths, the loader follows them into foreign libraries and
-# triggers ABI mismatches.
+# install(RUNTIME_DEPENDENCY_SET), the Qt deployment and the Crashpad handler
+# install copy third-party binaries without rewriting their RUNPATH. The external projects carry the
+# Qt install prefix in theirs (see SuperBuild.cmake), and CTK, which is used
+# from its build tree, carries that build tree as well. On a machine that has
+# libraries at these paths, the loader follows them into foreign libraries,
+# so the package is not relocatable.
 #
-# Reset RUNPATH to "$ORIGIN" so these libraries resolve peers (Qt, ITK, DCMTK,
-# etc.) from the same bin/ directory. Skip symlinks — only the real .so files
-# carry RPATH, and file(RPATH_SET) on a symlink is meaningless.
+# Keep only the $ORIGIN-relative entries, or $ORIGIN alone if none are left:
+# every bundled binary resolves its peers from the same bin/ directory.
 #
 # Windows: PE has no RPATH. macOS: macdeployqt rewrites library references
 # during Qt deployment, so Mach-O references are already flattened.
@@ -169,13 +165,44 @@ endif()
 
 if(LINUX)
   foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
-    install(CODE "
-      file(GLOB _mitk_ctk_libs \"\${CMAKE_INSTALL_PREFIX}/${_bindir}/libCTK*.so*\")
-      foreach(_lib IN LISTS _mitk_ctk_libs)
-        if(NOT IS_SYMLINK \"\${_lib}\")
-          file(RPATH_SET FILE \"\${_lib}\" NEW_RPATH \"\$ORIGIN\")
+    install(CODE "set(_mitk_bindir \"${_bindir}\")")
+    install(CODE [[
+      file(GLOB _mitk_binaries "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${_mitk_bindir}/*")
+      foreach(_binary IN LISTS _mitk_binaries)
+        if(IS_SYMLINK "${_binary}" OR IS_DIRECTORY "${_binary}")
+          continue()
+        endif()
+        set(_runpath "")
+        set(_rpath "")
+        set(_error "")
+        file(READ_ELF "${_binary}" RUNPATH _runpath RPATH _rpath CAPTURE_ERROR _error)
+        if(_error)
+          continue()
+        endif()
+        set(_current "${_runpath}")
+        if(NOT _current)
+          set(_current "${_rpath}")
+        endif()
+        if(NOT _current)
+          continue()
+        endif()
+        string(REPLACE ":" ";" _entries "${_current}")
+        set(_relative_entries "")
+        foreach(_entry IN LISTS _entries)
+          string(FIND "${_entry}" "$ORIGIN" _position)
+          if(_position EQUAL 0)
+            list(APPEND _relative_entries "${_entry}")
+          endif()
+        endforeach()
+        list(REMOVE_DUPLICATES _relative_entries)
+        if(NOT _relative_entries)
+          set(_relative_entries "$ORIGIN")
+        endif()
+        string(REPLACE ";" ":" _new "${_relative_entries}")
+        if(NOT _new STREQUAL _current)
+          file(RPATH_SET FILE "${_binary}" NEW_RPATH "${_new}")
         endif()
       endforeach()
-    ")
+    ]])
   endforeach()
 endif()

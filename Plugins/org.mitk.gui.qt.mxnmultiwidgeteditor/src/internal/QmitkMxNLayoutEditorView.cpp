@@ -185,10 +185,12 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   // Made on the real widget before any early return, and kept with the other
   // per-attachment connections, so every re-evaluation replaces it rather than
   // stacking another. Locking unbinds the view, unlocking binds it again.
+  // The view, not the editor widget, is the context: detaching drops every
+  // connection from the widget to the editor widget, this one included.
   if (nullptr != shownMultiWidget)
   {
     m_LayoutConnections.push_back(connect(
-      shownMultiWidget, &QmitkMxNMultiWidget::LayoutLocksChanged, m_LayoutEditorWidget, [this]()
+      shownMultiWidget, &QmitkMxNMultiWidget::LayoutLocksChanged, this, [this]()
       {
         this->RenderWindowPartActivated(m_ShownPart);
       }));

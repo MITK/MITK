@@ -98,8 +98,8 @@ private:
 
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;
 
-  /** \brief Editor-wide mouse-interaction scheme toggle, live only while an MxN
-   *         editor part is active. */
+  /** \brief Editor-wide mouse-interaction scheme toggle, live only while the
+   *         view is bound to an MxN editor. */
   QCheckBox* m_PacsSchemeBox = nullptr;
 
   /** \brief Names the display the view is bound to. The view follows
@@ -107,9 +107,10 @@ private:
    *         focused one need not be the one being configured. */
   QLabel* m_BoundDisplayLabel = nullptr;
 
-  /** Covers the editor while no MxN display is open: with nothing to configure
-   *  the controls would otherwise sit there greyed out and unexplained. Carries
-   *  the action that resolves it, so the display is one click away. */
+  /** Covers the editor while the view is unbound - no MxN display visible, or only
+   *  one whose plugin locked its structure: the controls would otherwise sit
+   *  there greyed out and unexplained. Says which case applies and carries the
+   *  action that resolves it, so a bindable display is one click away. */
   QmitkButtonOverlayWidget* m_NoDisplayOverlay = nullptr;
 
   /** \brief Per-attachment connections of the layout-shape controls to the

@@ -391,7 +391,7 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH.
+Linux packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into `.rodata` (see \ref CppMicroServicesResourcesSection). Where resource linking is unavailable and the resources are appended instead, stripping stays off. CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH.
 
 Windows and macOS packages are not stripped: MSVC has no strip step, and the macOS bundle post-processing has not been verified with stripped binaries yet.
 
@@ -659,7 +659,7 @@ The current install system replaced several legacy approaches:
 
 ## Known Issues and Future Work
 
-- **CPACK_STRIP_FILES is OFF globally**: Packages are larger than necessary because all binaries retain debug symbols. The root cause is CppMicroServices APPEND-mode resource embedding. Switching to LINK mode (see \ref CppMicroServicesResourcesSection) would allow re-enabling stripping.
+- **macOS packages are not stripped**: The resources are linked on macOS as well, so stripping is possible in principle, but the bundle post-processing (`macdeployqt`, code signing) has not been verified with stripped binaries yet.
 
 - **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
 

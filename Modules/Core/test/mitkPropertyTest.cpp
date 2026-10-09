@@ -504,7 +504,7 @@ public:
     CPPUNIT_ASSERT(prop->FromJSON(j));
 
     CPPUNIT_ASSERT_EQUAL(mitk::LookupTable::MULTILABEL, prop->GetValue()->GetActiveType());
-    CPPUNIT_ASSERT_EQUAL(lut->GetVtkLookupTable()->GetTableValue(1)[3], prop->GetValue()->GetVtkLookupTable()->GetTableValue(1)[3]);
+    CPPUNIT_ASSERT(*lut == *prop->GetValue());
   }
 
   void TestDoubleVectorProperty_Success()

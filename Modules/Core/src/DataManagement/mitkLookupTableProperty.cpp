@@ -118,7 +118,7 @@ bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
 
   lut->SetNumberOfTableValues(j["NumberOfColors"].get<int>());
   lut->SetScale(j["Scale"].get<int>());
-  lut->SetScale(j["Ramp"].get<int>());
+  lut->SetRamp(j["Ramp"].get<int>());
 
   std::array<double, 2> range;
 

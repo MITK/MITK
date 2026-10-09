@@ -367,8 +367,13 @@
 	acquired at an oblique angle. Rotating the camera with the mouse turns the direction into
 	"Free" ("3D | Free"); "Free" can also be picked directly. Picking a plane turns the camera
 	back. A "Free" view that is switched to 2D shows the plane it was looking at most
-	directly. A window linked on orientation always keeps its group's direction, so "Free" is
-	not offered there.
+	directly.
+
+	A 3D view linked on orientation always keeps its group's direction and turns with the
+	group's other windows, 2D or 3D. The mouse does not rotate it, while pan and zoom still
+	work; its label reads e.g. "3D | Coronal (locked)", and the label's tooltip names the
+	group. "Free" is not offered there. A "Free" view that joins an orientation group turns
+	to the group's direction.
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,
 	the navigator's slice and position rows, the level/window readout and the colorbar

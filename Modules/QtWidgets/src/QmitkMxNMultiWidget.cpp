@@ -4049,6 +4049,12 @@ QmitkMxNMultiWidget::ViewDirection QmitkMxNMultiWidget::GetViewDirection(const Q
   return FromAnatomicalPlane(widget->GetSliceNavigationController()->GetDefaultViewDirection());
 }
 
+bool QmitkMxNMultiWidget::IsRotationLocked(const QString& windowId) const
+{
+  return RenderMode::ThreeD == this->GetRenderMode(windowId) && 0 == m_FreeCells.count(windowId)
+         && this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value();
+}
+
 void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode)
 {
   const auto widget = this->GetRenderWindowWidget(windowId);
@@ -4170,6 +4176,9 @@ void QmitkMxNMultiWidget::SwitchCellToThreeD(QmitkRenderWindowWidget* cell)
   style->SetObservedRenderer(renderer->GetVtkRenderer());
   const auto windowId = cell->GetWidgetName();
   style->SetRotationCallback([this, windowId]() { this->OnThreeDCameraRotated(windowId); });
+  // Asked from within VTK's event dispatch, which must not see an exception.
+  style->SetRotationLock([this, windowId]()
+  { return nullptr != this->GetRenderWindowWidget(windowId) && this->IsRotationLocked(windowId); });
   interactor->SetInteractorStyle(style);
 }
 
@@ -4274,7 +4283,17 @@ void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::An
         continue;
       }
       m_FreeCells.erase(descriptor.id);
-      memberUtility->SetViewDirectionSelection(viewDirection);
+      if (IsThreeD(RendererOf(memberWidget.get())))
+      {
+        // The slice-plane path would refit the 3D camera to the anterior
+        // view; a 3D member only turns its camera.
+        memberWidget->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
+        this->ApplyThreeDViewDirection(descriptor.id);
+      }
+      else
+      {
+        memberUtility->SetViewDirectionSelection(viewDirection);
+      }
       ++m_OrientationApplyCount;
       affected.push_back(descriptor.id);
     }

@@ -177,6 +177,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_MatrixShowsNotApplicableChips);
   MITK_TEST(ThreeD_GroupWithTwoDMemberIsSolidNotPartial);
   MITK_TEST(ThreeD_AllThreeDGroupShowsNotApplicable);
+  MITK_TEST(ThreeD_FreeCellJoiningNewGroupSkipsOnlyOrientation);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -2529,6 +2530,23 @@ public:
     const auto groupSlots = m_Widget->BuildGroupBarcodeSlots("nav");
     CPPUNIT_ASSERT(!groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan)].applicable);
     CPPUNIT_ASSERT(groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)].applicable);
+  }
+
+  void ThreeD_FreeCellJoiningNewGroupSkipsOnlyOrientation()
+  {
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
+    const auto group = m_Widget->CreateGroup();
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
+
+    // As the group's only member the free cell has no direction to snap to.
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, group);
+
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("The group's other axes still apply",
+                           IsLinked(1, QmitkMxNSyncDimension::Windowing, group));
   }
 };
 

@@ -38,7 +38,8 @@ namespace mitk
 *   of camera rotations: when an interaction ends with a direction of
 *   projection or a view-up different from the one it started with (beyond
 *   'QmitkMxN3DCamera::Tolerance'), the rotation callback runs. Pan and dolly
-*   change neither, so they never report a rotation.
+*   change neither, so they never report a rotation. While the rotation lock
+*   reports true, rotate and spin do nothing; pan and dolly stay.
 */
 class MITKQTWIDGETS_EXPORT QmitkMxN3DInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
@@ -47,12 +48,19 @@ public:
   vtkTypeMacro(QmitkMxN3DInteractorStyle, vtkInteractorStyleTrackballCamera);
 
   using RotationCallback = std::function<void()>;
+  using RotationLock = std::function<bool()>;
 
   /** \brief The renderer whose active camera the detection compares. */
   void SetObservedRenderer(vtkRenderer* renderer);
 
   /** \brief Called once per interaction that rotated the camera. */
   void SetRotationCallback(RotationCallback callback);
+
+  /** \brief Asked at every rotate and spin step whether the camera may turn. */
+  void SetRotationLock(RotationLock lock);
+
+  void Rotate() override;
+  void Spin() override;
 
 protected:
   QmitkMxN3DInteractorStyle();
@@ -66,6 +74,7 @@ private:
 
   vtkWeakPointer<vtkRenderer> m_ObservedRenderer;
   RotationCallback m_RotationCallback;
+  RotationLock m_RotationLock;
   bool m_InteractionStarted = false;
   double m_StartDirectionOfProjection[3] = { 0.0, 0.0, 0.0 };
   double m_StartViewUp[3] = { 0.0, 0.0, 0.0 };

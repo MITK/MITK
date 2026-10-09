@@ -919,10 +919,12 @@ QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
   const auto windowId = m_Cell->GetWidgetName();
   ViewDirection direction = ViewDirection::Axial;
   bool threeD = false;
+  bool locked = false;
   try
   {
     direction = m_Editor->GetViewDirection(windowId);
     threeD = QmitkMxNMultiWidget::RenderMode::ThreeD == m_Editor->GetRenderMode(windowId);
+    locked = m_Editor->IsRotationLocked(windowId);
   }
   catch (const mitk::Exception&)
   {
@@ -938,7 +940,29 @@ QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
     case ViewDirection::Original: name = QStringLiteral("Original"); break;
     case ViewDirection::Free:     name = QStringLiteral("Free"); break;
   }
-  return threeD ? QStringLiteral("3D | ") + name : name;
+  if (!threeD)
+  {
+    return name;
+  }
+  return QStringLiteral("3D | ") + name + (locked ? QStringLiteral(" (locked)") : QString());
+}
+
+QString QmitkMxNCellOverlay::PlaneLabelToolTip() const
+{
+  const auto windowId = m_Cell->GetWidgetName();
+  try
+  {
+    if (m_Editor->IsRotationLocked(windowId))
+    {
+      const auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+      return tr("Rotation locked by orientation group %1").arg(QString::fromStdString(link->group));
+    }
+  }
+  catch (const mitk::Exception&)
+  {
+    // the cell is being created or torn down
+  }
+  return QString();
 }
 
 bool QmitkMxNCellOverlay::IsThreeD() const
@@ -3192,6 +3216,21 @@ QRect QmitkMxNCellOverlay::PlateCloseButtonRect() const
                PlateButtonSize, PlateButtonSize);
 }
 
+bool QmitkMxNCellOverlay::ShowPlaneLabelToolTip(const QPoint& position, const QPoint& globalPosition)
+{
+  if (!this->PlaneLabelRect().contains(position))
+  {
+    return false;
+  }
+  const QString toolTip = this->PlaneLabelToolTip();
+  if (toolTip.isEmpty())
+  {
+    return false;
+  }
+  QToolTip::showText(globalPosition, toolTip, this);
+  return true;
+}
+
 bool QmitkMxNCellOverlay::ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition)
 {
   if (this->PlateCloseButtonRect().contains(position))
@@ -3225,7 +3264,8 @@ bool QmitkMxNCellOverlay::event(QEvent* event)
   if (QEvent::ToolTip == event->type())
   {
     auto* helpEvent = static_cast<QHelpEvent*>(event);
-    if (this->ShowPlateButtonToolTip(helpEvent->pos(), helpEvent->globalPos()))
+    if (this->ShowPlateButtonToolTip(helpEvent->pos(), helpEvent->globalPos())
+        || this->ShowPlaneLabelToolTip(helpEvent->pos(), helpEvent->globalPos()))
     {
       return true;
     }

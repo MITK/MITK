@@ -56,6 +56,29 @@ void QmitkMxN3DInteractorStyle::SetRotationCallback(RotationCallback callback)
   m_RotationCallback = std::move(callback);
 }
 
+void QmitkMxN3DInteractorStyle::SetRotationLock(RotationLock lock)
+{
+  m_RotationLock = std::move(lock);
+}
+
+void QmitkMxN3DInteractorStyle::Rotate()
+{
+  if (m_RotationLock && m_RotationLock())
+  {
+    return;
+  }
+  Superclass::Rotate();
+}
+
+void QmitkMxN3DInteractorStyle::Spin()
+{
+  if (m_RotationLock && m_RotationLock())
+  {
+    return;
+  }
+  Superclass::Spin();
+}
+
 void QmitkMxN3DInteractorStyle::OnInteractionEvent(vtkObject*, unsigned long eventId, void* clientData, void*)
 {
   auto* self = static_cast<QmitkMxN3DInteractorStyle*>(clientData);

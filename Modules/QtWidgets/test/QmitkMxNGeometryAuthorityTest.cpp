@@ -55,6 +55,8 @@ class QmitkMxNGeometryAuthorityTestSuite : public mitk::TestFixture
 
   MITK_TEST(Orientation_PropagatesToGroup_ExactlyOncePerMember);
   MITK_TEST(Orientation_UnlinkedCellDoesNotPropagate);
+  MITK_TEST(Orientation_MixedGroup_TurnsThreeDCameraInPlace);
+  MITK_TEST(GeometryComponent_ThreeDSliceLinkConnectsNothing);
   MITK_TEST(OrientationLink_AlignsJoiningCellToSeedPlane);
   MITK_TEST(OrientationLink_JoinFromEarlierCell_AdoptsGroupPlane);
   MITK_TEST(OrientationLink_JoinOnSamePlane_KeepsSliceOffset);
@@ -204,6 +206,68 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Without an orientation link nothing propagates",
                                  planeBefore, Plane(1));
     CPPUNIT_ASSERT_EQUAL(0u, m_Editor->GetOrientationApplyCount());
+  }
+
+  void Orientation_MixedGroup_TurnsThreeDCameraInPlace()
+  {
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(2), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+
+    // A camera a reset would refit.
+    auto* camera = Renderer(1)->GetVtkRenderer()->GetActiveCamera();
+    camera->Dolly(1.5);
+    const double distance = camera->GetDistance();
+    mitk::Point3D focalPoint;
+    camera->GetFocalPoint(focalPoint.GetDataPointer());
+
+    unsigned int viewsInitialized = 0;
+    auto* renderingManager = mitk::RenderingManager::GetInstance();
+    const auto tag = renderingManager->AddObserver(mitk::RenderingManagerViewsInitializedEvent(),
+                                                   [&viewsInitialized](const itk::EventObject&) { ++viewsInitialized; });
+    const auto applyCountBefore = m_Editor->GetOrientationApplyCount();
+
+    // Sagittal: coronal coincides with the anterior view a reset produces.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Sagittal);
+    const auto linkedEvents = viewsInitialized;
+
+    // The same flip on a cell without group members.
+    viewsInitialized = 0;
+    m_Editor->SetViewDirection(CellId(2), mitk::AnatomicalPlane::Sagittal);
+    const auto aloneEvents = viewsInitialized;
+    renderingManager->RemoveObserver(tag);
+
+    CPPUNIT_ASSERT_EQUAL(mitk::AnatomicalPlane::Sagittal, Plane(1));
+    auto normal = Snc(0)->GetCurrentPlaneGeometry()->GetNormal();
+    normal.Normalize();
+    mitk::Vector3D directionOfProjection;
+    camera->GetDirectionOfProjection(directionOfProjection.GetDataPointer());
+    CPPUNIT_ASSERT_MESSAGE("The 3D member looks along the group's plane normal",
+                           (directionOfProjection + normal).GetNorm() < 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The 3D member turns, it is not refit", distance, camera->GetDistance(), 1e-6);
+    mitk::Point3D focalPointAfter;
+    camera->GetFocalPoint(focalPointAfter.GetDataPointer());
+    CPPUNIT_ASSERT_MESSAGE("The 3D member turns about its focal point", focalPoint.EuclideanDistanceTo(focalPointAfter) < 1e-6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One member, one apply", applyCountBefore + 1, m_Editor->GetOrientationApplyCount());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The 3D member initializes no view", aloneEvents, linkedEvents);
+  }
+
+  void GeometryComponent_ThreeDSliceLinkConnectsNothing()
+  {
+    // A geometry of its own, so an alignment to the 2D peer would show.
+    const auto other = mitk::ImageGenerator::GenerateGradientImage<short>(10, 10, 10, 2.0f, 2.0f, 2.0f);
+    mitk::RenderingManager::GetInstance()->InitializeView(Renderer(1)->GetRenderWindow(), other->GetTimeGeometry());
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    const mitk::TimeGeometry* threeDGeometry = Snc(1)->GetInputWorldTimeGeometry();
+    const mitk::TimeGeometry* twoDGeometry = Snc(0)->GetInputWorldTimeGeometry();
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "slices");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "slices");
+
+    CPPUNIT_ASSERT_MESSAGE("The 3D cell keeps its geometry", threeDGeometry == Snc(1)->GetInputWorldTimeGeometry());
+    CPPUNIT_ASSERT_MESSAGE("The 2D cell keeps its geometry", twoDGeometry == Snc(0)->GetInputWorldTimeGeometry());
   }
 
   void OrientationLink_AlignsJoiningCellToSeedPlane()

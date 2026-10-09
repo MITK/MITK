@@ -69,6 +69,9 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(SetViewDirection_FreeOnLinkedCell_ThrowsConflict);
   MITK_TEST(OrientationLink_FreeCellAlone_ThrowsConflict);
   MITK_TEST(OrientationLink_FreeCellJoins_SnapsToGroup);
+  MITK_TEST(OrientationLink_ThreeDJoinsCoronalGroup_Snaps);
+  MITK_TEST(Lock_FollowsTheOrientationLink);
+  MITK_TEST(Lock_LinkedCellRefusesRotateAndSpin);
   MITK_TEST(Switch_TwoDThreeDTwoD_KeepsDirection);
   MITK_TEST(Switch_FreeToTwoD_TakesNearestPlane);
   MITK_TEST(Switch_KeepsTimeStep);
@@ -259,6 +262,18 @@ public:
     style->InvokeEvent(vtkCommand::EndInteractionEvent);
   }
 
+  /** A mouse move of the style's own 'motion' (rotate, spin), as during a drag. */
+  static void Drag(mitk::BaseRenderer* renderer, void (vtkInteractorStyle::*motion)())
+  {
+    auto* style = Style(renderer);
+    CPPUNIT_ASSERT(nullptr != style);
+    auto* interactor = renderer->GetRenderWindow()->GetInteractor();
+    style->SetCurrentRenderer(renderer->GetVtkRenderer());
+    interactor->SetEventPosition(40, 40);
+    interactor->SetEventPosition(60, 55);
+    (style->*motion)();
+  }
+
   static mitk::Image::Pointer Tilted(const mitk::Image* image)
   {
     auto tilted = image->Clone();
@@ -406,6 +421,62 @@ public:
 
     CPPUNIT_ASSERT(ViewDirection::Sagittal == m_Editor->GetViewDirection(CellId(1)));
     AssertLooksAt(Renderer(1), Snc(0)->GetCurrentPlaneGeometry(), "joined free cell");
+  }
+
+  void OrientationLink_ThreeDJoinsCoronalGroup_Snaps()
+  {
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+
+    CPPUNIT_ASSERT(ViewDirection::Coronal == m_Editor->GetViewDirection(CellId(1)));
+    AssertLooksAt(Renderer(1), Snc(0)->GetCurrentPlaneGeometry(), "joined 3D cell");
+  }
+
+  void Lock_FollowsTheOrientationLink()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell has no rotation to lock", !m_Editor->IsRotationLocked(CellId(1)));
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    CPPUNIT_ASSERT(m_Editor->IsRotationLocked(CellId(1)));
+
+    m_Editor->ClearSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation);
+    CPPUNIT_ASSERT(!m_Editor->IsRotationLocked(CellId(1)));
+
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("An unlinked 3D cell rotates", !m_Editor->IsRotationLocked(CellId(2)));
+  }
+
+  void Lock_LinkedCellRefusesRotateAndSpin()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+
+    const std::pair<const char*, void (vtkInteractorStyle::*)()> motions[] = {
+      { "rotate", &vtkInteractorStyle::Rotate }, { "spin", &vtkInteractorStyle::Spin }
+    };
+    for (const auto& [name, motion] : motions)
+    {
+      const auto lockedDop = DirectionOfProjection(Renderer(1));
+      const auto lockedUp = ViewUp(Renderer(1));
+      Drag(Renderer(1), motion);
+      CPPUNIT_ASSERT_MESSAGE(std::string(name) + ": the linked cell keeps its direction",
+                             Near(lockedDop, DirectionOfProjection(Renderer(1))) && Near(lockedUp, ViewUp(Renderer(1))));
+
+      // The same drag turns an unlinked 3D cell, so the gesture itself is real.
+      const auto unlinkedDop = DirectionOfProjection(Renderer(2));
+      const auto unlinkedUp = ViewUp(Renderer(2));
+      Drag(Renderer(2), motion);
+      CPPUNIT_ASSERT_MESSAGE(std::string(name) + ": the unlinked cell turns",
+                             !Near(unlinkedDop, DirectionOfProjection(Renderer(2))) || !Near(unlinkedUp, ViewUp(Renderer(2))));
+    }
   }
 
   void Switch_TwoDThreeDTwoD_KeepsDirection()

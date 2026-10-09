@@ -189,6 +189,10 @@ public:
    */
   QString PlaneLabel() const;
 
+  /** \brief The tooltip of the plane label: why a 3D cell does not rotate,
+   *         empty when it does. Exposed for verification. */
+  QString PlaneLabelToolTip() const;
+
   qreal RevealProgress() const;
   void SetRevealProgress(qreal progress);
 
@@ -527,6 +531,9 @@ private:
 
   /** \brief Show the tooltip of the plate button at 'position', if any. */
   bool ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition);
+
+  /** \brief Show the plane label's tooltip when 'position' is on it and it has one. */
+  bool ShowPlaneLabelToolTip(const QPoint& position, const QPoint& globalPosition);
 
   /**
   * \brief Arrange-mode input on the plate, from wherever it arrives: the render

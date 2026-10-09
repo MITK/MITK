@@ -981,7 +981,17 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
       {
         continue;
       }
-      m_MultiWidget->SetSyncLink(windowId, dimension, group);
+      try
+      {
+        m_MultiWidget->SetSyncLink(windowId, dimension, group);
+      }
+      catch (const QmitkMxNOrientationConflictException& e)
+      {
+        // The cell's view direction cannot join the group's orientation; the
+        // group's other axes still apply.
+        MITK_WARN << "Layout editor: '" << windowId.toStdString() << "' not linked on orientation to '"
+                  << group << "': " << e.GetDescription();
+      }
     }
     if (includeSelection)
     {

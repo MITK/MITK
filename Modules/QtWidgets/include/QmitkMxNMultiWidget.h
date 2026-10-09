@@ -479,6 +479,14 @@ public:
   ViewDirection GetViewDirection(const QString& windowId) const;
 
   /**
+  * \brief Whether the cell's camera may not rotate: a 3D cell linked on
+  *        `Orientation` shows its group's direction.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  bool IsRotationLocked(const QString& windowId) const;
+
+  /**
   * \brief Whether the axis has a meaning for the cell in its current render
   *        mode.
   *

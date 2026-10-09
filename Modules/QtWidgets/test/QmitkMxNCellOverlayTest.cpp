@@ -83,6 +83,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(LostGrab_EndsAStaleColorbarDrag);
   MITK_TEST(PlaneLabel_NamesTheRenderModeAndFree);
   MITK_TEST(PlaneLabel_OriginalIsNamed);
+  MITK_TEST(PlaneLabel_LockedThreeDCellSaysWhy);
   MITK_TEST(ThreeD_NoSliceReadoutOrNavigatorWithoutTime);
   MITK_TEST(ThreeD_TimeOnlyReadoutAndNavigator);
   MITK_TEST(ThreeD_ContextMenuLeavesOutTwoDEntries);
@@ -656,6 +657,24 @@ public:
     auto* overlay = m_Editor->GetRenderWindowWidget("mxn__w0")->findChild<QmitkMxNCellOverlay*>();
     CPPUNIT_ASSERT(nullptr != overlay);
     CPPUNIT_ASSERT_EQUAL(std::string("Original"), overlay->PlaneLabel().toStdString());
+  }
+
+  void PlaneLabel_LockedThreeDCellSaysWhy()
+  {
+    auto* overlay = this->Overlay(1);
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT(overlay->PlaneLabelToolTip().isEmpty());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Coronal (locked)"), overlay->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Rotation locked by orientation group planes"),
+                         overlay->PlaneLabelToolTip().toStdString());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
+    CPPUNIT_ASSERT_EQUAL(std::string("Coronal"), overlay->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT(overlay->PlaneLabelToolTip().isEmpty());
   }
 
   void ThreeD_NoSliceReadoutOrNavigatorWithoutTime()

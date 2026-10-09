@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkLookupTable.h>
+#include <mitkExceptionMacro.h>
 #include <itkProcessObject.h>
 
 #include <vtkColorTransferFunction.h>
@@ -212,8 +213,11 @@ void mitk::LookupTable::SetType(const std::string &typeName)
     if (typenameList.at(i) == typeName)
     {
       this->SetType(static_cast<mitk::LookupTable::LookupTableType>(i));
+      return;
     }
   }
+
+  mitkThrow() << "Unknown lookup table type \"" << typeName << "\".";
 }
 
 mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType() const

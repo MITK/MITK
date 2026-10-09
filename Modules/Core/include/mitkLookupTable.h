@@ -282,9 +282,9 @@ namespace mitk
      * \brief Set the lookup table type by name string.
      *
      * Looks up \p typeName in typenameList and delegates to SetType(LookupTableType).
-     * Does nothing if the name is not found.
      *
      * \param[in] typeName Case-sensitive name of the lookup table type.
+     * \throw mitk::Exception if \p typeName is not in typenameList.
      */
     virtual void SetType(const std::string &typeName);
 

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkLookupTablePropertySerializer.h>
+#include <mitkExceptionMacro.h>
 #include <mitkStringsToNumbers.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkLookupTableProperty.h>
@@ -225,7 +226,16 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(con
 
   // SetType() rebuilds the table, so it must precede restoring the stored one.
   if (const auto *type = element->Attribute("Type"))
-    mitkLut->SetType(type);
+  {
+    try
+    {
+      mitkLut->SetType(type);
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_WARN << e.GetDescription() << " Restoring the lookup table colors without it.";
+    }
+  }
 
   mitkLut->SetVtkLookupTable(lut);
 

@@ -44,6 +44,8 @@ found in the LICENSE file.
 #include <mitkVtkWidgetRendering.h>
 
 #include <tinyxml2.h>
+#include <vtkLookupTable.h>
+#include <vtkSmartPointer.h>
 
 void TestAllProperties(const mitk::PropertyList *propList);
 void TestLookupTableTypeRoundTrip();
@@ -162,6 +164,26 @@ void TestLookupTableTypeRoundTrip()
   MITK_TEST_CONDITION(mitk::LookupTable::MULTILABEL == deserializedLut->GetActiveType(),
                       "Deserialized lookup table keeps its type");
   MITK_TEST_CONDITION(*deserializedLut == *lut, "Deserialized lookup table keeps its stored colors");
+
+  auto entries = vtkSmartPointer<vtkLookupTable>::New();
+  entries->DeepCopy(lut->GetVtkLookupTable());
+  auto untypedLut = mitk::LookupTable::New();
+  untypedLut->SetVtkLookupTable(entries);
+
+  const auto deserializeUntyped = [&serializer, element]() {
+    const auto untyped = serializer->Deserialize(element);
+    auto *untypedProp = dynamic_cast<mitk::LookupTableProperty *>(untyped.GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(untypedProp != nullptr, "Deserialize lookup table without known type");
+    return untypedProp->GetValue();
+  };
+
+  element->DeleteAttribute("Type");
+  MITK_TEST_CONDITION(*deserializeUntyped() == *untypedLut,
+                      "Lookup table without type keeps its stored colors as grayscale");
+
+  element->SetAttribute("Type", "Unknown");
+  MITK_TEST_CONDITION(*deserializeUntyped() == *untypedLut,
+                      "Lookup table with unknown type keeps its stored colors as grayscale");
 }
 
 void TestAllProperties(const mitk::PropertyList *propList)

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkLookupTableProperty.h>
+#include <mitkExceptionMacro.h>
 #include <iomanip>
 #include <nlohmann/json.hpp>
 
@@ -157,7 +158,16 @@ bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
 
   // SetType() rebuilds the table, so it must precede restoring the stored one.
   if (j.contains("Type"))
-    mitkLut->SetType(j["Type"].get<std::string>());
+  {
+    try
+    {
+      mitkLut->SetType(j["Type"].get<std::string>());
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << e.GetDescription() << " Restoring the lookup table colors without it.";
+    }
+  }
 
   mitkLut->SetVtkLookupTable(lut);
   this->SetLookupTable(mitkLut);

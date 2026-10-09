@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
 
 namespace mitk
 {
@@ -243,6 +244,7 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
   {
     lut->SetType(LookupTable::MULTILABEL);
     result->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+    result->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST));
   }
   else
   {

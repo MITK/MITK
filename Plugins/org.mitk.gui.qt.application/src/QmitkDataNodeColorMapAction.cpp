@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLookupTable.h>
 #include <mitkRenderingManager.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
@@ -131,6 +132,13 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     renderingMode->SetValue(mitk::LookupTable::LookupTableType::MULTILABEL != renderWindowSpecificLuT->GetActiveType()
       ? mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR
       : mitk::RenderingModeProperty::LOOKUPTABLE_COLOR);
+
+    if (mitk::LookupTable::LookupTableType::MULTILABEL == renderWindowSpecificLuT->GetActiveType())
+    {
+      // The multilabel lookup table colors exact label values, so interpolated
+      // values in rotated slices would show the colors of unrelated labels.
+      dataNode->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST), baseRenderer);
+    }
 
     if (nullptr == baseRenderer)
     {

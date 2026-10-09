@@ -97,33 +97,6 @@ namespace
 
     return false;
   }
-
-  bool IsColoredByMultiLabelLookupTable(const mitk::DataNode* node, const mitk::BaseRenderer* renderer)
-  {
-    bool binary = false;
-    node->GetBoolProperty("binary", binary, renderer);
-
-    if (binary)
-      return false;
-
-    const auto* renderingMode = dynamic_cast<const mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode", renderer));
-
-    if (nullptr != renderingMode)
-    {
-      const auto mode = renderingMode->GetValueAsId();
-
-      if (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == mode ||
-          mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == mode)
-      {
-        return false;
-      }
-    }
-
-    const auto* lookupTable = dynamic_cast<const mitk::LookupTableProperty*>(node->GetProperty("LookupTable", renderer));
-
-    return nullptr != lookupTable &&
-      mitk::LookupTable::MULTILABEL == lookupTable->GetValue()->GetActiveType();
-  }
 }
 
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
@@ -230,11 +203,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
 
   // Initialize the interpolation mode for resampling; switch to nearest
-  // neighbor if the input image is too small. The multilabel lookup table
-  // assigns colors to exact label values, so interpolated values would show
-  // the colors of unrelated labels.
-  if ((image->GetDimension() >= 3) && (image->GetDimension(2) > 1) &&
-      !IsColoredByMultiLabelLookupTable(datanode, renderer))
+  // neighbor if the input image is too small.
+  if ((image->GetDimension() >= 3) && (image->GetDimension(2) > 1))
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(resliceInterpolationProperty, "reslice interpolation", renderer);

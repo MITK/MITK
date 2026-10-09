@@ -160,6 +160,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
     lookUpTable->SetTableValue(value, rgba);
   }
 
+  localStorage->m_LastNodeOpacity = nodeOpacity;
   localStorage->m_LastOpacityFactor = opacityFactor;
   localStorage->m_LabelLookupTable->Modified();
 }
@@ -193,11 +194,14 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   auto *segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(node->GetData());
   assert(segmentation && segmentation->IsInitialized());
 
+  float nodeOpacity = 1.0f;
+  node->GetOpacity(nodeOpacity, renderer, "opacity");
+
   bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
     (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime()) ||
+    nodeOpacity != localStorage->m_LastNodeOpacity ||
     this->GetOpacityFactor() != localStorage->m_LastOpacityFactor;
 
   if (isLookupModified)

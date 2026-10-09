@@ -160,6 +160,12 @@ namespace mitk
        * comparing against this cached value to trigger a LUT rebuild. */
       float m_LastOpacityFactor = 1.0f;
 
+      /** \brief The node "opacity" baked into the current LUT.
+       *
+       * Compared by value, as removing a renderer-specific opacity falls back to the
+       * global one, whose time stamp predates the LUT. */
+      float m_LastNodeOpacity = 1.0f;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */

@@ -43,6 +43,32 @@ namespace
     MITK_INFO << "Using virtual environment: " << venvName;
   }
 
+  // Keeps the user's own Python setup out of the interpreter: packages
+  // installed with "pip install --user" (and the .pth files that come with
+  // them) and the current working directory would otherwise precede the
+  // site-packages of MITK and its virtual environments on sys.path.
+  void InitializeInterpreter()
+  {
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
+    config.parse_argv = 0;
+    config.user_site_directory = 0;
+
+#if defined(__APPLE__)
+    // Python cannot derive its home from an executable inside an app bundle.
+    const auto home = mitk::PythonHelper::GetHomePath();
+
+    if (home.empty() || PyStatus_Exception(PyConfig_SetBytesString(&config, &config.home, home.string().c_str())))
+    {
+      PyConfig_Clear(&config);
+      mitkThrow() << "Could not determine the home of the Python interpreter.";
+    }
+#endif
+
+    py::initialize_interpreter(&config, 0, nullptr, false);
+  }
+
   // Inserts a key into a dict on construction and removes it on
   // destruction. GIL must be held by the caller for both. Used to scope
   // __file__/__name__ during ExecuteFile so they never leak into the
@@ -119,7 +145,7 @@ mitk::PythonContext::PythonContext(const std::string& venvName)
     ActivateVirtualEnv(venvName);
 
   if (!Py_IsInitialized())
-    py::initialize_interpreter();
+    InitializeInterpreter();
 
   m_Impl = std::make_unique<Impl>();
   m_Impl->VirtualEnvPath = mitk::PythonHelper::GetVirtualEnvPath(venvName).string();

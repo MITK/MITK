@@ -90,6 +90,8 @@ It also sets and unsets a few environment variables to ensure a clean and functi
 
 3. **MitkPython**: This module **does** link privately against the Python library.
 It provides the `mitk::PythonContext` class, which acts as the primary bridge between MITK and Python.
+The first context starts the interpreter isolated from the user's own Python setup: neither the user site-packages (packages installed with `pip install --user`, including their `.pth` files) nor the current working directory end up on `sys.path`.
+Both would otherwise precede the site-packages of MITK and its virtual environments, so that, for example, a NumPy installed for some other Python of the same version would replace MITK's own.
 
 In most cases, you won't need to interact with the `MitkPreloadPython` module directly.
 To run the Python interpreter as a separate process, use `MitkPythonHelper`.
@@ -318,9 +320,11 @@ As mentioned at the beginning, Python integration is a complex and sometimes fra
 In particular, differences between our supported platforms—Windows, Linux, and macOS—can be challenging.
 This section collects a few non-obvious quirks.
 
-### Preloading the Python library on macOS
+### Python home on macOS
 
-While we explictly unset the `PYTHONHOME` environment variable on Windows and Linux before preloading the Python library, on macOS we must explicitly set it.
+Python derives its home from the location of the executable, which does not work for an executable inside an application bundle.
+On macOS, `mitk::PythonContext` therefore passes the home determined by `mitk::PythonHelper::GetHomePath()` to the interpreter when it starts it.
+`MitkPreloadPython` unsets the `PYTHONHOME` environment variable on all platforms.
 
 ### OpenMP on macOS
 

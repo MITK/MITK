@@ -153,8 +153,14 @@ std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> QmitkImageStatis
 {
   auto resultDataNode = this->GetLatestResult(imageNode, roiNode, true, false);
 
+  // The base class starts a job only together with its placeholder.
+  if (resultDataNode.IsNull())
+  {
+    return std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer>(nullptr, nullptr);
+  }
+
   std::string status;
-  if (resultDataNode.IsNull() || (resultDataNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) && status == mitk::STATS_GENERATION_STATUS_VALUE_PENDING))
+  if (resultDataNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) && status == mitk::STATS_GENERATION_STATUS_VALUE_PENDING)
   {
     if (imageNode == nullptr || !imageNode->GetData())
     {

@@ -28,6 +28,9 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 #include <itkMath.h>
+#include <itkRGBAPixel.h>
+#include <itkRGBPixel.h>
+#include <itkVectorImage.h>
 
 #include <cmath>
 #include <numeric>
@@ -80,6 +83,34 @@ namespace
     index[2] = z;
     return index;
   }
+
+  using RGBAPixelType = itk::RGBAPixel<unsigned char>;
+
+  RGBAPixelType MakeRGBA(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+  {
+    RGBAPixelType pixel;
+    pixel.Set(red, green, blue, alpha);
+    return pixel;
+  }
+
+  using RGB16PixelType = itk::RGBPixel<unsigned short>;
+
+  RGB16PixelType MakeRGB16(unsigned short red, unsigned short green, unsigned short blue)
+  {
+    RGB16PixelType pixel;
+    pixel.Set(red, green, blue);
+    return pixel;
+  }
+
+  // grid with a voxel volume of 3 mm^3 and distinct spacings per axis
+  Grid AnisotropicGrid()
+  {
+    Grid grid;
+    grid.spacing[0] = 0.5;
+    grid.spacing[1] = 2.0;
+    grid.spacing[2] = 3.0;
+    return grid;
+  }
 }
 
 /**
@@ -119,6 +150,13 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestZeroImageMinMaxPosition);
   MITK_TEST(TestSubRegionMaskMinMaxPosition);
   MITK_TEST(TestIncompatibleMaskThrows);
+  MITK_TEST(TestRGBAImageUnmaskedVoxelCount);
+  MITK_TEST(TestRGBAImageMaskedVoxelCount);
+  MITK_TEST(TestRGBAImageIgnoreZero);
+  MITK_TEST(TestRGB16ImageIgnoreZero);
+  MITK_TEST(TestVectorImageIgnoreZero);
+  MITK_TEST(TestRGBAImagePlanarFigure);
+  MITK_TEST(TestRGBA2DImagePlanarFigure);
   MITK_TEST(TestPic3DCroppedNoMask);
   MITK_TEST(TestPic3DCroppedBinMask);
   MITK_TEST(TestPic3DCroppedMultilabelMask);
@@ -162,6 +200,13 @@ public:
   void TestZeroImageMinMaxPosition();
   void TestSubRegionMaskMinMaxPosition();
   void TestIncompatibleMaskThrows();
+  void TestRGBAImageUnmaskedVoxelCount();
+  void TestRGBAImageMaskedVoxelCount();
+  void TestRGBAImageIgnoreZero();
+  void TestRGB16ImageIgnoreZero();
+  void TestVectorImageIgnoreZero();
+  void TestRGBAImagePlanarFigure();
+  void TestRGBA2DImagePlanarFigure();
 
   void TestPic3DCroppedNoMask();
   void TestPic3DCroppedBinMask();
@@ -300,6 +345,22 @@ private:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxel count" + voxel, mitk::ImageStatisticsContainer::VoxelCountType(1), numberOfVoxelsObject);
 
     this->VerifyExtrema(stats, value, index, value, index, voxel);
+  }
+
+  // checks that the statistics of an image without scalar pixel values hold
+  // nothing but the voxel count and the volume
+  void VerifyVoxelCountAndVolumeOnly(const mitk::ImageStatisticsContainer::ImageStatisticsObject& stats,
+    mitk::ImageStatisticsContainer::VoxelCountType testN,
+    mitk::ImageStatisticsContainer::RealType testVolume)
+  {
+    mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject = 0;
+    mitk::ImageStatisticsContainer::RealType volumeObject = 0;
+    CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+    CPPUNIT_ASSERT_NO_THROW(volumeObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VOLUME()));
+    CPPUNIT_ASSERT_EQUAL(testN, numberOfVoxelsObject);
+    CPPUNIT_ASSERT_MESSAGE("Calculated volume is not equal to the desired value.", std::abs(volumeObject - testVolume) < mitk::eps);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), stats.GetExistingStatisticNames().size());
+    CPPUNIT_ASSERT(stats.m_Histogram.IsNull());
   }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
@@ -1153,6 +1214,252 @@ void mitkImageStatisticsCalculatorTestSuite::TestIncompatibleMaskThrows()
   coarseMaskGen->SetInputImage(image);
   coarseMaskGen->SetImageMask(BuildImage<unsigned short>(size, maskValues, coarse));
   CPPUNIT_ASSERT_THROW(ComputeStatistics(image, coarseMaskGen.GetPointer()), mitk::Exception);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageUnmaskedVoxelCount()
+{
+  /*****************************
+   * 3x2x2 RGBA image with a voxel volume of 3 mm^3
+   * -> 12 voxels and 36 mm^3, no other statistics and no histogram
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image unmasked voxel count:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 3;
+  size[1] = 2;
+  size[2] = 2;
+  std::vector<RGBAPixelType> values(12, MakeRGBA(10, 20, 30, 255));
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, AnisotropicGrid());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0), 12, 36.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageMaskedVoxelCount()
+{
+  /*****************************
+   * 3x2x2 RGBA image with a voxel volume of 3 mm^3 and a mask with three
+   * voxels of label 1 and one voxel of label 4
+   * -> per label voxel count and volume, background skipped; a mask off the
+   *    voxel grid is still rejected
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image masked voxel count:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 3;
+  size[1] = 2;
+  size[2] = 2;
+  const Grid grid = AnisotropicGrid();
+  std::vector<RGBAPixelType> values(12, MakeRGBA(10, 20, 30, 255));
+  std::vector<unsigned char> maskValues{ 1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1 };
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, grid);
+
+  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+  imgMaskGen->SetInputImage(image);
+  imgMaskGen->SetImageMask(BuildImage<unsigned char>(size, maskValues, grid));
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, imgMaskGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(2), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 3, 9.0);
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(4, 0), 1, 3.0);
+
+  Grid shifted = grid;
+  shifted.origin[0] += 0.5 * grid.spacing[0];
+
+  mitk::ImageMaskGenerator::Pointer shiftedMaskGen = mitk::ImageMaskGenerator::New();
+  shiftedMaskGen->SetInputImage(image);
+  shiftedMaskGen->SetImageMask(BuildImage<unsigned char>(size, maskValues, shifted));
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image, shiftedMaskGen.GetPointer()), mitk::Exception);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImageIgnoreZero()
+{
+  /*****************************
+   * 2x2x2 RGBA image with a voxel volume of 3 mm^3: two transparent black
+   * voxels, one opaque black voxel, one transparent blue voxel, four colored
+   * voxels
+   * -> black voxels are ignored regardless of their alpha, the transparent
+   *    blue one is kept: 5 voxels and 15 mm^3 under label 1
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image ignore zero:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  const auto transparentBlack = MakeRGBA(0, 0, 0, 0);
+  const auto opaqueBlack = MakeRGBA(0, 0, 0, 255);
+  const auto transparentBlue = MakeRGBA(0, 0, 1, 0);
+  const auto color = MakeRGBA(200, 0, 50, 128);
+  std::vector<RGBAPixelType> values{ transparentBlack, color, transparentBlack, opaqueBlack, color, transparentBlue, color, color };
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, values, AnisotropicGrid());
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, ignoreZeroGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 5, 15.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGB16ImageIgnoreZero()
+{
+  /*****************************
+   * 2x2x2 RGB image with 16 bit components and a voxel volume of 3 mm^3: three
+   * black voxels, one voxel whose only nonzero component exceeds 8 bit, four
+   * colored voxels
+   * -> only the black voxels are ignored: 5 voxels and 15 mm^3 under label 1
+   ******************************/
+  MITK_INFO << std::endl << "Test RGB 16 bit image ignore zero:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size.Fill(2);
+  const auto black = MakeRGB16(0, 0, 0);
+  const auto beyond8Bit = MakeRGB16(0, 256, 0);
+  const auto color = MakeRGB16(1000, 0, 50000);
+  std::vector<RGB16PixelType> values{ black, color, black, beyond8Bit, color, black, color, color };
+  mitk::Image::Pointer image = BuildImage<RGB16PixelType>(size, values, AnisotropicGrid());
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, ignoreZeroGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 5, 15.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestVectorImageIgnoreZero()
+{
+  /*****************************
+   * 2x2x2 vector image with two components per voxel: two zero voxels, two
+   * voxels with one nonzero component, four nonzero voxels
+   * -> only the zero voxels are ignored: 6 voxels and 6 mm^3 under label 1
+   ******************************/
+  MITK_INFO << std::endl << "Test vector image ignore zero:-----------------------------------------------------------------------------------";
+
+  using ImageType = itk::VectorImage<float, 3>;
+
+  ImageType::SizeType size;
+  size.Fill(2);
+
+  auto itkImage = ImageType::New();
+  itkImage->SetRegions(ImageType::RegionType(size));
+  itkImage->SetNumberOfComponentsPerPixel(2);
+  itkImage->Allocate();
+
+  ImageType::PixelType zero(2);
+  zero.Fill(0.0f);
+  ImageType::PixelType oneNonzero(2);
+  oneNonzero[0] = 0.0f;
+  oneNonzero[1] = 0.5f;
+  ImageType::PixelType nonzero(2);
+  nonzero.Fill(2.0f);
+
+  itkImage->FillBuffer(nonzero);
+  itkImage->SetPixel(MakeIndex(0, 0, 0), zero);
+  itkImage->SetPixel(MakeIndex(1, 1, 1), zero);
+  itkImage->SetPixel(MakeIndex(1, 0, 0), oneNonzero);
+  itkImage->SetPixel(MakeIndex(0, 1, 1), oneNonzero);
+
+  mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
+
+  mitk::IgnorePixelMaskGenerator::Pointer ignoreZeroGen = mitk::IgnorePixelMaskGenerator::New();
+  ignoreZeroGen->SetInputImage(image);
+  ignoreZeroGen->SetIgnoredPixelValue(0);
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, ignoreZeroGen.GetPointer()));
+  CPPUNIT_ASSERT_EQUAL(std::size_t(1), statisticsContainer->GetExistingLabelValues().size());
+
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 6, 6.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBAImagePlanarFigure()
+{
+  /*****************************
+   * 4x4x3 RGBA image and a scalar image of the same geometry; a square planar
+   * figure on slice 1 covers the voxels [1,2]x[1,2]
+   * -> 4 voxels and an area of 4 mm^2 for both images
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA image planar figure:-----------------------------------------------------------------------------------";
+
+  itk::Size<3> size;
+  size[0] = 4;
+  size[1] = 4;
+  size[2] = 3;
+  mitk::Image::Pointer image = BuildImage<RGBAPixelType>(size, std::vector<RGBAPixelType>(4 * 4 * 3, MakeRGBA(10, 20, 30, 255)));
+  mitk::Image::Pointer scalarImage = BuildImage<short>(size, std::vector<short>(4 * 4 * 3, 10));
+
+  mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+  mitk::Point2D pnt2; pnt2[0] = 2.5; pnt2[1] = 0.5;
+  mitk::Point2D pnt3; pnt3[0] = 2.5; pnt3[1] = 2.5;
+  mitk::Point2D pnt4; pnt4[0] = 0.5; pnt4[1] = 2.5;
+  auto figure = GeneratePlanarPolygon(image->GetSlicedGeometry()->GetPlaneGeometry(1), { pnt1, pnt2, pnt3, pnt4 });
+
+  mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  planFigMaskGen->SetInputImage(image);
+  planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, planFigMaskGen.GetPointer()));
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 4, 4.0);
+
+  mitk::PlanarFigureMaskGenerator::Pointer scalarPlanFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  scalarPlanFigMaskGen->SetInputImage(scalarImage);
+  scalarPlanFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer scalarStatisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(scalarStatisticsContainer = ComputeStatistics(scalarImage, scalarPlanFigMaskGen.GetPointer()));
+  const auto scalarStatistics = scalarStatisticsContainer->GetStatistics(1, 0);
+
+  CPPUNIT_ASSERT_EQUAL(mitk::ImageStatisticsContainer::VoxelCountType(4),
+    scalarStatistics.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+  CPPUNIT_ASSERT(std::abs(scalarStatistics.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VOLUME()) - 4.0) < mitk::eps);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRGBA2DImagePlanarFigure()
+{
+  /*****************************
+   * 4x4 RGBA image, which the planar figure mask uses as its slice without
+   * extraction; a square planar figure covers the pixels [1,2]x[1,2]
+   * -> 4 pixels and an area of 4 mm^2
+   ******************************/
+  MITK_INFO << std::endl << "Test RGBA 2D image planar figure:-----------------------------------------------------------------------------------";
+
+  using ImageType = itk::Image<RGBAPixelType, 2>;
+
+  ImageType::SizeType size;
+  size.Fill(4);
+
+  auto itkImage = ImageType::New();
+  itkImage->SetRegions(ImageType::RegionType(size));
+  itkImage->Allocate();
+  itkImage->FillBuffer(MakeRGBA(10, 20, 30, 255));
+
+  mitk::Image::Pointer image = mitk::GrabItkImageMemory(itkImage, nullptr, nullptr, false);
+
+  mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+  mitk::Point2D pnt2; pnt2[0] = 2.5; pnt2[1] = 0.5;
+  mitk::Point2D pnt3; pnt3[0] = 2.5; pnt3[1] = 2.5;
+  mitk::Point2D pnt4; pnt4[0] = 0.5; pnt4[1] = 2.5;
+  auto figure = GeneratePlanarPolygon(image->GetSlicedGeometry()->GetPlaneGeometry(0), { pnt1, pnt2, pnt3, pnt4 });
+
+  mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
+  planFigMaskGen->SetInputImage(image);
+  planFigMaskGen->SetPlanarFigure(figure.GetPointer());
+
+  mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(image, planFigMaskGen.GetPointer()));
+  this->VerifyVoxelCountAndVolumeOnly(statisticsContainer->GetStatistics(1, 0), 4, 4.0);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)

@@ -157,6 +157,22 @@ bool QmitkImageStatisticsTreeItem::isWIP() const
   return m_IsWIP;
 }
 
+void QmitkImageStatisticsTreeItem::SetFailed(const QString& reason)
+{
+  m_IsFailed = true;
+  m_FailureReason = reason;
+}
+
+bool QmitkImageStatisticsTreeItem::isFailed() const
+{
+  return m_IsFailed;
+}
+
+QString QmitkImageStatisticsTreeItem::GetFailureReason() const
+{
+  return m_FailureReason;
+}
+
 mitk::Label::ConstPointer QmitkImageStatisticsTreeItem::GetLabelInstance() const
 {
   return m_Label.Lock();

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsTreeItem.h"
 #include <mitkImageStatisticsConstants.h>
 #include <mitkImageStatisticsContainerManager.h>
+#include <mitkExceptionMacro.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
@@ -23,6 +24,7 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 
+#include <QFile>
 #include <QLocale>
 
 #include <algorithm>
@@ -30,6 +32,7 @@ found in the LICENSE file.
 #include <functional>
 #include <iterator>
 #include <map>
+#include <set>
 #include <variant>
 
 namespace
@@ -99,6 +102,18 @@ namespace
     return std::clamp(SIGNIFICANT_DIGITS - 1 - magnitude, MIN_DECIMALS, MAX_DECIMALS);
   }
 
+  /** In the error color instead of the icon color of the theme, so that a failed computation
+  stands out. */
+  QIcon CreateErrorIcon()
+  {
+    QFile file(QStringLiteral(":/Qmitk/error.svg"));
+
+    if (!file.open(QIODevice::ReadOnly))
+      mitkThrow() << "Could not open resource \":/Qmitk/error.svg\"!";
+
+    return QmitkIconTheme::GetIcon(file.readAll(), QmitkIconTheme::GetErrorColor());
+  }
+
   /** Decimal places are chosen per column instead of per value: all values of a column then
   share the position of the decimal point, while columns of very different magnitude, e.g.
   volume and uniformity, still show a comparable number of significant digits. */
@@ -140,6 +155,39 @@ namespace
     std::transform(maxAbsValues.cbegin(), maxAbsValues.cend(), std::back_inserter(decimals), GetDecimals);
 
     return decimals;
+  }
+
+  /** Images without scalar pixel values, e.g. RGB images, only get a few statistics. Columns
+  are therefore offered for the statistics that at least one container holds, in the order of
+  mitk::GetAllStatisticNames(). While statistics are still being computed, it is not known yet
+  which ones they will hold, so all statistics are offered then. */
+  std::vector<std::string> GetOfferedStatisticNames(const std::vector<mitk::ImageStatisticsContainer::ConstPointer>& statistics)
+  {
+    auto names = mitk::GetAllStatisticNames(statistics);
+    std::set<std::string> existingNames;
+
+    for (const auto& container : statistics)
+    {
+      if (container->IsWIP())
+        return names;
+
+      for (const auto labelValue : container->GetExistingLabelValues())
+      {
+        for (const auto timeStep : container->GetExistingTimeSteps(labelValue))
+        {
+          const auto keys = container->GetStatistics(labelValue, timeStep).GetExistingStatisticNames();
+          existingNames.insert(keys.cbegin(), keys.cend());
+        }
+      }
+    }
+
+    // Failed computations hold no statistics either.
+    if (existingNames.empty())
+      return names;
+
+    std::erase_if(names, [&existingNames](const std::string& name) { return !existingNames.contains(name); });
+
+    return names;
   }
 
   /** Formats a statistic value for display in the locale of the user. Anything but a number,
@@ -193,6 +241,13 @@ QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : 
 {
   m_RootItem = std::make_unique<QmitkImageStatisticsTreeItem>();
   m_WIPIcon = QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg"));
+  m_ErrorIcon = CreateErrorIcon();
+
+  // Unlike icons in the icon color, an icon in a fixed color does not follow a theme switch.
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]()
+  {
+    m_ErrorIcon = CreateErrorIcon();
+  });
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
@@ -204,6 +259,7 @@ QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
 void QmitkImageStatisticsTreeModel::DataStorageChanged()
 {
   emit beginResetModel();
+  m_InputStatisticNamesKnown = false;
   UpdateByDataStorage();
   emit endResetModel();
   emit modelChanged();
@@ -265,7 +321,9 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   }
   else if (role == Qt::DecorationRole && index.column() == 0)
   {
-    if (item->isWIP() && item->childCount() == 0)
+    if (item->isFailed())
+      return QVariant(m_ErrorIcon);
+    else if (item->isWIP() && item->childCount() == 0)
       return QVariant(m_WIPIcon);
     else if (!item->isWIP())
     {
@@ -287,6 +345,9 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   }
   else if (role == Qt::ToolTipRole)
   {
+    if (item->isFailed())
+      return item->GetFailureReason();
+
     if (this->IsCheckable(index))
       return QStringLiteral("Show the histogram of this label");
 
@@ -472,6 +533,7 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
   emit beginResetModel();
   m_TimeStepResolvedImageNodes = std::move(tempNodes);
   m_ImageNodes = nodes;
+  m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
@@ -503,6 +565,7 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
   emit beginResetModel();
   m_TimeStepResolvedMaskNodes = std::move(tempNodes);
   m_MaskNodes = nodes;
+  m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
   this->UpdateInputObservers();
   this->UpdateByDataStorage();
@@ -520,6 +583,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   m_MaskNodes.clear();
   m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
+  m_InputStatisticNamesKnown = false;
   m_ColumnDecimals.clear();
   m_CheckedLabelValues.reset();
   emit endResetModel();
@@ -655,11 +719,18 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
     }
   }
 
+  const auto expectedStatisticsCount = m_ImageNodes.size() * std::max<std::size_t>(1, m_MaskNodes.size());
+  const bool isComplete = newStatistics.size() == expectedStatisticsCount &&
+    std::none_of(newStatistics.cbegin(), newStatistics.cend(), [](const auto& statistics) { return statistics->IsWIP(); });
+
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
 
-    m_StatisticNames = mitk::GetAllStatisticNames(m_Statistics);
+    if (isComplete || !m_InputStatisticNamesKnown)
+      m_StatisticNames = GetOfferedStatisticNames(m_Statistics);
+
+    m_InputStatisticNamesKnown = m_InputStatisticNamesKnown || isComplete;
     BuildHierarchicalModel();
     m_BuildTime.Modified();
   }
@@ -801,6 +872,8 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   for (const auto &statistic : m_Statistics)
   {
     bool isWIP = statistic->IsWIP();
+    const bool isFailed = statistic->IsFailed();
+    const auto failureReason = QString::fromStdString(statistic->GetFailureReason());
     // get the connected image data node/mask data node
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     auto imageOfStatisticsPredicate = imageRule->GetDestinationsDetector(statistic);
@@ -828,13 +901,25 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     else
     {
       QString imageLabel = QString::fromStdString(image->GetName());
-      if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
-      {
-        auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
 
-        auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValue, 0);
-        // create the final statistics tree item
-        imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, isWIP, m_RootItem.get(), image);
+      // A failed computation has no time steps to list, so its row is the image row itself.
+      if ((statistic->GetTimeSteps() == 1 || isFailed) && maskFinding == m_MaskNodes.end())
+      {
+        // A pending or failed computation leaves the container without label values.
+        const auto labelValues = statistic->GetExistingLabelValues();
+
+        if (labelValues.empty())
+        {
+          imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, true, m_RootItem.get(), image);
+
+          if (isFailed)
+            imageItem->SetFailed(failureReason);
+        }
+        else
+        {
+          // create the final statistics tree item
+          imageItem = new QmitkImageStatisticsTreeItem(statistic->GetStatistics(labelValues.front(), 0), m_StatisticNames, imageLabel, isWIP, m_RootItem.get(), image);
+        }
       }
       else
       {
@@ -863,6 +948,9 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       {
         //all labels are empty -> no stats are computed
         maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, true, imageItem, image, mask);
+
+        if (isFailed)
+          maskItem->SetFailed(failureReason);
       }
       else if (statistic->GetTimeSteps() == 1 && !showLabelRows)
       {
@@ -886,10 +974,11 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
       imageItem->appendChild(maskItem);
     }
-    else
+    else if (!isFailed)
     {
       //no mask -> but multi time step
-      auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
+      const auto labelValues = statistic->GetExistingLabelValues();
+      auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
 
       AddTimeStepTreeItems(statistic, image, nullptr, labelValue, m_StatisticNames, isWIP, imageItem);
     }
@@ -940,9 +1029,19 @@ void QmitkImageStatisticsTreeModel::NodeChanged(const mitk::DataNode * changedNo
   }
 
   const auto* data = changedNode->GetData();
-  const bool isRelevantNode = isInputNode || (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(data));
+  const auto* statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(data);
+  const bool isRelevantNode = isInputNode || nullptr != statistics;
 
-  if (isRelevantNode && nullptr != data && m_BuildTime.GetMTime() < data->GetMTime())
+  if (!isRelevantNode || nullptr == data)
+    return;
+
+  // The generation status of statistics, e.g. a failure, is a property of the data and
+  // leaves the modification time of the data untouched.
+  const auto mTime = nullptr != statistics
+    ? std::max(data->GetMTime(), statistics->GetPropertyList()->GetMTime())
+    : data->GetMTime();
+
+  if (m_BuildTime.GetMTime() < mTime)
   {
     emit beginResetModel();
     this->UpdateByDataStorage();

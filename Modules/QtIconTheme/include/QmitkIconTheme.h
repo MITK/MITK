@@ -112,11 +112,29 @@ public:
   static QString GetSelectionColor();
 
   /**
-   * \brief Returns the color of the current theme's warnings, as its
+   * \brief Returns the text color of the current theme's warnings, as its
    *        "font.warning" rule declares it for rich text. Widgets that cannot
    *        use that rule (a plain label does not inherit it) read it here,
    *        as "#rrggbb" whatever notation the rule uses. Empty when the theme
    *        declares none or the declared value is not a valid color.
+   * \sa GetWarningColor()
+   */
+  static QString GetWarningTextColor();
+
+  /**
+   * \brief Returns the icon color for errors in the current theme.
+   *
+   * Pass it to GetIcon(const QByteArray&, const QString&) for an error icon
+   * that stands out in either theme.
+   *
+   * \return A CSS-compatible color string.
+   */
+  static QString GetErrorColor();
+
+  /**
+   * \brief Returns the icon color for warnings in the current theme.
+   * \return A CSS-compatible color string.
+   * \sa GetErrorColor(), GetWarningTextColor()
    */
   static QString GetWarningColor();
 

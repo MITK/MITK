@@ -11,9 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 /*
-  iconColor       = #c7c7c7 <- This line is parsed by MITK
-  iconAccentColor = #d4821e <- This line is parsed by MITK
-  selectionColor  = #1c97ea <- This line is parsed by MITK
+  iconColor        = #c7c7c7 <- This line is parsed by MITK
+  iconAccentColor  = #d4821e <- This line is parsed by MITK
+  iconErrorColor   = #ff6b6b <- This line is parsed by MITK
+  iconWarningColor = #ffb74d <- This line is parsed by MITK
+  selectionColor   = #1c97ea <- This line is parsed by MITK
 */
 
 font.warning {

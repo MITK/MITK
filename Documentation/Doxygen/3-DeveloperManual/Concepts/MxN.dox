@@ -33,10 +33,13 @@ one for each sync group.
 Unlike in the standard 4-window-view, in the MxN View each \ref QmitkRenderWindowWidget is
 extended with a \ref QmitkRenderWindowUtilityWidget. This widget takes the form of a bar
 at the top of the render window, with features including:
- - Selecting a view direction (i.e. "sagittal", "axial", "coronal")
  - Navigating along the current view axis via a \ref QmitkSliceNavigationWidget
  - Selecting a synchronization group
  - A \ref QmitkSynchronizedNodeSelectionWidget to change the shown selection of nodes, as well as their properties
+
+A cell's view direction and its render mode (a 2D slice or a 3D view) are not chosen in this
+bar but from the plane label the \ref QmitkMxNCellOverlay paints bottom-left, which opens the
+direction picker.
 
 When the sync group of a render window is changed, this signal will inform the \ref MxNConceptPage_MxNWidget
 of the change to handle the synchronization.

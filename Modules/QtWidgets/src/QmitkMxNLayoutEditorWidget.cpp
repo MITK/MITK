@@ -165,6 +165,7 @@ namespace
   constexpr int ChipHueRole = Qt::UserRole + 2;
   constexpr int ChipOffsetRole = Qt::UserRole + 3;
   constexpr int ChipHighlightRole = Qt::UserRole + 4;
+  constexpr int ChipNotApplicableRole = Qt::UserRole + 5;
 
   // Out-of-domain values the offset editors rest on when the selected cells
   // disagree, surfaced through specialValueText. An offset the user cannot mean,
@@ -202,7 +203,19 @@ namespace
       painter->setRenderHint(QPainter::Antialiasing, true);
 
       auto hue = index.data(ChipHueRole).value<QColor>();
-      if (hue.isValid())
+      if (index.data(ChipNotApplicableRole).toBool())
+      {
+        // The axis has no meaning for this window: a struck-through outline
+        // instead of a chip, whatever link the window keeps.
+        const QRect chip = option.rect.adjusted(2, 2, -2, -2);
+        const QColor ink = option.palette.color(QPalette::Mid);
+        painter->setPen(QPen(ink, 1, Qt::DashLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRoundedRect(QRectF(chip).adjusted(0.5, 0.5, -0.5, -0.5), 3, 3);
+        painter->setPen(ink);
+        painter->drawText(chip, Qt::AlignCenter, QObject::tr("n/a"));
+      }
+      else if (hue.isValid())
       {
         // A chip sharing the hovered synchronization brightens. A frame would be
         // invisible here - the chip is already filled in the group hue - and the
@@ -1570,13 +1583,22 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   // The group perspective speaks for several windows at once, so it marks that
   // an offset exists somewhere in the group but leaves the number to the
   // per-window surfaces, which can say whose it is.
-  const auto stateSlot = [total](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked,
-                                 bool anyOffset,
-                                 const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
+  // 'total' counts the members the axis applies to, so a group is not partial
+  // merely because a 3D member cannot take a 2D-only axis.
+  const bool hasMembers = !members.empty();
+  const auto stateSlot = [hasMembers](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked, int total,
+                                      bool anyOffset,
+                                      const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
   {
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
     slot.glyph = glyph;
-    if (linked > 0 && groupHue.isValid())
+    if (hasMembers && 0 == total)
+    {
+      slot.applicable = false;
+      slot.color = linked > 0 ? groupHue : QColor();
+      slot.tooltip = QObject::tr("%1 - not applicable to any window of the group").arg(label);
+    }
+    else if (linked > 0 && groupHue.isValid())
     {
       slot.color = groupHue;
       slot.partial = linked < total;
@@ -1599,6 +1621,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
     int linked = 0;
+    int applicableMembers = total;
     bool anyOffset = false;
     if (useCache)
     {
@@ -1606,18 +1629,32 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
     }
     else
     {
+      applicableMembers = 0;
+      int inactiveLinked = 0;
       for (const auto& windowId : members)
       {
+        const bool applicable = m_MultiWidget->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension));
+        applicableMembers += applicable ? 1 : 0;
         const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
         if (link.has_value() && link->group == group)
         {
+          if (!applicable)
+          {
+            ++inactiveLinked;
+            continue;
+          }
           ++linked;
           anyOffset = anyOffset
                       || !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty();
         }
       }
+      // An axis no member can take still shows the hue its kept links carry.
+      if (0 == applicableMembers)
+      {
+        linked = inactiveLinked;
+      }
     }
-    result.append(stateSlot(GlyphFor(dimension), hue, linked, anyOffset,
+    result.append(stateSlot(GlyphFor(dimension), hue, linked, applicableMembers, anyOffset,
                             QString::fromUtf8(DimensionLabel(dimension))));
     ++axisIndex;
   }
@@ -1639,7 +1676,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   }
   // Data selection has no offset to carry, so it never takes the footnote mark.
   result.append(
-    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, false, tr("Data selection")));
+    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, total, false, tr("Data selection")));
 
   return result;
 }
@@ -2201,8 +2238,10 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
       std::string group;
       QString offset;
       QString axisName;
+      bool applicable = true;
       try
       {
+        applicable = m_MultiWidget->IsAxisApplicable(windowId, *QmitkMxNSyncAxisFromSlot(column));
         if (column == dimensionCount)
         {
           // Data selection always resolves to a group - it has no unlinked
@@ -2224,6 +2263,26 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
       catch (const mitk::Exception&)
       {
         // Transient mid-layout-change state; the next engine signal refreshes.
+        continue;
+      }
+
+      // A not-applicable chip is neither shown as a group nor selectable, so
+      // the action bar never edits a link the window cannot use.
+      item->setData(ChipNotApplicableRole, !applicable);
+      const auto selectable = item->flags() | Qt::ItemIsSelectable;
+      item->setFlags(applicable ? selectable : selectable & ~Qt::ItemIsSelectable);
+      if (!applicable)
+      {
+        item->setSelected(false);
+        item->setData(ChipGroupRole, QString());
+        item->setData(ChipNameRole, QString());
+        item->setData(ChipHueRole, QColor());
+        item->setData(ChipOffsetRole, QString());
+        item->setText(QString());
+        item->setToolTip(group.empty()
+                           ? tr("%1: not applicable to 3D views").arg(axisName)
+                           : tr("%1: not applicable to 3D views (link to %2 kept)")
+                               .arg(axisName, QString::fromStdString(group)));
         continue;
       }
 
@@ -2307,6 +2366,7 @@ QmitkMxNLayoutEditorWidget::AdvancedMatrixCell(const QString& windowId, QmitkMxN
     content.group = item->data(ChipGroupRole).toString().toStdString();
     content.offset = item->data(ChipOffsetRole).toString();
     content.highlighted = item->data(ChipHighlightRole).toBool();
+    content.applicable = !item->data(ChipNotApplicableRole).toBool();
   }
   return content;
 }

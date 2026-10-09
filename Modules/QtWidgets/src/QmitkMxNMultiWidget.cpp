@@ -685,6 +685,9 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
   for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
   {
     this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+    // The cells outlive this destructor (the base class releases them), but
+    // their overlays query this editor; they go while it is still whole.
+    delete cell->findChild<QmitkMxNCellOverlay*>();
   }
 }
 
@@ -5180,6 +5183,11 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
     if (!slot.color.isValid())
     {
       slot.tooltip = tr("%1 - not linked").arg(label);
+    }
+    slot.applicable = this->IsDimensionApplicable(windowId, dimension);
+    if (!slot.applicable)
+    {
+      slot.tooltip = tr("%1 - not applicable to 3D views").arg(label);
     }
     axisSlots.append(slot);
   }

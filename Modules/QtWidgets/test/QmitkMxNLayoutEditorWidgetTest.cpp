@@ -172,6 +172,12 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Assign_ReplaceDropStartsTheOffsetFresh);
   MITK_TEST(Refresh_DeferredWhileApplyingLayout);
 
+  MITK_TEST(ThreeD_CellBarcodeMarksTwoDOnlyAxes);
+  MITK_TEST(ThreeD_BackToTwoDRestoresApplicabilityAndHues);
+  MITK_TEST(ThreeD_MatrixShowsNotApplicableChips);
+  MITK_TEST(ThreeD_GroupWithTwoDMemberIsSolidNotPartial);
+  MITK_TEST(ThreeD_AllThreeDGroupShowsNotApplicable);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -2442,6 +2448,87 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("No refresh while a layout is being applied", !cardWhileBusy);
     CPPUNIT_ASSERT_MESSAGE("The refresh runs once the load is over", nullptr != CardFor("x"));
+  }
+
+  static bool AppliesIn3D(QmitkMxNSyncAxis axis)
+  {
+    return QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
+  }
+
+  void ThreeD_CellBarcodeMarksTwoDOnlyAxes()
+  {
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    const auto axisSlots = m_Editor->BuildBarcodeSlots(CellId(0));
+
+    // The strip and the peek plate are positional: a 3D window keeps every slot.
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+    for (int slot = 0; slot < QmitkMxNSyncAxisCount; ++slot)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("slot " + std::to_string(slot),
+                                   AppliesIn3D(*QmitkMxNSyncAxisFromSlot(slot)), axisSlots[slot].applicable);
+    }
+    for (const auto& slot : m_Editor->BuildBarcodeSlots(CellId(1)))
+    {
+      CPPUNIT_ASSERT_MESSAGE("Every axis applies to a 2D window", slot.applicable);
+    }
+  }
+
+  void ThreeD_BackToTwoDRestoresApplicabilityAndHues()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    const auto panSlot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan);
+    const auto hue = m_Editor->BuildBarcodeSlots(CellId(0))[panSlot].color;
+    CPPUNIT_ASSERT(hue.isValid());
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT(!m_Editor->BuildBarcodeSlots(CellId(0))[panSlot].applicable);
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::TwoD);
+    const auto restored = m_Editor->BuildBarcodeSlots(CellId(0))[panSlot];
+    CPPUNIT_ASSERT(restored.applicable);
+    CPPUNIT_ASSERT_MESSAGE("The kept link shows its hue again", hue == restored.color);
+  }
+
+  void ThreeD_MatrixShowsNotApplicableChips()
+  {
+    this->RaiseAdvancedFace();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    Pump();
+
+    for (int slot = 0; slot < QmitkMxNSyncAxisCount; ++slot)
+    {
+      const auto axis = *QmitkMxNSyncAxisFromSlot(slot);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("slot " + std::to_string(slot), AppliesIn3D(axis),
+                                   m_Widget->AdvancedMatrixCell(CellId(0), axis).applicable);
+    }
+    CPPUNIT_ASSERT_MESSAGE("An n/a chip names no group, even with a kept link",
+                           m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Zoom).group.empty());
+    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(1), QmitkMxNSyncAxis::Zoom).applicable);
+  }
+
+  void ThreeD_GroupWithTwoDMemberIsSolidNotPartial()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+
+    const auto pan = m_Widget->BuildGroupBarcodeSlots("nav")[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan)];
+    CPPUNIT_ASSERT(pan.applicable);
+    CPPUNIT_ASSERT(pan.color.isValid());
+    CPPUNIT_ASSERT_MESSAGE("A 3D member does not make a 2D-only axis partial", !pan.partial);
+  }
+
+  void ThreeD_AllThreeDGroupShowsNotApplicable()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+
+    const auto groupSlots = m_Widget->BuildGroupBarcodeSlots("nav");
+    CPPUNIT_ASSERT(!groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan)].applicable);
+    CPPUNIT_ASSERT(groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)].applicable);
   }
 };
 

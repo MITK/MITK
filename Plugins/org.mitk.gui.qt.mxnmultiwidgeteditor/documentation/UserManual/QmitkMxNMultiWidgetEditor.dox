@@ -337,8 +337,9 @@
 	still scroll together (see \ref org_mitk_editors_mxnmultiwidget_Synchronization).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Slice_Selection Slice selection
-	Displayed data is typically 3D but each window view shows a 2D slice of the volume,
-	sliced along the window's "view direction" (or "anatomical plane"). The slice position
+	Displayed data is typically 3D. A window view shows either a 2D slice of the volume,
+	sliced along the window's "view direction" (or "anatomical plane"), or a 3D view of it
+	(see \ref org_mitk_editors_mxnmultiwidget_3DViews). In a 2D window the slice position
 	is set with the per-cell navigator (\ref org_mitk_editors_mxnmultiwidget_Navigator) or
 	by the mouse (e.g. mouse-wheel scrolling). The current position is shown bottom-left as
 	<tt>slice/total</tt> and as a tick on the bottom hairline.
@@ -346,9 +347,38 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_View_Direction View direction
 	Each window view "is looking in" one of the three view directions, "Axial", "Sagittal"
 	or "Coronal", shown as the plane label in the window's bottom-left corner. Click that
-	label to pick another anatomical plane. Changing the view direction resets the camera to
-	its default for the new plane (default zoom, centered position). When the window is in an
-	orientation group, the change propagates to the group's other windows.
+	label to pick another anatomical plane, or to switch the window between a 2D slice and
+	a 3D view. Changing the view direction resets the camera to its default for the new
+	plane (default zoom, centered position). When the window is in an orientation group,
+	the change propagates to the group's other windows.
+
+	A window loaded from a layout file can also show the data's own stacking direction; its
+	label then reads "Original". It stays so until another direction is picked; the picker
+	offers only the three anatomical planes.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_3DViews 3D views
+	A window can show a 3D view of the data instead of a slice: pick "3D view" from the plane
+	label or from "View direction" in the window's context menu, and "2D view" to return. A 3D
+	view shows what has a 3D representation - segmentations, surfaces and volume renderings;
+	plain images are not shown as slices in it. The label reads "3D | Axial" and so on.
+
+	A 3D view keeps the window's view direction: it looks at the data exactly as a 2D window
+	with the same direction does, from the same side and with the same edge up, also for data
+	acquired at an oblique angle. Rotating the camera with the mouse turns the direction into
+	"Free" ("3D | Free"); "Free" can also be picked directly. Picking a plane turns the camera
+	back. A "Free" view that is switched to 2D shows the plane it was looking at most
+	directly. A window linked on orientation always keeps its group's direction, so "Free" is
+	not offered there.
+
+	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,
+	the navigator's slice and position rows, the level/window readout and the colorbar
+	disappear; for time-resolved data the time readout and the navigator's time row stay.
+	The context menu leaves out "Set level/window..." and "Go to coordinate...".
+
+	Of the synchronization axes, a 3D view takes part in orientation and data selection
+	only; the others are drawn struck through ("not applicable") in its sync barcode and on
+	its window plate. A link the window had before it turned 3D is kept and takes effect again
+	when it returns to 2D.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
 	Window views are coupled per dimension:
@@ -373,7 +403,8 @@
 		<tr><td>Data selection</td><td>eye</td></tr>
 	</table>
 	A glyph drawn in a group's hue is linked to that group; a faint, uncolored one is not
-	linked.
+	linked. A glyph struck through has no meaning for the window - in a 3D view, every axis
+	but orientation and data selection - and does not synchronize, whatever link it keeps.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
 	The MxN Layout Editor is the authoritative view of the whole layout document: the

@@ -76,6 +76,12 @@ public:
     // perspective, which speaks for several windows at once and so can mark that
     // an offset exists but not say which.
     QString offsetText;
+
+    // The axis has no meaning for the window (e.g. slice in a 3D view). Drawn as
+    // a third state, struck through, whether or not a link is kept: a positional
+    // strip keeps the slot, so the axes sit at the same place in every window.
+    // A kept link's hue stays in 'color' and shows again once the axis applies.
+    bool applicable = true;
   };
 
   /**

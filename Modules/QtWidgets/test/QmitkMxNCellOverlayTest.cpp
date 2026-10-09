@@ -32,6 +32,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <nlohmann/json.hpp>
+
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
@@ -53,7 +55,9 @@ found in the LICENSE file.
  * frame's group identity follows the mono / complex rule over the cell's
  * per-dimension synchronization. The suite also covers how masked furniture
  * routes input (right click, wheel, lost grab, popups) and the mask's
- * lifecycle (resize, destruction). Presentation and animation are manual
+ * lifecycle (resize, destruction). A 3D cell names its render mode in the
+ * label, keeps only the time readout and navigator row, and its menus leave
+ * out what has no 3D meaning. Presentation and animation are manual
  * acceptance.
  */
 class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
@@ -77,6 +81,12 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Popup_ContextMenuDoesNotRevealTheFrame);
   MITK_TEST(LostGrab_LeavesTheColorbarDragWorking);
   MITK_TEST(LostGrab_EndsAStaleColorbarDrag);
+  MITK_TEST(PlaneLabel_NamesTheRenderModeAndFree);
+  MITK_TEST(PlaneLabel_OriginalIsNamed);
+  MITK_TEST(ThreeD_NoSliceReadoutOrNavigatorWithoutTime);
+  MITK_TEST(ThreeD_TimeOnlyReadoutAndNavigator);
+  MITK_TEST(ThreeD_ContextMenuLeavesOutTwoDEntries);
+  MITK_TEST(Picker_OffersTheOtherRenderModeAndFree);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -620,6 +630,134 @@ public:
 
     // Reaching here means the paint path did not crash across those branches.
     CPPUNIT_ASSERT(true);
+  }
+
+  void PlaneLabel_NamesTheRenderModeAndFree()
+  {
+    auto* overlay = this->Overlay(1);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Coronal);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Coronal"), overlay->PlaneLabel().toStdString());
+
+    m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Free"), overlay->PlaneLabel().toStdString());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
+    CPPUNIT_ASSERT_EQUAL(std::string("Coronal"), overlay->PlaneLabel().toStdString());
+  }
+
+  void PlaneLabel_OriginalIsNamed()
+  {
+    m_Editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__w0", "view_direction": "original", "links": { "selection": "main" } } ] }
+    })json"));
+    auto* overlay = m_Editor->GetRenderWindowWidget("mxn__w0")->findChild<QmitkMxNCellOverlay*>();
+    CPPUNIT_ASSERT(nullptr != overlay);
+    CPPUNIT_ASSERT_EQUAL(std::string("Original"), overlay->PlaneLabel().toStdString());
+  }
+
+  void ThreeD_NoSliceReadoutOrNavigatorWithoutTime()
+  {
+    this->ShowEditor();
+    CPPUNIT_ASSERT_MESSAGE("Precondition: a 2D cell has a slice readout", this->Overlay(1)->SliceReadoutRect().isValid());
+    CPPUNIT_ASSERT_MESSAGE("Precondition: a 2D cell has a navigator", this->Overlay(1)->NavigatorBandRect().isValid());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("No slice readout in 3D", !this->Overlay(1)->SliceReadoutRect().isValid());
+    CPPUNIT_ASSERT_MESSAGE("No navigator in 3D without time steps", !this->Overlay(1)->NavigatorBandRect().isValid());
+    CPPUNIT_ASSERT(this->Overlay(1)->IsThreeD());
+  }
+
+  void ThreeD_TimeOnlyReadoutAndNavigator()
+  {
+    const auto image4D = mitk::ImageGenerator::GenerateRandomImage<short>(16, 16, 8, 4);
+    for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        cell->GetRenderWindow()->GetVtkRenderWindow(), image4D->GetTimeGeometry());
+    }
+    this->ShowEditor();
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+
+    const auto twoDReadout = this->Overlay(0)->SliceReadoutRect();
+    const auto threeDReadout = this->Overlay(1)->SliceReadoutRect();
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell reads out the time", threeDReadout.isValid());
+    CPPUNIT_ASSERT_MESSAGE("...and only the time", threeDReadout.width() < twoDReadout.width());
+
+    const auto twoDBand = this->Overlay(0)->NavigatorBandRect();
+    const auto threeDBand = this->Overlay(1)->NavigatorBandRect();
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell navigates time", threeDBand.isValid());
+    CPPUNIT_ASSERT_MESSAGE("...in a single row", threeDBand.height() < twoDBand.height());
+  }
+
+  static QStringList ActionTexts(const QMenu& menu)
+  {
+    QStringList texts;
+    for (const auto* action : menu.actions())
+    {
+      if (!action->isSeparator())
+      {
+        texts.append(action->text());
+      }
+    }
+    return texts;
+  }
+
+  static const QAction* ActionNamed(const QMenu& menu, const QString& text)
+  {
+    for (const auto* action : menu.actions())
+    {
+      if (action->text() == text)
+      {
+        return action;
+      }
+    }
+    return nullptr;
+  }
+
+  void ThreeD_ContextMenuLeavesOutTwoDEntries()
+  {
+    QMenu twoDMenu;
+    this->Overlay(0)->PopulateContextMenu(&twoDMenu, QPoint());
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Set level/window...")));
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Go to coordinate...")));
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu threeDMenu;
+    this->Overlay(1)->PopulateContextMenu(&threeDMenu, QPoint());
+    const auto texts = ActionTexts(threeDMenu);
+    CPPUNIT_ASSERT_MESSAGE("No level/window in 3D", !texts.contains(QStringLiteral("Set level/window...")));
+    CPPUNIT_ASSERT_MESSAGE("No coordinate entry in 3D", !texts.contains(QStringLiteral("Go to coordinate...")));
+    const auto* reconverge = ActionNamed(threeDMenu, QStringLiteral("Re-converge sync groups"));
+    CPPUNIT_ASSERT(nullptr != reconverge);
+    CPPUNIT_ASSERT_MESSAGE("An inactive zoom link gives nothing to re-converge", !reconverge->isEnabled());
+  }
+
+  void Picker_OffersTheOtherRenderModeAndFree()
+  {
+    QMenu twoDMenu;
+    this->Overlay(0)->PopulateDirectionMenu(&twoDMenu);
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("3D view")));
+    CPPUNIT_ASSERT(!ActionTexts(twoDMenu).contains(QStringLiteral("Free")));
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu threeDMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&threeDMenu);
+    CPPUNIT_ASSERT(ActionTexts(threeDMenu).contains(QStringLiteral("2D view")));
+    const auto* free = ActionNamed(threeDMenu, QStringLiteral("Free"));
+    CPPUNIT_ASSERT(nullptr != free && free->isEnabled());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    QMenu linkedMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&linkedMenu);
+    const auto* linkedFree = ActionNamed(linkedMenu, QStringLiteral("Free"));
+    CPPUNIT_ASSERT(nullptr != linkedFree);
+    CPPUNIT_ASSERT_MESSAGE("An orientation-linked view cannot go free", !linkedFree->isEnabled());
+    CPPUNIT_ASSERT(!linkedFree->toolTip().isEmpty());
   }
 };
 

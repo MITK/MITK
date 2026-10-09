@@ -183,6 +183,13 @@
 	are only ever shortened by a width you set yourself - widen the view rather than
 	read an abbreviation.
 
+	A dashed "n/a" cell is a dimension that has no meaning for the window: a 3D view
+	synchronizes only orientation and data selection. Such a cell cannot be selected or
+	edited. A link the window had before it turned 3D is kept and takes effect again
+	once the window shows a 2D slice; its tooltip names the group. On the group cards,
+	a 3D member does not make a group's 2D-only dimension partial, and a dimension that
+	applies to none of the group's windows is drawn struck through.
+
 	This face exposes the complete layout-file link model, including couplings between
 	windows that are not adjacent on screen, and it is the deliberate way to author a
 	partial group state in which only some windows are linked on a dimension. Everyday

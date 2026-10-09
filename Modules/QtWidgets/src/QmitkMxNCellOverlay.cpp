@@ -381,6 +381,9 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
   // render - so repaint on the editor's link-change signal to keep it current.
   connect(m_Editor, &QmitkMxNMultiWidget::SyncLinksChanged, this, [this]()
   {
+    // A render-mode switch is announced here too, and changes which readouts
+    // the cell has before its next render does.
+    this->RefreshValues();
     this->UpdateInteractivity();
     this->update();
   });
@@ -505,7 +508,7 @@ QRect QmitkMxNCellOverlay::RenderWindowRect() const
 QRect QmitkMxNCellOverlay::RibbonRect() const
 {
   const QRect area = this->RenderWindowRect();
-  if (!area.isValid())
+  if (!area.isValid() || m_ThreeD)
   {
     return QRect();
   }
@@ -526,7 +529,9 @@ QRect QmitkMxNCellOverlay::SliceReadoutRect() const
     return QRect();
   }
 
-  if (m_SliceSteps == 0)
+  const bool showsSlice = m_SliceSteps > 0;
+  const bool showsTime = m_TimeSteps > 1 && (showsSlice || m_ThreeD);
+  if (!showsSlice && !showsTime)
   {
     return QRect();
   }
@@ -534,10 +539,14 @@ QRect QmitkMxNCellOverlay::SliceReadoutRect() const
   const QFontMetrics metrics(ReadoutFont(this->font()));
   const int lineHeight = metrics.height() + 4;
 
-  int width = metrics.horizontalAdvance(QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
-  if (m_TimeSteps > 1)
+  int width = 0;
+  if (showsSlice)
   {
-    width += ReadoutMargin + lineHeight
+    width = metrics.horizontalAdvance(QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
+  }
+  if (showsTime)
+  {
+    width += (showsSlice ? ReadoutMargin : 0) + lineHeight
       + metrics.horizontalAdvance(QStringLiteral(" %1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps));
   }
 
@@ -903,25 +912,38 @@ QString QmitkMxNCellOverlay::PlaneLabel() const
 
 QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
 {
-  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
-  if (nullptr == renderer)
+  // Read live from the editor, whose direction is the slice navigation
+  // controller's that every reorientation path writes, so a reorientation is
+  // reflected without a separate signal.
+  using ViewDirection = QmitkMxNMultiWidget::ViewDirection;
+  const auto windowId = m_Cell->GetWidgetName();
+  ViewDirection direction = ViewDirection::Axial;
+  bool threeD = false;
+  try
   {
-    return QString();
+    direction = m_Editor->GetViewDirection(windowId);
+    threeD = QmitkMxNMultiWidget::RenderMode::ThreeD == m_Editor->GetRenderMode(windowId);
+  }
+  catch (const mitk::Exception&)
+  {
+    return QString();  // the cell is being created or torn down
   }
 
-  // Read from the slice navigation controller that every reorientation path
-  // writes, so a reorientation is reflected without a separate signal.
-  if (auto* sliceNavigation = renderer->GetSliceNavigationController())
+  QString name;
+  switch (direction)
   {
-    switch (sliceNavigation->GetDefaultViewDirection())
-    {
-      case mitk::AnatomicalPlane::Axial:    return QStringLiteral("Axial");
-      case mitk::AnatomicalPlane::Coronal:  return QStringLiteral("Coronal");
-      case mitk::AnatomicalPlane::Sagittal: return QStringLiteral("Sagittal");
-      default: break;  // 'Original' has no fixed anatomical name
-    }
+    case ViewDirection::Axial:    name = QStringLiteral("Axial"); break;
+    case ViewDirection::Coronal:  name = QStringLiteral("Coronal"); break;
+    case ViewDirection::Sagittal: name = QStringLiteral("Sagittal"); break;
+    case ViewDirection::Original: name = QStringLiteral("Original"); break;
+    case ViewDirection::Free:     name = QStringLiteral("Free"); break;
   }
-  return QString();
+  return threeD ? QStringLiteral("3D | ") + name : name;
+}
+
+bool QmitkMxNCellOverlay::IsThreeD() const
+{
+  return m_ThreeD;
 }
 
 void QmitkMxNCellOverlay::SetNavigatorExpanded(bool expanded)
@@ -999,11 +1021,15 @@ std::vector<QmitkMxNCellOverlay::NavRow> QmitkMxNCellOverlay::NavigatorRows() co
     return rows;
   }
 
-  rows.push_back({ NavRow::Kind::Slice, this->NavigatorDepthLabel(), 0.0 });
-  if (m_NavigatorExpanded)
+  // A 3D cell has no slice and no plane to move in; only time navigates it.
+  if (!m_ThreeD)
   {
-    rows.push_back({ NavRow::Kind::InPlaneRight, tr("Horiz."), 0.0 });
-    rows.push_back({ NavRow::Kind::InPlaneUp, tr("Vert."), 0.0 });
+    rows.push_back({ NavRow::Kind::Slice, this->NavigatorDepthLabel(), 0.0 });
+    if (m_NavigatorExpanded)
+    {
+      rows.push_back({ NavRow::Kind::InPlaneRight, tr("Horiz."), 0.0 });
+      rows.push_back({ NavRow::Kind::InPlaneUp, tr("Vert."), 0.0 });
+    }
   }
   if (m_TimeSteps > 1)
   {
@@ -1014,7 +1040,7 @@ std::vector<QmitkMxNCellOverlay::NavRow> QmitkMxNCellOverlay::NavigatorRows() co
   mitk::Point3D origin;
   mitk::Vector3D rightUnit, upUnit;
   double extentRight = 0.0, extentUp = 0.0, rightCoord = 0.0, upCoord = 0.0;
-  const bool hasPlane = m_NavigatorExpanded
+  const bool hasPlane = m_NavigatorExpanded && !m_ThreeD
     && this->NavigatorInPlaneState(origin, rightUnit, upUnit, extentRight, extentUp, rightCoord, upCoord);
 
   // The label column is only as wide as the widest label, capped so a long
@@ -1071,17 +1097,22 @@ QRect QmitkMxNCellOverlay::NavigatorBandRect() const
     return QRect();
   }
 
-  int rowCount = m_NavigatorExpanded ? 3 : 1;  // depth [+ H + V]
+  const bool spatialRows = !m_ThreeD;
+  int rowCount = spatialRows ? (m_NavigatorExpanded ? 3 : 1) : 0;  // depth [+ H + V]
   if (m_TimeSteps > 1)
   {
     ++rowCount;  // time row
+  }
+  if (0 == rowCount)
+  {
+    return QRect();
   }
 
   const QFontMetrics metrics(ReadoutFont(this->font()));
   const int readoutLineHeight = metrics.height() + 4;
   // Clear the two always-on bottom-left readout lines and the hairline.
   const int passiveBottom = ReadoutMargin + 2 * readoutLineHeight + LineGap;
-  const int coordExtra = m_NavigatorExpanded ? (NavRowGap + NavRowHeight) : 0;
+  const int coordExtra = (spatialRows && m_NavigatorExpanded) ? (NavRowGap + NavRowHeight) : 0;
   const int bandHeight = rowCount * NavRowHeight + (rowCount - 1) * NavRowGap + coordExtra;
 
   const int bandBottom = area.bottom() - passiveBottom - NavRowGap;
@@ -1102,7 +1133,7 @@ QRect QmitkMxNCellOverlay::NavigatorBandRect() const
 
 QRect QmitkMxNCellOverlay::CoordinateLineRect() const
 {
-  if (!m_NavigatorExpanded)
+  if (!m_NavigatorExpanded || m_ThreeD)
   {
     return QRect();
   }
@@ -1394,13 +1425,18 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   const int insetBottom = qRound(ColorbarInsetBottom * m_RevealProgress);
   const QRect ribbon(area.right() - ribbonWidth + 1, area.top() + insetTop,
                      ribbonWidth, area.height() - insetTop - insetBottom);
-  if (!m_LutStrip.isNull())
+  // No image plane in 3D, so no intensity scale; the rest of the cluster
+  // stays away with the level window it reads.
+  if (!m_ThreeD)
   {
-    painter.drawImage(ribbon, m_LutStrip);
-  }
-  else
-  {
-    painter.fillRect(ribbon, QColor(255, 255, 255, 40));
+    if (!m_LutStrip.isNull())
+    {
+      painter.drawImage(ribbon, m_LutStrip);
+    }
+    else
+    {
+      painter.fillRect(ribbon, QColor(255, 255, 255, 40));
+    }
   }
 
   // Value tick scale left of the widened bar: labels on a few evenly-spaced
@@ -1522,22 +1558,22 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
         const QString sliceText = QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps);
         painter.drawText(QRect(x, line2.top(), metrics.horizontalAdvance(sliceText), line2.height()),
                          Qt::AlignLeft | Qt::AlignVCenter, sliceText);
-        x += metrics.horizontalAdvance(sliceText);
+        x += metrics.horizontalAdvance(sliceText) + ReadoutMargin;
+      }
 
-        // Time rides the same line, prefixed by a small clock glyph.
-        if (m_TimeSteps > 1)
-        {
-          x += ReadoutMargin;
-          const int glyph = metrics.height();
-          painter.setRenderHint(QPainter::Antialiasing, true);
-          DrawClockGlyph(painter, QRect(x, line2.top() + (line2.height() - glyph) / 2, glyph, glyph), IdleText);
-          painter.setRenderHint(QPainter::Antialiasing, false);
-          x += glyph + 2;
-          const QString timeText = QStringLiteral("%1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps);
-          painter.setPen(IdleText);
-          painter.drawText(QRect(x, line2.top(), metrics.horizontalAdvance(timeText), line2.height()),
-                           Qt::AlignLeft | Qt::AlignVCenter, timeText);
-        }
+      // Time rides the same line, prefixed by a small clock glyph; a 3D cell
+      // shows it alone.
+      if (m_TimeSteps > 1)
+      {
+        const int glyph = metrics.height();
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        DrawClockGlyph(painter, QRect(x, line2.top() + (line2.height() - glyph) / 2, glyph, glyph), IdleText);
+        painter.setRenderHint(QPainter::Antialiasing, false);
+        x += glyph + 2;
+        const QString timeText = QStringLiteral("%1/%2").arg(m_TimePosition + 1).arg(m_TimeSteps);
+        painter.setPen(IdleText);
+        painter.drawText(QRect(x, line2.top(), metrics.horizontalAdvance(timeText), line2.height()),
+                         Qt::AlignLeft | Qt::AlignVCenter, timeText);
       }
     }
   }
@@ -1743,7 +1779,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   const auto paintGlyph = [&](int axis)
   {
     const auto& axisSlot = axisSlots[axis];
-    const bool synced = axisSlot.color.isValid();
+    const bool synced = axisSlot.color.isValid() && axisSlot.applicable;
     // The two carriers are kept independent: opacity says whether this window
     // synchronizes the axis, size says which axis the pointer is on. That lets
     // one row be read either way round - the window's whole coupling at a
@@ -1764,14 +1800,21 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
         painter.drawPixmap(QRectF(box).center() - QPointF(stickerSize.width(), stickerSize.height()) / 2,
                            sticker);
       }
-      return;
     }
-    const QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx, dpr);
-    if (glyph.isNull())
+    else
     {
-      return;
+      const QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx, dpr);
+      if (!glyph.isNull())
+      {
+        painter.drawPixmap(box.topLeft(), glyph);
+      }
     }
-    painter.drawPixmap(box.topLeft(), glyph);
+    if (!axisSlot.applicable)
+    {
+      // Struck through like the strip's slot, apart from "not linked".
+      painter.setPen(QPen(PeekAbsentGlyph, 1.5));
+      painter.drawLine(QRectF(box).bottomLeft(), QRectF(box).topRight());
+    }
   };
   for (int axis = 0; axis < PeekAxisCount; ++axis)
   {
@@ -1852,7 +1895,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   const auto paintValue = [&](int axis)
   {
     const auto& axisSlot = axisSlots[axis];
-    if (axisSlot.offsetText.isEmpty() || !axisSlot.color.isValid())
+    if (axisSlot.offsetText.isEmpty() || !axisSlot.color.isValid() || !axisSlot.applicable)
     {
       return;
     }
@@ -2582,6 +2625,56 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
       }
     });
   }
+
+  using RenderMode = QmitkMxNMultiWidget::RenderMode;
+  RenderMode renderMode = RenderMode::TwoD;
+  try
+  {
+    renderMode = m_Editor->GetRenderMode(windowId);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
+
+  if (RenderMode::ThreeD == renderMode)
+  {
+    auto* freeAction = menu->addAction(tr("Free"));
+    // An orientation-linked cell takes its group's direction.
+    if (const auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation); link.has_value())
+    {
+      freeAction->setEnabled(false);
+      freeAction->setToolTip(tr("Not available while the view is linked on orientation (group %1)")
+                               .arg(QString::fromStdString(m_Editor->GetSyncGroupDisplayName(link->group))));
+      menu->setToolTipsVisible(true);
+    }
+    connect(freeAction, &QAction::triggered, this, [this, windowId]()
+    {
+      try
+      {
+        m_Editor->SetViewDirection(windowId, QmitkMxNMultiWidget::ViewDirection::Free);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "View direction ignored: " << e.GetDescription();
+      }
+    });
+  }
+
+  menu->addSeparator();
+  const auto otherMode = RenderMode::ThreeD == renderMode ? RenderMode::TwoD : RenderMode::ThreeD;
+  auto* modeAction = menu->addAction(RenderMode::ThreeD == otherMode ? tr("3D view") : tr("2D view"));
+  connect(modeAction, &QAction::triggered, this, [this, windowId, otherMode]()
+  {
+    try
+    {
+      m_Editor->SetRenderMode(windowId, otherMode);
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Render mode ignored: " << e.GetDescription();
+    }
+  });
 }
 
 void QmitkMxNCellOverlay::OpenDirectionPicker(const QPoint& globalPosition)
@@ -2641,7 +2734,10 @@ void QmitkMxNCellOverlay::RefreshValues()
     return;
   }
 
-  const auto node = this->ResolveTopImageNode();
+  // A 3D cell's slice navigation controller still has steps, and its image
+  // nodes still a level window; neither is shown in a 3D view.
+  const bool threeD = mitk::BaseRenderer::Standard3D == renderer->GetMapperID();
+  const auto node = threeD ? mitk::DataNode::Pointer() : this->ResolveTopImageNode();
 
   mitk::LevelWindow levelWindow;
   const bool hasLevelWindow = node.IsNotNull() && node->GetLevelWindow(levelWindow, renderer);
@@ -2662,7 +2758,7 @@ void QmitkMxNCellOverlay::RefreshValues()
 
   unsigned int slicePosition = 0;
   unsigned int sliceSteps = 0;
-  if (auto* sliceStepper = renderer->GetSliceNavigationController()->GetStepper())
+  if (auto* sliceStepper = renderer->GetSliceNavigationController()->GetStepper(); !threeD && nullptr != sliceStepper)
   {
     slicePosition = sliceStepper->GetPos();
     sliceSteps = sliceStepper->GetSteps();
@@ -2682,7 +2778,7 @@ void QmitkMxNCellOverlay::RefreshValues()
     }
   }
 
-  const bool changed = node != m_TopNode || hasLevelWindow != m_HasLevelWindow
+  const bool changed = threeD != m_ThreeD || node != m_TopNode || hasLevelWindow != m_HasLevelWindow
     || lutMTime != m_LutMTime
     || slicePosition != m_SlicePosition || sliceSteps != m_SliceSteps
     || timePosition != m_TimePosition || timeSteps != m_TimeSteps
@@ -2695,6 +2791,7 @@ void QmitkMxNCellOverlay::RefreshValues()
     return;
   }
 
+  m_ThreeD = threeD;
   m_TopNode = node;
   m_HasLevelWindow = hasLevelWindow;
   if (hasLevelWindow)
@@ -3305,19 +3402,25 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   {
     return;
   }
-  const auto windowId = m_Cell->GetWidgetName();
 
   QMenu menu;  // No parent, see OpenColormapMenu.
+  this->PopulateContextMenu(&menu, globalPosition);
+  menu.exec(globalPosition);
+}
 
-  this->PopulateDirectionMenu(menu.addMenu(tr("View direction")));
+void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalPosition)
+{
+  const auto windowId = m_Cell->GetWidgetName();
+
+  this->PopulateDirectionMenu(menu->addMenu(tr("View direction")));
 
   // The furniture's own entry points - the Data button, the W/L readout, the
   // navigator's coordinate line - are pointer-only and hidden until revealed;
   // these make them reachable from a keyboard-opened menu too. Each opens a
   // popup of its own, so it waits until this menu has closed.
-  menu.addSeparator();
+  menu->addSeparator();
 
-  auto* dataAction = menu.addAction(tr("Data..."));
+  auto* dataAction = menu->addAction(tr("Data..."));
   connect(dataAction, &QAction::triggered, this, [this, globalPosition]()
   {
     QTimer::singleShot(0, this, [this, globalPosition]()
@@ -3329,22 +3432,28 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     });
   });
 
-  auto* levelWindowAction = menu.addAction(tr("Set level/window..."));
-  levelWindowAction->setEnabled(m_TopNode.IsNotNull());
-  connect(levelWindowAction, &QAction::triggered, this, [this, globalPosition]()
+  if (m_Editor->IsAxisApplicable(windowId, QmitkMxNSyncAxis::Windowing))
   {
-    QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenNumericEntry(globalPosition); });
-  });
+    auto* levelWindowAction = menu->addAction(tr("Set level/window..."));
+    levelWindowAction->setEnabled(m_TopNode.IsNotNull());
+    connect(levelWindowAction, &QAction::triggered, this, [this, globalPosition]()
+    {
+      QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenNumericEntry(globalPosition); });
+    });
+  }
 
-  auto* coordinateAction = menu.addAction(tr("Go to coordinate..."));
-  connect(coordinateAction, &QAction::triggered, this, [this, globalPosition]()
+  if (m_Editor->IsAxisApplicable(windowId, QmitkMxNSyncAxis::Crosshair))
   {
-    QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenCoordinateEntry(globalPosition); });
-  });
+    auto* coordinateAction = menu->addAction(tr("Go to coordinate..."));
+    connect(coordinateAction, &QAction::triggered, this, [this, globalPosition]()
+    {
+      QTimer::singleShot(0, this, [this, globalPosition]() { this->OpenCoordinateEntry(globalPosition); });
+    });
+  }
 
-  menu.addSeparator();
+  menu->addSeparator();
 
-  auto* reinitAction = menu.addAction(tr("Fit group views to visible data"));
+  auto* reinitAction = menu->addAction(tr("Fit group views to visible data"));
   connect(reinitAction, &QAction::triggered, this, [this, windowId]()
   {
     try
@@ -3357,7 +3466,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     }
   });
 
-  auto* reconvergeAction = menu.addAction(tr("Re-converge sync groups"));
+  auto* reconvergeAction = menu->addAction(tr("Re-converge sync groups"));
   bool hasOffsetLink = false;
   for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
                                 QmitkMxNSyncDimension::Pan })
@@ -3388,7 +3497,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     }
   });
 
-  menu.addSeparator();
+  menu->addSeparator();
 
   // The MxN utility strip covers the built-in render-window menu, so the two
   // controls of that menu that still mean something for a cell whose
@@ -3396,7 +3505,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   // No icons on the checkable entries: a style draws the check mark and the icon
   // in the same column, so an icon silently replaces the tick and the state
   // stops being readable. The strip carries the icons; the menu carries state.
-  auto* maximizeAction = menu.addAction(tr("Maximized"));
+  auto* maximizeAction = menu->addAction(tr("Maximized"));
   maximizeAction->setCheckable(true);
   maximizeAction->setChecked(m_Editor->GetMaximizedCell() == windowId);
   connect(maximizeAction, &QAction::toggled, this, [this, windowId](bool maximized)
@@ -3404,7 +3513,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     m_Editor->SetMaximizedCell(maximized ? windowId : QString());
   });
 
-  auto* crosshairAction = menu.addAction(tr("Show crosshair"));
+  auto* crosshairAction = menu->addAction(tr("Show crosshair"));
   crosshairAction->setCheckable(true);
   crosshairAction->setChecked(m_Editor->GetCrosshairVisibility());
   connect(crosshairAction, &QAction::toggled, this, [this](bool visible)
@@ -3412,7 +3521,7 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     m_Editor->SetCrosshairVisibility(visible);
   });
 
-  auto* cleanViewAction = menu.addAction(tr("Clean view"));
+  auto* cleanViewAction = menu->addAction(tr("Clean view"));
   cleanViewAction->setShortcut(QmitkMxNMultiWidget::CleanViewShortcut());
   cleanViewAction->setShortcutVisibleInContextMenu(true);
   cleanViewAction->setCheckable(true);
@@ -3422,21 +3531,19 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     m_Editor->SetCleanView(cleanView);
   });
 
-  menu.addSeparator();
+  menu->addSeparator();
 
-  auto* editorAction = menu.addAction(tr("Open layout editor"));
+  auto* editorAction = menu->addAction(tr("Open layout editor"));
   connect(editorAction, &QAction::triggered, this, [this]()
   {
     m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
   });
 
-  auto* expandedNavigatorAction = menu.addAction(tr("Expanded navigator"));
+  auto* expandedNavigatorAction = menu->addAction(tr("Expanded navigator"));
   expandedNavigatorAction->setCheckable(true);
   expandedNavigatorAction->setChecked(m_Editor->IsNavigatorExpanded());
   connect(expandedNavigatorAction, &QAction::toggled, this, [this](bool expanded)
   {
     m_Editor->SetNavigatorExpanded(expanded);
   });
-
-  menu.exec(globalPosition);
 }

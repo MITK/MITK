@@ -215,6 +215,7 @@ public:
     std::string group;
     QString offset;
     bool highlighted = false;
+    bool applicable = true;  // false: the axis has no meaning for the window (n/a chip)
   };
   MatrixCellContent AdvancedMatrixCell(const QString& windowId, QmitkMxNSyncAxis axis) const;
 

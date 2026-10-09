@@ -332,8 +332,7 @@ private:
     std::mutex m_Mutex;
     std::unique_ptr<QmitkImageStatisticsTreeItem> m_RootItem;
     QIcon m_WIPIcon;
-    QIcon m_LightThemeErrorIcon;
-    QIcon m_DarkThemeErrorIcon;
+    QIcon m_ErrorIcon;
     itk::TimeStamp m_BuildTime;
 
     bool m_IgnoreZeroValueVoxel = false;

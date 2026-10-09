@@ -83,7 +83,8 @@ class QmitkIconThemeTestSuite : public mitk::TestFixture
   MITK_TEST(RefreshEmitsChanged);
   MITK_TEST(ColorsFollowRefresh);
   MITK_TEST(SelectionColorIsEmptyUnlessTheThemeDefinesOne);
-  MITK_TEST(WarningColorIsReadFromTheWarningRule);
+  MITK_TEST(WarningTextColorIsReadFromTheWarningRule);
+  MITK_TEST(ErrorAndWarningColorsFollowRefresh);
   MITK_TEST(DarkThemeHasLightIcons);
   MITK_TEST(RendersAtTheRequestedSize);
   MITK_TEST(RendersInDevicePixels);
@@ -200,30 +201,49 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("#1c97ea"), QmitkIconTheme::GetSelectionColor().toStdString());
   }
 
-  void WarningColorIsReadFromTheWarningRule()
+  void WarningTextColorIsReadFromTheWarningRule()
   {
     ApplyTheme("#123456", "#abcdef");
-    CPPUNIT_ASSERT_MESSAGE("No warning rule, no warning colour", QmitkIconTheme::GetWarningColor().isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("No warning rule, no warning colour", QmitkIconTheme::GetWarningTextColor().isEmpty());
 
     qApp->setStyleSheet(QStringLiteral("/*\n  iconColor = #123456\n*/\n"
                                        "font.warning {\n  color: #ff5c33;\n  font-weight: bold;\n}\n"));
     QmitkIconTheme::Refresh();
-    CPPUNIT_ASSERT_EQUAL(std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("#ff5c33"), QmitkIconTheme::GetWarningTextColor().toStdString());
 
     // The light theme names its warning colour.
     qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: red;\n  font-weight: bold;\n}\n"));
     QmitkIconTheme::Refresh();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A named colour is read and normalized",
-                                 std::string("#ff0000"), QmitkIconTheme::GetWarningColor().toStdString());
+                                 std::string("#ff0000"), QmitkIconTheme::GetWarningTextColor().toStdString());
 
     qApp->setStyleSheet(QStringLiteral("font.warning {\n  background-color: #000000;\n  color: #ff5c33;\n}\n"));
     QmitkIconTheme::Refresh();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("background-color is not the text colour",
-                                 std::string("#ff5c33"), QmitkIconTheme::GetWarningColor().toStdString());
+                                 std::string("#ff5c33"), QmitkIconTheme::GetWarningTextColor().toStdString());
 
     qApp->setStyleSheet(QStringLiteral("font.warning {\n  color: nonsense;\n}\n"));
     QmitkIconTheme::Refresh();
-    CPPUNIT_ASSERT_MESSAGE("An invalid colour reads as none", QmitkIconTheme::GetWarningColor().isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("An invalid colour reads as none", QmitkIconTheme::GetWarningTextColor().isEmpty());
+  }
+
+  void ErrorAndWarningColorsFollowRefresh()
+  {
+    // Without declaration, as in an application without the workbench style sheets
+    CPPUNIT_ASSERT_EQUAL(std::string("#c62828"), QmitkIconTheme::GetErrorColor().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("#b26a00"), QmitkIconTheme::GetWarningColor().toStdString());
+
+    int count = 0;
+    const auto connection = QObject::connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, [&count] { ++count; });
+
+    qApp->setStyleSheet(QStringLiteral("/*\n  iconErrorColor = #123456\n  iconWarningColor = #abcdef\n*/\n"));
+    QmitkIconTheme::Refresh();
+
+    QObject::disconnect(connection);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("#123456"), QmitkIconTheme::GetErrorColor().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("#abcdef"), QmitkIconTheme::GetWarningColor().toStdString());
+    CPPUNIT_ASSERT_EQUAL(1, count);
   }
 
   void DarkThemeHasLightIcons()

@@ -102,16 +102,16 @@ namespace
     return std::clamp(SIGNIFICANT_DIGITS - 1 - magnitude, MIN_DECIMALS, MAX_DECIMALS);
   }
 
-  /** In the error colors of QmitkInfoCard instead of the icon color of the theme, so that a
-  failed computation stands out in either theme. */
-  QIcon CreateErrorIcon(bool darkTheme)
+  /** In the error color instead of the icon color of the theme, so that a failed computation
+  stands out. */
+  QIcon CreateErrorIcon()
   {
     QFile file(QStringLiteral(":/Qmitk/error.svg"));
 
     if (!file.open(QIODevice::ReadOnly))
       mitkThrow() << "Could not open resource \":/Qmitk/error.svg\"!";
 
-    return QmitkIconTheme::GetIcon(file.readAll(), darkTheme ? QStringLiteral("#ff6b6b") : QStringLiteral("#c62828"));
+    return QmitkIconTheme::GetIcon(file.readAll(), QmitkIconTheme::GetErrorColor());
   }
 
   /** Decimal places are chosen per column instead of per value: all values of a column then
@@ -241,8 +241,13 @@ QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : 
 {
   m_RootItem = std::make_unique<QmitkImageStatisticsTreeItem>();
   m_WIPIcon = QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg"));
-  m_LightThemeErrorIcon = CreateErrorIcon(false);
-  m_DarkThemeErrorIcon = CreateErrorIcon(true);
+  m_ErrorIcon = CreateErrorIcon();
+
+  // Unlike icons in the icon color, an icon in a fixed color does not follow a theme switch.
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]()
+  {
+    m_ErrorIcon = CreateErrorIcon();
+  });
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
@@ -317,7 +322,7 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   else if (role == Qt::DecorationRole && index.column() == 0)
   {
     if (item->isFailed())
-      return QVariant(QmitkIconTheme::IsDarkTheme() ? m_DarkThemeErrorIcon : m_LightThemeErrorIcon);
+      return QVariant(m_ErrorIcon);
     else if (item->isWIP() && item->childCount() == 0)
       return QVariant(m_WIPIcon);
     else if (!item->isWIP())

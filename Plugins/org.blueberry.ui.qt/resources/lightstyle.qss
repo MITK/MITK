@@ -1,6 +1,8 @@
 /*
-  iconColor       = #000000 <- This line is parsed by MITK
-  iconAccentColor = #2067bd <- This line is parsed by MITK
+  iconColor        = #000000 <- This line is parsed by MITK
+  iconAccentColor  = #2067bd <- This line is parsed by MITK
+  iconErrorColor   = #c62828 <- This line is parsed by MITK
+  iconWarningColor = #b26a00 <- This line is parsed by MITK
 */
 
 font.warning {

@@ -1402,7 +1402,7 @@ void QmitkMxNLayoutEditorWidget::UpdateArrangeHint()
   const bool maximized = !m_MultiWidget.isNull() && !m_MultiWidget->GetMaximizedCell().isEmpty();
   // While maximized the hint is a warning - windows the user may mean to
   // arrange are out of reach - so it takes the theme's warning styling.
-  const QString warningColor = QmitkIconTheme::GetWarningColor();
+  const QString warningColor = QmitkIconTheme::GetWarningTextColor();
   m_ArrangeHint->setStyleSheet(!maximized ? QString()
                                : warningColor.isEmpty() ? QStringLiteral("font-weight: bold;")
                                : QStringLiteral("color: %1; font-weight: bold;").arg(warningColor));

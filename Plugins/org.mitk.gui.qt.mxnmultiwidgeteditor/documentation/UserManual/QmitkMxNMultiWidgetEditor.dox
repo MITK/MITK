@@ -372,18 +372,31 @@
 	A 3D view linked on orientation always keeps its group's direction and turns with the
 	group's other windows, 2D or 3D. The mouse does not rotate it, while pan and zoom still
 	work; its label reads e.g. "3D | Coronal (locked)", and the label's tooltip names the
-	group. "Free" is not offered there. A "Free" view that joins an orientation group turns
-	to the group's direction.
+	group. A "Free" view that joins such a group turns to the group's direction.
+
+	An orientation group of 3D views only can also turn "Free" as a whole: pick "Free" in
+	one of them. Rotating any member with the mouse then rotates all of them alike, and a
+	3D view that joins the group takes its camera direction. A 2D window cannot join a
+	"Free" group, and "Free" is not offered while the group has a 2D window; a member that
+	is switched to 2D leaves the group.
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,
 	the navigator's slice and position rows, the level/window readout and the colorbar
 	disappear; for time-resolved data the time readout and the navigator's time row stay.
 	The context menu leaves out "Set level/window..." and "Go to coordinate...".
 
-	Of the synchronization axes, a 3D view takes part in orientation and data selection
-	only; the others are drawn struck through ("not applicable") in its sync barcode and on
-	its window plate. A link the window had before it turned 3D is kept and takes effect again
-	when it returns to 2D.
+	Of the synchronization axes, a 3D view takes part in pan, zoom, orientation and data
+	selection; slice, crosshair, level/window and colormap are drawn struck through ("not
+	applicable") in its sync barcode and on its window plate. A link the window had before it
+	turned 3D is kept and takes effect again when it returns to 2D.
+
+	Pan and zoom couple 2D and 3D views both ways. Zooming a 3D view (mouse wheel or right
+	drag) zooms the members of its zoom group by the same factor, and a 3D view in a zoom
+	group shows as much of the data as the group's 2D windows. Panning a 3D view (middle drag)
+	moves the members of its pan group the same distance; a 2D window follows the part of the
+	move that lies in its plane. Pan stays relative for 3D views: joining a pan group or
+	"Re-converge sync groups" never moves a 3D camera, so a 3D view keeps looking at its own
+	center.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
 	Window views are coupled per dimension:
@@ -408,8 +421,8 @@
 		<tr><td>Data selection</td><td>eye</td></tr>
 	</table>
 	A glyph drawn in a group's hue is linked to that group; a faint, uncolored one is not
-	linked. A glyph struck through has no meaning for the window - in a 3D view, every axis
-	but orientation and data selection - and does not synchronize, whatever link it keeps.
+	linked. A glyph struck through has no meaning for the window - in a 3D view, slice,
+	crosshair, level/window and colormap - and does not synchronize, whatever link it keeps.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
 	The MxN Layout Editor is the authoritative view of the whole layout document: the

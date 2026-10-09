@@ -88,6 +88,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_TimeOnlyReadoutAndNavigator);
   MITK_TEST(ThreeD_ContextMenuLeavesOutTwoDEntries);
   MITK_TEST(Picker_OffersTheOtherRenderModeAndFree);
+  MITK_TEST(PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -743,7 +744,8 @@ public:
     CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Set level/window...")));
     CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Go to coordinate...")));
 
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
     m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
     QMenu threeDMenu;
     this->Overlay(1)->PopulateContextMenu(&threeDMenu, QPoint());
@@ -752,7 +754,14 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No coordinate entry in 3D", !texts.contains(QStringLiteral("Go to coordinate...")));
     const auto* reconverge = ActionNamed(threeDMenu, QStringLiteral("Re-converge sync groups"));
     CPPUNIT_ASSERT(nullptr != reconverge);
-    CPPUNIT_ASSERT_MESSAGE("An inactive zoom link gives nothing to re-converge", !reconverge->isEnabled());
+    CPPUNIT_ASSERT_MESSAGE("An inactive slice link and the relative pan of a 3D view give nothing to re-converge",
+                           !reconverge->isEnabled());
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    QMenu zoomMenu;
+    this->Overlay(1)->PopulateContextMenu(&zoomMenu, QPoint());
+    CPPUNIT_ASSERT_MESSAGE("A 3D view converges on zoom",
+                           ActionNamed(zoomMenu, QStringLiteral("Re-converge sync groups"))->isEnabled());
   }
 
   void Picker_OffersTheOtherRenderModeAndFree()
@@ -775,8 +784,56 @@ public:
     this->Overlay(1)->PopulateDirectionMenu(&linkedMenu);
     const auto* linkedFree = ActionNamed(linkedMenu, QStringLiteral("Free"));
     CPPUNIT_ASSERT(nullptr != linkedFree);
-    CPPUNIT_ASSERT_MESSAGE("An orientation-linked view cannot go free", !linkedFree->isEnabled());
+    CPPUNIT_ASSERT_MESSAGE("A view sharing its orientation group with a 2D view cannot go free",
+                           !linkedFree->isEnabled());
     CPPUNIT_ASSERT(!linkedFree->toolTip().isEmpty());
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu allThreeDMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&allThreeDMenu);
+    CPPUNIT_ASSERT_MESSAGE("An all-3D orientation group may go free",
+                           ActionNamed(allThreeDMenu, QStringLiteral("Free"))->isEnabled());
+  }
+
+  /** Counts the paint events a widget receives. */
+  class PaintCounter : public QObject
+  {
+  public:
+    int count = 0;
+
+    bool eventFilter(QObject*, QEvent* event) override
+    {
+      if (QEvent::Paint == event->type())
+      {
+        ++count;
+      }
+      return false;
+    }
+  };
+
+  void PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers()
+  {
+    // A free group that has not been rotated still shares its former camera:
+    // turning it back to that direction moves no camera and renders nothing,
+    // yet every member's label changes.
+    this->ShowEditor();
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "orbit");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
+    QmitkTestPopupProbe::Pump(200);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Free"), this->Overlay(2)->PlaneLabel().toStdString());
+
+    PaintCounter paints;
+    this->Overlay(2)->installEventFilter(&paints);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    QmitkTestPopupProbe::Pump(200);
+    this->Overlay(2)->removeEventFilter(&paints);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Sagittal (locked)"), this->Overlay(2)->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The other member repaints its label", paints.count > 0);
   }
 };
 

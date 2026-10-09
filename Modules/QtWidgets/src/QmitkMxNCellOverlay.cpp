@@ -388,6 +388,15 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
     this->update();
   });
 
+  // The plane label shows the direction; a direction change need not render.
+  connect(m_Editor, &QmitkMxNMultiWidget::ViewDirectionChanged, this, [this](const QString& windowId)
+  {
+    if (windowId == m_Cell->GetWidgetName())
+    {
+      this->update();
+    }
+  });
+
   // The interactive furniture reveals as one coordinated frame (opacity +
   // offset), not region by region; the proximity controller supplies the
   // collapse delay and hysteresis, this only the easing.
@@ -2664,11 +2673,12 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
   if (RenderMode::ThreeD == renderMode)
   {
     auto* freeAction = menu->addAction(tr("Free"));
-    // An orientation-linked cell takes its group's direction.
-    if (const auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation); link.has_value())
+    // The whole orientation group turns free, which a 2D member cannot follow.
+    const auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+    if (link.has_value() && !m_Editor->IsFreeViewDirectionAllowed(windowId))
     {
       freeAction->setEnabled(false);
-      freeAction->setToolTip(tr("Not available while the view is linked on orientation (group %1)")
+      freeAction->setToolTip(tr("Not available while orientation group %1 has a 2D view")
                                .arg(QString::fromStdString(m_Editor->GetSyncGroupDisplayName(link->group))));
       menu->setToolTipsVisible(true);
     }
@@ -3513,7 +3523,7 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
   {
     hasOffsetLink = hasOffsetLink
                     || (m_Editor->GetSyncLink(windowId, dimension).has_value()
-                        && m_Editor->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension)));
+                        && m_Editor->IsConvergenceApplicable(windowId, dimension));
   }
   reconvergeAction->setEnabled(hasOffsetLink);
   connect(reconvergeAction, &QAction::triggered, this, [this, windowId]()
@@ -3528,6 +3538,12 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
       }
       try
       {
+        // Re-converging means bringing this window back to its groups; a
+        // group it takes no part in converging is not its to move.
+        if (!m_Editor->IsConvergenceApplicable(windowId, dimension))
+        {
+          continue;
+        }
         m_Editor->ReconvergeSyncGroup(dimension, link->group);
       }
       catch (const mitk::Exception& e)

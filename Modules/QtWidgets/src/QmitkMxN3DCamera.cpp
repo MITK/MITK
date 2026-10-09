@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkMath.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderer.h>
 
@@ -41,6 +42,7 @@ QmitkMxN3DInteractorStyle::QmitkMxN3DInteractorStyle()
   observer->SetCallback(&QmitkMxN3DInteractorStyle::OnInteractionEvent);
   observer->SetClientData(this);
   this->AddObserver(vtkCommand::StartInteractionEvent, observer);
+  this->AddObserver(vtkCommand::InteractionEvent, observer);
   this->AddObserver(vtkCommand::EndInteractionEvent, observer);
 }
 
@@ -59,6 +61,11 @@ void QmitkMxN3DInteractorStyle::SetRotationCallback(RotationCallback callback)
 void QmitkMxN3DInteractorStyle::SetRotationLock(RotationLock lock)
 {
   m_RotationLock = std::move(lock);
+}
+
+void QmitkMxN3DInteractorStyle::SetCameraStepCallback(CameraStepCallback callback)
+{
+  m_CameraStepCallback = std::move(callback);
 }
 
 void QmitkMxN3DInteractorStyle::Rotate()
@@ -92,11 +99,17 @@ void QmitkMxN3DInteractorStyle::OnInteractionEvent(vtkObject*, unsigned long eve
   {
     camera->GetDirectionOfProjection(self->m_StartDirectionOfProjection);
     camera->GetViewUp(self->m_StartViewUp);
+    self->m_LastReportedState = QmitkMxN3DCamera::CaptureState(camera);
     self->m_InteractionStarted = true;
     return;
   }
 
   if (!self->m_InteractionStarted)
+  {
+    return;
+  }
+  self->ReportCameraStep();
+  if (vtkCommand::InteractionEvent == eventId)
   {
     return;
   }
@@ -112,7 +125,39 @@ void QmitkMxN3DInteractorStyle::OnInteractionEvent(vtkObject*, unsigned long eve
   }
 }
 
+void QmitkMxN3DInteractorStyle::ReportCameraStep()
+{
+  const auto current = QmitkMxN3DCamera::CaptureState(m_ObservedRenderer->GetActiveCamera());
+  const auto& last = m_LastReportedState;
+  const bool changed = (current.focalPoint - last.focalPoint).GetNorm() > QmitkMxN3DCamera::Tolerance
+                       || std::abs(current.visibleHalfHeight - last.visibleHalfHeight) > QmitkMxN3DCamera::Tolerance
+                       || !SameDirection(current.directionOfProjection.GetDataPointer(),
+                                         last.directionOfProjection.GetDataPointer())
+                       || !SameDirection(current.viewUp.GetDataPointer(), last.viewUp.GetDataPointer());
+  if (!changed)
+  {
+    return;
+  }
+  const auto from = m_LastReportedState;
+  m_LastReportedState = current;
+  if (m_CameraStepCallback)
+  {
+    m_CameraStepCallback(from, current);
+  }
+}
+
 bool QmitkMxN3DCamera::ApplyViewFrame(vtkRenderer* renderer, const mitk::PlaneGeometry& plane)
+{
+  auto normal = plane.GetNormal();
+  normal.Normalize();
+  auto viewUp = plane.GetAxisVector(1);
+  viewUp.Normalize();
+  return ApplyDirection(renderer, -normal, viewUp);
+}
+
+bool QmitkMxN3DCamera::ApplyDirection(vtkRenderer* renderer,
+                                      const mitk::Vector3D& directionOfProjection,
+                                      const mitk::Vector3D& viewUp)
 {
   if (nullptr == renderer)
   {
@@ -120,14 +165,12 @@ bool QmitkMxN3DCamera::ApplyViewFrame(vtkRenderer* renderer, const mitk::PlaneGe
   }
   auto* camera = renderer->GetActiveCamera();
 
-  auto normal = plane.GetNormal();
-  normal.Normalize();
-  auto viewUp = plane.GetAxisVector(1);
-  viewUp.Normalize();
-
-  const double directionOfProjection[3] = { -normal[0], -normal[1], -normal[2] };
-  if (SameDirection(camera->GetDirectionOfProjection(), directionOfProjection)
-      && SameDirection(camera->GetViewUp(), viewUp.GetDataPointer()))
+  auto direction = directionOfProjection;
+  direction.Normalize();
+  auto up = viewUp;
+  up.Normalize();
+  if (SameDirection(camera->GetDirectionOfProjection(), direction.GetDataPointer())
+      && SameDirection(camera->GetViewUp(), up.GetDataPointer()))
   {
     return false;
   }
@@ -135,13 +178,92 @@ bool QmitkMxN3DCamera::ApplyViewFrame(vtkRenderer* renderer, const mitk::PlaneGe
   double focalPoint[3];
   camera->GetFocalPoint(focalPoint);
   const double distance = camera->GetDistance();
-  camera->SetPosition(focalPoint[0] + normal[0] * distance,
-                      focalPoint[1] + normal[1] * distance,
-                      focalPoint[2] + normal[2] * distance);
-  camera->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
+  camera->SetPosition(focalPoint[0] - direction[0] * distance,
+                      focalPoint[1] - direction[1] * distance,
+                      focalPoint[2] - direction[2] * distance);
+  camera->SetViewUp(up[0], up[1], up[2]);
   camera->OrthogonalizeViewUp();
   renderer->ResetCameraClippingRange();
   return true;
+}
+
+QmitkMxN3DInteractorStyle::CameraState QmitkMxN3DCamera::CaptureState(vtkCamera* camera)
+{
+  QmitkMxN3DInteractorStyle::CameraState state;
+  camera->GetFocalPoint(state.focalPoint.GetDataPointer());
+  state.visibleHalfHeight = VisibleHalfHeight(camera);
+  camera->GetDirectionOfProjection(state.directionOfProjection.GetDataPointer());
+  camera->GetViewUp(state.viewUp.GetDataPointer());
+  return state;
+}
+
+double QmitkMxN3DCamera::VisibleHalfHeight(vtkCamera* camera)
+{
+  if (camera->GetParallelProjection())
+  {
+    return camera->GetParallelScale();
+  }
+  return camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()) / 2.0);
+}
+
+void QmitkMxN3DCamera::Zoom(vtkRenderer* renderer, double factor)
+{
+  if (nullptr == renderer || factor <= 0.0)
+  {
+    return;
+  }
+  auto* camera = renderer->GetActiveCamera();
+  if (camera->GetParallelProjection())
+  {
+    camera->SetParallelScale(camera->GetParallelScale() / factor);
+  }
+  else
+  {
+    camera->Dolly(factor);
+  }
+  renderer->ResetCameraClippingRange();
+}
+
+void QmitkMxN3DCamera::Translate(vtkRenderer* renderer, const mitk::Vector3D& worldVector)
+{
+  if (nullptr == renderer)
+  {
+    return;
+  }
+  auto* camera = renderer->GetActiveCamera();
+  double position[3];
+  double focalPoint[3];
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  for (int i = 0; i < 3; ++i)
+  {
+    position[i] += worldVector[i];
+    focalPoint[i] += worldVector[i];
+  }
+  camera->SetPosition(position);
+  camera->SetFocalPoint(focalPoint);
+  renderer->ResetCameraClippingRange();
+}
+
+mitk::Vector3D QmitkMxN3DCamera::PlaneToWorld(const mitk::PlaneGeometry& plane, const mitk::Vector2D& planeVector)
+{
+  auto axis0 = plane.GetAxisVector(0);
+  axis0.Normalize();
+  auto axis1 = plane.GetAxisVector(1);
+  axis1.Normalize();
+  return axis0 * planeVector[0] + axis1 * planeVector[1];
+}
+
+mitk::Vector2D QmitkMxN3DCamera::WorldToPlane(const mitk::PlaneGeometry& plane, const mitk::Vector3D& worldVector)
+{
+  auto axis0 = plane.GetAxisVector(0);
+  axis0.Normalize();
+  auto axis1 = plane.GetAxisVector(1);
+  axis1.Normalize();
+  mitk::Vector2D result;
+  result[0] = worldVector * axis0;
+  result[1] = worldVector * axis1;
+  return result;
 }
 
 mitk::AnatomicalPlane QmitkMxN3DCamera::NearestStandardPlane(const mitk::BaseGeometry& geometry,

@@ -274,7 +274,8 @@ across windows that show the same plane; across planes the in-plane vector is
 applied as is.
 
 `orientation` aligns a joining window to its group's view direction; a 3D
-member turns its camera to that direction.
+member turns its camera to that direction, and in a `"free"` group (see "3D
+windows") takes the group's camera direction.
 `windowing` and `lut` relay changes to every member but do not converge a
 joining window, which keeps its own value until the group's next change.
 `time` is reserved as a future key and rejected by v3.0.
@@ -296,17 +297,34 @@ and an orientation group may mix 2D and 3D windows.
 directions. The rotation itself is not persisted (no camera is), so a loaded
 `"free"` window starts from the anterior view. A 2D window cannot be
 `"free"`; switching a `"free"` window to 2D gives it the standard plane its
-camera looks at most directly.
+camera looks at most directly and takes it out of its orientation group.
 
 A 3D window synchronizes only what has a meaning for it:
 
 | Dimension | 2D window | 3D window |
 | --- | --- | --- |
 | `selection` | yes | yes |
-| `orientation` | yes | yes |
-| `pan`, `zoom`, `crosshair` | yes | not applicable |
+| `orientation` | yes | yes, including `"free"` |
+| `pan` | yes | yes, relative |
+| `zoom` | yes | yes |
+| `crosshair` | yes | not applicable |
 | `slice` | yes | not applicable |
 | `windowing`, `lut` | yes | not applicable |
+
+A 3D camera decomposes into the point it looks at (`pan`), the visible
+extent there (`zoom`) and its direction with view-up (`orientation`):
+
+- `pan` is relative for 3D windows: a pan gesture moves every member by the
+  same world vector (a 2D member by its part in the window's plane), but a
+  3D window never takes or defines a group's pan reference, so joining a
+  pan group or re-converging it moves no 3D camera. An absolute reference
+  would pull the 3D view onto a 2D slice plane.
+- `zoom` compares the visible half-height at the camera's focal point (a
+  2D window's view height): a 3D window converges to its zoom group and
+  carries zoom offsets like a 2D window.
+- `orientation` with a standard direction locks the rotation of the 3D
+  members. All members of an orientation group whose direction is `"free"`
+  are 3D windows; rotating one turns the others alike.
 
 A link on a dimension that is not applicable is kept, written back and shown
 as not applicable, but it has no effect: the window neither follows the
@@ -319,8 +337,9 @@ The loader rejects what a layout cannot honour:
 - `"free"` on a window that is not `"3d"`;
 - a `"free"` window sharing an orientation group with a 2D window (a 2D
   window cannot follow a freely rotated camera);
-- an orientation-linked `"free"` window (a rotation is not relayed to the
-  group).
+- a `"free"` window sharing an orientation group with a window that has a
+  standard direction (the members of an orientation group share one
+  direction).
 
 A `"pan"` offset on a 3D window is kept and written back; the loader logs
 that it has no effect while the window renders 3D.

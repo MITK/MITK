@@ -177,7 +177,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_MatrixShowsNotApplicableChips);
   MITK_TEST(ThreeD_GroupWithTwoDMemberIsSolidNotPartial);
   MITK_TEST(ThreeD_AllThreeDGroupShowsNotApplicable);
-  MITK_TEST(ThreeD_FreeCellJoiningNewGroupSkipsOnlyOrientation);
+  MITK_TEST(ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -2453,7 +2453,8 @@ public:
 
   static bool AppliesIn3D(QmitkMxNSyncAxis axis)
   {
-    return QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
+    return QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis || QmitkMxNSyncAxis::Orientation == axis
+           || QmitkMxNSyncAxis::Selection == axis;
   }
 
   void ThreeD_CellBarcodeMarksTwoDOnlyAxes()
@@ -2476,16 +2477,16 @@ public:
 
   void ThreeD_BackToTwoDRestoresApplicabilityAndHues()
   {
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
-    const auto panSlot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan);
-    const auto hue = m_Editor->BuildBarcodeSlots(CellId(0))[panSlot].color;
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    const auto sliceSlot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice);
+    const auto hue = m_Editor->BuildBarcodeSlots(CellId(0))[sliceSlot].color;
     CPPUNIT_ASSERT(hue.isValid());
 
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
-    CPPUNIT_ASSERT(!m_Editor->BuildBarcodeSlots(CellId(0))[panSlot].applicable);
+    CPPUNIT_ASSERT(!m_Editor->BuildBarcodeSlots(CellId(0))[sliceSlot].applicable);
 
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::TwoD);
-    const auto restored = m_Editor->BuildBarcodeSlots(CellId(0))[panSlot];
+    const auto restored = m_Editor->BuildBarcodeSlots(CellId(0))[sliceSlot];
     CPPUNIT_ASSERT(restored.applicable);
     CPPUNIT_ASSERT_MESSAGE("The kept link shows its hue again", hue == restored.color);
   }
@@ -2493,7 +2494,7 @@ public:
   void ThreeD_MatrixShowsNotApplicableChips()
   {
     this->RaiseAdvancedFace();
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
     Pump();
 
@@ -2504,49 +2505,52 @@ public:
                                    m_Widget->AdvancedMatrixCell(CellId(0), axis).applicable);
     }
     CPPUNIT_ASSERT_MESSAGE("An n/a chip names no group, even with a kept link",
-                           m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Zoom).group.empty());
-    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(1), QmitkMxNSyncAxis::Zoom).applicable);
+                           m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).group.empty());
+    CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(1), QmitkMxNSyncAxis::Slice).applicable);
   }
 
   void ThreeD_GroupWithTwoDMemberIsSolidNotPartial()
   {
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
 
-    const auto pan = m_Widget->BuildGroupBarcodeSlots("nav")[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan)];
-    CPPUNIT_ASSERT(pan.applicable);
-    CPPUNIT_ASSERT(pan.color.isValid());
-    CPPUNIT_ASSERT_MESSAGE("A 3D member does not make a 2D-only axis partial", !pan.partial);
+    const auto slice = m_Widget->BuildGroupBarcodeSlots("nav")[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice)];
+    CPPUNIT_ASSERT(slice.applicable);
+    CPPUNIT_ASSERT(slice.color.isValid());
+    CPPUNIT_ASSERT_MESSAGE("A 3D member does not make a 2D-only axis partial", !slice.partial);
   }
 
   void ThreeD_AllThreeDGroupShowsNotApplicable()
   {
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
     m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
 
     const auto groupSlots = m_Widget->BuildGroupBarcodeSlots("nav");
-    CPPUNIT_ASSERT(!groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Pan)].applicable);
+    CPPUNIT_ASSERT(!groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice)].applicable);
     CPPUNIT_ASSERT(groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)].applicable);
   }
 
-  void ThreeD_FreeCellJoiningNewGroupSkipsOnlyOrientation()
+  void ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation()
   {
     m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
     m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
     const auto group = m_Widget->CreateGroup();
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
-
-    // As the group's only member the free cell has no direction to snap to.
     m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, group);
+    CPPUNIT_ASSERT_MESSAGE("precondition: a free orientation group",
+                           IsLinked(1, QmitkMxNSyncDimension::Orientation, group));
 
-    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation).has_value());
+    // A 2D cell cannot follow a freely rotated 3D view.
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
+
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
     CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
     CPPUNIT_ASSERT_MESSAGE("The group's other axes still apply",
-                           IsLinked(1, QmitkMxNSyncDimension::Windowing, group));
+                           IsLinked(0, QmitkMxNSyncDimension::Windowing, group));
   }
 };
 

@@ -19,7 +19,9 @@ found in the LICENSE file.
 
 #include <mitkBaseRenderer.h>
 #include <mitkCameraController.h>
+#include <mitkDisplayActionEvents.h>
 #include <mitkImageGenerator.h>
+#include <mitkInteractionEvent.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
@@ -52,7 +54,11 @@ found in the LICENSE file.
  *   - A view initialization, which turns 3D renderers anterior, is followed
  *     by the cell's direction again; 'free' cells are left alone.
  *   - Links on axes without 3D meaning are inactive: a 3D member never
- *     anchors or converges a pan, zoom or slice group.
+ *     anchors or converges a slice group. Pan is relative for 3D cells: they
+ *     never anchor nor converge a pan group; zoom converges on the visible
+ *     half-height.
+ *   - Camera gestures relay between 2D and 3D members of pan and zoom
+ *     groups, and within 'free' orientation groups, exactly once.
  *   - Name-based window lookups prefer cells of the requested mode.
  */
 class QmitkMxN3DCellTestSuite : public mitk::TestFixture
@@ -67,7 +73,8 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(ViewFrame_MatchesTwoDCell_RotatedGeometry);
   MITK_TEST(SetViewDirection_OriginalAndFreeOn2D_Throw);
   MITK_TEST(SetViewDirection_FreeOnLinkedCell_ThrowsConflict);
-  MITK_TEST(OrientationLink_FreeCellAlone_ThrowsConflict);
+  MITK_TEST(SetViewDirection_FreeOnAllThreeDGroup_TurnsGroupFree);
+  MITK_TEST(OrientationLink_FreeCellAlone_FormsFreeGroup);
   MITK_TEST(OrientationLink_FreeCellJoins_SnapsToGroup);
   MITK_TEST(OrientationLink_ThreeDJoinsCoronalGroup_Snaps);
   MITK_TEST(Lock_FollowsTheOrientationLink);
@@ -86,14 +93,33 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Reinit_AfterLoad_RestoresDirection);
   MITK_TEST(Reinit_TwoEditors_EachKeepsItsDirection);
   MITK_TEST(Applicability_PerRenderMode);
-  MITK_TEST(Gate_ZoomGroup_ThreeDNeverAnchors);
+  MITK_TEST(Zoom_ThreeDAnchor_ConvergesTwoDToItsHalfHeight);
+  MITK_TEST(Zoom_SwitchToThreeD_KeepsGroupZoom);
   MITK_TEST(Gate_PanGroup_ThreeDNeverAnchors);
+  MITK_TEST(Gate_PanLink_MovesNoCamera);
   MITK_TEST(Gate_SliceGroup_ThreeDNeverAnchors);
-  MITK_TEST(Gate_AllThreeDZoomGroup_ReconvergeIsNoOp);
+  MITK_TEST(Gate_AllThreeDSliceGroup_ReconvergeIsNoOp);
   MITK_TEST(Routing_ThreeD_PrefersActiveThenFirst);
   MITK_TEST(Routing_Axial_PrefersTwoD);
   MITK_TEST(Routing_NoThreeDCell_ReturnsActive);
   MITK_TEST(InitializeViews_ThreeDActive_BroadcastsTwoDPosition);
+  MITK_TEST(Math_VisibleHalfHeight_ParallelAndPerspective);
+  MITK_TEST(Math_Zoom_DividesHalfHeight);
+  MITK_TEST(Math_PlaneAndWorldVectors);
+  MITK_TEST(Relay_ThreeDToThreeD_StepsAddUpOnce);
+  MITK_TEST(Relay_ThreeDToThreeD_WheelWithoutSteps);
+  MITK_TEST(Relay_ThreeDToTwoD_PanFollowsInPlanePart);
+  MITK_TEST(Relay_ThreeDToTwoD_DollyZoomsTwoD);
+  MITK_TEST(Relay_TwoDToThreeD_PanTranslatesByWorldVector);
+  MITK_TEST(Relay_TwoDToThreeD_ZoomUsesEffectiveFactor);
+  MITK_TEST(Relay_UnlinkedThreeDCell_MovesNoOtherCamera);
+  MITK_TEST(FreeGroup_JoinerTakesAnchorDirection);
+  MITK_TEST(FreeGroup_RotationRelaysDirection);
+  MITK_TEST(FreeGroup_ResetMemberReturnsToGroup);
+  MITK_TEST(FreeGroup_TwoDJoin_ThrowsConflict);
+  MITK_TEST(FreeGroup_MemberTurnsTwoD_LeavesGroup);
+  MITK_TEST(FreeGroup_StandardDirection_TurnsWholeGroupCanonical);
+  MITK_TEST(ViewDirectionChanged_AnnouncesEachChangedCellOnce);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -189,6 +215,13 @@ public:
   {
     mitk::Vector3D result;
     Camera(renderer)->GetViewUp(result.GetDataPointer());
+    return result;
+  }
+
+  static mitk::Point3D FocalPoint(mitk::BaseRenderer* renderer)
+  {
+    mitk::Point3D result;
+    Camera(renderer)->GetFocalPoint(result.GetDataPointer());
     return result;
   }
 
@@ -397,13 +430,28 @@ public:
     CPPUNIT_ASSERT(ViewDirection::Free != m_Editor->GetViewDirection(CellId(0)));
   }
 
-  void OrientationLink_FreeCellAlone_ThrowsConflict()
+  void SetViewDirection_FreeOnAllThreeDGroup_TurnsGroupFree()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT(m_Editor->IsFreeViewDirectionAllowed(CellId(1)));
+    CPPUNIT_ASSERT(!m_Editor->IsFreeViewDirectionAllowed(CellId(0)));
+
+    m_Editor->SetViewDirection(CellId(1), ViewDirection::Free);
+
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(2)));
+    CPPUNIT_ASSERT_MESSAGE("A free group rotates", !m_Editor->IsRotationLocked(CellId(2)));
+  }
+
+  void OrientationLink_FreeCellAlone_FormsFreeGroup()
   {
     m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
     m_Editor->SetViewDirection(CellId(0), ViewDirection::Free);
-    CPPUNIT_ASSERT_THROW(m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes"),
-                         QmitkMxNOrientationConflictException);
-    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT(m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
     CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(0)));
   }
 
@@ -644,25 +692,44 @@ public:
     for (int slot = 0; slot < QmitkMxNSyncAxisCount; ++slot)
     {
       const auto axis = *QmitkMxNSyncAxisFromSlot(slot);
-      const bool expected = QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
+      const bool expected = QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis
+                            || QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
       CPPUNIT_ASSERT_EQUAL_MESSAGE("slot " + std::to_string(slot), expected,
                                    m_Editor->IsAxisApplicable(CellId(0), axis));
     }
     CPPUNIT_ASSERT_THROW(m_Editor->IsAxisApplicable("mxn__nowhere", QmitkMxNSyncAxis::Pan), mitk::Exception);
   }
 
-  void Gate_ZoomGroup_ThreeDNeverAnchors()
+  static double HalfHeight(mitk::BaseRenderer* renderer)
+  {
+    return QmitkMxN3DCamera::VisibleHalfHeight(Camera(renderer));
+  }
+
+  void Zoom_ThreeDAnchor_ConvergesTwoDToItsHalfHeight()
   {
     m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
-    Camera(Renderer(0))->SetParallelScale(3.0);
+    Camera(Renderer(0))->Dolly(1.7);
     Camera(Renderer(1))->SetParallelScale(7.0);
+    const double threeDHalfHeight = HalfHeight(Renderer(0));
+    CPPUNIT_ASSERT_MESSAGE("precondition: the cells differ", std::abs(threeDHalfHeight - 7.0) > 1e-3);
 
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(7.0, Camera(Renderer(1))->GetParallelScale(), 1e-9);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav", 2.0);
 
-    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Zoom, "nav");
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(7.0, Camera(Renderer(1))->GetParallelScale(), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(threeDHalfHeight, HalfHeight(Renderer(0)), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(threeDHalfHeight / 2.0, Camera(Renderer(1))->GetParallelScale(), 1e-9);
+  }
+
+  void Zoom_SwitchToThreeD_KeepsGroupZoom()
+  {
+    Camera(Renderer(0))->SetParallelScale(5.0);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, HalfHeight(Renderer(1)), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, Camera(Renderer(0))->GetParallelScale(), 1e-9);
   }
 
   void Gate_PanGroup_ThreeDNeverAnchors()
@@ -683,6 +750,20 @@ public:
     CPPUNIT_ASSERT((before - controller->GetCameraPositionOnPlane()).GetNorm() < 1e-9);
   }
 
+  void Gate_PanLink_MovesNoCamera()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    const auto focalPoint = FocalPoint(Renderer(1));
+    const auto twoD = Renderer(0)->GetCameraController()->GetCameraPositionOnPlane();
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Pan, "nav");
+
+    CPPUNIT_ASSERT((focalPoint - FocalPoint(Renderer(1))).GetNorm() < 1e-9);
+    CPPUNIT_ASSERT((twoD - Renderer(0)->GetCameraController()->GetCameraPositionOnPlane()).GetNorm() < 1e-9);
+  }
+
   void Gate_SliceGroup_ThreeDNeverAnchors()
   {
     m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
@@ -697,16 +778,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(3u, Snc(1)->GetStepper()->GetPos());
   }
 
-  void Gate_AllThreeDZoomGroup_ReconvergeIsNoOp()
+  void Gate_AllThreeDSliceGroup_ReconvergeIsNoOp()
   {
     m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
     m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
-    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "nav");
     // A plane change re-converges the cell's groups; no member is applicable.
     m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
-    CPPUNIT_ASSERT_THROW(m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Zoom, "unknown"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Editor->ReconvergeSyncGroup(QmitkMxNSyncDimension::Slice, "unknown"), mitk::Exception);
   }
 
   QmitkRenderWindow* Window(std::size_t index) const
@@ -766,6 +847,341 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The other 2D cell is moved to the first 2D cell's position",
                                  Snc(1)->GetStepper()->GetPos(), Snc(2)->GetStepper()->GetPos());
+  }
+
+  // --- Camera synchronization ----------------------------------------------
+
+  void Math_VisibleHalfHeight_ParallelAndPerspective()
+  {
+    auto camera = vtkSmartPointer<vtkCamera>::New();
+    camera->ParallelProjectionOn();
+    camera->SetParallelScale(12.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(12.5, QmitkMxN3DCamera::VisibleHalfHeight(camera), 1e-12);
+
+    camera->ParallelProjectionOff();
+    camera->SetViewAngle(90.0);
+    camera->SetPosition(0.0, 0.0, 40.0);
+    camera->SetFocalPoint(0.0, 0.0, 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(40.0, QmitkMxN3DCamera::VisibleHalfHeight(camera), 1e-9);
+  }
+
+  void Math_Zoom_DividesHalfHeight()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    const double before = HalfHeight(Renderer(1));
+    const auto focalPoint = FocalPoint(Renderer(1));
+    QmitkMxN3DCamera::Zoom(Renderer(1)->GetVtkRenderer(), 2.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(before / 2.5, HalfHeight(Renderer(1)), 1e-9);
+    CPPUNIT_ASSERT_MESSAGE("A zoom keeps the focal point", (focalPoint - FocalPoint(Renderer(1))).GetNorm() < 1e-9);
+  }
+
+  void Math_PlaneAndWorldVectors()
+  {
+    const auto tilted = Tilted(m_Image);
+    const auto plane = this->StandardPlane(mitk::AnatomicalPlane::Coronal, tilted->GetTimeGeometry());
+    mitk::Vector2D planeVector;
+    planeVector[0] = 3.0;
+    planeVector[1] = -2.0;
+    const auto world = QmitkMxN3DCamera::PlaneToWorld(*plane, planeVector);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(planeVector.GetNorm(), world.GetNorm(), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, world * plane->GetNormal(), 1e-9);
+    const auto back = QmitkMxN3DCamera::WorldToPlane(*plane, world);
+    CPPUNIT_ASSERT((back - planeVector).GetNorm() < 1e-9);
+
+    auto normal = plane->GetNormal();
+    normal.Normalize();
+    const auto projected = QmitkMxN3DCamera::WorldToPlane(*plane, world + normal * 4.0);
+    CPPUNIT_ASSERT_MESSAGE("The normal part is dropped", (projected - planeVector).GetNorm() < 1e-9);
+  }
+
+  /** Links cells 1 and 2 (both 3D) on pan and zoom. */
+  void LinkThreeDPair()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom })
+    {
+      m_Editor->SetSyncLink(CellId(1), dimension, "nav");
+      m_Editor->SetSyncLink(CellId(2), dimension, "nav");
+    }
+  }
+
+  static mitk::Vector3D WorldVector(double x, double y, double z)
+  {
+    mitk::Vector3D v;
+    v[0] = x;
+    v[1] = y;
+    v[2] = z;
+    return v;
+  }
+
+  static void Step(mitk::BaseRenderer* renderer)
+  {
+    Style(renderer)->InvokeEvent(vtkCommand::InteractionEvent);
+  }
+
+  void Relay_ThreeDToThreeD_StepsAddUpOnce()
+  {
+    this->LinkThreeDPair();
+    const auto focalPoint = FocalPoint(Renderer(2));
+    const double halfHeight = HalfHeight(Renderer(2));
+    auto* style = Style(Renderer(1));
+    auto* senderRenderer = Renderer(1)->GetVtkRenderer();
+
+    style->InvokeEvent(vtkCommand::StartInteractionEvent);
+    QmitkMxN3DCamera::Translate(senderRenderer, WorldVector(2.0, 0.0, 1.0));
+    Step(Renderer(1));
+    QmitkMxN3DCamera::Translate(senderRenderer, WorldVector(0.0, -3.0, 0.0));
+    Camera(Renderer(1))->Dolly(1.25);
+    Step(Renderer(1));
+    Camera(Renderer(1))->Dolly(1.6);
+    style->InvokeEvent(vtkCommand::EndInteractionEvent);
+
+    const auto moved = FocalPoint(Renderer(2)) - focalPoint;
+    CPPUNIT_ASSERT_MESSAGE("moved " + ToString(moved), Near(moved, WorldVector(2.0, -3.0, 1.0)));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(halfHeight / (1.25 * 1.6), HalfHeight(Renderer(2)), 1e-9);
+  }
+
+  void Relay_ThreeDToThreeD_WheelWithoutSteps()
+  {
+    this->LinkThreeDPair();
+    const double halfHeight = HalfHeight(Renderer(2));
+    Gesture(Renderer(1), [](vtkCamera* camera) { camera->Dolly(1.5); });
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(halfHeight / 1.5, HalfHeight(Renderer(2)), 1e-9);
+  }
+
+  void Relay_ThreeDToTwoD_PanFollowsInPlanePart()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    auto* controller = Renderer(0)->GetCameraController();
+    const auto before = controller->GetCameraPositionOnPlane();
+    const auto* plane = Renderer(0)->GetCurrentWorldPlaneGeometry();
+    auto normal = plane->GetNormal();
+    normal.Normalize();
+    mitk::Vector2D inPlane;
+    inPlane[0] = 1.5;
+    inPlane[1] = -1.0;
+    const auto world = QmitkMxN3DCamera::PlaneToWorld(*plane, inPlane) + normal * 2.0;
+
+    Gesture(Renderer(1), [&](vtkCamera*) { QmitkMxN3DCamera::Translate(Renderer(1)->GetVtkRenderer(), world); });
+
+    const auto moved = controller->GetCameraPositionOnPlane() - before;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(inPlane[0], moved[0], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(inPlane[1], moved[1], 1e-6);
+  }
+
+  void Relay_ThreeDToTwoD_DollyZoomsTwoD()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav", 2.0);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    const double scale = Camera(Renderer(0))->GetParallelScale();
+
+    Gesture(Renderer(1), [](vtkCamera* camera) { camera->Dolly(1.25); });
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(scale / 1.25, Camera(Renderer(0))->GetParallelScale(), 1e-9);
+  }
+
+  template <typename TDisplayEvent, typename... TArgs>
+  void Fire(std::size_t senderIndex, TArgs&&... args)
+  {
+    auto interactionEvent = mitk::InteractionEvent::New(Renderer(senderIndex));
+    m_Editor->GetInteractionEventHandler()->InvokeEvent(TDisplayEvent(interactionEvent, std::forward<TArgs>(args)...));
+  }
+
+  void Relay_TwoDToThreeD_PanTranslatesByWorldVector()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    auto* controller = Renderer(0)->GetCameraController();
+    const auto twoDBefore = controller->GetCameraPositionOnPlane();
+    const auto focalPoint = FocalPoint(Renderer(1));
+
+    mitk::Vector2D moveVector;
+    moveVector[0] = 1.0;
+    moveVector[1] = 2.0;
+    Fire<mitk::DisplayMoveEvent>(0, moveVector);
+
+    const auto twoDMove = controller->GetCameraPositionOnPlane() - twoDBefore;
+    CPPUNIT_ASSERT_MESSAGE("precondition: the 2D cell moved", twoDMove.GetNorm() > 1e-3);
+    const auto expected = QmitkMxN3DCamera::PlaneToWorld(*Renderer(0)->GetCurrentWorldPlaneGeometry(), twoDMove);
+    const auto moved = FocalPoint(Renderer(1)) - focalPoint;
+    CPPUNIT_ASSERT_MESSAGE("moved " + ToString(moved) + ", expected " + ToString(expected), Near(moved, expected));
+  }
+
+  void Relay_TwoDToThreeD_ZoomUsesEffectiveFactor()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav", 3.0);
+    mitk::Point2D center;
+    center.Fill(6.0);
+
+    double twoDBefore = Camera(Renderer(0))->GetParallelScale();
+    double threeDBefore = HalfHeight(Renderer(1));
+    Fire<mitk::DisplayZoomEvent>(0, 2.0f, center);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(twoDBefore / 2.0, Camera(Renderer(0))->GetParallelScale(), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(threeDBefore / 2.0, HalfHeight(Renderer(1)), 1e-9);
+
+    // Zooming far out is clamped in the 2D cell; the 3D cell follows the
+    // change the 2D cell actually made.
+    twoDBefore = Camera(Renderer(0))->GetParallelScale();
+    threeDBefore = HalfHeight(Renderer(1));
+    Fire<mitk::DisplayZoomEvent>(0, 0.01f, center);
+    const double effective = twoDBefore / Camera(Renderer(0))->GetParallelScale();
+    CPPUNIT_ASSERT_MESSAGE("precondition: the 2D zoom was clamped", std::abs(effective - 0.01) > 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(threeDBefore / effective, HalfHeight(Renderer(1)), 1e-6);
+  }
+
+  void Relay_UnlinkedThreeDCell_MovesNoOtherCamera()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    const auto focalPoint = FocalPoint(Renderer(2));
+    const double halfHeight = HalfHeight(Renderer(2));
+    const double scale = Camera(Renderer(0))->GetParallelScale();
+
+    Gesture(Renderer(1), [&](vtkCamera* camera)
+    {
+      camera->Dolly(1.4);
+      QmitkMxN3DCamera::Translate(Renderer(1)->GetVtkRenderer(), WorldVector(1.0, 1.0, 1.0));
+    });
+
+    CPPUNIT_ASSERT((focalPoint - FocalPoint(Renderer(2))).GetNorm() < 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(halfHeight, HalfHeight(Renderer(2)), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(scale, Camera(Renderer(0))->GetParallelScale(), 1e-9);
+  }
+
+  /** Cell 1 3D 'free', rotated, alone in orientation group "orbit"; cell 2 3D sagittal. */
+  void MakeFreeGroup()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(2), mitk::AnatomicalPlane::Sagittal);
+    Gesture(Renderer(1), [](vtkCamera* camera)
+    {
+      camera->Azimuth(30.0);
+      camera->Elevation(20.0);
+      camera->OrthogonalizeViewUp();
+    });
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "orbit");
+  }
+
+  void AssertSameDirection(mitk::BaseRenderer* a, mitk::BaseRenderer* b, const std::string& what)
+  {
+    CPPUNIT_ASSERT_MESSAGE(what + ": direction " + ToString(DirectionOfProjection(a)) + " vs "
+                             + ToString(DirectionOfProjection(b)),
+                           Near(DirectionOfProjection(a), DirectionOfProjection(b)));
+    CPPUNIT_ASSERT_MESSAGE(what + ": view-up", Near(ViewUp(a), ViewUp(b)));
+  }
+
+  void FreeGroup_JoinerTakesAnchorDirection()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(2)));
+    CPPUNIT_ASSERT(!m_Editor->IsRotationLocked(CellId(2)));
+    AssertSameDirection(Renderer(1), Renderer(2), "joined");
+  }
+
+  void FreeGroup_RotationRelaysDirection()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    const auto focalPoint = FocalPoint(Renderer(2));
+
+    auto* style = Style(Renderer(2));
+    style->InvokeEvent(vtkCommand::StartInteractionEvent);
+    Camera(Renderer(2))->Azimuth(15.0);
+    Step(Renderer(2));
+    AssertSameDirection(Renderer(2), Renderer(1), "during the drag");
+    Camera(Renderer(2))->Roll(10.0);
+    style->InvokeEvent(vtkCommand::EndInteractionEvent);
+
+    AssertSameDirection(Renderer(2), Renderer(1), "after the drag");
+    CPPUNIT_ASSERT_MESSAGE("The sender turns about its own focal point",
+                           (focalPoint - FocalPoint(Renderer(2))).GetNorm() < 1e-9);
+  }
+
+  void FreeGroup_ResetMemberReturnsToGroup()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      Renderer(2)->GetRenderWindow(), m_Image->GetTimeGeometry(), true);
+
+    AssertSameDirection(Renderer(2), Renderer(1), "after a reset");
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(2)));
+  }
+
+  void FreeGroup_TwoDJoin_ThrowsConflict()
+  {
+    this->MakeFreeGroup();
+    CPPUNIT_ASSERT_THROW(m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "orbit"),
+                         QmitkMxNOrientationConflictException);
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT(ViewDirection::Free != m_Editor->GetViewDirection(CellId(0)));
+  }
+
+  void FreeGroup_MemberTurnsTwoD_LeavesGroup()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+
+    m_Editor->SetRenderMode(CellId(2), RenderMode::TwoD);
+
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell cannot follow the free group",
+                           !m_Editor->GetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT(ViewDirection::Free != m_Editor->GetViewDirection(CellId(2)));
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT(m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation).has_value());
+  }
+
+  void FreeGroup_StandardDirection_TurnsWholeGroupCanonical()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    // Cell 0 is outside the group and shows the expected plane.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
+    const auto* coronal = Snc(0)->GetCurrentPlaneGeometry();
+
+    m_Editor->SetViewDirection(CellId(2), mitk::AnatomicalPlane::Coronal);
+
+    for (const std::size_t index : { std::size_t(1), std::size_t(2) })
+    {
+      const auto what = "member " + std::to_string(index);
+      CPPUNIT_ASSERT_MESSAGE(what, ViewDirection::Coronal == m_Editor->GetViewDirection(CellId(index)));
+      CPPUNIT_ASSERT_MESSAGE(what + " is locked", m_Editor->IsRotationLocked(CellId(index)));
+      AssertLooksAt(Renderer(index), coronal, what);
+    }
+  }
+
+  void ViewDirectionChanged_AnnouncesEachChangedCellOnce()
+  {
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    QStringList announced;
+    QObject::connect(m_Editor.get(), &QmitkMxNMultiWidget::ViewDirectionChanged,
+                     [&announced](const QString& windowId) { announced.append(windowId); });
+
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Coronal);
+    announced.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell and the member it relays to, once each",
+                                 (QStringList{ CellId(1), CellId(2) }).join(',').toStdString(),
+                                 announced.join(',').toStdString());
+
+    announced.clear();
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Coronal);
+    CPPUNIT_ASSERT_MESSAGE("No change, no announcement", announced.isEmpty());
+
+    m_Editor->ApplyLayout(ThreeDDoc());
+    CPPUNIT_ASSERT_MESSAGE("A layout load is announced by LayoutChanged", announced.isEmpty());
   }
 };
 

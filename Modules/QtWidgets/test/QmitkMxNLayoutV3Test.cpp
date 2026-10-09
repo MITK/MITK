@@ -80,7 +80,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3Doc_UnknownRenderMode_Throws);
   MITK_TEST(V3Doc_FreeOn2DWindow_Throws);
   MITK_TEST(V3Doc_FreeAnd2DInOneOrientationGroup_Throws);
-  MITK_TEST(V3Doc_OrientationLinkedFree_Throws);
+  MITK_TEST(V3Doc_FreeAndCanonicalInOneOrientationGroup_Throws);
+  MITK_TEST(V3Doc_FreeOrientationGroup_LoadsAndRoundTrips);
   MITK_TEST(V3Doc_ThreeDWindows_Load);
   MITK_TEST(InTreeV3Documents_Load);
 
@@ -727,13 +728,33 @@ public:
                              && QmitkMxNMultiWidget::RenderMode::TwoD == editor->GetRenderMode("mxn__w0"));
   }
 
-  void V3Doc_OrientationLinkedFree_Throws()
+  void V3Doc_FreeAndCanonicalInOneOrientationGroup_Throws()
   {
     auto doc = OrientationGroupDoc();
     doc["root"]["children"][1]["view_direction"] = "free";
 
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+  }
+
+  void V3Doc_FreeOrientationGroup_LoadsAndRoundTrips()
+  {
+    auto doc = OrientationGroupDoc();
+    doc["root"]["children"][0]["view_direction"] = "free";
+    doc["root"]["children"][1]["view_direction"] = "free";
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Free == editor->GetViewDirection("mxn__w0"));
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Free == editor->GetViewDirection("mxn__w1"));
+    CPPUNIT_ASSERT(editor->GetSyncLink("mxn__w1", QmitkMxNSyncDimension::Orientation).has_value());
+
+    const auto saved = editor->SerializeLayout();
+    for (const auto& child : saved["root"]["children"])
+    {
+      CPPUNIT_ASSERT_EQUAL(std::string("free"), child["view_direction"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("planes"), child["links"]["orientation"].get<std::string>());
+    }
   }
 
   void V3Doc_ThreeDWindows_Load()

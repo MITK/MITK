@@ -256,6 +256,7 @@ namespace mitk
     }
     catch (const itk::ExceptionObject &e)
     {
+      MITK_ERROR << e.what();
       mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.GetDescription();
     }
 

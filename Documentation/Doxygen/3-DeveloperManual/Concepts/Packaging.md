@@ -372,10 +372,10 @@ Wrapper scripts launch MITK executables from the install root. They exist becaus
 
 | Script | Used by | Behavior |
 |---|---|---|
-| `RunInstalledApp.sh` | Regular executables and BlueBerry apps | Sets `LD_LIBRARY_PATH` to include `bin/` and `python/lib`, then launches `bin/<name>` |
+| `RunInstalledApp.sh` | Regular executables and BlueBerry apps | Prepends `bin/` to `LD_LIBRARY_PATH`, then launches `bin/<name>` |
 | `RunInstalledCmdLineApp.sh` | Command-line apps | Same but resolves paths from `apps/` subdirectory |
 
-On Linux, the wrapper scripts prepend `bin/` and `python/lib` to `LD_LIBRARY_PATH`. `python/lib` duplicates the install RPATH of `MitkPython`, which reaches the Python shared library on its own. `bin/` is a defensive layer: `LD_LIBRARY_PATH` takes precedence over a library's RUNPATH, so even if a bundled external `.so` carries a stale build-tree RPATH entry that happens to match a real directory on the user's machine, the bundled libraries in `bin/` are loaded first. The CTK RUNPATH fixup in `mitkInstallRules.cmake` addresses the root cause for CTK specifically; this wrapper-script layer protects against the same class of failure for other externals and for the case of running the raw executable directly through the wrapper.
+On Linux, the wrapper scripts prepend `bin/` to `LD_LIBRARY_PATH`. The Python library needs no entry, since the install RPATH of `MitkPython` reaches it (see Python). `bin/` is a defensive layer: `LD_LIBRARY_PATH` takes precedence over a library's RUNPATH, so even if a bundled external `.so` carries a stale build-tree RPATH entry that happens to match a real directory on the user's machine, the bundled libraries in `bin/` are loaded first. The CTK RUNPATH fixup in `mitkInstallRules.cmake` addresses the root cause for CTK specifically; this wrapper-script layer protects against the same class of failure for other externals and for the case of running the raw executable directly through the wrapper.
 
 ## CPack Configuration
 

@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <cmath>
+#include <numbers>
 
 class mitkImageIsRotatedTestSuite : public mitk::TestFixture
 {
@@ -54,7 +55,7 @@ private:
 
   static mitk::AffineTransform3D::MatrixType::InternalMatrixType RotationAboutZ(double degrees, double xSpacing, double ySpacing)
   {
-    const auto radians = degrees * std::acos(-1.0) / 180.0;
+    const auto radians = degrees * std::numbers::pi / 180.0;
     const auto c = std::cos(radians);
     const auto s = std::sin(radians);
 

@@ -29,6 +29,8 @@ class mitkImageIsRotatedTestSuite : public mitk::TestFixture
   MITK_TEST(RoundingNoise_IsNotRotated);
   MITK_TEST(SmallRotation_IsRotated);
   MITK_TEST(SmallRotationWithAnisotropicSpacing_IsRotated);
+  MITK_TEST(TiltBelowTolerance_IsNotRotated);
+  MITK_TEST(TiltAboveTolerance_IsRotated);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -100,6 +102,18 @@ public:
   void SmallRotationWithAnisotropicSpacing_IsRotated()
   {
     CPPUNIT_ASSERT(IsRotated(RotationAboutZ(1.0, 0.1, 5.0)));
+  }
+
+  void TiltBelowTolerance_IsNotRotated()
+  {
+    CPPUNIT_ASSERT(!IsRotated(RotationAboutZ(0.1, 1.0, 1.0)));
+    CPPUNIT_ASSERT(!IsRotated(RotationAboutZ(0.1, 0.5, 5.0)));
+  }
+
+  void TiltAboveTolerance_IsRotated()
+  {
+    CPPUNIT_ASSERT(IsRotated(RotationAboutZ(0.3, 1.0, 1.0)));
+    CPPUNIT_ASSERT(IsRotated(RotationAboutZ(0.3, 0.5, 5.0)));
   }
 };
 

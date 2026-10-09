@@ -1304,7 +1304,7 @@ bool mitk::Image::IsRotated() const
   // tolerance absorbs rounding noise in stored direction cosines.
   for (unsigned int column = 0; column < 3; ++column)
   {
-    const auto tolerance = 0.001 * mx.get_column(column).two_norm();
+    const auto tolerance = 0.003 * mx.get_column(column).two_norm();
     unsigned int nonZeroComponents = 0;
 
     for (unsigned int row = 0; row < 3; ++row)

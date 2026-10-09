@@ -34,6 +34,15 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="shift"/>
   </event_variant>
+  <event_variant class="MousePressEvent" name="SecondaryButtonPressedWhilePrimaryHeld">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="CtrlSecondaryButtonPressedWhilePrimaryHeld">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
   
   <event_variant class="MouseDoubleClickEvent" name="PrimaryButtonDoubleClick">
     <attribute name="EventButton" value="LeftMouseButton" />
@@ -89,6 +98,10 @@ Global variant    Event class   Button/Key      Modifiers
   </event_variant>
   <event_variant class="InteractionKeyEvent" name="KeyEscape">
       <attribute name="Key" value="Escape"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="CtrlKeyEscape">
+      <attribute name="Key" value="Escape"/>
+      <attribute name="Modifiers" value="ctrl"/>
   </event_variant>
   <event_variant class="InteractionKeyEvent" name="KeyPlus">
       <attribute name="Key" value="+"/>

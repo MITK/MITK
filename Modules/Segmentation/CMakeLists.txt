@@ -25,6 +25,7 @@ mitk_create_module(
       GrowCut
       ITKLabelMap
       ITKMathematicalMorphology
+      ITKSmoothing
       VTK::ImagingGeneral
 )
 

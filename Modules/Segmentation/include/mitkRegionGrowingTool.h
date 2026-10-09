@@ -13,9 +13,13 @@ found in the LICENSE file.
 #ifndef mitkRegionGrowingTool_h
 #define mitkRegionGrowingTool_h
 
-#include <mitkFeedbackContourTool.h>
+#include <mitkSegTool2D.h>
+#include <mitkWeakPointer.h>
 #include <MitkSegmentationExports.h>
-#include <array>
+#include <itkContinuousIndex.h>
+#include <itkImage.h>
+#include <optional>
+#include <vector>
 
 namespace us
 {
@@ -27,29 +31,35 @@ namespace mitk
   /**
     \brief A slice based region growing tool.
 
-    \sa FeedbackContourTool
+    \sa SegTool2D
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl
 
-    When the user presses the mouse button, RegionGrowingTool will use the gray values at that position
-    to initialize a region growing algorithm (in the affected 2D slice).
+    Pressing the mouse button into a 2D slice sets a seed. Dragging with the button held grows a region from the
+    seed and moves its edge to the cursor: the region contains all pixels at most as far from the seed, in geodesic
+    distance, as the pixel under the cursor. Releasing the button writes the region into the active label of the
+    working segmentation. A click without dragging writes nothing.
 
-    By moving the mouse up and down while the button is still pressed, the user can widen or narrow the threshold
-    window, i.e. select more or less within the desired region.
-    The current result of region growing will always be shown as a contour to the user.
+    The geodesic distance makes stepping onto a pixel cost more the less its gray value matches the tissue grown so
+    far, whose mean and standard deviation are re-estimated during growth. A leak into a neighboring tissue therefore
+    has to pay for every dissimilar pixel it crosses, so it creeps in gradually instead of flooding everything behind
+    a single gap.
 
-    After releasing the button, the current result of the region growing algorithm will be written to the
-    working image of this tool's ToolManager.
+    Dragging with Ctrl held draws a cut line instead. Once the line separates parts of the active label in the slice,
+    the part that would be removed is shown, and releasing the button removes it. The part containing the last seed
+    is kept if its region was grown in this slice and label, otherwise the largest part. Holding Ctrl already
+    prepares the cut before the button is pressed: the cursor changes, the segmentation is dimmed and the last seed
+    is marked.
+
+    Pressing Escape or the secondary mouse button while the button is held discards the preview or the cut.
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
-  class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
+  class MITKSEGMENTATION_EXPORT RegionGrowingTool : public SegTool2D
   {
   public:
-    mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
+    mitkClassMacro(RegionGrowingTool, SegTool2D);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -70,71 +80,117 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
-    /**
-     * \brief Called when the user clicks. Initiates region growing.
-     *
-     * Grows a region by calling GetNeighborhoodAverage() and StartRegionGrowing().
-     */
+    /** \brief Discards the preview and the cut, as they belong to the previous time point. */
+    void OnTimePointChanged() override;
+
+    /** \brief Called when the user presses the button. Sets the seed and computes the geodesic distances from it. */
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /**
-     * \brief Called when the user moves the mouse with the left button pressed. Adjusts thresholds.
-     *
-     * - Up: Increase upper threshold, decrease lower threshold.
-     * - Down: Decrease upper threshold, increase lower threshold.
-     * - Right: Increase both thresholds.
-     * - Left: Decrease both thresholds.
-     */
+    /** \brief Called when the mouse moves with the button held. Moves the region's edge to the cursor, once the mouse
+     * left a small deadzone around the seed. */
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /**
-     * \brief Called when the mouse button is released. Converts the feedback contour to a segmentation.
-     */
-    virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent);
+    /** \brief Called when the user releases the button. Writes the region into the active label if the mouse was
+     * dragged. */
+    virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
 
-    /**
-     * \brief Calculates average pixel value around index using a square/cube neighborhood.
-     *
-     * Example: neighborhood=1 yields a 3x3 region, neighborhood=2 yields 5x5, etc.
-     */
-    template <typename TPixel, unsigned int imageDimension>
-    void GetNeighborhoodAverage(const itk::Image<TPixel, imageDimension> *itkImage,
-                                const itk::Index<imageDimension>& index,
-                                ScalarType *result,
-                                unsigned int neighborhood = 1);
+    /** \brief Called when Ctrl is held. Changes the cursor, dims the segmentation in the event's render window and
+     * marks the last seed if a cut there keeps its side. */
+    virtual void OnCutArmed(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /**
-     * \brief Calls an ITK filter to perform the region growing.
-     */
-    template <typename TPixel, unsigned int imageDimension>
-    void StartRegionGrowing(const itk::Image<TPixel, imageDimension> *itkImage,
-                            const itk::Index<imageDimension>& seedPoint,
-                            const std::array<ScalarType, 2>& thresholds,
-                            mitk::Image::Pointer &outputImage);
+    /** \brief Called when Ctrl is no longer held. Undoes OnCutArmed(). */
+    virtual void OnCutDisarmed(StateMachineAction *, InteractionEvent *);
 
-    /**
-     * \brief Calculates the initial thresholds for region growing based on the seed point.
-     */
-    template <typename TPixel, unsigned int imageDimension>
-    void CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>* itkImage);
+    /** \brief Called when the user presses the button with Ctrl held. Starts a cut line. */
+    virtual void OnCutStarted(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    Image::Pointer m_ReferenceSlice;
-    Image::Pointer m_WorkingSlice;
+    /** \brief Called when the mouse moves while cutting. Extends the cut line and shows what it would remove. */
+    virtual void OnCutMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    ScalarType m_SeedValue;
-    itk::Index<3> m_SeedPoint;
-    std::array<ScalarType, 2> m_ThresholdExtrema;
-    std::array<ScalarType, 2> m_Thresholds;
-    std::array<ScalarType, 2> m_InitialThresholds;
-    Point2I m_LastScreenPosition;
-    int m_ScreenYDifference;
-    int m_ScreenXDifference;
+    /** \brief Called when the user releases the button while cutting. Removes what the cut line separated. */
+    virtual void OnCutFinished(StateMachineAction *, InteractionEvent *);
+
+    /** \brief Called when the user presses Escape or the secondary button while the button is held. Discards the
+     * preview or the cut without writing it. */
+    virtual void OnCancel(StateMachineAction *, InteractionEvent *);
 
   private:
-    ScalarType m_MouseDistanceScaleFactor;
-    int m_PaintingPixelValue;
-    bool m_FillFeedbackContour;
-    int m_ConnectedComponentValue;
+    using BinaryImageType = itk::Image<DefaultSegmentationDataType, 2>;
+
+    void UpdatePreview();
+    void UpdatePreviewLayers();
+
+    /** \brief Returns whether the preview could be written. */
+    bool WriteBackPreview();
+    void DiscardPreview();
+
+    void UpdateCut();
+    void DiscardCut();
+
+    void ArmCut(const BaseRenderer* renderer);
+    void DisarmCut();
+
+    /** \brief Dims the working segmentation in m_ArmedRenderer only. */
+    void DimSegmentation();
+    void RestoreSegmentationOpacity();
+
+    /** \brief Whether a cut in renderer keeps the side of the last seed: its region was written into the active label
+     * of the working segmentation, in the slice and at the time point renderer shows. */
+    bool IsLastSeedApplicable(const BaseRenderer* renderer) const;
+
+    Image::Pointer m_WorkingSlice;
+    PlaneGeometry::Pointer m_WorkingPlane;
+    TimeStepType m_TimeStep = 0;
+    DataNode::Pointer m_PreviewNode;
+    DataNode::Pointer m_PreviewOutlineNode;
+
+    /** Geodesic distance of every pixel of the slice from the seed, x running fastest. */
+    std::vector<double> m_Distances;
+    BinaryImageType::SizeType m_SliceSize = {};
+    BinaryImageType::SpacingType m_SliceSpacing;
+
+    itk::Index<2> m_SeedIndex = {};
+    Point3D m_SeedInWorld;
+
+    /** The distance up to which the region grows, set by the cursor while dragging. */
+    double m_MaxDistance = 0;
+
+    Point2D m_PressPositionOnScreen;
+    bool m_IsDragging = false;
+
+    /** The seed of the last region written and where it was written to, see IsLastSeedApplicable(). */
+    Point3D m_LastSeed;
+    PlaneGeometry::Pointer m_LastSeedPlane;
+    TimeStepType m_LastSeedTimeStep = 0;
+    WeakPointer<MultiLabelSegmentation> m_LastSeedSegmentation;
+    MultiLabelSegmentation::LabelValueType m_LastSeedLabelValue = 0;
+
+    /** The slice of the active label's group a cut works on, and the cut line drawn so far. */
+    Image::Pointer m_CutSlice;
+    PlaneGeometry::Pointer m_CutPlane;
+    TimeStepType m_CutTimeStep = 0;
+    DefaultSegmentationDataType m_CutLabelValue = 0;
+    BinaryImageType::Pointer m_CutLabelMask;
+    BinaryImageType::Pointer m_CutLabelParts;
+    std::size_t m_CutNumberOfLabelParts = 0;
+    BinaryImageType::Pointer m_CutLineMask;
+    BinaryImageType::Pointer m_CutAway;
+    itk::ContinuousIndex<double, 2> m_CutLastIndex;
+    itk::Index<2> m_CutStartIndex = {};
+    itk::Index<2> m_ProtectedIndex = {};
+    bool m_HasProtectedIndex = false;
+    DataNode::Pointer m_CutLineNode;
+    DataNode::Pointer m_CutAwayNode;
+
+    /** Marks the last seed while cutting, as its side of the cut is kept. */
+    DataNode::Pointer m_SeedMarkerNode;
+
+    /** While Ctrl is held, the segmentation is dimmed in the armed render window so the image along the cut stays
+     * visible. A renderer-specific opacity it had before is restored afterwards. */
+    bool m_IsCutArmed = false;
+    const BaseRenderer* m_ArmedRenderer = nullptr;
+    DataNode::Pointer m_DimmedNode;
+    std::optional<float> m_DimmedRendererOpacity;
   };
 
 } // namespace

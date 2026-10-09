@@ -71,6 +71,7 @@ class mitkPythonContextTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPythonContextTestSuite);
   MITK_TEST(TestExecuteAndGetVariable);
+  MITK_TEST(TestUserSetupIsIgnored);
   MITK_TEST(TestExecuteFile);
   MITK_TEST(TestBindImageToPython);
   MITK_TEST(TestBindFunctionToPython);
@@ -94,6 +95,22 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Variable 'result' should exist", result.has_value());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Result should be 10", 10, result.value());
+  }
+
+  void TestUserSetupIsIgnored()
+  {
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    pythonContext.Execute(
+      "import site, sys\n"
+      "user_site_enabled = bool(site.ENABLE_USER_SITE)\n"
+      "user_site_on_path = site.getusersitepackages() in sys.path\n"
+      "cwd_on_path = any(p in ('', '.') for p in sys.path)\n");
+
+    CPPUNIT_ASSERT_MESSAGE("The user site should be disabled", !pythonContext.GetVariableAsBool("user_site_enabled").value());
+    CPPUNIT_ASSERT_MESSAGE("The user site should not be on sys.path", !pythonContext.GetVariableAsBool("user_site_on_path").value());
+    CPPUNIT_ASSERT_MESSAGE("The working directory should not be on sys.path", !pythonContext.GetVariableAsBool("cwd_on_path").value());
   }
 
   void TestExecuteFile()

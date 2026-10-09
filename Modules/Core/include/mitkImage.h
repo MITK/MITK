@@ -608,7 +608,8 @@ namespace mitk
      * \brief Check whether the image has a rotated geometry.
      *
      * Returns true if the geometry's transformation matrix has non-zero
-     * off-diagonal elements larger than 1/1000 of the matrix trace.
+     * off-diagonal elements larger than 1/1000 of the sum of the absolute
+     * diagonal elements. Pure axis flips do not count as rotation.
      *
      * \return True if the image geometry is rotated.
      */

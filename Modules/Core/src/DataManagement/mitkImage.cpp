@@ -1300,7 +1300,7 @@ bool mitk::Image::IsRotated() const
     const vnl_matrix_fixed<ScalarType, 3, 3> &mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
     mitk::ScalarType ref = 0;
     for (short k = 0; k < 3; ++k)
-      ref += mx[k][k];
+      ref += std::abs(mx[k][k]);
     ref /= 1000; // Arbitrary value; if a non-diagonal (nd) element is bigger then this, matrix is considered nd.
 
     for (short i = 0; i < 3; ++i)

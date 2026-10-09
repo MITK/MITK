@@ -201,7 +201,8 @@ protected:
    * \param[in] imageNode The image data node.
    * \param[in] roiNode The ROI data node (may be nullptr).
    * \return A pair of (job, placeholder node) with three possible outcomes:
-   *         - Both null: nothing to do.
+   *         - Both null: the pair is settled, i.e. has a valid or failed result; it counts as
+   *           complete and its obsolete nodes are removed.
    *         - Both set: a pending placeholder needs computation; trigger the job.
    *         - Job null, node set: a job for this node is already in progress; wait for completion.
    */

@@ -17,6 +17,14 @@
 #!
 #! \sa usFunctionEmbedResources
 function(usFunctionCheckResourceLinking)
+  # Earlier versions of this check cached these and skipped themselves while
+  # US_RESOURCE_LINKING_AVAILABLE was defined, so a build tree shared with
+  # such a version (e.g. by CI agents) would keep our suffix with their mode.
+  foreach(_var US_RESOURCE_LINKING_AVAILABLE US_DEFAULT_RESOURCE_MODE
+               US_RESOURCE_SOURCE_SUFFIX_LINK US_RESOURCE_SOURCE_SUFFIX_APPEND)
+    unset(${_var} CACHE)
+  endforeach()
+
   set(_suffix "")
   if(APPLE)
     set(_result )

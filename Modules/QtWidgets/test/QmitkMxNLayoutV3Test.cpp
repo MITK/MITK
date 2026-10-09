@@ -22,10 +22,17 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <usModule.h>
+#include <usModuleRegistry.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 #include <QColor>
 
 #include <algorithm>
+#include <fstream>
 #include <string>
+#include <vector>
 
 /**
  * Tests the v3 layout format on QmitkMxNMultiWidget:
@@ -38,6 +45,9 @@ found in the LICENSE file.
  *     slice / zoom / pan offsets.
  *   - Strict mode requires every referenced group declared, across all
  *     dimensions; lazy mode does not.
+ *   - A "3.0" window is closed as well; `render_mode` and `free` are
+ *     validated, also across the windows of an orientation group.
+ *   - The v3 documents shipped in the tree load.
  */
 class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
 {
@@ -66,6 +76,13 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(EmptyNavEntry_GroupGoesWithItsLastLink);
   MITK_TEST(Apply_NotifiesSyncLinksOncePerLoad);
   MITK_TEST(Apply_ActiveCellIsFirstInDocumentOrder);
+  MITK_TEST(V3Doc_UnknownWindowKey_Throws);
+  MITK_TEST(V3Doc_UnknownRenderMode_Throws);
+  MITK_TEST(V3Doc_FreeOn2DWindow_Throws);
+  MITK_TEST(V3Doc_FreeAnd2DInOneOrientationGroup_Throws);
+  MITK_TEST(V3Doc_OrientationLinkedFree_Throws);
+  MITK_TEST(V3Doc_ThreeDWindows_Load);
+  MITK_TEST(InTreeV3Documents_Load);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -639,6 +656,134 @@ public:
     CPPUNIT_ASSERT(nullptr != active);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The first window of the document is active, not the first id in sort order",
                                  std::string("mxn__zeta"), active->GetWidgetName().toStdString());
+  }
+
+  void V3Doc_UnknownWindowKey_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["root"]["children"][0]["rendermode"] = "3d";  // typo'd key
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+  }
+
+  void V3Doc_UnknownRenderMode_Throws()
+  {
+    for (const auto& renderMode : { nlohmann::json("4d"), nlohmann::json(3) })
+    {
+      auto doc = SingleWindowDoc();
+      doc["root"]["children"][0]["render_mode"] = renderMode;
+
+      auto editor = MakeEditor();
+      CPPUNIT_ASSERT_THROW_MESSAGE("render_mode " + renderMode.dump() + " must throw",
+                                   editor->ApplyLayout(doc), mitk::Exception);
+    }
+  }
+
+  void V3Doc_FreeOn2DWindow_Throws()
+  {
+    for (const auto* renderMode : { "2d", "" })
+    {
+      auto doc = SingleWindowDoc();
+      doc["root"]["children"][0]["view_direction"] = "free";
+      if (std::string(renderMode).size() > 0)
+      {
+        doc["root"]["children"][0]["render_mode"] = renderMode;
+      }
+
+      auto editor = MakeEditor();
+      CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+    }
+  }
+
+  /** Two windows linked on orientation; callers patch modes and directions. */
+  static nlohmann::json OrientationGroupDoc()
+  {
+    return nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "render_mode": "3d",
+            "links": { "selection": "main", "orientation": "planes" } },
+          { "type": "window", "id": "mxn__w1", "view_direction": "axial", "render_mode": "3d",
+            "links": { "selection": "main", "orientation": "planes" } }
+        ]
+      }
+    })json");
+  }
+
+  void V3Doc_FreeAnd2DInOneOrientationGroup_Throws()
+  {
+    auto doc = OrientationGroupDoc();
+    doc["root"]["children"][0]["view_direction"] = "free";
+    doc["root"]["children"][1].erase("render_mode");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(SingleWindowDoc());
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("A rejected document leaves the previous layout in place",
+                           nullptr != editor->GetRenderWindowWidget("mxn__w0")
+                             && QmitkMxNMultiWidget::RenderMode::TwoD == editor->GetRenderMode("mxn__w0"));
+  }
+
+  void V3Doc_OrientationLinkedFree_Throws()
+  {
+    auto doc = OrientationGroupDoc();
+    doc["root"]["children"][1]["view_direction"] = "free";
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+  }
+
+  void V3Doc_ThreeDWindows_Load()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(OrientationGroupDoc());
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::RenderMode::ThreeD == editor->GetRenderMode("mxn__w0"));
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Axial == editor->GetViewDirection("mxn__w1"));
+  }
+
+  static nlohmann::json ReadJson(const std::string& path)
+  {
+    std::ifstream stream(path);
+    CPPUNIT_ASSERT_MESSAGE("Cannot open " + path, stream.good());
+    return nlohmann::json::parse(stream);
+  }
+
+  void InTreeV3Documents_Load()
+  {
+    std::vector<std::pair<std::string, nlohmann::json>> documents;
+
+    const auto resource =
+      us::ModuleRegistry::GetModule("MitkQtWidgets")->GetResource("mxnLayout_twoRowsEachDirection.json");
+    CPPUNIT_ASSERT(resource.IsValid());
+    us::ModuleResourceStream resourceStream(resource);
+    documents.emplace_back("mxnLayout_twoRowsEachDirection.json", nlohmann::json::parse(resourceStream));
+
+    const auto schema = ReadJson(MITK_MXN_LAYOUT_V3_SCHEMA_PATH);
+    for (const auto& example : schema.at("examples"))
+    {
+      documents.emplace_back("schema example '" + example.value("name", std::string()) + "'", example);
+    }
+
+    const auto openApi = ReadJson(MITK_REST_API_OPENAPI_PATH);
+    documents.emplace_back("openapi.json layout example",
+      openApi.at("paths").at("/rendering/editors/mxn/layout").at("get").at("responses").at("200")
+        .at("content").at("application/json").at("example"));
+
+    for (const auto& [what, document] : documents)
+    {
+      auto editor = MakeEditor();
+      try
+      {
+        editor->ApplyLayout(document);
+      }
+      catch (const mitk::Exception& e)
+      {
+        CPPUNIT_FAIL(what + " does not load: " + e.GetDescription());
+      }
+    }
   }
 };
 

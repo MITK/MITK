@@ -12,6 +12,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkButtonOverlayWidgetTest.cpp
   QmitkIconThemeTest.cpp
   QmitkLineCompletionTextEditTest.cpp
+  QmitkMxN3DCellTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNGeometryAuthorityTest.cpp
   QmitkMxNLayoutV2Test.cpp

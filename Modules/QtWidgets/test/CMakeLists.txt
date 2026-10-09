@@ -24,6 +24,10 @@ mitkAddCustomModuleTest(QmitkLineCompletionTextEditTest QmitkLineCompletionTextE
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxN3DCellTest QmitkMxN3DCellTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNExplicitNameTest QmitkMxNExplicitNameTest
   -platform minimal
 )
@@ -90,6 +94,13 @@ mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWi
 
 mitkAddCustomModuleTest(QmitkRunInputBlockingTest QmitkRunInputBlockingTest
   -platform minimal
+)
+
+# The v3 layout documents shipped outside this module's resources - the
+# schema's own examples and the REST API's example - must load.
+target_compile_definitions(MitkQtWidgetsTestDriver PRIVATE
+  MITK_MXN_LAYOUT_V3_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../resource/mxn-layout-v3.schema.json"
+  MITK_REST_API_OPENAPI_PATH="${MITK_SOURCE_DIR}/Modules/RESTAPI/resource/openapi.json"
 )
 
 # Schema validation of the MxN v2 layout (schema examples, in-tree preset,

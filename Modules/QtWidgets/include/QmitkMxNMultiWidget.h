@@ -74,6 +74,17 @@ public:
 };
 
 /**
+* \brief Thrown when a view direction or an orientation link would give an
+*        orientation group a direction that one of its members cannot take,
+*        e.g. 'free' (a rotated 3D camera) in a group that a 2D cell shares.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNOrientationConflictException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNOrientationConflictException, mitk::Exception);
+};
+
+/**
 * \brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
 *        is done by using the 'SetLayout'-function to define a layout. This will automatically add or remove
@@ -395,6 +406,48 @@ public:
   */
   void ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, const std::string& group);
 
+  /** \brief Whether a cell shows a 2D slice or a 3D view of its data. */
+  enum class RenderMode
+  {
+    TwoD,
+    ThreeD
+  };
+
+  /**
+  * \brief The direction a cell looks from, in both render modes.
+  *
+  *   For a 2D cell it is the slice plane. A 3D cell looks along the normal of
+  *   the plane a 2D cell with the same direction and reference geometry
+  *   shows, with the same view-up. 'Free' is 3D only: the camera keeps
+  *   whatever rotation the user gave it. 'Original' is the reference
+  *   geometry's own slicing; it comes only from a layout document.
+  */
+  enum class ViewDirection
+  {
+    Axial,
+    Sagittal,
+    Coronal,
+    Original,
+    Free
+  };
+
+  /**
+  * \brief Switch a cell between 2D and 3D rendering.
+  *
+  *   The cell keeps its view direction and is re-initialized on its
+  *   reference geometry; the application-global time point is kept. A 3D
+  *   cell with the direction 'Free' turns 2D with the standard plane nearest
+  *   to its camera direction. Applicability of the cell's links follows the
+  *   new mode (see IsAxisApplicable); links that become applicable converge
+  *   the cell like a cell joining the group. Emits 'SyncLinksChanged'.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  void SetRenderMode(const QString& windowId, RenderMode mode);
+
+  /** \throws mitk::Exception on an unknown window. */
+  RenderMode GetRenderMode(const QString& windowId) const;
+
   /**
   * \brief Set a cell's view direction and relay it to the cell's
   *        `Orientation` group (if linked).
@@ -403,13 +456,40 @@ public:
   *   relayed change never re-triggers propagation. After the relay, the
   *   geometry-relative offsets of the affected cells' `Slice` / `Zoom` /
   *   `Pan` groups are re-converged (the plane flip re-initializes each
-  *   member's stepper and camera).
+  *   member's stepper and camera). 'Free' keeps the camera of a 3D cell as it
+  *   is; it is not relayed.
+  *
+  * \throws mitk::Exception on an unknown window, on 'Original' (the
+  *         reference geometry's own slicing comes only from a layout
+  *         document), and on 'Free' for a 2D cell.
+  * \throws QmitkMxNOrientationConflictException on 'Free' for a cell that is
+  *         linked on `Orientation`.
+  */
+  void SetViewDirection(const QString& windowId, ViewDirection viewDirection);
+
+  /**
+  * \brief Overload for the standard anatomical planes.
   *
   * \throws mitk::Exception on an unknown window or a plane other than
-  *         Axial / Coronal / Sagittal (interactive orientation sync targets
-  *         the standard anatomical planes).
+  *         Axial / Coronal / Sagittal.
   */
   void SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection);
+
+  /** \throws mitk::Exception on an unknown window. */
+  ViewDirection GetViewDirection(const QString& windowId) const;
+
+  /**
+  * \brief Whether the axis has a meaning for the cell in its current render
+  *        mode.
+  *
+  *   A 3D cell synchronizes orientation and data selection only. Links on an
+  *   axis that is not applicable are kept but inactive: they neither relay,
+  *   nor anchor, nor converge, and they take effect again once the cell
+  *   returns to 2D.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  bool IsAxisApplicable(const QString& windowId, QmitkMxNSyncAxis axis) const;
 
   /**
   * \brief Set a node's lookup table on the cell and on every member of the
@@ -884,7 +964,8 @@ public:
   *
   *   Holds the per-cell fields that the layout document persists for a
   *   window besides its links -- identity (id), optional display label, view
-  *   direction enum value, and selection-group label -- without dragging the
+  *   direction and render mode in the document's vocabulary, and
+  *   selection-group label -- without dragging the
   *   JSON or QSplitter shape across the API boundary. The other dimensions'
   *   links are read through GetSyncLink.
   *
@@ -899,7 +980,8 @@ public:
   {
     QString id;              // canonical fully-qualified window id
     QString displayName;     // optional human-readable label, empty when absent
-    QString viewDirection;   // "axial" | "sagittal" | "coronal" | "original"
+    QString viewDirection;   // "axial" | "sagittal" | "coronal" | "original" | "free"
+    QString renderMode;      // "2d" | "3d"
     QString selectionGroup;  // links.selection group label
   };
 
@@ -1513,6 +1595,43 @@ private:
   void PropagateOrientation(const QString& sourceId, mitk::AnatomicalPlane viewDirection);
 
   /**
+  * \brief Whether the axis applies to the renderer's current render mode
+  *        (see IsAxisApplicable).
+  */
+  static bool IsAxisApplicableTo(const mitk::BaseRenderer* renderer, QmitkMxNSyncAxis axis);
+
+  /**
+  * \brief The window the name-based lookups ("axial", "3d", ...) resolve to:
+  *        the active cell if it renders in 'mode', else the first cell in
+  *        document order that does, else the active cell. Null only while no
+  *        cell is active.
+  */
+  QmitkRenderWindow* RenderWindowForMode(RenderMode mode) const;
+
+  /** \brief IsAxisApplicable for a live cell id; false for an unknown one. */
+  bool IsDimensionApplicable(const QString& windowId, QmitkMxNSyncDimension dimension) const;
+
+  /**
+  * \brief Put a cell into 3D rendering: mapper, camera setup and the MxN
+  *        interactor style. Does not initialize the view.
+  */
+  void SwitchCellToThreeD(QmitkRenderWindowWidget* cell);
+
+  /**
+  * \brief Point a 3D cell's camera along its canonical view direction
+  *        (see ViewDirection). No-op for a 2D cell, a 'Free' cell and a
+  *        cell without geometry yet.
+  */
+  void ApplyThreeDViewDirection(const QString& windowId);
+
+  /** \brief Re-apply the view direction of this editor's 3D cells after a
+   *         view initialization turned them anterior. */
+  void OnViewsInitialized();
+
+  /** \brief A rotation of a 3D cell's camera by the user. */
+  void OnThreeDCameraRotated(const QString& windowId);
+
+  /**
   * \brief Cells reachable from 'windowId' over shared `Slice` or
   *        `Orientation` groups (the geometry-authority component, always
   *        including 'windowId' itself), in pre-order.
@@ -1591,6 +1710,17 @@ private:
   unsigned int m_OrientationPropagationDepth = 0;
 
   unsigned int m_OrientationApplyCount = 0;
+
+  /**
+  * \brief The 3D cells whose view direction is 'Free'. Every other cell's
+  *        direction is its slice navigation controller's default direction,
+  *        and its render mode is its renderer's mapper id.
+  */
+  std::set<QString> m_FreeCells;
+
+  /** \brief Tag of this editor's observer of the rendering manager's
+   *         views-initialized event. */
+  unsigned long m_ViewsInitializedObserverTag = 0;
 
   std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 

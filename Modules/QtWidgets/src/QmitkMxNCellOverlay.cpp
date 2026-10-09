@@ -3362,7 +3362,9 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
   for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
                                 QmitkMxNSyncDimension::Pan })
   {
-    hasOffsetLink = hasOffsetLink || m_Editor->GetSyncLink(windowId, dimension).has_value();
+    hasOffsetLink = hasOffsetLink
+                    || (m_Editor->GetSyncLink(windowId, dimension).has_value()
+                        && m_Editor->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension)));
   }
   reconvergeAction->setEnabled(hasOffsetLink);
   connect(reconvergeAction, &QAction::triggered, this, [this, windowId]()

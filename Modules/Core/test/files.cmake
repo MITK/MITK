@@ -40,6 +40,7 @@ set(MODULE_TESTS
   mitkImageDescriptorTest.cpp
   mitkImageGeneratorTest.cpp
   mitkImageIsRotatedTest.cpp
+  mitkImageVtkMapper2DApplyLookupTableTest.cpp
   mitkIOUtilTest.cpp
   mitkITKEventObserverGuardTest.cpp
   mitkBaseDataTest.cpp

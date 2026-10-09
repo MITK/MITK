@@ -23,10 +23,9 @@ found in the LICENSE file.
 #include <mitkDICOMPMPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
 
+#include <mitkImageVtkMapper2D.h>
 #include <mitkLevelWindowProperty.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkRenderingModeProperty.h>
-#include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkLookupTable.h>
 
 namespace mitk
 {
@@ -240,17 +239,8 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
   parameterImage->SetProperty("levelwindow", levWinProp);
   // set lookup table
   auto lut = mitk::LookupTable::New();
-  if (name == "stop_condition")
-  {
-    lut->SetType(LookupTable::MULTILABEL);
-    result->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
-    result->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST));
-  }
-  else
-  {
-    lut->SetType(LookupTable::JET_TRANSPARENT);
-  }
-  result->SetProperty("LookupTable", mitk::LookupTableProperty::New(lut));
+  lut->SetType(name == "stop_condition" ? LookupTable::MULTILABEL : LookupTable::JET_TRANSPARENT);
+  mitk::ImageVtkMapper2D::ApplyLookupTable(result, lut);
 
   return result;
 }

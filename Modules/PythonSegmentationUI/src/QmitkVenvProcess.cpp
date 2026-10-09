@@ -26,8 +26,8 @@ found in the LICENSE file.
 
 QProcessEnvironment QmitkVenvProcess::CleanEnvironment()
 {
-  // The host sets PYTHONHOME / PYTHONPATH for its embedded interpreter; leaving
-  // them in place would make the venv interpreter import from the host instead.
+  // PYTHONHOME / PYTHONPATH of another Python installation would make the venv
+  // interpreter import from there instead of from the venv.
   auto env = QProcessEnvironment::systemEnvironment();
   env.remove(QStringLiteral("PYTHONHOME"));
   env.remove(QStringLiteral("PYTHONPATH"));

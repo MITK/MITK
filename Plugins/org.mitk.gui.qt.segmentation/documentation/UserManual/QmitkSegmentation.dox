@@ -48,8 +48,9 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 <tr><td>Add anchor point</td><td><tt>Ctrl+Left-Click</tt></td></tr>
 <tr><td>Delete anchor point</td><td><tt>Del</tt> (when selected)</td></tr>
 <tr><td>Move anchor point</td><td><tt>Click+Drag</tt> anchor</td></tr>
-<tr><td rowspan="2"><b>Region Growing</b></td><td>Widen/narrow gray value range</td><td>Mouse Up/Down while drawing</td></tr>
-<tr><td>Shift gray value range</td><td>Mouse Left/Right while drawing</td></tr>
+<tr><td rowspan="3"><b>Region Growing</b></td><td>Segment a structure</td><td>Press inside it, drag to its edge, release</td></tr>
+<tr><td>Cut off a leak</td><td><tt>Ctrl</tt> / <tt>Cmd</tt> + drag a line across it</td></tr>
+<tr><td>Cancel</td><td><tt>Esc</tt> or <tt>Right-Click</tt> while dragging</td></tr>
 <tr><td rowspan="2"><b>Selection Tool</b></td><td>Show label info popup</td><td><tt>Hover</tt> over label</td></tr>
 <tr><td>Select topmost label</td><td><tt>Left-Click</tt></td></tr>
 </table>
@@ -365,19 +366,25 @@ Holding CTRL / CMD inverts the current tool's behavior (i.e. instead of painting
 
 \imageMacro{QmitkSegmentation_IMGIconRegionGrowing.png,"Region growing tool",2.00}
 
-Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool.
-Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor.
-This allows to quickly create segmentations of structures that have a good contrast to surrounding tissue.
-The tool operates based on the current level window, so changing the level window to optimize the contrast for the ROI is encouraged.
-Moving the mouse up / down is different from left / right:
-Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it.
-Moving the mouse left and right will shift the range.
-The tool will select more or less pixels, corresponding to the changing gray value range.
+Press the mouse button inside a structure in a 2D slice widget and drag to its edge to segment it with the region growing tool.
+The region spreads from the pressed point through tissue of similar gray value, and its edge follows the cursor: it grows out to the cursor or shrinks back to it, following the tissue everywhere else.
+It learns the gray values of the tissue while it grows, so it follows slow changes in brightness within a structure.
+Crossing into tissue of a different gray value is expensive for the region, so a leak through a gap creeps in slowly instead of flooding everything behind it.
+To get rid of a leak while dragging, move the cursor back to where the leak enters the neighboring tissue.
+Pressing well inside a structure rather than close to its border gives the best result.
+
+Releasing the button adds the region to the active label; a click without dragging adds nothing.
+Press Escape or the right mouse button while still holding the left one to discard the region instead.
+
+To cut off a leak after the region was added, hold CTRL / CMD and draw a line across it, starting and ending outside the segmentation.
+Once the line separates a part, that part is shown in red and releasing the button removes it.
+The part containing the point you last pressed to grow a region of this label in this slice is always kept; without such a point, the largest part is kept.
 
 <table>
 <tr><th>Category</th><th>Action</th><th>Shortcut</th></tr>
-<tr><td rowspan="2"><b>Region Growing</b></td><td>Widen/narrow gray value range</td><td>Mouse Up/Down while drawing</td></tr>
-<tr><td>Shift gray value range</td><td>Mouse Left/Right while drawing</td></tr>
+<tr><td rowspan="3"><b>Region Growing</b></td><td>Segment a structure</td><td>Press inside it, drag to its edge, release</td></tr>
+<tr><td>Cut off a leak</td><td><tt>Ctrl</tt> / <tt>Cmd</tt> + drag a line across it</td></tr>
+<tr><td>Cancel</td><td><tt>Esc</tt> or <tt>Right-Click</tt> while dragging</td></tr>
 </table>
 
 \subsection org_mitk_views_segmentationfilltool Fill tool

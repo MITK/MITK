@@ -1048,7 +1048,7 @@ void mitk::RegionGrowingTool::ArmCut(const BaseRenderer* renderer)
     m_IsCutArmed = true;
 
     auto module = us::GetModuleContext()->GetModule();
-    this->PushCursor(module->GetResource("Subtract_Cursor.svg"));
+    this->PushCursor(module->GetResource("Cut_Cursor.svg"));
   }
 
   if (renderer != m_ArmedRenderer)

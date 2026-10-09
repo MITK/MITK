@@ -10,7 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkDataNode.h>
 #include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 
 #include <mitkTestingMacros.h>
 #include <mitkNumericTypes.h>
@@ -19,6 +21,7 @@ found in the LICENSE file.
 #include <iostream>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkSmartPointer.h>
 
 class mitkLookupTableTestSuite : public mitk::TestFixture
 {
@@ -26,6 +29,8 @@ class mitkLookupTableTestSuite : public mitk::TestFixture
   MITK_TEST(TestCreateLookupTable);
   MITK_TEST(TestSetVtkLookupTable);
   MITK_TEST(TestSetOpacity);
+  MITK_TEST(TestEquality_ConsidersType);
+  MITK_TEST(TestSetPropertyWithOnlyTypeChanged_StoresType);
   MITK_TEST(TestCreateColorTransferFunction);
   MITK_TEST(TestCreateOpacityTransferFunction);
   MITK_TEST(TestCreateGradientTransferFunction);
@@ -33,6 +38,19 @@ class mitkLookupTableTestSuite : public mitk::TestFixture
 
 private:
   mitk::LookupTable::Pointer m_LookupTable;
+
+  static mitk::LookupTable::Pointer CreateUntypedMultilabelTable()
+  {
+    auto multilabel = mitk::LookupTable::New();
+    multilabel->SetType(mitk::LookupTable::MULTILABEL);
+
+    auto entries = vtkSmartPointer<vtkLookupTable>::New();
+    entries->DeepCopy(multilabel->GetVtkLookupTable());
+
+    auto untyped = mitk::LookupTable::New();
+    untyped->SetVtkLookupTable(entries);
+    return untyped;
+  }
 
 public:
   void TestCreateLookupTable()
@@ -89,6 +107,33 @@ public:
     lut->GetTableValue(tableIndex, rgba);
     CPPUNIT_ASSERT_MESSAGE("Opacity not set for value", mitk::Equal(1.0, rgba[3], 0.01, true));
     lut->Delete();
+  }
+
+  void TestEquality_ConsidersType()
+  {
+    auto untyped = CreateUntypedMultilabelTable();
+    auto typed = untyped->Clone();
+    typed->SetType(mitk::LookupTable::MULTILABEL);
+
+    CPPUNIT_ASSERT_EQUAL(mitk::LookupTable::GRAYSCALE, untyped->GetActiveType());
+    CPPUNIT_ASSERT(*untyped != *typed);
+
+    untyped->SetType(mitk::LookupTable::MULTILABEL);
+    CPPUNIT_ASSERT(*untyped == *typed);
+  }
+
+  void TestSetPropertyWithOnlyTypeChanged_StoresType()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(CreateUntypedMultilabelTable()));
+
+    auto typed = CreateUntypedMultilabelTable();
+    typed->SetType(mitk::LookupTable::MULTILABEL);
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(typed));
+
+    auto stored = dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+    CPPUNIT_ASSERT(nullptr != stored);
+    CPPUNIT_ASSERT_EQUAL(mitk::LookupTable::MULTILABEL, stored->GetValue()->GetActiveType());
   }
 
   void TestCreateColorTransferFunction()

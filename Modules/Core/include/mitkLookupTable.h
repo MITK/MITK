@@ -144,7 +144,7 @@ namespace mitk
     /**
      * \brief Compare two LookupTable objects for equality.
      * \param[in] LookupTable The LookupTable to compare against.
-     * \return True if both tables contain the same entries.
+     * \return True if both tables have the same type and contain the same entries.
      */
     virtual bool operator==(const mitk::LookupTable &LookupTable) const;
 

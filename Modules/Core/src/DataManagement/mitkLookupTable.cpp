@@ -293,6 +293,8 @@ mitk::LookupTable::RawLookupTableType *mitk::LookupTable::GetRawLookupTable() co
 
 bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
 {
+  if (m_Type != other.m_Type)
+    return false;
   if (m_LookupTable == other.GetVtkLookupTable())
     return true;
   vtkLookupTable *olut = other.GetVtkLookupTable();

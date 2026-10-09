@@ -98,6 +98,7 @@ bool mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
   }
 
   j = nlohmann::json::object();
+  j["Type"] = this->GetValue()->GetActiveTypeAsString();
   j["NumberOfColors"] = static_cast<int>(lut->GetNumberOfTableValues());
   j["Scale"] = lut->GetScale();
   j["Ramp"] = lut->GetRamp();
@@ -153,6 +154,11 @@ bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
   }
 
   auto mitkLut = LookupTable::New();
+
+  // SetType() rebuilds the table, so it must precede restoring the stored one.
+  if (j.contains("Type"))
+    mitkLut->SetType(j["Type"].get<std::string>());
+
   mitkLut->SetVtkLookupTable(lut);
   this->SetLookupTable(mitkLut);
 

@@ -34,6 +34,7 @@ found in the LICENSE file.
 #include <mitkVtkScalarModeProperty.h>
 
 #include <mitkBasePropertySerializer.h>
+#include <mitkLookupTablePropertySerializer.h>
 #include <mitkPropertyList.h>
 #include <mitkPropertyListSerializer.h>
 
@@ -45,6 +46,7 @@ found in the LICENSE file.
 #include <tinyxml2.h>
 
 void TestAllProperties(const mitk::PropertyList *propList);
+void TestLookupTableTypeRoundTrip();
 
 /**Documentation
 * \brief Test for all PropertySerializer classes.
@@ -134,7 +136,32 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   node->SetData(mitk::VtkWidgetRendering::New());
   TestAllProperties(node->GetPropertyList());
 
+  TestLookupTableTypeRoundTrip();
+
   MITK_TEST_END();
+}
+
+void TestLookupTableTypeRoundTrip()
+{
+  auto lut = mitk::LookupTable::New();
+  lut->SetType(mitk::LookupTable::MULTILABEL);
+  lut->ChangeOpacity(1, 0.5);
+  auto prop = mitk::LookupTableProperty::New(lut);
+
+  auto serializer = mitk::LookupTablePropertySerializer::New();
+  serializer->SetProperty(prop);
+  tinyxml2::XMLDocument doc;
+  auto *element = serializer->Serialize(doc);
+  MITK_TEST_CONDITION_REQUIRED(element != nullptr, "Serialize multilabel lookup table");
+
+  const auto deserialized = serializer->Deserialize(element);
+  auto *deserializedProp = dynamic_cast<mitk::LookupTableProperty *>(deserialized.GetPointer());
+  MITK_TEST_CONDITION_REQUIRED(deserializedProp != nullptr, "Deserialize multilabel lookup table");
+
+  const auto deserializedLut = deserializedProp->GetValue();
+  MITK_TEST_CONDITION(mitk::LookupTable::MULTILABEL == deserializedLut->GetActiveType(),
+                      "Deserialized lookup table keeps its type");
+  MITK_TEST_CONDITION(*deserializedLut == *lut, "Deserialized lookup table keeps its stored colors");
 }
 
 void TestAllProperties(const mitk::PropertyList *propList)

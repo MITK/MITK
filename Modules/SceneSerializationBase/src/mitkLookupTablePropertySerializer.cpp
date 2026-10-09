@@ -38,6 +38,7 @@ tinyxml2::XMLElement *mitk::LookupTablePropertySerializer::Serialize(tinyxml2::X
     double *range;
     double *rgba;
 
+    element->SetAttribute("Type", mitkLut->GetActiveTypeAsString().c_str());
     element->SetAttribute("NumberOfColors", static_cast<int>(lut->GetNumberOfTableValues()));
     element->SetAttribute("Scale", lut->GetScale());
     element->SetAttribute("Ramp", lut->GetRamp());
@@ -221,6 +222,11 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(con
   }
 
   LookupTable::Pointer mitkLut = LookupTable::New();
+
+  // SetType() rebuilds the table, so it must precede restoring the stored one.
+  if (const auto *type = element->Attribute("Type"))
+    mitkLut->SetType(type);
+
   mitkLut->SetVtkLookupTable(lut);
 
   return LookupTableProperty::New(mitkLut).GetPointer();

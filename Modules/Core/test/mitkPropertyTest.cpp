@@ -34,6 +34,8 @@ found in the LICENSE file.
 // VTK includes
 #include <vtkDebugLeaks.h>
 
+#include <nlohmann/json.hpp>
+
 struct PropertyModifiedListener
 {
   typedef itk::SimpleMemberCommand<PropertyModifiedListener> CmdType;
@@ -79,6 +81,7 @@ class mitkPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferFunctionProperty_Success);
   MITK_TEST(TestWeakPointerProperty_Success);
   MITK_TEST(TestLookupTablePropertyProperty_Success);
+  MITK_TEST(TestLookupTablePropertyJSON_KeepsType);
   MITK_TEST(TestDoubleVectorProperty_Success);
   MITK_TEST(TestIntVectorProperty_Success);
   CPPUNIT_TEST_SUITE_END();
@@ -486,6 +489,22 @@ public:
     std::string strLUT2 = prop2->GetValueAsString();
 
     TestProperty<mitk::LookupTableProperty>(lut1, lut2, strLUT1, strLUT2);
+  }
+
+  void TestLookupTablePropertyJSON_KeepsType()
+  {
+    auto lut = mitk::LookupTable::New();
+    lut->SetType(mitk::LookupTable::MULTILABEL);
+    lut->ChangeOpacity(1, 0.5);
+
+    nlohmann::json j;
+    CPPUNIT_ASSERT(mitk::LookupTableProperty::New(lut)->ToJSON(j));
+
+    auto prop = mitk::LookupTableProperty::New();
+    CPPUNIT_ASSERT(prop->FromJSON(j));
+
+    CPPUNIT_ASSERT_EQUAL(mitk::LookupTable::MULTILABEL, prop->GetValue()->GetActiveType());
+    CPPUNIT_ASSERT_EQUAL(lut->GetVtkLookupTable()->GetTableValue(1)[3], prop->GetValue()->GetVtkLookupTable()->GetTableValue(1)[3]);
   }
 
   void TestDoubleVectorProperty_Success()

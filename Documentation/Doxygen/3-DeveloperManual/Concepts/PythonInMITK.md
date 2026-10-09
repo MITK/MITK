@@ -359,6 +359,6 @@ How the extension module finds the libraries in the external case:
 
 The wheel solves the same problem with its own repair tools and keeps its own RPATH; none of this applies to it.
 
-On macOS, an MITK process currently loads the Python library twice: `MitkPython` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks`, while `MitkPreloadPython` loads `Python.framework/Versions/A/Python`.
+The Python library ships only inside the Python installation, and an MITK process loads a single copy of it. In MITK's executables, `MitkPreloadPython` loads it before `MitkPython` is loaded. A process that links `MitkPython` itself loads it at startup through the install RPATH of `MitkPython`, which reaches the library directory of the Python installation on Linux and macOS. On Windows, such a process has to load `MitkCore` first and delay-load `MitkPython`.
 
 \ref PackagingPage describes how to verify these scenarios on a package.

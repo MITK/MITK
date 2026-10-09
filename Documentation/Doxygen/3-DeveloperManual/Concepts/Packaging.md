@@ -83,7 +83,7 @@ The single resolution call uses two layers of filtering:
 **POST_EXCLUDE_REGEXES** (matched against the full resolved path):
 - `[/\\]Windows[/\\]` — Windows system directory (case-insensitive)
 - `/usr/lib`, `/lib`, `/System` — Linux/macOS system libraries
-- `python3[0-9]+.` — Python shared library (installed separately)
+- `[/\\](lib)?python3[.]?[0-9]+[.](dll|so|dylib)` — Python shared library (`python3X.dll`, `libpython3.X.so.1.0`, `libpython3.X.dylib`), which ships with the Python installation only (see Python below)
 - `.*/plugins/.*` — Qt/CTK plugins (deployed by Qt deployment or CTK plugin install)
 - `.*Qt[A-Z].*\.framework.*` — Qt frameworks on macOS (deployed by `qt_generate_deploy_app_script()`)
 - `.*/Qt[A-Z].*\.dylib$` — Qt dylibs in non-framework form (same reason)
@@ -245,6 +245,8 @@ The bindings are used in two ways, and both have to work from the package:
 
 For the external case, `mitkInstallRules.cmake` gives the module an install RPATH that reaches the libraries next to the executables (`$ORIGIN/../../../../../bin` on Linux, the corresponding `@loader_path` entries for `Contents/MacOS` and `Contents/Frameworks` on macOS). Windows has no RPATH, and Python resolves the DLLs of an extension module only from registered directories, so the package's `__init__.py` registers `bin/` with `os.add_dll_directory()` when it finds MITK's DLLs there. The wheel configuration handles all of this through its own repair tools instead.
 
+The Python library itself ships only inside the Python installation; the dependency resolution leaves it out. MITK's executables load `MitkPython` only after `PreloadPython` loaded the library from its full path, but a process that links `MitkPython` loads it at startup. `mitkInstallRules.cmake` therefore extends the install RPATH of `MitkPython` by the library directory of the Python installation: `$ORIGIN/../python/lib` on Linux, and on macOS `@loader_path/../Frameworks/Python.framework/lib` for a plain install plus `.../Python.framework/Versions/A/lib` for a package, whose framework conversion moves `lib/`. Either way, a process loads a single Python library. On Windows, such a process has to load `MitkCore` first (see Verifying a Package).
+
 ## Qt Deployment
 
 Qt deployment is handled by `mitkFunctionDeployQt()` in `mitkFunctionDeployQt.cmake`. It runs **after** the runtime dependency resolution, so that tools like `windeployqt` can see all MITK DLLs already present in `bin/` and correctly trace their transitive Qt dependencies.
@@ -349,6 +351,7 @@ This ensures external project libraries can find each other within the SuperBuil
 | Autoload modules | `$ORIGIN/..` | `@loader_path/..` | Installed in `<parent>/` subdir, must find libs in parent dir |
 | Plugins | `$ORIGIN/..` | `@loader_path/..` | Installed in `plugins/`, must find libs in parent dir |
 | Imported CTK plugins | `$ORIGIN/..` (via `file(RPATH_SET)`) | `@loader_path/..` (via `install_name_tool`) | Same as plugins, but set post-install since they are imported targets |
+| `MitkPython` | Global default + `$ORIGIN/../python/lib` | Global default + `@loader_path/../Frameworks/Python.framework/lib` and `.../Versions/A/lib` | Finds the Python library inside the Python installation (see Python) |
 | Executables | `$ORIGIN;$ORIGIN/plugins` | `@loader_path;@loader_path/plugins;@loader_path/../Frameworks` | Global default |
 
 On **Windows**, RPATH does not apply. DLLs are found via the executable's directory and `PATH`.
@@ -372,7 +375,7 @@ Wrapper scripts launch MITK executables from the install root. They exist becaus
 | `RunInstalledApp.sh` | Regular executables and BlueBerry apps | Sets `LD_LIBRARY_PATH` to include `bin/` and `python/lib`, then launches `bin/<name>` |
 | `RunInstalledCmdLineApp.sh` | Command-line apps | Same but resolves paths from `apps/` subdirectory |
 
-On Linux, the wrapper scripts prepend `bin/` and `python/lib` to `LD_LIBRARY_PATH`. `python/lib` is required for the Python shared library to be found at runtime. `bin/` is a defensive layer: `LD_LIBRARY_PATH` takes precedence over a library's RUNPATH, so even if a bundled external `.so` carries a stale build-tree RPATH entry that happens to match a real directory on the user's machine, the bundled libraries in `bin/` are loaded first. The CTK RUNPATH fixup in `mitkInstallRules.cmake` addresses the root cause for CTK specifically; this wrapper-script layer protects against the same class of failure for other externals and for the case of running the raw executable directly through the wrapper.
+On Linux, the wrapper scripts prepend `bin/` and `python/lib` to `LD_LIBRARY_PATH`. `python/lib` duplicates the install RPATH of `MitkPython`, which reaches the Python shared library on its own. `bin/` is a defensive layer: `LD_LIBRARY_PATH` takes precedence over a library's RUNPATH, so even if a bundled external `.so` carries a stale build-tree RPATH entry that happens to match a real directory on the user's machine, the bundled libraries in `bin/` are loaded first. The CTK RUNPATH fixup in `mitkInstallRules.cmake` addresses the root cause for CTK specifically; this wrapper-script layer protects against the same class of failure for other externals and for the case of running the raw executable directly through the wrapper.
 
 ## CPack Configuration
 
@@ -406,7 +409,7 @@ On Linux, the distribution name and version are read from `/etc/os-release`.
 
 ### Strip Policy
 
-Linux and macOS packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into a section of their own, `us_resources` on Linux and `__TEXT,us_resources` on macOS (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores their install RUNPATH. On macOS CMake strips with `strip -x`, which keeps the exported symbols, and the bundle is signed only afterwards, in `FixMacOSInstaller.cmake`.
+Linux and macOS packages are stripped (`CPACK_STRIP_FILES ON`). MITK's own modules keep their CppMicroServices resources through this because the resources are linked into a section of their own, `us_resources` on Linux and `__TEXT,us_resources` on macOS (see \ref CppMicroServicesResourcesSection). CPack strips only what `install(TARGETS)` installs. Libraries that `install(RUNTIME_DEPENDENCY_SET)` copies from the superbuild prefix stay as they are, and because the Qt deployment resolves the build-tree executable and copies its MITK dependencies over the stripped files, `mitkInstallRules.cmake` strips MITK's own libraries once more after it and restores the install RUNPATH of each. On macOS CMake strips with `strip -x`, which keeps the exported symbols, and the bundle is signed only afterwards, in `FixMacOSInstaller.cmake`.
 
 Windows packages are not stripped: MSVC has no strip step.
 
@@ -665,7 +668,7 @@ Runtime scenarios, each with the build tree, the Qt installation, the sources an
 
 1. The command-line apps start, and a conversion with `MitkFileConverter` loads the IO auto-load modules.
 2. The bundled interpreter runs a script that imports `mitk`, finds the auto-load modules in `mitk.get_loaded_modules()` and loads an image.
-3. A small executable next to `MitkWorkbench` embeds Python through `mitk::PythonContext` and does the same.
+3. A small executable next to `MitkWorkbench` embeds Python through `mitk::PythonContext` and does the same, with a single Python library loaded (`strace -e trace=openat` on Linux, `DYLD_PRINT_LIBRARIES` on macOS).
 4. The Workbench starts and runs Python; this one needs a display.
 
 On macOS, run them on the CPack package and on a plain install, which differ in layout and signing.
@@ -676,10 +679,6 @@ Pitfalls of these checks:
 - The working directory must not lie inside a hidden location: an embedded interpreter resolves the empty `sys.path` entry through it and fails with a `PermissionError`.
 - `codesign --verify` on the main executable or a framework binary also checks the resource seal of the bundle, which only a package has.
 - On Windows, a test executable that links `MitkPython` needs the Python DLL at process start, whereas the Workbench loads `MitkPython` only after `PreloadPython` loaded the DLL from its full path. Load `MitkCore` first and delay-load `MitkPython` to behave the same.
-
-## Known Issues and Future Work
-
-- **Two copies of the Python library on macOS**: `MitkPython` links `@rpath/libpython3.X.dylib`, which resolves to a copy in `Contents/Frameworks/`, while `PreloadPython` loads `Python.framework/Versions/A/Python`. Both end up in an MITK process.
 
 ## File Reference
 

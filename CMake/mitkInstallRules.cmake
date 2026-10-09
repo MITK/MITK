@@ -42,6 +42,24 @@ if(MITK_USE_Python3)
           "$ORIGIN/${_to_bindir}")
       endif()
     endif()
+
+    # The Python library ships only inside the Python installation. MITK's
+    # executables load MitkPython after PreloadPython loaded the library, but
+    # a process that links MitkPython loads it at startup and needs to find it
+    # on its own. On macOS, FixMacOSInstaller moves lib/ into Versions/A/ for
+    # a package, while a plain install keeps it in place.
+    if(TARGET MitkPython AND NOT WIN32)
+      file(RELATIVE_PATH _to_python "/${_bindir}" "/${_python_dest}")
+      if(APPLE)
+        set(_python_rpaths "@loader_path/${_to_python}/lib" "@loader_path/${_to_python}/Versions/A/lib")
+      else()
+        set(_python_rpaths "$ORIGIN/${_to_python}/lib")
+      endif()
+      get_target_property(_rpaths MitkPython INSTALL_RPATH)
+      list(APPEND _rpaths ${_python_rpaths})
+      list(REMOVE_DUPLICATES _rpaths)
+      set_property(TARGET MitkPython PROPERTY INSTALL_RPATH ${_rpaths})
+    endif()
   endforeach()
 endif()
 
@@ -76,7 +94,7 @@ foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRA
       "^/usr/lib"
       "^/lib"
       "^/System"
-      "python3[0-9]+[.]"
+      "[/\\\\](lib)?python3[.]?[0-9]+[.](dll|so|dylib)"   # Python library, installed with the Python installation
       ".*/plugins/.*"
       ".*Qt[A-Z].*\\.framework.*"   # Qt frameworks — handled by qt_generate_deploy_app_script() on macOS
       ".*/Qt[A-Z].*\\.dylib$"       # Qt dylibs (non-framework form) — same reason
@@ -195,11 +213,22 @@ endif()
 # resolution is not an option: the exclusion also stops the search below
 # them, so Qt modules reached only through MITK libraries would lose their
 # plugins. CMake applies the install RUNPATH and the strip only to what
-# install(TARGETS) installs, hence the second pass.
+# install(TARGETS) installs, hence the second pass. A module's own install
+# RUNPATH, such as the one of MitkPython, takes precedence over the default.
 #-----------------------------------------------------------------------------
 
 if(LINUX)
   string(REPLACE ";" ":" _mitk_install_rpath "${CMAKE_INSTALL_RPATH}")
+  set(_mitk_module_rpaths "")
+  get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+  foreach(_target IN LISTS _mitk_module_targets)
+    get_target_property(_type ${_target} TYPE)
+    if(_type STREQUAL "SHARED_LIBRARY")
+      string(APPEND _mitk_module_rpaths
+        "set(\"_rpath_$<TARGET_FILE_NAME:${_target}>\" \"$<JOIN:$<TARGET_PROPERTY:${_target},INSTALL_RPATH>,:>\")\n")
+    endif()
+  endforeach()
+  install(CODE "${_mitk_module_rpaths}")
   install(CODE "
     file(GLOB _mitk_libraries \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so\")
     foreach(_library \${_mitk_libraries})
@@ -214,7 +243,12 @@ if(LINUX)
           message(FATAL_ERROR \"strip failed on \${_installed}\")
         endif()
       endif()
-      file(RPATH_SET FILE \"\${_installed}\" NEW_RPATH \"${_mitk_install_rpath}\")
+      if(DEFINED \"_rpath_\${_name}\")
+        set(_rpath \"\${_rpath_\${_name}}\")
+      else()
+        set(_rpath \"${_mitk_install_rpath}\")
+      endif()
+      file(RPATH_SET FILE \"\${_installed}\" NEW_RPATH \"\${_rpath}\")
     endforeach()
   ")
 endif()

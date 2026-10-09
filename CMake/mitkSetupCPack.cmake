@@ -52,12 +52,15 @@ set(CPACK_RESOURCE_FILE_LICENSE "${MITK_SOURCE_DIR}/LICENSE")
 
 string(REPLACE "/" "_" CPACK_PACKAGE_VERSION_MAJOR "${MITK_REVISION_DESC}")
 
-# Do not strip files during packaging. MitkCppMicroServices currently
-# embeds resources as ZIP archives appended to shared library files
-# (APPEND mode). The strip command rewrites ELF binaries and discards
-# all data beyond the ELF structure, destroying these appended resources.
-# This restriction will go away once LINK mode is used instead.
-set(CPACK_STRIP_FILES OFF)
+# Strip the installed binaries on Linux and macOS. MITK's own modules keep
+# their CppMicroServices resources through strip because the resources are
+# linked into a regular section (see usFunctionCheckResourceLinking). MSVC has
+# no strip step.
+if(UNIX)
+  set(CPACK_STRIP_FILES ON)
+else()
+  set(CPACK_STRIP_FILES OFF)
+endif()
 
 # set version
 if(NOT CPACK_PACKAGE_VERSION_MAJOR)

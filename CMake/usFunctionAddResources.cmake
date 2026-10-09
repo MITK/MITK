@@ -3,16 +3,15 @@
 #!
 #! This CMake function uses an external command line program to generate a ZIP archive
 #! containing data from external resources such as text files or images or other ZIP
-#! archives. The created archive file can be appended or linked into the target file
-#! using the usFunctionEmbedResources macro.
+#! archives. The created archive file is linked into the target file by the
+#! usFunctionEmbedResources macro.
 #!
 #! Each module can call this function to add resources and make them available at
 #! runtime through the Module class. Multiple calls to this function append the
 #! input files.
 #!
-#! In the case of linking static modules which contain resources to the target module,
-#! adding the static module target name to the ZIP_ARCHIVES list will merge its
-#! resources into the target module.
+#! Adding another target name to the ZIP_ARCHIVES list merges the resources of that
+#! target into this one.
 #!
 #! Example usage:
 #! \code{.cmake}

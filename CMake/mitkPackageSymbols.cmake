@@ -66,14 +66,13 @@ if(CMAKE_HOST_WIN32)
     math(EXPR _staged "${_staged} + 1")
   endforeach()
 else()
-  # Split DWARF (.dwo) lives beside the objects, not next to the binaries, so
-  # pack each binary's debug info into a self-contained sidecar: dwp (.dwp) on
-  # ELF, dsymutil (.dSYM) on macOS. Best effort - warns and skips if the tool
-  # is unavailable (e.g. the -g fallback leaves debug info embedded instead).
+  # On ELF the unstripped build-tree binary is the symbol file: it carries
+  # the DWARF that strip removes from the shipped copy, so archive it as is.
+  # On macOS the linker leaves the DWARF in the object files, so dsymutil
+  # packs it into a self-contained .dSYM here. Without dsymutil nothing is
+  # staged and the archive step below fails.
   if(CMAKE_HOST_APPLE)
     find_program(_dsymutil dsymutil)
-  else()
-    find_program(_dwp NAMES dwp)
   endif()
 
   set(_search_dirs "${_bin_dir}")
@@ -114,19 +113,15 @@ else()
       if(_result EQUAL 0)
         math(EXPR _staged "${_staged} + 1")
       endif()
-    elseif(NOT CMAKE_HOST_APPLE AND _dwp)
-      execute_process(COMMAND "${_dwp}" -e "${_binary}" -o "${MITK_SYMBOL_STAGING_DIR}/${_name}.dwp"
-        RESULT_VARIABLE _result)
-      if(_result EQUAL 0 AND EXISTS "${MITK_SYMBOL_STAGING_DIR}/${_name}.dwp")
+    elseif(NOT CMAKE_HOST_APPLE)
+      # The extensionless candidates include scripts and data files.
+      file(READ "${_binary}" _magic LIMIT 4 HEX)
+      if(_magic STREQUAL "7f454c46")
+        file(COPY "${_binary}" DESTINATION "${MITK_SYMBOL_STAGING_DIR}")
         math(EXPR _staged "${_staged} + 1")
       endif()
     endif()
   endforeach()
-
-  if(_staged EQUAL 0)
-    message(WARNING "mitkPackageSymbols: no debug symbols collected. If dwp/dsymutil "
-                    "is unavailable, debug info is embedded in the binaries themselves.")
-  endif()
 endif()
 
 if(_staged EQUAL 0)

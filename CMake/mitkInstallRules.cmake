@@ -24,6 +24,42 @@ if(MITK_USE_Python3)
       RUNTIME_DEPENDENCY_SET ${_depset}
       RUNTIME DESTINATION ${_python_dest}/${_rel_sitearch}/mitk
       LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
+
+    # The install RPATH of MITK's binaries is relative to the directory of the
+    # executables and does not reach their libraries from inside the Python
+    # installation. Without entries of its own, the module resolves its
+    # dependencies only while an MITK executable is the host process, not in
+    # the bundled interpreter. The wheel configuration sets its own RPATH.
+    if(NOT WIN32 AND NOT MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
+      set(_module_dir "${_python_dest}/${_rel_sitearch}/mitk")
+      file(RELATIVE_PATH _to_bindir "/${_module_dir}" "/${_bindir}")
+      if(APPLE)
+        file(RELATIVE_PATH _to_fwdir "/${_module_dir}" "/${_fwdir}")
+        set_property(TARGET mitk_python_bindings PROPERTY INSTALL_RPATH
+          "@loader_path/${_to_bindir}" "@loader_path/${_to_fwdir}")
+      else()
+        set_property(TARGET mitk_python_bindings PROPERTY INSTALL_RPATH
+          "$ORIGIN/${_to_bindir}")
+      endif()
+    endif()
+
+    # The Python library ships only inside the Python installation. MITK's
+    # executables load MitkPython after PreloadPython loaded the library, but
+    # a process that links MitkPython loads it at startup and needs to find it
+    # on its own. On macOS, FixMacOSInstaller moves lib/ into Versions/A/ for
+    # a package, while a plain install keeps it in place.
+    if(TARGET MitkPython AND NOT WIN32)
+      file(RELATIVE_PATH _to_python "/${_bindir}" "/${_python_dest}")
+      if(APPLE)
+        set(_python_rpaths "@loader_path/${_to_python}/lib" "@loader_path/${_to_python}/Versions/A/lib")
+      else()
+        set(_python_rpaths "$ORIGIN/${_to_python}/lib")
+      endif()
+      get_target_property(_rpaths MitkPython INSTALL_RPATH)
+      list(APPEND _rpaths ${_python_rpaths})
+      list(REMOVE_DUPLICATES _rpaths)
+      set_property(TARGET MitkPython PROPERTY INSTALL_RPATH ${_rpaths})
+    endif()
   endforeach()
 endif()
 
@@ -58,7 +94,7 @@ foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRA
       "^/usr/lib"
       "^/lib"
       "^/System"
-      "python3[0-9]+[.]"
+      "[/\\\\](lib)?python3[.]?[0-9]+[.](dll|so|dylib)"   # Python library, installed with the Python installation
       ".*/plugins/.*"
       ".*Qt[A-Z].*\\.framework.*"   # Qt frameworks — handled by qt_generate_deploy_app_script() on macOS
       ".*/Qt[A-Z].*\\.dylib$"       # Qt dylibs (non-framework form) — same reason
@@ -117,21 +153,118 @@ if(MITK_USE_Qt6 AND _mitk_executable_targets)
 endif()
 
 #-----------------------------------------------------------------------------
-# Reset RUNPATH of bundled CTK core libraries on Linux.
+# Drop absolute LC_RPATH entries of the bundled binaries on macOS.
 #
-# CTK has INSTALL_COMMAND "" in CMakeExternals/CTK.cmake, so CTK_DIR points
-# directly at the build tree. install(RUNTIME_DEPENDENCY_SET) copies libCTK*.so*
-# in as a transitive dependency of MITK plug-ins but does not rewrite RPATHs,
-# so the bundled CTK libraries retain absolute build-host paths in their
-# RUNPATH (e.g. the Qt install prefix, and the CTK build dir itself as the
-# first entry — which shadows $ORIGIN). That makes the bundle non-relocatable:
-# on a machine that happens to have a different CTK build tree or Qt install
-# at the baked-in paths, the loader follows them into foreign libraries and
-# triggers ABI mismatches.
+# Libraries copied in from the superbuild or a package manager, such as CTK
+# (used from its build tree) or Homebrew and MacPorts libraries, keep their
+# absolute LC_RPATH entries, and macdeployqt only removes the ones it used.
+# dyld searches them before the bundle, so on a machine that has libraries at
+# these paths, the bundle loads foreign ones, for example a second Qt. Replace
+# them by an entry relative to the binary that reaches Contents/Frameworks.
 #
-# Reset RUNPATH to "$ORIGIN" so these libraries resolve peers (Qt, ITK, DCMTK,
-# etc.) from the same bin/ directory. Skip symlinks — only the real .so files
-# carry RPATH, and file(RPATH_SET) on a symlink is meaningless.
+# This is the last step that changes binaries, so it also re-signs those
+# whose signature the changes before invalidated.
+#-----------------------------------------------------------------------------
+
+if(APPLE AND MACOSX_BUNDLE_NAMES)
+  foreach(_bundle IN LISTS MACOSX_BUNDLE_NAMES)
+    install(CODE "
+      set(_mitk_macho_tools \"${MITK_SOURCE_DIR}/CMake/mitkMachOTools.cmake\")
+      set(_mitk_bundle \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_bundle}.app\")
+    ")
+    install(CODE [[
+      include("${_mitk_macho_tools}")
+      mitk_macho_files(_binaries "${_mitk_bundle}")
+      foreach(_binary IN LISTS _binaries)
+        mitk_macho_read("${_binary}" RPATHS _rpaths)
+        set(_args "")
+        foreach(_rpath IN LISTS _rpaths)
+          if(NOT _rpath MATCHES "^@")
+            list(APPEND _args -delete_rpath "${_rpath}")
+          endif()
+        endforeach()
+        if(NOT _args)
+          continue()
+        endif()
+        get_filename_component(_dir "${_binary}" DIRECTORY)
+        file(RELATIVE_PATH _to_frameworks "${_dir}" "${_mitk_bundle}/Contents/Frameworks")
+        set(_frameworks_rpath "@loader_path/${_to_frameworks}")
+        string(REGEX REPLACE "/$" "" _frameworks_rpath "${_frameworks_rpath}")
+        if(NOT _frameworks_rpath IN_LIST _rpaths)
+          list(APPEND _args -add_rpath "${_frameworks_rpath}")
+        endif()
+        execute_process(COMMAND install_name_tool ${_args} "${_binary}" RESULT_VARIABLE _result)
+        if(NOT _result EQUAL 0)
+          message(FATAL_ERROR "install_name_tool failed on ${_binary}")
+        endif()
+      endforeach()
+      mitk_macho_resign_invalid(${_binaries})
+    ]])
+  endforeach()
+endif()
+
+#-----------------------------------------------------------------------------
+# Restore MITK's own libraries after the Qt deployment.
+#
+# On Linux, qt_deploy_runtime_dependencies() resolves the dependencies of the
+# build-tree executable and copies them into the package, which replaces the
+# installed copies of MITK's own libraries with the build-tree files: with
+# the absolute build RUNPATH, and unstripped. Excluding them from that
+# resolution is not an option: the exclusion also stops the search below
+# them, so Qt modules reached only through MITK libraries would lose their
+# plugins. CMake applies the install RUNPATH and the strip only to what
+# install(TARGETS) installs, hence the second pass. A module's own install
+# RUNPATH, such as the one of MitkPython, takes precedence over the default.
+#-----------------------------------------------------------------------------
+
+if(LINUX)
+  string(REPLACE ";" ":" _mitk_install_rpath "${CMAKE_INSTALL_RPATH}")
+  set(_mitk_module_rpaths "")
+  get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+  foreach(_target IN LISTS _mitk_module_targets)
+    get_target_property(_type ${_target} TYPE)
+    if(_type STREQUAL "SHARED_LIBRARY")
+      string(APPEND _mitk_module_rpaths
+        "set(\"_rpath_$<TARGET_FILE_NAME:${_target}>\" \"$<JOIN:$<TARGET_PROPERTY:${_target},INSTALL_RPATH>,:>\")\n")
+    endif()
+  endforeach()
+  install(CODE "${_mitk_module_rpaths}")
+  install(CODE "
+    file(GLOB _mitk_libraries \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so\")
+    foreach(_library \${_mitk_libraries})
+      get_filename_component(_name \"\${_library}\" NAME)
+      set(_installed \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${MITK_INSTALL_BINDIR}/\${_name}\")
+      if(NOT EXISTS \"\${_installed}\")
+        continue()
+      endif()
+      if(CMAKE_INSTALL_DO_STRIP AND NOT \"${CMAKE_STRIP}\" STREQUAL \"\")
+        execute_process(COMMAND \"${CMAKE_STRIP}\" \"\${_installed}\" RESULT_VARIABLE _result)
+        if(NOT _result EQUAL 0)
+          message(FATAL_ERROR \"strip failed on \${_installed}\")
+        endif()
+      endif()
+      if(DEFINED \"_rpath_\${_name}\")
+        set(_rpath \"\${_rpath_\${_name}}\")
+      else()
+        set(_rpath \"${_mitk_install_rpath}\")
+      endif()
+      file(RPATH_SET FILE \"\${_installed}\" NEW_RPATH \"\${_rpath}\")
+    endforeach()
+  ")
+endif()
+
+#-----------------------------------------------------------------------------
+# Drop absolute RUNPATH entries of the bundled binaries on Linux.
+#
+# install(RUNTIME_DEPENDENCY_SET), the Qt deployment and the Crashpad handler
+# install copy third-party binaries without rewriting their RUNPATH. The external projects carry the
+# Qt install prefix in theirs (see SuperBuild.cmake), and CTK, which is used
+# from its build tree, carries that build tree as well. On a machine that has
+# libraries at these paths, the loader follows them into foreign libraries,
+# so the package is not relocatable.
+#
+# Keep only the $ORIGIN-relative entries, or $ORIGIN alone if none are left:
+# every bundled binary resolves its peers from the same bin/ directory.
 #
 # Windows: PE has no RPATH. macOS: macdeployqt rewrites library references
 # during Qt deployment, so Mach-O references are already flattened.
@@ -139,13 +272,46 @@ endif()
 
 if(LINUX)
   foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
-    install(CODE "
-      file(GLOB _mitk_ctk_libs \"\${CMAKE_INSTALL_PREFIX}/${_bindir}/libCTK*.so*\")
-      foreach(_lib IN LISTS _mitk_ctk_libs)
-        if(NOT IS_SYMLINK \"\${_lib}\")
-          file(RPATH_SET FILE \"\${_lib}\" NEW_RPATH \"\$ORIGIN\")
+    install(CODE "set(_mitk_bindir \"${_bindir}\")")
+    install(CODE [[
+      file(GLOB _mitk_binaries "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${_mitk_bindir}/*")
+      foreach(_binary IN LISTS _mitk_binaries)
+        if(IS_SYMLINK "${_binary}" OR IS_DIRECTORY "${_binary}")
+          continue()
+        endif()
+        # READ_ELF leaves a variable untouched when the file has no such entry
+        # or reads fine, so values from the previous file would carry over.
+        set(_runpath "")
+        set(_rpath "")
+        set(_error "")
+        file(READ_ELF "${_binary}" RUNPATH _runpath RPATH _rpath CAPTURE_ERROR _error)
+        if(_error)
+          continue()
+        endif()
+        set(_current "${_runpath}")
+        if(NOT _current)
+          set(_current "${_rpath}")
+        endif()
+        if(NOT _current)
+          continue()
+        endif()
+        string(REPLACE ":" ";" _entries "${_current}")
+        set(_relative_entries "")
+        foreach(_entry IN LISTS _entries)
+          string(FIND "${_entry}" "$ORIGIN" _position)
+          if(_position EQUAL 0)
+            list(APPEND _relative_entries "${_entry}")
+          endif()
+        endforeach()
+        list(REMOVE_DUPLICATES _relative_entries)
+        if(NOT _relative_entries)
+          set(_relative_entries "$ORIGIN")
+        endif()
+        string(REPLACE ";" ":" _new "${_relative_entries}")
+        if(NOT _new STREQUAL _current)
+          file(RPATH_SET FILE "${_binary}" NEW_RPATH "${_new}")
         endif()
       endforeach()
-    ")
+    ]])
   endforeach()
 endif()

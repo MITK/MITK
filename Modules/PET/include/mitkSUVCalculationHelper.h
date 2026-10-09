@@ -884,14 +884,21 @@ namespace mitk
    * \brief Get the patient's weight from DICOM properties.
    *
    * Extracts the patient weight from DICOM tag (0010,1030) stored in the
-   * properties of the passed provider.
+   * properties of the passed provider. A value of 1000 or more is no
+   * plausible weight in the kilograms DICOM prescribes; following the
+   * IBSI-SUV recommendation, it is read as grams and recorded in
+   * \p adaptations.
    *
-   * \param[in] provider Source of DICOM properties.
+   * \param[in]     provider    Source of DICOM properties.
+   * \param[in]     policy      Active read policy.
+   * \param[in,out] adaptations Appended to; never cleared.
    * \return The patient's weight in [kg].
    * \pre \p provider must point to a valid instance.
    * \pre \p provider must contain a DICOM patient weight property.
    * \throw MissingDICOMPropertyException if \p provider is \c nullptr or contains
    *        no patient-weight property.
+   * \throw ImplausiblePatientWeightException if \p policy is
+   *        \c DICOMReadPolicy::Strict and the weight would be read as grams.
    */
   double MITKPET_EXPORT GetPatientsWeight(const mitk::IPropertyProvider* provider,
                                          DICOMReadPolicy policy,

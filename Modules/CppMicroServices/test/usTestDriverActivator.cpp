@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "usTestDriverActivator.h"
-#include <usModuleImport.h>
 
 namespace us {
 

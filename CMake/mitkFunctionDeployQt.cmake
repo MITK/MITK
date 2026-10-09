@@ -18,6 +18,7 @@ function(mitkFunctionDeployQt _target)
   set(_exclude_plugins
     qsqlibase
     qsqlmimer
+    qsqlmysql
     qsqloci
     qsqlodbc
     qsqlpsql
@@ -30,14 +31,39 @@ function(mitkFunctionDeployQt _target)
   get_target_property(_is_bundle ${_target} MACOSX_BUNDLE)
 
   if(APPLE AND _is_bundle)
-    # For macOS bundles, Qt handles the .app bundle layout
-    qt_generate_deploy_app_script(
+    # macdeployqt rewrites the library references of the bundle executable
+    # only. The other executables installed into the bundle, such as the
+    # command-line apps, have to be named explicitly, or they keep references
+    # to the libraries of the build host. Naming any makes macdeployqt write
+    # all references of the bundle relative to @loader_path instead of
+    # @executable_path, so they also resolve when another executable, such
+    # as the bundled Python, loads the libraries.
+    set(_additional_executables "")
+    get_property(_executable_targets GLOBAL PROPERTY MITK_EXECUTABLE_TARGETS)
+    foreach(_executable_target IN LISTS _executable_targets)
+      if(_executable_target STREQUAL _target)
+        continue()
+      endif()
+      get_target_property(_no_install ${_executable_target} NO_INSTALL)
+      get_target_property(_is_other_bundle ${_executable_target} MACOSX_BUNDLE)
+      if(_no_install OR _is_other_bundle)
+        continue()
+      endif()
+      list(APPEND _additional_executables
+        "\"$<TARGET_FILE_NAME:${_target}>.app/Contents/MacOS/$<TARGET_FILE_NAME:${_executable_target}>\"")
+    endforeach()
+    list(JOIN _additional_executables " " _additional_executables)
+
+    qt_generate_deploy_script(
       TARGET ${_target}
       OUTPUT_SCRIPT _deploy_script
-      NO_TRANSLATIONS
-      EXCLUDE_PLUGIN_TYPES ${_exclude_plugin_types}
-      EXCLUDE_PLUGINS ${_exclude_plugins}
-      INCLUDE_PLUGINS ${_include_plugins}
+      CONTENT "
+qt_deploy_runtime_dependencies(
+  EXECUTABLE \"$<TARGET_FILE_NAME:${_target}>.app\"
+  ADDITIONAL_EXECUTABLES ${_additional_executables}
+  NO_TRANSLATIONS
+)
+"
     )
   else()
     # For Windows/Linux, deploy Qt into bin/ with plugins in bin/plugins/
@@ -93,6 +119,30 @@ qt_deploy_runtime_dependencies(
     )
   endif()
   install(SCRIPT ${_deploy_script})
+
+  # macdeployqt ignores the plugin selection, and the generic deployment of Qt
+  # before 6.12 also ignores the exclusion by name, so remove the excluded
+  # plugins afterwards. A deployed plugin whose dependencies are not bundled
+  # fails to load on other machines.
+  if((APPLE AND _is_bundle) OR LINUX)
+    if(APPLE)
+      set(_plugins_dir "$<TARGET_FILE_NAME:${_target}>.app/Contents/PlugIns")
+    else()
+      set(_plugins_dir "bin/plugins")
+    endif()
+    install(CODE "
+      set(_plugins_dir \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_plugins_dir}\")
+      foreach(_type ${_exclude_plugin_types})
+        file(REMOVE_RECURSE \"\${_plugins_dir}/\${_type}\")
+      endforeach()
+      foreach(_plugin ${_exclude_plugins})
+        file(GLOB _files \"\${_plugins_dir}/*/lib\${_plugin}.*\")
+        if(_files)
+          file(REMOVE \${_files})
+        endif()
+      endforeach()
+    ")
+  endif()
 
   # On Linux, write qt.conf with a relative prefix so the deployed bin/ layout
   # stays relocatable: Qt then resolves plugins at bin/plugins/, QML at

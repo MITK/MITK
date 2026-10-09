@@ -36,7 +36,7 @@ BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent)
   provisioningFiles = appDir.entryList(
     QStringList(QApplication::applicationName() + "_*.provisioning"), QDir::Files | QDir::Readable, QDir::Name);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
   /*
    * On Mac, if started from the build directory the .provisioning file is located at:
    * <MITK-build/bin/BlueBerryExampleLauncher_*.provisioning>
@@ -97,7 +97,7 @@ QString BlueBerryExampleLauncherDialog::getDemoConfiguration()
     appDir.cdUp();
 #endif
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     /*
      * On Mac, if started from the build directory the .provisioning file is located at:
      * <MITK-build/bin/BlueBerryExampleLauncher_*.provisioning>

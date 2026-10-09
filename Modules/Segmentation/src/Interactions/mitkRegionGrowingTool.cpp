@@ -33,12 +33,11 @@ found in the LICENSE file.
 // ITK
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
+#include <itkBinaryMedianImageFilter.h>
 #include <itkConnectedComponentImageFilter.h>
 #include <itkImageDuplicator.h>
 #include <itkImageRegionConstIterator.h>
-#include <itkImageRegionIterator.h>
 #include <itkMedianImageFilter.h>
-#include <itkNeighborhoodIterator.h>
 
 #include <algorithm>
 #include <cmath>
@@ -239,32 +238,13 @@ namespace
   /** \brief Every pixel is replaced by the majority of its 5x5 neighborhood. */
   BinaryImageType::Pointer SmoothByMajorityVote(const BinaryImageType* region)
   {
-    auto duplicator = itk::ImageDuplicator<BinaryImageType>::New();
-    duplicator->SetInputImage(region);
-    duplicator->Update();
-    BinaryImageType::Pointer result = duplicator->GetOutput();
-
-    itk::ConstNeighborhoodIterator<BinaryImageType>::RadiusType radius;
-    radius.Fill(2);
-
-    itk::ConstNeighborhoodIterator<BinaryImageType> neighborhoodIt(radius, region, region->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<BinaryImageType> resultIt(result, result->GetLargestPossibleRegion());
-
-    for (neighborhoodIt.GoToBegin(), resultIt.GoToBegin(); !neighborhoodIt.IsAtEnd(); ++neighborhoodIt, ++resultIt)
-    {
-      unsigned int votes = 0;
-      for (unsigned int i = 0; i < neighborhoodIt.Size(); ++i)
-      {
-        if (neighborhoodIt.GetPixel(i) > 0)
-        {
-          ++votes;
-        }
-      }
-
-      resultIt.Set(2 * votes > neighborhoodIt.Size() ? 1 : 0);
-    }
-
-    return result;
+    auto filter = itk::BinaryMedianImageFilter<BinaryImageType, BinaryImageType>::New();
+    filter->SetInput(region);
+    filter->SetRadius(BinaryImageType::SizeType::Filled(2));
+    filter->SetForegroundValue(1);
+    filter->SetBackgroundValue(0);
+    filter->Update();
+    return filter->GetOutput();
   }
 
   /** \brief 4-connected components of a binary image, with their count. */

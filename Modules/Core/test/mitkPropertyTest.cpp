@@ -33,6 +33,10 @@ found in the LICENSE file.
 #include <itkCommand.h>
 // VTK includes
 #include <vtkDebugLeaks.h>
+#include <vtkLookupTable.h>
+#include <vtkSmartPointer.h>
+
+#include <nlohmann/json.hpp>
 
 struct PropertyModifiedListener
 {
@@ -79,6 +83,8 @@ class mitkPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferFunctionProperty_Success);
   MITK_TEST(TestWeakPointerProperty_Success);
   MITK_TEST(TestLookupTablePropertyProperty_Success);
+  MITK_TEST(TestLookupTablePropertyJSON_KeepsType);
+  MITK_TEST(TestLookupTablePropertyJSON_WithoutKnownType_KeepsColors);
   MITK_TEST(TestDoubleVectorProperty_Success);
   MITK_TEST(TestIntVectorProperty_Success);
   CPPUNIT_TEST_SUITE_END();
@@ -486,6 +492,46 @@ public:
     std::string strLUT2 = prop2->GetValueAsString();
 
     TestProperty<mitk::LookupTableProperty>(lut1, lut2, strLUT1, strLUT2);
+  }
+
+  void TestLookupTablePropertyJSON_KeepsType()
+  {
+    auto lut = mitk::LookupTable::New();
+    lut->SetType(mitk::LookupTable::MULTILABEL);
+    lut->ChangeOpacity(1, 0.5);
+
+    nlohmann::json j;
+    CPPUNIT_ASSERT(mitk::LookupTableProperty::New(lut)->ToJSON(j));
+
+    auto prop = mitk::LookupTableProperty::New();
+    CPPUNIT_ASSERT(prop->FromJSON(j));
+
+    CPPUNIT_ASSERT_EQUAL(mitk::LookupTable::MULTILABEL, prop->GetValue()->GetActiveType());
+    CPPUNIT_ASSERT(*lut == *prop->GetValue());
+  }
+
+  void TestLookupTablePropertyJSON_WithoutKnownType_KeepsColors()
+  {
+    auto lut = mitk::LookupTable::New();
+    lut->SetType(mitk::LookupTable::MULTILABEL);
+
+    nlohmann::json j;
+    CPPUNIT_ASSERT(mitk::LookupTableProperty::New(lut)->ToJSON(j));
+
+    auto entries = vtkSmartPointer<vtkLookupTable>::New();
+    entries->DeepCopy(lut->GetVtkLookupTable());
+    auto untypedLut = mitk::LookupTable::New();
+    untypedLut->SetVtkLookupTable(entries);
+
+    j.erase("Type");
+    auto withoutType = mitk::LookupTableProperty::New();
+    CPPUNIT_ASSERT(withoutType->FromJSON(j));
+    CPPUNIT_ASSERT(*untypedLut == *withoutType->GetValue());
+
+    j["Type"] = "Unknown";
+    auto unknownType = mitk::LookupTableProperty::New();
+    CPPUNIT_ASSERT(unknownType->FromJSON(j));
+    CPPUNIT_ASSERT(*untypedLut == *unknownType->GetValue());
   }
 
   void TestDoubleVectorProperty_Success()

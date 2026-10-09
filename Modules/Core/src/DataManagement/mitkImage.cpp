@@ -1293,29 +1293,31 @@ void mitk::Image::PrintSelf(std::ostream &os, itk::Indent indent) const
 bool mitk::Image::IsRotated() const
 {
   const mitk::BaseGeometry *geo = this->GetGeometry();
-  bool ret = false;
 
-  if (geo)
+  if (nullptr == geo)
+    return false;
+
+  const auto &mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+
+  // Each column is an index axis scaled by its spacing. The axis is aligned
+  // with a world axis if only one of its components is non-zero; the
+  // tolerance absorbs rounding noise in stored direction cosines.
+  for (unsigned int column = 0; column < 3; ++column)
   {
-    const vnl_matrix_fixed<ScalarType, 3, 3> &mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
-    mitk::ScalarType ref = 0;
-    for (short k = 0; k < 3; ++k)
-      ref += mx[k][k];
-    ref /= 1000; // Arbitrary value; if a non-diagonal (nd) element is bigger then this, matrix is considered nd.
+    const auto tolerance = 0.003 * mx.get_column(column).two_norm();
+    unsigned int nonZeroComponents = 0;
 
-    for (short i = 0; i < 3; ++i)
+    for (unsigned int row = 0; row < 3; ++row)
     {
-      for (short j = 0; j < 3; ++j)
-      {
-        if (i != j)
-        {
-          if (std::abs(mx[i][j]) > ref) // matrix is nd
-            ret = true;
-        }
-      }
+      if (std::abs(mx[row][column]) > tolerance)
+        ++nonZeroComponents;
     }
+
+    if (nonZeroComponents > 1)
+      return true;
   }
-  return ret;
+
+  return false;
 }
 
 mitk::ImageDimensionVectorType mitk::DetermineImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry)

@@ -1099,7 +1099,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // ApplyLayout can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
   const auto id = prefix + QString::number(i);
-  auto renderWindowWidget = this->CreateRenderWindowWidget(id);
+  auto renderWindowWidget = this->CreateRenderWindowWidget(id, mitk::AnatomicalPlane::Sagittal);
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
 
   // The default group (engine index 1) synchronizes the appearance axes by
@@ -1119,7 +1119,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   return renderWindowWidget;
 }
 
-QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& id)
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& id,
+                                              mitk::AnatomicalPlane viewDirection)
 {
   if (id.isEmpty())
   {
@@ -1151,7 +1152,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   m_CellBorderColors.erase(id);
   this->TickLayoutLoadFeedbackCell();
 
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(
+    this, id, this->GetDataStorage(), viewDirection);
   // The cell's plane label is drawn by the Qt overlay in the same layer as the
   // slice readout (so the two align); the VTK corner annotation, which would
   // otherwise show the internal cell id, is blanked to avoid a second, stale
@@ -2189,25 +2191,10 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
         const auto groupName = LinkTarget(child["links"]["selection"]);
         const auto targetIdx = nameToInt.at(groupName);
 
-        auto window = this->CreateRenderWindowWidget(id);
+        auto window = this->CreateRenderWindowWidget(id, viewDirection);
         // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
-        // With data loaded, the new cell has already initialized itself in its
-        // constructor's default direction, so the plane, slice and camera all
-        // belong to that one. Re-initializing on the geometry it holds makes
-        // the declared direction current and fits the slice and camera to it.
-        auto* sliceNavigation = window->GetSliceNavigationController();
-        sliceNavigation->SetDefaultViewDirection(viewDirection);
-        if (const auto* cellGeometry = sliceNavigation->GetInputWorldTimeGeometry(); nullptr != cellGeometry)
-        {
-          mitk::RenderingManager::GetInstance()->InitializeView(
-            window->GetRenderWindow()->GetVtkRenderWindow(), cellGeometry);
-        }
-        else
-        {
-          sliceNavigation->Update();
-        }
         // Optional display label (free-form, non-unique). Pre-walk has
         // already validated type and non-emptiness.
         if (child.contains("name"))
@@ -2923,11 +2910,9 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       // initial seeding into group 1 followed by an immediate move.
       const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER
                       + QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(id);
+      auto window = this->CreateRenderWindowWidget(id, viewPlane);
       this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
 
-      window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
-      window->GetSliceNavigationController()->Update();
       auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
       node->SetVisibility(true, baseRenderer);
       mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());

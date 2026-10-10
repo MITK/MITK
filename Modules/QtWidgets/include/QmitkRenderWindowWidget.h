@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 
 // mitk core
+#include <mitkAnatomicalPlanes.h>
 #include <mitkCrosshairManager.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderWindow.h>
@@ -58,6 +59,9 @@ public:
   *                     convention). Must not be empty.
   * \param dataStorage  Data storage backing the render window. Must not be null;
   *                     the widget unconditionally talks to it during 'InitializeGUI'.
+  * \param viewDirection  View direction of the render window. The widget
+  *                     initializes its view once, in this direction, on the
+  *                     data storage's bounding geometry.
   *
   *   Defaults intentionally not provided: the widget is unusable without a
   *   non-null data storage and a non-empty name. Earlier versions defaulted
@@ -66,7 +70,8 @@ public:
   QmitkRenderWindowWidget(
     QWidget* parent,
     const QString& widgetName,
-    mitk::DataStorage* dataStorage);
+    mitk::DataStorage* dataStorage,
+    mitk::AnatomicalPlane viewDirection);
 
   ~QmitkRenderWindowWidget() override;
 
@@ -148,7 +153,7 @@ protected:
 
 private:
 
-  void InitializeGUI();
+  void InitializeGUI(mitk::AnatomicalPlane viewDirection);
   void InitializeDecorations();
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
   void UpdateUtilityWidgetGeometry();

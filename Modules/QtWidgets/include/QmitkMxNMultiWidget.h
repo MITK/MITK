@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QmitkSynchronizedWidgetConnector.h>
 
 // mitk core
+#include <mitkAnatomicalPlanes.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkException.h>
 #include <mitkVector.h>
@@ -893,6 +894,8 @@ public:
   *            "mxn__alpha"). Must be non-empty, must start with
   *            `<multiWidgetName>__`, and must not collide with an existing
   *            render-window in this editor.
+  * \param viewDirection  The view direction the cell is created and initialized
+  *            in.
   *
   * \return  Shared pointer to the newly constructed render-window widget.
   *
@@ -902,7 +905,7 @@ public:
   *
   * \throws mitk::Exception on precondition violation.
   */
-  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& id);
+  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& id, mitk::AnatomicalPlane viewDirection);
 
   /**
   * \brief Serialize the current layout tree to a v3.0 JSON document
@@ -1390,7 +1393,7 @@ private:
   * \brief Recursive constructor for a 'split' subtree. Returns a freshly
   *        allocated QSplitter with the cell tree below.
   *
-  *   Window leaves are created via 'CreateRenderWindowWidget(id)' using the
+  *   Window leaves are created via 'CreateRenderWindowWidget(id, viewDirection)' using the
   *   document's id verbatim, then re-parented to the new splitter and moved
   *   into their target sync group via 'SetSynchronizationGroup'.
   */

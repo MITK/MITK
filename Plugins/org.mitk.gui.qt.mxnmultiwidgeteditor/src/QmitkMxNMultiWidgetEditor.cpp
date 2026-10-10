@@ -300,16 +300,14 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     {
       multiWidget->ApplyLayout(*m_Impl->m_InitialLayout);
     }
-    catch (const std::exception& e)
+    catch (const mitk::Exception& e)
     {
       delete multiWidget;
-      const auto* mitkException = dynamic_cast<const mitk::Exception*>(&e);
-      this->RecordConfigurationError(QStringLiteral("initialLayout"), nullptr != mitkException
-        ? QString::fromStdString(mitkException->GetDescription())
-        : QString::fromUtf8(e.what()));
+      this->RecordConfigurationError(QStringLiteral("initialLayout"), QString::fromStdString(e.GetDescription()));
       this->ShowConfigurationErrors(parent);
       return;
     }
+    m_Impl->m_InitialLayout.reset();
   }
 
   // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
@@ -325,7 +323,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
     this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
 
-  SetMultiWidget(multiWidget);
+  this->SetMultiWidget(multiWidget);
   connect(multiWidget, &QmitkMxNMultiWidget::LayoutChanged,
     this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
   connect(multiWidget, &QmitkMxNMultiWidget::LayoutEditorRequested,

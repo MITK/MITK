@@ -16,7 +16,8 @@ found in the LICENSE file.
 #include <QColorDialog>
 #include <QMouseEvent>
 
-QmitkLabelColorItemDelegate::QmitkLabelColorItemDelegate(QObject * /*parent*/)
+QmitkLabelColorItemDelegate::QmitkLabelColorItemDelegate(QObject *parent)
+  : QStyledItemDelegate(parent)
 {
 }
 

@@ -1487,22 +1487,23 @@ public:
 
   void ArrangeSelection_ARebindStopsTheOldEditorsMirror()
   {
-    // A second editor with the same name has the same cell ids, so a leaking
-    // connection would visibly move its active window.
-    QmitkMxNMultiWidget other;
+    // The old editor's selection names one of the new editor's windows, so a
+    // leaking connection would visibly move its active window.
+    QmitkMxNMultiWidget other(nullptr, {}, QStringLiteral("other"));
+    const auto otherCell = [](int i) { return QStringLiteral("other__widget") + QString::number(i); };
     other.SetDataStorage(m_DataStorage);
     other.InitializeMultiWidget();
     other.SetLayout(1, 3);
-    other.SetActiveRenderWindowWidget(other.GetRenderWindowWidget(CellId(1)));
+    other.SetActiveRenderWindowWidget(other.GetRenderWindowWidget(otherCell(1)));
     m_Widget->SetMultiWidget(&other);
 
-    m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(0) });
+    m_Editor->GetArrangeMode()->SetSelectedWindowIds(QStringList{ otherCell(0) });
     CPPUNIT_ASSERT_MESSAGE("The previously bound editor's selection no longer drives the widget",
-                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(CellId(1)));
+                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(otherCell(1)));
 
-    other.GetArrangeMode()->SetSelectedWindowIds(QStringList{ CellId(2) });
+    other.GetArrangeMode()->SetSelectedWindowIds(QStringList{ otherCell(2) });
     CPPUNIT_ASSERT_MESSAGE("The bound editor's selection does",
-                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(CellId(2)));
+                           other.GetActiveRenderWindowWidget() == other.GetRenderWindowWidget(otherCell(2)));
     m_Widget->SetMultiWidget(m_Editor.get());
   }
 

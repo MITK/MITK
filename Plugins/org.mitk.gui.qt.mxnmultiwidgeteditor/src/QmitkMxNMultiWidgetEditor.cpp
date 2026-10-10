@@ -273,9 +273,20 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   // Locks are set before InitializeMultiWidget creates the first cell, so no
   // cell is ever shown unlocked. The initial layout is applied before the
   // widget is registered anywhere, so a failing one can be undone by deleting
-  // the widget: nothing outside this method has seen it.
-  auto* multiWidget = new QmitkMxNMultiWidget(parent, {}, m_Impl->m_WidgetName);
-  multiWidget->SetDataStorage(GetDataStorage());
+  // the widget: nothing outside this method has seen it. The constructor
+  // rejects a name another live widget already uses.
+  QmitkMxNMultiWidget* multiWidget = nullptr;
+  try
+  {
+    multiWidget = new QmitkMxNMultiWidget(parent, {}, m_Impl->m_WidgetName);
+  }
+  catch (const QmitkMxNWidgetNameInUseException& e)
+  {
+    this->RecordConfigurationError(QStringLiteral("widgetName"), QString::fromStdString(e.GetDescription()));
+    this->ShowConfigurationErrors(parent);
+    return;
+  }
+  multiWidget->SetDataStorage(this->GetDataStorage());
   multiWidget->SetLayoutLocks(m_Impl->m_LayoutLocks);
   multiWidget->InitializeMultiWidget();
   if (m_Impl->m_InitialLayout.has_value())

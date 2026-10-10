@@ -75,10 +75,23 @@ public:
 };
 
 /**
+* \brief Thrown by the 'QmitkMxNMultiWidget' constructor when another MxN widget
+*        with the same name is alive: render-window IDs derive from the name,
+*        so the two would share cell IDs and per-cell renderer properties.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNWidgetNameInUseException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNWidgetNameInUseException, mitk::Exception);
+};
+
+/**
 * \brief A user-facing interaction that can be locked on an MxN widget.
 *
-*   A lock gates only the widget's own chrome and the MxN Layout Editor view;
-*   programmatic calls ('ApplyLayout', 'SetSyncLink', 'SetViewDirection', node
+*   'Direction', 'Proportions' and 'Content' gate only the widget's own chrome.
+*   'Structure' also keeps the MxN Layout Editor view away; without it, the view
+*   replaces whole layouts and so still changes what the other locks cover.
+*   Programmatic calls ('ApplyLayout', 'SetSyncLink', 'SetViewDirection', node
 *   selection, ...) are never blocked, so the plugin that owns a locked widget
 *   keeps full control.
 */
@@ -143,6 +156,8 @@ public:
   *        satisfy 'QmitkMxNIsValidMultiWidgetName' and be unique among the MxN
   *        widgets alive at the same time.
   * \throws mitk::Exception if 'multiWidgetName' is not a valid name.
+  * \throws QmitkMxNWidgetNameInUseException if another live MxN widget already
+  *         uses 'multiWidgetName'.
   */
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = {},

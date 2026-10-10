@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QProgressBar>
 #include <QRegularExpression>
 #include <QScopedValueRollback>
+#include <QSet>
 #include <QShortcut>
 #include <QSplitter>
 #include <QTimer>
@@ -68,6 +69,13 @@ found in the LICENSE file.
 
 namespace
 {
+  // Names of the live widgets; the GUI is single-threaded.
+  QSet<QString>& LiveMultiWidgetNames()
+  {
+    static QSet<QString> names;
+    return names;
+  }
+
   // Where per-cell construction sits on the load dialog's bar; the ends leave
   // room for the teardown before it and the group wiring after.
   constexpr int LoadPercentCellsBegin = 15;
@@ -485,6 +493,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                 << "and use only the alphabet [A-Za-z0-9.-].";
   }
 
+  if (LiveMultiWidgetNames().contains(multiWidgetName))
+  {
+    mitkThrowException(QmitkMxNWidgetNameInUseException)
+      << "An MxN widget named '" << multiWidgetName.toStdString()
+      << "' already exists; its render-window IDs would collide.";
+  }
+
   // A cell's frame carries its group identity (mono group hue, else neutral),
   // and the per-cell utility-strip sync barcodes track the same per-dimension
   // membership the layout editor shows; refresh both whenever the links change
@@ -541,6 +556,10 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
           this, &QmitkMxNMultiWidget::RefreshSyncPeekPlates);
   connect(this, &QmitkMxNMultiWidget::LayoutChanged,
           m_ArrangeMode, &QmitkMxNArrangeMode::PruneToExistingCells);
+
+  // Last, so that a throw above leaves no entry behind: the destructor that
+  // would remove it does not run for a widget whose constructor threw.
+  LiveMultiWidgetNames().insert(multiWidgetName);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -550,6 +569,8 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
   {
     this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
   }
+
+  LiveMultiWidgetNames().remove(this->GetMultiWidgetName());
 }
 
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)

@@ -38,6 +38,8 @@ class QmitkMxNExplicitNameTestSuite : public mitk::TestFixture
   MITK_TEST(Positional_SkipsAlreadyUsedSlots);
   MITK_TEST(CustomEditorName_RegistersWithItsPrefix);
   MITK_TEST(CustomEditorName_RejectsOtherEditorPrefix);
+  MITK_TEST(DuplicateLiveName_Throws_AndIsReleasedOnDestruction);
+  MITK_TEST(InvalidName_LeavesNoEntryBehind);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -214,6 +216,24 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
   }
 
+  // ---------- Name uniqueness ----------
+
+  void DuplicateLiveName_Throws_AndIsReleasedOnDestruction()
+  {
+    {
+      QmitkMxNMultiWidget first(nullptr, {}, QStringLiteral("dup"));
+      CPPUNIT_ASSERT_THROW(QmitkMxNMultiWidget second(nullptr, {}, QStringLiteral("dup")),
+                           QmitkMxNWidgetNameInUseException);
+    }
+    CPPUNIT_ASSERT_NO_THROW(QmitkMxNMultiWidget again(nullptr, {}, QStringLiteral("dup")));
+  }
+
+  void InvalidName_LeavesNoEntryBehind()
+  {
+    CPPUNIT_ASSERT_THROW(QmitkMxNMultiWidget invalid(nullptr, {}, QStringLiteral("bad__name")),
+                         mitk::Exception);
+    CPPUNIT_ASSERT_NO_THROW(QmitkMxNMultiWidget fresh(nullptr, {}, QStringLiteral("fresh")));
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkMxNExplicitName)

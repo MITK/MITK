@@ -444,6 +444,7 @@ public:
     const auto saved = editor->SerializeLayout();
     CPPUNIT_ASSERT_MESSAGE("Save declares the empty group", saved.at("groups").contains(id));
 
+    editor.reset();
     auto reloaded = MakeEditor();
     reloaded->ApplyLayout(saved);
     const auto infos = reloaded->GetSyncGroupInfos();
@@ -543,6 +544,7 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("A removed group cannot be recolored",
       editor->SetSyncGroupColor(removed, QColor("#ff0000")), mitk::Exception);
 
+    editor.reset();
     auto linkOnly = MakeEditor();
     linkOnly->ApplyLayout(LinkOnlyCosmeticsDoc());
     linkOnly->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);

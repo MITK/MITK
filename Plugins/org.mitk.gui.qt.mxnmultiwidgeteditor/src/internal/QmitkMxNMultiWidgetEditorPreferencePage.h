@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
+#include <QStringList>
 #include <QPushButton>
 #include <memory>
 
@@ -43,11 +44,14 @@ public:
   ~QmitkMxNMultiWidgetEditorPreferencePage() override;
 
   /**
-  * \brief Reads the optional 'editorId' parameter: the editor declaration whose
-  *        preference node this page edits. Default: the stock MxN editor.
+  * \brief Reads the optional 'editorId' parameter, the editor whose
+  *        preference node this page edits.
   *
-  *   Never throws, because the preferences dialog creates pages without a
-  *   handler; bad input is logged and the default used.
+  *   Without parameters the page edits the stock MxN editor. An unknown
+  *   parameter, a blank or unregistered 'editorId', or unnamed data is a
+  *   configuration error: the page shows it instead of its controls and
+  *   leaves all preferences untouched. Never throws, because the preferences
+  *   dialog uses created pages without error handling.
   */
   void SetInitializationData(const berry::IConfigurationElement::Pointer& config,
                              const QString& propertyName,
@@ -63,18 +67,22 @@ public:
 
 public slots:
   /**
-   * @brief ResetColors set default colors and refresh the GUI.
+   * @brief Clears the editor's preferences and refreshes the GUI.
    */
   void ResetPreferencesAndGUI();
 
 private:
 
   std::unique_ptr<Ui::QmitkMxNMultiWidgetEditorPreferencePage> m_Ui;
-  QWidget* m_MainControl;
+  QWidget* m_MainControl = nullptr;
 
   QString m_EditorId;
+  QString m_PageContext;
+  QStringList m_ConfigurationErrors;
 
   mitk::IPreferences* GetPreferences() const;
+  void RecordConfigurationError(const QString& parameter, const QString& problem);
+  void ShowConfigurationErrors(QWidget* parent);
 
 };
 

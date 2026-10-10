@@ -101,9 +101,13 @@ enum class QmitkMxNLayoutLock
       load: everything the Layout Editor view and arrange mode change. The view
       does not bind to the widget and the widget does not request it. */
   Structure = 0x1,
-  /** A cell's view direction. */
+  /** A cell's view direction through the cell's own chrome (context menu and
+      plane label). Without 'Structure', the Layout Editor view can still change
+      directions through a grid change, a data-based layout or a layout load. */
   Direction = 0x2,
-  /** The proportions between cells (splitter handles). */
+  /** The proportions between cells through the splitter handles. Without
+      'Structure', the Layout Editor view can still change them through a grid
+      change, a data-based layout or a layout load. */
   Proportions = 0x4,
   /** The data a cell shows through the cell's own chrome (its node selection,
       which propagates to its selection group). Without 'Structure', the Layout

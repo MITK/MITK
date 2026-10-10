@@ -142,10 +142,15 @@ A lock withdraws one aspect from users:
  - `structure`: the grid, the synchronization and selection groups, the sync links and
    layout loading. The cells' sync barcodes do not open the MxN Layout Editor, and the view
    does not bind to the editor; it says that the plugin manages the layout instead.
- - `direction`: a cell's view direction, from the context menu and the plane label.
+ - `direction`: a cell's view direction, from the cell's own context menu and plane label.
  - `proportions`: the splitter handles between cells.
  - `content`: the data a cell shows through its own Data button and "Data..." entry, which
    would also change the cell's selection group.
+
+Only `structure` keeps the MxN Layout Editor view away. The other three locks cover the
+cell's own controls; while `structure` is unlocked, the view's grid changes, data-based
+layouts and layout loads still replace directions, proportions and content. Lock
+`structure` as well when these must stay fixed.
 
 Locks never block programmatic calls: `ApplyLayout`, `SetSyncLink`, `SetCellSelectionGroup`,
 `SetViewDirection`, `SetMaximizedCell` and a cell's node selection all keep working, so the

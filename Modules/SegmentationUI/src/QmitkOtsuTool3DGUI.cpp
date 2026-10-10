@@ -106,16 +106,16 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
 
     try
     {
-      int proceed;
-      QMessageBox *messageBox = new QMessageBox(QMessageBox::Question,
-                                                nullptr,
-                                                "The otsu segmentation computation may take several minutes depending "
-                                                "on the number of Regions you selected. Proceed anyway?",
-                                                QMessageBox::Ok | QMessageBox::Cancel);
       if (m_Controls->m_Spinbox->value() >= 5)
       {
-        proceed = messageBox->exec();
-        if (proceed != QMessageBox::Ok)
+        QMessageBox messageBox(QMessageBox::Question,
+                               "Otsu",
+                               "The otsu segmentation computation may take several minutes depending "
+                               "on the number of Regions you selected. Proceed anyway?",
+                               QMessageBox::Ok | QMessageBox::Cancel,
+                               this->window());
+
+        if (messageBox.exec() != QMessageBox::Ok)
           return;
       }
 
@@ -128,23 +128,15 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
     catch (const std::exception& e)
     {
       this->setCursor(Qt::ArrowCursor);
-      QMessageBox* messageBox =
-        new QMessageBox(QMessageBox::Critical,
-          nullptr,
-          e.what());
-      messageBox->exec();
-      delete messageBox;
+      QMessageBox messageBox(QMessageBox::Critical, "Otsu", e.what(), QMessageBox::NoButton, this->window());
+      messageBox.exec();
       return;
     }
     catch (...)
     {
       this->setCursor(Qt::ArrowCursor);
-      QMessageBox *messageBox =
-        new QMessageBox(QMessageBox::Critical,
-                        nullptr,
-                        "Unkown error while computing Otsu preview.");
-      messageBox->exec();
-      delete messageBox;
+      QMessageBox messageBox(QMessageBox::Critical, "Otsu", "Unknown error while computing Otsu preview.", QMessageBox::NoButton, this->window());
+      messageBox.exec();
       return;
     }
 

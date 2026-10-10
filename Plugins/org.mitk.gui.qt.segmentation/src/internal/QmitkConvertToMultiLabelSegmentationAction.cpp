@@ -20,12 +20,10 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 
+#include <QApplication>
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QPushButton>
-
-//needed for qApp
-#include <QCoreApplication>
 
 namespace
 {
@@ -81,7 +79,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
 
     if (distinctValues >= DISTINCT_VALUE_WARNING_THRESHOLD)
     {
-      QMessageBox msgBox;
+      QMessageBox msgBox(QApplication::activeWindow());
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.setWindowTitle(QStringLiteral("Convert to Segmentation"));
       msgBox.setText(QStringLiteral("Image \"%1\" contains at least %2 distinct values.")
@@ -135,7 +133,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
     catch (const mitk::Exception &e)
     {
       MITK_ERROR << "Could not convert image to segmentation: " << e.GetDescription();
-      QMessageBox::warning(nullptr, QStringLiteral("Convert to Segmentation"),
+      QMessageBox::warning(QApplication::activeWindow(), QStringLiteral("Convert to Segmentation"),
         QStringLiteral("Could not convert image \"%1\" to a segmentation.")
           .arg(QString::fromStdString(referenceNode->GetName())));
       continue;

@@ -2027,7 +2027,9 @@ QmitkMxNCellOverlay::HoverTarget QmitkMxNCellOverlay::HoverAt(const QPoint& pos)
   {
     return HoverTarget::WindowLevel;
   }
-  if (!this->IsLocked(QmitkMxNLayoutLock::Direction) && this->PlaneLabelRect().contains(pos))
+  // The Direction lock is applied where the label is painted and clicked, so
+  // the hover target survives a live lock or unlock under a resting pointer.
+  if (this->PlaneLabelRect().contains(pos))
   {
     return HoverTarget::PlaneLabel;
   }
@@ -2592,6 +2594,12 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
     const auto planeValue = plane;
     connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
     {
+      // QMenu::exec runs a nested event loop, so the owning plugin can lock
+      // while the menu is open.
+      if (this->IsLocked(QmitkMxNLayoutLock::Direction))
+      {
+        return;
+      }
       try
       {
         m_Editor->SetViewDirection(windowId, planeValue);
@@ -3349,6 +3357,11 @@ void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
     {
       QTimer::singleShot(0, this, [this, globalPosition]()
       {
+        // A lock can land between the menu closing and this deferred call.
+        if (this->IsLocked(QmitkMxNLayoutLock::Content))
+        {
+          return;
+        }
         if (auto* utilityWidget = m_Cell->GetUtilityWidget(); nullptr != utilityWidget)
         {
           utilityWidget->ShowDataSelection(globalPosition);

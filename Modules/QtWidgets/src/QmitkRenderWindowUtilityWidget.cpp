@@ -325,4 +325,10 @@ void QmitkRenderWindowUtilityWidget::SetSyncBarcodeClickable(bool clickable)
 void QmitkRenderWindowUtilityWidget::SetDataSelectionVisible(bool visible)
 {
   m_DataButton->setVisible(visible);
+  if (!visible)
+  {
+    // The popup is a top-level window of its own, so hiding the button leaves
+    // it open, and the node selection inside applies picks immediately.
+    m_DataMenu->hide();
+  }
 }

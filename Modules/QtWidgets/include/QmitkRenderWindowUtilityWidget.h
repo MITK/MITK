@@ -134,7 +134,8 @@ public Q_SLOTS:
   void SetSyncBarcodeClickable(bool clickable);
 
   /** \brief Shows or hides the Data button and with it the cell's node
-   *         selection. Default: shown. */
+   *         selection. Hiding also closes an open selection popup.
+   *         Default: shown. */
   void SetDataSelectionVisible(bool visible);
 
 Q_SIGNALS:

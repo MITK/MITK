@@ -78,7 +78,8 @@ class QmitkMxNLayoutLockTestSuite : public mitk::TestFixture
   MITK_TEST(SingleAspects_CloseOnlyTheirSeams);
   MITK_TEST(Barcode_LiveLockUnderThePointerDropsTheHighlight);
   MITK_TEST(Barcode_PeekStillReportsWhileLocked);
-  MITK_TEST(PlaneLabel_LiveLockUnderThePointerDropsTheHighlight);
+  MITK_TEST(PlaneLabel_LiveLockAndUnlockUnderThePointer);
+  MITK_TEST(LiveContentLock_ClosesOpenDataPopup);
   MITK_TEST(ProgrammaticCalls_WorkOnALockedWidget);
   CPPUNIT_TEST_SUITE_END();
 
@@ -568,7 +569,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The sync peek still answers a locked strip", !reports.empty() && reports.back());
   }
 
-  void PlaneLabel_LiveLockUnderThePointerDropsTheHighlight()
+  void PlaneLabel_LiveLockAndUnlockUnderThePointer()
   {
     auto widget = this->MakeWidget({});
     const auto id = widget->GetRenderWindowWidgets().begin()->first;
@@ -585,6 +586,24 @@ public:
 
     SendMouse(overlay, QEvent::MouseMove, onLabel + QPoint(1, 0), Qt::NoButton);
     CPPUNIT_ASSERT_MESSAGE("A locked plane label is not highlighted on hover", idle == PlaneLabelImage(overlay));
+
+    widget->SetLayoutLocks({});
+    CPPUNIT_ASSERT_MESSAGE("A live unlock restores the highlight under a resting pointer",
+                           idle != PlaneLabelImage(overlay));
+  }
+
+  void LiveContentLock_ClosesOpenDataPopup()
+  {
+    auto widget = this->MakeWidget({});
+    const auto id = widget->GetRenderWindowWidgets().begin()->first;
+    auto* utility = Cell(*widget, id)->GetUtilityWidget();
+
+    utility->ShowDataSelection(QPoint(10, 10));
+    auto* menu = utility->findChild<QMenu*>();
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the data popup is open", nullptr != menu && menu->isVisible());
+
+    widget->SetLayoutLocks(QmitkMxNLayoutLock::Content);
+    CPPUNIT_ASSERT_MESSAGE("A live Content lock closes an open data popup", !menu->isVisible());
   }
 
   void ProgrammaticCalls_WorkOnALockedWidget()

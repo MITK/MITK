@@ -93,8 +93,17 @@ private:
    *         the bound widget, so a change confirmed before can still go to it. */
   bool IsStillBoundTo(const QmitkMxNMultiWidget* multiWidget) const;
 
-  /** \brief Show the overlay that explains why nothing is bound, or hide it. */
-  void ShowUnboundOverlay(bool show, bool locked);
+  /** \brief Why the view is not bound to the shown part, or that it is. */
+  enum class Binding
+  {
+    Bound,
+    NoDisplay,
+    Locked,
+    InvalidDeclaration
+  };
+
+  /** \brief Shows the overlay that explains why nothing is bound, or hides it. */
+  void ShowUnboundOverlay(Binding binding);
 
   QmitkMxNLayoutEditorWidget* m_LayoutEditorWidget = nullptr;
 
@@ -108,7 +117,7 @@ private:
   QLabel* m_BoundDisplayLabel = nullptr;
 
   /** Covers the editor while the view is unbound - no MxN display visible, or only
-   *  one whose plugin locked its structure: the controls would otherwise sit
+   *  one whose plugin locked its structure or whose declaration is invalid: the controls would otherwise sit
    *  there greyed out and unexplained. Says which case applies and carries the
    *  action that resolves it, so a bindable display is one click away. */
   QmitkButtonOverlayWidget* m_NoDisplayOverlay = nullptr;
@@ -124,9 +133,11 @@ private:
   /** \brief The editor currently in arrange mode on this view's behalf. */
   QPointer<QmitkMxNMultiWidget> m_ArrangedMultiWidget;
 
-  /** \brief The part the view shows, bound or locked; null for none. Kept so
-   *         a lock change re-runs the binding decision on it, and so its
-   *         closing returns the view to the no-display state. */
+  /** \brief The part the view shows, bound or locked; null for none. Also kept
+   *         for an editor with an invalid declaration, so that closing it
+   *         resets the text. Kept so a lock change re-runs the binding
+   *         decision on it, and so its closing returns the view to the
+   *         no-display state. */
   mitk::IRenderWindowPart* m_ShownPart = nullptr;
   QPointer<QmitkMxNMultiWidget> m_ShownMultiWidget;
 

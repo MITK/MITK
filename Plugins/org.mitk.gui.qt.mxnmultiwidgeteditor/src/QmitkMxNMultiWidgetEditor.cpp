@@ -245,6 +245,11 @@ QmitkMxNMultiWidgetEditor::GetInteractionScheme() const
   return m_Impl->m_InteractionScheme;
 }
 
+bool QmitkMxNMultiWidgetEditor::HasConfigurationErrors() const
+{
+  return !m_Impl->m_ConfigurationErrors.isEmpty();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
 //////////////////////////////////////////////////////////////////////////

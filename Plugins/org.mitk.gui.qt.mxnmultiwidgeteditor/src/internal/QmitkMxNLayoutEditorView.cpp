@@ -178,21 +178,30 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     ? dynamic_cast<QmitkMxNMultiWidget*>(multiWidgetEditor->GetMultiWidget())
     : nullptr;
 
+  auto* mxnPart = dynamic_cast<QmitkMxNMultiWidgetEditor*>(renderWindowPart);
+  const bool invalidDeclaration = nullptr != mxnPart && mxnPart->HasConfigurationErrors();
+
   this->DisconnectLayoutControls();
-  m_ShownPart = nullptr != shownMultiWidget ? renderWindowPart : nullptr;
+  m_ShownPart = nullptr != shownMultiWidget || invalidDeclaration ? renderWindowPart : nullptr;
   m_ShownMultiWidget = shownMultiWidget;
 
   // Made on the real widget before any early return, and kept with the other
   // per-attachment connections, so every re-evaluation replaces it rather than
-  // stacking another. Locking unbinds the view, unlocking binds it again.
+  // stacking another. Only 'Structure' decides whether the view binds, so
+  // other lock changes leave the binding as it is.
   // The view, not the editor widget, is the context: detaching drops every
   // connection from the widget to the editor widget, this one included.
   if (nullptr != shownMultiWidget)
   {
     m_LayoutConnections.push_back(connect(
-      shownMultiWidget, &QmitkMxNMultiWidget::LayoutLocksChanged, this, [this]()
+      shownMultiWidget, &QmitkMxNMultiWidget::LayoutLocksChanged, this, [this](QmitkMxNLayoutLocks locks)
       {
-        this->RenderWindowPartActivated(m_ShownPart);
+        const bool bindable = !locks.testFlag(QmitkMxNLayoutLock::Structure);
+        const bool bound = nullptr != m_LayoutEditorWidget->GetMultiWidget();
+        if (bindable != bound)
+        {
+          this->RenderWindowPartActivated(m_ShownPart);
+        }
       }));
   }
 
@@ -203,7 +212,10 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
 
   m_LayoutEditorWidget->SetMultiWidget(multiWidget);
   this->UpdateArrangeMode();
-  this->ShowUnboundOverlay(nullptr == multiWidget, locked);
+  this->ShowUnboundOverlay(nullptr != multiWidget ? Binding::Bound
+    : locked ? Binding::Locked
+    : invalidDeclaration ? Binding::InvalidDeclaration
+    : Binding::NoDisplay);
 
   // Unbound, the overlay already says why, so the label goes with it.
   auto* boundPart = nullptr != multiWidget ? dynamic_cast<berry::IWorkbenchPart*>(renderWindowPart) : nullptr;
@@ -233,11 +245,8 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
           ? mitk::InteractionSchemeSwitcher::PACSStandard
           : mitk::InteractionSchemeSwitcher::MITKStandard);
       }));
-    if (nullptr != multiWidget)
-    {
-      m_LayoutConnections.push_back(connect(
-        multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged, m_PacsSchemeBox, showScheme));
-    }
+    m_LayoutConnections.push_back(connect(
+      multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged, m_PacsSchemeBox, showScheme));
   }
 
   if (nullptr == multiWidget)
@@ -356,19 +365,35 @@ bool QmitkMxNLayoutEditorView::IsStillBoundTo(const QmitkMxNMultiWidget* multiWi
   return nullptr != m_LayoutEditorWidget && m_LayoutEditorWidget->GetMultiWidget() == multiWidget;
 }
 
-void QmitkMxNLayoutEditorView::ShowUnboundOverlay(bool show, bool locked)
+void QmitkMxNLayoutEditorView::ShowUnboundOverlay(Binding binding)
 {
   if (nullptr == m_NoDisplayOverlay)
   {
     return;
   }
-  m_NoDisplayOverlay->SetOverlayText(locked
-    ? tr("<b>The active display's layout is managed by its plugin.</b><br/>This view cannot "
-         "change it. Bring an MxN display to the front, or open one.")
-    : tr("<b>No MxN display is active.</b><br/>This view configures the window "
-         "arrangement and the synchronization of an MxN display. Bring one to the "
-         "front, or open one."));
-  m_NoDisplayOverlay->setVisible(show);
+  switch (binding)
+  {
+    case Binding::Bound:
+      break;
+    case Binding::Locked:
+      m_NoDisplayOverlay->SetOverlayText(
+        tr("<b>The active display's layout is managed by its plugin.</b><br/>This view cannot "
+           "change it. Bring an MxN display to the front, or open one."));
+      break;
+    case Binding::InvalidDeclaration:
+      m_NoDisplayOverlay->SetOverlayText(
+        tr("<b>The active display cannot be shown: its declaration is invalid.</b><br/>The display "
+           "names the plugin and the setting at fault. Bring another MxN display to the front, or "
+           "open one."));
+      break;
+    case Binding::NoDisplay:
+      m_NoDisplayOverlay->SetOverlayText(
+        tr("<b>No MxN display is active.</b><br/>This view configures the window "
+           "arrangement and the synchronization of an MxN display. Bring one to the "
+           "front, or open one."));
+      break;
+  }
+  m_NoDisplayOverlay->setVisible(Binding::Bound != binding);
 }
 
 bool QmitkMxNLayoutEditorView::ConfirmDestructiveLayoutChange()
@@ -393,12 +418,10 @@ void QmitkMxNLayoutEditorView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
     return;
   }
 
-  // The shown part, not only the bound one: a locked part's overlay text must
-  // not outlive it. A closed part is never followed by an activation, so the
-  // view falls back to its no-display state here.
-  auto* multiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(renderWindowPart);
-  if (nullptr != multiWidgetEditor && !m_ShownMultiWidget.isNull()
-      && m_ShownMultiWidget.data() == multiWidgetEditor->GetMultiWidget())
+  // The shown part, not only the bound one: a locked or invalid part's overlay
+  // text must not outlive it. A closed part is never followed by an
+  // activation, so the view falls back to its no-display state here.
+  if (nullptr != renderWindowPart && renderWindowPart == m_ShownPart)
   {
     this->RenderWindowPartActivated(nullptr);
   }

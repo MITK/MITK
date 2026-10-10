@@ -80,6 +80,11 @@ public:
    *         live state. */
   mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
 
+  /** \brief Whether the declaration, or applying its initial layout, failed.
+   *         Such an editor has no multi widget and shows an error panel
+   *         instead. */
+  bool HasConfigurationErrors() const;
+
 private Q_SLOTS:
 
   void OnLayoutChanged();

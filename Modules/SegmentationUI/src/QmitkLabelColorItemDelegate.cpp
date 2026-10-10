@@ -37,7 +37,7 @@ void QmitkLabelColorItemDelegate::paint(QPainter *painter, const QStyleOptionVie
   }
 }
 
-bool QmitkLabelColorItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &,
+bool QmitkLabelColorItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
   const QModelIndex &index)
 {
   Q_ASSERT(event);
@@ -58,7 +58,7 @@ bool QmitkLabelColorItemDelegate::editorEvent(QEvent *event, QAbstractItemModel 
   }
 
   QColor oldColor = index.data(Qt::EditRole).value<QColor>();
-  QColor newColor = QColorDialog::getColor(oldColor, nullptr);
+  QColor newColor = QColorDialog::getColor(oldColor, option.widget != nullptr ? option.widget->window() : nullptr);
 
   if (newColor.isValid())
   {

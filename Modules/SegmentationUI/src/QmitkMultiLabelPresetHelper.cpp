@@ -19,13 +19,13 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QMessageBox>
 
-void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
+void QmitkSaveMultiLabelPreset(QWidget* parent, const mitk::MultiLabelSegmentation* segmentation)
 {
   if (nullptr == segmentation)
     mitkThrow() << "Invalid call of QmitkSaveMultiLabelPreset. Passed image is a null pointer.";
 
   auto filename = QFileDialog::getSaveFileName(
-    nullptr,
+    parent,
     QStringLiteral("Save Multi Label Preset"),
     QString(),
     QStringLiteral("Multi label preset (*.mitklabel.json)")).toUtf8().toStdString();
@@ -40,12 +40,12 @@ void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
 
   if (!mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(filename, segmentation))
   {
-    QMessageBox::critical(nullptr, QStringLiteral("Save Multi Label Preset"),
+    QMessageBox::critical(parent, QStringLiteral("Save Multi Label Preset"),
       QString("Could not save \"%1\" as label preset.").arg(QString::fromStdString(filename)));
   }
 }
 
-void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations)
+void QmitkLoadMultiLabelPreset(QWidget* parent, const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations)
 {
 #if defined(_WIN32)
   const auto filter = QStringLiteral("Multi label preset (*.mitklabel.json;*.json;*.lsetp)");
@@ -54,7 +54,7 @@ void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::P
 #endif
 
   const auto filename = QFileDialog::getOpenFileName(
-    nullptr,
+    parent,
     QStringLiteral("Load Multi Label Preset"),
     QString(),
     filter).toUtf8().toStdString();

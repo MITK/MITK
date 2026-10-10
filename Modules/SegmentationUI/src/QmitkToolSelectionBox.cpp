@@ -42,9 +42,11 @@ namespace
     return !widget->testAttribute(Qt::WA_ForceDisabled);
   }
 
+  // The tool manager outlives the boxes and calls this also when another view
+  // claims exclusive interaction, so no box can serve as the parent.
   bool ConfirmDiscardingResults(const mitk::Tool& tool)
   {
-    return QMessageBox::Yes == QMessageBox::question(nullptr,
+    return QMessageBox::Yes == QMessageBox::question(QApplication::activeWindow(),
                                                      tool.GetName(),
                                                      QStringLiteral("The %1 tool currently has unconfirmed results. "
                                                                     "Do you really want to discard the results by "
@@ -643,13 +645,13 @@ void QmitkToolSelectionBox::ObserveToolBusyState(bool observe)
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)
 {
   QMessageBox::critical(
-    this, "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
+    this->window(), "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
 {
   QMessageBox::information(
-    this, "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
+    this->window(), "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string &toolGroups)

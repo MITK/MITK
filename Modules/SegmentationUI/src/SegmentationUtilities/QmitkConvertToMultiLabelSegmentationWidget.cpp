@@ -473,7 +473,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   }
   catch (const mitk::Exception& e)
   {
-    QMessageBox::warning(nullptr, "Conversion error", "Cannot convert selected data into segmentations due to unresolved label collisions. "
+    QMessageBox::warning(this->window(), "Conversion error", "Cannot convert selected data into segmentations due to unresolved label collisions. "
       "The inputs contain at least one equal label value that could not be resolved by remapping as not enough unused destination label values are available.\n\n"
       "One can often mitigate this problem by checking the \"Convert inputs separately\" option." );
     QApplication::restoreOverrideCursor();

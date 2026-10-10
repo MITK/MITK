@@ -111,7 +111,8 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
                                                 nullptr,
                                                 "The otsu segmentation computation may take several minutes depending "
                                                 "on the number of Regions you selected. Proceed anyway?",
-                                                QMessageBox::Ok | QMessageBox::Cancel);
+                                                QMessageBox::Ok | QMessageBox::Cancel,
+                                                this->window());
       if (m_Controls->m_Spinbox->value() >= 5)
       {
         proceed = messageBox->exec();
@@ -131,7 +132,9 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
       QMessageBox* messageBox =
         new QMessageBox(QMessageBox::Critical,
           nullptr,
-          e.what());
+          e.what(),
+          QMessageBox::NoButton,
+          this->window());
       messageBox->exec();
       delete messageBox;
       return;
@@ -142,7 +145,9 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
       QMessageBox *messageBox =
         new QMessageBox(QMessageBox::Critical,
                         nullptr,
-                        "Unkown error while computing Otsu preview.");
+                        "Unkown error while computing Otsu preview.",
+                        QMessageBox::NoButton,
+                        this->window());
       messageBox->exec();
       delete messageBox;
       return;

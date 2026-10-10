@@ -197,7 +197,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Masking failed";
-    QMessageBox::information( this, "Image Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
+    QMessageBox::information( this->window(), "Image Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
     this->EnableButtons(true);
     return;
   }
@@ -237,7 +237,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
     if (!ok)
     {
       // Input is not even a number
-      QMessageBox::warning(nullptr, warningTitle, "Please enter a valid number as custom pixel value.");
+      QMessageBox::warning(this->window(), warningTitle, "Please enter a valid number as custom pixel value.");
       return nullptr;
     }
     else
@@ -268,7 +268,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
         "<p>Apply the closest valid pixel value <b>%2</b> instead?</p>").arg(originalBackgroundValue).arg(backgroundValue);
 
       auto ret = QMessageBox::warning(
-        nullptr,
+        this->window(),
         warningTitle,
         warningText,
         QMessageBox::StandardButton::Apply | QMessageBox::StandardButton::Cancel,
@@ -306,7 +306,7 @@ mitk::DataNode::Pointer QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStor
   {
     std::string exception = "Cannot add result to the data storage. Data storage invalid.";
     MITK_ERROR << "Masking failed: " << exception;
-    QMessageBox::information(nullptr, "Masking failed", QString::fromStdString(exception));
+    QMessageBox::information(this->window(), "Masking failed", QString::fromStdString(exception));
     return nullptr;
   }
 

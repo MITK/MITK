@@ -448,21 +448,21 @@ void QmitkSegmentationView::OnNewSegmentation()
   if (referenceImage.IsNull())
   {
     QMessageBox::information(
-      m_Parent, "New segmentation", "Please load and select an image before starting some action.");
+      m_Parent->window(), "New segmentation", "Please load and select an image before starting some action.");
     return;
   }
 
   if (referenceImage->GetDimension() <= 1)
   {
     QMessageBox::information(
-      m_Parent, "New segmentation", "Segmentation is not supported for 1-dimensional images.");
+      m_Parent->window(), "New segmentation", "Segmentation is not supported for 1-dimensional images.");
     return;
   }
 
   auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
-    QmitkStaticDynamicSegmentationDialog dialog(m_Parent);
+    QmitkStaticDynamicSegmentationDialog dialog(m_Parent->window());
     dialog.SetReferenceImage(referenceImage.GetPointer());
     dialog.exec();
     segTemplateImage = dialog.GetSegmentationTemplate();
@@ -479,7 +479,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::warning(m_Parent, "New segmentation", "Could not create a new segmentation.");
+    QMessageBox::warning(m_Parent->window(), "New segmentation", "Could not create a new segmentation.");
     return;
   }
 
@@ -499,7 +499,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
     if (!m_DefaultLabelNaming || suggestionPref.enforceSuggestions)
     {
-      auto success = QmitkNewSegmentationDialog::DoRenameLabel(newLabel, newLabelSetImage, m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+      auto success = QmitkNewSegmentationDialog::DoRenameLabel(newLabel, newLabelSetImage, m_Parent->window(), QmitkNewSegmentationDialog::Mode::NewLabel);
       if (!success && suggestionPref.enforceSuggestions && !m_LabelSuggestionHelper->IsNewInstanceAllowed(newLabelSetImage, newLabel->GetName()))
         return; //we have to enforce label suggestions but no valid label name is selected -> cancel segmentation creation.
     }
@@ -580,11 +580,11 @@ void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rena
 
   if (rename)
   {
-    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent->window(), QmitkNewSegmentationDialog::Mode::RenameLabel);
     return;
   }
 
-  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent->window(), QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::MultiLabelSegmentation* QmitkSegmentationView::GetCurrentSegmentation() const

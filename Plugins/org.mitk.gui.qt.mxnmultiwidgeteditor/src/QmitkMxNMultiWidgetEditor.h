@@ -49,7 +49,7 @@ public:
   *   Never throws: an unknown parameter name, an invalid 'widgetName', an
   *   invalid 'layoutLock', or an 'initialLayout' resource that is missing or
   *   not valid JSON is logged and recorded. The editor then shows an error
-  *   panel naming the declaring plugin, the parameter and the value instead of
+  *   panel naming the declaring plugin, the parameter and the problem instead of
   *   the MxN display, because the Qt workbench shows nothing for a part that
   *   fails to create.
   */
@@ -80,9 +80,9 @@ public:
    *         live state. */
   mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
 
-  /** \brief Whether the declaration, or applying its initial layout, failed.
-   *         Such an editor has no multi widget and shows an error panel
-   *         instead. */
+  /** \brief Whether the declaration or applying its initial layout failed, or
+   *         another live MxN widget already uses the widget name. Such an
+   *         editor has no multi widget and shows an error panel instead. */
   bool HasConfigurationErrors() const;
 
 private Q_SLOTS:
@@ -110,7 +110,8 @@ private:
   /** \brief Logs a configuration error and records it for the error panel. */
   void RecordConfigurationError(const QString& parameter, const QString& problem);
 
-  void ShowConfigurationErrors(QWidget* parent);
+  /** \brief Shows 'reason' and the recorded errors in place of the MxN display. */
+  void ShowConfigurationErrors(QWidget* parent, const QString& reason);
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

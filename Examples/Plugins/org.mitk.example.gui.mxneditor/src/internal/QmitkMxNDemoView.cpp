@@ -215,7 +215,7 @@ QmitkMxNMultiWidget* QmitkMxNDemoView::FindMultiWidget() const
     berry::IEditorInput::Pointer(), EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
   for (const auto& reference : editors)
   {
-    // An editor whose declaration is invalid has no multi widget.
+    // An editor showing its error panel has no multi widget.
     auto* editor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(reference->GetEditor(false).GetPointer());
     auto* multiWidget = nullptr != editor ? dynamic_cast<QmitkMxNMultiWidget*>(editor->GetMultiWidget()) : nullptr;
     if (nullptr != multiWidget)

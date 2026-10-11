@@ -99,7 +99,7 @@ private:
     Bound,
     NoDisplay,
     Locked,
-    InvalidDeclaration
+    CannotBeShown
   };
 
   /** \brief Shows the overlay that explains why nothing is bound, or hides it. */
@@ -117,7 +117,7 @@ private:
   QLabel* m_BoundDisplayLabel = nullptr;
 
   /** Covers the editor while the view is unbound - no MxN display visible, or only
-   *  one whose plugin locked its structure or whose declaration is invalid: the controls would otherwise sit
+   *  one whose plugin locked its structure or that shows an error panel: the controls would otherwise sit
    *  there greyed out and unexplained. Says which case applies and carries the
    *  action that resolves it, so a bindable display is one click away. */
   QmitkButtonOverlayWidget* m_NoDisplayOverlay = nullptr;

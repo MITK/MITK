@@ -179,10 +179,10 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     : nullptr;
 
   auto* mxnPart = dynamic_cast<QmitkMxNMultiWidgetEditor*>(renderWindowPart);
-  const bool invalidDeclaration = nullptr != mxnPart && mxnPart->HasConfigurationErrors();
+  const bool cannotBeShown = nullptr != mxnPart && mxnPart->HasConfigurationErrors();
 
   this->DisconnectLayoutControls();
-  m_ShownPart = nullptr != shownMultiWidget || invalidDeclaration ? renderWindowPart : nullptr;
+  m_ShownPart = nullptr != shownMultiWidget || cannotBeShown ? renderWindowPart : nullptr;
 
   // Made on the real widget before any early return, and kept with the other
   // per-attachment connections, so every re-evaluation replaces it rather than
@@ -213,7 +213,7 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   this->UpdateArrangeMode();
   this->ShowUnboundOverlay(nullptr != multiWidget ? Binding::Bound
     : locked ? Binding::Locked
-    : invalidDeclaration ? Binding::InvalidDeclaration
+    : cannotBeShown ? Binding::CannotBeShown
     : Binding::NoDisplay);
 
   // Unbound, the overlay already says why, so the label goes with it.
@@ -379,11 +379,10 @@ void QmitkMxNLayoutEditorView::ShowUnboundOverlay(Binding binding)
         tr("<b>The active display's layout is managed by its plugin.</b><br/>This view cannot "
            "change it. Bring an MxN display to the front, or open one."));
       break;
-    case Binding::InvalidDeclaration:
+    case Binding::CannotBeShown:
       m_NoDisplayOverlay->SetOverlayText(
-        tr("<b>The active display cannot be shown: its declaration is invalid.</b><br/>The display "
-           "names the plugin and the setting at fault. Bring another MxN display to the front, or "
-           "open one."));
+        tr("<b>The active display cannot be shown.</b><br/>The display says why and names the "
+           "plugin and the setting involved. Bring another MxN display to the front, or open one."));
       break;
     case Binding::NoDisplay:
       m_NoDisplayOverlay->SetOverlayText(

@@ -191,15 +191,14 @@ void QmitkMxNMultiWidgetEditor::RecordConfigurationError(const QString& paramete
   m_Impl->m_ConfigurationErrors.append(message);
 }
 
-void QmitkMxNMultiWidgetEditor::ShowConfigurationErrors(QWidget* parent)
+void QmitkMxNMultiWidgetEditor::ShowConfigurationErrors(QWidget* parent, const QString& reason)
 {
   auto* label = new QLabel(parent);
   label->setTextFormat(Qt::PlainText);
   label->setWordWrap(true);
   label->setAlignment(Qt::AlignCenter);
   label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-  label->setText(QStringLiteral("This display cannot be shown because its declaration is invalid.\n\n")
-                 + m_Impl->m_ConfigurationErrors.join(QStringLiteral("\n")));
+  label->setText(reason + QStringLiteral("\n\n") + m_Impl->m_ConfigurationErrors.join(QStringLiteral("\n")));
   parent->layout()->addWidget(label);
 }
 
@@ -267,9 +266,10 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   QHBoxLayout *layout = new QHBoxLayout(parent);
   layout->setContentsMargins(0, 0, 0, 0);
 
+  const auto invalidDeclaration = QStringLiteral("This display cannot be shown because its declaration is invalid.");
   if (!m_Impl->m_ConfigurationErrors.isEmpty())
   {
-    this->ShowConfigurationErrors(parent);
+    this->ShowConfigurationErrors(parent, invalidDeclaration);
     return;
   }
 
@@ -288,7 +288,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   catch (const QmitkMxNWidgetNameInUseException& e)
   {
     this->RecordConfigurationError(QStringLiteral("widgetName"), QString::fromStdString(e.GetDescription()));
-    this->ShowConfigurationErrors(parent);
+    this->ShowConfigurationErrors(parent,
+      QStringLiteral("This display cannot be shown because another open MxN display already uses its widget name."));
     return;
   }
   multiWidget->SetDataStorage(this->GetDataStorage());
@@ -304,7 +305,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     {
       delete multiWidget;
       this->RecordConfigurationError(QStringLiteral("initialLayout"), QString::fromStdString(e.GetDescription()));
-      this->ShowConfigurationErrors(parent);
+      this->ShowConfigurationErrors(parent, invalidDeclaration);
       return;
     }
     m_Impl->m_InitialLayout.reset();

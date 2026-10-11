@@ -102,9 +102,9 @@ own view. The example plugin `org.mitk.example.gui.mxneditor`
 The declaring plugin lists `org.mitk.gui.qt.mxnmultiwidgeteditor` in its `Require-Plugin`.
 All parameters are optional:
  - `widgetName`: the prefix of the editor's render-window IDs, `<widgetName>__<cellId>`.
-   It defaults to the editor ID, which keeps the names unique without a naming rule. It
-   must match `^[A-Za-z][A-Za-z0-9.-]*$`. An override must be unique among the MxN
-   editors open at the same time; this is not enforced. The stock editor sets `mxn`.
+   It defaults to the editor ID, which keeps the names of different editors unique
+   without a naming rule. It must match `^[A-Za-z][A-Za-z0-9.-]*$`. An override must
+   be unique among the MxN editors open at the same time. The stock editor sets `mxn`.
  - `layoutLock`: a comma-separated list of the aspects users cannot change
    (see \ref MxNConceptPage_PluginEditors_Locks).
  - `initialLayout`: a layout file (\ref MxNLayoutFormatPage) embedded in the declaring
@@ -120,6 +120,10 @@ invalid name or lock token, and an initial layout that is missing, not valid JSO
 rejected by `ApplyLayout`. The editor opens with an error panel that names the plugin,
 the parameter and the problem, and logs the same message. No MxN widget of that editor
 stays alive.
+
+The same panel appears when another open MxN editor already uses the widget name. This
+is checked when the display opens, not when the plugin loads, so it also hits a second
+open instance of the same editor, for example in a second workbench window.
 
 \subsection MxNConceptPage_PluginEditors_Code Declaration and code
 

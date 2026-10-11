@@ -467,7 +467,14 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   for (int preset = 0; preset < presetNames.size(); ++preset)
   {
     connect(presetMenu->addAction(presetNames[preset]), &QAction::triggered, this,
-            [this, preset]() { m_LayoutSelection->ApplyPreset(preset); });
+            [this, preset]()
+            {
+              if (nullptr == m_MultiWidget)
+              {
+                return;
+              }
+              m_LayoutSelection->ApplyPreset(preset, m_MultiWidget->GetMultiWidgetName());
+            });
   }
   presetButton->setMenu(presetMenu);
   presetButton->setEnabled(!presetNames.isEmpty());

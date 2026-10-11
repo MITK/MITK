@@ -394,12 +394,15 @@ constructor inputs that contain `_` or otherwise violate the editor-name
 regex are rejected at editor construction time, not at load time.
 
 `SerializeLayout` writes each window's id verbatim. `SetLayout` and the grid
-operations name new windows `mxn__widget<i>`, but `<i>` carries no
+operations name new windows `<editor_name>__widget<i>`, but `<i>` carries no
 positional meaning: after a row or column is added, the ids are no longer in
-reading order. Tools that generate layouts may use `mxn__widget<i>` with
+reading order. Tools that generate layouts may use `<editor_name>__widget<i>` with
 `<i>` the leaf's pre-order index (0-based, contiguous) as a readable default.
 Hand-authored presets may use any unique bare-id segment (e.g. `mxn__alpha`, `mxn__upper_left`) as long as
 the qualified id is URL-segment-safe and unique within the document.
+The presets shipped with MITK are written for the `mxn` widget and take the
+target widget's name when applied from the Layout Editor; the loader itself
+still never rewrites ids.
 
 Renaming an id breaks every cached reference to it (persisted sessions,
 REST clients holding URLs, scene-file context keys); treat it as

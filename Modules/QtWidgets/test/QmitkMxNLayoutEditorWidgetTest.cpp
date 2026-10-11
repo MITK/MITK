@@ -61,7 +61,9 @@ found in the LICENSE file.
 #include <algorithm>
 #include <array>
 #include <memory>
+#include <string>
 #include <variant>
+#include <vector>
 
 /**
  * Drives the layout editor widget's mutation API against a real
@@ -171,6 +173,8 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_FirstBuildMirrorsThePlateSelection);
   MITK_TEST(Assign_ReplaceDropStartsTheOffsetFresh);
   MITK_TEST(Refresh_DeferredWhileApplyingLayout);
+  MITK_TEST(Preset_AppliesToTheDefaultNamedEditor);
+  MITK_TEST(Preset_IsRequalifiedForACustomNamedEditor);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -2443,6 +2447,91 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("No refresh while a layout is being applied", !cardWhileBusy);
     CPPUNIT_ASSERT_MESSAGE("The refresh runs once the load is over", nullptr != CardFor("x"));
+  }
+
+  /** Every window id in a layout document's tree. */
+  static void CollectWindowIds(const nlohmann::json& node, std::vector<std::string>& ids)
+  {
+    if (node.contains("id"))
+    {
+      ids.push_back(node["id"].get<std::string>());
+    }
+    if (node.contains("children"))
+    {
+      for (const auto& child : node["children"])
+      {
+        CollectWindowIds(child, ids);
+      }
+    }
+  }
+
+  /** Pick the first entry of the layout editor's "Presets" menu, apply what it
+   *  emits to the editor as the hosting view does, and return the window ids of
+   *  the emitted document. */
+  static std::vector<std::string> ApplyFirstPreset(QmitkMxNLayoutEditorWidget& layoutEditor,
+                                                   QmitkMxNMultiWidget& editor)
+  {
+    QToolButton* presetButton = nullptr;
+    for (auto* button : layoutEditor.findChildren<QToolButton*>())
+    {
+      if (QStringLiteral("Presets") == button->text())
+      {
+        presetButton = button;
+        break;
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE("The editor offers a Presets button", nullptr != presetButton);
+    CPPUNIT_ASSERT_MESSAGE("The Presets button has a menu", nullptr != presetButton->menu());
+    CPPUNIT_ASSERT_MESSAGE("The Presets menu lists the shipped presets",
+                           !presetButton->menu()->actions().isEmpty());
+
+    std::vector<std::string> ids;
+    const auto connection = QObject::connect(
+      &layoutEditor, &QmitkMxNLayoutEditorWidget::LoadLayout,
+      [&ids, &editor](const nlohmann::json* doc)
+      {
+        CollectWindowIds((*doc)["root"], ids);
+        editor.ApplyLayout(*doc);
+      });
+    presetButton->menu()->actions().first()->trigger();
+    QObject::disconnect(connection);
+    return ids;
+  }
+
+  void Preset_AppliesToTheDefaultNamedEditor()
+  {
+    std::vector<std::string> ids;
+    CPPUNIT_ASSERT_NO_THROW(ids = ApplyFirstPreset(*m_Widget, *m_Editor));
+
+    CPPUNIT_ASSERT_MESSAGE("The preset has windows", !ids.empty());
+    for (const auto& id : ids)
+    {
+      CPPUNIT_ASSERT_MESSAGE("A window id carries the editor's name: " + id,
+                             0 == id.rfind("mxn__", 0));
+    }
+    CPPUNIT_ASSERT_MESSAGE("The preset's windows exist after the apply",
+                           nullptr != m_Editor->GetRenderWindowWidget(QString::fromStdString(ids.front())));
+  }
+
+  void Preset_IsRequalifiedForACustomNamedEditor()
+  {
+    QmitkMxNMultiWidget custom(nullptr, Qt::WindowFlags{}, QStringLiteral("custom"));
+    custom.SetDataStorage(m_DataStorage);
+    custom.InitializeMultiWidget();
+    QmitkMxNLayoutEditorWidget customWidget;
+    customWidget.SetMultiWidget(&custom);
+
+    std::vector<std::string> ids;
+    CPPUNIT_ASSERT_NO_THROW(ids = ApplyFirstPreset(customWidget, custom));
+
+    CPPUNIT_ASSERT_MESSAGE("The preset has windows", !ids.empty());
+    for (const auto& id : ids)
+    {
+      CPPUNIT_ASSERT_MESSAGE("A window id is qualified with the target editor's name: " + id,
+                             0 == id.rfind("custom__", 0));
+    }
+    CPPUNIT_ASSERT_MESSAGE("The preset's windows exist after the apply",
+                           nullptr != custom.GetRenderWindowWidget(QString::fromStdString(ids.front())));
   }
 };
 

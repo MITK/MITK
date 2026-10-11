@@ -26,6 +26,30 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
+namespace
+{
+  /** Replaces the editor segment of every window id below 'node'. An id without
+   *  the "__" separator is left for the loader to reject. */
+  void RequalifyWindowIds(nlohmann::json& node, const std::string& widgetName)
+  {
+    if (const auto id = node.find("id"); node.end() != id && id->is_string())
+    {
+      const auto separator = id->get_ref<const std::string&>().find("__");
+      if (std::string::npos != separator)
+      {
+        *id = widgetName + id->get_ref<const std::string&>().substr(separator);
+      }
+    }
+    if (const auto children = node.find("children"); node.end() != children && children->is_array())
+    {
+      for (auto& child : *children)
+      {
+        RequalifyWindowIds(child, widgetName);
+      }
+    }
+  }
+}
+
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
   , ui(std::make_unique<Ui::QmitkMultiWidgetLayoutSelectionWidget>())
@@ -225,12 +249,17 @@ void QmitkMultiWidgetLayoutSelectionWidget::RequestLoad()
   emit LoadLayout(&jsonData);
 }
 
-void QmitkMultiWidgetLayoutSelectionWidget::ApplyPreset(int index)
+void QmitkMultiWidgetLayoutSelectionWidget::ApplyPreset(int index, const QString& widgetName)
 {
   if (index < 0 || static_cast<std::size_t>(index) >= m_Presets.size())
   {
     return;
   }
 
-  emit LoadLayout(&m_Presets[index].layout);
+  nlohmann::json layout = m_Presets[index].layout;
+  if (auto root = layout.find("root"); layout.end() != root)
+  {
+    RequalifyWindowIds(*root, widgetName.toStdString());
+  }
+  emit LoadLayout(&layout);
 }

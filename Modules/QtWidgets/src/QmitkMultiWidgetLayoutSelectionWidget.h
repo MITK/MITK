@@ -74,8 +74,14 @@ public Q_SLOTS:
   /** \brief Ask for a layout file and emit LoadLayout with its parsed content. */
   void RequestLoad();
 
-  /** \brief Emit LoadLayout with the preset at 'index' into PresetNames. */
-  void ApplyPreset(int index);
+  /**
+   * \brief Emit LoadLayout with the preset at 'index' into PresetNames.
+   *
+   * Shipped presets are authored for one widget name and are re-qualified for
+   * 'widgetName': window ids are editor-qualified and the loader never
+   * rewrites them.
+   */
+  void ApplyPreset(int index, const QString& widgetName);
 
 Q_SIGNALS:
 

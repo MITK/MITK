@@ -183,7 +183,6 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
 
   this->DisconnectLayoutControls();
   m_ShownPart = nullptr != shownMultiWidget || invalidDeclaration ? renderWindowPart : nullptr;
-  m_ShownMultiWidget = shownMultiWidget;
 
   // Made on the real widget before any early return, and kept with the other
   // per-attachment connections, so every re-evaluation replaces it rather than

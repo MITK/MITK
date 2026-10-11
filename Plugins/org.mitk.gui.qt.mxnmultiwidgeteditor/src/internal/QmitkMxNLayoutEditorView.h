@@ -139,7 +139,6 @@ private:
    *         decision on it, and so its closing returns the view to the
    *         no-display state. */
   mitk::IRenderWindowPart* m_ShownPart = nullptr;
-  QPointer<QmitkMxNMultiWidget> m_ShownMultiWidget;
 
 };
 

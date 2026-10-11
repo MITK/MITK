@@ -90,10 +90,10 @@ own view. The example plugin `org.mitk.example.gui.mxneditor`
 
 \code{.xml}
 <extension point="org.blueberry.ui.editors">
-  <editor id="org.mitk.editors.longitrack" name="LongiTrack Display">
+  <editor id="org.mitk.example.editors.mxndemo" name="MxN Demo Display">
     <class class="QmitkMxNMultiWidgetEditor">
       <parameter name="layoutLock" value="structure,direction,proportions,content"/>
-      <parameter name="initialLayout" value="resources/LongiTrackLayout.json"/>
+      <parameter name="initialLayout" value="resources/MxNDemoLayout.json"/>
     </class>
   </editor>
 </extension>
@@ -172,10 +172,10 @@ its display preferences, a plugin declares a page with the stock page class and 
 
 \code{.xml}
 <extension point="org.blueberry.ui.preferencePages">
-  <page id="org.mitk.LongiTrackDisplayPreferencePage" name="Display"
-        category="org.mitk.LongiTrackPreferencePage">
+  <page id="org.mitk.example.MxNDemoDisplayPreferencePage" name="MxN Demo Display"
+        category="org.mitk.EditorsPreferencePage">
     <class class="QmitkMxNMultiWidgetEditorPreferencePage">
-      <parameter name="editorId" value="org.mitk.editors.longitrack"/>
+      <parameter name="editorId" value="org.mitk.example.editors.mxndemo"/>
     </class>
     <keywordreference id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords"/>
   </page>
@@ -183,8 +183,9 @@ its display preferences, a plugin declares a page with the stock page class and 
 \endcode
 
 The page's Reset clears every key at the root of the editor's node. Keep a plugin's own
-settings in a child node of the editor node (e.g. `org.mitk.editors.longitrack/backend`)
-or in the plugin's own node, never as root keys of the editor node.
+settings in a child node of the editor node (e.g.
+`org.mitk.example.editors.mxndemo/backend`) or in the plugin's own node, never as root
+keys of the editor node.
 
 \subsection MxNConceptPage_PluginEditors_Tooling Generic tooling
 

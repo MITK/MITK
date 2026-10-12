@@ -98,6 +98,28 @@ cmake -S MITK -B MITK-superbuild -G "Visual Studio 17 2022"
 cmake --build MITK-superbuild -- -m
 \endcode
 
+\subsection BuildInstructions_Presets CMake presets
+
+Alternatively, the <tt>CMakePresets.json</tt> file in the MITK source directory provides predefined configure and build presets.
+Each preset uses its own superbuild directory next to the source directory, named <tt>MITK-superbuild-&lt;preset&gt;</tt>.
+
+\code{.unparsed}
+cmake --list-presets              # show the presets available on this platform
+cmake --preset release            # configure
+cmake --build --preset release    # build
+\endcode
+
+| Preset       | Generator             | Build configuration      | Platform        |
+| ------------ | --------------------- | ------------------------ | --------------- |
+| release      | Ninja                 | WorkbenchRelease         | all             |
+| debug        | Ninja                 | WorkbenchReleaseNoPython | all             |
+| vs-release   | Visual Studio 17 2022 | WorkbenchRelease         | Windows         |
+| vs-debug     | Visual Studio 17 2022 | WorkbenchReleaseNoPython | Windows         |
+
+The debug presets use <tt>WorkbenchReleaseNoPython</tt> because Debug builds are incompatible with <tt>MITK_USE_Python3</tt>.
+For personal adjustments, create a <tt>CMakeUserPresets.json</tt> next to <tt>CMakePresets.json</tt> and inherit from the provided presets.
+This file is ignored by Git.
+
 \section BuildInstructions_Superbuild_Note A note on the MITK superbuild
 
 The MITK superbuild has the major advantage that most of MITK’s dependencies are built automatically and do not need to be provided manually.

@@ -1,0 +1,99 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceParentDir}/MITK-superbuild-${presetName}",
+      "cacheVariables": {
+        "MITK_BUILD_CONFIGURATION": "WorkbenchRelease"
+      }
+    },
+    {
+      "name": "ninja",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja"
+    },
+    {
+      "name": "vs2022",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Visual Studio 17 2022",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (Ninja)",
+      "inherits": "ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug without Python (Ninja)",
+      "inherits": "ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MITK_BUILD_CONFIGURATION": "WorkbenchReleaseNoPython"
+      }
+    },
+    {
+      "name": "vs-release",
+      "displayName": "Release (Visual Studio 2022)",
+      "inherits": "vs2022"
+    },
+    {
+      "name": "vs-debug",
+      "displayName": "Debug without Python (Visual Studio 2022)",
+      "inherits": "vs2022",
+      "cacheVariables": {
+        "MITK_BUILD_CONFIGURATION": "WorkbenchReleaseNoPython"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "vs-release",
+      "configurePreset": "vs-release",
+      "configuration": "Release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "vs-debug",
+      "configurePreset": "vs-debug",
+      "configuration": "Debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    }
+  ]
+}

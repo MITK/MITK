@@ -51,6 +51,9 @@ out/
 build/
 CMakeSettings.json
 
+# CMake presets (personal overrides of CMakePresets.json)
+CMakeUserPresets.json
+
 ########## OS specific
 
 ## Windows files to ignore

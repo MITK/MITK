@@ -57,6 +57,14 @@ cmake -S . -B ../MITK-superbuild -G "Ninja" -D CMAKE_BUILD_TYPE=Release
 cmake --build ../MITK-superbuild
 ```
 
+**CMake presets** (`CMakePresets.json`): `release`, `debug`
+(Ninja), `vs-release`, `vs-debug` (Windows only). Each configures
+into `../MITK-superbuild-<preset>`:
+```bash
+cmake --preset release
+cmake --build --preset release
+```
+
 Subsequent rebuilds of just MITK happen in the inner build tree (the
 `-- -m` is an MSBuild flag that parallelises across targets; omit it when
 building with Ninja):

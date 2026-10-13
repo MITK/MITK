@@ -34,6 +34,7 @@ found in the LICENSE file.
 // qt
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPointer>
 
 // c++
 #include <optional>
@@ -63,6 +64,12 @@ struct QmitkMxNMultiWidgetEditor::Impl final
 
   /** Non-empty puts the editor into its error state: no multi widget. */
   QStringList m_ConfigurationErrors;
+
+  /** The multi widget this editor created. Deleted with the editor because
+   *  the workbench pane that parents it can outlive the editor, and the
+   *  widget's name and render windows must be released when the editor
+   *  goes. Guarded because the pane may also delete it first. */
+  QPointer<QmitkMxNMultiWidget> m_OwnedMultiWidget;
 };
 
 QmitkMxNMultiWidgetEditor::Impl::Impl()
@@ -85,6 +92,7 @@ QmitkMxNMultiWidgetEditor::QmitkMxNMultiWidgetEditor()
 QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 {
   GetSite()->GetPage()->RemovePartListener(this);
+  delete m_Impl->m_OwnedMultiWidget;
 }
 
 berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
@@ -324,6 +332,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
     this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
 
+  m_Impl->m_OwnedMultiWidget = multiWidget;
   this->SetMultiWidget(multiWidget);
   connect(multiWidget, &QmitkMxNMultiWidget::LayoutChanged,
     this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);

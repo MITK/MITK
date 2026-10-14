@@ -168,6 +168,12 @@ public:
   bool HasCoupledRenderWindows() const override;
 
   void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
+  /**
+   * \brief The selected position of the named cell; for an empty name, of
+   *        the active cell, or of the first 2D cell in layout order while
+   *        the active cell is 3D, since a 3D cell's crosshair does not
+   *        follow navigation.
+   */
   const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 
   void SetCrosshairVisibility(bool visible) override;

@@ -1134,10 +1134,8 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   unsigned int imageTimeStep = 0;
   if (!resetCamera)
   {
-    // store the current position to set it again later, if the camera should not be reset;
-    // a 3D cell has no slice position of its own, so a 2D cell provides it
-    auto* positionSource = this->RenderWindowForMode(RenderMode::TwoD);
-    currentPosition = this->GetSelectedPosition(QString::fromUtf8(positionSource->GetRenderer()->GetName()));
+    // store the current position to set it again later, if the camera should not be reset
+    currentPosition = this->GetSelectedPosition("");
 
     // store the current time step to set it again later, if the camera should not be reset
     const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
@@ -1212,7 +1210,13 @@ const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widg
   RenderWindowWidgetPointer renderWindowWidget;
   if (widgetName.isNull() || widgetName.isEmpty())
   {
-    renderWindowWidget = GetActiveRenderWindowWidget();
+    // A 3D cell's crosshair does not follow navigation, so a 2D cell answers
+    // for it.
+    auto* positionSource = this->RenderWindowForMode(RenderMode::TwoD);
+    if (nullptr != positionSource)
+    {
+      renderWindowWidget = this->GetRenderWindowWidget(QString::fromUtf8(positionSource->GetRenderer()->GetName()));
+    }
   }
   else
   {

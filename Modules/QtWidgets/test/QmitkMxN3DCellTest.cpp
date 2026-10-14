@@ -106,6 +106,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Routing_Axial_PrefersTwoD);
   MITK_TEST(Routing_NoThreeDCell_ReturnsActive);
   MITK_TEST(InitializeViews_ThreeDActive_BroadcastsTwoDPosition);
+  MITK_TEST(SelectedPosition_EmptyNameFollowsTwoDCellWhileThreeDIsActive);
   MITK_TEST(Math_VisibleHalfHeight_ParallelAndPerspective);
   MITK_TEST(Math_Zoom_DividesHalfHeight);
   MITK_TEST(Math_PlaneAndWorldVectors);
@@ -854,6 +855,27 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The other 2D cell is moved to the first 2D cell's position",
                                  Snc(1)->GetStepper()->GetPos(), Snc(2)->GetStepper()->GetPos());
+  }
+
+  void SelectedPosition_EmptyNameFollowsTwoDCellWhileThreeDIsActive()
+  {
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    mitk::Point3D position;
+    position[0] = 2.0;
+    position[1] = 2.0;
+    position[2] = 2.0;
+    m_Editor->SetSelectedPosition(position, CellId(1));
+    const auto twoDPosition = m_Editor->GetSelectedPosition(CellId(1));
+    CPPUNIT_ASSERT_MESSAGE("precondition: the 3D cell's position is stale",
+                           !mitk::Equal(twoDPosition, m_Editor->GetSelectedPosition(CellId(0))));
+
+    this->Activate(0);
+    CPPUNIT_ASSERT_MESSAGE("An empty name asks the first 2D cell while a 3D cell is active",
+                           mitk::Equal(twoDPosition, m_Editor->GetSelectedPosition("")));
+
+    this->Activate(1);
+    CPPUNIT_ASSERT_MESSAGE("An empty name asks the active cell when it is 2D",
+                           mitk::Equal(twoDPosition, m_Editor->GetSelectedPosition("")));
   }
 
   // --- Camera synchronization ----------------------------------------------

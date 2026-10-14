@@ -159,7 +159,7 @@ namespace
         visit(i + width, slice.spacing[1]);
     };
 
-    // Tissue statistics of the core around the seed
+    // Tissue statistics of the core around the seed. The seed itself is finite, so the core is never empty.
     std::vector<double> core;
     const auto seedX = static_cast<int>(seed % width);
     const auto seedY = static_cast<int>(seed / width);
@@ -167,15 +167,20 @@ namespace
     {
       for (int x = std::max(0, seedX - CoreRadius); x <= std::min(static_cast<int>(width) - 1, seedX + CoreRadius); ++x)
       {
-        core.push_back(values[x + y * width]);
+        if (std::isfinite(values[x + y * width]))
+        {
+          core.push_back(values[x + y * width]);
+        }
       }
     }
 
     const auto [coreMean, robustCoreSpread] = ComputeRobustStatistics(std::move(core));
 
     // A perfectly homogeneous core would make every other gray value infinitely dissimilar. The range is taken from
-    // the image, as the slice also covers the background of a world plane reaching beyond the image.
-    const double coreSpread = std::max(robustCoreSpread, std::max(1e-3 * valueRange, 1e-12));
+    // the image, as the slice also covers the background of a world plane reaching beyond the image. An infinite
+    // pixel value in the image would make every gray value similar.
+    const double rangeSpread = std::isfinite(valueRange) ? 1e-3 * valueRange : 0.0;
+    const double coreSpread = std::max(robustCoreSpread, std::max(rangeSpread, 1e-12));
 
     std::size_t count = 0;
     double mean = coreMean;

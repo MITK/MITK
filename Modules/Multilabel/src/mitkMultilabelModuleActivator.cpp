@@ -61,6 +61,7 @@ namespace mitk
 
       CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
       transience->AddTransient<MultiLabelSegmentation>(MultiLabelSegmentationVtkMapper3D::PROPERTY_NAME_3D_HIDDEN_LABELS());
+      transience->AddTransient<MultiLabelSegmentation>(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE());
     }
 
     void Unload(us::ModuleContext *) override

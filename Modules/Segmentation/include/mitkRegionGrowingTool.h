@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <itkContinuousIndex.h>
 #include <itkImage.h>
-#include <optional>
 #include <vector>
 
 namespace us
@@ -186,11 +185,10 @@ namespace mitk
     DataNode::Pointer m_SeedMarkerNode;
 
     /** While Ctrl is held, the segmentation is dimmed in the armed render window so the image along the cut stays
-     * visible. A renderer-specific opacity it had before is restored afterwards. */
+     * visible. */
     bool m_IsCutArmed = false;
     const BaseRenderer* m_ArmedRenderer = nullptr;
     DataNode::Pointer m_DimmedNode;
-    std::optional<float> m_DimmedRendererOpacity;
   };
 
 } // namespace

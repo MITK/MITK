@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageVtkMapper2D.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkPointSet.h>
 #include <mitkPointSetShapeProperty.h>
@@ -1108,15 +1109,8 @@ void mitk::RegionGrowingTool::DimSegmentation()
     return;
   }
 
-  float opacity = 1.0f;
-  m_DimmedNode->GetOpacity(opacity, m_ArmedRenderer);
-
-  if (nullptr != m_DimmedNode->GetPropertyList(m_ArmedRenderer)->GetProperty("opacity"))
-  {
-    m_DimmedRendererOpacity = opacity;
-  }
-
-  m_DimmedNode->SetOpacity(opacity * CutOpacityFactor, m_ArmedRenderer);
+  m_DimmedNode->SetFloatProperty(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE(), CutOpacityFactor,
+                                 m_ArmedRenderer);
 }
 
 void mitk::RegionGrowingTool::RestoreSegmentationOpacity()
@@ -1126,17 +1120,9 @@ void mitk::RegionGrowingTool::RestoreSegmentationOpacity()
     return;
   }
 
-  if (m_DimmedRendererOpacity.has_value())
-  {
-    m_DimmedNode->SetOpacity(*m_DimmedRendererOpacity, m_ArmedRenderer);
-  }
-  else
-  {
-    m_DimmedNode->GetPropertyList(m_ArmedRenderer)->DeleteProperty("opacity");
-  }
-
+  m_DimmedNode->GetPropertyList(m_ArmedRenderer)
+    ->DeleteProperty(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE());
   m_DimmedNode = nullptr;
-  m_DimmedRendererOpacity.reset();
 }
 
 bool mitk::RegionGrowingTool::IsLastSeedApplicable(const BaseRenderer* renderer) const

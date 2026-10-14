@@ -692,6 +692,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No slice readout in 3D", !this->Overlay(1)->SliceReadoutRect().isValid());
     CPPUNIT_ASSERT_MESSAGE("No navigator in 3D without time steps", !this->Overlay(1)->NavigatorBandRect().isValid());
     CPPUNIT_ASSERT(this->Overlay(1)->IsThreeD());
+    CPPUNIT_ASSERT_MESSAGE("No hairline in 3D without time steps", !this->Overlay(1)->ShowsHairline());
   }
 
   void ThreeD_TimeOnlyReadoutAndNavigator()
@@ -714,6 +715,9 @@ public:
     const auto threeDBand = this->Overlay(1)->NavigatorBandRect();
     CPPUNIT_ASSERT_MESSAGE("A 3D cell navigates time", threeDBand.isValid());
     CPPUNIT_ASSERT_MESSAGE("...in a single row", threeDBand.height() < twoDBand.height());
+
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell's hairline carries the time marker", this->Overlay(1)->ShowsHairline());
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell keeps its hairline", this->Overlay(0)->ShowsHairline());
   }
 
   static QStringList ActionTexts(const QMenu& menu)

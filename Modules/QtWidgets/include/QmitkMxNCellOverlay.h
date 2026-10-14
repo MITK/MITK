@@ -75,8 +75,8 @@ class vtkRenderWindow;
  *
  * A 3D cell has no slice and no image plane: line 1 reads `3D | <name>`,
  * line 2 shows the time alone, the colorbar and the `W/L` readout are
- * absent, and the hairline carries only the time marker. The navigator
- * keeps just the time row.
+ * absent, and the hairline carries only the time marker (when the data has
+ * more than one time step). The navigator keeps just the time row.
  *
  * Passive readouts are always-on and faint (the level/window readout honors
  * the MxN preference and every readout honors clean-view). The interactive
@@ -315,6 +315,11 @@ public:
    *         the time row, so it has no band without several time steps.
    *         Exposed for verification. */
   QRect NavigatorBandRect() const;
+
+  /** \brief Whether the bottom hairline is painted: a 2D cell with a slice
+   *         bar, or a 3D cell with several time steps (the time marker alone).
+   *         Exposed for verification. */
+  bool ShowsHairline() const;
 
   /** \brief Whether the furniture is laid out for a 3D cell, as of the last
    *         value refresh. Exposed for verification. */

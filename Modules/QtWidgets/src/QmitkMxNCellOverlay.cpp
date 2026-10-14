@@ -975,6 +975,11 @@ QString QmitkMxNCellOverlay::PlaneLabelToolTip() const
   return QString();
 }
 
+bool QmitkMxNCellOverlay::ShowsHairline() const
+{
+  return m_SliceSteps > 0 || (m_ThreeD && m_TimeSteps > 1);
+}
+
 bool QmitkMxNCellOverlay::IsThreeD() const
 {
   return m_ThreeD;
@@ -1613,7 +1618,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   }
 
   // ---- Bottom hairline: slice tick (bar) + time position (triangle) ----
-  if (m_SliceSteps > 0 && this->IsPassiveVisible(false))
+  if (this->ShowsHairline() && this->IsPassiveVisible(false))
   {
     painter.fillRect(QRect(area.left(), area.bottom() - 1, area.width(), 1), QColor(255, 255, 255, 40));
     if (m_SliceSteps > 1)

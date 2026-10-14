@@ -383,7 +383,8 @@
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,
 	the navigator's slice and position rows, the level/window readout and the colorbar
-	disappear; for time-resolved data the time readout and the navigator's time row stay.
+	disappear; for time-resolved data the time readout and the navigator's time row stay,
+	and the bottom hairline shows only the time marker.
 	The context menu leaves out "Set level/window..." and "Go to coordinate...".
 
 	Of the synchronization axes, a 3D view takes part in pan, zoom, orientation and data

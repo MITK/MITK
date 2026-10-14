@@ -348,17 +348,57 @@ namespace
   }
 
   /**
+   * \brief The piece containing point, or 0 if there is none.
+   *
+   * A point on a pixel of the cut line lies on one side of the line, so it belongs to the piece of its nearest
+   * neighbor off the line.
+   */
+  std::size_t FindPieceAt(const BinaryImageType* pieces, const BinaryImageType* lineMask,
+                          const itk::ContinuousIndex<double, 2>& point)
+  {
+    const auto bounds = pieces->GetLargestPossibleRegion();
+    const auto index = RoundIndex(point);
+    if (!bounds.IsInside(index))
+    {
+      return 0;
+    }
+
+    const std::size_t width = bounds.GetSize(0);
+    const auto i = static_cast<std::size_t>(index[0]) + static_cast<std::size_t>(index[1]) * width;
+    const auto* piece = pieces->GetBufferPointer();
+    if (0 != piece[i] || 0 == lineMask->GetBufferPointer()[i])
+    {
+      return piece[i];
+    }
+
+    std::size_t nearestPiece = 0;
+    auto nearestDistance = std::numeric_limits<double>::infinity();
+    ForEachNeighbor(i, bounds.GetSize(), [&](std::size_t j, unsigned int) {
+      const double deltaX = static_cast<double>(j % width) - point[0];
+      const double deltaY = static_cast<double>(j / width) - point[1];
+      const double distance = deltaX * deltaX + deltaY * deltaY;
+      if (0 != piece[j] && distance < nearestDistance)
+      {
+        nearestPiece = piece[j];
+        nearestDistance = distance;
+      }
+    });
+
+    return nearestPiece;
+  }
+
+  /**
    * \brief The pixels of the label that a cut line separates and that are to be removed, or null if it separates none.
    *
    * A line separates nothing unless both its ends lie outside the label. Of each part of the label the line splits,
-   * the piece containing protectedIndex is kept, or the largest piece without one. Line pixels on the label go with the
-   * nearest pieces, so a kept piece does not lose its edge to the line. labelParts are the components of labelMask as
-   * computed by LabelComponents().
+   * the piece containing protectedPoint is kept, or the largest piece without one. Line pixels on the label go with
+   * the nearest pieces, so a kept piece does not lose its edge to the line. labelParts are the components of labelMask
+   * as computed by LabelComponents().
    */
   BinaryImageType::Pointer ComputeCutAway(const BinaryImageType* labelMask, const BinaryImageType* labelParts,
                                           std::size_t numberOfParts, const BinaryImageType* lineMask,
                                           const itk::Index<2>& start, const itk::Index<2>& end,
-                                          const itk::Index<2>* protectedIndex)
+                                          const itk::ContinuousIndex<double, 2>* protectedPoint)
   {
     const auto bounds = labelMask->GetLargestPossibleRegion();
     for (const auto& lineEnd : { start, end })
@@ -412,8 +452,7 @@ namespace
       }
     }
 
-    const std::size_t protectedPiece =
-      nullptr != protectedIndex && bounds.IsInside(*protectedIndex) ? pieces->GetPixel(*protectedIndex) : 0;
+    const std::size_t protectedPiece = nullptr != protectedPoint ? FindPieceAt(pieces, lineMask, *protectedPoint) : 0;
 
     std::vector<bool> isRemoved(numberOfPieces + 1, false);
     bool removesAnything = false;
@@ -916,11 +955,12 @@ void mitk::RegionGrowingTool::OnCutStarted(StateMachineAction*, InteractionEvent
   m_CutLineNode->SetData(line);
   ShowOnlyIn(m_CutLineNode, m_LastEventSender);
 
-  m_HasProtectedIndex = this->IsLastSeedApplicable(positionEvent->GetSender());
-  if (m_HasProtectedIndex)
+  m_HasProtectedPoint = this->IsLastSeedApplicable(positionEvent->GetSender());
+  if (m_HasProtectedPoint)
   {
     geometry->WorldToIndex(m_LastSeed, index);
-    m_ProtectedIndex = { { std::lround(index[0]), std::lround(index[1]) } };
+    m_ProtectedPoint[0] = index[0];
+    m_ProtectedPoint[1] = index[1];
   }
 
   this->UpdateCut();
@@ -986,7 +1026,7 @@ void mitk::RegionGrowingTool::UpdateCut()
 {
   auto cutAway = ComputeCutAway(m_CutLabelMask, m_CutLabelParts, m_CutNumberOfLabelParts, m_CutLineMask,
                                 m_CutStartIndex, RoundIndex(m_CutLastIndex),
-                                m_HasProtectedIndex ? &m_ProtectedIndex : nullptr);
+                                m_HasProtectedPoint ? &m_ProtectedPoint : nullptr);
 
   if (cutAway.IsNotNull())
   {

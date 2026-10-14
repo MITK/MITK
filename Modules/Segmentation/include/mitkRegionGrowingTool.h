@@ -177,8 +177,8 @@ namespace mitk
     Image::Pointer m_CutAway;
     itk::ContinuousIndex<double, 2> m_CutLastIndex;
     itk::Index<2> m_CutStartIndex = {};
-    itk::Index<2> m_ProtectedIndex = {};
-    bool m_HasProtectedIndex = false;
+    itk::ContinuousIndex<double, 2> m_ProtectedPoint;
+    bool m_HasProtectedPoint = false;
     DataNode::Pointer m_CutLineNode;
     DataNode::Pointer m_CutAwayNode;
 

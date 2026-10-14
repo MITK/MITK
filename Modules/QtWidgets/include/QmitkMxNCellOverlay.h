@@ -73,6 +73,11 @@ class vtkRenderWindow;
  *     time-resolved data the time-step position rides the same hairline as a
  *     distinct triangle marker.
  *
+ * A 3D cell has no slice and no image plane: line 1 reads `3D | <name>`,
+ * line 2 shows the time alone, the colorbar and the `W/L` readout are
+ * absent, and the hairline carries only the time marker. The navigator
+ * keeps just the time row.
+ *
  * Passive readouts are always-on and faint (the level/window readout honors
  * the MxN preference and every readout honors clean-view). The interactive
  * furniture reveals as one coordinated frame when the pointer nears any piece
@@ -182,10 +187,11 @@ public:
   QString NavigatorDepthLabel() const;
 
   /**
-   * \brief The plane label currently shown bottom-left, tracking the cell's
-   *        view direction (empty before the first refresh or for a view with
-   *        no fixed anatomical name). Exposed for headless verification of the
-   *        reorientation tracking.
+   * \brief The plane label shown bottom-left: the cell's current view direction
+   *        ("Axial", "Coronal", "Sagittal", "Original", "Free"); for a 3D cell
+   *        "3D | <direction>", suffixed " (locked)" while its rotation is
+   *        locked. Always reflects the current state; empty while the editor
+   *        does not know the cell. Exposed for verification.
    */
   QString PlaneLabel() const;
 
@@ -432,11 +438,13 @@ private:
   };
 
   /** \brief The navigator rows for the current mode and data (compact = slice
-   *         [+ time]; expanded = depth, in-plane H, in-plane V [+ time]),
-   *         with their tracks laid out and knob positions resolved. */
+   *         [+ time]; expanded = depth, in-plane H, in-plane V [+ time]; a 3D
+   *         cell has only [time]), with their tracks laid out and knob
+   *         positions resolved. */
   std::vector<NavRow> NavigatorRows() const;
 
-  /** \brief The click-to-edit coordinate line, expanded mode only. */
+  /** \brief The click-to-edit coordinate line, expanded mode only; empty for
+   *         a 3D cell. */
   QRect CoordinateLineRect() const;
 
   /**

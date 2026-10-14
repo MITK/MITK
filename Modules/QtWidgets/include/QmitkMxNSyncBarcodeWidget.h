@@ -28,8 +28,9 @@ class QPainter;
 
 /**
  * \brief A compact synchronization barcode: one slot per synchronization axis,
- *        rendered as the group's hue when the cell is linked on that axis and
- *        left as a gap when it is not.
+ *        rendered as the group's hue when the cell is linked on that axis,
+ *        left as a gap when it is not, and struck through when the axis does
+ *        not apply to the cell.
  *
  * The widget is a passive presenter: the owner computes one slot per axis
  * (which axis glyph, the group hue, a tooltip) and pushes them via SetSlots.
@@ -38,6 +39,9 @@ class QPainter;
  * an offset by filling its box's upper-right corner; when it is too narrow it
  * collapses to plain color slots, which have no room for that mark and so omit
  * it.
+ *
+ * A slot whose axis does not apply to the window (applicable == false) is
+ * struck through in the gap color in both modes, with no offset mark.
  *
  * The whole strip doubles as a button: it emits Clicked so the owner can open
  * the layout editor.
@@ -55,7 +59,10 @@ public:
   struct AxisSlot
   {
     QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;  // which axis icon to draw
-    QColor color;     // invalid == this cell is unsynced on the axis (a gap)
+    // The group hue; invalid == this cell is unsynced on the axis (a gap). On an
+    // axis that does not apply, a valid hue is a kept link, not drawn until the
+    // axis applies.
+    QColor color;
     QString tooltip;  // per-slot hover text, shown in axis-clickable mode
     QString label;    // the axis's display name, for a surface that names it in words
 
@@ -63,13 +70,14 @@ public:
     // but only some of the group's member windows are linked on this axis. The
     // window perspective (a single cell) never sets this - a cell is linked or
     // not. Rendered as a broken variant of the hue so "some" reads distinctly
-    // from "all" (solid) and "none" (gap).
+    // from "all" (solid) and "none" (gap). Meaningful only where the axis applies.
     bool partial = false;
 
     // The axis carries an offset relative to its group's reference. Marked by
     // filling the box's upper-right corner, because an offset is otherwise
     // invisible outside the layout editor's matrix, and a window parked at
-    // slice -1 looks exactly like one sitting on the group.
+    // slice -1 looks exactly like one sitting on the group. Not marked on a slot
+    // whose axis does not apply.
     bool hasOffset = false;
 
     // That offset in words, where a single window's is meant. Empty on the group

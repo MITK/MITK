@@ -348,9 +348,10 @@
 	Each window view "is looking in" one of the three view directions, "Axial", "Sagittal"
 	or "Coronal", shown as the plane label in the window's bottom-left corner. Click that
 	label to pick another anatomical plane, or to switch the window between a 2D slice and
-	a 3D view. Changing the view direction resets the camera to its default for the new
-	plane (default zoom, centered position). When the window is in an orientation group,
-	the change propagates to the group's other windows.
+	a 3D view. In a 2D window, changing the view direction resets the camera to its default
+	for the new plane (default zoom, centered position); a 3D view only turns its camera and
+	keeps its zoom and center. When the window is in an orientation group, the change
+	propagates to the group's other windows.
 
 	A window loaded from a layout file can also show the data's own stacking direction; its
 	label then reads "Original". It stays so until another direction is picked; the picker
@@ -377,7 +378,7 @@
 	An orientation group of 3D views only can also turn "Free" as a whole: pick "Free" in
 	one of them. Rotating any member with the mouse then rotates all of them alike, and a
 	3D view that joins the group takes its camera direction. A 2D window cannot join a
-	"Free" group, and "Free" is not offered while the group has a 2D window; a member that
+	"Free" group, and "Free" is greyed out while the group has a 2D window; a member that
 	is switched to 2D leaves the group.
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,

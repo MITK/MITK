@@ -174,7 +174,7 @@ namespace mitk
     BinaryImageType::Pointer m_CutLabelParts;
     std::size_t m_CutNumberOfLabelParts = 0;
     BinaryImageType::Pointer m_CutLineMask;
-    BinaryImageType::Pointer m_CutAway;
+    Image::Pointer m_CutAway;
     itk::ContinuousIndex<double, 2> m_CutLastIndex;
     itk::Index<2> m_CutStartIndex = {};
     itk::Index<2> m_ProtectedIndex = {};

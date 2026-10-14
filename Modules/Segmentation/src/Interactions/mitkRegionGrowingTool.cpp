@@ -36,7 +36,6 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <itkBinaryMedianImageFilter.h>
 #include <itkConnectedComponentImageFilter.h>
-#include <itkImageDuplicator.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkMedianImageFilter.h>
 
@@ -963,10 +962,12 @@ void mitk::RegionGrowingTool::OnCutFinished(StateMachineAction*, InteractionEven
   if (m_CutAway.IsNotNull())
   {
     {
+      ImagePixelReadAccessor<DefaultSegmentationDataType, 2> cutAwayAccessor(m_CutAway);
       ImagePixelWriteAccessor<DefaultSegmentationDataType, 2> accessor(m_CutSlice);
       auto* labels = accessor.GetData();
-      const auto* cutAway = m_CutAway->GetBufferPointer();
-      for (std::size_t i = 0; i < m_CutAway->GetLargestPossibleRegion().GetNumberOfPixels(); ++i)
+      const auto* cutAway = cutAwayAccessor.GetData();
+      const auto numberOfPixels = static_cast<std::size_t>(m_CutAway->GetDimension(0)) * m_CutAway->GetDimension(1);
+      for (std::size_t i = 0; i < numberOfPixels; ++i)
       {
         if (0 != cutAway[i])
         {
@@ -989,26 +990,21 @@ void mitk::RegionGrowingTool::OnCancel(StateMachineAction*, InteractionEvent*)
 
 void mitk::RegionGrowingTool::UpdateCut()
 {
-  m_CutAway = ComputeCutAway(m_CutLabelMask, m_CutLabelParts, m_CutNumberOfLabelParts, m_CutLineMask,
-                             m_CutStartIndex, RoundIndex(m_CutLastIndex),
-                             m_HasProtectedIndex ? &m_ProtectedIndex : nullptr);
+  auto cutAway = ComputeCutAway(m_CutLabelMask, m_CutLabelParts, m_CutNumberOfLabelParts, m_CutLineMask,
+                                m_CutStartIndex, RoundIndex(m_CutLastIndex),
+                                m_HasProtectedIndex ? &m_ProtectedIndex : nullptr);
 
-  if (m_CutAway.IsNotNull())
+  if (cutAway.IsNotNull())
   {
-    // Grabbing takes over the memory, but m_CutAway is still needed when the cut is finished.
-    auto duplicator = itk::ImageDuplicator<BinaryImageType>::New();
-    duplicator->SetInputImage(m_CutAway);
-    duplicator->Update();
-    BinaryImageType::Pointer shown = duplicator->GetOutput();
-
-    auto cutAwaySlice = mitk::GrabItkImageMemory(shown);
-    cutAwaySlice->SetGeometry(m_CutSlice->GetGeometry());
-    m_CutAwayNode->SetData(cutAwaySlice);
+    m_CutAway = mitk::GrabItkImageMemory(cutAway);
+    m_CutAway->SetGeometry(m_CutSlice->GetGeometry());
   }
   else
   {
-    m_CutAwayNode->SetData(nullptr);
+    m_CutAway = nullptr;
   }
+
+  m_CutAwayNode->SetData(m_CutAway);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }

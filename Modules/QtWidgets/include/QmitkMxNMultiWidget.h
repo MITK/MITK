@@ -1730,6 +1730,34 @@ private:
   void SwitchCellToThreeD(QmitkRenderWindowWidget* cell);
 
   /**
+  * \brief Install the MxN interactor style on a cell whose mapper is already
+  *        3D. A no-op for a cell without an interactor.
+  */
+  void InstallThreeDInteractorStyle(QmitkRenderWindowWidget* cell);
+
+  /**
+  * \brief Take a cell out of the 'free' state before it renders 2D: leave its
+  *        orientation group, whose camera it cannot follow, and drop it from
+  *        the free cells.
+  * \return Whether the cell was free.
+  */
+  bool ReleaseFreeCellForTwoD(const QString& windowId);
+
+  /** \brief Steps after a cell started rendering 2D: the 2D-only links are active again. */
+  void FinishTwoDAdoption(const QString& windowId);
+
+  /** \brief Steps after a cell started rendering 3D and its view was initialized. */
+  void FinishThreeDAdoption(const QString& windowId);
+
+  /**
+  * \brief Bring cells whose renderer mapper was switched by someone else
+  *        (e.g. the Render Window Manager) in line with this editor's 3D
+  *        bookkeeping. Such a switch never goes through SetRenderMode, whose
+  *        early return on an unchanged mode is why this cannot reuse it.
+  */
+  void ReconcileExternalRenderModes();
+
+  /**
   * \brief Point a 3D cell's camera along its canonical view direction
   *        (see ViewDirection). No-op for a 2D cell, a 'Free' cell and a
   *        cell without geometry yet.

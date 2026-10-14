@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTable.h>
+#include <mitkRenderWindowViewDirectionController.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
@@ -86,6 +87,8 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Switch_FreeToTwoD_TakesNearestPlane);
   MITK_TEST(Switch_KeepsTimeStep);
   MITK_TEST(Switch_EmitsSyncLinksChanged);
+  MITK_TEST(ExternalSwitch_FreeThreeDToAxial_LeavesFree);
+  MITK_TEST(ExternalSwitch_TwoDToThreeD_InstallsMxNStyle);
   MITK_TEST(Lifecycle_ReusedIdOfFreeCell_IsCanonical);
   MITK_TEST(Rotation_Azimuth_TurnsCellFree);
   MITK_TEST(Rotation_Roll_TurnsCellFree);
@@ -580,6 +583,44 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, notifications);
     m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("No change, no notification", 1, notifications);
+  }
+
+  void SwitchByRenderWindowManager(const std::string& direction, mitk::BaseRenderer* renderer) const
+  {
+    mitk::RenderWindowViewDirectionController controller;
+    controller.SetDataStorage(m_DataStorage);
+    controller.SetControlledRenderer({ renderer });
+    controller.SetViewDirectionOfRenderer(direction, renderer);
+  }
+
+  void ExternalSwitch_FreeThreeDToAxial_LeavesFree()
+  {
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), ViewDirection::Free);
+    CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+
+    this->SwitchByRenderWindowManager("axial", Renderer(1));
+
+    CPPUNIT_ASSERT(RenderMode::TwoD == m_Editor->GetRenderMode(CellId(1)));
+    CPPUNIT_ASSERT(ViewDirection::Free != m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT(ViewDirection::Axial == m_Editor->GetViewDirection(CellId(1)));
+
+    const auto saved = m_Editor->SerializeLayout();
+    auto other = this->MakeEditor("mxn");
+    CPPUNIT_ASSERT_NO_THROW(other->ApplyLayout(saved));
+  }
+
+  void ExternalSwitch_TwoDToThreeD_InstallsMxNStyle()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT(nullptr == Style(Renderer(1)));
+
+    this->SwitchByRenderWindowManager("3D", Renderer(1));
+
+    CPPUNIT_ASSERT(RenderMode::ThreeD == m_Editor->GetRenderMode(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("The cell navigates with the MxN interactor style", nullptr != Style(Renderer(1)));
+    CPPUNIT_ASSERT(m_Editor->IsRotationLocked(CellId(1)));
   }
 
   void Lifecycle_ReusedIdOfFreeCell_IsCanonical()

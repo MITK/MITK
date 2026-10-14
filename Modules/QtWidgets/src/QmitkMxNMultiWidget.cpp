@@ -4269,18 +4269,8 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
   }
   else
   {
-    // A 2D cell cannot follow a 'free' group's rotated camera. Leaving the
-    // group first also takes the cell out of the group's geometry component
-    // before the 2D path aligns it.
-    if (m_FreeCells.count(windowId) > 0 && this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value())
-    {
-      MITK_WARN << "Render window '" << windowId.toStdString() << "' turns 2D and leaves its orientation group "
-                << "'" << this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation)->group
-                << "', whose view direction is 'free'.";
-      this->ClearSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
-    }
     // A 2D cell needs a plane; a rotated camera shows the one it looks at most.
-    if (m_FreeCells.erase(windowId) > 0 && referenceGeometry.IsNotNull())
+    if (this->ReleaseFreeCellForTwoD(windowId) && referenceGeometry.IsNotNull())
     {
       mitk::Vector3D directionOfProjection;
       renderer->GetVtkRenderer()->GetActiveCamera()->GetDirectionOfProjection(directionOfProjection.GetDataPointer());
@@ -4304,27 +4294,52 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
 
   if (RenderMode::ThreeD == mode)
   {
-    this->ApplyThreeDViewDirection(windowId);
-    // The initialization fitted the camera; zoom is absolute across render
-    // modes, so the cell takes its group's zoom again like a joiner.
-    if (const auto zoomLink = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Zoom); zoomLink.has_value())
-    {
-      const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Zoom, zoomLink->group, { windowId });
-      if (!anchorId.isEmpty())
-      {
-        this->ConvergeMemberToAnchor(QmitkMxNSyncDimension::Zoom, anchorId,
-                                     this->GetSyncLink(anchorId, QmitkMxNSyncDimension::Zoom)->offset, windowId);
-      }
-    }
+    this->FinishThreeDAdoption(windowId);
   }
   else
   {
-    // The 2D-only links are active again: the cell converges like a joiner.
-    auto changed = this->EnforceComponentGeometry(windowId);
-    changed.push_back(windowId);
-    this->ReconvergeGeometryRelativeGroups(changed);
+    this->FinishTwoDAdoption(windowId);
   }
   this->RefreshSyncControls();
+}
+
+bool QmitkMxNMultiWidget::ReleaseFreeCellForTwoD(const QString& windowId)
+{
+  // A 2D cell cannot follow a 'free' group's rotated camera. Leaving the
+  // group first also takes the cell out of the group's geometry component
+  // before the 2D path aligns it.
+  if (m_FreeCells.count(windowId) > 0 && this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value())
+  {
+    MITK_WARN << "Render window '" << windowId.toStdString() << "' turns 2D and leaves its orientation group "
+              << "'" << this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation)->group
+              << "', whose view direction is 'free'.";
+    this->ClearSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+  }
+  return m_FreeCells.erase(windowId) > 0;
+}
+
+void QmitkMxNMultiWidget::FinishTwoDAdoption(const QString& windowId)
+{
+  // The 2D-only links are active again: the cell converges like a joiner.
+  auto changed = this->EnforceComponentGeometry(windowId);
+  changed.push_back(windowId);
+  this->ReconvergeGeometryRelativeGroups(changed);
+}
+
+void QmitkMxNMultiWidget::FinishThreeDAdoption(const QString& windowId)
+{
+  this->ApplyThreeDViewDirection(windowId);
+  // The initialization fitted the camera; zoom is absolute across render
+  // modes, so the cell takes its group's zoom again like a joiner.
+  if (const auto zoomLink = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Zoom); zoomLink.has_value())
+  {
+    const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Zoom, zoomLink->group, { windowId });
+    if (!anchorId.isEmpty())
+    {
+      this->ConvergeMemberToAnchor(QmitkMxNSyncDimension::Zoom, anchorId,
+                                   this->GetSyncLink(anchorId, QmitkMxNSyncDimension::Zoom)->offset, windowId);
+    }
+  }
 }
 
 QmitkMxNMultiWidget::RenderMode QmitkMxNMultiWidget::GetRenderMode(const QString& windowId) const
@@ -4436,8 +4451,13 @@ std::vector<QString> QmitkMxNMultiWidget::ActiveGroupPeers(const QString& window
 
 void QmitkMxNMultiWidget::SwitchCellToThreeD(QmitkRenderWindowWidget* cell)
 {
+  RendererOf(cell)->SetMapperID(mitk::BaseRenderer::Standard3D);
+  this->InstallThreeDInteractorStyle(cell);
+}
+
+void QmitkMxNMultiWidget::InstallThreeDInteractorStyle(QmitkRenderWindowWidget* cell)
+{
   auto* renderer = RendererOf(cell);
-  renderer->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   // Core installs its own interactor style on the first render after a
   // mapper switch. Preparing the render now makes that happen here, once, so
@@ -4504,11 +4524,43 @@ void QmitkMxNMultiWidget::OnViewsInitialized()
   // whatever initialized a view, which must not see this editor's errors.
   try
   {
+    this->ReconcileExternalRenderModes();
     this->RestoreThreeDViewDirections();
   }
   catch (const mitk::Exception& e)
   {
     MITK_WARN << "MxN: 3D view directions not restored after a view initialization: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNMultiWidget::ReconcileExternalRenderModes()
+{
+  ViewDirectionNotifier notifier(this);
+  bool reconciled = false;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* renderer = RendererOf(cell.get());
+    if (IsThreeD(renderer))
+    {
+      auto* interactor = renderer->GetRenderWindow()->GetInteractor();
+      if (nullptr == interactor || nullptr != QmitkMxN3DInteractorStyle::SafeDownCast(interactor->GetInteractorStyle()))
+      {
+        continue;
+      }
+      this->InstallThreeDInteractorStyle(cell.get());
+      this->FinishThreeDAdoption(windowId);
+      reconciled = true;
+    }
+    else if (this->ReleaseFreeCellForTwoD(windowId))
+    {
+      // The caller chose the plane by setting the default direction.
+      this->FinishTwoDAdoption(windowId);
+      reconciled = true;
+    }
+  }
+  if (reconciled)
+  {
+    this->RefreshSyncControls();
   }
 }
 

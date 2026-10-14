@@ -132,7 +132,9 @@ void QmitkGrowCutToolGUI::OnPreviewBtnClicked()
       QMessageBox *messageBox =
         new QMessageBox(QMessageBox::Critical,
                         nullptr,
-                        "itkGrowCutFilter error.");
+                        "itkGrowCutFilter error.",
+                        QMessageBox::NoButton,
+                        this->window());
       messageBox->exec();
       delete messageBox;
       return;

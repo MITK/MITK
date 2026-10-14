@@ -256,7 +256,8 @@ public:
   /**
    * \brief Returns the size of the resource data for this %ModuleResource object.
    *
-   * \return The resource data size.
+   * \return The resource data size, or 0 if the resource is invalid, for
+   *         example because its module was unloaded.
    */
   int GetSize() const;
 

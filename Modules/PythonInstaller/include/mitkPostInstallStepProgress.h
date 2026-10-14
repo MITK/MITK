@@ -25,7 +25,7 @@ namespace mitk
    * \brief A progress report of a post-install step.
    *
    * A step reports its progress by printing lines of the form
-   * <tt>MITK_PROGRESS <done> <total></tt> to its standard output, with
+   * <tt>MITK_PROGRESS \<done\> \<total\></tt> to its standard output, with
    * non-negative integers in a unit of its choice, for example the bytes of a
    * download. A total of 0 tells that the step is busy without knowing how far
    * it is. A step that turns out to have nothing to do prints no such line.

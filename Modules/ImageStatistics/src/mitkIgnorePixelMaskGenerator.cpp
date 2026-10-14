@@ -11,11 +11,52 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkIgnorePixelMaskGenerator.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageAccessByItk.h>
-#include <itkImageIterator.h>
-#include <itkImageConstIterator.h>
-#include <mitkITKImageImport.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
+
+#include <algorithm>
+
+namespace
+{
+  /** Sets a mask voxel to 0 if all compared components of the image voxel have the ignored
+  value, and to 1 otherwise. Reads the raw components, so it covers every kind of pixel, e.g.
+  RGB of any component type, vectors, or tensors. */
+  template <typename TComponent>
+  void CalculateMask(const mitk::PixelType& pixelType, const mitk::Image* image, double ignoredValue, mitk::Image::Pointer& mask)
+  {
+    std::size_t numberOfVoxels = 1;
+    for (unsigned int i = 0; i < image->GetDimension(); ++i)
+      numberOfVoxels *= image->GetDimension(i);
+
+    const auto numberOfComponents = pixelType.GetNumberOfComponents();
+
+    // The alpha is no color, so black RGBA voxels are ignored regardless of their opacity.
+    const auto numberOfComparedComponents = itk::IOPixelEnum::RGBA == pixelType.GetPixelType()
+      ? 3u
+      : numberOfComponents;
+
+    const auto ignoredComponentValue = static_cast<TComponent>(ignoredValue);
+    const auto isIgnored = [ignoredComponentValue](TComponent component) { return component == ignoredComponentValue; };
+
+    auto result = mitk::Image::New();
+    result->Initialize(mitk::MakeScalarPixelType<unsigned short>(), image->GetDimension(), image->GetDimensions());
+
+    {
+      mitk::ImageReadAccessor imageAccessor(image);
+      mitk::ImageWriteAccessor resultAccessor(result);
+
+      const auto* voxel = static_cast<const TComponent*>(imageAccessor.GetData());
+      auto* maskVoxel = static_cast<unsigned short*>(resultAccessor.GetData());
+
+      for (std::size_t i = 0; i < numberOfVoxels; ++i, voxel += numberOfComponents)
+        maskVoxel[i] = std::all_of(voxel, voxel + numberOfComparedComponents, isIgnored) ? 0 : 1;
+    }
+
+    mask = result;
+  }
+}
 
 namespace mitk
 {
@@ -51,46 +92,21 @@ mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int)
 
         if (timeSliceImage.IsNull()) mitkThrow() << "Cannot generate mask. Passed time point is not supported by input image. Invalid time point: "<< m_TimePoint;
 
-        // update m_InternalMask
-        AccessByItk(timeSliceImage, InternalCalculateMask);
+        const auto pixelType = timeSliceImage->GetPixelType();
+        mitk::Image::Pointer mask;
+        mitkPixelTypeMultiplex3(CalculateMask, pixelType, timeSliceImage.GetPointer(), m_IgnoredPixelValue, mask);
+
+        // mitkPixelTypeMultiplex calls nothing for a component type it does not know.
+        if (mask.IsNull())
+          mitkThrow() << "Cannot generate mask. Unsupported component type: " << pixelType.GetComponentTypeAsString();
+
+        m_InternalMask = mask;
         m_InternalMask->SetGeometry(timeSliceImage->GetGeometry());
 
         this->Modified();
     }
     m_InternalMaskUpdateTime = m_InternalMask->GetMTime();
     return m_InternalMask;
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void IgnorePixelMaskGenerator::InternalCalculateMask(const itk::Image<TPixel, VImageDimension>* image)
-{
-    typedef itk::Image<TPixel, VImageDimension> ImageType;
-    typedef itk::Image<unsigned short, VImageDimension> MaskType;
-
-    typename MaskType::Pointer mask = MaskType::New();
-    mask->SetOrigin(image->GetOrigin());
-    mask->SetSpacing(image->GetSpacing());
-    mask->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
-    mask->SetBufferedRegion(image->GetBufferedRegion());
-    mask->SetDirection(image->GetDirection());
-    mask->SetNumberOfComponentsPerPixel(image->GetNumberOfComponentsPerPixel());
-    mask->Allocate();
-    mask->FillBuffer(1);
-
-    // iterate over image and mask and set mask=1 if image=m_IgnorePixelValue
-    itk::ImageRegionConstIterator<ImageType> imageIterator(image, image->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<MaskType> maskIterator(mask, mask->GetLargestPossibleRegion());
-
-
-    for (imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator, ++maskIterator)
-    {
-        if (imageIterator.Value() == static_cast<TPixel>(m_IgnoredPixelValue))
-        {
-            maskIterator.Set(0);
-        }
-    }
-
-    m_InternalMask = GrabItkImageMemory(mask);
 }
 
 bool IgnorePixelMaskGenerator::IsUpdateRequired() const

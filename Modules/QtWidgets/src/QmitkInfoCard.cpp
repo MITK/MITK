@@ -92,15 +92,13 @@ void QmitkInfoCard::UpdateStyle()
     // Not the icon color of the theme, so that an error stands out in either theme.
     surface = darkTheme ? QStringLiteral("#4a2b2e") : QStringLiteral("#fdecea");
     border = darkTheme ? QStringLiteral("#8c3b42") : QStringLiteral("#e6a19c");
-    icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")),
-      darkTheme ? QStringLiteral("#ff6b6b") : QStringLiteral("#c62828"));
+    icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")), QmitkIconTheme::GetErrorColor());
   }
   else if (m_Severity == Severity::Warning)
   {
     surface = darkTheme ? QStringLiteral("#4a3d24") : QStringLiteral("#fff4e0");
     border = darkTheme ? QStringLiteral("#8c6d2e") : QStringLiteral("#f0c36d");
-    icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")),
-      darkTheme ? QStringLiteral("#ffb74d") : QStringLiteral("#b26a00"));
+    icon = QmitkIconTheme::GetIcon(ReadResource(QStringLiteral(":/Qmitk/error.svg")), QmitkIconTheme::GetWarningColor());
   }
   else
   {

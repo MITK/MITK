@@ -264,7 +264,7 @@ namespace mitk
     int m_Argc;
     char **m_Argv;
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     std::vector<char*> m_Argv_macOS;
 #endif
 
@@ -295,7 +295,7 @@ namespace mitk
       : m_QApp(nullptr),
         m_Argc(argc),
         m_Argv(argv),
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         m_Argv_macOS(),
 #endif
         m_SingleMode(false),
@@ -305,7 +305,7 @@ namespace mitk
         m_LogQtMessages(false),
         m_FullScreenMode(false)
     {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
       /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
          in certain circumstances. This option causes a Poco exception. We remove it, if present. */
 
@@ -636,7 +636,7 @@ namespace mitk
 
       QFileInfo provFile(basePath.absoluteFilePath(provFileName));
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
       /*
        * On macOS, if started from the build directory, the .provisioning file is located at:
        * <MITK-build/bin/MitkWorkbench.provisioning>
@@ -989,7 +989,7 @@ namespace mitk
   #endif
 #endif
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     suffixes << "../../plugins";
 #endif
 

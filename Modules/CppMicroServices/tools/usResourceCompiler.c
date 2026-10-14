@@ -120,19 +120,9 @@ static char* us_strncpy(char* dest, size_t dest_size, const char* src, size_t co
   return dest;
 }
 
-static FILE* us_fopen(const char* filename, const char* mode)
-{
-  FILE* file = NULL;
-  fopen_s(&file, filename, mode);
-  return file;
-}
-
 #define US_CWD(b, s) _getcwd(b, s)
 
 #define US_CLOSE _close
-#define US_READ _read
-#define US_FOPEN us_fopen
-#define US_FILENO _fileno
 
 #define US_STRCASECMP _stricmp
 #define US_STRCPY us_strcpy
@@ -164,9 +154,6 @@ static char* us_strncpy(char* dest, size_t dest_size, const char* src, size_t co
 }
 
 #define US_CLOSE close
-#define US_READ read
-#define US_FOPEN fopen
-#define US_FILENO fileno
 
 #define US_STRCASECMP strcasecmp
 #define US_STRCPY us_strcpy
@@ -376,7 +363,6 @@ int main(int argc, char** argv)
   int compressionLevel = 6;
   int argIndex = 0;
   int bPrintHelp = 0;
-  int bAppendMode = 0;
 
   int errCode = US_OK;
 
@@ -385,13 +371,10 @@ int main(int argc, char** argv)
   const char* moduleName = NULL;
   size_t moduleNameLength = 0;
 
-  FILE* zipfileStream = NULL;
   us_mz_zip_archive writeArchive;
 
   us_archived_names archivedNames;
   us_archived_names archivedDirs;
-
-  FILE* appendStream = NULL;
 
   char archiveName[US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
 
@@ -401,9 +384,6 @@ int main(int argc, char** argv)
   us_mz_zip_archive currFileArchive;
 
   int zipArgIndex = 0;
-
-  char readBuffer[1024];
-  us_mz_uint numRead = 0;
 
 
   // ---------------------------------------------------------------------------------
@@ -428,14 +408,6 @@ int main(int argc, char** argv)
         if (argc < 5 || compressionLevel < 0 || compressionLevel > 9) bPrintHelp = 1;
       }
     }
-    else if (strcmp(argv[1], "--append") == 0)
-    {
-      if (argc > 4)
-      {
-        bPrintHelp = 1;
-      }
-      bAppendMode = 1;
-    }
     else
     {
       bPrintHelp = 1;
@@ -445,8 +417,7 @@ int main(int argc, char** argv)
   if (bPrintHelp)
   {
     printf("A resource compiler for C++ Micro Services modules\n\n");
-    printf("Usage: usResourceCompiler [-#] zipfile modulename [[-a] file...] [-m archive...]\n");
-    printf("Usage: usResourceCompiler --append outfile zipfile\n\n");
+    printf("Usage: usResourceCompiler [-#] zipfile modulename [[-a] file...] [-m archive...]\n\n");
     printf("Add entries to zipfile and merge archives.\n\n");
     printf("  -# (-0, -1, -2, -3, -4, -5, -6, -7, -8, -9)\n");
     printf("             The Zip compression level. The default compression level is -6.\n");
@@ -456,53 +427,6 @@ int main(int argc, char** argv)
     printf("  archive    Path to a zip archive for merging into zipfile.\n");
     exit(EXIT_SUCCESS);
   }
-
-  if (bAppendMode)
-  {
-    // Special "append" mode. Just append zipfile to outfile as a binary blob.
-    // Open the module file for appending the temporary zip archive
-    dbg_print("Opening outfile '%s' as ab... ", argv[2]);
-    if (NULL == (appendStream = US_FOPEN(argv[2], "ab")))
-    {
-      dbg_print("failure\n");
-      exit_perror(NULL, "fopen");
-    }
-    else
-    {
-      dbg_print("success\n");
-    }
-
-    dbg_print("Opening zipfile '%s' as rb... ", argv[3]);
-    if (NULL == (zipfileStream = US_FOPEN(argv[3], "rb")))
-    {
-      dbg_print("failure\n");
-      exit_perror(NULL, "fopen");
-    }
-    else
-    {
-      dbg_print("success\n");
-    }
-
-    dbg_print("Appending zipfile to outfile\n");
-    do
-    {
-      numRead = US_READ(US_FILENO(zipfileStream), readBuffer, sizeof(readBuffer));
-      if (numRead == -1)
-      {
-        exit_perror(NULL, "read");
-      }
-      fwrite(readBuffer, numRead, 1, appendStream);
-      if (ferror(appendStream))
-      {
-        exit_printf(&writeArchive, "Appending zipfile failed\n");
-      }
-    } while (numRead != 0);
-
-    fclose(zipfileStream);
-    fclose(appendStream);
-    exit(EXIT_SUCCESS);
-  }
-
 
   // ---------------------------------------------------------------------------------
   //      OPEN OR CREATE ZIP FILE

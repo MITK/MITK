@@ -46,6 +46,19 @@ struct MITKCPPMICROSERVICES_EXPORT ModuleUtils
    * \return A pointer to the symbol, or \c nullptr if not found.
    */
   static void* GetSymbol(const ModuleInfo& module, const char* symbol);
+
+#ifdef _WIN32
+  /** \brief Hand the resource archive linked into a Windows binary to a module.
+   *
+   * Sets \c resourceData and \c resourceSize of \p moduleInfo if the binary
+   * containing \p symbol carries a resource archive. ELF and Mach-O binaries
+   * need no lookup: their module initialization finds the archive through
+   * linker-provided section symbols.
+   * \param[in] symbol A pointer to a symbol within the binary.
+   * \param[in,out] moduleInfo The module information to update.
+   */
+  static void GetLinkedResources(void* symbol, ModuleInfo* moduleInfo);
+#endif
 };
 
 }

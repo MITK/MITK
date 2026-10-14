@@ -566,7 +566,7 @@ void QmitkSegmentationTaskListWidget::OnFindButtonClicked()
   if (m_TaskList.IsNull())
     return;
 
-  QmitkFindSegmentationTaskDialog dialog;
+  QmitkFindSegmentationTaskDialog dialog(this->window());
   dialog.SetTaskList(m_TaskList);
 
   if (dialog.exec() != QDialog::Accepted)
@@ -888,7 +888,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
     catch (const mitk::Exception& e)
     {
-      QMessageBox::critical(this, "Error while loading scene", e.GetDescription());
+      QMessageBox::critical(this->window(), "Error while loading scene", e.GetDescription());
       MITK_ERROR << e.GetDescription();
       return;
     }
@@ -906,7 +906,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       }
       catch (const mitk::Exception& e)
       {
-        QMessageBox::critical(this, "Error while loading image", e.GetDescription());
+        QMessageBox::critical(this->window(), "Error while loading image", e.GetDescription());
         MITK_ERROR << e.GetDescription();
         return;
       }
@@ -939,7 +939,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
   }
   catch (const mitk::Exception& e)
   {
-    QMessageBox::critical(this, "Error while loading segmentation", e.GetDescription());
+    QMessageBox::critical(this->window(), "Error while loading segmentation", e.GetDescription());
     MITK_ERROR << e.GetDescription();
     return;
   }
@@ -961,7 +961,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
         .arg(QString::fromStdString(imageNodeName))
         .arg(QString::fromStdString(m_TaskList->GetScene(current).Path.string()));
 
-      QMessageBox::critical(this, "Error while loading scene", errorMessage);
+      QMessageBox::critical(this->window(), "Error while loading scene", errorMessage);
       MITK_ERROR << errorMessage.toStdString();
       return;
     }
@@ -978,7 +978,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
           .arg(QString::fromStdString(segmentationNodeName))
           .arg(QString::fromStdString(m_TaskList->GetScene(current).Path.string()));
 
-        QMessageBox::critical(this, "Error while loading scene", errorMessage);
+        QMessageBox::critical(this->window(), "Error while loading scene", errorMessage);
         MITK_ERROR << errorMessage.toStdString();
         return;
       }
@@ -996,7 +996,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
           auto errorMessage = QString("Data node \"%1\" is not a valid segmentation!")
             .arg(QString::fromStdString(segmentationNodeName));
 
-          QMessageBox::critical(this, "Error while loading scene", errorMessage);
+          QMessageBox::critical(this->window(), "Error while loading scene", errorMessage);
           MITK_ERROR << errorMessage.toStdString();
           return;
         }
@@ -1022,7 +1022,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       auto errorMessage = QString("Data node \"%1\" is not a valid image!")
         .arg(QString::fromStdString(imageNode->GetName()));
 
-      QMessageBox::critical(this, "Error while loading scene", errorMessage);
+      QMessageBox::critical(this->window(), "Error while loading scene", errorMessage);
       MITK_ERROR << errorMessage.toStdString();
       return;
     }
@@ -1044,7 +1044,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       }
       else
       {
-        QmitkStaticDynamicSegmentationDialog dialog(this);
+        QmitkStaticDynamicSegmentationDialog dialog(this->window());
         dialog.SetReferenceImage(templateImage);
         dialog.exec();
 
@@ -1224,7 +1224,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& altern
 
     text += "has unsaved changes.";
 
-    auto reply = QMessageBox::question(this, title, text, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    auto reply = QMessageBox::question(this->window(), title, text, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
 
     switch (reply)
     {

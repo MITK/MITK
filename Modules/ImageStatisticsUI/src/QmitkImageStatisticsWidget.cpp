@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <QmitkStatisticsModelToStringConverter.h>
 #include <QmitkImageStatisticsTreeModel.h>
 
+#include <mitkImageStatisticsContainer.h>
+
 #include <QSortFilterProxyModel>
 #include <QClipboard>
 #include <QHeaderView>
@@ -265,6 +267,11 @@ void QmitkImageStatisticsWidget::PopulateStatisticsMenu(QMenu* menu, int tableCo
 
       for (int column = 1; column < m_imageStatisticsModel->columnCount(); ++column)
         keys.insert(GetStatisticKey(m_imageStatisticsModel, column));
+
+      // The model offers only the statistics of the shown data, so the choice has to cover
+      // the statistics of other data as well.
+      const auto& defaultNames = mitk::ImageStatisticsContainer::ImageStatisticsObject::GetDefaultStatisticNames();
+      keys.insert(defaultNames.cbegin(), defaultNames.cend());
 
       keys.erase(key);
       this->ChangeHiddenStatistics(keys);

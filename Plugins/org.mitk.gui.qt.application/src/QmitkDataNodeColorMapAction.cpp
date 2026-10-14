@@ -14,10 +14,10 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkImage.h>
+#include <mitkImageVtkMapper2D.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkLookupTable.h>
 #include <mitkRenderingManager.h>
-#include <mitkRenderingModeProperty.h>
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
@@ -124,13 +124,7 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     // set lookup table type defined by the action string
     std::string activatedItem = senderAction->text().toStdString();
     renderWindowSpecificLuT->SetType(activatedItem);
-    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLuT), baseRenderer);
-
-    mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode", baseRenderer));
-
-    renderingMode->SetValue(mitk::LookupTable::LookupTableType::MULTILABEL != renderWindowSpecificLuT->GetActiveType()
-      ? mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR
-      : mitk::RenderingModeProperty::LOOKUPTABLE_COLOR);
+    mitk::ImageVtkMapper2D::ApplyLookupTable(dataNode, renderWindowSpecificLuT, baseRenderer);
 
     if (nullptr == baseRenderer)
     {

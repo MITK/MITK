@@ -1,0 +1,123 @@
+<statemachine name="RegionGrowingTool">
+
+  <!--
+    Ctrl is tracked through its own key press and release events and additionally through the modifiers of mouse
+    events, which keep the state consistent whenever the key events were not delivered (e.g. the render window had no
+    keyboard focus). Ctrl only needs to be held when a cut starts, so moves and releases while cutting are accepted
+    with and without it.
+  -->
+
+  <state name="neutral" ID="1" startstate="true">
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="growing">
+      <action name="PrimaryButtonPressed" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="ctrl press" target="cutting">
+      <action name="StartCut" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="CtrlKeyPressed" name="ctrl pressed" target="cutReady">
+      <action name="ArmCut" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" name="ctrl move" target="cutReady">
+      <action name="ArmCut" />
+    </transition>
+  </state>
+
+  <state name="cutReady" ID="4">
+
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="ctrl press" target="cutting">
+      <action name="StartCut" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" name="ctrl move" target="cutReady">
+      <action name="ArmCut" />
+    </transition>
+    <transition event_class="InteractionKeyReleaseEvent" event_variant="CtrlKeyReleased" name="ctrl released" target="neutral">
+      <action name="DisarmCut" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" name="move" target="neutral">
+      <action name="DisarmCut" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="growing">
+      <action name="DisarmCut" />
+      <action name="PrimaryButtonPressed" />
+    </transition>
+  </state>
+
+  <state name="growing" ID="2">
+
+    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="ctrl move" target="growing">
+      <action name="Move" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move" target="growing">
+      <action name="Move" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="CtrlPrimaryButtonReleased" name="ctrl release" target="cutReady">
+      <action name="Release" />
+      <action name="ArmCut" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral">
+      <action name="Release" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="CtrlKeyEscape" name="ctrl escape" target="cutReady">
+      <action name="Cancel" />
+      <action name="ArmCut" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="KeyEscape" name="escape" target="neutral">
+      <action name="Cancel" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="CtrlSecondaryButtonPressedWhilePrimaryHeld" name="ctrl cancel" target="cutReady">
+      <action name="Cancel" />
+      <action name="ArmCut" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressedWhilePrimaryHeld" name="cancel" target="neutral">
+      <action name="Cancel" />
+    </transition>
+    <!-- Recovers from a release that never arrived, e.g. because a dialog grabbed the mouse. -->
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="growing">
+      <action name="PrimaryButtonPressed" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="ctrl press" target="cutting">
+      <action name="StartCut" />
+    </transition>
+  </state>
+
+  <state name="cutting" ID="3">
+
+    <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="ctrl move" target="cutting">
+      <action name="MoveCut" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move" target="cutting">
+      <action name="MoveCut" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="CtrlPrimaryButtonReleased" name="ctrl release" target="cutReady">
+      <action name="FinishCut" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" name="release" target="neutral">
+      <action name="FinishCut" />
+      <action name="DisarmCut" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="CtrlKeyEscape" name="ctrl escape" target="cutReady">
+      <action name="Cancel" />
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="KeyEscape" name="escape" target="neutral">
+      <action name="Cancel" />
+      <action name="DisarmCut" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="CtrlSecondaryButtonPressedWhilePrimaryHeld" name="ctrl cancel" target="cutReady">
+      <action name="Cancel" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressedWhilePrimaryHeld" name="cancel" target="neutral">
+      <action name="Cancel" />
+      <action name="DisarmCut" />
+    </transition>
+    <!-- Recovers from a release that never arrived, e.g. because a dialog grabbed the mouse. -->
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="ctrl press" target="cutting">
+      <action name="StartCut" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="growing">
+      <action name="DisarmCut" />
+      <action name="PrimaryButtonPressed" />
+    </transition>
+  </state>
+
+</statemachine>

@@ -46,9 +46,9 @@ namespace
 
     QProcess process;
 
-    // Strip PYTHONHOME / PYTHONPATH (the host sets them for its embedded
-    // interpreter) so the venv interpreter resolves its environment from
-    // pyvenv.cfg and imports from the venv's site-packages, not the host's.
+    // Strip PYTHONHOME / PYTHONPATH so the venv interpreter resolves its
+    // environment from pyvenv.cfg and imports from the venv's site-packages,
+    // not from another Python installation.
     auto env = QProcessEnvironment::systemEnvironment();
     env.remove("PYTHONHOME");
     env.remove("PYTHONPATH");

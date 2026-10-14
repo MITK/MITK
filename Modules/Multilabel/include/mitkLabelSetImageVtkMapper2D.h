@@ -48,6 +48,7 @@ namespace mitk
    *
    *   - \b "labelset.contour.active": (BoolProperty) whether to show only the active label as a contour or not
    *   - \b "labelset.contour.width": (FloatProperty) line width of the contour
+   *   - PROPERTY_NAME_2D_OPACITY_SCALE() (FloatProperty)
 
    * The default properties are:
 
@@ -160,6 +161,16 @@ namespace mitk
        * comparing against this cached value to trigger a LUT rebuild. */
       float m_LastOpacityFactor = 1.0f;
 
+      /** \brief The node "opacity" baked into the current LUT.
+       *
+       * Compared by value, as removing a renderer-specific opacity falls back to the
+       * global one, whose time stamp predates the LUT. */
+      float m_LastNodeOpacity = 1.0f;
+
+      /** \brief The PROPERTY_NAME_2D_OPACITY_SCALE() value baked into the current LUT, compared by value for the same
+       * reason as m_LastNodeOpacity. */
+      float m_LastOpacityScale = 1.0f;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */
@@ -179,6 +190,18 @@ namespace mitk
      * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
      */
     void ApplyRenderingMode(mitk::BaseRenderer *renderer);
+
+    /** \brief Name of the node property that scales the opacity of the labels in 2D.
+     *
+     * Set renderer-specifically, it dims a segmentation in a single render window, e.g. while a tool needs the image
+     * underneath. The active label's outline keeps its opacity. The property is transient: a scene does not save it.
+     *
+     * \return The property name string "labels.2D.opacity scale".
+     */
+    constexpr static const char* PROPERTY_NAME_2D_OPACITY_SCALE()
+    {
+      return "labels.2D.opacity scale";
+    }
 
   protected:
     /** \brief Transforms the actor to the actual position in 3D.

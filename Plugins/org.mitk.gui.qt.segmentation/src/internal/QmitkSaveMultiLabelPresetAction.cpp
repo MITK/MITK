@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <QmitkMultiLabelPresetHelper.h>
 
+#include <QApplication>
+
 void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
   for (const auto &node : selectedNodes)
@@ -27,7 +29,7 @@ void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
     if (image.IsNull())
       continue;
 
-    QmitkSaveMultiLabelPreset(image);
+    QmitkSaveMultiLabelPreset(QApplication::activeWindow(), image);
   }
 }
 

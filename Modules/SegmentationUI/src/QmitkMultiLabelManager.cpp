@@ -280,13 +280,13 @@ void QmitkMultiLabelManager::OnCreateCroppedMask(bool)
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    QMessageBox::information(this->window(), "Create Mask", "Could not create a mask out of the selected label.\n");
     return;
   }
 
   if (maskImage.IsNull())
   {
-    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    QMessageBox::information(this->window(), "Create Mask", "Could not create a mask out of the selected label.\n");
     return;
   }
 
@@ -326,13 +326,13 @@ void QmitkMultiLabelManager::OnCreateMask(bool /*triggered*/)
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    QMessageBox::information(this->window(), "Create Mask", "Could not create a mask out of the selected label.\n");
     return;
   }
 
   if (maskImage.IsNull())
   {
-    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    QMessageBox::information(this->window(), "Create Mask", "Could not create a mask out of the selected label.\n");
     return;
   }
 
@@ -390,7 +390,7 @@ void QmitkMultiLabelManager::OnCreateSmoothedSurface(bool /*triggered*/)
   catch (mitk::Exception &e)
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this,
+    QMessageBox::information(this->window(),
                              "Create Surface",
                              "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
@@ -435,7 +435,7 @@ void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
   catch (mitk::Exception &e)
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this,
+    QMessageBox::information(this->window(),
                              "Create Surface",
                              "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
@@ -443,12 +443,12 @@ void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
 
 void QmitkMultiLabelManager::OnSavePreset()
 {
-  QmitkSaveMultiLabelPreset(this->GetMultiLabelSegmentation());
+  QmitkSaveMultiLabelPreset(this->window(), this->GetMultiLabelSegmentation());
 }
 
 void QmitkMultiLabelManager::OnLoadPreset()
 {
-  QmitkLoadMultiLabelPreset({ this->GetMultiLabelSegmentation() });
+  QmitkLoadMultiLabelPreset(this->window(), { this->GetMultiLabelSegmentation() });
 }
 
 void QmitkMultiLabelManager::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& position) const

@@ -13,6 +13,7 @@ found in the LICENSE file.
 // MITK
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
+#include <mitkExceptionMacro.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
@@ -96,6 +97,11 @@ namespace
     }
 
     return false;
+  }
+
+  int DefaultResliceInterpolation(const mitk::Image* image)
+  {
+    return image->IsRotated() ? VTK_RESLICE_CUBIC : VTK_RESLICE_NEAREST;
   }
 }
 
@@ -735,10 +741,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
   node->AddProperty("outline binary shadow", mitk::BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("outline binary shadow color", ColorProperty::New(0.0, 0.0, 0.0), renderer, overwrite);
   node->AddProperty("outline shadow width", mitk::FloatProperty::New(1.5), renderer, overwrite);
-  if (image->IsRotated())
-    node->AddProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC));
-  else
-    node->AddProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New());
+  node->AddProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(DefaultResliceInterpolation(image)));
   node->AddProperty("texture interpolation", mitk::BoolProperty::New(false));
   node->AddProperty("in plane resample extent by geometry", mitk::BoolProperty::New(false));
   node->AddProperty("bounding box", mitk::BoolProperty::New(false));
@@ -885,6 +888,39 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
     }
   }
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
+void mitk::ImageVtkMapper2D::ApplyLookupTable(mitk::DataNode *node, mitk::LookupTable *lookupTable, const mitk::BaseRenderer *renderer)
+{
+  if (nullptr == node)
+    mitkThrow() << "ApplyLookupTable: node must not be null.";
+
+  if (nullptr == lookupTable)
+    mitkThrow() << "ApplyLookupTable: lookupTable must not be null.";
+
+  const auto previousProperty = dynamic_cast<const mitk::LookupTableProperty *>(node->GetProperty("LookupTable", renderer));
+  const auto previousLookupTable = nullptr != previousProperty ? previousProperty->GetValue() : nullptr;
+  const bool wasMultilabel = previousLookupTable.IsNotNull() && mitk::LookupTable::MULTILABEL == previousLookupTable->GetActiveType();
+
+  node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable), renderer);
+
+  const auto image = dynamic_cast<const mitk::Image *>(node->GetData());
+
+  if (nullptr == image)
+    return;
+
+  if (mitk::LookupTable::MULTILABEL == lookupTable->GetActiveType())
+  {
+    node->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR), renderer);
+    node->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST), renderer);
+  }
+  else
+  {
+    node->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR), renderer);
+
+    if (wasMultilabel)
+      node->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(DefaultResliceInterpolation(image)), renderer);
+  }
 }
 
 mitk::ImageVtkMapper2D::LocalStorage *mitk::ImageVtkMapper2D::GetLocalStorage(mitk::BaseRenderer *renderer)

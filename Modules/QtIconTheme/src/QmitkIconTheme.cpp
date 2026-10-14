@@ -42,6 +42,8 @@ namespace
   QString s_Color;
   QString s_AccentColor;
   QString s_SelectionColor;
+  QString s_WarningTextColor;
+  QString s_ErrorColor;
   QString s_WarningColor;
 
   QString ParseColor(const QString &subject, const QString &colorName, const QString &fallback)
@@ -68,6 +70,8 @@ namespace
     s_Color = ParseColor(styleSheet, QStringLiteral("iconColor"), QStringLiteral("#000000"));
     s_AccentColor = ParseColor(styleSheet, QStringLiteral("iconAccentColor"), QStringLiteral("#ffffff"));
     s_SelectionColor = ParseColor(styleSheet, QStringLiteral("selectionColor"), QString());
+    s_ErrorColor = ParseColor(styleSheet, QStringLiteral("iconErrorColor"), QStringLiteral("#c62828"));
+    s_WarningColor = ParseColor(styleSheet, QStringLiteral("iconWarningColor"), QStringLiteral("#b26a00"));
 
     // Warnings already have a rule of their own, for rich text; reading it
     // keeps the theme from stating the colour twice. The rule may use any CSS
@@ -79,7 +83,7 @@ namespace
       QRegularExpression::CaseInsensitiveOption);
     const auto warning = warningRule.match(styleSheet);
     const auto warningColor = warning.hasMatch() ? QColor::fromString(warning.captured(1)) : QColor();
-    s_WarningColor = warningColor.isValid() ? warningColor.name() : QString();
+    s_WarningTextColor = warningColor.isValid() ? warningColor.name() : QString();
     s_Parsed = true;
   }
 
@@ -296,6 +300,18 @@ QString QmitkIconTheme::GetSelectionColor()
   return s_SelectionColor;
 }
 
+QString QmitkIconTheme::GetWarningTextColor()
+{
+  EnsureParsed();
+  return s_WarningTextColor;
+}
+
+QString QmitkIconTheme::GetErrorColor()
+{
+  EnsureParsed();
+  return s_ErrorColor;
+}
+
 QString QmitkIconTheme::GetWarningColor()
 {
   EnsureParsed();
@@ -313,13 +329,15 @@ void QmitkIconTheme::Refresh()
   const auto color = s_Color;
   const auto accentColor = s_AccentColor;
   const auto selectionColor = s_SelectionColor;
+  const auto warningTextColor = s_WarningTextColor;
+  const auto errorColor = s_ErrorColor;
   const auto warningColor = s_WarningColor;
 
   s_Parsed = false;
   EnsureParsed();
 
   if (color == s_Color && accentColor == s_AccentColor && selectionColor == s_SelectionColor
-      && warningColor == s_WarningColor)
+      && warningTextColor == s_WarningTextColor && errorColor == s_ErrorColor && warningColor == s_WarningColor)
     return;
 
   ++s_Generation;

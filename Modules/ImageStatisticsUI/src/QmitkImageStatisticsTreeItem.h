@@ -119,6 +119,18 @@ public:
    */
   bool isWIP() const;
 
+  /**
+   * \brief Mark this item as the row of statistics whose computation failed.
+   * \param reason Why the computation failed.
+   */
+  void SetFailed(const QString& reason);
+
+  /** \brief Indicate whether the computation of the statistics of this item failed. */
+  bool isFailed() const;
+
+  /** \brief Return why the computation of the statistics failed, see SetFailed(). */
+  QString GetFailureReason() const;
+
   /** \brief Return the label instance associated with this item, or nullptr. */
   mitk::Label::ConstPointer GetLabelInstance() const;
 
@@ -134,6 +146,8 @@ private:
 
   bool m_IsWIP;
   bool m_NA;
+  bool m_IsFailed = false;
+  QString m_FailureReason;
 };
 
 #endif

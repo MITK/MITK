@@ -34,6 +34,7 @@ found in the LICENSE file.
 #include <mitkVtkScalarModeProperty.h>
 
 #include <mitkBasePropertySerializer.h>
+#include <mitkLookupTablePropertySerializer.h>
 #include <mitkPropertyList.h>
 #include <mitkPropertyListSerializer.h>
 
@@ -43,8 +44,11 @@ found in the LICENSE file.
 #include <mitkVtkWidgetRendering.h>
 
 #include <tinyxml2.h>
+#include <vtkLookupTable.h>
+#include <vtkSmartPointer.h>
 
 void TestAllProperties(const mitk::PropertyList *propList);
+void TestLookupTableTypeRoundTrip();
 
 /**Documentation
 * \brief Test for all PropertySerializer classes.
@@ -134,7 +138,52 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   node->SetData(mitk::VtkWidgetRendering::New());
   TestAllProperties(node->GetPropertyList());
 
+  TestLookupTableTypeRoundTrip();
+
   MITK_TEST_END();
+}
+
+void TestLookupTableTypeRoundTrip()
+{
+  auto lut = mitk::LookupTable::New();
+  lut->SetType(mitk::LookupTable::MULTILABEL);
+  lut->ChangeOpacity(1, 0.5);
+  auto prop = mitk::LookupTableProperty::New(lut);
+
+  auto serializer = mitk::LookupTablePropertySerializer::New();
+  serializer->SetProperty(prop);
+  tinyxml2::XMLDocument doc;
+  auto *element = serializer->Serialize(doc);
+  MITK_TEST_CONDITION_REQUIRED(element != nullptr, "Serialize multilabel lookup table");
+
+  const auto deserialized = serializer->Deserialize(element);
+  auto *deserializedProp = dynamic_cast<mitk::LookupTableProperty *>(deserialized.GetPointer());
+  MITK_TEST_CONDITION_REQUIRED(deserializedProp != nullptr, "Deserialize multilabel lookup table");
+
+  const auto deserializedLut = deserializedProp->GetValue();
+  MITK_TEST_CONDITION(mitk::LookupTable::MULTILABEL == deserializedLut->GetActiveType(),
+                      "Deserialized lookup table keeps its type");
+  MITK_TEST_CONDITION(*deserializedLut == *lut, "Deserialized lookup table keeps its stored colors");
+
+  auto entries = vtkSmartPointer<vtkLookupTable>::New();
+  entries->DeepCopy(lut->GetVtkLookupTable());
+  auto untypedLut = mitk::LookupTable::New();
+  untypedLut->SetVtkLookupTable(entries);
+
+  const auto deserializeUntyped = [&serializer, element]() {
+    const auto untyped = serializer->Deserialize(element);
+    auto *untypedProp = dynamic_cast<mitk::LookupTableProperty *>(untyped.GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(untypedProp != nullptr, "Deserialize lookup table without known type");
+    return untypedProp->GetValue();
+  };
+
+  element->DeleteAttribute("Type");
+  MITK_TEST_CONDITION(*deserializeUntyped() == *untypedLut,
+                      "Lookup table without type keeps its stored colors as grayscale");
+
+  element->SetAttribute("Type", "Unknown");
+  MITK_TEST_CONDITION(*deserializeUntyped() == *untypedLut,
+                      "Lookup table with unknown type keeps its stored colors as grayscale");
 }
 
 void TestAllProperties(const mitk::PropertyList *propList)

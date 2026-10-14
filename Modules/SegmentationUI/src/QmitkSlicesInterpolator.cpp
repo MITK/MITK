@@ -1106,13 +1106,13 @@ void QmitkSlicesInterpolator::AcceptAllInterpolationsWithErrorHandling(mitk::Sli
   catch (const std::bad_alloc&)
   {
     MITK_ERROR << "Not enough memory to accept all interpolations.";
-    ShowInterpolationError(this, "There is not enough memory.");
+    ShowInterpolationError(this->window(), "There is not enough memory.");
   }
   catch (const itk::MemoryAllocationError&)
   {
     // ITK reports allocation failures as this type instead of std::bad_alloc.
     MITK_ERROR << "Not enough memory to accept all interpolations.";
-    ShowInterpolationError(this, "There is not enough memory.");
+    ShowInterpolationError(this->window(), "There is not enough memory.");
   }
   catch (const itk::ExceptionObject& e)
   {
@@ -1120,17 +1120,17 @@ void QmitkSlicesInterpolator::AcceptAllInterpolationsWithErrorHandling(mitk::Sli
     // in the interpolation pipeline (e.g. distance-map computation).
     // GetDescription() is the plain message; what() would prepend source file and line.
     MITK_ERROR << "Error while accepting all interpolations: " << e.what();
-    ShowInterpolationError(this, QString::fromUtf8(e.GetDescription()));
+    ShowInterpolationError(this->window(), QString::fromUtf8(e.GetDescription()));
   }
   catch (const std::exception& e)
   {
     MITK_ERROR << "Error while accepting all interpolations: " << e.what();
-    ShowInterpolationError(this, QString::fromUtf8(e.what()));
+    ShowInterpolationError(this->window(), QString::fromUtf8(e.what()));
   }
   catch (...)
   {
     MITK_ERROR << "Unknown error while accepting all interpolations.";
-    ShowInterpolationError(this, "The cause could not be determined.");
+    ShowInterpolationError(this->window(), "The cause could not be determined.");
   }
 }
 
@@ -1333,7 +1333,7 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
   else
   {
     m_BtnApply3D->setEnabled(false);
-    QMessageBox errorInfo;
+    QMessageBox errorInfo(this->window());
     errorInfo.setWindowTitle("Reinitialize surface interpolation");
     errorInfo.setIcon(QMessageBox::Information);
     errorInfo.setText("No contours available for the selected segmentation!");
@@ -1724,7 +1724,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
 
     if (m_3DInterpolationEnabled && m_Segmentation && ((m_Segmentation->GetDimension() != 3) || (m_Segmentation->GetDimension() != 4)) )
     {
-      QMessageBox info;
+      QMessageBox info(this->window());
       info.setWindowTitle("3D Interpolation Process");
       info.setIcon(QMessageBox::Information);
       info.setText("3D Interpolation is only supported for 3D/4D images at the moment!");

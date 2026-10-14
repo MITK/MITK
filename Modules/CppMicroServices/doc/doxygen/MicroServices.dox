@@ -29,7 +29,6 @@ CppMicroServices module:
 - \subpage MicroServices_ModuleProperties
 - \subpage MicroServices_AutoLoading
 - \subpage MicroServices_ServiceHooks
-- \subpage MicroServices_StaticModules
 - \subpage MicroServices_EmulateSingleton
 
 */
@@ -53,7 +52,6 @@ the different aspects of the CppMicroServices module:
 - \ref MicroServices_ModuleProperties
 - \ref MicroServices_AutoLoading
 - \ref MicroServices_ServiceHooks
-- \ref MicroServices_StaticModules
 - \ref MicroServices_EmulateSingleton
 
 */

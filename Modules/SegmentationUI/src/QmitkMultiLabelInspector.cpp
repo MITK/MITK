@@ -705,7 +705,7 @@ void QmitkMultiLabelInspector::DeleteLabelInstance()
   auto instanceName = index.data(Qt::DisplayRole);
 
   auto question = "Do you really want to delete label instance \"" + instanceName.toString() + "\"?";
-  auto answer = QMessageBox::question(this, QString("Delete label instances"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+  auto answer = QMessageBox::question(this->window(), QString("Delete label instances"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answer == QMessageBox::Yes)
   {
@@ -743,7 +743,7 @@ void QmitkMultiLabelInspector::DeleteLabel()
   auto question = "Do you really want to delete label \"" + QString::fromStdString(label->GetName());
   question = relevantLabels.size()==1 ? question + "\"?" : question + "\" with all "+QString::number(relevantLabels.size()) +" instances?";
 
-  auto answer = QMessageBox::question(this, QString("Delete label"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+  auto answer = QMessageBox::question(this->window(), QString("Delete label"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answer == QMessageBox::Yes)
   {
@@ -852,7 +852,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
     this->WaitCursorOff();
     m_ModelManipulationOngoing = false;
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Add group", "Could not add a new group. See error log for details.");
+    QMessageBox::information(this->window(), "Add group", "Could not add a new group. See error log for details.");
   }
   m_ModelManipulationOngoing = false;
 
@@ -899,7 +899,7 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
     m_ModelManipulationOngoing = false;
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Delete group", "Could not delete the currently active group. See error log for details.");
+    QMessageBox::information(this->window(), "Delete group", "Could not delete the currently active group. See error log for details.");
     return;
   }
 
@@ -936,7 +936,7 @@ void QmitkMultiLabelInspector::RemoveGroupWithConfirmation(mitk::MultiLabelSegme
   auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
 
   auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
-  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+  auto answer = QMessageBox::question(this->window(), QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if (answer != QMessageBox::Yes)
     return;
@@ -963,7 +963,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
 
   if (m_Segmentation->GetNumberOfGroups() < 2)
   {
-    QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
+    QMessageBox::information(this->window(), "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
     return;
   }
 
@@ -1229,7 +1229,7 @@ void QmitkMultiLabelInspector::OnCopyToGroup()
   if (selectedLabels.empty())
     return;
 
-  QmitkCopyLabelToGroupDialog dialog(m_Segmentation, m_Segmentation->GetLabel(selectedLabels.front()));
+  QmitkCopyLabelToGroupDialog dialog(m_Segmentation, m_Segmentation->GetLabel(selectedLabels.front()), this->window());
 
   if (dialog.exec() == QDialog::Accepted)
     this->SetSelectedLabel(dialog.GetDestinationLabel()->GetValue());
@@ -1311,7 +1311,7 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
   QString question = "Do you really want to clear the selected labels?";
 
   QMessageBox::StandardButton answerButton = QMessageBox::question(
-    this, "Clear selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    this->window(), "Clear selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {
@@ -1368,7 +1368,7 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
   QString question = "Do you really want to delete all instances of label \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
 
   QMessageBox::StandardButton answerButton =
-    QMessageBox::question(this, "Delete label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    QMessageBox::question(this->window(), "Delete label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {
@@ -1389,7 +1389,7 @@ void QmitkMultiLabelInspector::OnDeleteLabels(bool /*value*/)
 {
   QString question = "Do you really want to remove the selected labels?";
   QMessageBox::StandardButton answerButton = QMessageBox::question(
-    this, "Remove selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    this->window(), "Remove selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {
@@ -1433,7 +1433,7 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   QString question = "Do you really want to merge selected labels into \"" + QString::fromStdString(currentLabel->GetName())+"\"?";
 
   QMessageBox::StandardButton answerButton = QMessageBox::question(
-    this, "Merge selected label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    this->window(), "Merge selected label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {
@@ -1513,7 +1513,7 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
   QString question = "Do you really want to clear the contents of label \"" + QString::fromStdString(currentLabel->GetName())+"\"?";
 
   QMessageBox::StandardButton answerButton =
-    QMessageBox::question(this, "Clear label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    QMessageBox::question(this->window(), "Clear label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {
@@ -1555,7 +1555,7 @@ void QmitkMultiLabelInspector::OnRenameGroup()
 
     bool dlgOK;
     auto groupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
-    auto newName = QInputDialog::getText(this, "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
+    auto newName = QInputDialog::getText(this->window(), "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
     if (dlgOK)
     {
       mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, true, 0, true, true);

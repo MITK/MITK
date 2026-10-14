@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
 
+#include <QApplication>
 #include <QMessageBox>
 
 QmitkCreateMultiLabelSegmentationAction::QmitkCreateMultiLabelSegmentationAction()
@@ -33,7 +34,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
   {
     auto message = tr("Data storage not set.");
     MITK_ERROR << message;
-    QMessageBox::warning(nullptr, "New segmentation", message);
+    QMessageBox::warning(QApplication::activeWindow(), "New segmentation", message);
     return;
   }
 
@@ -60,7 +61,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
     auto segTemplateImage = referenceImage;
     if (referenceImage->GetDimension() > 3)
     {
-      QmitkStaticDynamicSegmentationDialog dialog(nullptr);
+      QmitkStaticDynamicSegmentationDialog dialog(QApplication::activeWindow());
       dialog.SetReferenceImage(referenceImage.GetPointer());
       dialog.exec();
       segTemplateImage = dialog.GetSegmentationTemplate();
@@ -74,7 +75,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
     catch (mitk::Exception& e)
     {
       MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::warning(nullptr, "New segmentation", "Could not create a new segmentation.");
+      QMessageBox::warning(QApplication::activeWindow(), "New segmentation", "Could not create a new segmentation.");
       return;
     }
 

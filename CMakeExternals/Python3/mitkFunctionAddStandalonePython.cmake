@@ -6,7 +6,8 @@
     <version> must be one of MITK_PYTHON3_VERSIONS; the matching patch version
     and archive hash come from Versions.cmake, which must be included
     beforehand. The archive is extracted and copied to <install_dir> verbatim,
-    nothing is built.
+    nothing is built. Working on a copy keeps the extracted archive pristine
+    while the installation is modified during development.
 
     WITH_NUMPY provisions the packages MITK's Python code needs at runtime. An
     interpreter that only supplies headers and an import library for compiling
@@ -57,8 +58,8 @@ function(mitkFunctionAddStandalonePython proj version install_dir)
     URL_HASH ${MITK_PYTHON3_${version_key}_HASH_${platform_key}}
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E rm -rf "${install_dir}"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>" "${install_dir}"
+    INSTALL_COMMAND ${CMAKE_COMMAND} -DSRC=<SOURCE_DIR> "-DDST=${install_dir}"
+                                     -P "${script_dir}/Python3_CopyTree.cmake"
   )
 
   if(WIN32)

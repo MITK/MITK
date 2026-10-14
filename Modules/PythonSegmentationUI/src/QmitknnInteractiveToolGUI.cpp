@@ -411,7 +411,7 @@ bool QmitknnInteractiveToolGUI::Install()
 
       // A reused virtual environment can hold an nnInteractive that predates this
       // MITK build (the venv survives MITK upgrades).
-      const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this, *this->GetTool()->GetPythonContext(),
+      const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this->window(), *this->GetTool()->GetPythonContext(),
         "nnInteractive", distributionName, mitk::nnInteractive::SupportedVersions(), mitk::nnInteractive::BuildUpgradeSpec(venvName, !localAvailable));
 
       if (outcome == mitk::PythonPackage::VersionCheckOutcome::Aborted)
@@ -431,7 +431,7 @@ bool QmitknnInteractiveToolGUI::Install()
   }
 
   // Fresh install: let the user choose between a full and a client-only install.
-  QmitknnInteractiveInstallModeDialog modeDialog(this);
+  QmitknnInteractiveInstallModeDialog modeDialog(this->window());
 
   if (modeDialog.exec() != QDialog::Accepted)
     return false;
@@ -441,7 +441,7 @@ bool QmitknnInteractiveToolGUI::Install()
 
   auto spec = mitk::nnInteractive::BuildInstallSpec(m_Preferences, venvName, clientOnly);
 
-  QmitkPipInstallDialog dialog(spec, this);
+  QmitkPipInstallDialog dialog(spec, this->window());
 
   if (dialog.exec() != QDialog::Accepted)
     return false;
@@ -459,7 +459,7 @@ bool QmitknnInteractiveToolGUI::Install()
     // rather than letting StartSession() fail with a bare "no server URL" error.
     if (m_Preferences->Get("nnInteractive/serverUrl", "").empty())
     {
-      QMessageBox::information(nullptr, "nnInteractive",
+      QMessageBox::information(this->window(), "nnInteractive",
         QString(
           "<h3 %1>Configure a server</h3>"
           "<p %1>Client-only mode runs nnInteractive on a remote server. Set the "
@@ -505,9 +505,9 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
   const auto selectedId = m_Preferences->Get("nnInteractive/modelCheckpoint", "");
 
   // CheckModelUpdate spins up a subprocess and refreshes the manifest over the
-  // network; it drives that behind a modal progress dialog (parented to this
-  // GUI) so the Workbench stays responsive and the user can cancel.
-  const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId, this);
+  // network; it drives that behind a modal progress dialog so the Workbench
+  // stays responsive and the user can cancel.
+  const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId, this->window());
 
   // Attempt-based: even an Unknown result (offline without a cached manifest,
   // or the user cancelled the progress dialog) counts, so the dialog does not
@@ -529,7 +529,8 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
       "initialization if it is not already available.</p>")
       .arg(LINE_HEIGHT_STYLE)
       .arg(QString::fromStdString(check.RecommendedId))
-      .arg(current));
+      .arg(current),
+    QMessageBox::NoButton, this->window());
   auto* switchButton = messageBox.addButton("Switch", QMessageBox::AcceptRole);
   messageBox.addButton("Keep current", QMessageBox::RejectRole);
   messageBox.setDefaultButton(switchButton);
@@ -579,7 +580,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     if (!remote)
     {
       QMessageBox::information(
-        nullptr,
+        this->window(),
         "nnInteractive",
         QString(
           "<h3 %1>Unsupported platform</h3>"
@@ -604,7 +605,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     "<p %1>Please wait while nnInteractive is initialized. If a model checkpoint "
     "still needs to be downloaded, this can take a few minutes.</p>").arg(LINE_HEIGHT_STYLE);
  
-  auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
+  auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage, QMessageBox::NoButton, this->window());
   messageBox->setStandardButtons(QMessageBox::NoButton);
   messageBox->setAttribute(Qt::WA_DeleteOnClose);
   messageBox->show();
@@ -618,7 +619,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     catch (const mitk::Exception& e)
     {
       messageBox->accept();
-      mitk::PythonPackage::ShowInitializationError(nullptr, "nnInteractive", e);
+      mitk::PythonPackage::ShowInitializationError(this->window(), "nnInteractive", e);
 
       this->EnableInitializeButtons(true);
       this->UncheckInitializeButton();
@@ -698,7 +699,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
       "by selecting <em>Remote server</em>.</p>")
       .arg(LINE_HEIGHT_STYLE);
 
-    QMessageBox::warning(nullptr, "nnInteractive", macCpuBackendMessage);
+    QMessageBox::warning(this->window(), "nnInteractive", macCpuBackendMessage);
   #else
     // The architectures follow the PyTorch build we install: torch 2.8 still
     // runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
@@ -725,7 +726,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
       "<em>Remote server</em>.</p>")
       .arg(LINE_HEIGHT_STYLE, gpuArchitectures);
 
-    QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
+    QMessageBox::warning(this->window(), "nnInteractive", cpuBackendMessage);
   #endif
   });
 }
@@ -1189,7 +1190,7 @@ void QmitknnInteractiveToolGUI::OnSessionExpired()
       "<p %1>Your interactions were cleared. Click <em>Initialize</em> to start a "
       "new session.</p>").arg(LINE_HEIGHT_STYLE);
 
-    QMessageBox::warning(nullptr, "nnInteractive", message);
+    QMessageBox::warning(this->window(), "nnInteractive", message);
   });
 }
 
@@ -1216,7 +1217,7 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
   // a silently dead panel.
   if (!caps.Point && !caps.Box && !caps.Scribble && !caps.Lasso && !caps.Mask)
   {
-    QMessageBox::warning(nullptr, "nnInteractive",
+    QMessageBox::warning(this->window(), "nnInteractive",
       QString("<p %1>The connected nnInteractive model reports no supported "
               "interactions, so there is nothing to interact with. This usually "
               "indicates a misconfigured server or model checkpoint.</p>")

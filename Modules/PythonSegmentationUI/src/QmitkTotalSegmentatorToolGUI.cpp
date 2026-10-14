@@ -353,7 +353,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallButtonClicked()
 {
   auto spec = mitk::TotalSegmentator::BuildInstallSpec(mitk::TotalSegmentator::VENV_NAME);
 
-  QmitkPipInstallDialog dialog(spec, this);
+  QmitkPipInstallDialog dialog(spec, this->window());
 
   if (dialog.exec() == QDialog::Accepted)
     this->RefreshInstallState();

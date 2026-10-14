@@ -41,6 +41,8 @@ class vtkMitkLevelWindowFilter;
 
 namespace mitk
 {
+  class LookupTable;
+
   /** \brief Mapper to resample and display 2D slices of a 3D image.
    *
    * The following image gives a brief overview of the mapping and the involved parts.
@@ -237,6 +239,21 @@ namespace mitk
      * \param[in] overwrite If true, overwrite existing properties.
      */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
+
+    /**
+     * \brief Set the lookup table of an image node together with the properties it depends on.
+     *
+     * The multilabel lookup table colors exact label values, so it gets
+     * "Image Rendering.Mode" LOOKUPTABLE_COLOR and nearest "reslice interpolation":
+     * interpolated values in rotated slices would show the colors of unrelated labels.
+     * Every other lookup table gets LOOKUPTABLE_LEVELWINDOW_COLOR. Switching away from
+     * the multilabel lookup table restores the default "reslice interpolation".
+     *
+     * \param[in] node The image node. Nodes without image data only get the lookup table.
+     * \param[in] lookupTable The lookup table to set.
+     * \param[in] renderer The renderer context (nullptr for the node-global properties).
+     */
+    static void ApplyLookupTable(mitk::DataNode *node, mitk::LookupTable *lookupTable, const mitk::BaseRenderer *renderer = nullptr);
 
     /**
      * \brief Apply the rendering mode for the given renderer.

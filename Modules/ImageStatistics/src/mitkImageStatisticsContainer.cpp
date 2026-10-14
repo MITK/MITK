@@ -148,7 +148,23 @@ namespace mitk
 
   bool ImageStatisticsContainer::IsWIP() const
   {
-    return this->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()).IsNotNull();
+    const auto status = this->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str());
+    return status.IsNotNull() && status->GetValueAsString() != mitk::STATS_GENERATION_STATUS_VALUE_FAILED;
+  }
+
+  bool ImageStatisticsContainer::IsFailed() const
+  {
+    const auto status = this->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str());
+    return status.IsNotNull() && status->GetValueAsString() == mitk::STATS_GENERATION_STATUS_VALUE_FAILED;
+  }
+
+  std::string ImageStatisticsContainer::GetFailureReason() const
+  {
+    if (!this->IsFailed())
+      return std::string();
+
+    const auto reason = this->GetProperty(mitk::STATS_GENERATION_FAILURE_REASON_PROPERTY_NAME.c_str());
+    return reason.IsNotNull() ? reason->GetValueAsString() : std::string();
   }
 
   const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatistics(LabelValueType labelValue,

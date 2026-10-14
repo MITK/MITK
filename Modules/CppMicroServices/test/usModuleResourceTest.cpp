@@ -391,28 +391,6 @@ void testResourceFromExecutable(Module* module)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
-void testResourcesFrom(const std::string& moduleName)
-{
-  SharedLibrary libR(LIB_PATH, moduleName);
-  try
-  {
-    libR.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
-  }
-
-  Module* moduleR = ModuleRegistry::GetModule(moduleName);
-  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module")
-
-  US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
-
-  US_TEST_CONDITION(moduleR->FindResources("", "*.txt", true).size() == 2, "Resource count")
-
-  libR.Unload();
-}
-
 } // end unnamed namespace
 
 
@@ -457,10 +435,20 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   ModuleResource foo = moduleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
   libR.Unload();
-  US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
+  // The archive was unmapped with the module, so the resource must not
+  // pretend to be readable.
+  US_TEST_CONDITION(foo.IsValid() == false, "Invalid resource after unload")
+  US_TEST_CONDITION(foo.GetSize() == 0, "No size after unload")
+  ModuleResourceStream unloadedStream(foo);
+  std::string unloadedContent;
+  std::getline(unloadedStream, unloadedContent);
+  US_TEST_CONDITION(unloadedContent.empty(), "No data after unload")
 
-  testResourcesFrom("TestModuleRL");
-  testResourcesFrom("TestModuleRA");
+  libR.Load();
+  moduleR = ModuleRegistry::GetModule("TestModuleR");
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Module reloaded")
+  US_TEST_CONDITION(moduleR->GetResource("foo.txt").IsValid() == true, "Valid resource after reload")
+  libR.Unload();
 
   US_TEST_END()
 }

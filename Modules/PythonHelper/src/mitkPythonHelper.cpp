@@ -222,7 +222,12 @@ fs::path mitk::PythonHelper::GetHomePath()
     return buildTreePython.lexically_normal();
 
 #if defined(__APPLE__)
+  // Packaging turns the installed Python into a framework, which moves it
+  // into Versions/A; a plain install keeps the original layout.
   auto installedPython = Up(appDir, 1) / "Frameworks" / "Python.framework" / "Versions" / "A";
+
+  if (!fs::exists(installedPython) || !fs::is_directory(installedPython))
+    installedPython = Up(appDir, 1) / "Frameworks" / "Python.framework";
 #else
   auto installedPython = Up(appDir, 1) / "python";
 #endif

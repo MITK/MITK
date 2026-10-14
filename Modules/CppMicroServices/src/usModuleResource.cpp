@@ -243,6 +243,7 @@ std::vector<ModuleResource> ModuleResource::GetChildResources() const
 
 int ModuleResource::GetSize() const
 {
+  if (!this->IsValid()) return 0;
   return d->stat.uncompressedSize;
 }
 

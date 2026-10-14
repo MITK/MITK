@@ -1,5 +1,7 @@
 cmake_policy(SET CMP0012 NEW) # if() recognizes numbers and boolean constants.
 
+include("@MITK_SOURCE_DIR@/CMake/mitkMachOTools.cmake")
+
 file(GLOB bundle_paths LIST_DIRECTORIES TRUE "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/*.app")
 
 foreach(bundle_path IN LISTS bundle_paths)
@@ -26,7 +28,8 @@ foreach(bundle_path IN LISTS bundle_paths)
   # qt_generate_deploy_app_script() deploys Qt frameworks with correct RPATHs.
 
   get_filename_component(app ${bundle_path} NAME_WE)
-  set(app_path "${bundle_path}/Contents/MacOS/${app}")
+  set(executable_dir "${bundle_path}/Contents/MacOS")
+  set(app_path "${executable_dir}/${app}")
 
   if(@MITK_USE_Python3@) # MITK_USE_Python3
 
@@ -62,66 +65,145 @@ foreach(bundle_path IN LISTS bundle_paths)
       WORKING_DIRECTORY "${python_framework_path}"
     )
 
-    ##########################
-    # Fix mitk Python module #
-    ##########################
+    ###############################################
+    # Re-anchor @loader_path references of Python #
+    ###############################################
 
-    set(mitk_python_module_dir "${python_framework_path}/Versions/A/lib/python3.@Python3_VERSION_MINOR@/site-packages/mitk")
-    set(mitk_python_module_lib "${mitk_python_module_dir}/mitk.so") # TODO: Figure out actual filename after migration to pybind11
-    if(EXISTS "${mitk_python_module_lib}")
-      set(freetype_bundled "${bundle_path}/Contents/MacOS/libfreetype.6.dylib")
-      if(EXISTS "${freetype_bundled}")
+    # The conversion moved bin/ and lib/ into Versions/A/, two directories
+    # deeper. A reference relative to @loader_path that leaves the moved
+    # directories, such as the ones of the mitk module to the bundle's
+    # libraries, misses its target since then.
 
-        #########################################
-        # Rewrite libfreetype path using @rpath #
-        #########################################
-
-        message("    Checking for freetype dependency in mitk Python module")
-
-        execute_process(COMMAND otool -L "${mitk_python_module_lib}" OUTPUT_VARIABLE mitk_python_module_otool)
-        string(REGEX MATCH "[^\n\t ]*\\/libfreetype\\.6\\.dylib" from "${mitk_python_module_otool}")
-
-        if(from)
-          set(to "@rpath/libfreetype.6.dylib")
-          message("      Found freetype reference: ${from}")
-          message("      Rewriting to: ${to}")
-
-          execute_process(COMMAND install_name_tool -change "${from}" "${to}" "${mitk_python_module_lib}")
-        else()
-          message("    No freetype dependency to fix")
-        endif()
-      else()
-        message("    Bundled freetype not found")
-      endif()
-
-      ########################################################
-      # Use @loader_path dependencies for mitk Python module #
-      ########################################################
-
-      message("    Changing path style of mitk Python module dependencies from @executable_path to @loader_path")
-      file(GET_RUNTIME_DEPENDENCIES
-        LIBRARIES "${mitk_python_module_lib}"
-        BUNDLE_EXECUTABLE "${app_path}"
-        PRE_EXCLUDE_REGEXES "^/"
-        RESOLVED_DEPENDENCIES_VAR deps
-        UNRESOLVED_DEPENDENCIES_VAR unresolved_deps
-      )
-      if(unresolved_deps)
-        message(FATAL_ERROR "Unresolved dependencies: ${unresolved_deps}")
-      endif()
-      foreach(dep IN LISTS deps)
-        get_filename_component(dep_path "${dep}" REALPATH)
-        foreach(other_dep IN LISTS deps)
-          get_filename_component(other_dep_name "${other_dep}" NAME)
-          set(from "@executable_path/../MacOS/${other_dep_name}")
-          set(to "@loader_path/${other_dep_name}")
-          execute_process(COMMAND install_name_tool -change "${from}" "${to}" "${dep_path}" ERROR_QUIET)
+    message("    Re-anchoring @loader_path references of the Python framework")
+    set(version_path "${python_framework_path}/Versions/A")
+    foreach(moved_dir bin lib)
+      mitk_macho_files(binaries "${version_path}/${moved_dir}")
+      foreach(binary IN LISTS binaries)
+        file(RELATIVE_PATH binary_rel "${version_path}" "${binary}")
+        get_filename_component(new_dir "${binary}" DIRECTORY)
+        mitk_macho_read("${binary}" DEPENDENCIES deps WEAK_DEPENDENCIES weak_deps RPATHS rpaths)
+        set(args "")
+        foreach(kind change rpath)
+          if(kind STREQUAL "change")
+            set(entries ${deps} ${weak_deps})
+          else()
+            set(entries ${rpaths})
+          endif()
+          foreach(entry IN LISTS entries)
+            if(NOT entry MATCHES "^@loader_path(/.*)?$")
+              continue()
+            endif()
+            mitk_macho_expand(target "${entry}" "${python_framework_path}/${binary_rel}" "${executable_dir}")
+            foreach(dir bin lib)
+              set(old_prefix "${python_framework_path}/${dir}")
+              string(FIND "${target}/" "${old_prefix}/" position)
+              if(position EQUAL 0)
+                string(LENGTH "${old_prefix}" old_prefix_length)
+                string(SUBSTRING "${target}" ${old_prefix_length} -1 rest)
+                set(target "${version_path}/${dir}${rest}")
+              endif()
+            endforeach()
+            file(RELATIVE_PATH target_rel "${new_dir}" "${target}")
+            if(target_rel STREQUAL "")
+              set(new_entry "@loader_path")
+            else()
+              set(new_entry "@loader_path/${target_rel}")
+            endif()
+            string(REGEX REPLACE "/$" "" entry_without_slash "${entry}")
+            if(NOT new_entry STREQUAL entry_without_slash)
+              list(APPEND args "-${kind}" "${entry}" "${new_entry}")
+            endif()
+          endforeach()
         endforeach()
-        # TODO: Autoload modules
+        if(args)
+          execute_process(COMMAND install_name_tool ${args} "${binary}" RESULT_VARIABLE result)
+          if(NOT result EQUAL 0)
+            message(FATAL_ERROR "install_name_tool failed on ${binary}")
+          endif()
+        endif()
       endforeach()
-    endif()
+    endforeach()
 
   endif() # MITK_USE_Python3
+
+  ###################
+  # Check binaries  #
+  ###################
+
+  # Every binary must load on the oldest supported macOS, and every reference
+  # must resolve inside the bundle or the system. A library from a package
+  # manager that was updated with a newer deployment target, or a reference
+  # back into the build host, would otherwise only fail on other machines.
+  #
+  # Libraries are checked as if loaded into the app: @executable_path is its
+  # directory and its rpaths apply. An executable, such as the bundled Python
+  # interpreter, is its own process, so only its own directory and rpaths
+  # count.
+
+  message("    Checking binaries")
+  set(problems "")
+  mitk_macho_read("${app_path}" RPATHS app_rpaths)
+  set(app_search_dirs "")
+  foreach(rpath IN LISTS app_rpaths)
+    mitk_macho_expand(dir "${rpath}" "${app_path}" "${executable_dir}")
+    list(APPEND app_search_dirs "${dir}")
+  endforeach()
+  mitk_macho_files(binaries "${bundle_path}")
+  foreach(binary IN LISTS binaries)
+    file(RELATIVE_PATH binary_rel "${bundle_path}" "${binary}")
+    mitk_macho_read("${binary}" EXECUTABLE is_executable ID id MINOS minos DEPENDENCIES deps RPATHS rpaths)
+    if(minos AND NOT "@CMAKE_OSX_DEPLOYMENT_TARGET@" STREQUAL "" AND minos VERSION_GREATER "@CMAKE_OSX_DEPLOYMENT_TARGET@")
+      list(APPEND problems "${binary_rel}: requires macOS ${minos}")
+    endif()
+    foreach(rpath IN LISTS rpaths)
+      if(NOT rpath MATCHES "^@")
+        list(APPEND problems "${binary_rel}: absolute LC_RPATH ${rpath}")
+      endif()
+    endforeach()
+    if(is_executable)
+      get_filename_component(binary_executable_dir "${binary}" DIRECTORY)
+      set(search_dirs "")
+    else()
+      set(binary_executable_dir "${executable_dir}")
+      set(search_dirs "${app_search_dirs}")
+    endif()
+    foreach(rpath IN LISTS rpaths)
+      mitk_macho_expand(dir "${rpath}" "${binary}" "${binary_executable_dir}")
+      list(APPEND search_dirs "${dir}")
+    endforeach()
+    foreach(dep IN LISTS deps)
+      if(dep STREQUAL id OR dep MATCHES "^/(usr/lib|System)/")
+        continue()
+      endif()
+      set(resolved FALSE)
+      if(dep MATCHES "^@rpath/(.+)$")
+        set(name "${CMAKE_MATCH_1}")
+        foreach(dir IN LISTS search_dirs)
+          if(EXISTS "${dir}/${name}")
+            set(resolved TRUE)
+            break()
+          endif()
+        endforeach()
+      elseif(dep MATCHES "^@")
+        mitk_macho_expand(path "${dep}" "${binary}" "${binary_executable_dir}")
+        if(EXISTS "${path}")
+          set(resolved TRUE)
+        endif()
+      endif()
+      if(NOT resolved)
+        list(APPEND problems "${binary_rel}: ${dep} does not resolve inside the bundle")
+      endif()
+    endforeach()
+  endforeach()
+  if(problems)
+    list(JOIN problems "\n  " problems)
+    message(FATAL_ERROR "Binaries of ${bundle_name} do not load from the bundle:\n  ${problems}")
+  endif()
+
+  # The bundle signature below covers only the code that codesign finds in
+  # the standard locations, not the binaries inside site-packages, which the
+  # steps above may have changed.
+  mitk_macho_resign_invalid(${binaries})
 
   ############
   # codesign #

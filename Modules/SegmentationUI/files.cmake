@@ -16,6 +16,7 @@ set(CPP_FILES
   QmitkOtsuTool3DGUI.cpp
   QmitkPaintbrushToolGUI.cpp
   QmitkPickingToolGUI.cpp
+  QmitkRegionGrowingToolGUI.cpp
   QmitkSlicesInterpolator.cpp
   QmitkToolGUI.cpp
   QmitkToolGUIArea.cpp

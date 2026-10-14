@@ -3,7 +3,6 @@ set(H_FILES
   usGlobalConfig.h
   usModuleAbstractTracked.tpp
   usModuleActivator.h
-  usModuleImport.h
   usModuleInitialization.h
   usPrototypeServiceFactory.h
   usServiceFactory.h

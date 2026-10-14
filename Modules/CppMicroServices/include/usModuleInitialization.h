@@ -23,7 +23,72 @@ found in the LICENSE file.
 #include <usModuleInfo.h>
 #include <usModuleUtils_p.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+
+namespace us {
+
+/**
+ * \brief Size of the range between two linker-provided addresses.
+ *
+ * The volatile copies keep the compiler from assuming that distinct symbols
+ * have distinct addresses, which does not hold for linker-provided section
+ * boundaries: the start and end of an empty section coincide.
+ */
+inline std::size_t ModuleResourceRangeSize(const char* begin, const char* end)
+{
+  const char* volatile first = begin;
+  const char* volatile last = end;
+  return static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(last) - reinterpret_cast<std::uintptr_t>(first));
+}
+
+}
+
+// The module hands the resource archive linked into its binary (see
+// usFunctionEmbedResources) to the resource container as a memory range.
+//
+// ELF: the archive is the section us_resources, whose bounds the linker
+// provides for each binary as __start_us_resources and __stop_us_resources.
+// The weak references resolve to nullptr in a binary without the section.
+// They are hidden, so they bind only within the binary being linked: linkers
+// may export the section bounds, and a module without resources would
+// otherwise resolve another module's archive.
+//
+// Mach-O: the archive is the section __TEXT,us_resources. The linker resolves
+// section$start and section$end within the image being linked, and to an
+// empty range if the section does not exist.
+//
+// Windows: the archive is a resource of the binary, found through the address
+// of a symbol in it.
+#if defined(__ELF__)
+#define US_DECLARE_MODULE_RESOURCES                                                          \
+extern "C" const char __start_us_resources[] __attribute__((weak, visibility("hidden")));    \
+extern "C" const char __stop_us_resources[] __attribute__((weak, visibility("hidden")));
+
+#define US_SET_MODULE_RESOURCES(info, symbol)                                                \
+  if (__start_us_resources != nullptr)                                                       \
+  {                                                                                          \
+    info->resourceData = __start_us_resources;                                               \
+    info->resourceSize = us::ModuleResourceRangeSize(__start_us_resources, __stop_us_resources); \
+  }
+#elif defined(__APPLE__)
+#define US_DECLARE_MODULE_RESOURCES                                                          \
+extern "C" const char us_resources_section_start __asm("section$start$__TEXT$us_resources"); \
+extern "C" const char us_resources_section_end __asm("section$end$__TEXT$us_resources");
+
+#define US_SET_MODULE_RESOURCES(info, symbol)                                                \
+  info->resourceSize = us::ModuleResourceRangeSize(&us_resources_section_start, &us_resources_section_end); \
+  if (info->resourceSize != 0)                                                               \
+  {                                                                                          \
+    info->resourceData = &us_resources_section_start;                                        \
+  }
+#elif defined(_WIN32)
+#define US_DECLARE_MODULE_RESOURCES
+#define US_SET_MODULE_RESOURCES(info, symbol) us::ModuleUtils::GetLinkedResources(symbol, info);
+#else
+#error CppMicroServices resources require ELF, Mach-O or Windows binaries
+#endif
 
 
 /**
@@ -46,6 +111,7 @@ found in the LICENSE file.
  * <code>usFunctionGenerateModuleInit()</code>.
  */
 #define US_INITIALIZE_MODULE                                                                 \
+US_DECLARE_MODULE_RESOURCES                                                                  \
 namespace us {                                                                           \
 namespace {                                                                                  \
                                                                                              \
@@ -66,6 +132,7 @@ public:                                                                         
     std::memcpy(&moduleInfoSym, &moduleInfoPtr, sizeof(void*));                              \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfoSym);                       \
     moduleInfoPtr()->location = location;                                                    \
+    US_SET_MODULE_RESOURCES(moduleInfoPtr(), moduleInfoSym)                                  \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \
@@ -82,30 +149,10 @@ public:                                                                         
                                                                                              \
 };                                                                                           \
                                                                                              \
-                                                                                             \
-US_DEFINE_MODULE_INITIALIZER                                                                 \
+/* Registers the module during static initialization of the shared library. */               \
+static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
 }                                                                                            \
                                                                                              \
-}                                                                             \
-                                                                                             \
-/* A helper function which is called by the US_IMPORT_MODULE macro to initialize             \
-   static modules */                                                                         \
-extern "C" void US_ABI_LOCAL US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()     \
-{                                                                                            \
-  static us::US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
 }
-
-// Create a file-scoped static object for registering the module
-// during static initialization of the shared library
-#define US_DEFINE_MODULE_INITIALIZER \
-static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME);
-
-// Static modules don't create a file-scoped static object for initialization
-// (it would be discarded during static linking anyway). The initialization code
-// is triggered by the US_IMPORT_MODULE macro instead.
-#if defined(US_STATIC_MODULE)
-#undef US_DEFINE_MODULE_INITIALIZER
-#define US_DEFINE_MODULE_INITIALIZER
-#endif
 
 #endif // USMODULEINITIALIZATION_H

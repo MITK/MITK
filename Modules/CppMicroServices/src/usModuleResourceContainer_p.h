@@ -30,9 +30,9 @@ struct ModuleResourceContainerPrivate;
 /**
  * \brief Internal container providing access to resources embedded in a module.
  *
- * This class is not part of the public API. It wraps a zip archive that
- * is appended to the module's shared library and provides lookup, stat,
- * and decompression operations for embedded resources.
+ * This class is not part of the public API. It wraps the zip archive that
+ * is linked into the module's binary and provides lookup, stat, and
+ * decompression operations for embedded resources.
  *
  * \sa ModuleResource ModulePrivate
  */
@@ -44,12 +44,22 @@ public:
   /**
    * \brief Construct a resource container for the given module.
    *
-   * \param[in] moduleInfo Module metadata used to locate the embedded resource archive.
+   * \param[in] moduleInfo Module metadata that locates the embedded resource
+   *            archive. It must outlive the container.
    */
   ModuleResourceContainer(const ModuleInfo* moduleInfo);
 
   /** \brief Destructor. */
   ~ModuleResourceContainer();
+
+  /**
+   * \brief Release the archive and make the container permanently invalid.
+   *
+   * The archive lives in the module's binary image, so it must not be read
+   * after the module is unloaded. Resources created from this container
+   * become invalid as well.
+   */
+  void Invalidate();
 
   /**
    * \brief File-level metadata for a single embedded resource entry.

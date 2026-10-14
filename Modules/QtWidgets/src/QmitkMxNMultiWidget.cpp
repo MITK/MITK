@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
 #include <mitkDisplayActionEvents.h>
+#include <mitkImageVtkMapper2D.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
-#include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
@@ -5033,7 +5033,7 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
   {
     // Unlinked cells keep the classic node-global write, staying coupled to
     // the global colormap controls like an unlinked cell's level/window.
-    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable));
+    mitk::ImageVtkMapper2D::ApplyLookupTable(node, lookupTable);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return;
   }
@@ -5057,7 +5057,7 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
     {
       continue;
     }
-    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable), targetRenderer);
+    mitk::ImageVtkMapper2D::ApplyLookupTable(node, lookupTable, targetRenderer);
     mitk::RenderingManager::GetInstance()->RequestUpdate(
       targetWidget->GetRenderWindow()->GetVtkRenderWindow());
   }

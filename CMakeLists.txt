@@ -40,6 +40,15 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
 
+# project() creates the macOS deployment target cache entry itself (CMake 3
+# fills it with the running macOS, CMake 4 leaves it empty), so whether one
+# was specified is only known before.
+if(DEFINED CACHE{CMAKE_OSX_DEPLOYMENT_TARGET} OR NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
+  set(_mitk_osx_deployment_target_specified TRUE)
+else()
+  set(_mitk_osx_deployment_target_specified FALSE)
+endif()
+
 if(MITK_USE_SUPERBUILD)
   project(MITK-superbuild)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
@@ -214,12 +223,6 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
   endif()
 
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_SYSROOT)
-    get_filename_component(macosx_sdk_name "${CMAKE_OSX_SYSROOT}" NAME)
-    string(REGEX REPLACE "^MacOSX([0-9]+)\\..*" "\\1" macosx_sdk_version_major "${macosx_sdk_name}")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "${macosx_sdk_version_major}.0" CACHE STRING "Deployment target version for macOS" FORCE)
-  endif()
-
   if(NOT MITK_CODESIGN_IDENTITY)
     set(MITK_CODESIGN_IDENTITY "-" CACHE STRING "Codesign identity for signing app bundles on macOS" FORCE)
   endif()
@@ -238,7 +241,8 @@ option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 option(MITK_PCH "Enable precompiled headers" ON)
 
 # Emit debug symbols for MITK's own code in Release builds (PDBs on MSVC,
-# split DWARF on GCC/Clang) so release crash dumps are decodable, with no
+# minimal DWARF on Linux, dSYM bundles on macOS) so release crash dumps are
+# decodable, with no
 # execution-speed cost (optimization and inlining are preserved; the MSVC
 # binary ends up marginally larger).
 # Declared here, before the superbuild include, so it can be forwarded to
@@ -422,6 +426,11 @@ endif()
 if(Qt6_DIR)
   list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}/../../..")
   list(REMOVE_DUPLICATES CMAKE_PREFIX_PATH)
+endif()
+
+if(APPLE)
+  include(mitkFunctionCheckMacOSDeploymentTarget)
+  mitkFunctionCheckMacOSDeploymentTarget(SPECIFIED ${_mitk_osx_deployment_target_specified})
 endif()
 
 # -----------------------------------------
@@ -1254,11 +1263,17 @@ add_library(MitkCompilerFlags INTERFACE)
 #    parallel-build safe, unlike /Zi) and is codegen-identical to no debug
 #    info; the linker still emits the per-DLL .pdb we archive. /O2 /Ob2 are
 #    untouched (full inlining, unlike RelWithDebInfo's /Ob1).
-#  - GCC/Clang: -gsplit-dwarf keeps debug info in .dwo files beside the
-#    objects, is codegen-neutral, and needs no link-side flag.
-#  - macOS: -g (not -gsplit-dwarf: dsymutil consumes plain DWARF, split
-#    DWARF is a Linux convention) is codegen-neutral; the .dSYM is produced
-#    at archive time.
+#  - GCC/Clang: -g1 emits line tables, function descriptions and inline
+#    entries, which is all a crash dump needs, at a quarter of the size of
+#    full -g; it is codegen-neutral and needs no link-side flag. GCC 14 and
+#    newer drop the inline entries of some vectorized loops at -g1, so such
+#    a frame shows the caller's name with the callee's file and line.
+#    Split
+#    DWARF is deliberately not used: binutils 2.46 dropped dwp, llvm-dwp
+#    does not cope with GCC's output in practice, and dump_syms ignores
+#    .dwo and .dwp files altogether.
+#  - macOS: -g is codegen-neutral; the linker leaves the DWARF in the
+#    object files and dsymutil produces the .dSYM at archive time.
 # The MSVC binary ends up marginally larger (~0.5%): /DEBUG makes /OPT:ICF
 # fold slightly fewer identical functions to keep them individually
 # debuggable. This is a code-size, not a runtime-speed, difference.
@@ -1269,10 +1284,21 @@ if(MITK_RELEASE_DEBUG_SYMBOLS)
   elseif(APPLE)
     set(_mitk_debug_symbol_flag "-g")
   else()
-    set(_mitk_debug_symbol_flag "-gsplit-dwarf")
+    set(_mitk_debug_symbol_flag "-g1")
   endif()
   string(APPEND MITK_CXX_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
   string(APPEND MITK_C_FLAGS_RELEASE " ${_mitk_debug_symbol_flag}")
+
+  # A flag the compiler accepts but that generates nothing would only show
+  # when a crash dump cannot be decoded, so assert the outcome on the Core
+  # library. ELF only: the PDB and dSYM files are separate artifacts.
+  if(BUILD_TESTING AND LINUX AND CMAKE_OBJDUMP AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_test(NAME mitkReleaseDebugSymbolsTest
+      COMMAND "${CMAKE_COMMAND}"
+        "-DMITK_DEBUG_SYMBOLS_BINARY=$<TARGET_FILE:MitkCore>"
+        "-DMITK_DEBUG_SYMBOLS_OBJDUMP=${CMAKE_OBJDUMP}"
+        -P "${MITK_SOURCE_DIR}/CMake/mitkTestReleaseDebugSymbols.cmake")
+  endif()
 endif()
 
 # C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)
@@ -1335,9 +1361,13 @@ endif()
 # and COMDAT folding and bloat the binary versus a plain Release; /OPT:REF
 # /OPT:ICF restore them. Codegen is unchanged, though /DEBUG keeps ICF
 # slightly more conservative, leaving the binary marginally larger.
+# /PDBALTPATH records only the PDB's file name in the binary instead of its
+# absolute path on the build host; debuggers match the PDB by its GUID. The
+# linker's own %_PDB% placeholder does not survive the escaping of the Visual
+# Studio generators, so the name comes from the consuming target instead.
 if(MITK_RELEASE_DEBUG_SYMBOLS AND MSVC)
   target_link_options(MitkCompilerFlags INTERFACE
-    $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>)
+    $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF;/PDBALTPATH:$<TARGET_PDB_FILE_NAME:$<TARGET_PROPERTY:NAME>>>)
 endif()
 
 # Linker flags remain global

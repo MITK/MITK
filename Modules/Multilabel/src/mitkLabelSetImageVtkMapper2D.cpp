@@ -119,13 +119,15 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
 
   float nodeOpacity = 1.0f;
   node->GetOpacity(nodeOpacity, renderer, "opacity");
+  float opacityScale = 1.0f;
+  node->GetFloatProperty(PROPERTY_NAME_2D_OPACITY_SCALE(), opacityScale, renderer);
   const float opacityFactor = this->GetOpacityFactor();
 
-  // Node "opacity" times the "opacity factor" preference define the base (normal)
-  // opacity. It is baked into the LUT alpha here rather than applied at the layer actor,
-  // so a hovered label can be spotlit above the base (see GenerateDataForRenderer, which
-  // keeps the actor opacity fixed at 1.0).
-  const double base = static_cast<double>(nodeOpacity) * opacityFactor;
+  // Node "opacity" times its opacity scale and the "opacity factor" preference define the
+  // base (normal) opacity. It is baked into the LUT alpha here rather than applied at the
+  // layer actor, so a hovered label can be spotlit above the base (see
+  // GenerateDataForRenderer, which keeps the actor opacity fixed at 1.0).
+  const double base = static_cast<double>(nodeOpacity) * opacityScale * opacityFactor;
 
   double rgba[4];
   for (const auto& value : labelValues)
@@ -160,6 +162,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
     lookUpTable->SetTableValue(value, rgba);
   }
 
+  localStorage->m_LastNodeOpacity = nodeOpacity;
+  localStorage->m_LastOpacityScale = opacityScale;
   localStorage->m_LastOpacityFactor = opacityFactor;
   localStorage->m_LabelLookupTable->Modified();
 }
@@ -193,11 +197,17 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   auto *segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(node->GetData());
   assert(segmentation && segmentation->IsInitialized());
 
+  float nodeOpacity = 1.0f;
+  node->GetOpacity(nodeOpacity, renderer, "opacity");
+  float opacityScale = 1.0f;
+  node->GetFloatProperty(PROPERTY_NAME_2D_OPACITY_SCALE(), opacityScale, renderer);
+
   bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
     (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime()) ||
+    nodeOpacity != localStorage->m_LastNodeOpacity ||
+    opacityScale != localStorage->m_LastOpacityScale ||
     this->GetOpacityFactor() != localStorage->m_LastOpacityFactor;
 
   if (isLookupModified)

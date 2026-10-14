@@ -95,6 +95,10 @@ void Module::Uninit()
   {
     //d->coreCtx->listeners.HooksModuleStopped(d->moduleContext);
     d->RemoveModuleResources();
+    // The resource archive lives in the module's binary image, which is
+    // unmapped once the module is unloaded. Resources handed out earlier
+    // turn invalid instead of reading freed memory.
+    d->resourceContainer.Invalidate();
     delete d->moduleContext;
     d->moduleContext = nullptr;
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));

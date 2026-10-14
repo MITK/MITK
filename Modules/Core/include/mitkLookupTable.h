@@ -144,7 +144,7 @@ namespace mitk
     /**
      * \brief Compare two LookupTable objects for equality.
      * \param[in] LookupTable The LookupTable to compare against.
-     * \return True if both tables contain the same entries.
+     * \return True if both tables have the same type and contain the same entries.
      */
     virtual bool operator==(const mitk::LookupTable &LookupTable) const;
 
@@ -282,9 +282,9 @@ namespace mitk
      * \brief Set the lookup table type by name string.
      *
      * Looks up \p typeName in typenameList and delegates to SetType(LookupTableType).
-     * Does nothing if the name is not found.
      *
      * \param[in] typeName Case-sensitive name of the lookup table type.
+     * \throw mitk::Exception if \p typeName is not in typenameList.
      */
     virtual void SetType(const std::string &typeName);
 

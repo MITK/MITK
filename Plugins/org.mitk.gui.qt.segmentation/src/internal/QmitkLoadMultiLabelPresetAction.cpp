@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <QmitkMultiLabelPresetHelper.h>
 
+#include <QApplication>
 
 void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
@@ -33,7 +34,7 @@ void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
 
     segmentations.emplace_back(segmentation);
   }
-  QmitkLoadMultiLabelPreset(segmentations);
+  QmitkLoadMultiLabelPreset(QApplication::activeWindow(), segmentations);
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)

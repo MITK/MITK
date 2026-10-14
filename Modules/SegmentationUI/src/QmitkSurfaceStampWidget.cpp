@@ -64,7 +64,7 @@ void QmitkSurfaceStampWidget::OnStamp()
 
   if (!surfaceNode)
   {
-    QMessageBox::information(this, "Surface Stamp", "Please load and select a surface before starting some action.");
+    QMessageBox::information(this->window(), "Surface Stamp", "Please load and select a surface before starting some action.");
     return;
   }
 
@@ -75,7 +75,7 @@ void QmitkSurfaceStampWidget::OnStamp()
   mitk::Surface *surface = dynamic_cast<mitk::Surface *>(surfaceNode->GetData());
   if (!surface)
   {
-    QMessageBox::information(this, "Surface Stamp", "Please load and select a surface before starting some action.");
+    QMessageBox::information(this->window(), "Surface Stamp", "Please load and select a surface before starting some action.");
     return;
   }
 
@@ -84,7 +84,7 @@ void QmitkSurfaceStampWidget::OnStamp()
   if (!workingNode)
   {
     QMessageBox::information(
-      this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+      this->window(), "Surface Stamp", "Please load and select a segmentation before starting some action.");
     return;
   }
 
@@ -93,7 +93,7 @@ void QmitkSurfaceStampWidget::OnStamp()
   if (!workingImage)
   {
     QMessageBox::information(
-      this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+      this->window(), "Surface Stamp", "Please load and select a segmentation before starting some action.");
     return;
   }
 
@@ -108,7 +108,7 @@ void QmitkSurfaceStampWidget::OnStamp()
     QApplication::restoreOverrideCursor();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(
-      this, "Surface Stamp", "Could not stamp the selected surface.\n See error log for details.\n");
+      this->window(), "Surface Stamp", "Could not stamp the selected surface.\n See error log for details.\n");
     return;
   }
 

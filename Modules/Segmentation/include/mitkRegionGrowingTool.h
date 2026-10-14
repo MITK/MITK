@@ -83,38 +83,38 @@ namespace mitk
     /** \brief Discards the preview and the cut, as they belong to the previous time point. */
     void OnTimePointChanged() override;
 
+  private:
     /** \brief Called when the user presses the button. Sets the seed and computes the geodesic distances from it. */
-    virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
+    void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /** \brief Called when the mouse moves with the button held. Moves the region's edge to the cursor, once the mouse
      * left a small deadzone around the seed. */
-    virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
+    void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /** \brief Called when the user releases the button. Writes the region into the active label if the mouse was
      * dragged. */
-    virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
+    void OnMouseReleased(StateMachineAction *, InteractionEvent *);
 
     /** \brief Called when Ctrl is held. Changes the cursor, dims the segmentation in the event's render window and
      * marks the last seed if a cut there keeps its side. */
-    virtual void OnCutArmed(StateMachineAction *, InteractionEvent *interactionEvent);
+    void OnCutArmed(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /** \brief Called when Ctrl is no longer held. Undoes OnCutArmed(). */
-    virtual void OnCutDisarmed(StateMachineAction *, InteractionEvent *);
+    void OnCutDisarmed(StateMachineAction *, InteractionEvent *);
 
     /** \brief Called when the user presses the button with Ctrl held. Starts a cut line. */
-    virtual void OnCutStarted(StateMachineAction *, InteractionEvent *interactionEvent);
+    void OnCutStarted(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /** \brief Called when the mouse moves while cutting. Extends the cut line and shows what it would remove. */
-    virtual void OnCutMoved(StateMachineAction *, InteractionEvent *interactionEvent);
+    void OnCutMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /** \brief Called when the user releases the button while cutting. Removes what the cut line separated. */
-    virtual void OnCutFinished(StateMachineAction *, InteractionEvent *);
+    void OnCutFinished(StateMachineAction *, InteractionEvent *);
 
     /** \brief Called when the user presses Escape or the secondary button while the button is held. Discards the
      * preview or the cut without writing it. */
-    virtual void OnCancel(StateMachineAction *, InteractionEvent *);
+    void OnCancel(StateMachineAction *, InteractionEvent *);
 
-  private:
     using BinaryImageType = itk::Image<DefaultSegmentationDataType, 2>;
 
     void UpdatePreview();

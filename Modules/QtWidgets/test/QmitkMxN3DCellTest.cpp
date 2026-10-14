@@ -128,6 +128,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(FreeGroup_StandardDirection_TurnsWholeGroupCanonical);
   MITK_TEST(ViewDirectionChanged_AnnouncesEachChangedCellOnce);
   MITK_TEST(SyncHighlight_ThreeDCellExcludedOnInactiveAxis);
+  MITK_TEST(FrameIdentity_IgnoresInactiveLinks);
   MITK_TEST(Windowing_ThreeDMemberIsNotWritten);
   MITK_TEST(Lut_ThreeDMemberIsNotWritten);
   MITK_TEST(WindowingAndLut_ThreeDSource_Throws);
@@ -1274,6 +1275,28 @@ public:
     CPPUNIT_ASSERT(m_Editor->CellsSharingAxis(group, QmitkMxNSyncAxis::Orientation).contains(CellId(0)));
     CPPUNIT_ASSERT_EQUAL(std::string("nav"),
                          m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Orientation));
+  }
+
+  void FrameIdentity_IgnoresInactiveLinks()
+  {
+    // A fresh cell ties Windowing, LUT and selection to "main". The Slice link
+    // is set while the cell is 2D and survives the switch, but is inactive in 3D.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("precondition: the 3D cell keeps its Slice link",
+                           m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice).has_value());
+
+    // Counting the inactive Slice link would span "nav" and "main" and read
+    // Complex.
+    const auto mono = m_Editor->ResolveCellGroupIdentity(CellId(0));
+    CPPUNIT_ASSERT_MESSAGE("An inactive link does not split the frame",
+                           QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == mono.kind);
+    CPPUNIT_ASSERT(mono.hue == m_Editor->GetSyncGroupColor("main"));
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, "nav");
+    CPPUNIT_ASSERT_MESSAGE("An active link on another group splits the frame",
+                           QmitkMxNMultiWidget::CellGroupIdentityKind::Complex
+                             == m_Editor->ResolveCellGroupIdentity(CellId(0)).kind);
   }
 
   void LinkWindowingAndLutWithThreeDMember()

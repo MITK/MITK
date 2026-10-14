@@ -743,9 +743,11 @@ public:
   * \brief Resolve a cell's frame identity from its navigation/intensity
   *        membership.
   *
-  *   Resolves over all eight axes - the seven 'QmitkMxNSyncDimension' links plus
-  *   the cell's data-selection group. 'Mono' when they all name one group (the
-  *   hue is that group's color); 'Complex' (gray) when they span more than one;
+  *   Resolves over the axes that apply to the cell's render mode - the
+  *   'QmitkMxNSyncDimension' links plus the cell's data-selection group; a 3D
+  *   cell's kept but inactive links do not count. 'Mono' when they all name
+  *   one group (the hue is that group's color); 'Complex' (gray) when they
+  *   span more than one;
   *   'None' only when the cell has no group at all (not reachable in normal
   *   operation, since every cell has a selection group). A fresh cell is
   *   'Mono' in the default group - it links Windowing, LUT, and selection to

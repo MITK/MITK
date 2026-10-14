@@ -5811,6 +5811,10 @@ QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
   std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
+    if (!this->IsDimensionApplicable(windowId, dimension))
+    {
+      continue;
+    }
     const auto link = this->GetSyncLink(windowId, dimension);
     if (!link.has_value())
     {

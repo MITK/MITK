@@ -256,6 +256,7 @@
 	The window's frame tells its group at a glance. It takes a group's hue when every axis
 	the window is linked on - the data selection included, which is always linked - names
 	that one group; a fresh window therefore reads in the hue of the default group.
+	For a 3D window, links on axes without 3D meaning do not count.
 	A window whose linked axes name more than one group has a neutral gray frame, and the exact per-dimension coupling is read
 	from the sync barcode and the layout editor. The active window is marked by white
 	brackets in its corners, so it keeps its group hue.

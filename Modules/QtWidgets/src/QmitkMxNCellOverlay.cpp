@@ -964,7 +964,8 @@ QString QmitkMxNCellOverlay::PlaneLabelToolTip() const
     if (m_Editor->IsRotationLocked(windowId))
     {
       const auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
-      return tr("Rotation locked by orientation group %1").arg(QString::fromStdString(link->group));
+      return tr("Rotation locked by orientation group %1")
+        .arg(QString::fromStdString(m_Editor->GetSyncGroupDisplayName(link->group)));
     }
   }
   catch (const mitk::Exception&)

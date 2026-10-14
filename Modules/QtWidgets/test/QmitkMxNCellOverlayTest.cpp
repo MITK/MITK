@@ -673,6 +673,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("Rotation locked by orientation group planes"),
                          overlay->PlaneLabelToolTip().toStdString());
 
+    m_Editor->SetSyncGroupDisplayName("planes", "Planes A");
+    CPPUNIT_ASSERT_EQUAL(std::string("Rotation locked by orientation group Planes A"),
+                         overlay->PlaneLabelToolTip().toStdString());
+
     m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
     CPPUNIT_ASSERT_EQUAL(std::string("Coronal"), overlay->PlaneLabel().toStdString());
     CPPUNIT_ASSERT(overlay->PlaneLabelToolTip().isEmpty());

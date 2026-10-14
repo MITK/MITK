@@ -687,7 +687,14 @@ void mitk::RegionGrowingTool::OnTimePointChanged()
   // The last seed belongs to one time step only.
   if (m_IsCutArmed)
   {
-    this->ArmCut(m_ArmedRenderer);
+    if (const auto* renderer = BaseRenderer::GetByName(m_ArmedRendererName); nullptr != renderer)
+    {
+      this->ArmCut(renderer);
+    }
+    else
+    {
+      this->DisarmCut();
+    }
   }
 }
 
@@ -1029,9 +1036,10 @@ void mitk::RegionGrowingTool::DiscardCut()
 void mitk::RegionGrowingTool::OnCutArmed(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const auto* renderer = nullptr != interactionEvent ? interactionEvent->GetSender() : nullptr;
+  const std::string rendererName = nullptr != renderer ? renderer->GetName() : "";
 
   // Moving the mouse with Ctrl held arms again and again, so only a change of the render window counts.
-  if (!m_IsCutArmed || renderer != m_ArmedRenderer)
+  if (!m_IsCutArmed || rendererName != m_ArmedRendererName)
   {
     this->ArmCut(renderer);
   }
@@ -1052,10 +1060,11 @@ void mitk::RegionGrowingTool::ArmCut(const BaseRenderer* renderer)
     this->PushCursor(module->GetResource("Cut_Cursor.svg"));
   }
 
-  if (renderer != m_ArmedRenderer)
+  const std::string rendererName = nullptr != renderer ? renderer->GetName() : "";
+  if (rendererName != m_ArmedRendererName)
   {
     this->RestoreSegmentationOpacity();
-    m_ArmedRenderer = renderer;
+    m_ArmedRendererName = rendererName;
     this->DimSegmentation();
   }
 
@@ -1091,7 +1100,7 @@ void mitk::RegionGrowingTool::DisarmCut()
   this->PopCursor();
 
   this->RestoreSegmentationOpacity();
-  m_ArmedRenderer = nullptr;
+  m_ArmedRendererName.clear();
 
   if (m_SeedMarkerNode.IsNotNull())
   {
@@ -1103,14 +1112,14 @@ void mitk::RegionGrowingTool::DisarmCut()
 
 void mitk::RegionGrowingTool::DimSegmentation()
 {
-  m_DimmedNode = nullptr != m_ArmedRenderer ? this->GetToolManager()->GetWorkingData(0) : nullptr;
+  m_DimmedNode = !m_ArmedRendererName.empty() ? this->GetToolManager()->GetWorkingData(0) : nullptr;
   if (m_DimmedNode.IsNull())
   {
     return;
   }
 
-  m_DimmedNode->SetFloatProperty(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE(), CutOpacityFactor,
-                                 m_ArmedRenderer);
+  m_DimmedNode->GetPropertyList(m_ArmedRendererName)
+    ->SetFloatProperty(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE(), CutOpacityFactor);
 }
 
 void mitk::RegionGrowingTool::RestoreSegmentationOpacity()
@@ -1120,7 +1129,7 @@ void mitk::RegionGrowingTool::RestoreSegmentationOpacity()
     return;
   }
 
-  m_DimmedNode->GetPropertyList(m_ArmedRenderer)
+  m_DimmedNode->GetPropertyList(m_ArmedRendererName)
     ->DeleteProperty(LabelSetImageVtkMapper2D::PROPERTY_NAME_2D_OPACITY_SCALE());
   m_DimmedNode = nullptr;
 }

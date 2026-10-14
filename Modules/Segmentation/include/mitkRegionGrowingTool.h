@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <itkContinuousIndex.h>
 #include <itkImage.h>
+#include <string>
 #include <vector>
 
 namespace us
@@ -129,7 +130,7 @@ namespace mitk
     void ArmCut(const BaseRenderer* renderer);
     void DisarmCut();
 
-    /** \brief Dims the working segmentation in m_ArmedRenderer only. */
+    /** \brief Dims the working segmentation in the armed render window only. */
     void DimSegmentation();
     void RestoreSegmentationOpacity();
 
@@ -185,9 +186,9 @@ namespace mitk
     DataNode::Pointer m_SeedMarkerNode;
 
     /** While Ctrl is held, the segmentation is dimmed in the armed render window so the image along the cut stays
-     * visible. */
+     * visible. The window is kept by name, as it may be destroyed while armed. */
     bool m_IsCutArmed = false;
-    const BaseRenderer* m_ArmedRenderer = nullptr;
+    std::string m_ArmedRendererName;
     DataNode::Pointer m_DimmedNode;
   };
 

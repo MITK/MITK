@@ -542,10 +542,11 @@ public:
   *   colormap changes by design. An unlinked cell falls back to the classic
   *   node-global write, keeping it coupled to the global colormap controls;
   *   unlinking a cell from its `Lut` group removes its renderer-specific
-  *   lookup table for the same reason.
+  *   lookup table for the same reason. Members whose axis is not applicable
+  *   (3D cells, see IsAxisApplicable) are skipped.
   *
-  * \throws mitk::Exception on an unknown window, a null node, or a null
-  *         lookup table.
+  * \throws mitk::Exception on an unknown window, a null node, a null
+  *         lookup table, or a window on which the axis is not applicable.
   */
   void SetLookupTable(const QString& windowId, mitk::DataNode* node, mitk::LookupTable* lookupTable);
 
@@ -557,13 +558,15 @@ public:
   *   property (all members end up on the same absolute value); renderers
   *   outside the group and the node-global property stay untouched. An
   *   unlinked cell falls back to the classic node-global write, keeping it
-  *   coupled to the global level/window controls.
+  *   coupled to the global level/window controls. Members whose axis is not
+  *   applicable (3D cells, see IsAxisApplicable) are skipped.
   *
   *   This is the absolute-set companion of the gesture-driven synchronized
   *   level-window path; use 'AdjustLevelWindow' for deltas that must preserve
   *   the members' relative differences.
   *
-  * \throws mitk::Exception on an unknown window or a null node.
+  * \throws mitk::Exception on an unknown window, a null node, or a window on
+  *         which the axis is not applicable.
   */
   void SetLevelWindow(const QString& windowId, mitk::DataNode* node, const mitk::LevelWindow& levelWindow);
 
@@ -575,9 +578,11 @@ public:
   *   member's own current value (renderer-specific, falling back to
   *   node-global) and written renderer-specific, so members keep their
   *   relative differences. An unlinked cell falls back to the classic
-  *   node-global write.
+  *   node-global write. Members whose axis is not applicable (3D cells, see
+  *   IsAxisApplicable) are skipped.
   *
-  * \throws mitk::Exception on an unknown window or a null node.
+  * \throws mitk::Exception on an unknown window, a null node, or a window on
+  *         which the axis is not applicable.
   */
   void AdjustLevelWindow(const QString& windowId, mitk::DataNode* node,
                          mitk::ScalarType levelDelta, mitk::ScalarType windowDelta);
@@ -700,14 +705,17 @@ public:
   /**
   * \brief The window ids that share one synchronization: the members of
   *        'group' on 'axis'. Empty for an unknown group, an axis the group
-  *        links for no cell, or a transient mid-layout-change state.
+  *        links for no cell, or a transient mid-layout-change state. A kept
+  *        link on an axis that does not apply to the cell (see
+  *        IsAxisApplicable) synchronizes nothing and is not counted.
   */
   QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
 
   /**
   * \brief The group 'windowId' is on for 'axis' - the per-dimension link, or
   *        the selection connector for the selection axis; empty when the cell
-  *        synchronizes nothing there.
+  *        synchronizes nothing there, including a kept link on an axis that
+  *        does not apply to the cell (see IsAxisApplicable).
   */
   std::string ResolveCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis) const;
 

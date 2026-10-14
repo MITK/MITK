@@ -4966,6 +4966,12 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
     mitkThrow() << "SetLookupTable: lookupTable must not be null.";
   }
 
+  if (!this->IsDimensionApplicable(windowId, QmitkMxNSyncDimension::Lut))
+  {
+    mitkThrow() << "SetLookupTable: a lookup table does not apply to window '" << windowId.toStdString()
+                << "' (a 3D view).";
+  }
+
   const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
   if (!link.has_value())
   {
@@ -4977,17 +4983,9 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
   }
 
   std::vector<QString> targets{ windowId };
-  for (const auto& descriptor : this->ListWindowDescriptors())
+  for (const auto& peerId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Lut))
   {
-    if (descriptor.id == windowId)
-    {
-      continue;
-    }
-    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
-    if (memberLink.has_value() && memberLink->group == link->group)
-    {
-      targets.push_back(descriptor.id);
-    }
+    targets.push_back(peerId);
   }
 
   for (const auto& targetId : targets)
@@ -5039,6 +5037,12 @@ void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNo
     mitkThrow() << "ApplyLevelWindow: node must not be null.";
   }
 
+  if (!this->IsDimensionApplicable(windowId, QmitkMxNSyncDimension::Windowing))
+  {
+    mitkThrow() << "ApplyLevelWindow: level/window does not apply to window '" << windowId.toStdString()
+                << "' (a 3D view).";
+  }
+
   const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
   if (!link.has_value())
   {
@@ -5053,17 +5057,9 @@ void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNo
   }
 
   std::vector<QString> targets{ windowId };
-  for (const auto& descriptor : this->ListWindowDescriptors())
+  for (const auto& peerId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Windowing))
   {
-    if (descriptor.id == windowId)
-    {
-      continue;
-    }
-    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Windowing);
-    if (memberLink.has_value() && memberLink->group == link->group)
-    {
-      targets.push_back(descriptor.id);
-    }
+    targets.push_back(peerId);
   }
 
   for (const auto& targetId : targets)
@@ -5551,7 +5547,10 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
         {
           for (const auto& windowId : it->second)
           {
-            result.append(windowId);
+            if (this->IsDimensionApplicable(windowId, *dimension))
+            {
+              result.append(windowId);
+            }
           }
         }
       }
@@ -5572,6 +5571,10 @@ std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, Q
   if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
   {
     return this->GetCellSelectionGroup(windowId);
+  }
+  else if (!this->IsDimensionApplicable(windowId, *dimension))
+  {
+    return std::string();
   }
   else if (const auto link = this->GetSyncLink(windowId, *dimension))
   {

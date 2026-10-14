@@ -3330,7 +3330,20 @@ void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
   std::vector<std::string> linked;
   for (int slot = 0; slot < PeekAxisCount; ++slot)
   {
-    const auto group = m_Editor->ResolveCellAxisGroup(windowId, *QmitkMxNSyncAxisFromSlot(slot));
+    // Raw membership: a kept link on an axis that does not apply to the cell
+    // still has to be removable.
+    std::string group;
+    if (const auto dimension = QmitkMxNSyncAxisDimension(*QmitkMxNSyncAxisFromSlot(slot)); dimension.has_value())
+    {
+      if (const auto link = m_Editor->GetSyncLink(windowId, *dimension))
+      {
+        group = link->group;
+      }
+    }
+    else
+    {
+      group = m_Editor->GetCellSelectionGroup(windowId);
+    }
     if (!group.empty() && std::find(linked.begin(), linked.end(), group) == linked.end())
     {
       linked.push_back(group);

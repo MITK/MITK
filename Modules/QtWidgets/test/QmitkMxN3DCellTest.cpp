@@ -22,6 +22,9 @@ found in the LICENSE file.
 #include <mitkDisplayActionEvents.h>
 #include <mitkImageGenerator.h>
 #include <mitkInteractionEvent.h>
+#include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTable.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
@@ -120,6 +123,10 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(FreeGroup_MemberTurnsTwoD_LeavesGroup);
   MITK_TEST(FreeGroup_StandardDirection_TurnsWholeGroupCanonical);
   MITK_TEST(ViewDirectionChanged_AnnouncesEachChangedCellOnce);
+  MITK_TEST(SyncHighlight_ThreeDCellExcludedOnInactiveAxis);
+  MITK_TEST(Windowing_ThreeDMemberIsNotWritten);
+  MITK_TEST(Lut_ThreeDMemberIsNotWritten);
+  MITK_TEST(WindowingAndLut_ThreeDSource_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1182,6 +1189,81 @@ public:
 
     m_Editor->ApplyLayout(ThreeDDoc());
     CPPUNIT_ASSERT_MESSAGE("A layout load is announced by LayoutChanged", announced.isEmpty());
+  }
+
+  void SyncHighlight_ThreeDCellExcludedOnInactiveAxis()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "nav");
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+
+    const QString group = QStringLiteral("nav");
+    CPPUNIT_ASSERT_MESSAGE("The 3D cell keeps its Slice link",
+                           m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice).has_value());
+
+    const auto sliceMembers = m_Editor->CellsSharingAxis(group, QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT(!sliceMembers.contains(CellId(0)));
+    CPPUNIT_ASSERT(sliceMembers.contains(CellId(1)));
+    CPPUNIT_ASSERT(m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Slice).empty());
+
+    CPPUNIT_ASSERT(m_Editor->CellsSharingAxis(group, QmitkMxNSyncAxis::Orientation).contains(CellId(0)));
+    CPPUNIT_ASSERT_EQUAL(std::string("nav"),
+                         m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Orientation));
+  }
+
+  void LinkWindowingAndLutWithThreeDMember()
+  {
+    m_ImageNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+    for (const auto dimension : { QmitkMxNSyncDimension::Windowing, QmitkMxNSyncDimension::Lut })
+    {
+      m_Editor->SetSyncLink(CellId(0), dimension, "grp");
+      m_Editor->SetSyncLink(CellId(1), dimension, "grp");
+    }
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+  }
+
+  void Windowing_ThreeDMemberIsNotWritten()
+  {
+    this->LinkWindowingAndLutWithThreeDMember();
+
+    m_Editor->SetLevelWindow(CellId(0), m_ImageNode, mitk::LevelWindow(310.0, 420.0));
+
+    auto* source = dynamic_cast<mitk::LevelWindowProperty*>(
+      m_ImageNode->GetPropertyList(this->Renderer(0))->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT_MESSAGE("The 2D source gets a renderer-specific levelwindow", nullptr != source);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(310.0, source->GetLevelWindow().GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_MESSAGE("The 3D member is not written",
+      nullptr == m_ImageNode->GetPropertyList(this->Renderer(1))->GetProperty("levelwindow"));
+
+    m_Editor->AdjustLevelWindow(CellId(0), m_ImageNode, 5.0, 10.0);
+
+    CPPUNIT_ASSERT_MESSAGE("The 3D member is not written by a delta either",
+      nullptr == m_ImageNode->GetPropertyList(this->Renderer(1))->GetProperty("levelwindow"));
+  }
+
+  void Lut_ThreeDMemberIsNotWritten()
+  {
+    this->LinkWindowingAndLutWithThreeDMember();
+
+    m_Editor->SetLookupTable(CellId(0), m_ImageNode, mitk::LookupTable::New());
+
+    CPPUNIT_ASSERT_MESSAGE("The 2D source gets a renderer-specific LookupTable",
+      nullptr != m_ImageNode->GetPropertyList(this->Renderer(0))->GetProperty("LookupTable"));
+    CPPUNIT_ASSERT_MESSAGE("The 3D member is not written",
+      nullptr == m_ImageNode->GetPropertyList(this->Renderer(1))->GetProperty("LookupTable"));
+  }
+
+  void WindowingAndLut_ThreeDSource_Throws()
+  {
+    this->LinkWindowingAndLutWithThreeDMember();
+
+    CPPUNIT_ASSERT_THROW(m_Editor->SetLevelWindow(CellId(1), m_ImageNode, mitk::LevelWindow(310.0, 420.0)),
+                         mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Editor->AdjustLevelWindow(CellId(1), m_ImageNode, 5.0, 10.0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Editor->SetLookupTable(CellId(1), m_ImageNode, mitk::LookupTable::New()),
+                         mitk::Exception);
   }
 };
 

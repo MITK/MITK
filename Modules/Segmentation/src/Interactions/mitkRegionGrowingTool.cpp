@@ -82,6 +82,26 @@ namespace
     BinaryImageType::SpacingType spacing;
   };
 
+  /** \brief Calls visit(j, axis) for every 4-neighbor j of pixel i, adjacent to it along axis. Pixels are numbered
+   * with x running fastest. */
+  template <typename TVisit>
+  void ForEachNeighbor(std::size_t i, const BinaryImageType::SizeType& size, const TVisit& visit)
+  {
+    const std::size_t width = size[0];
+    const std::size_t height = size[1];
+    const auto x = i % width;
+    const auto y = i / width;
+
+    if (x > 0)
+      visit(i - 1, 0u);
+    if (x + 1 < width)
+      visit(i + 1, 0u);
+    if (y > 0)
+      visit(i - width, 1u);
+    if (y + 1 < height)
+      visit(i + width, 1u);
+  }
+
   /** \brief Samples the slice after a 3x3 median filter, as noise widens the gray value spread of every tissue and
    * with it the risk of leaking into neighbors. */
   template <typename TPixel, unsigned int VImageDimension>
@@ -144,19 +164,6 @@ namespace
     const std::size_t width = slice.size[0];
     const std::size_t height = slice.size[1];
     const std::size_t numberOfPixels = values.size();
-
-    const auto forEachNeighbor = [&](std::size_t i, const auto& visit) {
-      const auto x = i % width;
-      const auto y = i / width;
-      if (x > 0)
-        visit(i - 1, slice.spacing[0]);
-      if (x + 1 < width)
-        visit(i + 1, slice.spacing[0]);
-      if (y > 0)
-        visit(i - width, slice.spacing[1]);
-      if (y + 1 < height)
-        visit(i + width, slice.spacing[1]);
-    };
 
     // Tissue statistics of the core around the seed. The seed itself is finite, so the core is never empty.
     std::vector<double> core;
@@ -221,14 +228,14 @@ namespace
       const double currentMean = tissueMean();
       const double currentSpread = tissueSpread();
 
-      forEachNeighbor(i, [&](std::size_t j, double stepLength) {
+      ForEachNeighbor(i, slice.size, [&](std::size_t j, unsigned int axis) {
         if (settled[j])
         {
           return;
         }
 
         const double z = (values[j] - currentMean) / currentSpread;
-        const double neighborDistance = distance + stepLength * (1.0 + z * z);
+        const double neighborDistance = distance + slice.spacing[axis] * (1.0 + z * z);
         if (neighborDistance < distances[j])
         {
           distances[j] = neighborDistance;
@@ -362,8 +369,6 @@ namespace
       }
     }
 
-    const std::size_t width = bounds.GetSize(0);
-    const std::size_t height = bounds.GetSize(1);
     const std::size_t numberOfPixels = bounds.GetNumberOfPixels();
     const auto* label = labelMask->GetBufferPointer();
     const auto* line = lineMask->GetBufferPointer();
@@ -471,21 +476,10 @@ namespace
       std::erase_if(unassignedLinePixels, [&](std::size_t i) {
         bool bordersKept = false;
         bool bordersRemoved = false;
-        const auto visit = [&](std::size_t j) {
+        ForEachNeighbor(i, bounds.GetSize(), [&](std::size_t j, unsigned int) {
           bordersKept |= Side::Kept == side[j];
           bordersRemoved |= Side::Removed == side[j];
-        };
-
-        const auto x = i % width;
-        const auto y = i / width;
-        if (x > 0)
-          visit(i - 1);
-        if (x + 1 < width)
-          visit(i + 1);
-        if (y > 0)
-          visit(i - width);
-        if (y + 1 < height)
-          visit(i + width);
+        });
 
         if (!bordersKept && !bordersRemoved)
         {

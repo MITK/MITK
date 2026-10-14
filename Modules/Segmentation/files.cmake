@@ -73,6 +73,7 @@ set(RESOURCE_FILES
   AI_Cursor.svg
   Close.svg
   Close_Cursor.svg
+  Cut_Cursor.svg
   Erase.svg
   Erase_Cursor.svg
   Fill.svg
@@ -109,6 +110,7 @@ set(RESOURCE_FILES
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml
   Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/RegionGrowingTool.xml
   Interactions/SegmentationConfig.xml
   Interactions/SegmentationInteraction.xml
   Interactions/SegmentationToolsConfig.xml

@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <string>
 
+#include <mitkDoseValueType.h>
+
 #include <MitkRTExports.h>
 
 namespace mitk
@@ -110,6 +112,11 @@ struct MITKRT_EXPORT RTConstants
       * Name of the property that encodes user defined iso values that mark special dose values in the distribution.
       */
   static const std::string DOSE_FREE_ISO_VALUES_PROPERTY_NAME;
+
+  /**
+      * Default value used as reference dose if not defined by application or data node.
+      */
+  static constexpr DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE = 40.0;
 
 };
 }

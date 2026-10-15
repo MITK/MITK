@@ -14,13 +14,13 @@ found in the LICENSE file.
 #include <QSize>
 
 #include <QmitkIsoDoseLevelSetModel.h>
-#include <mitkRTUIConstants.h>
+#include <mitkRTConstants.h>
 
 QmitkIsoDoseLevelSetModel::QmitkIsoDoseLevelSetModel(QObject *parent)
   : QAbstractTableModel(parent),
     m_showAbsoluteDose(false),
     m_visibilityEditOnly(false),
-    m_referenceDose(mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE),
+    m_referenceDose(mitk::RTConstants::DEFAULT_REFERENCE_DOSE_VALUE),
     m_modified(false)
 {
   m_DoseSet = mitk::IsoDoseLevelSet::New();

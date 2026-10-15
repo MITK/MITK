@@ -27,6 +27,9 @@ found in the LICENSE file.
 #include <mitkDICOMIOHelper.h>
 #include <mitkProperties.h>
 #include <mitkDICOMProperty.h>
+#include <mitkBaseDICOMReaderService.h>
+#include <mitkDoseNodeHelper.h>
+#include <mitkIsoLevelsGenerator.h>
 
 #include <dcmtk/dcmrt/drtdose.h>
 
@@ -160,8 +163,21 @@ namespace mitk
     auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
     DICOMIOHelper::SetProperties(this->scaledDoseImage, findings);
 
+    auto name = GenerateNameFromDICOMProperties(this->scaledDoseImage.GetPointer());
+
+    if (name == DataNode::NO_NAME_VALUE())
+      name = "RT Dose";
+
+    this->scaledDoseImage->SetProperty("name", StringProperty::New(name));
+
     result.push_back(this->scaledDoseImage.GetPointer());
     return result;
+  }
+
+  void RTDoseReaderService::SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath)
+  {
+    AbstractFileReader::SetDefaultDataNodeProperties(node, filePath);
+    ConfigureNodeAsDoseNode(node, GenerateIsoLevels_Virtuos(), RTConstants::DEFAULT_REFERENCE_DOSE_VALUE, true);
   }
 
   RTDoseReaderService* RTDoseReaderService::Clone() const

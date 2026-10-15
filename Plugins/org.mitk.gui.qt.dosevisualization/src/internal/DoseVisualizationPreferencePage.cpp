@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 
 #include "DoseVisualizationPreferencePage.h"
+#include <mitkRTConstants.h>
 #include <mitkRTUIConstants.h>
 
 #include <QWidget>
@@ -156,7 +157,7 @@ void DoseVisualizationPreferencePage::Update()
   m_Controls->checkGlobalVisIsoLine->setChecked(prefs->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID, true));
   m_Controls->radioAbsDose->setChecked(prefs->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, true));
   m_Controls->radioRelDose->setChecked(!(prefs->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false)));
-  m_Controls->spinReferenceDose->setValue(prefs->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE));
+  m_Controls->spinReferenceDose->setValue(prefs->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTConstants::DEFAULT_REFERENCE_DOSE_VALUE));
   m_Controls->checkGlobalSync->setChecked(prefs->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true));
 
   m_referenceDoseChanged = false;

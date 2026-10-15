@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 
 #include "mitkDoseVisPreferenceHelper.h"
+#include <mitkRTConstants.h>
 #include <mitkRTUIConstants.h>
 #include <mitkIsoLevelsGenerator.h>
 
@@ -172,7 +173,7 @@ bool mitk::GetReferenceDoseValue(mitk::DoseValueAbs& value)
   auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
   bool result = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true);
 
-  value = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
+  value = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTConstants::DEFAULT_REFERENCE_DOSE_VALUE);
 
   return result;
 }

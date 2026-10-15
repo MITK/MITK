@@ -5,12 +5,10 @@ mitk_create_plugin(
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS
     PRIVATE
-      MitkContourModel
       MitkDICOM
       MitkDICOMUI
       MitkQtWidgetsExt
       MitkRT
-      MitkRTUI
   PACKAGE_DEPENDS
     PRIVATE
       CTK|CTKDICOMWidgets

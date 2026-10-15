@@ -57,6 +57,14 @@ namespace mitk
        */
       std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
+      /**
+       * \brief Configures the node for dose visualization with color wash.
+       *
+       * Uses the default iso level preset and reference dose, so the dose
+       * appears the same regardless of how it was loaded.
+       */
+      void SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath) override;
+
     private:
       RTDoseReaderService* Clone() const override;
         /**

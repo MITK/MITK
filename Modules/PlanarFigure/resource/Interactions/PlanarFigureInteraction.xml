@@ -196,6 +196,11 @@
       <action name="hide_preview_point" />
       <action name="select_point" />
     </transition>
+
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="EditFigure" > <!-- end hovering -->
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+    </transition>
   </state>
 
   <state name="HoveringOverPoint">
@@ -258,7 +263,6 @@
 
     <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="EditFigure" > <!-- end hovering -->
       <action name="hide_preview_point" />
-      <action name="deselect_point" />
       <action name="end_hovering" />
     </transition>
 

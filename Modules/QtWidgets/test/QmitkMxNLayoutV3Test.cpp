@@ -13,16 +13,26 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 
+#include <mitkBaseRenderer.h>
 #include <mitkException.h>
+#include <mitkImageGenerator.h>
+#include <mitkRenderingManager.h>
+#include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkStepper.h>
+
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 #include <nlohmann/json.hpp>
 
 #include <QColor>
+#include <QCoreApplication>
 
 #include <algorithm>
 #include <string>
@@ -38,6 +48,8 @@ found in the LICENSE file.
  *     slice / zoom / pan offsets.
  *   - Strict mode requires every referenced group declared, across all
  *     dimensions; lazy mode does not.
+ *   - A layout applied while data is loaded shows every cell in its declared
+ *     view direction, initialized like a view set to that direction.
  */
 class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
 {
@@ -66,6 +78,7 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(EmptyNavEntry_GroupGoesWithItsLastLink);
   MITK_TEST(Apply_NotifiesSyncLinksOncePerLoad);
   MITK_TEST(Apply_ActiveCellIsFirstInDocumentOrder);
+  MITK_TEST(Apply_WithDataLoaded_CellsShowTheirDeclaredDirection);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -107,6 +120,15 @@ public:
     editor->SetDataStorage(m_DataStorage);
     editor->InitializeMultiWidget();
     return editor;
+  }
+
+  /** Pumps the event loop so a shown widget is laid out and rendered. */
+  static void Pump()
+  {
+    for (int i = 0; i < 20; ++i)
+    {
+      QCoreApplication::processEvents();
+    }
   }
 
   /** Single-window document skeleton; callers patch version / links / groups. */
@@ -422,6 +444,7 @@ public:
     const auto saved = editor->SerializeLayout();
     CPPUNIT_ASSERT_MESSAGE("Save declares the empty group", saved.at("groups").contains(id));
 
+    editor.reset();
     auto reloaded = MakeEditor();
     reloaded->ApplyLayout(saved);
     const auto infos = reloaded->GetSyncGroupInfos();
@@ -521,6 +544,7 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("A removed group cannot be recolored",
       editor->SetSyncGroupColor(removed, QColor("#ff0000")), mitk::Exception);
 
+    editor.reset();
     auto linkOnly = MakeEditor();
     linkOnly->ApplyLayout(LinkOnlyCosmeticsDoc());
     linkOnly->ClearSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
@@ -639,6 +663,75 @@ public:
     CPPUNIT_ASSERT(nullptr != active);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The first window of the document is active, not the first id in sort order",
                                  std::string("mxn__zeta"), active->GetWidgetName().toStdString());
+  }
+
+  void Apply_WithDataLoaded_CellsShowTheirDeclaredDirection()
+  {
+    // Every new cell initializes itself on construction from the loaded data,
+    // in its own default direction. The document's direction must replace that
+    // state completely: the plane, and the slice and camera fitted to it. The
+    // extents differ per axis, so a camera fitted for another direction shows.
+    auto image = mitk::ImageGenerator::GenerateGradientImage<short>(24, 16, 8, 1.0f, 1.0f, 1.0f);
+    auto imageNode = mitk::DataNode::New();
+    imageNode->SetName("image");
+    imageNode->SetData(image);
+    imageNode->SetIntProperty("layer", 2);
+    m_DataStorage->Add(imageNode);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 300);
+    editor->show();
+    Pump();
+
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__axial", "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__sagittal", "view_direction": "sagittal", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__coronal", "view_direction": "coronal", "links": { "selection": "main" } }
+      ] }
+    })json"));
+    Pump();
+
+    const std::pair<const char*, int> expectations[] = {
+      { "mxn__axial", 2 }, { "mxn__sagittal", 0 }, { "mxn__coronal", 1 }
+    };
+    for (const auto& [id, normalAxis] : expectations)
+    {
+      const std::string where = std::string(" (cell ") + id + ")";
+      auto* renderWindow = editor->GetRenderWindowWidget(QString::fromLatin1(id))->GetRenderWindow();
+      auto* renderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
+
+      auto normal = renderer->GetCurrentWorldPlaneGeometry()->GetNormal();
+      normal.Normalize();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The cell shows its declared direction" + where,
+                                           1.0, std::abs(normal[normalAxis]), 1e-6);
+
+      // A view freshly initialized in that direction is the reference for the
+      // slice and the camera.
+      auto* sliceNavigation = renderer->GetSliceNavigationController();
+      const auto slice = sliceNavigation->GetStepper()->GetPos();
+      auto* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+      const double parallelScale = camera->GetParallelScale();
+      double focalPoint[3];
+      camera->GetFocalPoint(focalPoint);
+
+      mitk::RenderingManager::GetInstance()->InitializeView(renderWindow->GetVtkRenderWindow(),
+                                                            sliceNavigation->GetInputWorldTimeGeometry());
+      Pump();
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The slice is the one a fresh view selects" + where,
+                                   sliceNavigation->GetStepper()->GetPos(), slice);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera is fitted to the declared direction" + where,
+                                           camera->GetParallelScale(), parallelScale, 1e-6);
+      double freshFocalPoint[3];
+      camera->GetFocalPoint(freshFocalPoint);
+      for (int i = 0; i < 3; ++i)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera is centered like a fresh view" + where,
+                                             freshFocalPoint[i], focalPoint[i], 1e-6);
+      }
+    }
   }
 };
 

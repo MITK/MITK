@@ -27,10 +27,35 @@ class MXNMULTIWIDGETEDITOR_EXPORT QmitkMxNMultiWidgetEditor final : public Qmitk
 
 public:
 
+  /** \brief ID of the stock MxN editor declaration. Other declarations of this
+   *         class use their own IDs; nothing in the editor compares against
+   *         this one. */
   static const QString EDITOR_ID;
 
   QmitkMxNMultiWidgetEditor();
   ~QmitkMxNMultiWidgetEditor() override;
+
+  /**
+  * \brief Reads the declaration's parameters before the part is created.
+  *
+  *   - 'widgetName': default the declaration's editor ID.
+  *   - 'layoutLock': see 'QmitkMxNParseLayoutLocks'; default none.
+  *   - 'initialLayout': a layout JSON file embedded in the declaring plugin,
+  *     path relative to it; default the widget's 1x1 default.
+  *
+  *   Locks and layout are starting values only; code can change both later
+  *   through the multi widget.
+  *
+  *   Never throws: an unknown parameter name, an invalid 'widgetName', an
+  *   invalid 'layoutLock', or an 'initialLayout' resource that is missing or
+  *   not valid JSON is logged and recorded. The editor then shows an error
+  *   panel naming the declaring plugin, the parameter and the problem instead of
+  *   the MxN display, because the Qt workbench shows nothing for a part that
+  *   fails to create.
+  */
+  void SetInitializationData(const berry::IConfigurationElement::Pointer& config,
+                             const QString& propertyName,
+                             const berry::Object::Pointer& data) override;
 
   QmitkLevelWindowWidget* GetLevelWindowWidget() const override { return nullptr; }
 
@@ -55,6 +80,11 @@ public:
    *         live state. */
   mitk::InteractionSchemeSwitcher::InteractionScheme GetInteractionScheme() const;
 
+  /** \brief Whether the declaration or applying its initial layout failed, or
+   *         another live MxN widget already uses the widget name. Such an
+   *         editor has no multi widget and shows an error panel instead. */
+  bool HasConfigurationErrors() const;
+
 private Q_SLOTS:
 
   void OnLayoutChanged();
@@ -76,6 +106,12 @@ private:
   * @brief Overridden from QmitkAbstractRenderEditor
   */
   void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
+
+  /** \brief Logs a configuration error and records it for the error panel. */
+  void RecordConfigurationError(const QString& parameter, const QString& problem);
+
+  /** \brief Shows 'reason' and the recorded errors in place of the MxN display. */
+  void ShowConfigurationErrors(QWidget* parent, const QString& reason);
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

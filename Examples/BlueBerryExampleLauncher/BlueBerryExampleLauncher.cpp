@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   appId += appIdTokens.size() > 1 ? appIdTokens.at(1) : appIdTokens.at(0);
 
   // Special cases
-  if (appId == "org.mitk.example.exampleplugins")
+  if (appId == "org.mitk.example.exampleplugins" || appId == "org.mitk.example.mxneditor")
   {
     appId = "org.mitk.qt.extapplication";
   }

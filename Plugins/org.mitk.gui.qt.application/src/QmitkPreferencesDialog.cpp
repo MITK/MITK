@@ -109,6 +109,17 @@ public:
       QString id = (*prefPagesIt)->GetAttribute("id");
       QString name = (*prefPagesIt)->GetAttribute("name");
       QString className = (*prefPagesIt)->GetAttribute("class");
+      if (className.isEmpty())
+      {
+        // Accept the same class declarations that CreateExecutableExtension("class")
+        // resolves when the page is opened: the attribute, or else the "class"
+        // attribute of the first <class> child (the executable-extension form
+        // that lets a page receive <parameter>s). Rejecting the child form here
+        // would hide such pages.
+        const auto classElements = (*prefPagesIt)->GetChildren("class");
+        if (!classElements.isEmpty())
+          className = classElements.front()->GetAttribute("class");
+      }
       if(!id.isEmpty() && !name.isEmpty() && !className.isEmpty())
       {
         QString keywordLabels;

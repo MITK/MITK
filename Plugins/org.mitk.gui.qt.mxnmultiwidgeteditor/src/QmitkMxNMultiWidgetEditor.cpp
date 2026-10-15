@@ -17,9 +17,15 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkLog.h>
 
+#include <berryIContributor.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchPartConstants.h>
+#include <berryObjectString.h>
+#include <berryObjectStringMap.h>
+#include <berryPlatform.h>
 #include <berryUIException.h>
+
+#include <ctkPlugin.h>
 
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>
@@ -27,6 +33,8 @@ found in the LICENSE file.
 
 // qt
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QPointer>
 
 // c++
 #include <optional>
@@ -46,6 +54,22 @@ struct QmitkMxNMultiWidgetEditor::Impl final
 
   /** Empty until the preferences have been read for the first time. */
   std::optional<bool> m_PACSInteraction;
+
+  // Read from the declaration in SetInitializationData.
+  QString m_EditorId;
+  QString m_DeclaringPlugin;
+  QString m_WidgetName;
+  QmitkMxNLayoutLocks m_LayoutLocks;
+  std::optional<nlohmann::json> m_InitialLayout;
+
+  /** Non-empty puts the editor into its error state: no multi widget. */
+  QStringList m_ConfigurationErrors;
+
+  /** The multi widget this editor created. Deleted with the editor because
+   *  the workbench pane that parents it can outlive the editor, and the
+   *  widget's name and render windows must be released when the editor
+   *  goes. Guarded because the pane may also delete it first. */
+  QPointer<QmitkMxNMultiWidget> m_OwnedMultiWidget;
 };
 
 QmitkMxNMultiWidgetEditor::Impl::Impl()
@@ -68,6 +92,7 @@ QmitkMxNMultiWidgetEditor::QmitkMxNMultiWidgetEditor()
 QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 {
   GetSite()->GetPage()->RemovePartListener(this);
+  delete m_Impl->m_OwnedMultiWidget;
 }
 
 berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
@@ -77,9 +102,120 @@ berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes
   return Events::OPENED;
 }
 
+void QmitkMxNMultiWidgetEditor::SetInitializationData(const berry::IConfigurationElement::Pointer& config,
+                                                      const QString& propertyName,
+                                                      const berry::Object::Pointer& data)
+{
+  QmitkAbstractMultiWidgetEditor::SetInitializationData(config, propertyName, data);
+
+  // The site, and with it the part ID, is not set yet; the declaring element
+  // carries the editor ID.
+  m_Impl->m_EditorId = config->GetAttribute("id");
+  m_Impl->m_DeclaringPlugin = config->GetContributor()->GetName();
+
+  // The editor ID as default makes widget names unique without a naming rule.
+  m_Impl->m_WidgetName = m_Impl->m_EditorId;
+  bool widgetNameDeclared = false;
+
+  QHash<QString, QString> parameters;
+  if (auto parameterMap = dynamic_cast<const berry::ObjectStringMap*>(data.GetPointer()))
+  {
+    parameters = *parameterMap;
+  }
+  else if (data.IsNotNull())
+  {
+    // The colon form 'class="Cls:data"' carries no parameter names.
+    const auto value = dynamic_cast<const berry::ObjectString*>(data.GetPointer());
+    this->RecordConfigurationError(propertyName,
+      QStringLiteral("'%1' carries unnamed data '%2'; declare <parameter> children of a <class> element instead.")
+        .arg(config->GetAttribute(propertyName), nullptr != value ? QString(*value) : QString()));
+  }
+
+  for (auto it = parameters.cbegin(); it != parameters.cend(); ++it)
+  {
+    const auto& name = it.key();
+    const auto& value = it.value();
+
+    if (name == QLatin1String("widgetName"))
+    {
+      m_Impl->m_WidgetName = value;
+      widgetNameDeclared = true;
+    }
+    else if (name == QLatin1String("layoutLock"))
+    {
+      try
+      {
+        m_Impl->m_LayoutLocks = QmitkMxNParseLayoutLocks(value);
+      }
+      catch (const mitk::Exception& e)
+      {
+        this->RecordConfigurationError(name, QString::fromStdString(e.GetDescription()));
+      }
+    }
+    else if (name == QLatin1String("initialLayout"))
+    {
+      const auto plugin = berry::Platform::GetPlugin(m_Impl->m_DeclaringPlugin);
+      const auto content = nullptr != plugin ? plugin->getResource(value) : QByteArray();
+      if (content.isEmpty())
+      {
+        this->RecordConfigurationError(name,
+          QStringLiteral("resource '%1' is missing or empty in plugin '%2'.").arg(value, m_Impl->m_DeclaringPlugin));
+        continue;
+      }
+      try
+      {
+        m_Impl->m_InitialLayout = nlohmann::json::parse(content.cbegin(), content.cend());
+      }
+      catch (const nlohmann::json::parse_error& e)
+      {
+        this->RecordConfigurationError(name,
+          QStringLiteral("resource '%1' is not valid JSON: %2").arg(value, QString::fromUtf8(e.what())));
+      }
+    }
+    else
+    {
+      // A typo such as 'layoutLocks' would otherwise yield a silently unlocked
+      // editor.
+      this->RecordConfigurationError(name,
+        QStringLiteral("unknown parameter (value '%1'); expected 'widgetName', 'layoutLock' or 'initialLayout'.")
+          .arg(value));
+    }
+  }
+
+  if (!QmitkMxNIsValidMultiWidgetName(m_Impl->m_WidgetName))
+  {
+    const auto rule = QStringLiteral("a widget name must start with a letter and contain only [A-Za-z0-9.-].");
+    this->RecordConfigurationError(QStringLiteral("widgetName"), widgetNameDeclared
+      ? QStringLiteral("'%1' is not valid; %2").arg(m_Impl->m_WidgetName, rule)
+      : QStringLiteral("not declared, and the editor ID it defaults to is not valid; %1").arg(rule));
+  }
+}
+
+void QmitkMxNMultiWidgetEditor::RecordConfigurationError(const QString& parameter, const QString& problem)
+{
+  const auto message = QStringLiteral("Editor '%1' declared by plugin '%2', parameter '%3': %4")
+    .arg(m_Impl->m_EditorId, m_Impl->m_DeclaringPlugin, parameter, problem);
+  MITK_ERROR << message.toStdString();
+  m_Impl->m_ConfigurationErrors.append(message);
+}
+
+void QmitkMxNMultiWidgetEditor::ShowConfigurationErrors(QWidget* parent, const QString& reason)
+{
+  auto* label = new QLabel(parent);
+  label->setTextFormat(Qt::PlainText);
+  label->setWordWrap(true);
+  label->setAlignment(Qt::AlignCenter);
+  label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  label->setText(reason + QStringLiteral("\n\n") + m_Impl->m_ConfigurationErrors.join(QStringLiteral("\n")));
+  parent->layout()->addWidget(label);
+}
+
 void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  // Identity, not the part ID: several declarations of this class have
+  // different IDs, and an ID comparison would also fire for another instance
+  // of the same declaration.
+  if (partRef->GetPart(false).GetPointer() == this)
   {
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
@@ -102,6 +238,10 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
 void QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
   m_Impl->m_InteractionScheme = scheme;
+  if (nullptr == m_Impl->m_InteractionSchemeToolBar)
+  {
+    return;
+  }
   m_Impl->m_InteractionSchemeToolBar->setVisible(QmitkAbstractMultiWidget::IsPACSScheme(scheme));
   m_Impl->m_InteractionSchemeToolBar->SetInteractionScheme(scheme);
 }
@@ -110,6 +250,11 @@ mitk::InteractionSchemeSwitcher::InteractionScheme
 QmitkMxNMultiWidgetEditor::GetInteractionScheme() const
 {
   return m_Impl->m_InteractionScheme;
+}
+
+bool QmitkMxNMultiWidgetEditor::HasConfigurationErrors() const
+{
+  return !m_Impl->m_ConfigurationErrors.isEmpty();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,39 +274,72 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   QHBoxLayout *layout = new QHBoxLayout(parent);
   layout->setContentsMargins(0, 0, 0, 0);
 
+  const auto invalidDeclaration = QStringLiteral("This display cannot be shown because its declaration is invalid.");
+  if (!m_Impl->m_ConfigurationErrors.isEmpty())
+  {
+    this->ShowConfigurationErrors(parent, invalidDeclaration);
+    return;
+  }
+
   auto* preferences = this->GetPreferences();
 
+  // Locks are set before InitializeMultiWidget creates the first cell, so no
+  // cell is ever shown unlocked. The initial layout is applied before the
+  // widget is registered anywhere, so a failing one can be undone by deleting
+  // the widget: nothing outside this method has seen it. The constructor
+  // rejects a name another live widget already uses.
+  QmitkMxNMultiWidget* multiWidget = nullptr;
+  try
+  {
+    multiWidget = new QmitkMxNMultiWidget(parent, {}, m_Impl->m_WidgetName);
+  }
+  catch (const QmitkMxNWidgetNameInUseException& e)
+  {
+    this->RecordConfigurationError(QStringLiteral("widgetName"), QString::fromStdString(e.GetDescription()));
+    this->ShowConfigurationErrors(parent,
+      QStringLiteral("This display cannot be shown because another open MxN display already uses its widget name."));
+    return;
+  }
+  multiWidget->SetDataStorage(this->GetDataStorage());
+  multiWidget->SetLayoutLocks(m_Impl->m_LayoutLocks);
+  multiWidget->InitializeMultiWidget();
+  if (m_Impl->m_InitialLayout.has_value())
+  {
+    try
+    {
+      multiWidget->ApplyLayout(*m_Impl->m_InitialLayout);
+    }
+    catch (const mitk::Exception& e)
+    {
+      delete multiWidget;
+      this->RecordConfigurationError(QStringLiteral("initialLayout"), QString::fromStdString(e.GetDescription()));
+      this->ShowConfigurationErrors(parent, invalidDeclaration);
+      return;
+    }
+    m_Impl->m_InitialLayout.reset();
+  }
+
   // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
-  if (nullptr == m_Impl->m_InteractionSchemeToolBar)
-  {
-    m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
-    // Keeps the tool bar from showing before the applied scheme is known; the
-    // sync at the end of this method decides whether it stays hidden.
-    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
-    layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
+  m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
+  // Keeps the tool bar from showing before the applied scheme is known; the
+  // sync at the end of this method decides whether it stays hidden.
+  m_Impl->m_InteractionSchemeToolBar->setVisible(false);
+  layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
 
-    // The tool bar only requests a scheme; the multi widget reports back what it
-    // applied. Keeping the two directions apart is what lets the tool bars follow
-    // scheme changes that did not originate from them.
-    connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
-      this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
-  }
+  // The tool bar only requests a scheme; the multi widget reports back what it
+  // applied. Keeping the two directions apart is what lets the tool bars follow
+  // scheme changes that did not originate from them.
+  connect(m_Impl->m_InteractionSchemeToolBar, &QmitkInteractionSchemeToolBar::InteractionSchemeChanged,
+    this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
 
-  auto multiWidget = GetMultiWidget();
-  if (nullptr == multiWidget)
-  {
-    multiWidget = new QmitkMxNMultiWidget(parent);
-
-    multiWidget->SetDataStorage(GetDataStorage());
-    multiWidget->InitializeMultiWidget();
-    SetMultiWidget(multiWidget);
-    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutChanged,
-      this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
-    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutEditorRequested,
-      this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
-    connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
-      this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied);
-  }
+  m_Impl->m_OwnedMultiWidget = multiWidget;
+  this->SetMultiWidget(multiWidget);
+  connect(multiWidget, &QmitkMxNMultiWidget::LayoutChanged,
+    this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
+  connect(multiWidget, &QmitkMxNMultiWidget::LayoutEditorRequested,
+    this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
+  connect(multiWidget, &QmitkAbstractMultiWidget::InteractionSchemeChanged,
+    this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied);
 
   layout->addWidget(multiWidget);
 

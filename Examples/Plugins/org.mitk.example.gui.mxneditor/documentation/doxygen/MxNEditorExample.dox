@@ -1,0 +1,28 @@
+/**
+
+\page BlueBerryExampleMxNEditor A Plugin-Owned MxN Editor
+
+  \brief An example plug-in that declares its own MxN editor and drives it from code.
+
+  The plug-in declares the editor `org.mitk.example.editors.mxndemo` with the stock
+  editor class `QmitkMxNMultiWidgetEditor`, fully locked and with a two-cell layout
+  embedded in the plug-in. It runs next to the stock MxN display without sharing its
+  state. Start it from the example launcher with the `MxNEditor` configuration.
+
+  The declaration in `plugin.xml` sets the editor's starting locks and layout, and adds a
+  "MxN Demo Display" preference page for the editor's own preference node. The
+  "MxN Demo" view shows the programmatic path next to it:
+  - "Open demo display" opens the editor by its ID;
+  - one checkbox per lock aspect changes the locks live and follows lock changes made
+    elsewhere;
+  - "Switch layout" applies a second layout embedded in the plug-in, which works with
+    every lock set, because locks never block code.
+
+  The view holds the editor's multi widget only as a guarded pointer and looks it up again
+  on part events, because a reopened editor builds a new widget.
+
+  See \ref MxNConceptPage_PluginEditors for the declaration, its parameters, the lock
+  aspects and how the generic MxN tooling treats such an editor.
+
+  [\ref BlueBerryExamples]
+*/

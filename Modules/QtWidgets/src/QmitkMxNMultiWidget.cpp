@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QProgressBar>
 #include <QRegularExpression>
 #include <QScopedValueRollback>
+#include <QSet>
 #include <QShortcut>
 #include <QSplitter>
 #include <QTimer>
@@ -68,6 +69,13 @@ found in the LICENSE file.
 
 namespace
 {
+  // Names of the live widgets; the GUI is single-threaded.
+  QSet<QString>& LiveMultiWidgetNames()
+  {
+    static QSet<QString> names;
+    return names;
+  }
+
   // Where per-cell construction sits on the load dialog's bar; the ends leave
   // room for the teardown before it and the group wiring after.
   constexpr int LoadPercentCellsBegin = 15;
@@ -431,6 +439,41 @@ namespace
 
 }  // namespace
 
+QmitkMxNLayoutLocks QmitkMxNParseLayoutLocks(const QString& tokens)
+{
+  QmitkMxNLayoutLocks locks;
+  if (tokens.trimmed().isEmpty())
+  {
+    return locks;
+  }
+
+  for (const auto& rawToken : tokens.split(QLatin1Char(',')))
+  {
+    const auto token = rawToken.trimmed();
+    if (token == QLatin1String("structure"))
+      locks |= QmitkMxNLayoutLock::Structure;
+    else if (token == QLatin1String("direction"))
+      locks |= QmitkMxNLayoutLock::Direction;
+    else if (token == QLatin1String("proportions"))
+      locks |= QmitkMxNLayoutLock::Proportions;
+    else if (token == QLatin1String("content"))
+      locks |= QmitkMxNLayoutLock::Content;
+    else
+    {
+      mitkThrow() << "Unknown layout lock token '" << token.toStdString() << "' in '"
+                  << tokens.toStdString()
+                  << "' (expected a comma-separated list of 'structure', 'direction', "
+                  << "'proportions', 'content').";
+    }
+  }
+  return locks;
+}
+
+bool QmitkMxNIsValidMultiWidgetName(const QString& name)
+{
+  return EDITOR_NAME_PATTERN.match(name).hasMatch();
+}
+
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
@@ -440,7 +483,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   // Reject malformed names at construction; once stored, an `_` in the
   // editor name would later produce schema-invalid ids or break the
   // first-`__` split rule that separates editor-name from bare-id segments.
-  if (!EDITOR_NAME_PATTERN.match(multiWidgetName).hasMatch())
+  if (!QmitkMxNIsValidMultiWidgetName(multiWidgetName))
   {
     mitkThrow() << "QmitkMxNMultiWidget: multiWidgetName '"
                 << multiWidgetName.toStdString()
@@ -448,6 +491,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                 << EDITOR_NAME_PATTERN.pattern().toStdString()
                 << "'. Editor names must start with a letter, contain no '_', "
                 << "and use only the alphabet [A-Za-z0-9.-].";
+  }
+
+  if (LiveMultiWidgetNames().contains(multiWidgetName))
+  {
+    mitkThrowException(QmitkMxNWidgetNameInUseException)
+      << "An MxN widget named '" << multiWidgetName.toStdString()
+      << "' already exists; its render-window IDs would collide.";
   }
 
   // A cell's frame carries its group identity (mono group hue, else neutral),
@@ -506,6 +556,10 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
           this, &QmitkMxNMultiWidget::RefreshSyncPeekPlates);
   connect(this, &QmitkMxNMultiWidget::LayoutChanged,
           m_ArrangeMode, &QmitkMxNArrangeMode::PruneToExistingCells);
+
+  // Last, so that a throw above leaves no entry behind: the destructor that
+  // would remove it does not run for a widget whose constructor threw.
+  LiveMultiWidgetNames().insert(multiWidgetName);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -515,6 +569,8 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
   {
     this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
   }
+
+  LiveMultiWidgetNames().remove(this->GetMultiWidgetName());
 }
 
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
@@ -587,7 +643,10 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   auto displayActionEventHandler = this->GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
+    // The prefix only scopes the sender-only fallback actions the handler
+    // installs for a dimension without a predicate. With the delimiter, a
+    // widget named 'mxn' cannot match the windows of a widget named 'mxn2'.
+    displayActionEventHandler->InitActions((this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString());
   }
 }
 
@@ -1061,7 +1120,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // ApplyLayout can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
   const auto id = prefix + QString::number(i);
-  auto renderWindowWidget = this->CreateRenderWindowWidget(id);
+  auto renderWindowWidget = this->CreateRenderWindowWidget(id, mitk::AnatomicalPlane::Sagittal);
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
 
   // The default group (engine index 1) synchronizes the appearance axes by
@@ -1081,7 +1140,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   return renderWindowWidget;
 }
 
-QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& id)
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& id,
+                                              mitk::AnatomicalPlane viewDirection)
 {
   if (id.isEmpty())
   {
@@ -1113,7 +1173,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   m_CellBorderColors.erase(id);
   this->TickLayoutLoadFeedbackCell();
 
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(
+    this, id, this->GetDataStorage(), viewDirection);
   // The cell's plane label is drawn by the Qt overlay in the same layer as the
   // slice readout (so the two align); the VTK corner annotation, which would
   // otherwise show the internal cell id, is blanked to avoid a second, stale
@@ -1216,6 +1277,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
             }
             this->OnSyncPeekHovered(overStrip, axis);
           });
+
+  this->ApplyLayoutLocksToCell(*renderWindowWidget);
 
   // The Synchronize macro covers every cell of the editor, including cells
   // created while it is active - not only those present at toggle time.
@@ -1393,7 +1456,10 @@ void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
     return;
   }
 
-  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* split)
+  // Every rebuild of the splitter tree ends here, so this is where the
+  // Proportions lock reaches handles that did not exist before.
+  const bool handlesEnabled = !m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Proportions);
+  std::function<void(QSplitter*)> walk = [this, &walk, handlesEnabled](QSplitter* split)
   {
     // Signal to signal, and deliberately not a lambda: Qt honours
     // Qt::UniqueConnection only for member-function connections, so a functor
@@ -1407,6 +1473,7 @@ void QmitkMxNMultiWidget::ConfigureLayoutSplitters()
 
     for (int i = 0; i < split->count(); ++i)
     {
+      split->handle(i)->setEnabled(handlesEnabled);
       if (auto* sub = dynamic_cast<QSplitter*>(split->widget(i)))
       {
         walk(sub);
@@ -2145,12 +2212,10 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
         const auto groupName = LinkTarget(child["links"]["selection"]);
         const auto targetIdx = nameToInt.at(groupName);
 
-        auto window = this->CreateRenderWindowWidget(id);
+        auto window = this->CreateRenderWindowWidget(id, viewDirection);
         // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
-        window->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
-        window->GetSliceNavigationController()->Update();
         // Optional display label (free-form, non-unique). Pre-walk has
         // already validated type and non-emptiness.
         if (child.contains("name"))
@@ -2792,6 +2857,49 @@ bool QmitkMxNMultiWidget::IsApplyingLayout() const
   return m_ApplyingLayout || m_LayoutLoadPending;
 }
 
+void QmitkMxNMultiWidget::SetLayoutLocks(QmitkMxNLayoutLocks locks)
+{
+  if (locks == m_LayoutLocks)
+  {
+    return;
+  }
+
+  // Locks gate only the user-facing seams (cell chrome, the cell overlay's
+  // menus and plane label, the splitter handles, the layout editor view),
+  // never the mutating API: ApplyLayout and the plugin owning the widget call
+  // those same setters, and both must keep working on a locked widget.
+  const auto changed = m_LayoutLocks ^ locks;
+  m_LayoutLocks = locks;
+
+  // Maximize-hidden cells stay in the map, so they are re-gated as well.
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    this->ApplyLayoutLocksToCell(*cell);
+  }
+  if (changed.testFlag(QmitkMxNLayoutLock::Proportions))
+  {
+    this->ConfigureLayoutSplitters();
+  }
+
+  emit LayoutLocksChanged(m_LayoutLocks);
+}
+
+void QmitkMxNMultiWidget::ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell)
+{
+  auto* utility = cell.GetUtilityWidget();
+  if (nullptr == utility)
+  {
+    return;
+  }
+  utility->SetSyncBarcodeClickable(!m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Structure));
+  utility->SetDataSelectionVisible(!m_LayoutLocks.testFlag(QmitkMxNLayoutLock::Content));
+}
+
+QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const
+{
+  return m_LayoutLocks;
+}
+
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
   // Tear the existing cell tree down first rather than recycling 'widget<i>'
@@ -2823,11 +2931,9 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       // initial seeding into group 1 followed by an immediate move.
       const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER
                       + QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(id);
+      auto window = this->CreateRenderWindowWidget(id, viewPlane);
       this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
 
-      window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
-      window->GetSliceNavigationController()->Update();
       auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
       node->SetVisibility(true, baseRenderer);
       mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());

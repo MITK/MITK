@@ -40,6 +40,13 @@ mitkAddCustomModuleTest(QmitkMxNLayoutV3Test QmitkMxNLayoutV3Test
   -platform minimal
 )
 
+# The example plugin's layouts are read from the source tree, so they are
+# checked even when the examples are not built.
+mitkAddCustomModuleTest(QmitkMxNLayoutLockTest QmitkMxNLayoutLockTest
+  -platform minimal
+  ${MITK_SOURCE_DIR}/Examples/Plugins/org.mitk.example.gui.mxneditor/resources
+)
+
 mitkAddCustomModuleTest(QmitkMxNGridOpsTest QmitkMxNGridOpsTest
   -platform minimal
 )

@@ -481,7 +481,14 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   for (int preset = 0; preset < presetNames.size(); ++preset)
   {
     connect(presetMenu->addAction(presetNames[preset]), &QAction::triggered, this,
-            [this, preset]() { m_LayoutSelection->ApplyPreset(preset); });
+            [this, preset]()
+            {
+              if (nullptr == m_MultiWidget)
+              {
+                return;
+              }
+              m_LayoutSelection->ApplyPreset(preset, m_MultiWidget->GetMultiWidgetName());
+            });
   }
   presetButton->setMenu(presetMenu);
   presetButton->setEnabled(!presetNames.isEmpty());
@@ -1863,7 +1870,9 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
       const auto text = QInputDialog::getText(
         this, tr("Rename group"), tr("Display name:"), QLineEdit::Normal,
         QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(groupId)), &ok);
-      if (ok)
+      // The modal runs an event loop in which the widget can be unbound, e.g.
+      // by its plugin locking the structure, or closed.
+      if (ok && !m_MultiWidget.isNull())
       {
         try
         {

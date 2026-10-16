@@ -247,7 +247,7 @@ public:
    *   Superseded for new code: the MxN editor's v2 layout pipeline registers
    *   render windows by the explicit 'name' field carried in the layout
    *   document (see 'QmitkMxNMultiWidget::CreateRenderWindowWidget(const
-   *   QString&)'). New consumers should look up windows by the registered
+   *   QString&, mitk::AnatomicalPlane)'). New consumers should look up windows by the registered
    *   qualified name (via 'GetRenderWindowWidget(const QString&)') rather than
    *   reconstructing it from a positional index.
    *

@@ -398,6 +398,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(Windows(doc).dump(), Windows(saved).dump());
 
     // And the saved document loads into the same state.
+    // The saved ids carry the name "mxn", which only one live widget may hold.
+    m_Editor.reset();
     auto other = this->MakeEditor("mxn");
     other->ApplyLayout(saved);
     CPPUNIT_ASSERT_EQUAL(saved.dump(), other->SerializeLayout().dump());
@@ -725,6 +727,8 @@ public:
     CPPUNIT_ASSERT(ViewDirection::Axial == m_Editor->GetViewDirection(CellId(1)));
 
     const auto saved = m_Editor->SerializeLayout();
+    // The saved ids carry the name "mxn", which only one live widget may hold.
+    m_Editor.reset();
     auto other = this->MakeEditor("mxn");
     CPPUNIT_ASSERT_NO_THROW(other->ApplyLayout(saved));
   }

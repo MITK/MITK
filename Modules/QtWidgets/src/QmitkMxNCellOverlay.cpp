@@ -397,6 +397,15 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
     }
   });
 
+  // The plane label's hover highlight and its share of the input mask follow
+  // the Direction lock, and both are otherwise only refreshed by pointer
+  // movement.
+  connect(m_Editor, &QmitkMxNMultiWidget::LayoutLocksChanged, this, [this]()
+  {
+    this->UpdateInteractivity();
+    this->update();
+  });
+
   // The interactive furniture reveals as one coordinated frame (opacity +
   // offset), not region by region; the proximity controller supplies the
   // collapse delay and hysteresis, this only the easing.
@@ -1300,6 +1309,11 @@ void QmitkMxNCellOverlay::ApplyNavigatorRow(const NavRow& row, double normalized
   }
 }
 
+bool QmitkMxNCellOverlay::IsLocked(QmitkMxNLayoutLock lock) const
+{
+  return m_Editor->GetLayoutLocks().testFlag(lock);
+}
+
 void QmitkMxNCellOverlay::UpdateInteractivity()
 {
   using State = QmitkRenderWindowProximity::State;
@@ -1308,9 +1322,12 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
   // pointer (colorbar drag, colormap chip, W/L click, plane-label click, or
   // the navigator sliders); everywhere else the overlay stays transparent so
   // VTK is never shadowed.
+  // A locked plane label offers no click, so it must not take input from VTK.
+  const bool planeLabelInteractive = m_PlaneLabelState == State::Active
+                                     && !this->IsLocked(QmitkMxNLayoutLock::Direction);
   const bool interactive = !m_CleanView
     && (m_RibbonState == State::Active || m_WindowLevelState == State::Active
-        || m_PlaneLabelState == State::Active || m_BottomState == State::Active
+        || planeLabelInteractive || m_BottomState == State::Active
         || m_DragMode != DragMode::None || m_NavDragRow >= 0);
 
   if (!interactive)
@@ -1577,7 +1594,10 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     {
       // Highlights opaque on hover to advertise it is clickable (reorient).
       painter.setFont(readoutFont);
-      painter.setPen(m_Hover == HoverTarget::PlaneLabel ? ActiveText : IdleText);
+      // m_Hover is cached from the last pointer move, so the lock is checked
+      // here as well to drop the highlight at once on a live lock.
+      painter.setPen(m_Hover == HoverTarget::PlaneLabel && !this->IsLocked(QmitkMxNLayoutLock::Direction)
+                       ? ActiveText : IdleText);
       painter.drawText(this->PlaneLabelRect(), Qt::AlignLeft | Qt::AlignVCenter, planeLabel);
     }
 
@@ -2013,7 +2033,7 @@ void QmitkMxNCellOverlay::mousePressEvent(QMouseEvent* event)
     return;
   }
   if (event->button() == Qt::LeftButton && !this->ResolvePlaneLabel().isEmpty()
-      && this->PlaneLabelRect().contains(position))
+      && !this->IsLocked(QmitkMxNLayoutLock::Direction) && this->PlaneLabelRect().contains(position))
   {
     event->accept();
     this->OpenDirectionPicker(event->globalPosition().toPoint());
@@ -2086,6 +2106,8 @@ QmitkMxNCellOverlay::HoverTarget QmitkMxNCellOverlay::HoverAt(const QPoint& pos)
   {
     return HoverTarget::WindowLevel;
   }
+  // The Direction lock is applied where the label is painted and clicked, so
+  // the hover target survives a live lock or unlock under a resting pointer.
   if (this->PlaneLabelRect().contains(pos))
   {
     return HoverTarget::PlaneLabel;
@@ -2651,6 +2673,12 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
     const auto planeValue = plane;
     connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
     {
+      // QMenu::exec runs a nested event loop, so the owning plugin can lock
+      // while the menu is open.
+      if (this->IsLocked(QmitkMxNLayoutLock::Direction))
+      {
+        return;
+      }
       try
       {
         m_Editor->SetViewDirection(windowId, planeValue);
@@ -3478,7 +3506,12 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
 {
   const auto windowId = m_Cell->GetWidgetName();
 
-  this->PopulateDirectionMenu(menu->addMenu(tr("View direction")));
+  // Locked entries are left out rather than disabled: they are not this
+  // display's to offer.
+  if (!this->IsLocked(QmitkMxNLayoutLock::Direction))
+  {
+    this->PopulateDirectionMenu(menu->addMenu(tr("View direction")));
+  }
 
   // The furniture's own entry points - the Data button, the W/L readout, the
   // navigator's coordinate line - are pointer-only and hidden until revealed;
@@ -3486,17 +3519,25 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
   // popup of its own, so it waits until this menu has closed.
   menu->addSeparator();
 
-  auto* dataAction = menu->addAction(tr("Data..."));
-  connect(dataAction, &QAction::triggered, this, [this, globalPosition]()
+  if (!this->IsLocked(QmitkMxNLayoutLock::Content))
   {
-    QTimer::singleShot(0, this, [this, globalPosition]()
+    auto* dataAction = menu->addAction(tr("Data..."));
+    connect(dataAction, &QAction::triggered, this, [this, globalPosition]()
     {
-      if (auto* utilityWidget = m_Cell->GetUtilityWidget(); nullptr != utilityWidget)
+      QTimer::singleShot(0, this, [this, globalPosition]()
       {
-        utilityWidget->ShowDataSelection(globalPosition);
-      }
+        // A lock can land between the menu closing and this deferred call.
+        if (this->IsLocked(QmitkMxNLayoutLock::Content))
+        {
+          return;
+        }
+        if (auto* utilityWidget = m_Cell->GetUtilityWidget(); nullptr != utilityWidget)
+        {
+          utilityWidget->ShowDataSelection(globalPosition);
+        }
+      });
     });
-  });
+  }
 
   if (m_Editor->IsAxisApplicable(windowId, QmitkMxNSyncAxis::Windowing))
   {
@@ -3605,11 +3646,14 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
 
   menu->addSeparator();
 
-  auto* editorAction = menu->addAction(tr("Open layout editor"));
-  connect(editorAction, &QAction::triggered, this, [this]()
+  if (!this->IsLocked(QmitkMxNLayoutLock::Structure))
   {
-    m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
-  });
+    auto* editorAction = menu->addAction(tr("Open layout editor"));
+    connect(editorAction, &QAction::triggered, this, [this]()
+    {
+      m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
+    });
+  }
 
   auto* expandedNavigatorAction = menu->addAction(tr("Expanded navigator"));
   expandedNavigatorAction->setCheckable(true);

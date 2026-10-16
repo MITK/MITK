@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QmitkSynchronizedWidgetConnector.h>
 
 // mitk core
+#include <mitkAnatomicalPlanes.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkException.h>
 #include <mitkVector.h>
@@ -86,6 +87,68 @@ public:
 };
 
 /**
+* \brief Thrown by the 'QmitkMxNMultiWidget' constructor when another MxN widget
+*        with the same name is alive: render-window IDs derive from the name,
+*        so the two would share cell IDs and per-cell renderer properties.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNWidgetNameInUseException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNWidgetNameInUseException, mitk::Exception);
+};
+
+/**
+* \brief A user-facing interaction that can be locked on an MxN widget.
+*
+*   'Direction', 'Proportions' and 'Content' gate only the widget's own chrome.
+*   'Structure' also keeps the MxN Layout Editor view away; without it, the view
+*   replaces whole layouts and so still changes what the other locks cover.
+*   Programmatic calls ('ApplyLayout', 'SetSyncLink', 'SetViewDirection', node
+*   selection, ...) are never blocked, so the plugin that owns a locked widget
+*   keeps full control.
+*/
+enum class QmitkMxNLayoutLock
+{
+  /** Grid shape, synchronization and selection groups, sync links, and layout
+      load: everything the Layout Editor view and arrange mode change. The view
+      does not bind to the widget and the widget does not request it. */
+  Structure = 0x1,
+  /** A cell's view direction through the cell's own chrome (context menu and
+      plane label). Without 'Structure', the Layout Editor view can still change
+      directions through a grid change, a data-based layout or a layout load. */
+  Direction = 0x2,
+  /** The proportions between cells through the splitter handles. Without
+      'Structure', the Layout Editor view can still change them through a grid
+      change, a data-based layout or a layout load. */
+  Proportions = 0x4,
+  /** The data a cell shows through the cell's own chrome (its node selection,
+      which propagates to its selection group). Without 'Structure', the Layout
+      Editor view can still change content through a data-based layout or a
+      layout load. */
+  Content = 0x8
+};
+Q_DECLARE_FLAGS(QmitkMxNLayoutLocks, QmitkMxNLayoutLock)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QmitkMxNLayoutLocks)
+
+/**
+* \brief Parses a comma-separated list of lock tokens ('structure', 'direction',
+*        'proportions', 'content').
+*
+*   Tokens are trimmed and case-sensitive; an empty or blank string yields no
+*   lock.
+*
+* \throws mitk::Exception on an unknown or empty token (e.g. "structure,,").
+*/
+MITKQTWIDGETS_EXPORT QmitkMxNLayoutLocks QmitkMxNParseLayoutLocks(const QString& tokens);
+
+/**
+* \brief True if 'name' is accepted as an MxN multi-widget name, i.e. it matches
+*        '^[A-Za-z][A-Za-z0-9.-]*$'. The same check the 'QmitkMxNMultiWidget'
+*        constructor enforces.
+*/
+MITKQTWIDGETS_EXPORT bool QmitkMxNIsValidMultiWidgetName(const QString& name);
+
+/**
 * \brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
 *        is done by using the 'SetLayout'-function to define a layout. This will automatically add or remove
@@ -102,6 +165,16 @@ class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
 
 public:
 
+  /**
+  * \param parent Parent widget.
+  * \param f Window flags, as for QWidget.
+  * \param multiWidgetName Prefix of every render-window ID of this widget; must
+  *        satisfy 'QmitkMxNIsValidMultiWidgetName' and be unique among the MxN
+  *        widgets alive at the same time.
+  * \throws mitk::Exception if 'multiWidgetName' is not a valid name.
+  * \throws QmitkMxNWidgetNameInUseException if another live MxN widget already
+  *         uses 'multiWidgetName'.
+  */
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = {},
                       const QString& multiWidgetName = "mxn");
@@ -990,6 +1063,8 @@ public:
   *            "mxn__alpha"). Must be non-empty, must start with
   *            `<multiWidgetName>__`, and must not collide with an existing
   *            render-window in this editor.
+  * \param viewDirection  The view direction the cell is created and initialized
+  *            in.
   *
   * \return  Shared pointer to the newly constructed render-window widget.
   *
@@ -999,7 +1074,7 @@ public:
   *
   * \throws mitk::Exception on precondition violation.
   */
-  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& id);
+  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& id, mitk::AnatomicalPlane viewDirection);
 
   /**
   * \brief Serialize the current layout tree to a v3.0 JSON document
@@ -1144,6 +1219,18 @@ public:
   *   is true.
   */
   bool IsApplyingLayout() const;
+
+  /**
+  * \brief Sets the interactions users cannot perform on this widget.
+  *
+  *   Takes effect at once in every existing cell and in cells created later;
+  *   may be called at any time, before or after 'InitializeMultiWidget'. Emits
+  *   'LayoutLocksChanged' only if the set changes.
+  */
+  void SetLayoutLocks(QmitkMxNLayoutLocks locks);
+
+  /** \brief The interactions currently locked for users on this widget. */
+  QmitkMxNLayoutLocks GetLayoutLocks() const;
 
   /**
   * \brief True (and 'rows' / 'columns' filled) when the current layout is a
@@ -1310,6 +1397,9 @@ Q_SIGNALS:
   */
   void LayoutEditorRequested(QmitkMxNMultiWidget::LayoutEditorRequest request);
 
+  /** \brief The lock set changed; 'locks' is the new set. */
+  void LayoutLocksChanged(QmitkMxNLayoutLocks locks);
+
 protected:
 
   /**
@@ -1414,6 +1504,15 @@ private:
   void ConfigureLayoutSplitters();
 
   /**
+  * \brief Applies the current layout locks to one cell's chrome (sync barcode
+  *        click, Data button).
+  *
+  *   Cell creation and 'SetLayoutLocks' both go through here, so a cell
+  *   created later and a cell re-gated by a live change end up alike.
+  */
+  void ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell);
+
+  /**
   * \brief Tear down a single cell during grid surgery: capture its selection
   *        group index (before removal, see below), remove it from the
   *        render-window registry, erase its 'm_CellSyncLinks' entry, and reclaim
@@ -1478,7 +1577,7 @@ private:
   * \brief Recursive constructor for a 'split' subtree. Returns a freshly
   *        allocated QSplitter with the cell tree below.
   *
-  *   Window leaves are created via 'CreateRenderWindowWidget(id)' using the
+  *   Window leaves are created via 'CreateRenderWindowWidget(id, viewDirection)' using the
   *   document's id verbatim, then re-parented to the new splitter and moved
   *   into their target sync group via 'SetSynchronizationGroup'.
   */
@@ -1991,6 +2090,8 @@ private:
 
   /** \brief Sticky clean-view state; applied to cells created later, too. */
   bool m_CleanView = false;
+
+  QmitkMxNLayoutLocks m_LayoutLocks;
 
   /** \brief Window id of the maximized cell, empty while the grid is shown. */
   QString m_MaximizedCell;

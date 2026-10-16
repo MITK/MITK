@@ -129,6 +129,15 @@ public Q_SLOTS:
   /** \brief The slots the sync barcode currently shows. */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> GetSyncBarcodeSlots() const;
 
+  /** \brief Whether the sync barcode offers its click onto the layout editor;
+   *         see 'QmitkMxNSyncBarcodeWidget::SetClickable'. */
+  void SetSyncBarcodeClickable(bool clickable);
+
+  /** \brief Shows or hides the Data button and with it the cell's node
+   *         selection. Hiding also closes an open selection popup.
+   *         Default: shown. */
+  void SetDataSelectionVisible(bool visible);
+
 Q_SIGNALS:
 
   /**
@@ -199,6 +208,7 @@ private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
+  QToolButton* m_DataButton;
   QMenu* m_DataMenu;
   QToolButton* m_CleanViewButton;
   QToolButton* m_NavigatorToggleButton;

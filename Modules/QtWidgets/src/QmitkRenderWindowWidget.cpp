@@ -25,14 +25,15 @@ found in the LICENSE file.
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent,
                                                  const QString& widgetName,
-                                                 mitk::DataStorage* dataStorage)
+                                                 mitk::DataStorage* dataStorage,
+                                                 mitk::AnatomicalPlane viewDirection)
   : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderWindow(nullptr)
   , m_CrosshairManager(nullptr)
 {
-  this->InitializeGUI();
+  this->InitializeGUI(viewDirection);
 }
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
@@ -307,7 +308,7 @@ void QmitkRenderWindowWidget::DisableCrosshair()
   m_CrosshairManager->RemoveCrosshairNodeFromDataStorage(m_DataStorage);
 }
 
-void QmitkRenderWindowWidget::InitializeGUI()
+void QmitkRenderWindowWidget::InitializeGUI(mitk::AnatomicalPlane viewDirection)
 {
   m_Layout = new QVBoxLayout(this);
   m_Layout->setContentsMargins({});
@@ -324,12 +325,12 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
-  m_RenderWindow->SetLayoutIndex(mitk::AnatomicalPlane::Sagittal);
+  m_RenderWindow->SetLayoutIndex(viewDirection);
   connect(m_RenderWindow, &QmitkRenderWindow::ResetGeometry,
     this, &QmitkRenderWindowWidget::OnResetGeometry);
 
   auto* sliceNavigationController = this->GetSliceNavigationController();
-  sliceNavigationController->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
+  sliceNavigationController->SetDefaultViewDirection(viewDirection);
 
   m_Layout->addWidget(m_RenderWindow);
 

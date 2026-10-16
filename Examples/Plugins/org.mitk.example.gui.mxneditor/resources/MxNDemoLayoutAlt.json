@@ -1,0 +1,48 @@
+{
+  "version": "3.0",
+  "name": "MxN demo: three cells",
+  "groups": {
+    "demo": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "horizontal",
+    "children": [
+      {
+        "type": "window",
+        "id": "org.mitk.example.editors.mxndemo__axial",
+        "name": "Axial",
+        "view_direction": "axial",
+        "links": {
+          "selection": "demo",
+          "crosshair": "demo"
+        },
+        "size": 1
+      },
+      {
+        "type": "window",
+        "id": "org.mitk.example.editors.mxndemo__sagittal",
+        "name": "Sagittal",
+        "view_direction": "sagittal",
+        "links": {
+          "selection": "demo",
+          "crosshair": "demo"
+        },
+        "size": 1
+      },
+      {
+        "type": "window",
+        "id": "org.mitk.example.editors.mxndemo__coronal",
+        "name": "Coronal",
+        "view_direction": "coronal",
+        "links": {
+          "selection": "demo",
+          "crosshair": "demo"
+        },
+        "size": 1
+      }
+    ]
+  }
+}

@@ -54,6 +54,30 @@ QmitkMxNSyncBarcodeWidget::QmitkMxNSyncBarcodeWidget(QWidget* parent)
   this->setToolTip(tr("Show or hide the layout editor"));
 }
 
+void QmitkMxNSyncBarcodeWidget::SetClickable(bool clickable)
+{
+  if (clickable == m_Clickable)
+  {
+    return;
+  }
+  m_Clickable = clickable;
+  this->setToolTip(clickable ? tr("Show or hide the layout editor") : QString());
+
+  // The hover state and cursor otherwise only follow mouse moves, so a pointer
+  // already resting on the strip would keep advertising a click that is gone,
+  // or miss one that just arrived.
+  const bool over = clickable && !m_AxisClickable && m_ReportedOverStrip;
+  if (!m_AxisClickable)
+  {
+    this->setCursor(over ? Qt::PointingHandCursor : Qt::ArrowCursor);
+  }
+  if (over != m_Hovered)
+  {
+    m_Hovered = over;
+    this->update();
+  }
+}
+
 QmitkMxNSyncBarcodeWidget::~QmitkMxNSyncBarcodeWidget()
 {
 }
@@ -377,12 +401,13 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
   else
   {
     const bool over = this->ContentRect(layout).contains(event->pos());
-    if (over != m_Hovered)
+    const bool offersClick = over && m_Clickable;
+    if (offersClick != m_Hovered)
     {
-      m_Hovered = over;
+      m_Hovered = offersClick;
       this->update();
     }
-    this->setCursor(over ? Qt::PointingHandCursor : Qt::ArrowCursor);
+    this->setCursor(offersClick ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
     // Reporting is separate from the whole-strip hover above: it tells a receiver
     // that answers editor-wide (the sync peek) where the pointer is, and touches
@@ -454,7 +479,7 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
         emit AxisClicked(slot);
       }
     }
-    else
+    else if (m_Clickable)
     {
       emit Clicked();
     }

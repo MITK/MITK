@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 /**
- * Tests the explicit-id 'CreateRenderWindowWidget(const QString&)' overload
+ * Tests the explicit-id 'CreateRenderWindowWidget(const QString&, mitk::AnatomicalPlane)' overload
  * on QmitkMxNMultiWidget plus the collision-free positional fallback used by
  * 'SetLayout(r, c)'. Together they replace an earlier 'widget<count>'
  * naming scheme that silently collided when custom-named cells already
@@ -38,6 +38,8 @@ class QmitkMxNExplicitNameTestSuite : public mitk::TestFixture
   MITK_TEST(Positional_SkipsAlreadyUsedSlots);
   MITK_TEST(CustomEditorName_RegistersWithItsPrefix);
   MITK_TEST(CustomEditorName_RejectsOtherEditorPrefix);
+  MITK_TEST(DuplicateLiveName_Throws_AndIsReleasedOnDestruction);
+  MITK_TEST(InvalidName_LeavesNoEntryBehind);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -85,7 +87,7 @@ public:
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell = widget.CreateRenderWindowWidget("mxn__alpha");
+    auto cell = widget.CreateRenderWindowWidget("mxn__alpha", mitk::AnatomicalPlane::Axial);
 
     CPPUNIT_ASSERT(nullptr != cell);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
@@ -105,7 +107,8 @@ public:
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("alpha", mitk::AnatomicalPlane::Axial),
+                         mitk::Exception);
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
   }
 
@@ -114,10 +117,11 @@ public:
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    widget.CreateRenderWindowWidget("mxn__alpha");
+    widget.CreateRenderWindowWidget("mxn__alpha", mitk::AnatomicalPlane::Axial);
     CPPUNIT_ASSERT_EQUAL(std::size_t{1}, WidgetCount(widget));
 
-    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha", mitk::AnatomicalPlane::Axial),
+                         mitk::Exception);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Map size must remain 1 after rejected duplicate",
       std::size_t{1}, WidgetCount(widget));
@@ -128,7 +132,7 @@ public:
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget(""), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("", mitk::AnatomicalPlane::Axial), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
   }
 
@@ -141,7 +145,7 @@ public:
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell0 = widget.CreateRenderWindowWidget(QString("mxn__widget0"));
+    auto cell0 = widget.CreateRenderWindowWidget(QString("mxn__widget0"), mitk::AnatomicalPlane::Axial);
     CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), cell0->GetWidgetName().toStdString());
     CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("mxn__widget0")));
 
@@ -149,8 +153,8 @@ public:
     // public path the layout applier uses: the explicit-id overload with
     // the next qualified id. This documents the intent without depending
     // on the internal nullary helper signature.
-    auto cell1 = widget.CreateRenderWindowWidget(QString("mxn__widget1"));
-    auto cell2 = widget.CreateRenderWindowWidget(QString("mxn__widget2"));
+    auto cell1 = widget.CreateRenderWindowWidget(QString("mxn__widget1"), mitk::AnatomicalPlane::Axial);
+    auto cell2 = widget.CreateRenderWindowWidget(QString("mxn__widget2"), mitk::AnatomicalPlane::Axial);
     CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget1"), cell1->GetWidgetName().toStdString());
     CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget2"), cell2->GetWidgetName().toStdString());
     CPPUNIT_ASSERT_EQUAL(std::size_t{3}, WidgetCount(widget));
@@ -166,7 +170,7 @@ public:
     widget.SetDataStorage(m_DataStorage);
 
     // Pre-populate with a custom-indexed name occupying slot 3.
-    widget.CreateRenderWindowWidget(QString("mxn__widget3"));
+    widget.CreateRenderWindowWidget(QString("mxn__widget3"), mitk::AnatomicalPlane::Axial);
     CPPUNIT_ASSERT_EQUAL(std::size_t{1}, WidgetCount(widget));
 
     // Drive 'SetLayout(1, 5)': the public positional path used by the
@@ -195,7 +199,7 @@ public:
     QmitkMxNMultiWidget widget(nullptr, Qt::WindowFlags{}, QString("custom"));
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell = widget.CreateRenderWindowWidget("custom__alpha");
+    auto cell = widget.CreateRenderWindowWidget("custom__alpha", mitk::AnatomicalPlane::Axial);
     CPPUNIT_ASSERT_EQUAL(std::string("custom__alpha"), cell->GetWidgetName().toStdString());
     CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("custom__alpha")));
   }
@@ -207,8 +211,28 @@ public:
 
     // Ids belong to one editor instance, identified by its multiWidgetName;
     // a custom-named editor rejects ids carrying any other prefix.
-    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha", mitk::AnatomicalPlane::Axial),
+                         mitk::Exception);
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
+  }
+
+  // ---------- Name uniqueness ----------
+
+  void DuplicateLiveName_Throws_AndIsReleasedOnDestruction()
+  {
+    {
+      QmitkMxNMultiWidget first(nullptr, {}, QStringLiteral("dup"));
+      CPPUNIT_ASSERT_THROW(QmitkMxNMultiWidget second(nullptr, {}, QStringLiteral("dup")),
+                           QmitkMxNWidgetNameInUseException);
+    }
+    CPPUNIT_ASSERT_NO_THROW(QmitkMxNMultiWidget again(nullptr, {}, QStringLiteral("dup")));
+  }
+
+  void InvalidName_LeavesNoEntryBehind()
+  {
+    CPPUNIT_ASSERT_THROW(QmitkMxNMultiWidget invalid(nullptr, {}, QStringLiteral("bad__name")),
+                         mitk::Exception);
+    CPPUNIT_ASSERT_NO_THROW(QmitkMxNMultiWidget fresh(nullptr, {}, QStringLiteral("fresh")));
   }
 };
 

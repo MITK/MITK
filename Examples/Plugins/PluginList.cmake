@@ -15,4 +15,5 @@ set(MITK_EXAMPLE_PLUGINS
   org.mitk.example.gui.pcaexample:ON
   org.mitk.example.gui.imaging:ON
   org.mitk.example.gui.forms:ON
+  org.mitk.example.gui.mxneditor:ON
 )

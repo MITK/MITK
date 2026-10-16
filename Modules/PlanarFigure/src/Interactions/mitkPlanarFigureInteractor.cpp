@@ -222,6 +222,7 @@ void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, Interaction
   }
 
   planarFigure->ResetPreviewContolPoint();
+  planarFigure->DeselectControlPoint();
 
   // Invoke end-hover event once the mouse is exiting the figure area
   m_IsHovering = false;

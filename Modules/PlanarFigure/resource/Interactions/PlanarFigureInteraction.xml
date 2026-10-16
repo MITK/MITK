@@ -54,8 +54,21 @@
       <action name="move_current_point" ID="90" /> <!-- AcMOVEPOINT -->
     </transition>
 
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
+      <condition name="hovering_above_point" />
+      <action name="deselect_point" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverFigure" >
+      <condition name="hovering_above_figure" />
+      <action name="deselect_point" />
+    </transition>
+
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="EditFigure" >
-      <action name="deselect_point" ID="76" /> <!-- AcDESELECTPOINT -->
+      <!-- released away from the figure, e.g. outside the render window -->
+      <action name="deselect_point" />
+      <action name="end_hovering" />
     </transition>
 
   </state>
@@ -157,6 +170,11 @@
       <action name="request_context_menu" ID="48000" />
     </transition>
 
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="EditFigure" > <!-- end hovering -->
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+    </transition>
+
   </state>
 
   <state name="ContextMenuHelperState">
@@ -177,6 +195,11 @@
       <condition name="hovering_above_point" />
       <action name="hide_preview_point" />
       <action name="select_point" />
+    </transition>
+
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="EditFigure" > <!-- end hovering -->
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
     </transition>
   </state>
 
@@ -236,6 +259,11 @@
       <!-- nothing to do, just blocking event -->
       <condition name="figure_is_on_current_slice" />
       <condition name="points_can_be_added_or_removed" inverted="true" />
+    </transition>
+
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="EditFigure" > <!-- end hovering -->
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
     </transition>
 
   </state>

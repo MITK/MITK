@@ -18,5 +18,6 @@ All examples can be found among the shown list.
 \li \subpage BlueBerrySelectionServiceIntro
 \li \subpage BlueBerryExampleExtensionPoint
 \li \subpage BlueBerryExampleCustomViewer
+\li \subpage BlueBerryExampleMxNEditor
 
 */

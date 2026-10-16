@@ -178,6 +178,8 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_MatrixShowsNotApplicableChips);
   MITK_TEST(ThreeD_GroupWithTwoDMemberIsSolidNotPartial);
   MITK_TEST(ThreeD_AllThreeDGroupShowsNotApplicable);
+  MITK_TEST(ThreeD_NotApplicableGroupAxisKeepsLinks);
+  MITK_TEST(ThreeD_NotApplicableGroupAxisCreatesNoLinks);
   MITK_TEST(ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation);
   MITK_TEST(ThreeD_FreeGroupConflictFromMatrixAndStripIsReported);
   MITK_TEST(ThreeD_FreeGroupConflictFromPlateMenuStaysReported);
@@ -2538,6 +2540,59 @@ public:
     const auto groupSlots = m_Widget->BuildGroupBarcodeSlots("nav");
     CPPUNIT_ASSERT(!groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice)].applicable);
     CPPUNIT_ASSERT(groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)].applicable);
+  }
+
+  void ThreeD_NotApplicableGroupAxisKeepsLinks()
+  {
+    // The links kept on an axis the 3D members cannot use are what the cells
+    // take back up when they return to 2D; a click on the n/a slot is not an
+    // edit.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    const int sliceSlot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT_MESSAGE("precondition: the slice slot is n/a for an all-3D group",
+                           !m_Widget->BuildGroupBarcodeSlots("nav")[sliceSlot].applicable);
+
+    m_Widget->ToggleGroupAxis("nav", QmitkMxNSyncAxis::Slice);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("Toggling an n/a axis keeps the link of cell 0",
+                           IsLinked(0, QmitkMxNSyncDimension::Slice, "nav"));
+    CPPUNIT_ASSERT_MESSAGE("Toggling an n/a axis keeps the link of cell 1",
+                           IsLinked(1, QmitkMxNSyncDimension::Slice, "nav"));
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::TwoD);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
+    CPPUNIT_ASSERT_MESSAGE("The kept link is there again in 2D", IsLinked(0, QmitkMxNSyncDimension::Slice, "nav"));
+    CPPUNIT_ASSERT_MESSAGE("for every member", IsLinked(1, QmitkMxNSyncDimension::Slice, "nav"));
+    const auto slice = m_Widget->BuildGroupBarcodeSlots("nav")[sliceSlot];
+    CPPUNIT_ASSERT_MESSAGE("The slot applies again", slice.applicable);
+    CPPUNIT_ASSERT_MESSAGE("and shows the group hue", slice.color.isValid());
+  }
+
+  void ThreeD_NotApplicableGroupAxisCreatesNoLinks()
+  {
+    // A toggle on an axis no member can use must not link it for cells that
+    // cannot show it either.
+    const auto group = m_Widget->CreateGroup();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, group);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, group);
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("precondition: the slice slot is n/a for an all-3D group",
+                           !m_Widget->BuildGroupBarcodeSlots(group)[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice)]
+                              .applicable);
+
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Slice);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("Toggling an n/a axis links no slice for cell 0",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice).has_value());
+    CPPUNIT_ASSERT_MESSAGE("nor for cell 1",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice).has_value());
+    CPPUNIT_ASSERT_MESSAGE("The group's applicable axis stays linked", IsLinked(0, QmitkMxNSyncDimension::Zoom, group));
   }
 
   QmitkInfoCard* ConflictNotice() const

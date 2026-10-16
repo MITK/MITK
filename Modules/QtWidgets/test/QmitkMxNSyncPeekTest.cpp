@@ -120,6 +120,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Barcode_PassiveStripReportsColorBarModeWithoutAnAxis);
   MITK_TEST(Barcode_PassiveStripStillOpensTheLayoutEditor);
   MITK_TEST(Barcode_ClickableStripReportsInBothRenderModes);
+  MITK_TEST(Barcode_NotApplicableSlotIsInert);
   MITK_TEST(PaintPath_PlateDoesNotCrash);
   MITK_TEST(Peek_FadeOutKeepsThePlateGeometry);
   CPPUNIT_TEST_SUITE_END();
@@ -1215,6 +1216,47 @@ public:
                                    1, static_cast<int>(recorder.axes.size()));
       CPPUNIT_ASSERT_EQUAL(0, recorder.axes[0]);
     }
+  }
+
+  void Barcode_NotApplicableSlotIsInert()
+  {
+    constexpr int notApplicable = 2;
+    constexpr int applicable = 5;
+
+    auto axisSlots = EightSlots();
+    axisSlots[notApplicable].applicable = false;
+
+    QmitkMxNSyncBarcodeWidget strip;
+    strip.SetAxisClickable(true);
+    strip.SetSlots(axisSlots);
+    strip.resize(240, 24);
+
+    QList<int> clicked;
+    QObject::connect(&strip, &QmitkMxNSyncBarcodeWidget::AxisClicked,
+                     [&clicked](int index) { clicked.append(index); });
+
+    const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(240, 24, 8);
+    CPPUNIT_ASSERT_MESSAGE("This geometry must render glyphs for the test to mean anything",
+                           layout.mode == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs);
+    const int step = layout.box + 2;
+    const QPoint notApplicablePoint(1 + notApplicable * step + layout.box / 2, 12);
+    const QPoint applicablePoint(1 + applicable * step + layout.box / 2, 12);
+
+    MoveTo(strip, applicablePoint);
+    CPPUNIT_ASSERT_MESSAGE("An applicable slot invites a click",
+                           strip.cursor().shape() == Qt::PointingHandCursor);
+    MoveTo(strip, notApplicablePoint);
+    CPPUNIT_ASSERT_MESSAGE("A slot that does not apply gives no click affordance",
+                           strip.cursor().shape() == Qt::ArrowCursor);
+
+    ClickAt(strip, notApplicablePoint);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A click on a slot that does not apply reports nothing",
+                                 0, static_cast<int>(clicked.size()));
+
+    ClickAt(strip, applicablePoint);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A click on an applicable slot is reported once",
+                                 1, static_cast<int>(clicked.size()));
+    CPPUNIT_ASSERT_EQUAL(applicable, clicked[0]);
   }
 
   void Glyph_LargeRenderIsNotAnUpscaledResource()

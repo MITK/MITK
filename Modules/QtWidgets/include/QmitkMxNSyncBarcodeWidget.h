@@ -139,7 +139,8 @@ public:
    * \brief Whether a click targets a single axis (AxisClicked) or the whole
    *        strip (Clicked). Off by default: the per-cell strip is one button
    *        onto the layout editor. The layout editor's group header turns it on
-   *        so each axis glyph toggles that axis for the group.
+   *        so each axis glyph toggles that axis for the group. A slot that
+   *        does not apply (applicable == false) emits no AxisClicked.
    */
   void SetAxisClickable(bool clickable);
 

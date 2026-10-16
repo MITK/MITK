@@ -1130,6 +1130,12 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, Qmi
   {
     return;
   }
+  // The links kept on an axis that does not apply are inactive and wait for the
+  // cells' return to 2D; the card must not edit them.
+  if (!axisSlots[slot].applicable)
+  {
+    return;
+  }
   const bool enable = !(axisSlots[slot].color.isValid() && !axisSlots[slot].partial);
   if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
   {

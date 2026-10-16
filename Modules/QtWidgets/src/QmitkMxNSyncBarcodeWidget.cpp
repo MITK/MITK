@@ -369,7 +369,10 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
       emit AxisHovered(slot);
       this->update();
     }
-    this->setCursor(slot >= 0 ? Qt::PointingHandCursor : Qt::ArrowCursor);
+    // A slot whose axis does not apply is hoverable (it still explains itself) but
+    // is not a button.
+    const bool clickable = slot >= 0 && m_Slots[slot].applicable;
+    this->setCursor(clickable ? Qt::PointingHandCursor : Qt::ArrowCursor);
   }
   else
   {
@@ -446,7 +449,7 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
   {
     if (m_AxisClickable)
     {
-      if (const int slot = this->SlotAt(event->pos()); slot >= 0)
+      if (const int slot = this->SlotAt(event->pos()); slot >= 0 && m_Slots[slot].applicable)
       {
         emit AxisClicked(slot);
       }

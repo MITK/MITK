@@ -88,6 +88,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_TimeOnlyReadoutAndNavigator);
   MITK_TEST(ThreeD_ContextMenuLeavesOutTwoDEntries);
   MITK_TEST(Picker_OffersTheOtherRenderModeAndFree);
+  MITK_TEST(Picker_DirectionLockedWhileOpen_EveryEntryIsInert);
   MITK_TEST(PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers);
   CPPUNIT_TEST_SUITE_END();
 
@@ -801,6 +802,36 @@ public:
     this->Overlay(1)->PopulateDirectionMenu(&allThreeDMenu);
     CPPUNIT_ASSERT_MESSAGE("An all-3D orientation group may go free",
                            ActionNamed(allThreeDMenu, QStringLiteral("Free"))->isEnabled());
+  }
+
+  void Picker_DirectionLockedWhileOpen_EveryEntryIsInert()
+  {
+    // QMenu::exec runs a nested event loop, so the owning plugin can lock
+    // between the menu being built and an entry being triggered.
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    for (const int cell : { 0, 1 })
+    {
+      m_Editor->SetLayoutLocks({});
+      QMenu menu;
+      this->Overlay(cell)->PopulateDirectionMenu(&menu);
+      m_Editor->SetLayoutLocks(QmitkMxNLayoutLock::Direction);
+
+      for (auto* action : menu.actions())
+      {
+        if (action->isSeparator())
+        {
+          continue;
+        }
+        const auto direction = m_Editor->GetViewDirection(CellId(cell));
+        const auto renderMode = m_Editor->GetRenderMode(CellId(cell));
+        action->trigger();
+        const auto where = " ('" + action->text().toStdString() + "' on cell " + std::to_string(cell) + ")";
+        CPPUNIT_ASSERT_MESSAGE("The view direction stays" + where,
+                               direction == m_Editor->GetViewDirection(CellId(cell)));
+        CPPUNIT_ASSERT_MESSAGE("The render mode stays" + where,
+                               renderMode == m_Editor->GetRenderMode(CellId(cell)));
+      }
+    }
   }
 
   /** Counts the paint events a widget receives. */

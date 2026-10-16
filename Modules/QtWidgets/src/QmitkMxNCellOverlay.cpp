@@ -2715,6 +2715,10 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
     }
     connect(freeAction, &QAction::triggered, this, [this, windowId]()
     {
+      if (this->IsLocked(QmitkMxNLayoutLock::Direction))
+      {
+        return;
+      }
       try
       {
         m_Editor->SetViewDirection(windowId, QmitkMxNMultiWidget::ViewDirection::Free);
@@ -2731,6 +2735,10 @@ void QmitkMxNCellOverlay::PopulateDirectionMenu(QMenu* menu)
   auto* modeAction = menu->addAction(RenderMode::ThreeD == otherMode ? tr("3D view") : tr("2D view"));
   connect(modeAction, &QAction::triggered, this, [this, windowId, otherMode]()
   {
+    if (this->IsLocked(QmitkMxNLayoutLock::Direction))
+    {
+      return;
+    }
     try
     {
       m_Editor->SetRenderMode(windowId, otherMode);

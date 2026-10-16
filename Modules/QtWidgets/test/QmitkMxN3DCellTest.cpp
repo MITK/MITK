@@ -80,6 +80,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(SetViewDirection_OriginalAndFreeOn2D_Throw);
   MITK_TEST(SetViewDirection_FreeOnLinkedCell_ThrowsConflict);
   MITK_TEST(SetViewDirection_FreeOnAllThreeDGroup_TurnsGroupFree);
+  MITK_TEST(IsOrientationLinkAllowed_FollowsTheFreeAnchor);
   MITK_TEST(OrientationLink_FreeCellAlone_FormsFreeGroup);
   MITK_TEST(OrientationLink_FreeCellJoins_SnapsToGroup);
   MITK_TEST(OrientationLink_ThreeDJoinsCoronalGroup_Snaps);
@@ -469,6 +470,32 @@ public:
     CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
     CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(2)));
     CPPUNIT_ASSERT_MESSAGE("A free group rotates", !m_Editor->IsRotationLocked(CellId(2)));
+  }
+
+  void IsOrientationLinkAllowed_FollowsTheFreeAnchor()
+  {
+    const std::string group = "planes";
+    this->m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell can always link", this->m_Editor->IsOrientationLinkAllowed(CellId(1), group));
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell can link a group without an anchor",
+                           this->m_Editor->IsOrientationLinkAllowed(CellId(0), group));
+    CPPUNIT_ASSERT_THROW(this->m_Editor->IsOrientationLinkAllowed("mxn__nowhere", group), mitk::Exception);
+
+    this->m_Editor->SetViewDirection(CellId(1), ViewDirection::Free);
+    this->m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, group);
+
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell cannot follow a free anchor",
+                           !this->m_Editor->IsOrientationLinkAllowed(CellId(0), group));
+    CPPUNIT_ASSERT_MESSAGE("The free cell itself can link", this->m_Editor->IsOrientationLinkAllowed(CellId(1), group));
+    CPPUNIT_ASSERT_THROW(this->m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, group),
+                         QmitkMxNOrientationConflictException);
+
+    this->m_Editor->ClearSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation);
+
+    CPPUNIT_ASSERT_MESSAGE("Once the free cell has left, the group takes a 2D cell again",
+                           this->m_Editor->IsOrientationLinkAllowed(CellId(0), group));
+    CPPUNIT_ASSERT_NO_THROW(this->m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, group));
   }
 
   void OrientationLink_FreeCellAlone_FormsFreeGroup()

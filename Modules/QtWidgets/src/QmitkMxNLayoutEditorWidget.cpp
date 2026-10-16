@@ -1030,7 +1030,22 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
     return;
   }
 
-  for (const auto& windowId : this->GroupMembers(group))
+  auto members = this->GroupMembers(group);
+  if (enabled && QmitkMxNSyncDimension::Orientation == dimension)
+  {
+    // The first member to link anchors the group. A free 3D cell has to be
+    // that anchor: joining a group anchored by a non-free cell snaps it to the
+    // anchor's direction and it loses 'free', while the 2D members, linked
+    // after it, are only refused with the conflict notice.
+    std::stable_partition(members.begin(), members.end(),
+                          [this](const QString& windowId)
+                          {
+                            return QmitkMxNMultiWidget::ViewDirection::Free
+                                   == m_MultiWidget->GetViewDirection(windowId);
+                          });
+  }
+
+  for (const auto& windowId : members)
   {
     try
     {
@@ -1614,8 +1629,9 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   // The group perspective speaks for several windows at once, so it marks that
   // an offset exists somewhere in the group but leaves the number to the
   // per-window surfaces, which can say whose it is.
-  // 'total' counts the members the axis applies to, so a group is not partial
-  // merely because a 3D member cannot take a 2D-only axis.
+  // 'total' counts the members that can take the axis, so a group is not
+  // partial merely because a 3D member cannot take a 2D-only axis, or a 2D
+  // member cannot follow the free orientation of the group.
   const bool hasMembers = !members.empty();
   const auto stateSlot = [hasMembers](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked, int total,
                                       bool anyOffset,
@@ -1665,9 +1681,12 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
       for (const auto& windowId : members)
       {
         const bool applicable = m_MultiWidget->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension));
-        applicableMembers += applicable ? 1 : 0;
         const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
-        if (link.has_value() && link->group == group)
+        const bool linkedToGroup = link.has_value() && link->group == group;
+        const bool canTake = linkedToGroup || QmitkMxNSyncDimension::Orientation != dimension
+                             || m_MultiWidget->IsOrientationLinkAllowed(windowId, group);
+        applicableMembers += (applicable && canTake) ? 1 : 0;
+        if (linkedToGroup)
         {
           if (!applicable)
           {

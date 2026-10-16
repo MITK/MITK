@@ -513,6 +513,16 @@ public:
   bool IsFreeViewDirectionAllowed(const QString& windowId) const;
 
   /**
+  * \brief Whether linking the cell to the `Orientation` group would succeed:
+  *        false exactly when SetSyncLink would throw
+  *        QmitkMxNOrientationConflictException, i.e. a 2D cell joining a
+  *        group whose anchor is 'Free'. A 3D cell can always link.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  bool IsOrientationLinkAllowed(const QString& windowId, const std::string& group) const;
+
+  /**
   * \brief Whether the axis has a meaning for the cell in its current render
   *        mode.
   *

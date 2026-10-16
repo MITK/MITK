@@ -3614,15 +3614,11 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
                 << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
   }
 
-  if (QmitkMxNSyncDimension::Orientation == dimension && RenderMode::TwoD == this->GetRenderMode(windowId))
+  if (QmitkMxNSyncDimension::Orientation == dimension && !this->IsOrientationLinkAllowed(windowId, group))
   {
-    const auto otherAnchorId = this->FindSyncGroupAnchor(dimension, group, { windowId });
-    if (!otherAnchorId.isEmpty() && m_FreeCells.count(otherAnchorId) > 0)
-    {
-      mitkThrowException(QmitkMxNOrientationConflictException)
-        << "SetSyncLink: orientation group '" << group << "' has the view direction 'free'; the 2D cell '"
-        << windowId.toStdString() << "' cannot follow a freely rotated 3D view.";
-    }
+    mitkThrowException(QmitkMxNOrientationConflictException)
+      << "SetSyncLink: orientation group '" << group << "' has the view direction 'free'; the 2D cell '"
+      << windowId.toStdString() << "' cannot follow a freely rotated 3D view.";
   }
 
   // A write moves only the written cell, so the group's reference is taken
@@ -4476,6 +4472,16 @@ bool QmitkMxNMultiWidget::IsFreeViewDirectionAllowed(const QString& windowId) co
     }
   }
   return true;
+}
+
+bool QmitkMxNMultiWidget::IsOrientationLinkAllowed(const QString& windowId, const std::string& group) const
+{
+  if (RenderMode::TwoD != this->GetRenderMode(windowId))
+  {
+    return true;
+  }
+  const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Orientation, group, { windowId });
+  return anchorId.isEmpty() || 0 == m_FreeCells.count(anchorId);
 }
 
 std::vector<QString> QmitkMxNMultiWidget::ActiveGroupPeers(const QString& windowId,

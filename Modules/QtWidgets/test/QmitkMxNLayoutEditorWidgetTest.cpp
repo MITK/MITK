@@ -181,7 +181,9 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_NotApplicableGroupAxisKeepsLinks);
   MITK_TEST(ThreeD_NotApplicableGroupAxisCreatesNoLinks);
   MITK_TEST(ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation);
-  MITK_TEST(ThreeD_FreeGroupConflictFromMatrixAndStripIsReported);
+  MITK_TEST(ThreeD_FreeGroupConflictFromMatrixIsReported);
+  MITK_TEST(ThreeD_FreeGroupOrientationSlotUnlinksFromStrip);
+  MITK_TEST(ThreeD_FreeGroupRelinkKeepsFree);
   MITK_TEST(ThreeD_FreeGroupConflictFromPlateMenuStaysReported);
 
   CPPUNIT_TEST_SUITE_END();
@@ -2646,7 +2648,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The next link change clears the notice", !this->ConflictNoticeShown());
   }
 
-  void ThreeD_FreeGroupConflictFromMatrixAndStripIsReported()
+  void ThreeD_FreeGroupConflictFromMatrixIsReported()
   {
     const auto group = this->MakeFreeOrientationGroup();
 
@@ -2654,16 +2656,54 @@ public:
     Pump();
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
     CPPUNIT_ASSERT_MESSAGE("from the matrix", this->ConflictNoticeShown());
+  }
 
-    // Cell 0 joins on windowing only; the group's strip then links the
-    // orientation of every member.
+  void ThreeD_FreeGroupOrientationSlotUnlinksFromStrip()
+  {
+    const auto group = this->MakeFreeOrientationGroup();
+
+    // Cell 0 joins on windowing only. It could never follow the group's free
+    // orientation, so it does not make the orientation slot partial.
     m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Windowing, group);
-    CPPUNIT_ASSERT(!this->ConflictNoticeShown());
+    Pump();
+    const auto slot = m_Widget->BuildGroupBarcodeSlots(group)[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)];
+    CPPUNIT_ASSERT_MESSAGE("The orientation slot shows the group's link", slot.color.isValid());
+    CPPUNIT_ASSERT_MESSAGE("A 2D member that cannot link does not make the slot partial", !slot.partial);
+
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
     Pump();
-    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
-    CPPUNIT_ASSERT(IsLinked(1, QmitkMxNSyncDimension::Orientation, group));
-    CPPUNIT_ASSERT_MESSAGE("from the group's axis strip", this->ConflictNoticeShown());
+
+    CPPUNIT_ASSERT_MESSAGE("One click on the full slot unlinks the free cell",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT_MESSAGE("The 2D cell stays unlinked",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT_MESSAGE("Unlinking leaves the free cell's view direction alone",
+                           QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("Unlinking reports no conflict", !this->ConflictNoticeShown());
+  }
+
+  void ThreeD_FreeGroupRelinkKeepsFree()
+  {
+    const auto group = this->MakeFreeOrientationGroup();
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Windowing, group);
+    m_Widget->ClearCellAxis(CellId(1), QmitkMxNSyncAxis::Orientation);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("precondition: the group links no orientation any more",
+                           !m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT_MESSAGE("precondition: the free cell is still free",
+                           QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("precondition: no notice", !this->ConflictNoticeShown());
+
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
+    Pump();
+
+    CPPUNIT_ASSERT_MESSAGE("The free cell links, and anchors the group",
+                           IsLinked(1, QmitkMxNSyncDimension::Orientation, group));
+    CPPUNIT_ASSERT_MESSAGE("Linking does not take the free cell's view direction",
+                           QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
+    CPPUNIT_ASSERT_MESSAGE("The 2D cell cannot follow it",
+                           !m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT_MESSAGE("The skipped link is reported", this->ConflictNoticeShown());
   }
 
   void ThreeD_FreeGroupConflictFromPlateMenuStaysReported()

@@ -49,9 +49,9 @@ found in the LICENSE file.
  * read from the renderer's vtkCamera):
  *   - Loading a 3D cell switches its mapper and installs the MxN interactor
  *     style; render mode and direction round-trip through the layout.
- *   - A 3D cell looks along minus the normal of the plane a 2D cell with the
- *     same direction and reference geometry shows, with the plane's second
- *     axis as view-up, also for a rotated geometry.
+ *   - A 3D cell's camera has the direction of projection and view-up of the
+ *     camera of a 2D cell with the same direction and reference geometry,
+ *     also for a rotated geometry.
  *   - Switching 2D <-> 3D keeps the direction and the global time step; a
  *     'free' cell turns 2D with the nearest standard plane. Back in 2D, a
  *     cell has the slice, zoom and pan it had before, unless its plane or
@@ -417,8 +417,9 @@ public:
       renderingManager->InitializeView(Renderer(1)->GetRenderWindow(), geometry, true);
       m_Editor->SetViewDirection(CellId(1), plane);
 
-      AssertLooksAt(Renderer(1), Snc(0)->GetCurrentPlaneGeometry(),
-                    what + " plane " + std::to_string(static_cast<int>(plane)));
+      // The 2D camera as Core sets it before each render.
+      Renderer(0)->GetCameraController()->AdjustCameraToPlane();
+      this->AssertSameDirection(Renderer(1), Renderer(0), what + " plane " + std::to_string(static_cast<int>(plane)));
     }
   }
 

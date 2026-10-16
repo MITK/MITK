@@ -53,7 +53,9 @@ found in the LICENSE file.
  *     same direction and reference geometry shows, with the plane's second
  *     axis as view-up, also for a rotated geometry.
  *   - Switching 2D <-> 3D keeps the direction and the global time step; a
- *     'free' cell turns 2D with the nearest standard plane.
+ *     'free' cell turns 2D with the nearest standard plane. Back in 2D, a
+ *     cell has the slice, zoom and pan it had before, unless its plane or
+ *     geometry changed meanwhile or a group sets them.
  *   - Camera rotations turn an unlinked cell 'free'; pan and dolly do not.
  *   - A view initialization, which turns 3D renderers anterior, is followed
  *     by the cell's direction again; 'free' cells are left alone.
@@ -84,6 +86,10 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Lock_FollowsTheOrientationLink);
   MITK_TEST(Lock_LinkedCellRefusesRotateAndSpin);
   MITK_TEST(Switch_TwoDThreeDTwoD_KeepsDirection);
+  MITK_TEST(Switch_TwoDThreeDTwoD_KeepsUnlinkedView);
+  MITK_TEST(Switch_BackToTwoD_LinkedSliceFollowsGroup);
+  MITK_TEST(Switch_DirectionChangedInThreeD_FitsTheNewPlane);
+  MITK_TEST(Switch_GeometryChangedInThreeD_FitsTheNewGeometry);
   MITK_TEST(Switch_FreeToTwoD_TakesNearestPlane);
   MITK_TEST(Switch_KeepsTimeStep);
   MITK_TEST(Switch_EmitsSyncLinksChanged);
@@ -91,6 +97,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(ExternalSwitch_TwoDToThreeD_InstallsMxNStyle);
   MITK_TEST(ExternalSwitch_CanonicalThreeDToAxial_JoinsSliceGroup);
   MITK_TEST(ExternalSwitch_ThreeDBeforeRender_TakesGroupZoom);
+  MITK_TEST(ExternalSwitch_TwoDInBetween_ForgetsTheTwoDView);
   MITK_TEST(Lifecycle_ReusedIdOfFreeCell_IsCanonical);
   MITK_TEST(Rotation_Azimuth_TurnsCellFree);
   MITK_TEST(Rotation_Roll_TurnsCellFree);
@@ -554,6 +561,80 @@ public:
     CPPUNIT_ASSERT(mitk::AnatomicalPlane::Sagittal == Snc(1)->GetViewDirection());
   }
 
+  void Switch_TwoDThreeDTwoD_KeepsUnlinkedView()
+  {
+    // The cell starts fitted, as a reset would leave it; the view to keep is
+    // neither the middle slice nor the fitted camera.
+    auto* controller = Renderer(1)->GetCameraController();
+    const double fittedScale = Camera(Renderer(1))->GetParallelScale();
+    const auto fittedPosition = controller->GetCameraPositionOnPlane();
+    auto* stepper = Snc(1)->GetStepper();
+    stepper->SetPos(1);
+    CPPUNIT_ASSERT_MESSAGE("precondition: off the middle slice", 1u != stepper->GetSteps() / 2);
+    Camera(Renderer(1))->SetParallelScale(3.5);
+    mitk::Point2D center;
+    center[0] = 5.0;
+    center[1] = 4.0;
+    controller->MoveCameraToPoint(center);
+    const double scale = Camera(Renderer(1))->GetParallelScale();
+    const auto position = controller->GetCameraPositionOnPlane();
+    CPPUNIT_ASSERT_MESSAGE("precondition: zoomed", std::abs(scale - fittedScale) > 0.1);
+    CPPUNIT_ASSERT_MESSAGE("precondition: panned", (position - fittedPosition).GetNorm() > 0.1);
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    CPPUNIT_ASSERT_EQUAL(1u, Snc(1)->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(scale, Camera(Renderer(1))->GetParallelScale(), 1e-9);
+    CPPUNIT_ASSERT_MESSAGE("The camera keeps its position on the plane",
+                           (position - controller->GetCameraPositionOnPlane()).GetNorm() < 1e-9);
+  }
+
+  void Switch_BackToTwoD_LinkedSliceFollowsGroup()
+  {
+    for (const std::size_t index : { std::size_t(0), std::size_t(1) })
+    {
+      m_Editor->SetViewDirection(CellId(index), mitk::AnatomicalPlane::Axial);
+      m_Editor->SetSyncLink(CellId(index), QmitkMxNSyncDimension::Slice, "nav");
+    }
+    Snc(1)->GetStepper()->SetPos(1);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    // The group moves on while the cell's slice link is inactive.
+    Snc(0)->GetStepper()->SetPos(5);
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group's slice, not the remembered one", 5u, Snc(1)->GetStepper()->GetPos());
+  }
+
+  void Switch_DirectionChangedInThreeD_FitsTheNewPlane()
+  {
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    Snc(1)->GetStepper()->SetPos(1);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    auto* stepper = Snc(1)->GetStepper();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A slice of the axial plane means nothing on the sagittal one",
+                                 stepper->GetSteps() / 2, stepper->GetPos());
+  }
+
+  void Switch_GeometryChangedInThreeD_FitsTheNewGeometry()
+  {
+    Snc(1)->GetStepper()->SetPos(1);
+    CPPUNIT_ASSERT_MESSAGE("precondition: off the middle slice", 1u != Snc(1)->GetStepper()->GetSteps() / 2);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    const auto tilted = Tilted(m_Image);
+    mitk::RenderingManager::GetInstance()->InitializeView(Renderer(1)->GetRenderWindow(), tilted->GetTimeGeometry());
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    auto* stepper = Snc(1)->GetStepper();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A slice of other data means nothing here", stepper->GetSteps() / 2, stepper->GetPos());
+  }
+
   void Switch_FreeToTwoD_TakesNearestPlane()
   {
     m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
@@ -658,6 +739,24 @@ public:
 
     CPPUNIT_ASSERT(RenderMode::ThreeD == m_Editor->GetRenderMode(CellId(1)));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, HalfHeight(Renderer(1)), 1e-6);
+  }
+
+  void ExternalSwitch_TwoDInBetween_ForgetsTheTwoDView()
+  {
+    // Initialized like the Render Window Manager does, so only a remembered
+    // 2D view that outlived its 2D phase could put the cell back on slice 1.
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(Renderer(1)->GetRenderWindow(), m_DataStorage);
+    Snc(1)->GetStepper()->SetPos(1);
+    CPPUNIT_ASSERT_MESSAGE("precondition: off the middle slice", 1u != Snc(1)->GetStepper()->GetSteps() / 2);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    this->SwitchByRenderWindowManager("axial", Renderer(1));
+    Snc(1)->GetStepper()->SetPos(2);
+    this->SwitchByRenderWindowManager("3D", Renderer(1));
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    CPPUNIT_ASSERT_MESSAGE("No slice of an earlier 2D phase", 1u != Snc(1)->GetStepper()->GetPos());
   }
 
   void Lifecycle_ReusedIdOfFreeCell_IsCanonical()

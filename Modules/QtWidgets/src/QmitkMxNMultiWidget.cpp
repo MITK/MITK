@@ -846,6 +846,7 @@ void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
   // nothing remembered.
   m_FreeCells.erase(widgetName);
   m_SeenRenderModes.erase(widgetName);
+  m_TwoDViews.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
 }
 
@@ -4266,12 +4267,18 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
   const mitk::TimeGeometry::ConstPointer referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
   const auto timePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
 
+  std::optional<TwoDView> twoDView;
   if (RenderMode::ThreeD == mode)
   {
+    this->RememberTwoDView(windowId);
     this->SwitchCellToThreeD(widget.get());
   }
   else
   {
+    if (auto remembered = m_TwoDViews.extract(windowId); !remembered.empty())
+    {
+      twoDView = remembered.mapped();
+    }
     // A 2D cell needs a plane; a rotated camera shows the one it looks at most.
     if (this->ReleaseFreeCellForTwoD(windowId) && referenceGeometry.IsNotNull())
     {
@@ -4302,9 +4309,52 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
   }
   else
   {
+    // Before the adoption, whose group convergence sets the linked dimensions.
+    if (twoDView.has_value())
+    {
+      this->RestoreTwoDView(windowId, *twoDView);
+    }
     this->FinishTwoDAdoption(windowId);
   }
   this->RefreshSyncControls();
+}
+
+void QmitkMxNMultiWidget::RememberTwoDView(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  auto* renderer = RendererOf(widget.get());
+  if (nullptr == sliceNavigation->GetInputWorldTimeGeometry())
+  {
+    m_TwoDViews.erase(windowId);
+    return;
+  }
+  TwoDView view;
+  view.viewDirection = sliceNavigation->GetDefaultViewDirection();
+  view.referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  view.slice = sliceNavigation->GetStepper()->GetPos();
+  view.parallelScale = renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+  view.cameraPosition = renderer->GetCameraController()->GetCameraPositionOnPlane();
+  m_TwoDViews[windowId] = view;
+}
+
+void QmitkMxNMultiWidget::RestoreTwoDView(const QString& windowId, const TwoDView& view)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  const auto* referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  // Compared by value: every view initialization hands the cell a copy.
+  if (view.viewDirection != sliceNavigation->GetDefaultViewDirection() || nullptr == referenceGeometry
+      || !mitk::Equal(*view.referenceGeometry, *referenceGeometry, mitk::eps, false))
+  {
+    return;
+  }
+  auto* renderer = RendererOf(widget.get());
+  sliceNavigation->GetStepper()->SetPos(view.slice);
+  // The camera position is constrained by the zoom, so the zoom comes first.
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(view.parallelScale);
+  renderer->GetCameraController()->MoveCameraToPoint(view.cameraPosition);
+  mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
 }
 
 bool QmitkMxNMultiWidget::ReleaseFreeCellForTwoD(const QString& windowId)
@@ -4571,6 +4621,7 @@ void QmitkMxNMultiWidget::ReconcileExternalRenderModes()
       {
         continue;
       }
+      m_TwoDViews.erase(windowId);
       // The caller chose the plane by setting the default direction.
       this->FinishTwoDAdoption(windowId);
       reconciled = true;

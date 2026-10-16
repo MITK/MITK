@@ -451,8 +451,10 @@ public:
   *   to its camera direction; when it was linked on `Orientation`, it leaves
   *   that group, which stays 'Free'. Applicability of the cell's links
   *   follows the new mode (see IsAxisApplicable); links that become
-  *   applicable converge the cell like a cell joining the group. Emits
-  *   'SyncLinksChanged'.
+  *   applicable converge the cell like a cell joining the group. A cell
+  *   this turned 3D gets its slice, zoom and pan back when it turns 2D on
+  *   the same plane of the same reference geometry; linked ones follow
+  *   their groups instead. Emits 'SyncLinksChanged'.
   *
   * \throws mitk::Exception on an unknown window.
   */
@@ -1748,6 +1750,26 @@ private:
   /** \brief Steps after a cell started rendering 2D: the 2D-only links are active again. */
   void FinishTwoDAdoption(const QString& windowId);
 
+  /** \brief A 2D cell's slice, zoom and pan, and the plane and geometry they belong to. */
+  struct TwoDView
+  {
+    mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Axial;
+    mitk::TimeGeometry::ConstPointer referenceGeometry;
+    unsigned int slice = 0;
+    double parallelScale = 0.0;
+    mitk::Point2D cameraPosition;
+  };
+
+  /** \brief Remember a 2D cell's slice, zoom and pan before it turns 3D (see m_TwoDViews). */
+  void RememberTwoDView(const QString& windowId);
+
+  /**
+  * \brief Give a cell that turned back to 2D the slice, zoom and pan of
+  *        'view' if it shows the same plane of the same geometry as then. Its
+  *        linked dimensions follow their groups afterwards (FinishTwoDAdoption).
+  */
+  void RestoreTwoDView(const QString& windowId, const TwoDView& view);
+
   /** \brief Steps after a cell started rendering 3D and its view was initialized. */
   void FinishThreeDAdoption(const QString& windowId);
 
@@ -1884,6 +1906,13 @@ private:
   *        else switched the mapper; GetRenderMode always reads the mapper.
   */
   std::map<QString, RenderMode> m_SeenRenderModes;
+
+  /**
+  * \brief The 2D view of each cell that SetRenderMode turned 3D, which
+  *        turning it back to 2D restores. Dropped whenever the cell renders
+  *        2D again, whichever way it gets there.
+  */
+  std::map<QString, TwoDView> m_TwoDViews;
 
   /** \brief Tag of this editor's observer of the rendering manager's
    *         views-initialized event. */

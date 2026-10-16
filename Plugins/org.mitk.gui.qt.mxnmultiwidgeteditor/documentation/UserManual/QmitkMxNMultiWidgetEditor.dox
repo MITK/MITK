@@ -391,7 +391,10 @@
 	Of the synchronization axes, a 3D view takes part in pan, zoom, orientation and data
 	selection; slice, crosshair, level/window and colormap are drawn struck through ("not
 	applicable") in its sync barcode and on its window plate. A link the window had before it
-	turned 3D is kept and takes effect again when it returns to 2D.
+	turned 3D is kept and takes effect again when it returns to 2D. Back in 2D through
+	"2D view", the window shows the slice, zoom and position it had before, unless its view
+	direction changed or it was reinitialized to other data meanwhile; a linked slice, zoom
+	or pan follows its group instead.
 
 	Pan and zoom couple 2D and 3D views both ways. Zooming a 3D view (mouse wheel or right
 	drag) zooms the members of its zoom group by the same factor, and a 3D view in a zoom

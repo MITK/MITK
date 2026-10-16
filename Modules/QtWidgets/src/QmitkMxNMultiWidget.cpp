@@ -2364,9 +2364,9 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
       }
       childJson["view_direction"] = descriptor.viewDirection.toStdString();
       // 2D is the default; omitting it keeps 2D-only documents as they were.
-      if (RenderModeToString(RenderMode::ThreeD) == descriptor.renderMode.toStdString())
+      if (RenderMode::ThreeD == descriptor.renderMode)
       {
-        childJson["render_mode"] = descriptor.renderMode.toStdString();
+        childJson["render_mode"] = RenderModeToString(descriptor.renderMode);
       }
 
       nlohmann::json linksJson{ { "selection", descriptor.selectionGroup.toStdString() } };
@@ -2444,8 +2444,7 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
     ViewDirectionToString(this->GetViewDirection(descriptor.id)));
-  descriptor.renderMode = QString::fromStdString(
-    RenderModeToString(this->GetRenderMode(descriptor.id)));
+  descriptor.renderMode = this->GetRenderMode(descriptor.id);
 
   const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
   const auto recorded = m_GroupNameByIndex.find(idx);

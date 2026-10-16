@@ -1359,7 +1359,8 @@ public:
     for (const auto& d : descriptors)
     {
       CPPUNIT_ASSERT_EQUAL(std::string("main"), d.selectionGroup.toStdString());
-      CPPUNIT_ASSERT_EQUAL(std::string("2d"), d.renderMode.toStdString());
+      CPPUNIT_ASSERT_MESSAGE("a 2D-only layout must report RenderMode::TwoD for every cell",
+                             QmitkMxNMultiWidget::RenderMode::TwoD == d.renderMode);
     }
   }
 

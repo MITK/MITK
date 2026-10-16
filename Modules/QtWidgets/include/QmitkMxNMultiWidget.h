@@ -1022,10 +1022,11 @@ public:
   *
   *   Holds the per-cell fields that the layout document persists for a
   *   window besides its links -- identity (id), optional display label, view
-  *   direction and render mode in the document's vocabulary, and
-  *   selection-group label -- without dragging the
-  *   JSON or QSplitter shape across the API boundary. The other dimensions'
-  *   links are read through GetSyncLink.
+  *   direction, render mode, and selection-group label -- without dragging
+  *   the JSON or QSplitter shape across the API boundary. The view direction
+  *   is carried in the document's vocabulary as a string; the render mode is
+  *   the engine's RenderMode. The other dimensions' links are read through
+  *   GetSyncLink.
   *
   *   Identity vs. display label: 'id' is the layout schema's required `id`
   *   field -- the fully-qualified, URL-segment-safe canonical window name
@@ -1039,7 +1040,7 @@ public:
     QString id;              // canonical fully-qualified window id
     QString displayName;     // optional human-readable label, empty when absent
     QString viewDirection;   // "axial" | "sagittal" | "coronal" | "original" | "free"
-    QString renderMode;      // "2d" | "3d"
+    RenderMode renderMode = RenderMode::TwoD;
     QString selectionGroup;  // links.selection group label
   };
 

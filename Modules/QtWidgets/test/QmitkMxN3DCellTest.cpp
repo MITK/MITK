@@ -368,8 +368,10 @@ public:
     const auto descriptors = m_Editor->ListWindowDescriptors();
     CPPUNIT_ASSERT_EQUAL(std::size_t(3), descriptors.size());
     CPPUNIT_ASSERT_EQUAL(std::string("free"), descriptors[2].viewDirection.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("3d"), descriptors[2].renderMode.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("2d"), descriptors[0].renderMode.toStdString());
+    CPPUNIT_ASSERT_MESSAGE("the 3D cell must report RenderMode::ThreeD",
+                           RenderMode::ThreeD == descriptors[2].renderMode);
+    CPPUNIT_ASSERT_MESSAGE("a 2D cell must report RenderMode::TwoD",
+                           RenderMode::TwoD == descriptors[0].renderMode);
   }
 
   /** The window nodes of a document, without the live splitter sizes. */

@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkCrashDumpFacility.h>
 #endif
 
+#include <QDateTime>
 #include <QDialog>
 #include <QFutureWatcher>
 #include <QPixmap>
@@ -98,10 +99,10 @@ public:
   void done(int result) override;
 
   /** \brief The crash dumps in the last successfully written bundle that are
-   *  still included, if the user asked to delete them, else none. Deleting
-   *  is left to the caller after the dialog has closed, because later
-   *  hand-offs from the same dialog may write the bundle again from the same
-   *  dumps. */
+   *  still included, if the user asked to delete them and that bundle file
+   *  still exists, else none. Deleting is left to the caller after the dialog
+   *  has closed, because later hand-offs from the same dialog may write the
+   *  bundle again from the same dumps. */
   std::vector<std::filesystem::path> GetDumpsToDelete() const;
 
 protected:
@@ -139,7 +140,8 @@ private:
    *  where a check box text would widen the form. */
   QWidget* CreateWrappingCheckBox(QCheckBox* checkBox, const QString& text);
 
-  /** A word-wrapped label that clicks \p button when clicked. */
+  /** A word-wrapped label that clicks \p button when clicked and names it for
+   *  assistive technology. */
   QLabel* CreateClickableLabel(const QString& text, QAbstractButton* button);
 
   void AddEnvironmentRow(QVBoxLayout* layout);
@@ -164,11 +166,22 @@ private:
    *  row is checked. */
   std::vector<std::filesystem::path> GetIncludedDumps() const;
 
+  /** The included dumps that are in the last successfully written bundle,
+   *  whether or not that file still exists. */
+  std::vector<std::filesystem::path> GetIncludedBundledDumps() const;
+
   /** Shows the dump list and the logs of the included dumps only. */
   void UpdateDumpRows();
 
   void UpdateHeaderIcon();
   void UpdateImageList();
+
+  /** Re-reads every listed image whose file differs in size or modification
+   *  time from when it was read; an image whose file is gone or can no
+   *  longer be read as an image is removed, with a warning. If any image
+   *  changed, the sharing confirmations are withdrawn and the status line
+   *  asks the user to review the images. Returns whether any image changed. */
+  bool ReloadChangedImages();
 
   void UpdateSummaries();
   void UpdateConfirmations(const mitk::FeedbackReport& report);
@@ -179,7 +192,10 @@ private:
 
   /** Writes the bundle off the UI thread (a long write would look like a
    *  freeze to the UI-freeze watchdog), then runs \p handoff. A bundle
-   *  written for the unchanged report is reused. */
+   *  written for the unchanged report is reused. Nothing is handed off if an
+   *  image file changed on disk, before or during the write, or if the report
+   *  changed while the bundle was being written; the status line says so, and
+   *  the user uses the button again. */
   void WriteBundleThen(Handoff handoff);
   void OnBundleWritten();
 
@@ -211,6 +227,10 @@ private:
   {
     QString path;
     QPixmap thumbnail;
+
+    /** State of the file when it was read, to notice a later edit. */
+    qint64 size = 0;
+    QDateTime modified;
   };
 
   /** Image files the user added, all included. */
@@ -239,6 +259,10 @@ private:
 
   /** Labels and panels that click a button when clicked. */
   std::map<QObject*, QAbstractButton*> m_ClickTargets;
+
+  /** The click target on which the left button went down and has not come
+   *  up, else null. A release clicks only on the target it started on. */
+  QObject* m_PressTarget = nullptr;
 
   QWidget* m_PreviewPane = nullptr;
   QTextBrowser* m_Preview = nullptr;

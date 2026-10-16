@@ -67,10 +67,10 @@ The report is assembled on your computer, and the dialog previews it next to you
 
 <ul>
   <li><b>Category and description</b> - the description is required.</li>
-  <li><b>Environment</b> - the MITK version and revision, the build type, the versions of Qt, VTK and ITK, the operating system, the processor architecture, the language of the user interface, and the graphics adapter. You can leave out each of them. The name of your computer is never collected.</li>
-  <li><b>Log</b> - off by default. The last 1000 lines of the log of this session. You can edit the excerpt before including it; an edited excerpt is marked as such in the report.</li>
+  <li><b>Environment</b> - the MITK version and revision, the build type, the versions of Qt, VTK and ITK, the operating system, the processor architecture, the language of the user interface, and the graphics adapter, if a display that has been shown in this session is open. You can leave out each of them. The name of your computer is never collected.</li>
+  <li><b>Log</b> - off by default. The end of the log of this session, at most its last 1000 lines and at most 512 KB. You can edit the excerpt before including it; an edited excerpt is marked as such in the report.</li>
   <li><b>Screenshot</b> - off by default. Of the application window or of the display area, taken just before the dialog opened.</li>
-  <li><b>Images from files</b> - images of your own, for example a screenshot of something you saw earlier. Each is shown as a thumbnail and can be removed again.</li>
+  <li><b>Images from files</b> - images of your own, for example a screenshot of something you saw earlier. Each is shown as a thumbnail and can be removed again. An image is read from its file when the report is saved; if the file changed since you added it, the dialog reloads it and asks you to confirm sharing again, and if the file is gone or can no longer be read, the image is removed from the report. Adding a listed file again reloads it as well.</li>
   <li><b>Crash dumps</b> - off by default, and offered only if crash dumps are saved on your computer (see below).</li>
 </ul>
 
@@ -84,13 +84,13 @@ The report is handed off by a program of your choice:
   <li><b>Show report file</b> saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
 </ul>
 
-The .zip file is saved in a temporary folder and is kept when the dialog closes. Saving again replaces the previous file. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
+The .zip file is saved in a temporary folder and is kept when the dialog closes; the system may clean up temporary folders later, so move the file if you want to keep it. Saving again replaces the previous file. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
 
 \subsection MITKWorkbenchManualPage_Feedback_CrashDumps Reports with crash dumps
 
 A report filed with <i>File report...</i> from the crash dump dialogs is a bug report that includes the passed dumps; you can uncheck any of them. A report started from the Help menu or the welcome screen offers all saved dumps instead: check <i>Crash dumps</i> and then the dumps that belong to the problem. For each included dump, a copy of the log of the session that produced it is offered as a further log excerpt. A crash dump is a snapshot of parts of the application's memory that you cannot review before sending it, so a report with crash dumps is sent by email to the MITK team and never to the public issue tracker. GitHub remains available for feature requests, ideas, and bugs without crash dumps.
 
-You can choose to delete the included dumps from this computer when you close the dialog. They are deleted only if a report containing them was saved, and the saved .zip file is then their only copy.
+You can choose to delete the included dumps from this computer when you close the dialog. Only dumps in a saved .zip file that still exists at that point are deleted; if the file is gone, the dumps are kept and the dialog tells you so. The .zip file is then the only copy of the deleted dumps, and it lies in a temporary folder that the system may clean up, so pass it on or move it first. The copy of the session log that is kept with a dump is deleted too; the .zip file contains at most an excerpt of it, and only if you included that log.
 
 \section MITKWorkbenchManualPage_CrashDumpDialog Diagnostic Data After a Crash
 

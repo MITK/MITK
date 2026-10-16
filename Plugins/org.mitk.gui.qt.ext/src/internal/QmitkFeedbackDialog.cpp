@@ -42,6 +42,7 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QLocale>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPlainTextEdit>
 #include <QProgressBar>
 #include <QScreen>
@@ -123,6 +124,13 @@ namespace
     pixmap.save(&buffer, "PNG");
 
     return std::vector<unsigned char>(bytes.begin(), bytes.end());
+  }
+
+  QPixmap CreateImageThumbnail(const QPixmap& pixmap, qreal ratio)
+  {
+    auto thumbnail = pixmap.scaled(QSize(120, 80) * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    thumbnail.setDevicePixelRatio(ratio);
+    return thumbnail;
   }
 
   /** \p value percent-encoded for a URL query. QUrlQuery leaves "+" as is,
@@ -245,6 +253,14 @@ void QmitkFeedbackDialog::done(int result)
   if (m_BundleWatcher.isRunning())
     return;
 
+  if (m_DeleteDumps != nullptr && m_DeleteDumps->isChecked() && !this->GetIncludedBundledDumps().empty() &&
+    !QFileInfo::exists(m_BundlePath))
+  {
+    QMessageBox::information(this, this->windowTitle(),
+      "The crash dumps were kept, because the report file that contained them no longer exists.\n\n"
+      "You can delete them under Help > Diagnostic Data.");
+  }
+
   QDialog::done(result);
 }
 
@@ -253,28 +269,46 @@ std::vector<std::filesystem::path> QmitkFeedbackDialog::GetDumpsToDelete() const
   if (m_DeleteDumps == nullptr || !m_DeleteDumps->isChecked())
     return {};
 
-  // A dump excluded after the last save keeps its local copy.
-  const auto included = this->GetIncludedDumps();
-  std::vector<std::filesystem::path> dumps;
+  // Once deleted, the bundle file holds the only copy of the dumps.
+  if (m_BundlePath.isEmpty() || !QFileInfo::exists(m_BundlePath))
+    return {};
 
-  for (const auto& dump : m_BundleAttachments)
-  {
-    if (std::find(included.begin(), included.end(), dump) != included.end())
-      dumps.push_back(dump);
-  }
-
-  return dumps;
+  return this->GetIncludedBundledDumps();
 }
 
 bool QmitkFeedbackDialog::eventFilter(QObject* watched, QEvent* event)
 {
-  if (event->type() == QEvent::MouseButtonRelease)
+  const auto type = event->type();
+
+  if (type == QEvent::MouseButtonPress || type == QEvent::MouseButtonDblClick || type == QEvent::MouseButtonRelease)
   {
     if (const auto clickable = m_ClickTargets.find(watched); clickable != m_ClickTargets.end())
     {
-      if (clickable->second->isEnabled())
+      const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+      const bool left = mouseEvent->button() == Qt::LeftButton;
+
+      if (type != QEvent::MouseButtonRelease)
+      {
+        if (!left)
+          return QDialog::eventFilter(watched, event);
+
+        // Consumed, so that a press on a label does not propagate to the
+        // panel and replace the target.
+        m_PressTarget = watched;
+        return true;
+      }
+
+      // The release goes to the widget that got the press, even when the
+      // pointer has left it.
+      const bool inside = static_cast<const QWidget*>(watched)->rect().contains(mouseEvent->position().toPoint());
+
+      if (left && m_PressTarget == watched && inside && clickable->second->isEnabled())
         clickable->second->click();
 
+      m_PressTarget = nullptr;
+
+      // Consumed even without a click: an unconsumed release would
+      // propagate from a label to the panel and toggle the box there.
       return true;
     }
   }
@@ -565,6 +599,7 @@ QWidget* QmitkFeedbackDialog::CreateConfirmation(QCheckBox* checkBox, const QStr
   m_ClickTargets[panel] = checkBox;
 
   checkBox->setStyleSheet("QCheckBox::indicator { width: 18px; height: 18px; }");
+  checkBox->setAccessibleDescription(note);
 
   auto* text = new QVBoxLayout;
   text->setSpacing(4);
@@ -596,6 +631,8 @@ QLabel* QmitkFeedbackDialog::CreateClickableLabel(const QString& text, QAbstract
 {
   auto* label = new QLabel(text);
   label->setWordWrap(true);
+  // The label text becomes the accessible name of a button without text.
+  label->setBuddy(button);
   label->setCursor(Qt::PointingHandCursor);
   label->installEventFilter(this);
   m_ClickTargets[label] = button;
@@ -664,7 +701,9 @@ void QmitkFeedbackDialog::AddLogRows(QVBoxLayout* layout)
 
     row.text = new QPlainTextEdit(QString::fromStdString(source.log.text));
     row.text->setLineWrapMode(QPlainTextEdit::NoWrap);
-    row.text->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    // A style sheet, since the application's style sheet would override a widget font.
+    row.text->setStyleSheet(QString("QPlainTextEdit { font-family: \"%1\"; }")
+      .arg(QFontDatabase::systemFont(QFontDatabase::FixedFont).family()));
     row.text->setMinimumHeight(220);
     row.text->setPlaceholderText("The excerpt is empty.");
     row.originalText = row.text->toPlainText();
@@ -737,16 +776,28 @@ void QmitkFeedbackDialog::AddDumpsRow(QVBoxLayout* layout)
   m_DumpsInclude->setChecked(m_Input.dumpsIncluded);
 
   m_DeleteDumps = new QCheckBox;
-  m_DeleteDumps->setToolTip("Only dumps that are in a saved report file are deleted. "
-    "That file in the temporary folder is then their only copy.");
+
+  // Line breaks, since a plain-text tooltip is not wrapped.
+  const QString deleteDumpsNote("Only dumps in a saved report file that still exists when this dialog\n"
+    "closes are deleted. That file is then their only copy, and it lies in a\n"
+    "temporary folder that the system may clean up: pass it on or move it first.\n"
+    "The session log kept with a dump is deleted too. The report file contains\n"
+    "at most an excerpt of it, and only if you included that log.");
+
+  m_DeleteDumps->setAccessibleDescription(deleteDumpsNote);
+
+  auto* deleteDumps = this->CreateWrappingCheckBox(m_DeleteDumps,
+    "Delete the included crash dumps from this computer when I close this dialog");
+
+  // On the row, so that it shows over the text as well as over the box.
+  deleteDumps->setToolTip(deleteDumpsNote);
 
   m_DumpDetails = new QWidget;
   auto* detailsLayout = new QVBoxLayout(m_DumpDetails);
   detailsLayout->setContentsMargins(0, 4, 0, 0);
   detailsLayout->setSpacing(6);
   detailsLayout->addWidget(m_DumpList);
-  detailsLayout->addWidget(this->CreateWrappingCheckBox(m_DeleteDumps,
-    "Delete the included crash dumps from this computer when I close this dialog"));
+  detailsLayout->addWidget(deleteDumps);
   detailsLayout->addWidget(CreateMutedLabel("You can also delete them later under Help > Diagnostic Data."));
 
   m_DumpSummary = CreateMutedLabel();
@@ -805,22 +856,29 @@ void QmitkFeedbackDialog::OnAddImages()
 
   for (const auto& path : paths)
   {
-    if (std::any_of(m_Images.begin(), m_Images.end(), [&path](const auto& image) { return image.path == path; }))
-      continue;
+    // Stamped before the read, so that an edit in between shows up at the
+    // next ReloadChangedImages().
+    const QFileInfo info(path);
+    const auto size = info.size();
+    const auto modified = info.lastModified();
 
     const QPixmap pixmap(path);
 
     if (pixmap.isNull())
     {
-      unreadable << QFileInfo(path).fileName();
+      unreadable << info.fileName();
       continue;
     }
 
-    const auto ratio = this->devicePixelRatioF();
-    auto thumbnail = pixmap.scaled(QSize(120, 80) * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    thumbnail.setDevicePixelRatio(ratio);
+    UserImage image{ path, CreateImageThumbnail(pixmap, this->devicePixelRatioF()), size, modified };
+    const auto listed = std::find_if(m_Images.begin(), m_Images.end(),
+      [&path](const auto& other) { return other.path == path; });
 
-    m_Images.push_back({ path, thumbnail });
+    if (listed != m_Images.end())
+      *listed = std::move(image);
+    else
+      m_Images.push_back(std::move(image));
+
     added = true;
   }
 
@@ -893,6 +951,59 @@ void QmitkFeedbackDialog::UpdateImageList()
 
     m_ImageList->addWidget(row);
   }
+}
+
+bool QmitkFeedbackDialog::ReloadChangedImages()
+{
+  bool changed = false;
+  QStringList removed;
+
+  for (auto image = m_Images.begin(); image != m_Images.end();)
+  {
+    // Stamped before the read, as when adding.
+    const QFileInfo info(image->path);
+    const auto size = info.size();
+    const auto modified = info.lastModified();
+
+    if (size == image->size && modified == image->modified)
+    {
+      ++image;
+      continue;
+    }
+
+    changed = true;
+    const QPixmap pixmap(image->path);
+
+    // Its thumbnail would no longer show what the bundle contains.
+    if (pixmap.isNull())
+    {
+      removed << info.fileName();
+      image = m_Images.erase(image);
+      continue;
+    }
+
+    image->thumbnail = CreateImageThumbnail(pixmap, this->devicePixelRatioF());
+    image->size = size;
+    image->modified = modified;
+    ++image;
+  }
+
+  if (!changed)
+    return false;
+
+  this->UpdateImageList();
+  m_SharingConfirmation->setChecked(false);
+  this->OnPublicItemChanged();
+  m_Status->setText("<b>An image changed on disk. Review the images and confirm again before you continue.</b>");
+
+  if (!removed.isEmpty())
+  {
+    QMessageBox::warning(this, this->windowTitle(),
+      "These images were removed from the report, because their files are gone or can no longer be read as "
+      "images:\n\n" + removed.join('\n'));
+  }
+
+  return true;
 }
 
 void QmitkFeedbackDialog::UpdateHeaderIcon()
@@ -1088,6 +1199,21 @@ std::vector<std::filesystem::path> QmitkFeedbackDialog::GetIncludedDumps() const
 #endif
 
   return included;
+}
+
+std::vector<std::filesystem::path> QmitkFeedbackDialog::GetIncludedBundledDumps() const
+{
+  // A dump excluded after the last save keeps its local copy.
+  const auto included = this->GetIncludedDumps();
+  std::vector<std::filesystem::path> dumps;
+
+  for (const auto& dump : m_BundleAttachments)
+  {
+    if (std::find(included.begin(), included.end(), dump) != included.end())
+      dumps.push_back(dump);
+  }
+
+  return dumps;
 }
 
 void QmitkFeedbackDialog::UpdateDumpRows()
@@ -1306,6 +1432,11 @@ void QmitkFeedbackDialog::UpdateScreenshotPreview()
 
 void QmitkFeedbackDialog::WriteBundleThen(Handoff handoff)
 {
+  // Images are read from their files when the bundle is written, so an edit
+  // on disk changes what the user reviewed and confirmed.
+  if (this->ReloadChangedImages())
+    return;
+
   if (!m_BundlePath.isEmpty() && m_BundleGeneration == m_Generation && QFileInfo::exists(m_BundlePath))
   {
     handoff(m_BundlePath, this->AssembleReport());
@@ -1390,6 +1521,18 @@ void QmitkFeedbackDialog::OnBundleWritten()
 
   m_BundleStatus = status;
   m_Status->setText(status);
+
+  // The images were read from their files during the write.
+  if (this->ReloadChangedImages())
+    return;
+
+  // A hand-off passes on only what the form currently shows.
+  if (m_PendingGeneration != m_Generation)
+  {
+    m_Status->setText(status + " <b>The report changed while it was being saved, so nothing was opened. "
+      "Use the button again to pass on the current report.</b>");
+    return;
+  }
 
   handoff(m_BundlePath, m_PendingReport);
 }

@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QmitkCrashDumpManagerDialog.h>
 #endif
 
+#include <berryIEditorReference.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -29,6 +30,7 @@ found in the LICENSE file.
 #include <mitkEnvironmentInfo.h>
 #include <mitkException.h>
 #include <mitkIRenderWindowPart.h>
+#include <mitkLog.h>
 #include <mitkLogBackend.h>
 #include <mitkLogTail.h>
 
@@ -41,11 +43,13 @@ found in the LICENSE file.
 #include <QWidget>
 
 #include <algorithm>
+#include <exception>
 #include <sstream>
 
 namespace
 {
   constexpr std::size_t MaxLogLines = 1000;
+  constexpr std::size_t MaxLogBytes = 512 * 1024;
 
   const std::string CurrentSessionLogName = "logs/current-session.log";
   const std::string CurrentSessionLabel = "This session";
@@ -63,31 +67,82 @@ namespace
     return window.IsNull() ? nullptr : static_cast<QWidget*>(window->GetShell()->GetControl());
   }
 
-  /** The render windows of the active editor, the active one first; empty
-   *  if the active editor has none. */
-  std::vector<QmitkRenderWindow*> GetActiveEditorRenderWindows(const berry::IWorkbenchWindow::Pointer& window)
+  /** Runs \p capture. A report is still worth filing when rendering throws,
+   *  so a failure only leaves the screenshot named \p what out of the report. */
+  template <class Capture>
+  void TryCapture(const char* what, Capture&& capture)
   {
-    if (window.IsNull() || window->GetActivePage().IsNull())
-      return {};
+    try
+    {
+      capture();
+    }
+    catch (const std::exception& e)
+    {
+      MITK_WARN << "The screenshot of the " << what << " is left out of the report: " << e.what();
+    }
+    catch (...)
+    {
+      MITK_WARN << "The screenshot of the " << what << " is left out of the report: unknown exception";
+    }
+  }
 
-    const auto editor = window->GetActivePage()->GetActiveEditor();
-    const auto* part = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
+  /** Whether VTK has set up the context of \p renderWindow, i.e. the window
+   *  was shown at least once. */
+  bool IsInitialized(QmitkRenderWindow* renderWindow)
+  {
+    auto* vtkWindow = renderWindow->GetVtkRenderWindow();
+    return vtkWindow != nullptr && vtkWindow->GetInitialized();
+  }
 
-    if (part == nullptr)
-      return {};
-
+  /** The render windows of \p part, its active one first. */
+  std::vector<QmitkRenderWindow*> GetRenderWindows(const mitk::IRenderWindowPart& part)
+  {
     std::vector<QmitkRenderWindow*> renderWindows;
 
-    if (auto* active = part->GetActiveQmitkRenderWindow(); active != nullptr)
+    if (auto* active = part.GetActiveQmitkRenderWindow(); active != nullptr)
       renderWindows.push_back(active);
 
-    for (auto* renderWindow : part->GetQmitkRenderWindows())
+    for (auto* renderWindow : part.GetQmitkRenderWindows())
     {
       if (renderWindow != nullptr && std::find(renderWindows.begin(), renderWindows.end(), renderWindow) == renderWindows.end())
         renderWindows.push_back(renderWindow);
     }
 
     return renderWindows;
+  }
+
+  /** The render windows of the editor that shows the display, the active one
+   *  first: the active editor if it is a render window part, else the first
+   *  open render window part with an initialized render window. The active
+   *  editor can be one without a display, e.g. the welcome screen. Editors
+   *  that are not realized yet stay so, and no editor is activated. Empty if
+   *  there is none. */
+  std::vector<QmitkRenderWindow*> FindDisplayRenderWindows(const berry::IWorkbenchWindow::Pointer& window)
+  {
+    if (window.IsNull() || window->GetActivePage().IsNull())
+      return {};
+
+    const auto page = window->GetActivePage();
+    const auto activeEditor = page->GetActiveEditor();
+
+    if (const auto* activePart = dynamic_cast<mitk::IRenderWindowPart*>(activeEditor.GetPointer()); activePart != nullptr)
+      return GetRenderWindows(*activePart);
+
+    for (const auto& editorRef : page->GetEditorReferences())
+    {
+      const auto editor = editorRef->GetPart(false);
+      const auto* part = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
+
+      if (part == nullptr)
+        continue;
+
+      auto renderWindows = GetRenderWindows(*part);
+
+      if (std::any_of(renderWindows.begin(), renderWindows.end(), IsInitialized))
+        return renderWindows;
+    }
+
+    return {};
   }
 
   /** The multi-widget hosting \p renderWindow, i.e. the editor area of the
@@ -105,18 +160,18 @@ namespace
     return nullptr;
   }
 
-  /** The renderer of the context VTK actually draws with. An offscreen GL
-   *  context could be bound to a different GPU on multi-GPU hosts. Empty if
-   *  there is no initialized render window. */
+  /** The renderer of the context VTK actually draws with, taken from the
+   *  first initialized window of \p renderWindows. An offscreen GL context
+   *  could be bound to a different GPU on multi-GPU hosts. Empty if there is
+   *  no initialized render window. */
   std::string GetGpuRenderer(const std::vector<QmitkRenderWindow*>& renderWindows)
   {
-    if (renderWindows.empty())
+    const auto initialized = std::find_if(renderWindows.begin(), renderWindows.end(), IsInitialized);
+
+    if (initialized == renderWindows.end())
       return {};
 
-    auto* vtkWindow = renderWindows.front()->GetVtkRenderWindow();
-
-    if (vtkWindow == nullptr || !vtkWindow->GetInitialized())
-      return {};
+    auto* vtkWindow = (*initialized)->GetVtkRenderWindow();
 
     const std::string prefix = "OpenGL renderer string:";
     std::istringstream capabilities(vtkWindow->ReportCapabilities());
@@ -147,16 +202,18 @@ QmitkFeedbackDialog::Input QmitkCollectFeedbackInput()
   QmitkFeedbackDialog::Input input;
 
   if (auto* windowWidget = GetWindowWidget(window); windowWidget != nullptr)
-    input.windowShot = windowWidget->grab();
+    TryCapture("application window", [&] { input.windowShot = windowWidget->grab(); });
 
-  const auto renderWindows = GetActiveEditorRenderWindows(window);
+  const auto renderWindows = FindDisplayRenderWindows(window);
 
   if (auto* multiWidget = renderWindows.empty() ? nullptr : FindMultiWidget(renderWindows.front()); multiWidget != nullptr)
   {
-    // Render windows of an editor in a background tab have their updates
-    // suspended and would be captured outdated.
-    multiWidget->ForceImmediateUpdateAll();
-    input.editorShot = multiWidget->grab();
+    TryCapture("display area", [&] {
+      // Render windows of an editor in a background tab have their updates
+      // suspended and would be captured outdated.
+      multiWidget->ForceImmediateUpdateAll();
+      input.editorShot = multiWidget->grab();
+    });
   }
 
   const auto logFile = mitk::LogBackend::GetLogFile();
@@ -191,7 +248,7 @@ QmitkFeedbackDialog::LogSource QmitkReadFeedbackLog(const std::filesystem::path&
 
   try
   {
-    const auto tail = mitk::ReadLogTail(path, MaxLogLines);
+    const auto tail = mitk::ReadLogTail(path, MaxLogLines, MaxLogBytes);
 
     std::ostringstream text;
 
@@ -260,7 +317,13 @@ void QmitkRunFeedbackDialog(const QmitkFeedbackDialog::Input& input, QWidget* pa
 
   for (const auto& dump : dumpsToDelete)
   {
-    if (!mitk::CrashDumpFacility::DeleteDump(dump))
+    if (mitk::CrashDumpFacility::DeleteDump(dump))
+      continue;
+
+    // Another instance or the dump pruning may have removed it meanwhile.
+    std::error_code error;
+
+    if (std::filesystem::exists(dump, error) || error)
       failed << QString::fromStdU16String(dump.filename().u16string());
   }
 

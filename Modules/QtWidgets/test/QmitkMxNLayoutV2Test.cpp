@@ -112,6 +112,11 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(ApplyLayout_WrongEditorPrefix_Throws);
   MITK_TEST(Construct_BadMultiWidgetName_Throws);
 
+  // --- v3 additions are rejected in a v2.0 document ---
+  MITK_TEST(V2Doc_RenderMode_Throws);
+  MITK_TEST(V2Doc_FreeViewDirection_Throws);
+  MITK_TEST(V2Doc_UnknownWindowKey_Tolerated);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -1352,7 +1357,55 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("original"),       descriptors[3].viewDirection.toStdString());
 
     for (const auto& d : descriptors)
+    {
       CPPUNIT_ASSERT_EQUAL(std::string("main"), d.selectionGroup.toStdString());
+      CPPUNIT_ASSERT_MESSAGE("a 2D-only layout must report RenderMode::TwoD for every cell",
+                             QmitkMxNMultiWidget::RenderMode::TwoD == d.renderMode);
+    }
+  }
+
+  /** A v2.0 single-window document; callers patch the window. */
+  static nlohmann::json V2SingleWindowDoc()
+  {
+    return nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial",
+            "links": { "selection": "main" } }
+        ]
+      }
+    })json");
+  }
+
+  void V2Doc_RenderMode_Throws()
+  {
+    // v2.0 ignores unknown window keys, which would load a 3D window as 2D.
+    for (const auto* renderMode : { "3d", "2d" })
+    {
+      auto doc = V2SingleWindowDoc();
+      doc["root"]["children"][0]["render_mode"] = renderMode;
+      auto editor = MakeEditor();
+      CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+    }
+  }
+
+  void V2Doc_FreeViewDirection_Throws()
+  {
+    auto doc = V2SingleWindowDoc();
+    doc["root"]["children"][0]["view_direction"] = "free";
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(doc), mitk::Exception);
+  }
+
+  void V2Doc_UnknownWindowKey_Tolerated()
+  {
+    auto doc = V2SingleWindowDoc();
+    doc["root"]["children"][0]["comment"] = "kept loading as before";
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
   }
 
   // ====================================================================

@@ -99,6 +99,7 @@ A node in the tree is one of two kinds, distinguished by `type`:
   "id": "mxn__widget0",
   "name": "Tumor axial",  // optional display label; omit if absent
   "view_direction": "axial",
+  "render_mode": "3d",    // optional (v3.0); "2d" when omitted
   "links": { "selection": "<groupName>" },
   "size": 1               // optional; defaults to 1 when omitted
 }
@@ -122,9 +123,14 @@ A `window` is a leaf render-window. Every window must declare:
   `^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$`. The editor-name segment
   contains no `_`, the namespace delimiter is the literal `__`, and the
   bare-id segment uses the existing URL-segment-safe alphabet.
-- `view_direction`: which anatomical plane the window shows. The closed enum
-  is `"axial"`, `"sagittal"`, `"coronal"`, `"original"` (lowercase). Unknown
-  strings throw at load time; there is no silent fallback.
+- `view_direction`: the direction the window looks from. The closed enum is
+  `"axial"`, `"sagittal"`, `"coronal"`, `"original"` and, from v3.0 on,
+  `"free"` (lowercase). A 2D window shows that anatomical plane; for 3D
+  windows see "3D windows" below. `"original"` slices the reference geometry
+  as it is stacked (axial when the geometry carries no slicing of its own);
+  it can only come from a document, the editor's direction picker offers the
+  three standard planes. Unknown strings throw at load time; there is no
+  silent fallback.
 - `links`: per-dimension synchronization references. v2.0 has one dimension,
   `selection`; v3.0 adds seven navigation and appearance dimensions (see
   "Navigation and appearance links" below). Every window must declare
@@ -138,6 +144,9 @@ A window may additionally declare:
   the loader does not use it for routing, addressing, persisted-state
   keying, or REST URL construction (those all use `id`). Omit the field
   entirely if the cell has no display name: empty strings are rejected.
+- `render_mode` (v3.0): `"2d"` (the default) or `"3d"`. Writers emit it only
+  for 3D windows, so a layout without 3D windows is written exactly as
+  before.
 
 ### `size` is a ratio, not pixels
 
@@ -264,10 +273,76 @@ window's own plane. They therefore point the same way in the patient only
 across windows that show the same plane; across planes the in-plane vector is
 applied as is.
 
-`orientation` aligns a joining window to its group's view direction.
+`orientation` aligns a joining window to its group's view direction; a 3D
+member turns its camera to that direction, and in a `"free"` group (see "3D
+windows") takes the group's camera direction.
 `windowing` and `lut` relay changes to every member but do not converge a
 joining window, which keeps its own value until the group's next change.
 `time` is reserved as a future key and rejected by v3.0.
+
+## 3D windows
+
+A window with `render_mode: "3d"` shows the 3D representations of its data:
+segmentations, surfaces and volume renderings. Plain images are not shown as
+slice planes in 3D.
+
+Its `view_direction` keeps the meaning it has for a 2D window: the 3D camera
+looks along the normal of exactly the plane a 2D window with the same
+direction and the same reference geometry shows, from the same side and with
+the same view-up. A 2D and a 3D window with the same direction therefore
+look at the data the same way, also for data acquired at an oblique angle,
+and an orientation group may mix 2D and 3D windows.
+
+`"free"` means a 3D camera the user rotated away from the standard
+directions. The rotation itself is not persisted (no camera is), so a loaded
+`"free"` window starts from the anterior view. A 2D window cannot be
+`"free"`; switching a `"free"` window to 2D gives it the standard plane its
+camera looks at most directly and takes it out of its orientation group.
+
+A 3D window synchronizes only what has a meaning for it:
+
+| Dimension | 2D window | 3D window |
+| --- | --- | --- |
+| `selection` | yes | yes |
+| `orientation` | yes | yes, including `"free"` |
+| `pan` | yes | yes, relative |
+| `zoom` | yes | yes |
+| `crosshair` | yes | not applicable |
+| `slice` | yes | not applicable |
+| `windowing`, `lut` | yes | not applicable |
+
+A 3D camera decomposes into the point it looks at (`pan`), the visible
+extent there (`zoom`) and its direction with view-up (`orientation`):
+
+- `pan` is relative for 3D windows: a pan gesture moves every member by the
+  same world vector (a 2D member by its part in the window's plane), but a
+  3D window never takes or defines a group's pan reference, so joining a
+  pan group or re-converging it moves no 3D camera. An absolute reference
+  would pull the 3D view onto a 2D slice plane.
+- `zoom` compares the visible half-height at the camera's focal point (a
+  2D window's view height): a 3D window converges to its zoom group and
+  carries zoom offsets like a 2D window.
+- `orientation` with a standard direction locks the rotation of the 3D
+  members. All members of an orientation group whose direction is `"free"`
+  are 3D windows; rotating one turns the others alike.
+
+A link on a dimension that is not applicable is kept, written back and shown
+as not applicable, but it has no effect: the window neither follows the
+group, nor drives it, nor defines its reference when the group converges.
+Switching the window back to 2D makes the link take effect again, and the
+window converges to its groups like a window that just joined them.
+
+The loader rejects what a layout cannot honour:
+
+- `"free"` on a window that is not `"3d"`;
+- a `"free"` window sharing an orientation group with a 2D window (a 2D
+  window cannot follow a freely rotated camera);
+- a `"free"` window sharing an orientation group with a window that has a
+  standard direction (the members of an orientation group share one
+  direction).
+
+A `"pan"` offset on a 3D window is kept and written back; the loader logs
+that it has no effect while the window renders 3D.
 
 ## Lazy vs. strict mode
 
@@ -456,7 +531,8 @@ loader that cannot honour a synchronization should not silently load the
 file and drop part of the contract.
 
 v2.0 to v3.0 is additive: more dimension keys inside `links`, the object
-form for offsets, and the cosmetic `color` / `name` group properties. The
+form for offsets, the cosmetic `color` / `name` group properties, and
+`render_mode` with the `"free"` view direction for 3D windows. The
 selection link and `select_all` keep their v2 shape, so tooling that learned
 the v2 shape keeps working. The loader reads both versions in one code path;
 there is no mandatory migration. A v2-only loader refuses a `"3.0"` document
@@ -464,11 +540,15 @@ at its version check, correctly, since it cannot honour the extra
 dimensions.
 
 The C++ loader runs no JSON-schema validator. It enforces the closure of
-`links` at runtime, and only for `"3.0"` documents: an unknown link key, an
-unknown modifier, or an offset on a dimension that does not take one (or of
-the wrong type) throws. `"2.0"` documents keep their historical leniency, so
-unknown link keys in them are ignored and existing v2 files are never newly
-rejected. Unknown keys inside a group entry are tolerated in both versions.
+windows and of `links` at runtime, and only for `"3.0"` documents: an unknown
+window key, an unknown link key, an unknown modifier, or an offset on a
+dimension that does not take one (or of the wrong type) throws. `"2.0"`
+documents keep their historical leniency, so unknown window and link keys in
+them are ignored and existing v2 files are never newly rejected. The one
+exception is the v3.0 vocabulary for 3D windows: a `"2.0"` document with
+`render_mode` or a `"free"` view direction is rejected, because ignoring it
+would load a 3D window as 2D. Unknown keys inside a group entry are
+tolerated in both versions.
 
 ## Where to look in the source
 

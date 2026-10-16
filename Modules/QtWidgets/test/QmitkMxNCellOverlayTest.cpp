@@ -32,6 +32,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <nlohmann/json.hpp>
+
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
@@ -53,7 +55,9 @@ found in the LICENSE file.
  * frame's group identity follows the mono / complex rule over the cell's
  * per-dimension synchronization. The suite also covers how masked furniture
  * routes input (right click, wheel, lost grab, popups) and the mask's
- * lifecycle (resize, destruction). Presentation and animation are manual
+ * lifecycle (resize, destruction). A 3D cell names its render mode in the
+ * label, keeps only the time readout and navigator row, and its menus leave
+ * out what has no 3D meaning. Presentation and animation are manual
  * acceptance.
  */
 class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
@@ -77,6 +81,15 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Popup_ContextMenuDoesNotRevealTheFrame);
   MITK_TEST(LostGrab_LeavesTheColorbarDragWorking);
   MITK_TEST(LostGrab_EndsAStaleColorbarDrag);
+  MITK_TEST(PlaneLabel_NamesTheRenderModeAndFree);
+  MITK_TEST(PlaneLabel_OriginalIsNamed);
+  MITK_TEST(PlaneLabel_LockedThreeDCellSaysWhy);
+  MITK_TEST(ThreeD_NoSliceReadoutOrNavigatorWithoutTime);
+  MITK_TEST(ThreeD_TimeOnlyReadoutAndNavigator);
+  MITK_TEST(ThreeD_ContextMenuLeavesOutTwoDEntries);
+  MITK_TEST(Picker_OffersTheOtherRenderModeAndFree);
+  MITK_TEST(Picker_DirectionLockedWhileOpen_EveryEntryIsInert);
+  MITK_TEST(PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -620,6 +633,246 @@ public:
 
     // Reaching here means the paint path did not crash across those branches.
     CPPUNIT_ASSERT(true);
+  }
+
+  void PlaneLabel_NamesTheRenderModeAndFree()
+  {
+    auto* overlay = this->Overlay(1);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Coronal);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Coronal"), overlay->PlaneLabel().toStdString());
+
+    m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Free"), overlay->PlaneLabel().toStdString());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
+    CPPUNIT_ASSERT_EQUAL(std::string("Coronal"), overlay->PlaneLabel().toStdString());
+  }
+
+  void PlaneLabel_OriginalIsNamed()
+  {
+    m_Editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__w0", "view_direction": "original", "links": { "selection": "main" } } ] }
+    })json"));
+    auto* overlay = m_Editor->GetRenderWindowWidget("mxn__w0")->findChild<QmitkMxNCellOverlay*>();
+    CPPUNIT_ASSERT(nullptr != overlay);
+    CPPUNIT_ASSERT_EQUAL(std::string("Original"), overlay->PlaneLabel().toStdString());
+  }
+
+  void PlaneLabel_LockedThreeDCellSaysWhy()
+  {
+    auto* overlay = this->Overlay(1);
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Coronal);
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT(overlay->PlaneLabelToolTip().isEmpty());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Coronal (locked)"), overlay->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Rotation locked by orientation group planes"),
+                         overlay->PlaneLabelToolTip().toStdString());
+
+    m_Editor->SetSyncGroupDisplayName("planes", "Planes A");
+    CPPUNIT_ASSERT_EQUAL(std::string("Rotation locked by orientation group Planes A"),
+                         overlay->PlaneLabelToolTip().toStdString());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::TwoD);
+    CPPUNIT_ASSERT_EQUAL(std::string("Coronal"), overlay->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT(overlay->PlaneLabelToolTip().isEmpty());
+  }
+
+  void ThreeD_NoSliceReadoutOrNavigatorWithoutTime()
+  {
+    this->ShowEditor();
+    CPPUNIT_ASSERT_MESSAGE("Precondition: a 2D cell has a slice readout", this->Overlay(1)->SliceReadoutRect().isValid());
+    CPPUNIT_ASSERT_MESSAGE("Precondition: a 2D cell has a navigator", this->Overlay(1)->NavigatorBandRect().isValid());
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("No slice readout in 3D", !this->Overlay(1)->SliceReadoutRect().isValid());
+    CPPUNIT_ASSERT_MESSAGE("No navigator in 3D without time steps", !this->Overlay(1)->NavigatorBandRect().isValid());
+    CPPUNIT_ASSERT(this->Overlay(1)->IsThreeD());
+    CPPUNIT_ASSERT_MESSAGE("No hairline in 3D without time steps", !this->Overlay(1)->ShowsHairline());
+  }
+
+  void ThreeD_TimeOnlyReadoutAndNavigator()
+  {
+    const auto image4D = mitk::ImageGenerator::GenerateRandomImage<short>(16, 16, 8, 4);
+    for (const auto& [name, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        cell->GetRenderWindow()->GetVtkRenderWindow(), image4D->GetTimeGeometry());
+    }
+    this->ShowEditor();
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+
+    const auto twoDReadout = this->Overlay(0)->SliceReadoutRect();
+    const auto threeDReadout = this->Overlay(1)->SliceReadoutRect();
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell reads out the time", threeDReadout.isValid());
+    CPPUNIT_ASSERT_MESSAGE("...and only the time", threeDReadout.width() < twoDReadout.width());
+
+    const auto twoDBand = this->Overlay(0)->NavigatorBandRect();
+    const auto threeDBand = this->Overlay(1)->NavigatorBandRect();
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell navigates time", threeDBand.isValid());
+    CPPUNIT_ASSERT_MESSAGE("...in a single row", threeDBand.height() < twoDBand.height());
+
+    CPPUNIT_ASSERT_MESSAGE("A 3D cell's hairline carries the time marker", this->Overlay(1)->ShowsHairline());
+    CPPUNIT_ASSERT_MESSAGE("A 2D cell keeps its hairline", this->Overlay(0)->ShowsHairline());
+  }
+
+  static QStringList ActionTexts(const QMenu& menu)
+  {
+    QStringList texts;
+    for (const auto* action : menu.actions())
+    {
+      if (!action->isSeparator())
+      {
+        texts.append(action->text());
+      }
+    }
+    return texts;
+  }
+
+  static const QAction* ActionNamed(const QMenu& menu, const QString& text)
+  {
+    for (const auto* action : menu.actions())
+    {
+      if (action->text() == text)
+      {
+        return action;
+      }
+    }
+    return nullptr;
+  }
+
+  void ThreeD_ContextMenuLeavesOutTwoDEntries()
+  {
+    QMenu twoDMenu;
+    this->Overlay(0)->PopulateContextMenu(&twoDMenu, QPoint());
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Set level/window...")));
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("Go to coordinate...")));
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav");
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu threeDMenu;
+    this->Overlay(1)->PopulateContextMenu(&threeDMenu, QPoint());
+    const auto texts = ActionTexts(threeDMenu);
+    CPPUNIT_ASSERT_MESSAGE("No level/window in 3D", !texts.contains(QStringLiteral("Set level/window...")));
+    CPPUNIT_ASSERT_MESSAGE("No coordinate entry in 3D", !texts.contains(QStringLiteral("Go to coordinate...")));
+    const auto* reconverge = ActionNamed(threeDMenu, QStringLiteral("Re-converge sync groups"));
+    CPPUNIT_ASSERT(nullptr != reconverge);
+    CPPUNIT_ASSERT_MESSAGE("An inactive slice link and the relative pan of a 3D view give nothing to re-converge",
+                           !reconverge->isEnabled());
+
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    QMenu zoomMenu;
+    this->Overlay(1)->PopulateContextMenu(&zoomMenu, QPoint());
+    CPPUNIT_ASSERT_MESSAGE("A 3D view converges on zoom",
+                           ActionNamed(zoomMenu, QStringLiteral("Re-converge sync groups"))->isEnabled());
+  }
+
+  void Picker_OffersTheOtherRenderModeAndFree()
+  {
+    QMenu twoDMenu;
+    this->Overlay(0)->PopulateDirectionMenu(&twoDMenu);
+    CPPUNIT_ASSERT(ActionTexts(twoDMenu).contains(QStringLiteral("3D view")));
+    CPPUNIT_ASSERT(!ActionTexts(twoDMenu).contains(QStringLiteral("Free")));
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu threeDMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&threeDMenu);
+    CPPUNIT_ASSERT(ActionTexts(threeDMenu).contains(QStringLiteral("2D view")));
+    const auto* free = ActionNamed(threeDMenu, QStringLiteral("Free"));
+    CPPUNIT_ASSERT(nullptr != free && free->isEnabled());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation, "planes");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "planes");
+    QMenu linkedMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&linkedMenu);
+    const auto* linkedFree = ActionNamed(linkedMenu, QStringLiteral("Free"));
+    CPPUNIT_ASSERT(nullptr != linkedFree);
+    CPPUNIT_ASSERT_MESSAGE("A view sharing its orientation group with a 2D view cannot go free",
+                           !linkedFree->isEnabled());
+    CPPUNIT_ASSERT(!linkedFree->toolTip().isEmpty());
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    QMenu allThreeDMenu;
+    this->Overlay(1)->PopulateDirectionMenu(&allThreeDMenu);
+    CPPUNIT_ASSERT_MESSAGE("An all-3D orientation group may go free",
+                           ActionNamed(allThreeDMenu, QStringLiteral("Free"))->isEnabled());
+  }
+
+  void Picker_DirectionLockedWhileOpen_EveryEntryIsInert()
+  {
+    // QMenu::exec runs a nested event loop, so the owning plugin can lock
+    // between the menu being built and an entry being triggered.
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    for (const int cell : { 0, 1 })
+    {
+      m_Editor->SetLayoutLocks({});
+      QMenu menu;
+      this->Overlay(cell)->PopulateDirectionMenu(&menu);
+      m_Editor->SetLayoutLocks(QmitkMxNLayoutLock::Direction);
+
+      for (auto* action : menu.actions())
+      {
+        if (action->isSeparator())
+        {
+          continue;
+        }
+        const auto direction = m_Editor->GetViewDirection(CellId(cell));
+        const auto renderMode = m_Editor->GetRenderMode(CellId(cell));
+        action->trigger();
+        const auto where = " ('" + action->text().toStdString() + "' on cell " + std::to_string(cell) + ")";
+        CPPUNIT_ASSERT_MESSAGE("The view direction stays" + where,
+                               direction == m_Editor->GetViewDirection(CellId(cell)));
+        CPPUNIT_ASSERT_MESSAGE("The render mode stays" + where,
+                               renderMode == m_Editor->GetRenderMode(CellId(cell)));
+      }
+    }
+  }
+
+  /** Counts the paint events a widget receives. */
+  class PaintCounter : public QObject
+  {
+  public:
+    int count = 0;
+
+    bool eventFilter(QObject*, QEvent* event) override
+    {
+      if (QEvent::Paint == event->type())
+      {
+        ++count;
+      }
+      return false;
+    }
+  };
+
+  void PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers()
+  {
+    // A free group that has not been rotated still shares its former camera:
+    // turning it back to that direction moves no camera and renders nothing,
+    // yet every member's label changes.
+    this->ShowEditor();
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(2), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Orientation, "orbit");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
+    QmitkTestPopupProbe::Pump(200);
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Free"), this->Overlay(2)->PlaneLabel().toStdString());
+
+    PaintCounter paints;
+    this->Overlay(2)->installEventFilter(&paints);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Sagittal);
+    QmitkTestPopupProbe::Pump(200);
+    this->Overlay(2)->removeEventFilter(&paints);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("3D | Sagittal (locked)"), this->Overlay(2)->PlaneLabel().toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The other member repaints its label", paints.count > 0);
   }
 };
 

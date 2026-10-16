@@ -74,6 +74,11 @@ class vtkRenderWindow;
  *     time-resolved data the time-step position rides the same hairline as a
  *     distinct triangle marker.
  *
+ * A 3D cell has no slice and no image plane: line 1 reads `3D | <name>`,
+ * line 2 shows the time alone, the colorbar and the `W/L` readout are
+ * absent, and the hairline carries only the time marker (when the data has
+ * more than one time step). The navigator keeps just the time row.
+ *
  * Passive readouts are always-on and faint (the level/window readout honors
  * the MxN preference and every readout honors clean-view). The interactive
  * furniture reveals as one coordinated frame when the pointer nears any piece
@@ -183,12 +188,17 @@ public:
   QString NavigatorDepthLabel() const;
 
   /**
-   * \brief The plane label currently shown bottom-left, tracking the cell's
-   *        view direction (empty before the first refresh or for a view with
-   *        no fixed anatomical name). Exposed for headless verification of the
-   *        reorientation tracking.
+   * \brief The plane label shown bottom-left: the cell's current view direction
+   *        ("Axial", "Coronal", "Sagittal", "Original", "Free"); for a 3D cell
+   *        "3D | <direction>", suffixed " (locked)" while its rotation is
+   *        locked. Always reflects the current state; empty while the editor
+   *        does not know the cell. Exposed for verification.
    */
   QString PlaneLabel() const;
+
+  /** \brief The tooltip of the plane label: why a 3D cell does not rotate,
+   *         empty when it does. Exposed for verification. */
+  QString PlaneLabelToolTip() const;
 
   qreal RevealProgress() const;
   void SetRevealProgress(qreal progress);
@@ -296,6 +306,43 @@ public:
    *         it opens the direction picker. Exposed for verification. */
   QRect PlaneLabelRect() const;
 
+  /** \brief The `slice N/max` readout, followed by a clock glyph and the time
+   *         readout when there is more than one time step; bottom-left line 2.
+   *         A 3D cell has no slice, so it shows the time alone, and nothing
+   *         without several time steps. Exposed for verification. */
+  QRect SliceReadoutRect() const;
+
+  /** \brief The bottom band the navigator sliders occupy; a 3D cell has only
+   *         the time row, so it has no band without several time steps.
+   *         Exposed for verification. */
+  QRect NavigatorBandRect() const;
+
+  /** \brief Whether the bottom hairline is painted: a 2D cell with a slice
+   *         bar, or a 3D cell with several time steps (the time marker alone).
+   *         Exposed for verification. */
+  bool ShowsHairline() const;
+
+  /** \brief Whether the furniture is laid out for a 3D cell, as of the last
+   *         value refresh. Exposed for verification. */
+  bool IsThreeD() const;
+
+  /**
+  * \brief Add the direction picker's entries to 'menu': the standard planes,
+  *        'Free' for a 3D cell (disabled with the reason where the cell's
+  *        orientation link forbids it), and the switch to the other render
+  *        mode. Shared by the plane-label picker and the context menu;
+  *        exposed for verification.
+  */
+  void PopulateDirectionMenu(QMenu* menu);
+
+  /**
+  * \brief Add the context menu's entries for this cell to 'menu'; entries
+  *        whose axis has no meaning for the cell's render mode are left out.
+  *        'globalPosition' is where the menu opens, which the entries that
+  *        open a popup of their own reuse. Exposed for verification.
+  */
+  void PopulateContextMenu(QMenu* menu, const QPoint& globalPosition);
+
 protected:
 
   void paintEvent(QPaintEvent* event) override;
@@ -364,10 +411,6 @@ private:
    *         tick scale, and colormap-chip anchor. */
   QRect RibbonRect() const;
 
-  /** \brief The `slice N/max` readout, followed by a clock glyph and the time
-   *         readout when there is more than one time step; bottom-left line 2. */
-  QRect SliceReadoutRect() const;
-
   /** \brief The `W <window> L <level>` readout, bottom-right beside the colorbar. */
   QRect WindowLevelRect() const;
 
@@ -378,9 +421,9 @@ private:
   /** \brief Hot region along the cell's top edge revealing the toolbar. */
   QRect TopStripRect() const;
 
-  /** \brief The plane label for the cell's current view direction, resolved
-   *         live from the renderer (empty for a view with no fixed anatomical
-   *         name). */
+  /** \brief The plane label for the cell's current view direction and render
+   *         mode, resolved live from the editor ("Axial", "Original",
+   *         "3D | Free", ...; empty while the editor does not know the cell). */
   QString ResolvePlaneLabel() const;
 
   /** \brief One painted navigator slider row. */
@@ -401,14 +444,13 @@ private:
   };
 
   /** \brief The navigator rows for the current mode and data (compact = slice
-   *         [+ time]; expanded = depth, in-plane H, in-plane V [+ time]),
-   *         with their tracks laid out and knob positions resolved. */
+   *         [+ time]; expanded = depth, in-plane H, in-plane V [+ time]; a 3D
+   *         cell has only [time]), with their tracks laid out and knob
+   *         positions resolved. */
   std::vector<NavRow> NavigatorRows() const;
 
-  /** \brief The bottom band the navigator sliders occupy. */
-  QRect NavigatorBandRect() const;
-
-  /** \brief The click-to-edit coordinate line, expanded mode only. */
+  /** \brief The click-to-edit coordinate line, expanded mode only; empty for
+   *         a 3D cell. */
   QRect CoordinateLineRect() const;
 
   /**
@@ -508,6 +550,9 @@ private:
   /** \brief Show the tooltip of the plate button at 'position', if any. */
   bool ShowPlateButtonToolTip(const QPoint& position, const QPoint& globalPosition);
 
+  /** \brief Show the plane label's tooltip when 'position' is on it and it has one. */
+  bool ShowPlaneLabelToolTip(const QPoint& position, const QPoint& globalPosition);
+
   /**
   * \brief Arrange-mode input on the plate, from wherever it arrives: the render
   *        window's event filter while the overlay is mouse-transparent, the
@@ -555,13 +600,9 @@ private:
    *         from the furniture, is destroyed (it deletes itself on close). */
   void PinWhileOpen(QWidget* popup);
 
-  /** \brief Axial/Coronal/Sagittal picker opened by clicking the plane label;
-   *         sets the cell's view direction (and propagates to its group). */
+  /** \brief The direction picker opened by clicking the plane label (see
+   *         PopulateDirectionMenu). */
   void OpenDirectionPicker(const QPoint& globalPosition);
-
-  /** \brief Add the Axial/Coronal/Sagittal entries to 'menu'; shared by the
-   *         picker and the context menu. */
-  void PopulateDirectionMenu(QMenu* menu);
 
   /** \brief World value per dragged pixel, from the drag-start window. */
   double DragScale() const;
@@ -636,6 +677,10 @@ private:
   unsigned int m_SliceSteps = 0;
   unsigned int m_TimePosition = 0;
   unsigned int m_TimeSteps = 0;
+
+  // The cell renders 3D: no slice, no level/window, no colormap to show,
+  // although the slice navigation controller of a 3D cell still has steps.
+  bool m_ThreeD = false;
 
   bool m_NavigatorExpanded = false;
   int m_NavDragRow = -1;                    // index into NavigatorRows() while dragging

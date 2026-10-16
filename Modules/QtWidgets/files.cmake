@@ -72,6 +72,7 @@ set(CPP_FILES
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
+  QmitkMxN3DCamera.cpp
   QmitkMxNArrangeMode.cpp
   QmitkMxNAxisGlyph.cpp
   QmitkMxNCellOverlay.cpp

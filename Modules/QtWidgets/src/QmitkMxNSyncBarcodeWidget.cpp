@@ -257,7 +257,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     for (int slot = 0; slot < n; ++slot)
     {
       const AxisSlot& s = axisSlots[slot];
-      const bool synced = s.color.isValid();
+      const bool synced = s.color.isValid() && s.applicable;
       const bool lit = hovered || slot == hoveredSlot;
       const QColor color = synced ? s.color : gapColor;
       const QRect boxRect = GlyphBoxRectIn(content, layout, slot);
@@ -280,6 +280,15 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       if (!glyph.isNull())
       {
         painter.drawPixmap(QPoint(boxRect.center().x() - inner / 2, boxRect.center().y() - inner / 2), glyph);
+      }
+
+      if (!s.applicable)
+      {
+        // Struck through, so "does not apply here" reads apart from "not linked".
+        painter.setOpacity(lit ? 1.0 : 0.7);
+        painter.setPen(QPen(frameColor, 1));
+        const QRectF frameRect = QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5);
+        painter.drawLine(frameRect.bottomLeft(), frameRect.topRight());
       }
 
       // The offset footnote: the box's upper-right corner filled. At the boxes'
@@ -312,7 +321,13 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     const QRect slotRect(content.left() + slot * (ColorSlotWidth + SlotGap), content.top(),
                          ColorSlotWidth, BarcodeHeight);
     const AxisSlot& s = axisSlots[slot];
-    if (s.color.isValid() && !s.partial)
+    if (!s.applicable)
+    {
+      // Not applicable: a diagonal stroke instead of the gap's baseline.
+      painter.setPen(QPen(gapColor, 1));
+      painter.drawLine(slotRect.left(), slotRect.bottom(), slotRect.right(), slotRect.top());
+    }
+    else if (s.color.isValid() && !s.partial)
     {
       painter.fillRect(slotRect, s.color);
     }
@@ -378,7 +393,10 @@ void QmitkMxNSyncBarcodeWidget::mouseMoveEvent(QMouseEvent* event)
       emit AxisHovered(slot);
       this->update();
     }
-    this->setCursor(slot >= 0 ? Qt::PointingHandCursor : Qt::ArrowCursor);
+    // A slot whose axis does not apply is hoverable (it still explains itself) but
+    // is not a button.
+    const bool clickable = slot >= 0 && m_Slots[slot].applicable;
+    this->setCursor(clickable ? Qt::PointingHandCursor : Qt::ArrowCursor);
   }
   else
   {
@@ -456,7 +474,7 @@ void QmitkMxNSyncBarcodeWidget::mouseReleaseEvent(QMouseEvent* event)
   {
     if (m_AxisClickable)
     {
-      if (const int slot = this->SlotAt(event->pos()); slot >= 0)
+      if (const int slot = this->SlotAt(event->pos()); slot >= 0 && m_Slots[slot].applicable)
       {
         emit AxisClicked(slot);
       }

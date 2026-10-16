@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkDisplayActionEvents.h>
 #include <mitkImageVtkMapper2D.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
@@ -25,13 +26,20 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkSliceNavigationHelper.h>
+#include <mitkVtkPropRenderer.h>
+
+// itk
+#include <itkCommand.h>
 
 // vtk
 #include <vtkCamera.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkMxN3DCamera.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellOverlay.h>
 #include <QmitkRenderWindowProximity.h>
@@ -103,30 +111,98 @@ namespace
     QStringLiteral("^#[0-9A-Fa-f]{6}$"));
 
 
-  // Translation helpers for the layout document's `view_direction` enum.
-  // Closed mapping (axial/sagittal/coronal/original); throws on anything else.
+  using ViewDirection = QmitkMxNMultiWidget::ViewDirection;
+  using RenderMode = QmitkMxNMultiWidget::RenderMode;
 
-  mitk::AnatomicalPlane ParseViewDirection(const std::string& s)
+  // Translation helpers for the layout document's `view_direction` and
+  // `render_mode` enums. Closed mappings that throw on anything else; `free`
+  // and `render_mode` exist from v3.0 on.
+
+  ViewDirection ParseViewDirection(const std::string& s, bool isV3)
   {
-    if (s == "axial")    return mitk::AnatomicalPlane::Axial;
-    if (s == "sagittal") return mitk::AnatomicalPlane::Sagittal;
-    if (s == "coronal")  return mitk::AnatomicalPlane::Coronal;
-    if (s == "original") return mitk::AnatomicalPlane::Original;
+    if (s == "axial")    return ViewDirection::Axial;
+    if (s == "sagittal") return ViewDirection::Sagittal;
+    if (s == "coronal")  return ViewDirection::Coronal;
+    if (s == "original") return ViewDirection::Original;
+    if (s == "free")
+    {
+      if (!isV3)
+      {
+        mitkThrow() << "view_direction 'free' requires a version '3.0' layout document.";
+      }
+      return ViewDirection::Free;
+    }
     mitkThrow() << "Unknown view_direction '" << s
-                << "' (expected 'axial', 'sagittal', 'coronal', or 'original').";
+                << "' (expected 'axial', 'sagittal', 'coronal'"
+                << (isV3 ? ", 'original' or 'free')." : " or 'original').");
   }
 
-  std::string ViewDirectionToString(mitk::AnatomicalPlane plane)
+  std::string ViewDirectionToString(ViewDirection direction)
+  {
+    switch (direction)
+    {
+      case ViewDirection::Axial:    return "axial";
+      case ViewDirection::Sagittal: return "sagittal";
+      case ViewDirection::Coronal:  return "coronal";
+      case ViewDirection::Original: return "original";
+      case ViewDirection::Free:     return "free";
+    }
+    mitkThrow() << "ViewDirectionToString: unsupported ViewDirection enum value.";
+  }
+
+  RenderMode ParseRenderMode(const std::string& s)
+  {
+    if (s == "2d") return RenderMode::TwoD;
+    if (s == "3d") return RenderMode::ThreeD;
+    mitkThrow() << "Unknown render_mode '" << s << "' (expected '2d' or '3d').";
+  }
+
+  std::string RenderModeToString(RenderMode mode)
+  {
+    return RenderMode::ThreeD == mode ? "3d" : "2d";
+  }
+
+  // The slice navigation controller's direction for a canonical view
+  // direction; 'Free' has none.
+  std::optional<mitk::AnatomicalPlane> ToAnatomicalPlane(ViewDirection direction)
+  {
+    switch (direction)
+    {
+      case ViewDirection::Axial:    return mitk::AnatomicalPlane::Axial;
+      case ViewDirection::Sagittal: return mitk::AnatomicalPlane::Sagittal;
+      case ViewDirection::Coronal:  return mitk::AnatomicalPlane::Coronal;
+      case ViewDirection::Original: return mitk::AnatomicalPlane::Original;
+      case ViewDirection::Free:     return std::nullopt;
+    }
+    return std::nullopt;
+  }
+
+  ViewDirection FromAnatomicalPlane(mitk::AnatomicalPlane plane)
   {
     switch (plane)
     {
-      case mitk::AnatomicalPlane::Axial:    return "axial";
-      case mitk::AnatomicalPlane::Sagittal: return "sagittal";
-      case mitk::AnatomicalPlane::Coronal:  return "coronal";
-      case mitk::AnatomicalPlane::Original: return "original";
+      case mitk::AnatomicalPlane::Axial:    return ViewDirection::Axial;
+      case mitk::AnatomicalPlane::Sagittal: return ViewDirection::Sagittal;
+      case mitk::AnatomicalPlane::Coronal:  return ViewDirection::Coronal;
+      case mitk::AnatomicalPlane::Original: return ViewDirection::Original;
     }
-    mitkThrow() << "ViewDirectionToString: unsupported AnatomicalPlane enum value.";
+    mitkThrow() << "FromAnatomicalPlane: unsupported AnatomicalPlane enum value.";
   }
+
+  bool IsThreeD(const mitk::BaseRenderer* renderer)
+  {
+    return nullptr != renderer && mitk::BaseRenderer::Standard3D == renderer->GetMapperID();
+  }
+
+  mitk::BaseRenderer* RendererOf(const QmitkRenderWindowWidget* cell)
+  {
+    return nullptr != cell ? mitk::BaseRenderer::GetInstance(cell->GetRenderWindow()->GetVtkRenderWindow())
+                           : nullptr;
+  }
+
+  // The window-level keys of a v3.0 document (the schema's window
+  // definition is closed).
+  const std::set<std::string> V3_WINDOW_KEYS{ "type", "id", "name", "size", "view_direction", "render_mode", "links" };
 
   // Group name each Synchronize(true) macro link uses. An ordinary group in
   // every respect (shared namespace, serialized like any other); the constant
@@ -173,7 +249,59 @@ namespace
     // defines each navigation group's seed cell as well.
     std::vector<std::pair<std::string, std::vector<NavLinkSpec>>> navLinks;
     std::set<std::string> navGroups;
+    // Per-window render mode and view direction in pre-order, for the
+    // checks that span several windows (see ValidateOrientationGroups).
+    struct WindowView
+    {
+      std::string id;
+      RenderMode renderMode;
+      ViewDirection viewDirection;
+      std::optional<std::string> orientationGroup;
+    };
+    std::vector<WindowView> windowViews;
   };
+
+  // The orientation-group rules no single window can violate on its own: an
+  // orientation group whose direction is 'free' shows one rotated 3D camera
+  // direction, which a 2D member cannot follow and a member with a standard
+  // direction does not show. The writer produces neither state.
+  void ValidateOrientationGroups(const PrewalkResult& result)
+  {
+    std::map<std::string, std::vector<const PrewalkResult::WindowView*>> members;
+    for (const auto& view : result.windowViews)
+    {
+      if (view.orientationGroup.has_value())
+      {
+        members[*view.orientationGroup].push_back(&view);
+      }
+    }
+    for (const auto& [group, views] : members)
+    {
+      const auto freeView = std::find_if(views.begin(), views.end(),
+        [](const auto* view) { return ViewDirection::Free == view->viewDirection; });
+      if (freeView == views.end())
+      {
+        continue;
+      }
+      const auto twoDView = std::find_if(views.begin(), views.end(),
+        [](const auto* view) { return RenderMode::TwoD == view->renderMode; });
+      if (twoDView != views.end())
+      {
+        mitkThrow() << "Layout window '" << (*freeView)->id << "' has view_direction 'free' and window '"
+                    << (*twoDView)->id << "' renders 2D, but both link orientation group '" << group
+                    << "'. A 2D window cannot follow a freely rotated 3D view.";
+      }
+      const auto canonicalView = std::find_if(views.begin(), views.end(),
+        [](const auto* view) { return ViewDirection::Free != view->viewDirection; });
+      if (canonicalView != views.end())
+      {
+        mitkThrow() << "Layout window '" << (*freeView)->id << "' has view_direction 'free' and window '"
+                    << (*canonicalView)->id << "' has '" << ViewDirectionToString((*canonicalView)->viewDirection)
+                    << "', but both link orientation group '" << group
+                    << "'. The members of an orientation group share one view direction.";
+      }
+    }
+  }
 
   void ValidateGroupNamePattern(const std::string& windowId, const std::string& groupName)
   {
@@ -285,11 +413,14 @@ namespace
   // Throws on missing required field, type mismatch on a known field, or
   // duplicate window id. Does not mutate engine state.
   //
-  // Version scope: for a "3.0" document the `links` object is closed (unknown
-  // keys, unknown modifiers, and misplaced or mistyped offsets throw). A
-  // "2.0" document keeps its historical lenient behavior - `links.selection`
-  // must be a bare string and every other link key is silently ignored - so
-  // existing v2 files load unchanged, including files with a typo'd key.
+  // Version scope: for a "3.0" document the window and its `links` object are
+  // closed (unknown keys, unknown modifiers, and misplaced or mistyped offsets
+  // throw). A "2.0" document keeps its historical lenient behavior -
+  // `links.selection` must be a bare string and every other link key and
+  // unknown window key is silently ignored - so existing v2 files load
+  // unchanged, including files with a typo'd key. Only the v3 additions
+  // `render_mode` and `free` are rejected in a "2.0" document, since ignoring
+  // them would load a 3D window as 2D.
   void PrewalkValidate(const nlohmann::json& node, bool isV3, PrewalkResult& result)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
@@ -353,6 +484,23 @@ namespace
       {
         mitkThrow() << "Layout document contains duplicate window id '" << id << "'.";
       }
+      if (isV3)
+      {
+        for (auto it = node.begin(); it != node.end(); ++it)
+        {
+          if (V3_WINDOW_KEYS.count(it.key()) == 0)
+          {
+            mitkThrow() << "Layout window '" << id << "' has unknown key '" << it.key() << "'.";
+          }
+        }
+      }
+      // v2.0 ignores unknown window keys, so a 3D window would silently load
+      // as 2D; its render mode is rejected rather than dropped.
+      else if (node.contains("render_mode"))
+      {
+        mitkThrow() << "Layout window '" << id
+                    << "' has a 'render_mode', which requires a version '3.0' layout document.";
+      }
       // Optional display label: free-form, not unique. If present, must be
       // a non-empty string. Anything else (wrong type, empty string) throws.
       if (node.contains("name"))
@@ -374,7 +522,21 @@ namespace
         mitkThrow() << "Layout window '" << id
                     << "' is missing the 'view_direction' string field.";
       }
-      ParseViewDirection(node["view_direction"].get<std::string>());
+      PrewalkResult::WindowView windowView{ id, RenderMode::TwoD,
+        ParseViewDirection(node["view_direction"].get<std::string>(), isV3), std::nullopt };
+      if (node.contains("render_mode"))
+      {
+        if (!node["render_mode"].is_string())
+        {
+          mitkThrow() << "Layout window '" << id << "' has a 'render_mode' that is not a string.";
+        }
+        windowView.renderMode = ParseRenderMode(node["render_mode"].get<std::string>());
+      }
+      if (ViewDirection::Free == windowView.viewDirection && RenderMode::TwoD == windowView.renderMode)
+      {
+        mitkThrow() << "Layout window '" << id
+                    << "' has view_direction 'free', which only a 'render_mode' of '3d' allows.";
+      }
       if (!node.contains("links") || !node["links"].is_object())
       {
         mitkThrow() << "Layout window '" << id << "' is missing the 'links' object.";
@@ -423,12 +585,17 @@ namespace
         }
         auto [group, offset] = ParseV3LinkValue(id, it.key(), dimension, it.value());
         result.navGroups.insert(group);
+        if (QmitkMxNSyncDimension::Orientation == *dimension)
+        {
+          windowView.orientationGroup = group;
+        }
         navSpecs.push_back({ *dimension, std::move(group), offset });
       }
       if (!navSpecs.empty())
       {
         result.navLinks.emplace_back(id, std::move(navSpecs));
       }
+      result.windowViews.push_back(std::move(windowView));
     }
     else
     {
@@ -437,7 +604,148 @@ namespace
     }
   }
 
+  /**
+   * The synchronized display actions, plus a relay of the pan and zoom
+   * gestures of 2D cells to 3D cells, which Core's synchronized actions leave
+   * out. The relay takes the change the gesture actually made to the
+   * sender's camera, which Core's action may have clamped
+   * (ConstrainZoomingAndPanning): an observer connected before Core's action
+   * records the sender's camera, one connected after it compares. Observers
+   * of the broadcast run in the order they were connected.
+   */
+  class ThreeDRelayingEventHandler : public mitk::DisplayActionEventHandlerSynchronized
+  {
+  public:
+    using Relay =
+      std::function<void(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)>;
+
+    ThreeDRelayingEventHandler(const Predicates& predicates, Relay relay)
+      : DisplayActionEventHandlerSynchronized(predicates), m_Relay(std::move(relay))
+    {
+    }
+
+  protected:
+    void InitActionsImpl(const std::string& prefixFilter) override
+    {
+      const auto record = [this](const itk::EventObject& event) { this->RecordSender(event); };
+      const auto relay = [this](const itk::EventObject& event) { this->RelaySender(event); };
+      this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), record);
+      this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), record);
+      DisplayActionEventHandlerSynchronized::InitActionsImpl(prefixFilter);
+      this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), relay);
+      this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), relay);
+    }
+
+  private:
+    void RecordSender(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      if (nullptr == sender || mitk::BaseRenderer::Standard2D != sender->GetMapperID())
+      {
+        m_Sender = nullptr;
+        return;
+      }
+      m_Sender = sender;
+      m_PositionBefore = sender->GetCameraController()->GetCameraPositionOnPlane();
+      m_ScaleBefore = sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+    }
+
+    void RelaySender(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      if (nullptr == sender || sender != m_Sender)
+      {
+        return;
+      }
+      m_Sender = nullptr;
+
+      mitk::Vector2D panVector(0.0);
+      double zoomFactor = 1.0;
+      if (nullptr != dynamic_cast<const mitk::DisplayMoveEvent*>(&event))
+      {
+        panVector = sender->GetCameraController()->GetCameraPositionOnPlane() - m_PositionBefore;
+      }
+      else
+      {
+        const double scaleAfter = sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+        if (scaleAfter <= 0.0)
+        {
+          return;
+        }
+        zoomFactor = m_ScaleBefore / scaleAfter;
+      }
+      m_Relay(sender, panVector, zoomFactor);
+    }
+
+    Relay m_Relay;
+    const mitk::BaseRenderer* m_Sender = nullptr;
+    mitk::Point2D m_PositionBefore;
+    double m_ScaleBefore = 1.0;
+  };
+
 }  // namespace
+
+// Comparing every cell's direction before and after, rather than announcing
+// at each write, also catches the members an orientation group relays to and
+// a flip of the 'free' state that leaves the standard direction as it was.
+class QmitkMxNMultiWidget::ViewDirectionNotifier
+{
+public:
+  explicit ViewDirectionNotifier(QmitkMxNMultiWidget* editor)
+    : m_Editor(editor), m_Outermost(0 == editor->m_ViewDirectionNotifierDepth)
+  {
+    ++m_Editor->m_ViewDirectionNotifierDepth;
+    if (m_Outermost)
+    {
+      m_Before = m_Editor->SnapshotViewDirections();
+    }
+  }
+
+  ~ViewDirectionNotifier()
+  {
+    --m_Editor->m_ViewDirectionNotifierDepth;
+    if (!m_Outermost || m_Editor->IsApplyingLayout())
+    {
+      return;
+    }
+    for (const auto& [windowId, after] : m_Editor->SnapshotViewDirections())
+    {
+      const auto before = m_Before.find(windowId);
+      if (before != m_Before.end() && before->second != after)
+      {
+        emit m_Editor->ViewDirectionChanged(windowId);
+      }
+    }
+  }
+
+  ViewDirectionNotifier(const ViewDirectionNotifier&) = delete;
+  ViewDirectionNotifier& operator=(const ViewDirectionNotifier&) = delete;
+
+private:
+  QmitkMxNMultiWidget* m_Editor;
+  bool m_Outermost;
+  std::map<QString, ViewDirection> m_Before;
+};
+
+std::map<QString, QmitkMxNMultiWidget::ViewDirection> QmitkMxNMultiWidget::SnapshotViewDirections() const
+{
+  std::map<QString, ViewDirection> directions;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    // Read from ViewDirectionNotifier's destructor, which must not throw;
+    // GetViewDirection throws only for a corrupt controller direction.
+    try
+    {
+      directions.emplace(windowId, this->GetViewDirection(windowId));
+    }
+    catch (const mitk::Exception&)
+    {
+    }
+  }
+  return directions;
+}
 
 QmitkMxNLayoutLocks QmitkMxNParseLayoutLocks(const QString& tokens)
 {
@@ -557,6 +865,14 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   connect(this, &QmitkMxNMultiWidget::LayoutChanged,
           m_ArrangeMode, &QmitkMxNArrangeMode::PruneToExistingCells);
 
+  // Every view initialization (global reinit, a cell's reset, a geometry
+  // alignment) turns 3D renderers to the anterior view; the event names no
+  // renderer, so this editor re-applies the direction of each of its 3D cells.
+  auto viewsInitialized = itk::SimpleMemberCommand<QmitkMxNMultiWidget>::New();
+  viewsInitialized->SetCallbackFunction(this, &QmitkMxNMultiWidget::OnViewsInitialized);
+  m_ViewsInitializedObserverTag = mitk::RenderingManager::GetInstance()->AddObserver(
+    mitk::RenderingManagerViewsInitializedEvent(), viewsInitialized);
+
   // Last, so that a throw above leaves no entry behind: the destructor that
   // would remove it does not run for a widget whose constructor threw.
   LiveMultiWidgetNames().insert(multiWidgetName);
@@ -564,10 +880,16 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 {
+  // The rendering manager outlives every editor.
+  mitk::RenderingManager::GetInstance()->RemoveObserver(m_ViewsInitializedObserverTag);
+
   // A reopened editor takes the same cell ids again.
   for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
   {
     this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+    // The cells outlive this destructor (the base class releases them), but
+    // their overlays query this editor; they go while it is still whole.
+    delete cell->findChild<QmitkMxNCellOverlay*>();
   }
 
   LiveMultiWidgetNames().remove(this->GetMultiWidgetName());
@@ -576,6 +898,11 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
 {
   this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
+  // Cell ids are reused; a new cell under this id starts canonical, with
+  // nothing remembered.
+  m_FreeCells.erase(widgetName);
+  m_SeenRenderModes.erase(widgetName);
+  m_TwoDViews.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
 }
 
@@ -637,7 +964,11 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   {
     return this->IsWindowingTarget(sender, target);
   };
-  auto handler = std::make_unique<mitk::DisplayActionEventHandlerSynchronized>(predicates);
+  auto handler = std::make_unique<ThreeDRelayingEventHandler>(predicates,
+    [this](const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)
+    {
+      this->RelayTwoDGestureToThreeD(sender, panVector, zoomFactor);
+    });
   this->SetDisplayActionEventHandler(std::move(handler));
 
   auto displayActionEventHandler = this->GetDisplayActionEventHandler();
@@ -671,6 +1002,13 @@ bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
   if (sender == target)
   {
     return true;
+  }
+
+  // A link on an axis without meaning in a cell's render mode stays inactive.
+  if (!IsAxisApplicableTo(sender, QmitkMxNSyncAxisOf(dimension))
+      || !IsAxisApplicableTo(target, QmitkMxNSyncAxisOf(dimension)))
+  {
+    return false;
   }
 
   const auto senderLinks = m_CellSyncLinks.find(senderId);
@@ -712,6 +1050,11 @@ bool QmitkMxNMultiWidget::IsWindowingTarget(const mitk::BaseRenderer* sender,
   const auto senderId = QString::fromUtf8(sender->GetName());
   const auto targetId = QString::fromUtf8(target->GetName());
   if (!senderId.startsWith(editorPrefix) || !targetId.startsWith(editorPrefix))
+  {
+    return false;
+  }
+  if (!IsAxisApplicableTo(sender, QmitkMxNSyncAxis::Windowing)
+      || !IsAxisApplicableTo(target, QmitkMxNSyncAxis::Windowing))
   {
     return false;
   }
@@ -762,10 +1105,7 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 {
   if ("axial" == widgetName || "sagittal" == widgetName || "coronal" == widgetName || "3d" == widgetName)
   {
-    // No active cell while a layout is being rebuilt; its event pump can still
-    // deliver a caller that asks.
-    const auto activeWidget = this->GetActiveRenderWindowWidget();
-    return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
+    return this->RenderWindowForMode("3d" == widgetName ? RenderMode::ThreeD : RenderMode::TwoD);
   }
 
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
@@ -773,11 +1113,56 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::AnatomicalPlane& /*orientation*/) const
 {
-  // currently no mapping between plane orientation and render windows
-  // simply return the currently active render window, if there is one (see
-  // the name-based overload)
+  // Cells are not bound to a plane; any plane asks for a 2D cell.
+  return this->RenderWindowForMode(RenderMode::TwoD);
+}
+
+QmitkRenderWindow* QmitkMxNMultiWidget::RenderWindowForMode(RenderMode mode) const
+{
+  // No active cell while a layout is being rebuilt; its event pump can still
+  // deliver a caller that asks.
   const auto activeWidget = this->GetActiveRenderWindowWidget();
-  return nullptr != activeWidget ? activeWidget->GetRenderWindow() : nullptr;
+  if (nullptr == activeWidget)
+  {
+    return nullptr;
+  }
+
+  // The active cell wins when it renders in the requested mode, so the user
+  // chooses which cell e.g. volume visualization controls. Callers asking
+  // for a plane use the window as a 2D slice, so a 3D active cell defers to
+  // the first 2D cell; with no cell in the mode, the active cell keeps the
+  // result non-null.
+  const auto wantsThreeD = RenderMode::ThreeD == mode;
+  if (IsThreeD(RendererOf(activeWidget.get())) == wantsThreeD)
+  {
+    return activeWidget->GetRenderWindow();
+  }
+  std::function<QmitkRenderWindowWidget*(const QSplitter*)> findFirst =
+    [&](const QSplitter* split) -> QmitkRenderWindowWidget*
+  {
+    for (int i = 0; i < split->count(); ++i)
+    {
+      auto* child = split->widget(i);
+      if (const auto* sub = dynamic_cast<const QSplitter*>(child))
+      {
+        if (auto* found = findFirst(sub))
+        {
+          return found;
+        }
+      }
+      else if (auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(child))
+      {
+        if (IsThreeD(RendererOf(cell)) == wantsThreeD)
+        {
+          return cell;
+        }
+      }
+    }
+    return nullptr;
+  };
+  const auto* root = this->RootSplitter();
+  auto* match = nullptr != root ? findFirst(root) : nullptr;
+  return nullptr != match ? match->GetRenderWindow() : activeWidget->GetRenderWindow();
 }
 
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
@@ -822,8 +1207,20 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
     }
   }
 
-  // initialize active render window
-  renderingManager->InitializeView(activeWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
+  // A 3D active cell cannot stand in for the slice cells, so the first 2D cell
+  // takes the geometry too; the active 3D cell takes it as well so it shows
+  // the new geometry when it returns to 2D. Both are the same window when the
+  // active cell is 2D or no 2D cell exists.
+  auto* const activeWindow = activeWidget->GetRenderWindow();
+  auto* const twoDWindow = this->RenderWindowForMode(RenderMode::TwoD);
+  if (nullptr != twoDWindow)
+  {
+    renderingManager->InitializeView(twoDWindow->GetVtkRenderWindow(), geometry, resetCamera);
+  }
+  if (activeWindow != twoDWindow)
+  {
+    renderingManager->InitializeView(activeWindow->GetVtkRenderWindow(), geometry, resetCamera);
+  }
 
   if (!resetCamera)
   {
@@ -887,7 +1284,13 @@ const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widg
   RenderWindowWidgetPointer renderWindowWidget;
   if (widgetName.isNull() || widgetName.isEmpty())
   {
-    renderWindowWidget = GetActiveRenderWindowWidget();
+    // A 3D cell's crosshair does not follow navigation, so a 2D cell answers
+    // for it.
+    auto* positionSource = this->RenderWindowForMode(RenderMode::TwoD);
+    if (nullptr != positionSource)
+    {
+      renderWindowWidget = this->GetRenderWindowWidget(QString::fromUtf8(positionSource->GetRenderer()->GetName()));
+    }
   }
   else
   {
@@ -1181,6 +1584,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // label in the OpenGL scene.
   renderWindowWidget->SetCornerAnnotationText(std::string());
   this->AddRenderWindowWidget(id, renderWindowWidget);
+  m_SeenRenderModes[id] = this->GetRenderMode(id);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
@@ -2038,6 +2442,11 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
         childJson["name"] = descriptor.displayName.toStdString();
       }
       childJson["view_direction"] = descriptor.viewDirection.toStdString();
+      // 2D is the default; omitting it keeps 2D-only documents as they were.
+      if (RenderMode::ThreeD == descriptor.renderMode)
+      {
+        childJson["render_mode"] = RenderModeToString(descriptor.renderMode);
+      }
 
       nlohmann::json linksJson{ { "selection", descriptor.selectionGroup.toStdString() } };
       const auto linksIt = m_CellSyncLinks.find(descriptor.id);
@@ -2113,8 +2522,8 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   descriptor.id = cell->GetWidgetName();
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
-    ViewDirectionToString(
-      cell->GetSliceNavigationController()->GetDefaultViewDirection()));
+    ViewDirectionToString(this->GetViewDirection(descriptor.id)));
+  descriptor.renderMode = this->GetRenderMode(descriptor.id);
 
   const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
   const auto recorded = m_GroupNameByIndex.find(idx);
@@ -2208,14 +2617,28 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
         // Id and view direction pass through verbatim - validation already
         // happened upstream (PrewalkValidate + ValidateIdsForThisEditor).
         const auto id = QString::fromStdString(child["id"].get<std::string>());
-        const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
+        const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>(), true);
+        const auto renderMode = child.contains("render_mode")
+                                  ? ParseRenderMode(child["render_mode"].get<std::string>())
+                                  : RenderMode::TwoD;
         const auto groupName = LinkTarget(child["links"]["selection"]);
         const auto targetIdx = nameToInt.at(groupName);
 
-        auto window = this->CreateRenderWindowWidget(id, viewDirection);
+        auto window = this->CreateRenderWindowWidget(
+          id, ToAnatomicalPlane(viewDirection).value_or(mitk::AnatomicalPlane::Axial));
         // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
+        if (RenderMode::ThreeD == renderMode)
+        {
+          this->SwitchCellToThreeD(window.get());
+        }
+        // A 'free' cell's camera is whatever its first initialization gives;
+        // its controller's direction only frames the geometry.
+        if (ViewDirection::Free == viewDirection)
+        {
+          m_FreeCells.insert(id);
+        }
         // Optional display label (free-form, non-unique). Pre-walk has
         // already validated type and non-emptiness.
         if (child.contains("name"))
@@ -2595,6 +3018,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // pairs for the post-build group-seeding pass.
     PrewalkResult prewalk;
     PrewalkValidate(doc.at("root"), isV3, prewalk);
+    ValidateOrientationGroups(prewalk);
     const auto& seedingOrder = prewalk.seedingOrder;
 
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode
@@ -2801,11 +3225,21 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // Applied in document order, so the first cell to link a group becomes
     // its seed and every later member converges to it on joining (windows
     // without world geometry yet defer to 'ReconvergeSyncGroup').
+    bool threeDPanOffsetLogged = false;
     for (const auto& [windowId, specs] : prewalk.navLinks)
     {
       for (const auto& spec : specs)
       {
-        this->SetSyncLink(QString::fromStdString(windowId), spec.dimension, spec.group, spec.offset);
+        const auto cellId = QString::fromStdString(windowId);
+        if (QmitkMxNSyncDimension::Pan == spec.dimension && !threeDPanOffsetLogged
+            && std::holds_alternative<mitk::Vector2D>(spec.offset)
+            && !this->ConvergesOn(cellId, QmitkMxNSyncDimension::Pan))
+        {
+          MITK_INFO << "Layout window '" << windowId
+                    << "' renders 3D; its pan offset is kept but has no effect while it does.";
+          threeDPanOffsetLogged = true;
+        }
+        this->SetSyncLink(cellId, spec.dimension, spec.group, spec.offset);
       }
     }
     this->StepLayoutLoadFeedback(92, tr("Preparing the views"));
@@ -2821,6 +3255,9 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 
     this->EnableCrosshair();
     this->ConfigureLayoutSplitters();
+
+    // The views-initialized hook stands still while a layout is applied.
+    this->RestoreThreeDViewDirections();
     emit LayoutChanged();
   }
   catch (const mitk::Exception&)
@@ -3283,6 +3720,7 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
                                       const std::string& group,
                                       const SyncOffset& offset)
 {
+  ViewDirectionNotifier notifier(this);
   if (nullptr == this->GetRenderWindowWidget(windowId))
   {
     mitkThrow() << "SetSyncLink: unknown render window '" << windowId.toStdString() << "'.";
@@ -3292,6 +3730,13 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
     mitkThrow() << "SetSyncLink: group name '" << group
                 << "' does not match the required pattern '"
                 << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
+  }
+
+  if (QmitkMxNSyncDimension::Orientation == dimension && !this->IsOrientationLinkAllowed(windowId, group))
+  {
+    mitkThrowException(QmitkMxNOrientationConflictException)
+      << "SetSyncLink: orientation group '" << group << "' has the view direction 'free'; the 2D cell '"
+      << windowId.toStdString() << "' cannot follow a freely rotated 3D view.";
   }
 
   // A write moves only the written cell, so the group's reference is taken
@@ -3372,10 +3817,31 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
   {
     const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
     const auto memberWidget = this->GetRenderWindowWidget(windowId);
-    if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
+    if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget()
+        && m_FreeCells.count(anchorId) > 0)
+    {
+      // A 'Free' group shares one camera direction, which the joiner takes.
+      m_FreeCells.insert(windowId);
+      auto* anchorCamera = RendererOf(anchorWidget.get())->GetVtkRenderer()->GetActiveCamera();
+      const auto anchorState = QmitkMxN3DCamera::CaptureState(anchorCamera);
+      if (QmitkMxN3DCamera::ApplyDirection(RendererOf(memberWidget.get())->GetVtkRenderer(),
+                                           anchorState.directionOfProjection, anchorState.viewUp))
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdate(memberWidget->GetRenderWindow()->GetVtkRenderWindow());
+      }
+    }
+    else if (nullptr != anchorWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
     {
       const auto groupPlane = anchorWidget->GetSliceNavigationController()->GetDefaultViewDirection();
-      if (memberWidget->GetSliceNavigationController()->GetDefaultViewDirection() != groupPlane)
+      m_FreeCells.erase(windowId);
+      if (IsThreeD(RendererOf(memberWidget.get())))
+      {
+        // The slice-plane path would refit the 3D camera to the anterior
+        // view; a 3D cell only turns its camera.
+        memberWidget->GetSliceNavigationController()->SetDefaultViewDirection(groupPlane);
+        this->ApplyThreeDViewDirection(windowId);
+      }
+      else if (memberWidget->GetSliceNavigationController()->GetDefaultViewDirection() != groupPlane)
       {
         // Silent path: adopting the group plane is a relayed change, not a
         // new orientation gesture.
@@ -3505,13 +3971,19 @@ void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, c
                 << "' carries no convergence bookkeeping (only slice, zoom, and pan do).";
   }
 
-  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
-  if (anchorId.isEmpty())
+  const auto names = this->GetSyncGroupNames(dimension);
+  if (std::find(names.begin(), names.end(), group) == names.end())
   {
     mitkThrow() << "ReconvergeSyncGroup: no cell links group '" << group
                 << "' for dimension '" << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
   }
-  this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+  // Empty when the dimension applies to no member (e.g. a group of 3D cells):
+  // nothing to converge.
+  const auto anchorId = this->FindSyncGroupAnchor(dimension, group);
+  if (!anchorId.isEmpty())
+  {
+    this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+  }
 }
 
 void QmitkMxNMultiWidget::ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension dimension,
@@ -3593,6 +4065,12 @@ QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension,
     {
       continue;
     }
+    // A member that does not converge on the dimension (a 3D cell on a
+    // 2D-only axis, or on relative pan) must not define its reference.
+    if (!this->ConvergesOn(descriptor.id, dimension))
+    {
+      continue;
+    }
     const auto it = m_CellSyncLinks.find(descriptor.id);
     if (it != m_CellSyncLinks.end() && it->second.groups[DimensionIndex(dimension)] == group)
     {
@@ -3622,7 +4100,7 @@ QString QmitkMxNMultiWidget::FindSyncGroupAnchor(QmitkMxNSyncDimension dimension
   std::vector<std::pair<QString, long>> candidates;
   for (const auto& descriptor : this->ListWindowDescriptors())
   {
-    if (excluded.count(descriptor.id) > 0)
+    if (excluded.count(descriptor.id) > 0 || !this->ConvergesOn(descriptor.id, dimension))
     {
       continue;
     }
@@ -3686,6 +4164,12 @@ void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension
   {
     return;
   }
+  // An inactive link (the dimension has no meaning in a cell's render mode)
+  // and the relative pan of a 3D cell neither give nor take the group state.
+  if (!IsConvergenceApplicableTo(anchorRenderer, dimension) || !IsConvergenceApplicableTo(memberRenderer, dimension))
+  {
+    return;
+  }
   // Unrealized windows (no world geometry yet) carry default camera/stepper
   // state that must not be propagated as a reference; the deferred converge
   // is covered by 'ReconvergeSyncGroup'.
@@ -3742,10 +4226,27 @@ void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension
       {
         return;
       }
-      // A factor > 1 keeps a cell zoomed in relative to the reference;
-      // parallel scale is the inverse zoom measure, hence the division.
-      const double referenceScale = anchorCamera->GetParallelScale() * std::get<double>(anchorOffset);
-      memberCamera->SetParallelScale(referenceScale / memberLinks.zoomOffset);
+      // A factor > 1 keeps a cell zoomed in relative to the reference; the
+      // visible half-height is the inverse zoom measure, hence the division.
+      // A 2D cell's parallel scale is its half-height whatever the camera's
+      // projection flag says (Core sets it on the first render only).
+      const double anchorHalfHeight = IsThreeD(anchorRenderer) ? QmitkMxN3DCamera::VisibleHalfHeight(anchorCamera)
+                                                               : anchorCamera->GetParallelScale();
+      const double referenceHalfHeight = anchorHalfHeight * std::get<double>(anchorOffset);
+      const double targetHalfHeight = referenceHalfHeight / memberLinks.zoomOffset;
+      if (IsThreeD(memberRenderer))
+      {
+        const double memberHalfHeight = QmitkMxN3DCamera::VisibleHalfHeight(memberCamera);
+        if (memberHalfHeight <= 0.0 || targetHalfHeight <= 0.0)
+        {
+          return;
+        }
+        QmitkMxN3DCamera::Zoom(memberRenderer->GetVtkRenderer(), memberHalfHeight / targetHalfHeight);
+      }
+      else
+      {
+        memberCamera->SetParallelScale(targetHalfHeight);
+      }
       mitk::RenderingManager::GetInstance()->RequestUpdate(
         memberWidget->GetRenderWindow()->GetVtkRenderWindow());
       break;
@@ -3771,26 +4272,659 @@ void QmitkMxNMultiWidget::ConvergeMemberToAnchor(QmitkMxNSyncDimension dimension
 
 void QmitkMxNMultiWidget::SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection)
 {
-  const auto widget = this->GetRenderWindowWidget(windowId);
-  if (nullptr == widget)
-  {
-    mitkThrow() << "SetViewDirection: unknown render window '" << windowId.toStdString() << "'.";
-  }
   if (mitk::AnatomicalPlane::Axial != viewDirection && mitk::AnatomicalPlane::Coronal != viewDirection
       && mitk::AnatomicalPlane::Sagittal != viewDirection)
   {
     mitkThrow() << "SetViewDirection: only the standard anatomical planes "
                 << "(axial, coronal, sagittal) are supported.";
   }
-  auto* utilityWidget = widget->GetUtilityWidget();
-  if (nullptr == utilityWidget)
+  this->SetViewDirection(windowId, FromAnatomicalPlane(viewDirection));
+}
+
+void QmitkMxNMultiWidget::SetViewDirection(const QString& windowId, ViewDirection viewDirection)
+{
+  ViewDirectionNotifier notifier(this);
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
   {
-    mitkThrow() << "SetViewDirection: cell '" << windowId.toStdString()
-                << "' has no utility widget.";
+    mitkThrow() << "SetViewDirection: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (ViewDirection::Original == viewDirection)
+  {
+    mitkThrow() << "SetViewDirection: 'original' is the reference geometry's own slicing and comes only "
+                << "from a layout document.";
+  }
+  const bool threeD = IsThreeD(RendererOf(widget.get()));
+
+  if (ViewDirection::Free == viewDirection)
+  {
+    if (!threeD)
+    {
+      mitkThrow() << "SetViewDirection: 'free' is a 3D camera rotation; cell '" << windowId.toStdString()
+                  << "' renders 2D.";
+    }
+    if (!this->IsFreeViewDirectionAllowed(windowId))
+    {
+      mitkThrowException(QmitkMxNOrientationConflictException)
+        << "SetViewDirection: cell '" << windowId.toStdString() << "' shares its orientation group with a 2D "
+        << "cell, which cannot follow a freely rotated 3D view.";
+    }
+    // The group shares the canonical camera direction at this moment, so
+    // every member turns 'Free' as it is.
+    m_FreeCells.insert(windowId);
+    for (const auto& memberId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Orientation))
+    {
+      m_FreeCells.insert(memberId);
+    }
+    return;
   }
 
-  utilityWidget->SetViewDirectionSelection(viewDirection);
-  this->PropagateOrientation(windowId, viewDirection);
+  const auto plane = *ToAnatomicalPlane(viewDirection);
+  m_FreeCells.erase(windowId);
+  if (threeD)
+  {
+    // The slice-plane path would refit the 3D camera to the anterior view; a
+    // 3D cell only turns its camera.
+    widget->GetSliceNavigationController()->SetDefaultViewDirection(plane);
+    this->ApplyThreeDViewDirection(windowId);
+  }
+  else
+  {
+    auto* utilityWidget = widget->GetUtilityWidget();
+    if (nullptr == utilityWidget)
+    {
+      mitkThrow() << "SetViewDirection: cell '" << windowId.toStdString()
+                  << "' has no utility widget.";
+    }
+    utilityWidget->SetViewDirectionSelection(plane);
+  }
+  this->PropagateOrientation(windowId, plane);
+}
+
+QmitkMxNMultiWidget::ViewDirection QmitkMxNMultiWidget::GetViewDirection(const QString& windowId) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "GetViewDirection: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (m_FreeCells.count(windowId) > 0)
+  {
+    return ViewDirection::Free;
+  }
+  return FromAnatomicalPlane(widget->GetSliceNavigationController()->GetDefaultViewDirection());
+}
+
+bool QmitkMxNMultiWidget::IsRotationLocked(const QString& windowId) const
+{
+  return RenderMode::ThreeD == this->GetRenderMode(windowId) && 0 == m_FreeCells.count(windowId)
+         && this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value();
+}
+
+void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode)
+{
+  ViewDirectionNotifier notifier(this);
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "SetRenderMode: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (this->GetRenderMode(windowId) == mode)
+  {
+    return;
+  }
+
+  auto* renderer = RendererOf(widget.get());
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  const mitk::TimeGeometry::ConstPointer referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  const auto timePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  std::optional<TwoDView> twoDView;
+  if (RenderMode::ThreeD == mode)
+  {
+    this->RememberTwoDView(windowId);
+    this->SwitchCellToThreeD(widget.get());
+  }
+  else
+  {
+    if (auto remembered = m_TwoDViews.extract(windowId); !remembered.empty())
+    {
+      twoDView = remembered.mapped();
+    }
+    // A 2D cell needs a plane; a rotated camera shows the one it looks at most.
+    if (this->ReleaseFreeCellForTwoD(windowId) && referenceGeometry.IsNotNull())
+    {
+      mitk::Vector3D directionOfProjection;
+      renderer->GetVtkRenderer()->GetActiveCamera()->GetDirectionOfProjection(directionOfProjection.GetDataPointer());
+      sliceNavigation->SetDefaultViewDirection(QmitkMxN3DCamera::NearestStandardPlane(
+        *referenceGeometry->GetGeometryForTimeStep(0), directionOfProjection));
+    }
+    m_SeenRenderModes[windowId] = RenderMode::TwoD;
+    renderer->SetMapperID(mitk::BaseRenderer::Standard2D);
+  }
+
+  if (referenceGeometry.IsNotNull())
+  {
+    renderingManager->InitializeView(widget->GetRenderWindow()->GetVtkRenderWindow(), referenceGeometry, true);
+    // Initializing a view resets the application-global time; switching how
+    // one cell renders must not move it.
+    if (referenceGeometry->IsValidTimePoint(timePoint))
+    {
+      renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
+        referenceGeometry->TimePointToTimeStep(timePoint));
+    }
+  }
+
+  if (RenderMode::ThreeD == mode)
+  {
+    this->FinishThreeDAdoption(windowId);
+  }
+  else
+  {
+    // Before the adoption, whose group convergence sets the linked dimensions.
+    if (twoDView.has_value())
+    {
+      this->RestoreTwoDView(windowId, *twoDView);
+    }
+    this->FinishTwoDAdoption(windowId);
+  }
+  this->RefreshSyncControls();
+}
+
+void QmitkMxNMultiWidget::RememberTwoDView(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  auto* renderer = RendererOf(widget.get());
+  if (nullptr == sliceNavigation->GetInputWorldTimeGeometry())
+  {
+    m_TwoDViews.erase(windowId);
+    return;
+  }
+  TwoDView view;
+  view.viewDirection = sliceNavigation->GetDefaultViewDirection();
+  view.referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  view.slice = sliceNavigation->GetStepper()->GetPos();
+  view.parallelScale = renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+  view.cameraPosition = renderer->GetCameraController()->GetCameraPositionOnPlane();
+  m_TwoDViews[windowId] = view;
+}
+
+void QmitkMxNMultiWidget::RestoreTwoDView(const QString& windowId, const TwoDView& view)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  const auto* referenceGeometry = sliceNavigation->GetInputWorldTimeGeometry();
+  // Compared by value: every view initialization hands the cell a copy.
+  if (view.viewDirection != sliceNavigation->GetDefaultViewDirection() || nullptr == referenceGeometry
+      || !mitk::Equal(*view.referenceGeometry, *referenceGeometry, mitk::eps, false))
+  {
+    return;
+  }
+  auto* renderer = RendererOf(widget.get());
+  sliceNavigation->GetStepper()->SetPos(view.slice);
+  // The camera position is constrained by the zoom, so the zoom comes first.
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(view.parallelScale);
+  renderer->GetCameraController()->MoveCameraToPoint(view.cameraPosition);
+  mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+}
+
+bool QmitkMxNMultiWidget::ReleaseFreeCellForTwoD(const QString& windowId)
+{
+  // A 2D cell cannot follow a 'free' group's rotated camera. Leaving the
+  // group first also takes the cell out of the group's geometry component
+  // before the 2D path aligns it.
+  if (m_FreeCells.count(windowId) > 0 && this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value())
+  {
+    MITK_WARN << "Render window '" << windowId.toStdString() << "' turns 2D and leaves its orientation group "
+              << "'" << this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation)->group
+              << "', whose view direction is 'free'.";
+    this->ClearSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+  }
+  return m_FreeCells.erase(windowId) > 0;
+}
+
+void QmitkMxNMultiWidget::FinishTwoDAdoption(const QString& windowId)
+{
+  // The 2D-only links are active again: the cell converges like a joiner.
+  auto changed = this->EnforceComponentGeometry(windowId);
+  changed.push_back(windowId);
+  this->ReconvergeGeometryRelativeGroups(changed);
+}
+
+void QmitkMxNMultiWidget::FinishThreeDAdoption(const QString& windowId)
+{
+  this->ApplyThreeDViewDirection(windowId);
+  // The initialization fitted the camera; zoom is absolute across render
+  // modes, so the cell takes its group's zoom again like a joiner.
+  if (const auto zoomLink = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Zoom); zoomLink.has_value())
+  {
+    const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Zoom, zoomLink->group, { windowId });
+    if (!anchorId.isEmpty())
+    {
+      this->ConvergeMemberToAnchor(QmitkMxNSyncDimension::Zoom, anchorId,
+                                   this->GetSyncLink(anchorId, QmitkMxNSyncDimension::Zoom)->offset, windowId);
+    }
+  }
+}
+
+QmitkMxNMultiWidget::RenderMode QmitkMxNMultiWidget::GetRenderMode(const QString& windowId) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "GetRenderMode: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  return IsThreeD(RendererOf(widget.get())) ? RenderMode::ThreeD : RenderMode::TwoD;
+}
+
+bool QmitkMxNMultiWidget::IsAxisApplicable(const QString& windowId, QmitkMxNSyncAxis axis) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "IsAxisApplicable: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  return IsAxisApplicableTo(RendererOf(widget.get()), axis);
+}
+
+bool QmitkMxNMultiWidget::IsAxisApplicableTo(const mitk::BaseRenderer* renderer, QmitkMxNSyncAxis axis)
+{
+  if (!IsThreeD(renderer))
+  {
+    return true;
+  }
+  // A 3D camera has no slice and shows no crosshair, and without image planes
+  // in 3D there is no level/window or lookup table to show.
+  return QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis || QmitkMxNSyncAxis::Orientation == axis
+         || QmitkMxNSyncAxis::Selection == axis;
+}
+
+bool QmitkMxNMultiWidget::IsDimensionApplicable(const QString& windowId, QmitkMxNSyncDimension dimension) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  return nullptr != widget && IsAxisApplicableTo(RendererOf(widget.get()), QmitkMxNSyncAxisOf(dimension));
+}
+
+bool QmitkMxNMultiWidget::IsConvergenceApplicable(const QString& windowId, QmitkMxNSyncDimension dimension) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "IsConvergenceApplicable: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  return IsConvergenceApplicableTo(RendererOf(widget.get()), dimension);
+}
+
+bool QmitkMxNMultiWidget::IsConvergenceApplicableTo(const mitk::BaseRenderer* renderer,
+                                                    QmitkMxNSyncDimension dimension)
+{
+  return IsAxisApplicableTo(renderer, QmitkMxNSyncAxisOf(dimension))
+         && !(IsThreeD(renderer) && QmitkMxNSyncDimension::Pan == dimension);
+}
+
+bool QmitkMxNMultiWidget::ConvergesOn(const QString& windowId, QmitkMxNSyncDimension dimension) const
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  return nullptr != widget && IsConvergenceApplicableTo(RendererOf(widget.get()), dimension);
+}
+
+bool QmitkMxNMultiWidget::IsFreeViewDirectionAllowed(const QString& windowId) const
+{
+  if (RenderMode::ThreeD != this->GetRenderMode(windowId))
+  {
+    return false;
+  }
+  const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+  if (!link.has_value())
+  {
+    return true;
+  }
+  for (const auto& [memberId, member] : this->GetRenderWindowWidgets())
+  {
+    const auto memberLink = this->GetSyncLink(memberId, QmitkMxNSyncDimension::Orientation);
+    if (memberLink.has_value() && memberLink->group == link->group && !IsThreeD(RendererOf(member.get())))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool QmitkMxNMultiWidget::IsOrientationLinkAllowed(const QString& windowId, const std::string& group) const
+{
+  if (RenderMode::TwoD != this->GetRenderMode(windowId))
+  {
+    return true;
+  }
+  const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Orientation, group, { windowId });
+  return anchorId.isEmpty() || 0 == m_FreeCells.count(anchorId);
+}
+
+std::vector<QString> QmitkMxNMultiWidget::ActiveGroupPeers(const QString& windowId,
+                                                           QmitkMxNSyncDimension dimension) const
+{
+  std::vector<QString> peers;
+  const auto link = this->GetSyncLink(windowId, dimension);
+  if (!link.has_value() || !this->IsDimensionApplicable(windowId, dimension))
+  {
+    return peers;
+  }
+  for (const auto& [memberId, member] : this->GetRenderWindowWidgets())
+  {
+    if (memberId == windowId || !this->IsDimensionApplicable(memberId, dimension))
+    {
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(memberId, dimension);
+    if (memberLink.has_value() && memberLink->group == link->group)
+    {
+      peers.push_back(memberId);
+    }
+  }
+  return peers;
+}
+
+void QmitkMxNMultiWidget::SwitchCellToThreeD(QmitkRenderWindowWidget* cell)
+{
+  m_SeenRenderModes[cell->GetWidgetName()] = RenderMode::ThreeD;
+  RendererOf(cell)->SetMapperID(mitk::BaseRenderer::Standard3D);
+  this->InstallThreeDInteractorStyle(cell);
+}
+
+void QmitkMxNMultiWidget::InstallThreeDInteractorStyle(QmitkRenderWindowWidget* cell)
+{
+  auto* renderer = RendererOf(cell);
+
+  // Core installs its own interactor style on the first render after a
+  // mapper switch. Preparing the render now makes that happen here, once, so
+  // the style installed below is not replaced by the next render.
+  if (auto* propRenderer = dynamic_cast<mitk::VtkPropRenderer*>(renderer))
+  {
+    propRenderer->PrepareRender();
+  }
+
+  auto* interactor = renderer->GetRenderWindow()->GetInteractor();
+  if (nullptr == interactor)
+  {
+    return;
+  }
+  auto style = vtkSmartPointer<QmitkMxN3DInteractorStyle>::New();
+  style->SetObservedRenderer(renderer->GetVtkRenderer());
+  const auto windowId = cell->GetWidgetName();
+  style->SetRotationCallback([this, windowId]() { this->OnThreeDCameraRotated(windowId); });
+  // Asked from within VTK's event dispatch, which must not see an exception.
+  style->SetRotationLock([this, windowId]()
+  { return nullptr != this->GetRenderWindowWidget(windowId) && this->IsRotationLocked(windowId); });
+  style->SetCameraStepCallback(
+    [this, windowId](const QmitkMxN3DCameraState& from, const QmitkMxN3DCameraState& to)
+    { this->OnThreeDCameraStep(windowId, from, to); });
+  interactor->SetInteractorStyle(style);
+}
+
+void QmitkMxNMultiWidget::ApplyThreeDViewDirection(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  auto* renderer = RendererOf(widget.get());
+  if (!IsThreeD(renderer) || m_FreeCells.count(windowId) > 0)
+  {
+    return;
+  }
+  auto* sliceNavigation = widget->GetSliceNavigationController();
+  if (nullptr == sliceNavigation->GetInputWorldTimeGeometry())
+  {
+    return;
+  }
+  // The camera follows the plane a 2D cell with this direction would show;
+  // setting only the default direction leaves a live controller's plane as
+  // it is.
+  if (sliceNavigation->GetViewDirection() != sliceNavigation->GetDefaultViewDirection())
+  {
+    sliceNavigation->SetViewDirectionToDefault();
+    sliceNavigation->Update();
+  }
+  const auto* plane = sliceNavigation->GetCurrentPlaneGeometry();
+  if (nullptr != plane && QmitkMxN3DCamera::ApplyViewFrame(renderer->GetVtkRenderer(), *plane))
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(widget->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+void QmitkMxNMultiWidget::OnViewsInitialized()
+{
+  // A layout being applied re-applies the directions once at its end.
+  if (this->IsApplyingLayout())
+  {
+    return;
+  }
+  // Called from the rendering manager's event dispatch, on behalf of
+  // whatever initialized a view, which must not see this editor's errors.
+  try
+  {
+    this->ReconcileExternalRenderModes();
+    this->RestoreThreeDViewDirections();
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "MxN: 3D view directions not restored after a view initialization: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNMultiWidget::ReconcileExternalRenderModes()
+{
+  ViewDirectionNotifier notifier(this);
+  bool reconciled = false;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* renderer = RendererOf(cell.get());
+    const auto mode = IsThreeD(renderer) ? RenderMode::ThreeD : RenderMode::TwoD;
+    // Recorded first: the finishing steps initialize views, which re-enters here.
+    const bool switched = std::exchange(m_SeenRenderModes[windowId], mode) != mode;
+    if (RenderMode::ThreeD == mode)
+    {
+      // Core installs its own style on the first render after a mapper
+      // switch, so a cell switched away and back between two view
+      // initializations needs the MxN style again in an unchanged mode.
+      auto* interactor = renderer->GetRenderWindow()->GetInteractor();
+      const bool hasStyle =
+        nullptr == interactor || nullptr != QmitkMxN3DInteractorStyle::SafeDownCast(interactor->GetInteractorStyle());
+      if (!switched && hasStyle)
+      {
+        continue;
+      }
+      this->InstallThreeDInteractorStyle(cell.get());
+      this->FinishThreeDAdoption(windowId);
+      reconciled = true;
+    }
+    else
+    {
+      const bool wasFree = this->ReleaseFreeCellForTwoD(windowId);
+      if (!switched && !wasFree)
+      {
+        continue;
+      }
+      m_TwoDViews.erase(windowId);
+      // The caller chose the plane by setting the default direction.
+      this->FinishTwoDAdoption(windowId);
+      reconciled = true;
+    }
+  }
+  if (reconciled)
+  {
+    this->RefreshSyncControls();
+  }
+}
+
+void QmitkMxNMultiWidget::RestoreThreeDViewDirections()
+{
+  std::set<std::string> freeGroups;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    this->ApplyThreeDViewDirection(windowId);
+    const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation);
+    if (link.has_value() && m_FreeCells.count(windowId) > 0)
+    {
+      freeGroups.insert(link->group);
+    }
+  }
+  for (const auto& group : freeGroups)
+  {
+    this->ConvergeFreeOrientationGroup(group);
+  }
+}
+
+void QmitkMxNMultiWidget::ConvergeFreeOrientationGroup(const std::string& group)
+{
+  const auto anchorId = this->FindSyncGroupAnchor(QmitkMxNSyncDimension::Orientation, group);
+  if (anchorId.isEmpty())
+  {
+    return;
+  }
+  const auto anchorWidget = this->GetRenderWindowWidget(anchorId);
+  auto* anchorRenderer = RendererOf(anchorWidget.get());
+  if (!IsThreeD(anchorRenderer))
+  {
+    return;
+  }
+  const auto anchorState = QmitkMxN3DCamera::CaptureState(anchorRenderer->GetVtkRenderer()->GetActiveCamera());
+  for (const auto& memberId : this->ActiveGroupPeers(anchorId, QmitkMxNSyncDimension::Orientation))
+  {
+    const auto memberWidget = this->GetRenderWindowWidget(memberId);
+    auto* memberRenderer = RendererOf(memberWidget.get());
+    if (IsThreeD(memberRenderer)
+        && QmitkMxN3DCamera::ApplyDirection(memberRenderer->GetVtkRenderer(), anchorState.directionOfProjection,
+                                            anchorState.viewUp))
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdate(memberWidget->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::OnThreeDCameraStep(const QString& windowId,
+                                             const QmitkMxN3DCameraState& from,
+                                             const QmitkMxN3DCameraState& to)
+{
+  // Relays move other cameras programmatically, which no interactor style
+  // reports; the guard keeps it that way should a relay ever reach a style.
+  if (m_CameraRelayDepth > 0 || nullptr == this->GetRenderWindowWidget(windowId))
+  {
+    return;
+  }
+  QScopedValueRollback<unsigned int> guard(m_CameraRelayDepth, m_CameraRelayDepth + 1);
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+
+  const auto worldPan = to.focalPoint - from.focalPoint;
+  if (worldPan.GetNorm() > QmitkMxN3DCamera::Tolerance)
+  {
+    for (const auto& memberId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Pan))
+    {
+      const auto member = this->GetRenderWindowWidget(memberId);
+      auto* memberRenderer = RendererOf(member.get());
+      if (IsThreeD(memberRenderer))
+      {
+        QmitkMxN3DCamera::Translate(memberRenderer->GetVtkRenderer(), worldPan);
+      }
+      else if (const auto* plane = memberRenderer->GetCurrentWorldPlaneGeometry(); nullptr != plane)
+      {
+        memberRenderer->GetCameraController()->MoveBy(QmitkMxN3DCamera::WorldToPlane(*plane, worldPan));
+      }
+      renderingManager->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+
+  if (from.visibleHalfHeight > 0.0 && to.visibleHalfHeight > 0.0
+      && std::abs(from.visibleHalfHeight - to.visibleHalfHeight) > QmitkMxN3DCamera::Tolerance)
+  {
+    const double zoomFactor = from.visibleHalfHeight / to.visibleHalfHeight;
+    for (const auto& memberId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Zoom))
+    {
+      const auto member = this->GetRenderWindowWidget(memberId);
+      auto* memberRenderer = RendererOf(member.get());
+      if (IsThreeD(memberRenderer))
+      {
+        QmitkMxN3DCamera::Zoom(memberRenderer->GetVtkRenderer(), zoomFactor);
+      }
+      else
+      {
+        // About the cell's own center, like a zoom gesture that does not pan;
+        // the camera controller keeps a constrained 2D cell in its range.
+        auto* controller = memberRenderer->GetCameraController();
+        controller->Zoom(zoomFactor, controller->GetCameraPositionOnPlane());
+      }
+      renderingManager->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+
+  // Only a 'Free' cell turns while linked on orientation (a canonical one is
+  // locked), and its group is 'Free' throughout.
+  if (m_FreeCells.count(windowId) > 0)
+  {
+    for (const auto& memberId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Orientation))
+    {
+      const auto member = this->GetRenderWindowWidget(memberId);
+      auto* memberRenderer = RendererOf(member.get());
+      if (IsThreeD(memberRenderer)
+          && QmitkMxN3DCamera::ApplyDirection(memberRenderer->GetVtkRenderer(), to.directionOfProjection, to.viewUp))
+      {
+        renderingManager->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
+      }
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender,
+                                                   const mitk::Vector2D& panVector,
+                                                   double zoomFactor)
+{
+  const bool pans = panVector.GetNorm() > QmitkMxN3DCamera::Tolerance;
+  const bool zooms = zoomFactor > 0.0 && std::abs(zoomFactor - 1.0) > QmitkMxN3DCamera::Tolerance;
+  const auto* plane = sender->GetCurrentWorldPlaneGeometry();
+  if ((!pans && !zooms) || nullptr == plane)
+  {
+    return;
+  }
+  const auto worldPan = QmitkMxN3DCamera::PlaneToWorld(*plane, panVector);
+
+  for (const auto& [memberId, member] : this->GetRenderWindowWidgets())
+  {
+    auto* memberRenderer = RendererOf(member.get());
+    if (memberRenderer == sender || !IsThreeD(memberRenderer))
+    {
+      continue;
+    }
+    bool moved = false;
+    if (pans && this->IsNavTarget(QmitkMxNSyncDimension::Pan, sender, memberRenderer))
+    {
+      QmitkMxN3DCamera::Translate(memberRenderer->GetVtkRenderer(), worldPan);
+      moved = true;
+    }
+    if (zooms && this->IsNavTarget(QmitkMxNSyncDimension::Zoom, sender, memberRenderer))
+    {
+      QmitkMxN3DCamera::Zoom(memberRenderer->GetVtkRenderer(), zoomFactor);
+      moved = true;
+    }
+    if (moved)
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::OnThreeDCameraRotated(const QString& windowId)
+{
+  ViewDirectionNotifier notifier(this);
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget || !IsThreeD(RendererOf(widget.get())) || m_FreeCells.count(windowId) > 0)
+  {
+    return;
+  }
+  // An orientation-linked cell keeps the group's direction.
+  if (this->GetSyncLink(windowId, QmitkMxNSyncDimension::Orientation).has_value())
+  {
+    return;
+  }
+  m_FreeCells.insert(windowId);
 }
 
 void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::AnatomicalPlane viewDirection)
@@ -3835,7 +4969,18 @@ void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::An
       {
         continue;
       }
-      memberUtility->SetViewDirectionSelection(viewDirection);
+      m_FreeCells.erase(descriptor.id);
+      if (IsThreeD(RendererOf(memberWidget.get())))
+      {
+        // The slice-plane path would refit the 3D camera to the anterior
+        // view; a 3D member only turns its camera.
+        memberWidget->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
+        this->ApplyThreeDViewDirection(descriptor.id);
+      }
+      else
+      {
+        memberUtility->SetViewDirectionSelection(viewDirection);
+      }
       ++m_OrientationApplyCount;
       affected.push_back(descriptor.id);
     }
@@ -3857,6 +5002,12 @@ std::vector<QString> QmitkMxNMultiWidget::ComputeGeometryComponent(const QString
   {
     for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Orientation })
     {
+      // A 3D cell shares the reference geometry through its orientation link
+      // only; its inactive slice link connects nothing.
+      if (!this->IsDimensionApplicable(a, dimension) || !this->IsDimensionApplicable(b, dimension))
+      {
+        continue;
+      }
       const auto linkA = this->GetSyncLink(a, dimension);
       const auto linkB = this->GetSyncLink(b, dimension);
       if (linkA.has_value() && linkB.has_value() && linkA->group == linkB->group)
@@ -3995,7 +5146,11 @@ void QmitkMxNMultiWidget::ReconvergeGeometryRelativeGroups(const std::vector<QSt
     {
       anchorId = this->FindSyncGroupSeed(dimension, group);
     }
-    this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+    // Still empty when the dimension applies to no member.
+    if (!anchorId.isEmpty())
+    {
+      this->ConvergeSyncGroupToAnchor(dimension, group, anchorId);
+    }
   }
 }
 
@@ -4059,6 +5214,12 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
     mitkThrow() << "SetLookupTable: lookupTable must not be null.";
   }
 
+  if (!this->IsDimensionApplicable(windowId, QmitkMxNSyncDimension::Lut))
+  {
+    mitkThrow() << "SetLookupTable: a lookup table does not apply to window '" << windowId.toStdString()
+                << "' (a 3D view).";
+  }
+
   const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
   if (!link.has_value())
   {
@@ -4070,17 +5231,9 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
   }
 
   std::vector<QString> targets{ windowId };
-  for (const auto& descriptor : this->ListWindowDescriptors())
+  for (const auto& peerId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Lut))
   {
-    if (descriptor.id == windowId)
-    {
-      continue;
-    }
-    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
-    if (memberLink.has_value() && memberLink->group == link->group)
-    {
-      targets.push_back(descriptor.id);
-    }
+    targets.push_back(peerId);
   }
 
   for (const auto& targetId : targets)
@@ -4132,6 +5285,12 @@ void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNo
     mitkThrow() << "ApplyLevelWindow: node must not be null.";
   }
 
+  if (!this->IsDimensionApplicable(windowId, QmitkMxNSyncDimension::Windowing))
+  {
+    mitkThrow() << "ApplyLevelWindow: level/window does not apply to window '" << windowId.toStdString()
+                << "' (a 3D view).";
+  }
+
   const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
   if (!link.has_value())
   {
@@ -4146,17 +5305,9 @@ void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNo
   }
 
   std::vector<QString> targets{ windowId };
-  for (const auto& descriptor : this->ListWindowDescriptors())
+  for (const auto& peerId : this->ActiveGroupPeers(windowId, QmitkMxNSyncDimension::Windowing))
   {
-    if (descriptor.id == windowId)
-    {
-      continue;
-    }
-    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Windowing);
-    if (memberLink.has_value() && memberLink->group == link->group)
-    {
-      targets.push_back(descriptor.id);
-    }
+    targets.push_back(peerId);
   }
 
   for (const auto& targetId : targets)
@@ -4644,7 +5795,10 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
         {
           for (const auto& windowId : it->second)
           {
-            result.append(windowId);
+            if (this->IsDimensionApplicable(windowId, *dimension))
+            {
+              result.append(windowId);
+            }
           }
         }
       }
@@ -4665,6 +5819,10 @@ std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, Q
   if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
   {
     return this->GetCellSelectionGroup(windowId);
+  }
+  else if (!this->IsDimensionApplicable(windowId, *dimension))
+  {
+    return std::string();
   }
   else if (const auto link = this->GetSyncLink(windowId, *dimension))
   {
@@ -4719,12 +5877,29 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
       try
       {
         slot.color = this->GetSyncGroupColor(link->group);
-        slot.offsetText = FormatSyncOffset(dimension, link->offset);
-        slot.hasOffset = !slot.offsetText.isEmpty();
+        const auto offsetText = FormatSyncOffset(dimension, link->offset);
+        // A link that does not converge on this cell (pan on a 3D view) keeps
+        // its stored offset for the 2D views; showing it here would mark a
+        // shift the cell does not exhibit.
+        const bool offsetHidden = !this->ConvergesOn(windowId, dimension);
+        if (!offsetHidden)
+        {
+          slot.offsetText = offsetText;
+          slot.hasOffset = !slot.offsetText.isEmpty();
+        }
         const auto groupName = QString::fromStdString(this->GetSyncGroupDisplayName(link->group));
-        slot.tooltip = slot.hasOffset
-                         ? tr("%1 - group %2, offset %3").arg(label, groupName, slot.offsetText)
-                         : tr("%1 - group %2").arg(label, groupName);
+        if (offsetText.isEmpty())
+        {
+          slot.tooltip = tr("%1 - group %2").arg(label, groupName);
+        }
+        else if (offsetHidden)
+        {
+          slot.tooltip = tr("%1 - group %2, offset %3 kept for 2D views").arg(label, groupName, offsetText);
+        }
+        else
+        {
+          slot.tooltip = tr("%1 - group %2, offset %3").arg(label, groupName, offsetText);
+        }
       }
       catch (const mitk::Exception&)
       {
@@ -4734,6 +5909,11 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
     if (!slot.color.isValid())
     {
       slot.tooltip = tr("%1 - not linked").arg(label);
+    }
+    slot.applicable = this->IsDimensionApplicable(windowId, dimension);
+    if (!slot.applicable)
+    {
+      slot.tooltip = tr("%1 - not applicable to 3D views").arg(label);
     }
     axisSlots.append(slot);
   }
@@ -4840,6 +6020,10 @@ QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
   std::vector<std::string> distinctGroups;  // in dimension order, de-duplicated
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
+    if (!this->IsDimensionApplicable(windowId, dimension))
+    {
+      continue;
+    }
     const auto link = this->GetSyncLink(windowId, dimension);
     if (!link.has_value())
     {

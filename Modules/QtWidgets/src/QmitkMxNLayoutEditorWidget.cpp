@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 
@@ -165,6 +166,7 @@ namespace
   constexpr int ChipHueRole = Qt::UserRole + 2;
   constexpr int ChipOffsetRole = Qt::UserRole + 3;
   constexpr int ChipHighlightRole = Qt::UserRole + 4;
+  constexpr int ChipNotApplicableRole = Qt::UserRole + 5;
 
   // Out-of-domain values the offset editors rest on when the selected cells
   // disagree, surfaced through specialValueText. An offset the user cannot mean,
@@ -202,7 +204,19 @@ namespace
       painter->setRenderHint(QPainter::Antialiasing, true);
 
       auto hue = index.data(ChipHueRole).value<QColor>();
-      if (hue.isValid())
+      if (index.data(ChipNotApplicableRole).toBool())
+      {
+        // The axis has no meaning for this window: a struck-through outline
+        // instead of a chip, whatever link the window keeps.
+        const QRect chip = option.rect.adjusted(2, 2, -2, -2);
+        const QColor ink = option.palette.color(QPalette::Mid);
+        painter->setPen(QPen(ink, 1, Qt::DashLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRoundedRect(QRectF(chip).adjusted(0.5, 0.5, -0.5, -0.5), 3, 3);
+        painter->setPen(ink);
+        painter->drawText(chip, Qt::AlignCenter, QObject::tr("n/a"));
+      }
+      else if (hue.isValid())
       {
         // A chip sharing the hovered synchronization brightens. A frame would be
         // invisible here - the chip is already filled in the group hue - and the
@@ -584,6 +598,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   mainLayout->addWidget(m_ArrangeHint);
   this->UpdateArrangeHint();
 
+  // Says why a link asked for was not made, until the next link change.
+  m_ConflictNotice = new QmitkInfoCard(this);
+  m_ConflictNotice->setObjectName(QStringLiteral("QmitkMxNLayoutEditorConflictNotice"));
+  m_ConflictNotice->hide();
+  mainLayout->addWidget(m_ConflictNotice);
+
   // Two faces of the same configuration, as tabs: "Sync groups" for the
   // everyday card work, "Advanced" for the per-window link matrix. They are
   // mutually exclusive - one configuration surface at a time.
@@ -835,11 +855,13 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
   // The empty-group intent cache belongs to the attached editor's groups; a
   // swap (or detach) invalidates it.
   m_EmptyGroupAxisCache.clear();
+  m_ConflictNotice->hide();
 
   if (!m_MultiWidget.isNull())
   {
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncLinksChanged,
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
+    connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncLinksChanged, this, [this]() { m_ConflictNotice->hide(); });
     connect(m_MultiWidget, &QmitkMxNMultiWidget::LayoutChanged,
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncGroupAdded,
@@ -930,6 +952,7 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
       this->ApplyGroupAxesToCell(windowId, group, dimensions, includeSelection, mode);
     }
     m_MultiWidget->RefreshSyncControls();
+    this->ShowOrientationConflicts(group);
     return;
   }
 
@@ -943,6 +966,7 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
     this->ApplyGroupAxesToCell(windowId, group, dimensions, this->GroupSelectionEnabled(group), mode);
   }
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
@@ -975,7 +999,16 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
       {
         continue;
       }
-      m_MultiWidget->SetSyncLink(windowId, dimension, group);
+      try
+      {
+        m_MultiWidget->SetSyncLink(windowId, dimension, group);
+      }
+      catch (const QmitkMxNOrientationConflictException& e)
+      {
+        // The cell's view direction cannot join the group's orientation; the
+        // group's other axes still apply.
+        this->NoteOrientationConflict(windowId, e);
+      }
     }
     if (includeSelection)
     {
@@ -1004,7 +1037,22 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
     return;
   }
 
-  for (const auto& windowId : this->GroupMembers(group))
+  auto members = this->GroupMembers(group);
+  if (enabled && QmitkMxNSyncDimension::Orientation == dimension)
+  {
+    // The first member to link anchors the group. A free 3D cell has to be
+    // that anchor: joining a group anchored by a non-free cell snaps it to the
+    // anchor's direction and it loses 'free', while the 2D members, linked
+    // after it, are only refused with the conflict notice.
+    std::stable_partition(members.begin(), members.end(),
+                          [this](const QString& windowId)
+                          {
+                            return QmitkMxNMultiWidget::ViewDirection::Free
+                                   == m_MultiWidget->GetViewDirection(windowId);
+                          });
+  }
+
+  for (const auto& windowId : members)
   {
     try
     {
@@ -1018,6 +1066,10 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
         m_MultiWidget->ClearSyncLink(windowId, dimension);
       }
     }
+    catch (const QmitkMxNOrientationConflictException& e)
+    {
+      this->NoteOrientationConflict(windowId, e);
+    }
     catch (const mitk::Exception& e)
     {
       MITK_WARN << "Layout editor: dimension change for '" << windowId.toStdString()
@@ -1027,6 +1079,7 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
   // Notify the per-cell furniture (barcodes, frame colors) of the link change;
   // this also drives the editor's own coalesced rebuild via SyncLinksChanged.
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group, bool enabled)
@@ -1096,6 +1149,12 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, Qmi
   // Non-empty group: homogenize the axis over the members (link all / unlink all).
   const auto axisSlots = this->BuildGroupBarcodeSlots(groupId);
   if (slot >= axisSlots.size())
+  {
+    return;
+  }
+  // The links kept on an axis that does not apply are inactive and wait for the
+  // cells' return to 2D; the card must not edit them.
+  if (!axisSlots[slot].applicable)
   {
     return;
   }
@@ -1577,13 +1636,23 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   // The group perspective speaks for several windows at once, so it marks that
   // an offset exists somewhere in the group but leaves the number to the
   // per-window surfaces, which can say whose it is.
-  const auto stateSlot = [total](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked,
-                                 bool anyOffset,
-                                 const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
+  // 'total' counts the members that can take the axis, so a group is not
+  // partial merely because a 3D member cannot take a 2D-only axis, or a 2D
+  // member cannot follow the free orientation of the group.
+  const bool hasMembers = !members.empty();
+  const auto stateSlot = [hasMembers](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked, int total,
+                                      bool anyOffset,
+                                      const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
   {
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
     slot.glyph = glyph;
-    if (linked > 0 && groupHue.isValid())
+    if (hasMembers && 0 == total)
+    {
+      slot.applicable = false;
+      slot.color = linked > 0 ? groupHue : QColor();
+      slot.tooltip = QObject::tr("%1 - not applicable to any window of the group").arg(label);
+    }
+    else if (linked > 0 && groupHue.isValid())
     {
       slot.color = groupHue;
       slot.partial = linked < total;
@@ -1606,6 +1675,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   for (const auto dimension : QmitkMxNAllSyncDimensions)
   {
     int linked = 0;
+    int applicableMembers = total;
     bool anyOffset = false;
     if (useCache)
     {
@@ -1613,18 +1683,38 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
     }
     else
     {
+      applicableMembers = 0;
+      int inactiveLinked = 0;
       for (const auto& windowId : members)
       {
+        const bool applicable = m_MultiWidget->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension));
         const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
-        if (link.has_value() && link->group == group)
+        const bool linkedToGroup = link.has_value() && link->group == group;
+        const bool canTake = linkedToGroup || QmitkMxNSyncDimension::Orientation != dimension
+                             || m_MultiWidget->IsOrientationLinkAllowed(windowId, group);
+        applicableMembers += (applicable && canTake) ? 1 : 0;
+        if (linkedToGroup)
         {
+          if (!applicable)
+          {
+            ++inactiveLinked;
+            continue;
+          }
           ++linked;
+          // A member the dimension does not converge on keeps its offset for
+          // the 2D views and exhibits none, so it does not mark the group.
           anyOffset = anyOffset
-                      || !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty();
+                      || (m_MultiWidget->IsConvergenceApplicable(windowId, dimension)
+                          && !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty());
         }
       }
+      // An axis no member can take still shows the hue its kept links carry.
+      if (0 == applicableMembers)
+      {
+        linked = inactiveLinked;
+      }
     }
-    result.append(stateSlot(GlyphFor(dimension), hue, linked, anyOffset,
+    result.append(stateSlot(GlyphFor(dimension), hue, linked, applicableMembers, anyOffset,
                             QString::fromUtf8(DimensionLabel(dimension))));
     ++axisIndex;
   }
@@ -1646,7 +1736,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   }
   // Data selection has no offset to carry, so it never takes the footnote mark.
   result.append(
-    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, false, tr("Data selection")));
+    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, total, false, tr("Data selection")));
 
   return result;
 }
@@ -2209,9 +2299,12 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
 
       std::string group;
       QString offset;
+      QString keptOffset;
       QString axisName;
+      bool applicable = true;
       try
       {
+        applicable = m_MultiWidget->IsAxisApplicable(windowId, *QmitkMxNSyncAxisFromSlot(column));
         if (column == dimensionCount)
         {
           // Data selection always resolves to a group - it has no unlinked
@@ -2226,13 +2319,43 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
           if (const auto link = m_MultiWidget->GetSyncLink(windowId, dimension))
           {
             group = link->group;
-            offset = QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset);
+            // An offset the cell does not exhibit (pan on a 3D view) is kept
+            // for the 2D views and named only in the tooltip.
+            const auto linkOffset = QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset);
+            if (m_MultiWidget->IsConvergenceApplicable(windowId, dimension))
+            {
+              offset = linkOffset;
+            }
+            else
+            {
+              keptOffset = linkOffset;
+            }
           }
         }
       }
       catch (const mitk::Exception&)
       {
         // Transient mid-layout-change state; the next engine signal refreshes.
+        continue;
+      }
+
+      // A not-applicable chip is neither shown as a group nor selectable, so
+      // the action bar never edits a link the window cannot use.
+      item->setData(ChipNotApplicableRole, !applicable);
+      const auto selectable = item->flags() | Qt::ItemIsSelectable;
+      item->setFlags(applicable ? selectable : selectable & ~Qt::ItemIsSelectable);
+      if (!applicable)
+      {
+        item->setSelected(false);
+        item->setData(ChipGroupRole, QString());
+        item->setData(ChipNameRole, QString());
+        item->setData(ChipHueRole, QColor());
+        item->setData(ChipOffsetRole, QString());
+        item->setText(QString());
+        item->setToolTip(group.empty()
+                           ? tr("%1: not applicable to 3D views").arg(axisName)
+                           : tr("%1: not applicable to 3D views (link to %2 kept)")
+                               .arg(axisName, QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(group))));
         continue;
       }
 
@@ -2270,9 +2393,16 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
       // rather than the painted chip see the whole text.
       item->setText(offset.isEmpty() ? displayName
                                      : QStringLiteral("%1 %2").arg(displayName, offset));
-      item->setToolTip(offset.isEmpty()
-                         ? tr("%1: %2").arg(axisName, displayName)
-                         : tr("%1: %2, offset %3").arg(axisName, displayName, offset));
+      if (!keptOffset.isEmpty())
+      {
+        item->setToolTip(tr("%1: %2, offset %3 kept for 2D views").arg(axisName, displayName, keptOffset));
+      }
+      else
+      {
+        item->setToolTip(offset.isEmpty()
+                           ? tr("%1: %2").arg(axisName, displayName)
+                           : tr("%1: %2, offset %3").arg(axisName, displayName, offset));
+      }
     }
   }
 
@@ -2316,6 +2446,8 @@ QmitkMxNLayoutEditorWidget::AdvancedMatrixCell(const QString& windowId, QmitkMxN
     content.group = item->data(ChipGroupRole).toString().toStdString();
     content.offset = item->data(ChipOffsetRole).toString();
     content.highlighted = item->data(ChipHighlightRole).toBool();
+    content.applicable = !item->data(ChipNotApplicableRole).toBool();
+    content.toolTip = item->toolTip();
   }
   return content;
 }
@@ -2682,7 +2814,25 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
   }
   const bool slice = QmitkMxNSyncDimension::Slice == dimension;
   const bool zoom = QmitkMxNSyncDimension::Zoom == dimension;
-  const bool pan = QmitkMxNSyncDimension::Pan == dimension;
+  // A pan offset has no effect on a 3D cell, so a selection holding one has
+  // nothing to edit on this axis; the offset stays stored for the 2D views.
+  bool panConverges = true;
+  if (QmitkMxNSyncDimension::Pan == dimension)
+  {
+    try
+    {
+      for (const auto& [windowId, axis] : selection)
+      {
+        panConverges = panConverges
+                       && m_MultiWidget->IsConvergenceApplicable(windowId, QmitkMxNSyncDimension::Pan);
+      }
+    }
+    catch (const mitk::Exception&)
+    {
+      panConverges = false;
+    }
+  }
+  const bool pan = QmitkMxNSyncDimension::Pan == dimension && panConverges;
 
   m_MatrixOffsetRow->setVisible(allLinked && (slice || zoom || pan));
   m_MatrixOffsetLabel->setVisible(slice || zoom || pan);
@@ -2800,6 +2950,7 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupToMatrixSelection(const std::string& 
     }
   }
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ShowMatrixGroupMenu(const QPoint& globalPos)
@@ -2867,6 +3018,7 @@ void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, Qmitk
   }
   this->WriteCellAxisGroup(windowId, axis, group);
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis,
@@ -2893,11 +3045,45 @@ void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, Qmi
                                                   : QmitkMxNMultiWidget::SyncOffset{});
     }
   }
+  catch (const QmitkMxNOrientationConflictException& e)
+  {
+    this->NoteOrientationConflict(windowId, e);
+  }
   catch (const mitk::Exception& e)
   {
     MITK_WARN << "Layout editor: link change for '" << windowId.toStdString()
               << "' ignored: " << e.GetDescription();
   }
+}
+
+void QmitkMxNLayoutEditorWidget::NoteOrientationConflict(const QString& windowId,
+                                                         const QmitkMxNOrientationConflictException& e)
+{
+  MITK_WARN << "Layout editor: '" << windowId.toStdString() << "' not linked on orientation: " << e.GetDescription();
+  m_OrientationConflicts.append(windowId);
+}
+
+void QmitkMxNLayoutEditorWidget::ShowOrientationConflicts(const std::string& group)
+{
+  const auto windowIds = std::exchange(m_OrientationConflicts, {});
+  if (windowIds.isEmpty() || m_MultiWidget.isNull())
+  {
+    return;
+  }
+  QStringList labels;
+  for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
+  {
+    if (windowIds.contains(descriptor.id))
+    {
+      labels.append(CellLabel(descriptor).toHtmlEscaped());
+    }
+  }
+  const auto groupName = QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(group)).toHtmlEscaped();
+  m_ConflictNotice->SetMessage(tr("Not linked on orientation: %1. A 2D window cannot follow the freely rotated "
+                                  "3D views of group %2.")
+                                 .arg(labels.join(QStringLiteral(", ")), groupName),
+                               QmitkInfoCard::Severity::Warning);
+  m_ConflictNotice->show();
 }
 
 void QmitkMxNLayoutEditorWidget::ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)

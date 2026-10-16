@@ -119,6 +119,9 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Routing_Axial_PrefersTwoD);
   MITK_TEST(Routing_NoThreeDCell_ReturnsActive);
   MITK_TEST(InitializeViews_ThreeDActive_BroadcastsTwoDPosition);
+  MITK_TEST(InitializeViews_ThreeDActive_InitializesFirstTwoDCell);
+  MITK_TEST(InitializeViews_ThreeDActive_ThreeDCellTakesGeometryAcrossRoundTrip);
+  MITK_TEST(InitializeViews_AllThreeD_InitializesActive);
   MITK_TEST(SelectedPosition_EmptyNameFollowsTwoDCellWhileThreeDIsActive);
   MITK_TEST(ThreeD_PanOffsetIsKeptButNotShown);
   MITK_TEST(Math_VisibleHalfHeight_ParallelAndPerspective);
@@ -1064,6 +1067,61 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The other 2D cell is moved to the first 2D cell's position",
                                  Snc(1)->GetStepper()->GetPos(), Snc(2)->GetStepper()->GetPos());
+  }
+
+  /** A volume whose extents differ from the fixture image's. */
+  static mitk::Image::Pointer LargerImage()
+  {
+    return mitk::ImageGenerator::GenerateGradientImage<short>(32, 24, 16, 1.0f, 1.0f, 1.0f);
+  }
+
+  static bool SameGeometry(const mitk::TimeGeometry* actual, const mitk::TimeGeometry* expected)
+  {
+    return nullptr != actual && nullptr != expected && mitk::Equal(*actual, *expected, mitk::eps, false);
+  }
+
+  void InitializeViews_ThreeDActive_InitializesFirstTwoDCell()
+  {
+    const auto larger = LargerImage();
+    CPPUNIT_ASSERT_MESSAGE("precondition: the 2D cell shows another geometry",
+                           !SameGeometry(this->Snc(1)->GetInputWorldTimeGeometry(), larger->GetTimeGeometry()));
+
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    this->Activate(0);
+    m_Editor->InitializeViews(larger->GetTimeGeometry(), false);
+
+    CPPUNIT_ASSERT_MESSAGE("The first 2D cell takes the geometry although a 3D cell is active",
+                           SameGeometry(this->Snc(1)->GetInputWorldTimeGeometry(), larger->GetTimeGeometry()));
+  }
+
+  void InitializeViews_ThreeDActive_ThreeDCellTakesGeometryAcrossRoundTrip()
+  {
+    const auto larger = LargerImage();
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    this->Activate(0);
+    m_Editor->InitializeViews(larger->GetTimeGeometry(), false);
+
+    CPPUNIT_ASSERT_MESSAGE("The active 3D cell takes the geometry",
+                           SameGeometry(this->Snc(0)->GetInputWorldTimeGeometry(), larger->GetTimeGeometry()));
+
+    m_Editor->SetRenderMode(CellId(0), RenderMode::TwoD);
+    CPPUNIT_ASSERT_MESSAGE("Back in 2D, the cell shows the new geometry, not the one it had before",
+                           SameGeometry(this->Snc(0)->GetInputWorldTimeGeometry(), larger->GetTimeGeometry()));
+  }
+
+  void InitializeViews_AllThreeD_InitializesActive()
+  {
+    const auto larger = LargerImage();
+    for (std::size_t index = 0; index < 3; ++index)
+    {
+      m_Editor->SetRenderMode(CellId(index), RenderMode::ThreeD);
+    }
+    this->Activate(1);
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Without a 2D cell, the active 3D cell stands in for it",
+                                    m_Editor->InitializeViews(larger->GetTimeGeometry(), false));
+    CPPUNIT_ASSERT_MESSAGE("The active 3D cell takes the geometry",
+                           SameGeometry(this->Snc(1)->GetInputWorldTimeGeometry(), larger->GetTimeGeometry()));
   }
 
   void SelectedPosition_EmptyNameFollowsTwoDCellWhileThreeDIsActive()

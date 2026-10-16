@@ -1148,8 +1148,20 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
     }
   }
 
-  // initialize active render window
-  renderingManager->InitializeView(activeWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
+  // A 3D active cell cannot stand in for the slice cells, so the first 2D cell
+  // takes the geometry too; the active 3D cell takes it as well so it shows
+  // the new geometry when it returns to 2D. Both are the same window when the
+  // active cell is 2D or no 2D cell exists.
+  auto* const activeWindow = activeWidget->GetRenderWindow();
+  auto* const twoDWindow = this->RenderWindowForMode(RenderMode::TwoD);
+  if (nullptr != twoDWindow)
+  {
+    renderingManager->InitializeView(twoDWindow->GetVtkRenderWindow(), geometry, resetCamera);
+  }
+  if (activeWindow != twoDWindow)
+  {
+    renderingManager->InitializeView(activeWindow->GetVtkRenderWindow(), geometry, resetCamera);
+  }
 
   if (!resetCamera)
   {

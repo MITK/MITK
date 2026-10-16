@@ -141,10 +141,12 @@ public:
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;
 
   /**
-  * \brief Initialize the active render windows of the MxNMultiWidget to the given geometry.
+  * \brief Initialize the active cell of the MxNMultiWidget to the given geometry. If the active
+  *        cell renders 3D, the first 2D cell in layout order is initialized as well. Other cells
+  *        keep their geometry unless linked.
   *
   * \param geometry       The geometry to be used to initialize / update the
-  *                       active render window's time and slice navigation controller.
+  *                       time and slice navigation controllers of the initialized cells.
   * \param resetCamera    If true, the camera and crosshair will be reset to the default view (centered, no zoom).
   *                       If false, the current crosshair position and the camera zoom will be stored and reset
   *                       after the reference geometry has been updated.

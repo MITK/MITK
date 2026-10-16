@@ -1694,8 +1694,11 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
             continue;
           }
           ++linked;
+          // A member the dimension does not converge on keeps its offset for
+          // the 2D views and exhibits none, so it does not mark the group.
           anyOffset = anyOffset
-                      || !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty();
+                      || (m_MultiWidget->IsConvergenceApplicable(windowId, dimension)
+                          && !QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset).isEmpty());
         }
       }
       // An axis no member can take still shows the hue its kept links carry.
@@ -2287,6 +2290,7 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
 
       std::string group;
       QString offset;
+      QString keptOffset;
       QString axisName;
       bool applicable = true;
       try
@@ -2306,7 +2310,17 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
           if (const auto link = m_MultiWidget->GetSyncLink(windowId, dimension))
           {
             group = link->group;
-            offset = QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset);
+            // An offset the cell does not exhibit (pan on a 3D view) is kept
+            // for the 2D views and named only in the tooltip.
+            const auto linkOffset = QmitkMxNMultiWidget::FormatSyncOffset(dimension, link->offset);
+            if (m_MultiWidget->IsConvergenceApplicable(windowId, dimension))
+            {
+              offset = linkOffset;
+            }
+            else
+            {
+              keptOffset = linkOffset;
+            }
           }
         }
       }
@@ -2370,9 +2384,16 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
       // rather than the painted chip see the whole text.
       item->setText(offset.isEmpty() ? displayName
                                      : QStringLiteral("%1 %2").arg(displayName, offset));
-      item->setToolTip(offset.isEmpty()
-                         ? tr("%1: %2").arg(axisName, displayName)
-                         : tr("%1: %2, offset %3").arg(axisName, displayName, offset));
+      if (!keptOffset.isEmpty())
+      {
+        item->setToolTip(tr("%1: %2, offset %3 kept for 2D views").arg(axisName, displayName, keptOffset));
+      }
+      else
+      {
+        item->setToolTip(offset.isEmpty()
+                           ? tr("%1: %2").arg(axisName, displayName)
+                           : tr("%1: %2, offset %3").arg(axisName, displayName, offset));
+      }
     }
   }
 
@@ -2784,7 +2805,25 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
   }
   const bool slice = QmitkMxNSyncDimension::Slice == dimension;
   const bool zoom = QmitkMxNSyncDimension::Zoom == dimension;
-  const bool pan = QmitkMxNSyncDimension::Pan == dimension;
+  // A pan offset has no effect on a 3D cell, so a selection holding one has
+  // nothing to edit on this axis; the offset stays stored for the 2D views.
+  bool panConverges = true;
+  if (QmitkMxNSyncDimension::Pan == dimension)
+  {
+    try
+    {
+      for (const auto& [windowId, axis] : selection)
+      {
+        panConverges = panConverges
+                       && m_MultiWidget->IsConvergenceApplicable(windowId, QmitkMxNSyncDimension::Pan);
+      }
+    }
+    catch (const mitk::Exception&)
+    {
+      panConverges = false;
+    }
+  }
+  const bool pan = QmitkMxNSyncDimension::Pan == dimension && panConverges;
 
   m_MatrixOffsetRow->setVisible(allLinked && (slice || zoom || pan));
   m_MatrixOffsetLabel->setVisible(slice || zoom || pan);

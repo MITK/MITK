@@ -120,6 +120,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Routing_NoThreeDCell_ReturnsActive);
   MITK_TEST(InitializeViews_ThreeDActive_BroadcastsTwoDPosition);
   MITK_TEST(SelectedPosition_EmptyNameFollowsTwoDCellWhileThreeDIsActive);
+  MITK_TEST(ThreeD_PanOffsetIsKeptButNotShown);
   MITK_TEST(Math_VisibleHalfHeight_ParallelAndPerspective);
   MITK_TEST(Math_Zoom_DividesHalfHeight);
   MITK_TEST(Math_PlaneAndWorldVectors);
@@ -1084,6 +1085,61 @@ public:
     this->Activate(1);
     CPPUNIT_ASSERT_MESSAGE("An empty name asks the active cell when it is 2D",
                            mitk::Equal(twoDPosition, m_Editor->GetSelectedPosition("")));
+  }
+
+  static QmitkMxNSyncBarcodeWidget::AxisSlot SlotOf(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots,
+                                                    QmitkMxNAxisGlyph glyph)
+  {
+    for (const auto& slot : axisSlots)
+    {
+      if (glyph == slot.glyph)
+      {
+        return slot;
+      }
+    }
+    CPPUNIT_FAIL("the barcode has no slot for the axis");
+    return {};
+  }
+
+  void ThreeD_PanOffsetIsKeptButNotShown()
+  {
+    mitk::Vector2D pan;
+    pan[0] = 5.0;
+    pan[1] = -3.0;
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "nav", pan);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav", 2.0);
+
+    auto axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
+    CPPUNIT_ASSERT_MESSAGE("precondition: in 2D the pan offset is shown",
+                           SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan).hasOffset);
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+
+    axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
+    const auto panSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan);
+    CPPUNIT_ASSERT_MESSAGE("A pan link stays applicable to a 3D cell and keeps its hue",
+                           panSlot.applicable && panSlot.color.isValid());
+    CPPUNIT_ASSERT_MESSAGE("A pan offset has no effect on a 3D cell, so the slot does not mark one",
+                           !panSlot.hasOffset);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A pan offset has no effect on a 3D cell, so the slot does not word one",
+                                 std::string(), panSlot.offsetText.toStdString());
+    CPPUNIT_ASSERT_MESSAGE("The tooltip says the offset is kept for the 2D views: " + panSlot.tooltip.toStdString(),
+                           panSlot.tooltip.contains(QStringLiteral("kept")));
+
+    const auto zoomSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Zoom);
+    CPPUNIT_ASSERT_MESSAGE("A zoom offset still applies to a 3D cell and is shown", zoomSlot.hasOffset);
+    CPPUNIT_ASSERT_MESSAGE("The zoom offset is worded", !zoomSlot.offsetText.isEmpty());
+
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    const auto link = m_Editor->GetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan);
+    CPPUNIT_ASSERT_MESSAGE("The pan link survives the round trip",
+                           link.has_value() && std::holds_alternative<mitk::Vector2D>(link->offset));
+    const auto stored = std::get<mitk::Vector2D>(link->offset);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", 5.0, stored[0], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", -3.0, stored[1], 1e-9);
+    CPPUNIT_ASSERT_MESSAGE("Back in 2D the pan offset is shown again",
+                           SlotOf(m_Editor->BuildBarcodeSlots(CellId(1)), QmitkMxNAxisGlyph::Pan).hasOffset);
   }
 
   // --- Camera synchronization ----------------------------------------------

@@ -5759,12 +5759,29 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
       try
       {
         slot.color = this->GetSyncGroupColor(link->group);
-        slot.offsetText = FormatSyncOffset(dimension, link->offset);
-        slot.hasOffset = !slot.offsetText.isEmpty();
+        const auto offsetText = FormatSyncOffset(dimension, link->offset);
+        // A link that does not converge on this cell (pan on a 3D view) keeps
+        // its stored offset for the 2D views; showing it here would mark a
+        // shift the cell does not exhibit.
+        const bool offsetHidden = !this->ConvergesOn(windowId, dimension);
+        if (!offsetHidden)
+        {
+          slot.offsetText = offsetText;
+          slot.hasOffset = !slot.offsetText.isEmpty();
+        }
         const auto groupName = QString::fromStdString(this->GetSyncGroupDisplayName(link->group));
-        slot.tooltip = slot.hasOffset
-                         ? tr("%1 - group %2, offset %3").arg(label, groupName, slot.offsetText)
-                         : tr("%1 - group %2").arg(label, groupName);
+        if (offsetText.isEmpty())
+        {
+          slot.tooltip = tr("%1 - group %2").arg(label, groupName);
+        }
+        else if (offsetHidden)
+        {
+          slot.tooltip = tr("%1 - group %2, offset %3 kept for 2D views").arg(label, groupName, offsetText);
+        }
+        else
+        {
+          slot.tooltip = tr("%1 - group %2, offset %3").arg(label, groupName, offsetText);
+        }
       }
       catch (const mitk::Exception&)
       {

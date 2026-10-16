@@ -185,6 +185,9 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_FreeGroupOrientationSlotUnlinksFromStrip);
   MITK_TEST(ThreeD_FreeGroupRelinkKeepsFree);
   MITK_TEST(ThreeD_FreeGroupConflictFromPlateMenuStaysReported);
+  MITK_TEST(ThreeD_MatrixChipKeepsPanOffsetOutOfSight);
+  MITK_TEST(ThreeD_GroupBarcodeMarksPanOffsetOnlyForConvergingMembers);
+  MITK_TEST(ThreeD_ActionBarHidesPanOffsetForThreeDSelection);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -2184,6 +2187,20 @@ public:
       "A pan of zero is no shift",
       QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Pan,
                                             mitk::Vector2D(0.0)).isEmpty());
+
+    // A pan offset a 3D view keeps without showing is worded the same way by
+    // the barcode and the chip.
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Pan, pan);
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    Pump();
+    const auto kept = QStringLiteral("offset %1 kept for 2D views")
+                        .arg(QmitkMxNMultiWidget::FormatSyncOffset(QmitkMxNSyncDimension::Pan, pan));
+    const auto barcodeTip = m_Editor->BuildBarcodeSlots(CellId(0))[AxisIndexOf(QmitkMxNSyncDimension::Pan)].tooltip;
+    const auto chipTip = m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Pan).toolTip;
+    CPPUNIT_ASSERT_MESSAGE("The barcode tooltip says the offset is kept for 2D views: " + barcodeTip.toStdString(),
+                           barcodeTip.contains(kept));
+    CPPUNIT_ASSERT_MESSAGE("The chip tooltip says the offset is kept for 2D views: " + chipTip.toStdString(),
+                           chipTip.contains(kept));
   }
 
   void ActionBar_NamesTheAxisWithItsGlyph()
@@ -2718,6 +2735,82 @@ public:
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
     CPPUNIT_ASSERT(IsLinked(0, QmitkMxNSyncDimension::Windowing, group));
     CPPUNIT_ASSERT_MESSAGE("The notice outlasts the queued rebuild", this->ConflictNoticeShown());
+  }
+
+  static mitk::Vector2D PanOffsetOf(double x, double y)
+  {
+    mitk::Vector2D pan;
+    pan[0] = x;
+    pan[1] = y;
+    return pan;
+  }
+
+  void ThreeD_MatrixChipKeepsPanOffsetOutOfSight()
+  {
+    // A 3D view does not pan the way a 2D one does, so it shows no pan offset;
+    // the offset is still stored and applies again in 2D.
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(0), QmitkMxNSyncDimension::Pan, PanOffsetOf(5.0, -3.0));
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("precondition: a 2D chip words the pan offset", std::string("(5|-3)"),
+                                 m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Pan).offset.toStdString());
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    Pump();
+
+    const auto chip = m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Pan);
+    CPPUNIT_ASSERT_MESSAGE("Pan applies to a 3D view", chip.applicable);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chip still names the linked group", id, chip.group);
+    CPPUNIT_ASSERT_MESSAGE("The chip of a 3D view shows no pan offset: " + chip.offset.toStdString(),
+                           chip.offset.isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("The tooltip says the offset is kept for 2D views: " + chip.toolTip.toStdString(),
+                           chip.toolTip.contains(QStringLiteral("kept")));
+    const auto* item = Matrix()->item(0, AxisIndexOf(QmitkMxNSyncDimension::Pan));
+    CPPUNIT_ASSERT_MESSAGE("The chip stays selectable", nullptr != item && item->flags().testFlag(Qt::ItemIsSelectable));
+  }
+
+  void ThreeD_GroupBarcodeMarksPanOffsetOnlyForConvergingMembers()
+  {
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    m_Widget->SetCellDimensionOffset(CellId(1), QmitkMxNSyncDimension::Pan, PanOffsetOf(5.0, -3.0));
+    const int panSlot = AxisIndexOf(QmitkMxNSyncDimension::Pan);
+    CPPUNIT_ASSERT_MESSAGE("precondition: a 2D member's pan offset marks the group",
+                           m_Widget->BuildGroupBarcodeSlots(id)[panSlot].hasOffset);
+
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    CPPUNIT_ASSERT_MESSAGE("A 2D member that still converges keeps the mark",
+                           m_Widget->BuildGroupBarcodeSlots(id)[panSlot].hasOffset);
+
+    m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    const auto slot = m_Widget->BuildGroupBarcodeSlots(id)[panSlot];
+    CPPUNIT_ASSERT_MESSAGE("Pan applies to 3D views", slot.applicable);
+    CPPUNIT_ASSERT_MESSAGE("An offset only 3D members carry is not marked", !slot.hasOffset);
+  }
+
+  void ThreeD_ActionBarHidesPanOffsetForThreeDSelection()
+  {
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, id);
+    Pump();
+    m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
+    Pump();
+    const int panAxis = AxisIndexOf(QmitkMxNSyncDimension::Pan);
+    auto* panOffset = m_Widget->findChild<QDoubleSpinBox*>(QStringLiteral("mxnMatrixPanOffsetX"));
+    CPPUNIT_ASSERT(nullptr != panOffset);
+
+    this->SelectMatrixCells({ { 1, panAxis } });
+    CPPUNIT_ASSERT_MESSAGE("A 2D selection offers the pan offset", panOffset->isVisibleTo(m_Widget.get()));
+
+    this->SelectMatrixCells({ { 0, panAxis } });
+    CPPUNIT_ASSERT_MESSAGE("A 3D selection offers no pan offset", !panOffset->isVisibleTo(m_Widget.get()));
+
+    this->SelectMatrixCells({ { 0, panAxis }, { 1, panAxis } });
+    CPPUNIT_ASSERT_MESSAGE("One 3D cell in the selection hides the pan offset",
+                           !panOffset->isVisibleTo(m_Widget.get()));
   }
 };
 

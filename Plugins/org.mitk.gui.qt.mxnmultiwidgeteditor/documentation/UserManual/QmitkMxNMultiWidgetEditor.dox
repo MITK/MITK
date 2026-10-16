@@ -400,7 +400,8 @@
 	turned 3D is kept and takes effect again when it returns to 2D. Back in 2D through
 	"2D view", the window shows the slice, zoom and position it had before, unless its view
 	direction changed or it was reinitialized to other data meanwhile; a linked slice, zoom
-	or pan follows its group instead.
+	or pan follows its group instead. A pan offset is kept for a 3D view and applies again once
+	it returns to 2D; it is not shown while the view renders 3D.
 
 	Pan and zoom couple 2D and 3D views both ways. Zooming a 3D view (mouse wheel or right
 	drag) zooms the members of its zoom group by the same factor, and a 3D view in a zoom

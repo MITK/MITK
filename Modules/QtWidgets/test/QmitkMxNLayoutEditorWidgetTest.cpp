@@ -2495,6 +2495,7 @@ public:
   {
     this->RaiseAdvancedFace();
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncGroupDisplayName("nav", "Navigation");
     m_Editor->SetRenderMode(CellId(0), QmitkMxNMultiWidget::RenderMode::ThreeD);
     Pump();
 
@@ -2506,6 +2507,9 @@ public:
     }
     CPPUNIT_ASSERT_MESSAGE("An n/a chip names no group, even with a kept link",
                            m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).group.empty());
+    const auto toolTip = m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).toolTip;
+    CPPUNIT_ASSERT_MESSAGE("The tooltip names the kept link's group by its display name: " + toolTip.toStdString(),
+                           toolTip.contains(QStringLiteral("Navigation")));
     CPPUNIT_ASSERT(m_Widget->AdvancedMatrixCell(CellId(1), QmitkMxNSyncAxis::Slice).applicable);
   }
 

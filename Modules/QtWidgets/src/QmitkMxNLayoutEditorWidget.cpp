@@ -2292,7 +2292,7 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
         item->setToolTip(group.empty()
                            ? tr("%1: not applicable to 3D views").arg(axisName)
                            : tr("%1: not applicable to 3D views (link to %2 kept)")
-                               .arg(axisName, QString::fromStdString(group)));
+                               .arg(axisName, QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(group))));
         continue;
       }
 
@@ -2377,6 +2377,7 @@ QmitkMxNLayoutEditorWidget::AdvancedMatrixCell(const QString& windowId, QmitkMxN
     content.offset = item->data(ChipOffsetRole).toString();
     content.highlighted = item->data(ChipHighlightRole).toBool();
     content.applicable = !item->data(ChipNotApplicableRole).toBool();
+    content.toolTip = item->toolTip();
   }
   return content;
 }

@@ -207,15 +207,17 @@ public:
   void ApplySliceOffsetRamp(const QStringList& windowIds, int from, int step);
 
   /** \brief What the advanced matrix shows for one cell: the linked group's id
-   *         (empty when the cell is unlinked on the axis) and the offset exactly as
-   *         the chip renders it (empty when the offset is the neutral one).
-   *         Read-only; public so the matrix's rendering is testable headlessly. */
+   *         (empty when the cell is unlinked on the axis), the offset exactly as
+   *         the chip renders it (empty when the offset is the neutral one) and the
+   *         chip's tooltip. Read-only; public so the matrix's rendering is
+   *         testable headlessly. */
   struct MatrixCellContent
   {
     std::string group;
     QString offset;
     bool highlighted = false;
     bool applicable = true;  // false: the axis has no meaning for the window (n/a chip)
+    QString toolTip;
   };
   MatrixCellContent AdvancedMatrixCell(const QString& windowId, QmitkMxNSyncAxis axis) const;
 

@@ -37,6 +37,18 @@ found in the LICENSE file.
 namespace
 {
   QPointer<QmitkCrashDumpManagerDialog> s_Instance;
+
+  // QWidget::isAncestorOf does not look beyond a window boundary.
+  bool IsWithin(const QWidget* widget, const QWidget* ancestor)
+  {
+    for (; widget != nullptr; widget = widget->parentWidget())
+    {
+      if (widget == ancestor)
+        return true;
+    }
+
+    return false;
+  }
 }
 
 void QmitkCrashDumpManagerDialog::ShowManager(QWidget* parent)
@@ -55,7 +67,9 @@ void QmitkCrashDumpManagerDialog::ShowManager(QWidget* parent)
   }
   else
   {
-    if (modal != nullptr && s_Instance->parentWidget() != modal)
+    // A modal dialog inside the manager (e.g. the report dialog it opened)
+    // cannot also be the manager's parent.
+    if (modal != nullptr && s_Instance->parentWidget() != modal && !IsWithin(modal, s_Instance.data()))
     {
       const QPointer<QWidget> previousParent = s_Instance->parentWidget();
       s_Instance->setParent(modal, s_Instance->windowFlags());
@@ -217,10 +231,9 @@ void QmitkCrashDumpManagerDialog::OnSelectionChanged()
 
 void QmitkCrashDumpManagerDialog::OnFileReport()
 {
+  // A refresh here would clear the selection even when nothing was deleted;
+  // a flow that deletes dumps calls RefreshIfOpen() itself.
   mitk::FileCrashReport(m_List->GetSelectedDumps(), this);
-
-  // The report flow may have deleted dumps.
-  this->Refresh();
 }
 
 void QmitkCrashDumpManagerDialog::OnShowInFolder()

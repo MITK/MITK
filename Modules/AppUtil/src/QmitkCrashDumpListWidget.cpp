@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QDateTime>
 #include <QFileInfo>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include <QLocale>
 #include <QSignalBlocker>
 #include <QTreeWidget>
@@ -60,6 +61,7 @@ QmitkCrashDumpListWidget::QmitkCrashDumpListWidget(QWidget* parent)
   m_Tree->header()->setStretchLastSection(false);
 
   this->SetSelectionEnabled(true);
+  m_Tree->installEventFilter(this);
 
   connect(m_Tree, &QTreeWidget::itemSelectionChanged, this, &QmitkCrashDumpListWidget::SelectionChanged);
   connect(m_Tree, &QTreeWidget::itemChanged, this, [this](QTreeWidgetItem*, int column) {
@@ -151,6 +153,7 @@ std::vector<mitk::CrashDumpInfo> QmitkCrashDumpListWidget::GetSelectedDumps() co
 void QmitkCrashDumpListWidget::SetCheckable(bool checkable)
 {
   m_Checkable = checkable;
+  this->UpdateFocusPolicy();
 
   {
     const QSignalBlocker blocker(m_Tree);
@@ -275,5 +278,63 @@ int QmitkCrashDumpListWidget::FitColumnsAndHeight()
 void QmitkCrashDumpListWidget::SetSelectionEnabled(bool enabled)
 {
   m_Tree->setSelectionMode(enabled ? QAbstractItemView::ExtendedSelection : QAbstractItemView::NoSelection);
-  m_Tree->setFocusPolicy(enabled ? Qt::StrongFocus : Qt::NoFocus);
+  this->UpdateFocusPolicy();
+}
+
+void QmitkCrashDumpListWidget::UpdateFocusPolicy()
+{
+  const bool selectable = m_Tree->selectionMode() != QAbstractItemView::NoSelection;
+  m_Tree->setFocusPolicy(selectable || m_Checkable ? Qt::StrongFocus : Qt::NoFocus);
+}
+
+bool QmitkCrashDumpListWidget::eventFilter(QObject* watched, QEvent* event)
+{
+  // Without selection, Qt moves the current row with the arrow keys only on
+  // styles that set SH_ItemView_MovementWithoutUpdatingSelection (the macOS
+  // style does not), so the navigation keys are handled here on every style.
+  if (watched != m_Tree || event->type() != QEvent::KeyPress ||
+      m_Tree->selectionMode() != QAbstractItemView::NoSelection)
+    return QWidget::eventFilter(watched, event);
+
+  const auto* keyEvent = static_cast<const QKeyEvent*>(event);
+  const auto modifiers = keyEvent->modifiers();
+  if (modifiers != Qt::NoModifier && modifiers != Qt::KeypadModifier)
+    return QWidget::eventFilter(watched, event);
+
+  QTreeWidgetItem* const current = m_Tree->currentItem();
+  QTreeWidgetItem* const first = m_Tree->topLevelItem(0);
+  QTreeWidgetItem* const last = m_Tree->topLevelItem(m_Tree->topLevelItemCount() - 1);
+  QTreeWidgetItem* target = nullptr;
+
+  switch (keyEvent->key())
+  {
+    case Qt::Key_Up:
+      target = current != nullptr ? m_Tree->itemAbove(current) : last;
+      break;
+
+    case Qt::Key_Down:
+      target = current != nullptr ? m_Tree->itemBelow(current) : first;
+      break;
+
+    case Qt::Key_Home:
+      target = first;
+      break;
+
+    case Qt::Key_End:
+      target = last;
+      break;
+
+    default:
+      return QWidget::eventFilter(watched, event);
+  }
+
+  // At either end of the list the key is passed on, so that an enclosing
+  // scroll area can still scroll.
+  if (target == nullptr || target == current)
+    return QWidget::eventFilter(watched, event);
+
+  m_Tree->setCurrentItem(target);
+  m_Tree->scrollToItem(target);
+
+  return true;
 }

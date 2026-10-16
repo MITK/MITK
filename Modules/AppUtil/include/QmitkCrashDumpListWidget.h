@@ -67,11 +67,15 @@ public:
   std::vector<mitk::CrashDumpInfo> GetDumps() const;
   std::vector<mitk::CrashDumpInfo> GetSelectedDumps() const;
 
-  /** \brief Multi-selection (default) or a read-only list. */
+  /** \brief Multi-selection (default) or a read-only list. A list that is
+   *  selectable or checkable takes keyboard focus; without selection, the arrow
+   *  keys, Home and End still move the current row. */
   void SetSelectionEnabled(bool enabled);
 
   /** \brief Show a check box per dump, for a list that picks the dumps an
-   *  action applies to. Off by default; SetDumps() checks every dump. */
+   *  action applies to. Off by default; SetDumps() checks every dump. A
+   *  checkable list takes keyboard focus whether or not it selects, so that
+   *  Space toggles the check box of the current row. */
   void SetCheckable(bool checkable);
 
   /** \brief The checked dumps in table order; empty unless checkable. */
@@ -101,7 +105,10 @@ signals:
   void CheckedChanged();
 
 private:
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
   void ApplyCheckable();
+  void UpdateFocusPolicy();
 
   /** Fits the columns and the height; returns the width of all columns. */
   int FitColumnsAndHeight();

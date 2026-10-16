@@ -49,7 +49,11 @@ namespace mitk
      *  Called on the UI thread. \p parent is a widget to parent the flow's
      *  windows to; it may be null, and a flow that outlives this call must
      *  not rely on it staying alive. Long-running work must not block the
-     *  UI thread: the UI-freeze watchdog would take it for a freeze. */
+     *  UI thread: the UI-freeze watchdog would take it for a freeze.
+     *
+     *  A flow that deletes dumps calls
+     *  QmitkCrashDumpManagerDialog::RefreshIfOpen() afterwards, so an open
+     *  manager shows the change; the callers do not refresh. */
     virtual void FileReport(const std::vector<CrashDumpInfo>& dumps, QWidget* parent) = 0;
   };
 
@@ -60,7 +64,8 @@ namespace mitk
    *
    *  Returns false, doing nothing, if \p dumps is empty or no service is
    *  registered. The service is held only for the duration of the call; a
-   *  flow that outlives it is the service's own business. */
+   *  flow that outlives it is the service's own business. Exceptions thrown
+   *  by the service propagate to the caller. */
   MITKAPPUTIL_EXPORT bool FileCrashReport(const std::vector<CrashDumpInfo>& dumps, QWidget* parent);
 }
 

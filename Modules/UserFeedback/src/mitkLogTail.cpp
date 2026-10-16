@@ -15,7 +15,9 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
+#include <string_view>
 
 namespace
 {
@@ -27,11 +29,14 @@ namespace
     return std::string(utf8.begin(), utf8.end());
   }
 
-  constexpr std::streamoff BlockSize = 64 * 1024;
+  bool IsUtf8Continuation(char byte)
+  {
+    return (static_cast<unsigned char>(byte) & 0xC0) == 0x80;
+  }
 
   /** Position just after the \p n-th '\n' counted from the end of \p text,
    *  or npos if \p text has fewer. */
-  std::size_t AfterNthNewlineFromEnd(const std::string& text, std::size_t n)
+  std::size_t AfterNthNewlineFromEnd(std::string_view text, std::size_t n)
   {
     auto position = text.size();
 
@@ -50,7 +55,7 @@ namespace
   }
 }
 
-mitk::LogTail mitk::ReadLogTail(const std::filesystem::path& path, std::size_t maxLines)
+mitk::LogTail mitk::ReadLogTail(const std::filesystem::path& path, std::size_t maxLines, std::size_t maxBytes)
 {
   std::ifstream file(path, std::ios::binary);
 
@@ -65,44 +70,66 @@ mitk::LogTail mitk::ReadLogTail(const std::filesystem::path& path, std::size_t m
 
   LogTail tail;
 
-  if (fileSize == 0 || maxLines == 0)
+  if (fileSize == 0 || maxLines == 0 || maxBytes == 0)
   {
     tail.truncated = fileSize != 0;
     return tail;
   }
 
-  // Read backwards in blocks until the buffer holds more than maxLines line
-  // ends (ignoring the final one) or the whole file: a log copy kept next to
-  // a crash dump can be large, while only its end is wanted.
-  std::string buffer;
-  std::streamoff start = fileSize;
-  std::size_t cut = std::string::npos;
+  // The window ends at the size seen above, not at the end of the file: the
+  // log of the current session is still being appended to. The byte before
+  // the window tells whether the window starts at a line start.
+  const auto size = static_cast<std::uintmax_t>(fileSize);
+  const auto windowStart = size > maxBytes ? size - maxBytes : std::uintmax_t{0};
+  const bool hasPredecessor = windowStart > 0;
+  const auto readStart = hasPredecessor ? windowStart - 1 : windowStart;
 
-  while (start > 0)
+  std::string buffer(static_cast<std::size_t>(size - readStart), '\0');
+  file.seekg(static_cast<std::streamoff>(readStart));
+
+  if (!file.read(buffer.data(), static_cast<std::streamsize>(buffer.size())))
+    mitkThrow() << "Cannot read log file " << ToUtf8(path);
+
+  const std::size_t windowBegin = hasPredecessor ? 1 : 0;
+
+  // A final newline ends the last line instead of starting another.
+  const auto lastLineEnd = buffer.back() == '\n' ? buffer.size() - 1 : buffer.size();
+  const auto lines = std::string_view(buffer).substr(windowBegin, lastLineEnd - windowBegin);
+
+  std::size_t keepFrom = windowBegin;
+  const auto afterNth = AfterNthNewlineFromEnd(lines, maxLines);
+
+  if (afterNth != std::string::npos)
   {
-    const auto length = std::min(BlockSize, start);
-    start -= length;
-
-    std::string block(static_cast<std::size_t>(length), '\0');
-    file.seekg(start);
-
-    if (!file.read(block.data(), length))
-      mitkThrow() << "Cannot read log file " << ToUtf8(path);
-
-    buffer.insert(0, block);
-
-    const auto lastLineEnd = buffer.back() == '\n' ? buffer.size() - 1 : buffer.size();
-    cut = AfterNthNewlineFromEnd(buffer.substr(0, lastLineEnd), maxLines);
-
-    if (cut != std::string::npos)
-      break;
-  }
-
-  if (cut != std::string::npos)
-  {
-    buffer.erase(0, cut);
+    keepFrom += afterNth;
     tail.truncated = true;
   }
+  else if (hasPredecessor)
+  {
+    tail.truncated = true;
+
+    // A line the byte cap cuts through is dropped. If the window has no line
+    // end to cut at, it lies within one line, of which the end is kept.
+    if (buffer.front() != '\n')
+    {
+      const auto firstLineEnd = lines.find('\n');
+
+      if (firstLineEnd != std::string_view::npos)
+      {
+        keepFrom += firstLineEnd + 1;
+      }
+      else
+      {
+        // A UTF-8 sequence has at most three continuation bytes.
+        const auto lastByte = buffer.size() - 1;
+
+        for (int skipped = 0; skipped < 3 && keepFrom < lastByte && IsUtf8Continuation(buffer[keepFrom]); ++skipped)
+          ++keepFrom;
+      }
+    }
+  }
+
+  buffer.erase(0, keepFrom);
 
   if (buffer.back() != '\n')
     buffer += '\n';

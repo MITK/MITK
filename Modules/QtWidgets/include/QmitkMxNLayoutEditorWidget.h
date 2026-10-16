@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <iosfwd>
 #include <map>
 
+class QmitkInfoCard;
 class QmitkMultiWidgetLayoutSelectionWidget;
 class QComboBox;
 class QDialog;
@@ -455,12 +456,23 @@ private:
                             const std::vector<QmitkMxNSyncDimension>& dimensions,
                             bool includeSelection, QmitkMxNGroupJoinMode mode);
 
+  /** \brief Note that 'windowId' was not linked on orientation because the
+   *         group's direction is 'Free'; ShowOrientationConflicts reports it. */
+  void NoteOrientationConflict(const QString& windowId, const QmitkMxNOrientationConflictException& e);
+
+  /** \brief Tell the user which windows of the batch just applied to 'group'
+   *         were not linked on orientation, if any. Called after the batch's
+   *         RefreshSyncControls, which hides the previous notice. */
+  void ShowOrientationConflicts(const std::string& group);
+
   static QString CellLabel(const QmitkMxNMultiWidget::WindowDescriptor& descriptor);
 
   QPointer<QmitkMxNMultiWidget> m_MultiWidget;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelection;
   QLabel* m_ArrangeHint = nullptr;
+  QmitkInfoCard* m_ConflictNotice = nullptr;
+  QStringList m_OrientationConflicts;  // windows noted since the last ShowOrientationConflicts
   QVBoxLayout* m_GroupsLayout;    // card list inside the scrollable lower pane
   QTableWidget* m_Matrix;         // the advanced link matrix, inside m_MatrixPane
   QTabWidget* m_FacesTab = nullptr;     // hosts the "Sync groups" and "Advanced" faces

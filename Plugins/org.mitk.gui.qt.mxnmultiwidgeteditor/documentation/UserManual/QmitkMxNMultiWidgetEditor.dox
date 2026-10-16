@@ -385,7 +385,8 @@
 	the whole group at once, turns every member to look at the data from the front, while
 	any other member that is reset returns to the group's direction. A 2D window cannot join
 	a "Free" group, and "Free" is greyed out while the group has a 2D window; a member that
-	is switched to 2D leaves the group.
+	is switched to 2D leaves the group. A 2D window added to such a group in the layout
+	editor joins it on the group's other axes only, and the editor says so.
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,
 	the navigator's slice and position rows, the level/window readout and the colorbar

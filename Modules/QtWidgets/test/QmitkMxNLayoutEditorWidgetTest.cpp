@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkAutomatedLayoutWidget.h>
+#include <QmitkInfoCard.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
@@ -178,6 +179,8 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_GroupWithTwoDMemberIsSolidNotPartial);
   MITK_TEST(ThreeD_AllThreeDGroupShowsNotApplicable);
   MITK_TEST(ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation);
+  MITK_TEST(ThreeD_FreeGroupConflictFromMatrixAndStripIsReported);
+  MITK_TEST(ThreeD_FreeGroupConflictFromPlateMenuStaysReported);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -2537,24 +2540,89 @@ public:
     CPPUNIT_ASSERT(groupSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Orientation)].applicable);
   }
 
-  void ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation()
+  QmitkInfoCard* ConflictNotice() const
+  {
+    return m_Widget->findChild<QmitkInfoCard*>(QStringLiteral("QmitkMxNLayoutEditorConflictNotice"));
+  }
+
+  bool ConflictNoticeShown() const
+  {
+    const auto* notice = this->ConflictNotice();
+    return nullptr != notice && !notice->isHidden();
+  }
+
+  /** Cell 1 3D 'free' and the only member of a new group "Orbit" that links
+   *  orientation and windowing; returns the group's id. */
+  std::string MakeFreeOrientationGroup()
   {
     m_Editor->SetRenderMode(CellId(1), QmitkMxNMultiWidget::RenderMode::ThreeD);
     m_Editor->SetViewDirection(CellId(1), QmitkMxNMultiWidget::ViewDirection::Free);
     const auto group = m_Widget->CreateGroup();
+    m_Editor->SetSyncGroupDisplayName(group, "Orbit");
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
     m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
     m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, group);
     CPPUNIT_ASSERT_MESSAGE("precondition: a free orientation group",
                            IsLinked(1, QmitkMxNSyncDimension::Orientation, group));
+    CPPUNIT_ASSERT_MESSAGE("precondition: no conflict, no notice", !this->ConflictNoticeShown());
+    return group;
+  }
+
+  void ThreeD_TwoDCellJoiningFreeGroupSkipsOnlyOrientation()
+  {
+    const auto group = this->MakeFreeOrientationGroup();
 
     // A 2D cell cannot follow a freely rotated 3D view.
     m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
+    Pump();
 
     CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
     CPPUNIT_ASSERT(QmitkMxNMultiWidget::ViewDirection::Free == m_Editor->GetViewDirection(CellId(1)));
     CPPUNIT_ASSERT_MESSAGE("The group's other axes still apply",
                            IsLinked(0, QmitkMxNSyncDimension::Windowing, group));
+
+    CPPUNIT_ASSERT_MESSAGE("The skipped orientation link is reported", this->ConflictNoticeShown());
+    const auto* notice = this->ConflictNotice();
+    CPPUNIT_ASSERT(QmitkInfoCard::Severity::Warning == notice->GetSeverity());
+    CPPUNIT_ASSERT_MESSAGE("The notice names the group by its display name: " + notice->GetMessage().toStdString(),
+                           notice->GetMessage().contains(QStringLiteral("Orbit")));
+
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Windowing);
+    CPPUNIT_ASSERT_MESSAGE("The next link change clears the notice", !this->ConflictNoticeShown());
+  }
+
+  void ThreeD_FreeGroupConflictFromMatrixAndStripIsReported()
+  {
+    const auto group = this->MakeFreeOrientationGroup();
+
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Orientation, group);
+    Pump();
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT_MESSAGE("from the matrix", this->ConflictNoticeShown());
+
+    // Cell 0 joins on windowing only; the group's strip then links the
+    // orientation of every member.
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Windowing, group);
+    CPPUNIT_ASSERT(!this->ConflictNoticeShown());
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Orientation);
+    Pump();
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT(IsLinked(1, QmitkMxNSyncDimension::Orientation, group));
+    CPPUNIT_ASSERT_MESSAGE("from the group's axis strip", this->ConflictNoticeShown());
+  }
+
+  void ThreeD_FreeGroupConflictFromPlateMenuStaysReported()
+  {
+    const auto group = this->MakeFreeOrientationGroup();
+
+    // The plate menu's "Add to group", which joins wholly.
+    m_Editor->GetArrangeMode()->RequestAssign(QString::fromStdString(group), CellId(0),
+                                              QmitkMxNGroupJoinMode::Replace);
+    Pump();
+
+    CPPUNIT_ASSERT(!m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Orientation).has_value());
+    CPPUNIT_ASSERT(IsLinked(0, QmitkMxNSyncDimension::Windowing, group));
+    CPPUNIT_ASSERT_MESSAGE("The notice outlasts the queued rebuild", this->ConflictNoticeShown());
   }
 };
 

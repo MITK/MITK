@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 
@@ -590,6 +591,12 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   mainLayout->addWidget(m_ArrangeHint);
   this->UpdateArrangeHint();
 
+  // Says why a link asked for was not made, until the next link change.
+  m_ConflictNotice = new QmitkInfoCard(this);
+  m_ConflictNotice->setObjectName(QStringLiteral("QmitkMxNLayoutEditorConflictNotice"));
+  m_ConflictNotice->hide();
+  mainLayout->addWidget(m_ConflictNotice);
+
   // Two faces of the same configuration, as tabs: "Sync groups" for the
   // everyday card work, "Advanced" for the per-window link matrix. They are
   // mutually exclusive - one configuration surface at a time.
@@ -841,11 +848,13 @@ void QmitkMxNLayoutEditorWidget::SetMultiWidget(QmitkMxNMultiWidget* multiWidget
   // The empty-group intent cache belongs to the attached editor's groups; a
   // swap (or detach) invalidates it.
   m_EmptyGroupAxisCache.clear();
+  m_ConflictNotice->hide();
 
   if (!m_MultiWidget.isNull())
   {
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncLinksChanged,
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
+    connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncLinksChanged, this, [this]() { m_ConflictNotice->hide(); });
     connect(m_MultiWidget, &QmitkMxNMultiWidget::LayoutChanged,
             this, &QmitkMxNLayoutEditorWidget::ScheduleRebuild);
     connect(m_MultiWidget, &QmitkMxNMultiWidget::SyncGroupAdded,
@@ -936,6 +945,7 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
       this->ApplyGroupAxesToCell(windowId, group, dimensions, includeSelection, mode);
     }
     m_MultiWidget->RefreshSyncControls();
+    this->ShowOrientationConflicts(group);
     return;
   }
 
@@ -949,6 +959,7 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
     this->ApplyGroupAxesToCell(windowId, group, dimensions, this->GroupSelectionEnabled(group), mode);
   }
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
@@ -989,8 +1000,7 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
       {
         // The cell's view direction cannot join the group's orientation; the
         // group's other axes still apply.
-        MITK_WARN << "Layout editor: '" << windowId.toStdString() << "' not linked on orientation to '"
-                  << group << "': " << e.GetDescription();
+        this->NoteOrientationConflict(windowId, e);
       }
     }
     if (includeSelection)
@@ -1034,6 +1044,10 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
         m_MultiWidget->ClearSyncLink(windowId, dimension);
       }
     }
+    catch (const QmitkMxNOrientationConflictException& e)
+    {
+      this->NoteOrientationConflict(windowId, e);
+    }
     catch (const mitk::Exception& e)
     {
       MITK_WARN << "Layout editor: dimension change for '" << windowId.toStdString()
@@ -1043,6 +1057,7 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
   // Notify the per-cell furniture (barcodes, frame colors) of the link change;
   // this also drives the editor's own coalesced rebuild via SyncLinksChanged.
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group, bool enabled)
@@ -2862,6 +2877,7 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupToMatrixSelection(const std::string& 
     }
   }
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::ShowMatrixGroupMenu(const QPoint& globalPos)
@@ -2929,6 +2945,7 @@ void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, Qmitk
   }
   this->WriteCellAxisGroup(windowId, axis, group);
   m_MultiWidget->RefreshSyncControls();
+  this->ShowOrientationConflicts(group);
 }
 
 void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis,
@@ -2955,11 +2972,45 @@ void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, Qmi
                                                   : QmitkMxNMultiWidget::SyncOffset{});
     }
   }
+  catch (const QmitkMxNOrientationConflictException& e)
+  {
+    this->NoteOrientationConflict(windowId, e);
+  }
   catch (const mitk::Exception& e)
   {
     MITK_WARN << "Layout editor: link change for '" << windowId.toStdString()
               << "' ignored: " << e.GetDescription();
   }
+}
+
+void QmitkMxNLayoutEditorWidget::NoteOrientationConflict(const QString& windowId,
+                                                         const QmitkMxNOrientationConflictException& e)
+{
+  MITK_WARN << "Layout editor: '" << windowId.toStdString() << "' not linked on orientation: " << e.GetDescription();
+  m_OrientationConflicts.append(windowId);
+}
+
+void QmitkMxNLayoutEditorWidget::ShowOrientationConflicts(const std::string& group)
+{
+  const auto windowIds = std::exchange(m_OrientationConflicts, {});
+  if (windowIds.isEmpty() || m_MultiWidget.isNull())
+  {
+    return;
+  }
+  QStringList labels;
+  for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
+  {
+    if (windowIds.contains(descriptor.id))
+    {
+      labels.append(CellLabel(descriptor).toHtmlEscaped());
+    }
+  }
+  const auto groupName = QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(group)).toHtmlEscaped();
+  m_ConflictNotice->SetMessage(tr("Not linked on orientation: %1. A 2D window cannot follow the freely rotated "
+                                  "3D views of group %2.")
+                                 .arg(labels.join(QStringLiteral(", ")), groupName),
+                               QmitkInfoCard::Severity::Warning);
+  m_ConflictNotice->show();
 }
 
 void QmitkMxNLayoutEditorWidget::ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)

@@ -1716,8 +1716,13 @@ private:
   */
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
 
-  /** \brief Turn the members of an orientation group whose direction is
-   *         'Free' to the camera direction of its anchor. */
+  /**
+  * \brief Turn the members of an orientation group whose direction is 'Free'
+  *        to the camera direction of its anchor, the first member in layout
+  *        order. A view initialization that turned the anchor anterior thus
+  *        turns the whole group anterior, while any other member it turned
+  *        returns to the group's direction.
+  */
   void ConvergeFreeOrientationGroup(const std::string& group);
 
   /**

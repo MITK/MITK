@@ -315,8 +315,10 @@
 	only, give that window a selection group of its own.
 
 	The "arrow" on a row fits this window to that image: default zoom, centered on it. It acts
-	on this window alone, regardless of any synchronization. To fit a group of windows to the
-	visible data, use "Fit group views to visible data" in the context menu.
+	on this window alone, regardless of any synchronization; only the first window of a
+	"Free" 3D group turns the group's direction with it (see
+	\ref org_mitk_editors_mxnmultiwidget_3DViews). To fit a group of windows to the visible
+	data, use "Fit group views to visible data" in the context menu.
 
 	The list also works from the keyboard: Space or Enter triggers the current cell - on the
 	name, it toggles visibility - and Delete removes the current row from the selection. The
@@ -378,8 +380,11 @@
 
 	An orientation group of 3D views only can also turn "Free" as a whole: pick "Free" in
 	one of them. Rotating any member with the mouse then rotates all of them alike, and a
-	3D view that joins the group takes its camera direction. A 2D window cannot join a
-	"Free" group, and "Free" is greyed out while the group has a 2D window; a member that
+	3D view that joins the group takes its camera direction. The group follows its first
+	window in the layout: resetting that window (e.g. with the "arrow" in its data list), or
+	the whole group at once, turns every member to look at the data from the front, while
+	any other member that is reset returns to the group's direction. A 2D window cannot join
+	a "Free" group, and "Free" is greyed out while the group has a 2D window; a member that
 	is switched to 2D leaves the group.
 
 	A 3D view has no slice, no level/window and no colormap to show, so the slice readout,

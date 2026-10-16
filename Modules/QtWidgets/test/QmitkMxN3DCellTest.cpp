@@ -132,6 +132,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(FreeGroup_JoinerTakesAnchorDirection);
   MITK_TEST(FreeGroup_RotationRelaysDirection);
   MITK_TEST(FreeGroup_ResetMemberReturnsToGroup);
+  MITK_TEST(FreeGroup_ResetFirstMember_ResetsGroup);
   MITK_TEST(FreeGroup_TwoDJoin_ThrowsConflict);
   MITK_TEST(FreeGroup_MemberTurnsTwoD_LeavesGroup);
   MITK_TEST(FreeGroup_StandardDirection_TurnsWholeGroupCanonical);
@@ -1318,12 +1319,35 @@ public:
   {
     this->MakeFreeGroup();
     m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+    const auto rotated = DirectionOfProjection(Renderer(1));
+    const auto rotatedUp = ViewUp(Renderer(1));
 
     mitk::RenderingManager::GetInstance()->InitializeView(
       Renderer(2)->GetRenderWindow(), m_Image->GetTimeGeometry(), true);
 
+    CPPUNIT_ASSERT_MESSAGE("The group keeps its rotation",
+                           Near(rotated, DirectionOfProjection(Renderer(1))) && Near(rotatedUp, ViewUp(Renderer(1))));
     AssertSameDirection(Renderer(2), Renderer(1), "after a reset");
     CPPUNIT_ASSERT(ViewDirection::Free == m_Editor->GetViewDirection(CellId(2)));
+  }
+
+  void FreeGroup_ResetFirstMember_ResetsGroup()
+  {
+    // The group follows its first member in layout order (cell 1), so
+    // resetting that one resets the group's direction.
+    this->MakeFreeGroup();
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Orientation, "orbit");
+
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      Renderer(1)->GetRenderWindow(), m_Image->GetTimeGeometry(), true);
+
+    for (const std::size_t index : { std::size_t(1), std::size_t(2) })
+    {
+      const auto what = "member " + std::to_string(index);
+      CPPUNIT_ASSERT_MESSAGE(what + " looks anterior, " + ToString(DirectionOfProjection(Renderer(index))),
+                             Near(WorldVector(0.0, 1.0, 0.0), DirectionOfProjection(Renderer(index))));
+      CPPUNIT_ASSERT_MESSAGE(what + " stays free", ViewDirection::Free == m_Editor->GetViewDirection(CellId(index)));
+    }
   }
 
   void FreeGroup_TwoDJoin_ThrowsConflict()

@@ -23,6 +23,8 @@ class mitkFeedbackReportTestSuite : public mitk::TestFixture
   MITK_TEST(ReportTextListsIncludedLogsWithEditedNote);
   MITK_TEST(ReportTextListsAttachmentsByDescriptionNeverByPath);
   MITK_TEST(ReportTextStatesTheConfirmationOnlyWhenGiven);
+  MITK_TEST(DescriptionHtmlIsEscapedInTheReport);
+  MITK_TEST(DescriptionEscapingKeepsCodeAndExistingEscapes);
   MITK_TEST(SharingConfirmationIsNeededForEveryPhiCapableItem);
   MITK_TEST(PublicTrackerGate);
   MITK_TEST(UserImagesAreReviewableScreenshots);
@@ -110,6 +112,49 @@ public:
 
     report.publicSharingConfirmed = true;
     CPPUNIT_ASSERT(Contains(mitk::BuildReportText(report), mitk::GetPublicSharingConfirmationStatement()));
+  }
+
+  void DescriptionHtmlIsEscapedInTheReport()
+  {
+    // A '<' before a letter, '/', '!' or '?' starts HTML in Markdown; inline
+    // code spans and fenced blocks are literal, and a '<' before anything
+    // else is plain text.
+    auto report = TextOnlyReport();
+    report.description = "crash in std::vector<int> and `std::map<int, int>` here\n"
+                         "```\nvector<int> v;\n```\n"
+                         "<!-- note\n"
+                         "a < b and x<3";
+
+    const auto text = mitk::BuildReportText(report);
+
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "std::vector\\<int>"));
+    CPPUNIT_ASSERT_MESSAGE(text, !Contains(text, "std::vector<int>"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "`std::map<int, int>`"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\nvector<int> v;\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\\<!-- note"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "a < b and x<3"));
+  }
+
+  void DescriptionEscapingKeepsCodeAndExistingEscapes()
+  {
+    // Line ends as a Windows text box may deliver them, a tilde fence, a code
+    // span delimited by two backticks around single ones, and a '<' the user
+    // escaped already.
+    auto report = TextOnlyReport();
+    report.description = "see <b>\r\n"
+                         "~~~\r\n"
+                         "<i>\r\n"
+                         "~~~\r\n"
+                         "``a `<c>` b`` and \\<div> and \\\\<p>";
+
+    const auto text = mitk::BuildReportText(report);
+
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "see \\<b>\r\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "~~~\r\n<i>\r\n~~~\r\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "``a `<c>` b``"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, " and \\<div> and "));
+    CPPUNIT_ASSERT_MESSAGE(text, !Contains(text, "\\\\<div>"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\\\\\\<p>"));
   }
 
   void SharingConfirmationIsNeededForEveryPhiCapableItem()

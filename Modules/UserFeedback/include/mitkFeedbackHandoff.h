@@ -26,7 +26,8 @@ namespace mitk
   {
     std::string title;  /**< First line of the description, capped. */
     std::string body;   /**< Follows the repository's issue template; its description is
-                             shortened so that the percent-encoded body fits a URL. */
+                             Markdown-escaped like in BuildReportText() and shortened so
+                             that the percent-encoded body fits a URL. */
     std::string labels; /**< "bug" or "enhancement"; GitHub may ignore it. */
   };
 

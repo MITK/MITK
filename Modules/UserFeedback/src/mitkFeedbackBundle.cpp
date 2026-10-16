@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkFeedbackBundle.h>
 
+#include "mitkFeedbackMarkdown.h"
+
 #include <Poco/DateTime.h>
 #include <Poco/Exception.h>
 #include <Poco/LocalDateTime.h>
@@ -205,7 +207,7 @@ std::string mitk::BuildReportText(const FeedbackReport& report)
   text << "# MITK Feedback Report\n\n"
        << "**Category:** " << ToString(report.category) << "\n\n"
        << "## Description\n\n"
-       << report.description << "\n";
+       << EscapeMarkdownHtml(report.description) << "\n";
 
   if (AnyIncluded(report.environment))
   {

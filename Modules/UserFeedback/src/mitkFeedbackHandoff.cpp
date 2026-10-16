@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <mitkExceptionMacro.h>
 
+#include "mitkFeedbackMarkdown.h"
+
 #include <algorithm>
 #include <cctype>
 #include <sstream>
@@ -73,14 +75,16 @@ namespace
   }
 
   /** \p text, or its start with a truncation note, encoded at most
-   *  \p maxEncodedLength long. */
+   *  \p maxEncodedLength long. If even the note does not fit, the start of
+   *  \p text alone. */
   std::string Shorten(const std::string& text, std::size_t maxEncodedLength)
   {
     if (EncodedLength(text) <= maxEncodedLength)
       return text;
 
     const auto noteLength = EncodedLength(TruncationNote);
-    const auto room = maxEncodedLength > noteLength ? maxEncodedLength - noteLength : 0;
+    const bool withNote = maxEncodedLength >= noteLength;
+    const auto room = withNote ? maxEncodedLength - noteLength : maxEncodedLength;
 
     std::size_t length = 0;
     std::size_t encoded = 0;
@@ -96,7 +100,8 @@ namespace
       ++length;
     }
 
-    return CutUtf8(text, length) + TruncationNote;
+    const auto start = CutUtf8(text, length);
+    return withNote ? start + TruncationNote : start;
   }
 
   std::string Trim(const std::string& text)
@@ -148,15 +153,37 @@ namespace
     return value.empty() ? std::string("Not included.") : value;
   }
 
-  std::string BundleContents(const mitk::FeedbackReport& report)
+  /** How BundleContents refers to the included logs. A mail body counts them
+   *  because the labels of many logs would take the room that the length cap
+   *  leaves for the description. */
+  enum class LogMention
+  {
+    ByLabel,
+    ByCount
+  };
+
+  std::string BundleContents(const mitk::FeedbackReport& report, LogMention logMention)
   {
     std::ostringstream contents;
     contents << "The bundle contains the full report (report.md)";
 
-    for (const auto& log : report.logs)
+    if (logMention == LogMention::ByLabel)
     {
-      if (log.included)
-        contents << ", the log excerpt \"" << log.sourceLabel << '"';
+      for (const auto& log : report.logs)
+      {
+        if (log.included)
+          contents << ", the log excerpt \"" << log.sourceLabel << '"';
+      }
+    }
+    else
+    {
+      const auto logs = std::count_if(report.logs.begin(), report.logs.end(),
+        [](const auto& log) { return log.included; });
+
+      if (logs == 1)
+        contents << ", a log excerpt";
+      else if (logs > 1)
+        contents << ", " << logs << " log excerpts";
     }
 
     if (report.includeScreenshot)
@@ -201,7 +228,7 @@ namespace
     std::ostringstream context;
     context << "**Additional context**\n"
             << "Bundle file: " << bundleFileName << '\n'
-            << BundleContents(report) << '\n';
+            << BundleContents(report, LogMention::ByLabel) << '\n';
 
     bool hasEnvironment = false;
 
@@ -286,7 +313,8 @@ mitk::GitHubIssueFields mitk::BuildGitHubIssueFields(const FeedbackReport& repor
   const auto frame = EncodedLength(BuildIssueBody(report, std::string(), bundleFileName, additionalContext));
   const auto room = MaxEncodedIssueBodyLength > frame ? MaxEncodedIssueBodyLength - frame : 0;
 
-  fields.body = BuildIssueBody(report, Shorten(report.description, room), bundleFileName, additionalContext);
+  fields.body = BuildIssueBody(report, Shorten(EscapeMarkdownHtml(report.description), room), bundleFileName,
+    additionalContext);
 
   return fields;
 }
@@ -304,7 +332,7 @@ mitk::MailFields mitk::BuildMailFields(const FeedbackReport& report, const std::
   const auto head = "[Before sending: attach " + bundleFileName +
     " from the folder MITK opened, then delete this note.]\n\n"
     "Hello MITK team,\n\nplease find my " + category + " attached as " + bundleFileName + ".\n\n";
-  const auto tail = "\n\n" + BundleContents(report) + "\n";
+  const auto tail = "\n\n" + BundleContents(report, LogMention::ByCount) + "\n";
   MailFields fields;
   fields.recipient = GetFeedbackMailRecipient();
   fields.subject = "[MITK " + ToString(report.category) + "] " + BuildTitle(report);

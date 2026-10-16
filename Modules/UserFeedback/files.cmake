@@ -10,6 +10,7 @@ set(CPP_FILES
   mitkEnvironmentInfo.cpp
   mitkFeedbackBundle.cpp
   mitkFeedbackHandoff.cpp
+  mitkFeedbackMarkdown.cpp
   mitkFeedbackReport.cpp
   mitkLogTail.cpp
 )

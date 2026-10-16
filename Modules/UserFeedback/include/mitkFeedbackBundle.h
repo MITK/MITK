@@ -44,7 +44,9 @@ namespace mitk
    *  items, included logs (by sourceLabel, with an edited note), included
    *  attachments (by description), the screenshot target, the included
    *  images (by description and archive name), and the sharing
-   *  confirmations when given. Deterministic. */
+   *  confirmations when given. Deterministic. The text is Markdown: a '<' in
+   *  the description that would start HTML is escaped with a backslash,
+   *  except in code. */
   MITKUSERFEEDBACK_EXPORT std::string BuildReportText(const FeedbackReport& report);
 
   /**

@@ -26,6 +26,10 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
   MITK_TEST(GitHubBodyIsCapped);
   MITK_TEST(BundleFileNameMustBeBare);
   MITK_TEST(MailGoesToTheTeamWithAShortBody);
+  MITK_TEST(MailWithManyLogsStaysUnderTheCapAndKeepsTheDescription);
+  MITK_TEST(MailCountsASingleLog);
+  MITK_TEST(GitHubBodyEscapesHtmlInTheDescription);
+  MITK_TEST(MailBodyKeepsTheDescriptionVerbatim);
   MITK_TEST(UserImagesMayGoToGitHub);
   MITK_TEST(BodiesOpenWithAReminderToAttachTheBundle);
   CPPUNIT_TEST_SUITE_END();
@@ -77,6 +81,34 @@ class mitkFeedbackHandoffTestSuite : public mitk::TestFixture
       description += "Fehler beim \xC3\x96" "ffnen, \xC3\xA4" "hnlich wie zuvor:\n";
 
     return description;
+  }
+
+  /** \p count included logs whose labels differ, as the capture of several
+   *  sessions produces them. */
+  static std::vector<mitk::FeedbackLog> IncludedLogs(int count)
+  {
+    std::vector<mitk::FeedbackLog> logs;
+
+    for (int i = 0; i < count; ++i)
+    {
+      const std::string minute = (i < 10 ? "0" : "") + std::to_string(i);
+
+      logs.push_back({ "logs/captured-" + std::to_string(i) + ".log",
+        "Session log (Captured on request, 2026-10-07 10:" + minute + ')', "a log line\n", true, false });
+    }
+
+    return logs;
+  }
+
+  /** A '<' that starts HTML in Markdown (before "int" and "!--") next to the
+   *  same character inside an inline code span and a fenced block, and as
+   *  plain text before a space and a digit. */
+  static std::string HtmlLikeDescription()
+  {
+    return "crash in std::vector<int> and `std::map<int, int>` here\n"
+           "```\nvector<int> v;\n```\n"
+           "<!-- note\n"
+           "a < b and x<3";
   }
 
 public:
@@ -223,6 +255,76 @@ public:
       CPPUNIT_ASSERT_MESSAGE(std::to_string(encoded), encoded <= 1900);
       CPPUNIT_ASSERT(Contains(mail.body, m_Bundle));
     }
+  }
+
+  void MailWithManyLogsStaysUnderTheCapAndKeepsTheDescription()
+  {
+    auto report = Report();
+    report.logs = IncludedLogs(14);
+    report.description = std::string(20000, 'x');
+    report.sharingConfirmed = true;
+
+    const auto mail = mitk::BuildMailFields(report, m_Bundle);
+
+    // The text around the description must not grow with the number of logs,
+    // or the cap leaves no room for the description.
+    const auto encoded = EncodedLength(mail.subject) + EncodedLength(mail.body);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(encoded), encoded <= 1900);
+    CPPUNIT_ASSERT_MESSAGE(mail.body, Contains(mail.body, std::string(50, 'x')));
+    CPPUNIT_ASSERT_MESSAGE(mail.body, Contains(mail.body, "14 log excerpts"));
+    CPPUNIT_ASSERT_MESSAGE(mail.body, !Contains(mail.body, "Captured on request"));
+    CPPUNIT_ASSERT(Contains(mail.body, m_Bundle));
+  }
+
+  void MailCountsASingleLog()
+  {
+    auto report = Report();
+    report.logs = IncludedLogs(2);
+    report.logs.back().included = false;
+    report.sharingConfirmed = true;
+
+    const auto body = mitk::BuildMailFields(report, m_Bundle).body;
+
+    CPPUNIT_ASSERT_MESSAGE(body, Contains(body, "a log excerpt"));
+    CPPUNIT_ASSERT_MESSAGE("a log that is not included is not counted", !Contains(body, "log excerpts"));
+
+    for (const auto& log : report.logs)
+    {
+      CPPUNIT_ASSERT_MESSAGE(log.sourceLabel, !Contains(body, log.sourceLabel));
+    }
+  }
+
+  void GitHubBodyEscapesHtmlInTheDescription()
+  {
+    auto report = Report();
+    report.description = HtmlLikeDescription();
+
+    const auto fields = mitk::BuildGitHubIssueFields(report, m_Bundle);
+
+    CPPUNIT_ASSERT_MESSAGE(fields.body, Contains(fields.body, "std::vector\\<int>"));
+    CPPUNIT_ASSERT_MESSAGE(fields.body, Contains(fields.body, "`std::map<int, int>`"));
+    CPPUNIT_ASSERT_MESSAGE(fields.body, Contains(fields.body, "\nvector<int> v;\n"));
+    CPPUNIT_ASSERT_MESSAGE(fields.body, Contains(fields.body, "\\<!-- note"));
+    CPPUNIT_ASSERT_MESSAGE(fields.body, Contains(fields.body, "a < b and x<3"));
+
+    // GitHub shows the title as plain text, so a backslash would stay visible.
+    CPPUNIT_ASSERT_MESSAGE(fields.title, Contains(fields.title, "std::vector<int>"));
+    CPPUNIT_ASSERT_MESSAGE(fields.title, !Contains(fields.title, "\\<"));
+  }
+
+  void MailBodyKeepsTheDescriptionVerbatim()
+  {
+    auto report = Report();
+    report.description = HtmlLikeDescription();
+
+    const auto mail = mitk::BuildMailFields(report, m_Bundle);
+
+    // A mail is plain text, so a backslash would stay visible.
+    CPPUNIT_ASSERT_MESSAGE(mail.body, Contains(mail.body, "std::vector<int>"));
+    CPPUNIT_ASSERT_MESSAGE(mail.body, Contains(mail.body, "<!-- note"));
+    CPPUNIT_ASSERT_MESSAGE(mail.body, !Contains(mail.body, "\\<"));
+    CPPUNIT_ASSERT_MESSAGE(mail.subject, Contains(mail.subject, "std::vector<int>"));
+    CPPUNIT_ASSERT_MESSAGE(mail.subject, !Contains(mail.subject, "\\<"));
   }
 
   void BodiesOpenWithAReminderToAttachTheBundle()

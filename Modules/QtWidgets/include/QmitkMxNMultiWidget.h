@@ -1754,8 +1754,10 @@ private:
   /**
   * \brief Bring cells whose renderer mapper was switched by someone else
   *        (e.g. the Render Window Manager) in line with this editor's 3D
-  *        bookkeeping. Such a switch never goes through SetRenderMode, whose
-  *        early return on an unchanged mode is why this cannot reuse it.
+  *        bookkeeping: a cell whose mapper differs from m_SeenRenderModes, a
+  *        2D cell still marked free, and a 3D cell that lost the MxN
+  *        interactor style. Such a switch never goes through SetRenderMode,
+  *        whose early return on an unchanged mode is why this cannot reuse it.
   */
   void ReconcileExternalRenderModes();
 
@@ -1875,6 +1877,13 @@ private:
   *        and its render mode is its renderer's mapper id.
   */
   std::set<QString> m_FreeCells;
+
+  /**
+  * \brief The render mode this editor last put each cell into or brought it
+  *        in line with. It differs from a cell's mapper only after someone
+  *        else switched the mapper; GetRenderMode always reads the mapper.
+  */
+  std::map<QString, RenderMode> m_SeenRenderModes;
 
   /** \brief Tag of this editor's observer of the rendering manager's
    *         views-initialized event. */

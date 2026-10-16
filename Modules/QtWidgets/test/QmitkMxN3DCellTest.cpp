@@ -89,6 +89,8 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Switch_EmitsSyncLinksChanged);
   MITK_TEST(ExternalSwitch_FreeThreeDToAxial_LeavesFree);
   MITK_TEST(ExternalSwitch_TwoDToThreeD_InstallsMxNStyle);
+  MITK_TEST(ExternalSwitch_CanonicalThreeDToAxial_JoinsSliceGroup);
+  MITK_TEST(ExternalSwitch_ThreeDBeforeRender_TakesGroupZoom);
   MITK_TEST(Lifecycle_ReusedIdOfFreeCell_IsCanonical);
   MITK_TEST(Rotation_Azimuth_TurnsCellFree);
   MITK_TEST(Rotation_Roll_TurnsCellFree);
@@ -622,6 +624,40 @@ public:
     CPPUNIT_ASSERT(RenderMode::ThreeD == m_Editor->GetRenderMode(CellId(1)));
     CPPUNIT_ASSERT_MESSAGE("The cell navigates with the MxN interactor style", nullptr != Style(Renderer(1)));
     CPPUNIT_ASSERT(m_Editor->IsRotationLocked(CellId(1)));
+  }
+
+  void ExternalSwitch_CanonicalThreeDToAxial_JoinsSliceGroup()
+  {
+    for (const std::size_t index : { std::size_t(0), std::size_t(1) })
+    {
+      m_Editor->SetViewDirection(CellId(index), mitk::AnatomicalPlane::Axial);
+      m_Editor->SetSyncLink(CellId(index), QmitkMxNSyncDimension::Slice, "nav");
+    }
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    Snc(0)->GetStepper()->SetPos(1);
+    CPPUNIT_ASSERT_MESSAGE("precondition: off the middle slice", 1u != Snc(0)->GetStepper()->GetSteps() / 2);
+
+    this->SwitchByRenderWindowManager("axial", Renderer(1));
+
+    CPPUNIT_ASSERT(RenderMode::TwoD == m_Editor->GetRenderMode(CellId(1)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The cell converges on its slice group again", 1u, Snc(1)->GetStepper()->GetPos());
+  }
+
+  void ExternalSwitch_ThreeDBeforeRender_TakesGroupZoom()
+  {
+    Camera(Renderer(0))->SetParallelScale(5.0);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "nav");
+    m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
+    m_Editor->SetRenderMode(CellId(1), RenderMode::TwoD);
+
+    // Nothing renders in between, so the cell still has the MxN interactor
+    // style and only the recorded render mode tells the switch.
+    CPPUNIT_ASSERT_MESSAGE("precondition: the MxN style is still installed", nullptr != Style(Renderer(1)));
+    this->SwitchByRenderWindowManager("3D", Renderer(1));
+
+    CPPUNIT_ASSERT(RenderMode::ThreeD == m_Editor->GetRenderMode(CellId(1)));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, HalfHeight(Renderer(1)), 1e-6);
   }
 
   void Lifecycle_ReusedIdOfFreeCell_IsCanonical()

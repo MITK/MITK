@@ -842,8 +842,10 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
 {
   this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
-  // Cell ids are reused; a new cell under this id starts canonical.
+  // Cell ids are reused; a new cell under this id starts canonical, with
+  // nothing remembered.
   m_FreeCells.erase(widgetName);
+  m_SeenRenderModes.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
 }
 
@@ -1508,6 +1510,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // label in the OpenGL scene.
   renderWindowWidget->SetCornerAnnotationText(std::string());
   this->AddRenderWindowWidget(id, renderWindowWidget);
+  m_SeenRenderModes[id] = this->GetRenderMode(id);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
@@ -4277,6 +4280,7 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
       sliceNavigation->SetDefaultViewDirection(QmitkMxN3DCamera::NearestStandardPlane(
         *referenceGeometry->GetGeometryForTimeStep(0), directionOfProjection));
     }
+    m_SeenRenderModes[windowId] = RenderMode::TwoD;
     renderer->SetMapperID(mitk::BaseRenderer::Standard2D);
   }
 
@@ -4451,6 +4455,7 @@ std::vector<QString> QmitkMxNMultiWidget::ActiveGroupPeers(const QString& window
 
 void QmitkMxNMultiWidget::SwitchCellToThreeD(QmitkRenderWindowWidget* cell)
 {
+  m_SeenRenderModes[cell->GetWidgetName()] = RenderMode::ThreeD;
   RendererOf(cell)->SetMapperID(mitk::BaseRenderer::Standard3D);
   this->InstallThreeDInteractorStyle(cell);
 }
@@ -4540,10 +4545,18 @@ void QmitkMxNMultiWidget::ReconcileExternalRenderModes()
   for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
   {
     auto* renderer = RendererOf(cell.get());
-    if (IsThreeD(renderer))
+    const auto mode = IsThreeD(renderer) ? RenderMode::ThreeD : RenderMode::TwoD;
+    // Recorded first: the finishing steps initialize views, which re-enters here.
+    const bool switched = std::exchange(m_SeenRenderModes[windowId], mode) != mode;
+    if (RenderMode::ThreeD == mode)
     {
+      // Core installs its own style on the first render after a mapper
+      // switch, so a cell switched away and back between two view
+      // initializations needs the MxN style again in an unchanged mode.
       auto* interactor = renderer->GetRenderWindow()->GetInteractor();
-      if (nullptr == interactor || nullptr != QmitkMxN3DInteractorStyle::SafeDownCast(interactor->GetInteractorStyle()))
+      const bool hasStyle =
+        nullptr == interactor || nullptr != QmitkMxN3DInteractorStyle::SafeDownCast(interactor->GetInteractorStyle());
+      if (!switched && hasStyle)
       {
         continue;
       }
@@ -4551,8 +4564,13 @@ void QmitkMxNMultiWidget::ReconcileExternalRenderModes()
       this->FinishThreeDAdoption(windowId);
       reconciled = true;
     }
-    else if (this->ReleaseFreeCellForTwoD(windowId))
+    else
     {
+      const bool wasFree = this->ReleaseFreeCellForTwoD(windowId);
+      if (!switched && !wasFree)
+      {
+        continue;
+      }
       // The caller chose the plane by setting the default direction.
       this->FinishTwoDAdoption(windowId);
       reconciled = true;

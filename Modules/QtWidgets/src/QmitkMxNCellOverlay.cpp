@@ -921,9 +921,6 @@ QString QmitkMxNCellOverlay::PlaneLabel() const
 
 QString QmitkMxNCellOverlay::ResolvePlaneLabel() const
 {
-  // Read live from the editor, whose direction is the slice navigation
-  // controller's that every reorientation path writes, so a reorientation is
-  // reflected without a separate signal.
   using ViewDirection = QmitkMxNMultiWidget::ViewDirection;
   const auto windowId = m_Cell->GetWidgetName();
   ViewDirection direction = ViewDirection::Axial;

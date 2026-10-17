@@ -1,0 +1,75 @@
+{
+  "version": "3.0",
+  "name": "3D from three sides",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "name": "Coronal",
+            "view_direction": "coronal",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main",
+              "zoom": "main",
+              "pan": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Sagittal",
+            "view_direction": "sagittal",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main",
+              "zoom": "main",
+              "pan": "main"
+            }
+          }
+        ]
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Axial",
+            "view_direction": "axial",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main",
+              "zoom": "main",
+              "pan": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "Free",
+            "view_direction": "free",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main",
+              "zoom": "main",
+              "pan": "main"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

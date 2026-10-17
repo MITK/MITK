@@ -61,6 +61,88 @@
 	arrangement already counts as synchronization beyond the default, and applying a
 	preset or a file over it asks for confirmation as well.
 
+\subsection org_mitk_views_mxnlayouteditor_Presets Presets
+	A preset is a starting point for one way of working: it sets up the windows, their
+	names and their synchronization, and all of it can be changed afterwards. Every window
+	of a preset shows all data, and its name is its title in the display (see
+	\ref org_mitk_editors_mxnmultiwidget_Readouts).
+
+	<b>MPR + 3D.</b> Axial, sagittal and coronal windows that share the crosshair, the
+	level/window and the colormap, and a 3D window. The arrangement of the Standard Display,
+	as a starting point that can be grown.
+
+	\imageMacroEx{QmitkMxN_Preset_MprAnd3D.png, "The MPR + 3D preset", 16, 720px}
+
+	<b>Focus + context.</b> One large axial working plane, and beside it two small context
+	planes (sagittal and coronal) on the same crosshair, level/window and colormap, and a
+	"3D check" that zooms with the working plane. For manual segmentation, annotation and
+	reading, which happen in one plane; a 2x2 grid would spend three quarters of the screen
+	on aids.
+
+	\imageMacroEx{QmitkMxN_Preset_FocusContext.png, "The Focus + context preset", 16, 720px}
+
+	<b>Same data, two looks.</b> Two rows of axial, sagittal and coronal windows. All six
+	share the crosshair, each column shares slice, zoom and pan, and each row has a
+	level/window and colormap of its own ("Look A" and "Look B"). For the lung and the
+	soft-tissue window of one CT side by side, or a parametric map in gray and in color.
+	Curating the data selection of the "Look B" group shows a second dataset below the
+	first.
+
+	\imageMacroEx{QmitkMxN_Preset_TwoLooks.png, "The Same data\, two looks preset", 16, 720px}
+
+	<b>Lightbox 3x3.</b> Nine axial windows that share zoom, pan, level/window and colormap
+	and show nine consecutive slices: their slice offsets run from -4 to +4 in reading
+	order, so scrolling any of them moves the whole sheet. "Ramp" in the <b>Advanced</b>
+	matrix sets larger steps. The film sheet, for figures, quality control and teaching. The
+	windows share no crosshair, which would put all of them on one slice.
+
+	\imageMacroEx{QmitkMxN_Preset_Lightbox.png, "The Lightbox 3x3 preset", 16, 720px}
+
+	<b>Slice context.</b> The working slice with the previous and the next slice beside
+	it, all axial and sharing zoom and pan, above a sagittal and a coronal context window
+	on the working slice's crosshair. For manual segmentation and delineation: whether a
+	structure continues, splits or ends shows in the neighboring slices. A click in a
+	context window moves the working slice, and the previous and next slices follow.
+
+	\imageMacroEx{QmitkMxN_Preset_SliceContext.png, "The Slice context preset", 16, 720px}
+
+	<b>2D | 3D.</b> An axial window to edit in and a "3D check" that zooms with it: the
+	simplest view of what a segmentation looks like in 3D while it is edited, and one that
+	suits a small screen.
+
+	\imageMacroEx{QmitkMxN_Preset_2DAnd3D.png, "The 2D | 3D preset", 16, 720px}
+
+	<b>3D from three sides.</b> 3D windows looking from the coronal, sagittal and axial
+	directions, and one that is turned freely, all zoomed and panned together. For shape
+	quality control and surgical planning, which need several standard views at one scale.
+	Each window keeps its direction: turning the free window does not turn the others.
+
+	\imageMacroEx{QmitkMxN_Preset_3DThreeSides.png, "The 3D from three sides preset", 16, 720px}
+
+	<b>Overview + detail.</b> A narrow overview beside a wide detail window on the same
+	slice, crosshair and pan, with the detail zoomed four times as far: a live minimap for
+	work on small structures.
+
+	\imageMacroEx{QmitkMxN_Preset_OverviewDetail.png, "The Overview + detail preset", 16, 720px}
+
+	Things to know:
+	<ul>
+		<li> A jump to a position that comes from outside the display - the Image Navigator,
+			a label's position chosen in the Segmentation view, resetting the views - puts all
+			windows of "Slice context" and "Lightbox 3x3" on one slice. "Re-converge sync groups"
+			in a window's context menu restores their offsets.
+		<li> The first window of a slice group keeps the slice the display shows when the
+			preset is applied, and the others take their offsets from it. The middle window of
+			"Lightbox 3x3" therefore starts four slices after that slice, and the working slice of
+			"Slice context" one slice after it.
+		<li> 3D windows show segmentations, surfaces and volume renderings; on a plain image
+			they stay empty.
+		<li> Each 3D window of "3D from three sides" looks from one side of its axis only; the
+			free window shows the others.
+		<li> Zooming at the pointer moves the centers of "Overview + detail" apart;
+			"Re-converge sync groups" brings them back together.
+	</ul>
+
 \section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows
 	While the MxN Layout Editor is visible, its MxN display is in <i>arrange mode</i>:
 	every window that has room for one shows its sync plate - the same plate that pointing

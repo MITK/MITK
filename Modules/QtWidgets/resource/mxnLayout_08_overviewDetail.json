@@ -1,0 +1,50 @@
+{
+  "version": "3.0",
+  "name": "Overview + detail",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "horizontal",
+    "children": [
+      {
+        "type": "window",
+        "id": "mxn__widget0",
+        "name": "Overview",
+        "view_direction": "axial",
+        "links": {
+          "selection": "main",
+          "crosshair": "main",
+          "slice": "main",
+          "zoom": "main",
+          "pan": "main",
+          "windowing": "main",
+          "lut": "main"
+        },
+        "size": 1
+      },
+      {
+        "type": "window",
+        "id": "mxn__widget1",
+        "name": "Detail",
+        "view_direction": "axial",
+        "links": {
+          "selection": "main",
+          "crosshair": "main",
+          "slice": "main",
+          "zoom": {
+            "target": "main",
+            "offset": 4.0
+          },
+          "pan": "main",
+          "windowing": "main",
+          "lut": "main"
+        },
+        "size": 3
+      }
+    ]
+  }
+}

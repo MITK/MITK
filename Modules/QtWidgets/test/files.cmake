@@ -24,6 +24,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNArrangeModeTest.cpp
   QmitkMxNCellOverlayTest.cpp
   QmitkMxNNavigatorTest.cpp
+  QmitkMxNPresetsTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNSyncPeekTest.cpp

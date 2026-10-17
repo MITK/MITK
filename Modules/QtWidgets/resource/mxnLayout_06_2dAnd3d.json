@@ -1,0 +1,38 @@
+{
+  "version": "3.0",
+  "name": "2D | 3D",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "horizontal",
+    "children": [
+      {
+        "type": "window",
+        "id": "mxn__widget0",
+        "name": "Edit",
+        "view_direction": "axial",
+        "links": {
+          "selection": "main",
+          "zoom": "main",
+          "windowing": "main",
+          "lut": "main"
+        }
+      },
+      {
+        "type": "window",
+        "id": "mxn__widget1",
+        "name": "3D check",
+        "view_direction": "coronal",
+        "render_mode": "3d",
+        "links": {
+          "selection": "main",
+          "zoom": "main"
+        }
+      }
+    ]
+  }
+}

@@ -129,7 +129,14 @@ set(UI_FILES
 )
 
 set(RESOURCE_FILES
-  mxnLayout_twoRowsEachDirection.json
+  mxnLayout_01_mprAnd3d.json
+  mxnLayout_02_focusContext.json
+  mxnLayout_03_twoLooks.json
+  mxnLayout_04_lightbox.json
+  mxnLayout_05_sliceContext.json
+  mxnLayout_06_2dAnd3d.json
+  mxnLayout_07_3dThreeSides.json
+  mxnLayout_08_overviewDetail.json
 )
 
 set(QRC_FILES

@@ -75,6 +75,10 @@ mitkAddCustomModuleTest(QmitkMxNNavigatorTest QmitkMxNNavigatorTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNPresetsTest QmitkMxNPresetsTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
   -platform minimal
 )

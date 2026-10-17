@@ -1,0 +1,134 @@
+{
+  "version": "3.0",
+  "name": "Same data, two looks",
+  "groups": {
+    "main": {
+      "select_all": true,
+      "name": "Look A"
+    },
+    "lookB": {
+      "select_all": true,
+      "name": "Look B"
+    },
+    "nav": {
+      "name": "Crosshair"
+    },
+    "ax": {
+      "name": "Axial column"
+    },
+    "sag": {
+      "name": "Sagittal column"
+    },
+    "cor": {
+      "name": "Coronal column"
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "name": "Look A",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "nav",
+              "slice": "ax",
+              "zoom": "ax",
+              "pan": "ax",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Look A",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "main",
+              "crosshair": "nav",
+              "slice": "sag",
+              "zoom": "sag",
+              "pan": "sag",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Look A",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "main",
+              "crosshair": "nav",
+              "slice": "cor",
+              "zoom": "cor",
+              "pan": "cor",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ]
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "Look B",
+            "view_direction": "axial",
+            "links": {
+              "selection": "lookB",
+              "crosshair": "nav",
+              "slice": "ax",
+              "zoom": "ax",
+              "pan": "ax",
+              "windowing": "lookB",
+              "lut": "lookB"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget4",
+            "name": "Look B",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "lookB",
+              "crosshair": "nav",
+              "slice": "sag",
+              "zoom": "sag",
+              "pan": "sag",
+              "windowing": "lookB",
+              "lut": "lookB"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget5",
+            "name": "Look B",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "lookB",
+              "crosshair": "nav",
+              "slice": "cor",
+              "zoom": "cor",
+              "pan": "cor",
+              "windowing": "lookB",
+              "lut": "lookB"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

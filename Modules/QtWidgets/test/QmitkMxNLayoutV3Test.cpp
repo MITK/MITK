@@ -800,11 +800,15 @@ public:
   {
     std::vector<std::pair<std::string, nlohmann::json>> documents;
 
-    const auto resource =
-      us::ModuleRegistry::GetModule("MitkQtWidgets")->GetResource("mxnLayout_twoRowsEachDirection.json");
-    CPPUNIT_ASSERT(resource.IsValid());
-    us::ModuleResourceStream resourceStream(resource);
-    documents.emplace_back("mxnLayout_twoRowsEachDirection.json", nlohmann::json::parse(resourceStream));
+    // Every shipped preset, found the way the layout selection widget finds them.
+    const auto presets =
+      us::ModuleRegistry::GetModule("MitkQtWidgets")->FindResources("/", "mxnLayout_*.json", false);
+    CPPUNIT_ASSERT_MESSAGE("The module ships presets", !presets.empty());
+    for (const auto& resource : presets)
+    {
+      us::ModuleResourceStream resourceStream(resource);
+      documents.emplace_back(resource.GetName(), nlohmann::json::parse(resourceStream));
+    }
 
     const auto schema = ReadJson(MITK_MXN_LAYOUT_V3_SCHEMA_PATH);
     for (const auto& example : schema.at("examples"))

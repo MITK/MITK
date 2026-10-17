@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QPalette>
 #include <QSaveFile>
 
+#include <algorithm>
 #include <sstream>
 
 #include <usGetModuleContext.h>
@@ -85,6 +86,9 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   // The presets ship as module resources; they are read once here and offered
   // by name, so the host can present them without knowing about the resources.
   auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
+  // FindResources promises no order; the two-digit prefixes of the file names
+  // define the menu order, and ModuleResource orders by resource path.
+  std::sort(presetResources.begin(), presetResources.end());
   for (const auto& resource : presetResources)
   {
     us::ModuleResourceStream jsonStream(resource);

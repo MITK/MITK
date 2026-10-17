@@ -1,0 +1,71 @@
+{
+  "version": "3.0",
+  "name": "Focus + context",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "horizontal",
+    "children": [
+      {
+        "type": "window",
+        "id": "mxn__widget0",
+        "name": "Working plane",
+        "view_direction": "axial",
+        "links": {
+          "selection": "main",
+          "crosshair": "main",
+          "zoom": "main",
+          "windowing": "main",
+          "lut": "main"
+        },
+        "size": 3
+      },
+      {
+        "type": "split",
+        "orientation": "vertical",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Context 1",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Context 2",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "3D check",
+            "view_direction": "coronal",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main",
+              "zoom": "main"
+            }
+          }
+        ],
+        "size": 1
+      }
+    ]
+  }
+}

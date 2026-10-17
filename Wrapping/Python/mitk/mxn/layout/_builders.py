@@ -169,8 +169,8 @@ def two_rows_each_direction(
 
     Top row links to ``group_top``, bottom row to ``group_bottom``. By
     default the top is the ``main`` group and the bottom is its own
-    ``row2`` group -- matches the in-tree preset
-    ``mxnLayout_twoRowsEachDirection.json`` in its 2.0 form.
+    ``row2`` group, so each row can show its own data. The rows share no
+    navigation: a 2.0 document has selection links only.
     """
     counter = count(start_index)
 

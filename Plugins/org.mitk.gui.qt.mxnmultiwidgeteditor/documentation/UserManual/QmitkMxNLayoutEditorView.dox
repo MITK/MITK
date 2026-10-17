@@ -210,6 +210,10 @@
 	button (three dots) opens the plate menu, which a right-click on the plate opens as
 	well, and the close button ends arrange mode.
 
+	Besides adding to and removing from groups, the plate menu offers "Rename window...",
+	which sets the name shown on the plate and as the window's title. An empty name
+	removes it. The name is saved with the layout.
+
 \subsection org_mitk_views_mxnlayouteditor_ArrangeLimits Limits
 	<ul>
 		<li> A window too small to hold a legible plate shows none, so it cannot be clicked

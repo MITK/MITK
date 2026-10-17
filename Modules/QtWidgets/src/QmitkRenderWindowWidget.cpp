@@ -77,6 +77,16 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->renderWindow());
 }
 
+void QmitkRenderWindowWidget::SetDisplayName(const QString& displayName)
+{
+  if (displayName == m_DisplayName)
+  {
+    return;
+  }
+  m_DisplayName = displayName;
+  emit DisplayNameChanged(m_DisplayName);
+}
+
 void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget)
 {
   m_UtilityWidget = utilityWidget;

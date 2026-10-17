@@ -155,6 +155,7 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
   auto* prefs = this->GetPreferences();
 
   prefs->PutBool("Show level/window readout", m_Ui->m_ShowLevelWindowReadout->isChecked());
+  prefs->PutBool("Show window titles", m_Ui->m_ShowWindowTitles->isChecked());
   prefs->PutBool("Expanded navigator", m_Ui->m_ExpandedNavigator->isChecked());
   prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
 
@@ -178,6 +179,7 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
   auto* prefs = this->GetPreferences();
 
   m_Ui->m_ShowLevelWindowReadout->setChecked(prefs->GetBool("Show level/window readout", true));
+  m_Ui->m_ShowWindowTitles->setChecked(prefs->GetBool("Show window titles", true));
   m_Ui->m_ExpandedNavigator->setChecked(prefs->GetBool("Expanded navigator", false));
   m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
 

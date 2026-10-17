@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include <QColor>
 #include <QList>
+#include <QRect>
+#include <QString>
 
 // qt
 #include <QWidget>
@@ -138,6 +140,19 @@ public Q_SLOTS:
    *         Default: shown. */
   void SetDataSelectionVisible(bool visible);
 
+  /** \brief The title between the buttons and the barcode; empty hides it. */
+  void SetTitle(const QString& title);
+  void SetTitleVisible(bool visible);
+
+  /**
+  * \brief The title as shown, elided to its room, and where it is painted in
+  *        this widget's coordinates; empty and invalid while it is not shown
+  *        (no title, titles off, or less room than the minimum width).
+  *        Exposed for verification.
+  */
+  QString TitleText() const;
+  QRect TitleRect() const;
+
 Q_SIGNALS:
 
   /**
@@ -215,6 +230,8 @@ private:
   QToolButton* m_CrosshairButton;
   QToolButton* m_MaximizeButton;
   QmitkMxNSyncBarcodeWidget* m_SyncBarcode;
+  class TitleLabel;
+  TitleLabel* m_TitleLabel = nullptr;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 
 };

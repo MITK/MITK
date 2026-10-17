@@ -1645,8 +1645,16 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
+  cellOverlay->SetTitleVisible(m_WindowTitlesVisible);
   cellOverlay->SetCleanView(m_CleanView);
   cellOverlay->SetNavigatorExpanded(m_NavigatorExpanded);
+
+  // ApplyLayout names a cell after creating it, so the strip follows the name
+  // rather than reading it once.
+  utilityWidget->SetTitleVisible(m_WindowTitlesVisible);
+  utilityWidget->SetTitle(renderWindowWidget->GetDisplayName());
+  connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::DisplayNameChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetTitle);
 
   // The utility row auto-hides into a top-edge strip; approaching the top
   // reveals it as a floating panel, so the render window never resizes.
@@ -5496,6 +5504,23 @@ void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
   }
 }
 
+void QmitkMxNMultiWidget::SetWindowTitlesVisible(bool visible)
+{
+  m_WindowTitlesVisible = visible;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetTitleVisible(visible);
+    }
+    if (auto* utilityWidget = renderWindowWidget->GetUtilityWidget(); nullptr != utilityWidget)
+    {
+      utilityWidget->SetTitleVisible(visible);
+    }
+  }
+}
+
 void QmitkMxNMultiWidget::SetNavigatorExpanded(bool expanded)
 {
   if (expanded == m_NavigatorExpanded)
@@ -5937,6 +5962,23 @@ std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, Q
     return link->group;
   }
   return std::string();
+}
+
+void QmitkMxNMultiWidget::SetCellDisplayName(const QString& windowId, const QString& name)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell)
+  {
+    mitkThrow() << "SetCellDisplayName: unknown window '" << windowId.toStdString() << "'.";
+  }
+
+  const auto displayName = name.trimmed();
+  if (displayName == cell->GetDisplayName())
+  {
+    return;
+  }
+  cell->SetDisplayName(displayName);
+  emit SyncLinksChanged();
 }
 
 QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const

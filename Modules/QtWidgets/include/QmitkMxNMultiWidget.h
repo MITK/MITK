@@ -718,6 +718,20 @@ public:
   QString CellLabel(const QString& windowId) const;
 
   /**
+  * \brief Set or clear the display name of a window.
+  *
+  *   The name is the window's role in the layout; it is shown as the
+  *   window's title, on its sync plate and in the advanced matrix, and is
+  *   written back by 'SerializeLayout'. Leading and trailing white space is
+  *   removed; an empty result clears the name. Emits 'SyncLinksChanged' when
+  *   the name changes, so the sync surfaces refresh as for any other layout
+  *   cosmetic.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  void SetCellDisplayName(const QString& windowId, const QString& name);
+
+  /**
   * \brief Raise or lower the sync peek in every visible cell that can host it,
   *        emphasising 'axis' - or none of them without one, which is what the
   *        pointer resting on a barcode between two glyphs shows.
@@ -934,6 +948,12 @@ public:
   *        proximity reveal instead of being always-on.
   */
   void SetLevelWindowReadoutVisible(bool visible);
+
+  /**
+  * \brief Show or hide the window titles of every cell, including cells
+  *        created later. On by default. Clean view hides them regardless.
+  */
+  void SetWindowTitlesVisible(bool visible);
 
   /**
   * \brief Per-cell navigator mode, mirrored editor-wide: compact (the slice
@@ -2131,6 +2151,9 @@ private:
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;
+
+  /** \brief Preference-backed visibility of the window titles. */
+  bool m_WindowTitlesVisible = true;
 
   /** \brief Editor-wide navigator mode (compact vs. expanded); the preference
    *         sets the default, the top-chrome toggle flips it live. Applied to

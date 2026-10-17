@@ -67,6 +67,10 @@ mitkAddCustomModuleTest(QmitkMxNArrangeModeTest QmitkMxNArrangeModeTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNCellNameTest QmitkMxNCellNameTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
   -platform minimal
 )
@@ -88,6 +92,10 @@ mitkAddCustomModuleTest(QmitkMxNSynchronizeScopeTest QmitkMxNSynchronizeScopeTes
 )
 
 mitkAddCustomModuleTest(QmitkMxNSyncPeekTest QmitkMxNSyncPeekTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNUtilityStripTest QmitkMxNUtilityStripTest
   -platform minimal
 )
 

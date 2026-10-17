@@ -368,6 +368,7 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   {
     mxnMultiWidget->SetLevelWindowReadoutVisible(
       preferences->GetBool("Show level/window readout", true));
+    mxnMultiWidget->SetWindowTitlesVisible(preferences->GetBool("Show window titles", true));
     mxnMultiWidget->SetNavigatorExpanded(preferences->GetBool("Expanded navigator", false));
   }
 

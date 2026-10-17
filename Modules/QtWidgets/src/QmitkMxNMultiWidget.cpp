@@ -73,6 +73,7 @@ found in the LICENSE file.
 #include <limits>
 #include <numeric>
 #include <fstream>
+#include <utility>
 #include <vector>
 
 namespace
@@ -605,22 +606,33 @@ namespace
   }
 
   /**
-   * The synchronized display actions, plus a relay of the pan and zoom
-   * gestures of 2D cells to 3D cells, which Core's synchronized actions leave
-   * out. The relay takes the change the gesture actually made to the
-   * sender's camera, which Core's action may have clamped
-   * (ConstrainZoomingAndPanning): an observer connected before Core's action
-   * records the sender's camera, one connected after it compares. Observers
-   * of the broadcast run in the order they were connected.
+   * The synchronized display actions, plus what follows from a gesture that
+   * Core's synchronized actions leave out:
+   *   - the pan and zoom gestures of 2D cells reach 3D cells. The relay takes
+   *     the change the gesture actually made to the sender's camera, which
+   *     Core's action may have clamped (ConstrainZoomingAndPanning);
+   *   - the slice groups of the cells a crosshair gesture moved converge,
+   *     because Core's crosshair relay moves slices without the scroll event
+   *     that slice links relay.
+   * Both compare a state recorded by an observer connected before Core's
+   * action with the state an observer connected after it sees. Observers of
+   * the broadcast run in the order they were connected.
    */
-  class ThreeDRelayingEventHandler : public mitk::DisplayActionEventHandlerSynchronized
+  class MxNSynchronizedEventHandler : public mitk::DisplayActionEventHandlerSynchronized
   {
   public:
     using Relay =
       std::function<void(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)>;
+    using SliceSnapshot = std::map<QString, unsigned int>;
+    using SnapshotSlices = std::function<SliceSnapshot(const mitk::BaseRenderer* sender)>;
+    using ConvergeMovedSlices = std::function<void(const mitk::BaseRenderer* sender, const SliceSnapshot& before)>;
 
-    ThreeDRelayingEventHandler(const Predicates& predicates, Relay relay)
-      : DisplayActionEventHandlerSynchronized(predicates), m_Relay(std::move(relay))
+    MxNSynchronizedEventHandler(const Predicates& predicates, Relay relay, SnapshotSlices snapshotSlices,
+                                ConvergeMovedSlices convergeMovedSlices)
+      : DisplayActionEventHandlerSynchronized(predicates)
+      , m_Relay(std::move(relay))
+      , m_SnapshotSlices(std::move(snapshotSlices))
+      , m_ConvergeMovedSlices(std::move(convergeMovedSlices))
     {
     }
 
@@ -629,14 +641,36 @@ namespace
     {
       const auto record = [this](const itk::EventObject& event) { this->RecordSender(event); };
       const auto relay = [this](const itk::EventObject& event) { this->RelaySender(event); };
+      const auto recordSlices = [this](const itk::EventObject& event) { this->RecordSlices(event); };
+      const auto convergeSlices = [this](const itk::EventObject& event) { this->ConvergeSlices(event); };
       this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), record);
       this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), record);
+      this->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), recordSlices);
       DisplayActionEventHandlerSynchronized::InitActionsImpl(prefixFilter);
       this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), relay);
       this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), relay);
+      this->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), convergeSlices);
     }
 
   private:
+    void RecordSlices(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      m_SlicesBefore = nullptr != sender ? m_SnapshotSlices(sender) : SliceSnapshot();
+    }
+
+    void ConvergeSlices(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      const auto before = std::exchange(m_SlicesBefore, SliceSnapshot());
+      if (nullptr != sender && !before.empty())
+      {
+        m_ConvergeMovedSlices(sender, before);
+      }
+    }
+
     void RecordSender(const itk::EventObject& event)
     {
       const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
@@ -680,9 +714,12 @@ namespace
     }
 
     Relay m_Relay;
+    SnapshotSlices m_SnapshotSlices;
+    ConvergeMovedSlices m_ConvergeMovedSlices;
     const mitk::BaseRenderer* m_Sender = nullptr;
     mitk::Point2D m_PositionBefore;
     double m_ScaleBefore = 1.0;
+    SliceSnapshot m_SlicesBefore;
   };
 
 }  // namespace
@@ -964,10 +1001,18 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   {
     return this->IsWindowingTarget(sender, target);
   };
-  auto handler = std::make_unique<ThreeDRelayingEventHandler>(predicates,
+  auto handler = std::make_unique<MxNSynchronizedEventHandler>(predicates,
     [this](const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)
     {
       this->RelayTwoDGestureToThreeD(sender, panVector, zoomFactor);
+    },
+    [this](const mitk::BaseRenderer* sender)
+    {
+      return this->SnapshotCrosshairTargetSlices(sender);
+    },
+    [this](const mitk::BaseRenderer* sender, const std::map<QString, unsigned int>& before)
+    {
+      this->ConvergeSlicesMovedByCrosshair(sender, before);
     });
   this->SetDisplayActionEventHandler(std::move(handler));
 
@@ -4908,6 +4953,69 @@ void QmitkMxNMultiWidget::RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sen
     {
       mitk::RenderingManager::GetInstance()->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
     }
+  }
+}
+
+std::map<QString, unsigned int> QmitkMxNMultiWidget::SnapshotCrosshairTargetSlices(
+  const mitk::BaseRenderer* sender) const
+{
+  std::map<QString, unsigned int> slices;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* renderer = RendererOf(cell.get());
+    // Core's crosshair relay moves 2D cells only.
+    if (nullptr == renderer || mitk::BaseRenderer::Standard2D != renderer->GetMapperID()
+        || !this->IsNavTarget(QmitkMxNSyncDimension::Crosshair, sender, renderer))
+    {
+      continue;
+    }
+    slices.emplace(windowId, renderer->GetSliceNavigationController()->GetStepper()->GetPos());
+  }
+  return slices;
+}
+
+void QmitkMxNMultiWidget::ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,
+                                                         const std::map<QString, unsigned int>& before)
+{
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  try
+  {
+    // Slice group and its anchor, in the pre-order of the group's first moved member.
+    std::vector<std::pair<std::string, QString>> anchors;
+    for (const auto& descriptor : this->ListWindowDescriptors())
+    {
+      const auto slice = before.find(descriptor.id);
+      const auto link = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Slice);
+      if (slice == before.end() || !link.has_value())
+      {
+        continue;
+      }
+      auto* renderer = RendererOf(this->GetRenderWindowWidget(descriptor.id).get());
+      if (renderer->GetSliceNavigationController()->GetStepper()->GetPos() == slice->second)
+      {
+        continue;
+      }
+      auto anchor = std::find_if(anchors.begin(), anchors.end(),
+                                 [&link](const auto& entry) { return entry.first == link->group; });
+      if (anchor == anchors.end())
+      {
+        anchors.emplace_back(link->group, descriptor.id);
+      }
+      else if (descriptor.id == senderId)
+      {
+        anchor->second = descriptor.id;
+      }
+    }
+
+    for (const auto& [group, anchorId] : anchors)
+    {
+      this->ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension::Slice, group, anchorId);
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    // This runs inside the interaction broadcast, which must not see a throw.
+    MITK_WARN << "Crosshair move: slice groups not converged: " << e.GetDescription();
   }
 }
 

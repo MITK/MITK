@@ -57,6 +57,10 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
 
   MITK_TEST(SliceLink_PropagatesToGroupOnly);
   MITK_TEST(Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation);
+  MITK_TEST(Crosshair_MovedPeer_ConvergesItsSliceGroup);
+  MITK_TEST(Crosshair_MovedSender_AnchorsItsSliceGroup);
+  MITK_TEST(Crosshair_SeveralMovedMembers_AnchorOnTheFirstInPreOrder);
+  MITK_TEST(Crosshair_ClickInTheShownPlane_ConvergesNothing);
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
   MITK_TEST(Converge_Zoom_FactorOffset);
@@ -327,6 +331,97 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A scroll keeps the displayed slices together", ShownSlice(0), ShownSlice(1));
     FireScroll(1, -1);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A scroll from the other cell keeps them together", ShownSlice(0), ShownSlice(1));
+  }
+
+  // --- A crosshair move keeps slice groups together ----------------------------
+
+  /** A world point inside the 16 x 16 x 8 image, on axial slice 'z'. */
+  static mitk::Point3D PointOnAxialSlice(double z)
+  {
+    mitk::Point3D point;
+    point[0] = 5.0;
+    point[1] = 9.0;
+    point[2] = z;
+    return point;
+  }
+
+  void FireCrosshair(std::size_t senderIndex, const mitk::Point3D& position)
+  {
+    Fire<mitk::DisplaySetCrosshairEvent>(senderIndex, position);
+  }
+
+  void Crosshair_MovedPeer_ConvergesItsSliceGroup()
+  {
+    // "Slice context": a click in a context window moves the working slice
+    // over the crosshair link; its neighbour on the slice group must follow.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "ctx");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "ctx", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Crosshair, "main");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Crosshair, "main");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the neighbour shows the previous slice", 3u, ShownSlice(0));
+
+    FireCrosshair(2, PointOnAxialSlice(6.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the crosshair moved the working slice", 6u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour follows to the slice before the working slice",
+                                 5u, ShownSlice(0));
+  }
+
+  void Crosshair_MovedSender_AnchorsItsSliceGroup()
+  {
+    // A crosshair set from the navigator ("Go to coordinate...") moves the
+    // sender's own slice; its slice group follows the sender.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(0, 4);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the second frame shows the next slice", 5u, ShownSlice(1));
+
+    FireCrosshair(0, PointOnAxialSlice(2.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the sender moved to the point's slice", 2u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group follows the sender, keeping its offset", 3u, ShownSlice(1));
+  }
+
+  void Crosshair_SeveralMovedMembers_AnchorOnTheFirstInPreOrder()
+  {
+    // Both members of the slice group are crosshair targets and land on the
+    // same slice; the group converges once, to the first of them.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(0, 4);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "main");
+    }
+
+    FireCrosshair(2, PointOnAxialSlice(2.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first moved member keeps the crosshair's slice", 2u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The later member converges to it with its offset", 3u, ShownSlice(1));
+  }
+
+  void Crosshair_ClickInTheShownPlane_ConvergesNothing()
+  {
+    // A click in a window's own plane moves no slice. Its slice group stays as
+    // the user left it, even where it has drifted from its offsets.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(0, 4);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    SetShownSlice(1, 7);
+
+    FireCrosshair(0, PointOnAxialSlice(4.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The clicked window stays on its slice", 4u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A drifted member is left where it is", 7u, ShownSlice(1));
   }
 
   void Converge_Slice_MovieFrameOffsets()

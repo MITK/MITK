@@ -1829,6 +1829,26 @@ private:
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
 
   /**
+  * \brief The slice positions of the cells a crosshair gesture of 'sender'
+  *        can move: its 2D crosshair targets, the sender included, by
+  *        window id.
+  */
+  std::map<QString, unsigned int> SnapshotCrosshairTargetSlices(const mitk::BaseRenderer* sender) const;
+
+  /**
+  * \brief Converge the slice groups of the cells a crosshair gesture moved.
+  *
+  *   Core's crosshair relay moves its targets' slices without the scroll
+  *   event that slice links relay, so a moved cell would leave its slice
+  *   group. Each slice group with a moved member converges once: to the
+  *   sender when it moved and is a member, else to the group's first moved
+  *   member in pre-order. A cell counts as moved when its slice differs from
+  *   'before', the snapshot taken ahead of Core's relay.
+  */
+  void ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,
+                                      const std::map<QString, unsigned int>& before);
+
+  /**
   * \brief Turn the members of an orientation group whose direction is 'Free'
   *        to the camera direction of its anchor, the first member in layout
   *        order. A view initialization that turned the anchor anterior thus

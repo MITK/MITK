@@ -73,6 +73,7 @@ namespace
 
   constexpr int IconSize = 40;
   constexpr int TileIconSize = 48;
+  constexpr int RowGlyphSize = 32;
 
   // The description is what the user writes; a larger font makes it easier
   // to read back.
@@ -123,19 +124,24 @@ namespace
     return divider;
   }
 
+  QString FeedbackGlyph(const QString& name)
+  {
+    return ":/org.mitk.gui.qt.ext/feedback/" + name + ".svg";
+  }
+
   QString PictogramPath(mitk::FeedbackCategory category)
   {
     switch (category)
     {
       case mitk::FeedbackCategory::Feature:
-        return ":/org.mitk.gui.qt.ext/feedback/feature.svg";
+        return FeedbackGlyph("feature");
 
       case mitk::FeedbackCategory::Idea:
-        return ":/org.mitk.gui.qt.ext/feedback/idea.svg";
+        return FeedbackGlyph("idea");
 
       case mitk::FeedbackCategory::Bug:
       default:
-        return ":/org.mitk.gui.qt.ext/feedback/bug.svg";
+        return FeedbackGlyph("bug");
     }
   }
 
@@ -690,11 +696,12 @@ QWidget* QmitkFeedbackDialog::CreateSendPage()
 
   auto* routes = new QVBoxLayout;
   routes->setSpacing(0);
-  routes->addWidget(this->CreateItemRow(CreateHeading("Email to the MITK team"),
+  routes->addWidget(this->CreateItemRow(FeedbackGlyph("email"), CreateHeading("Email to the MITK team"),
     CreateMutedLabel("Only the MITK team reads it. Opens your mail program; attach the report file before sending."),
     m_EmailButton, nullptr));
-  routes->addWidget(this->CreateItemRow(CreateHeading("GitHub issue"), gitHubSummary, m_IssueButton, nullptr));
-  routes->addWidget(this->CreateItemRow(CreateHeading("Report file only"),
+  routes->addWidget(this->CreateItemRow(FeedbackGlyph("public"), CreateHeading("GitHub issue"), gitHubSummary,
+    m_IssueButton, nullptr));
+  routes->addWidget(this->CreateItemRow(FeedbackGlyph("file"), CreateHeading("Report file only"),
     CreateMutedLabel("Shows the report file in your file manager, to pass on in another way."),
     m_ShowBundleButton, nullptr));
   routes->addWidget(CreateDivider());
@@ -807,8 +814,8 @@ void QmitkFeedbackDialog::UpdateNavigation(const mitk::FeedbackReport& report)
   m_Hint->setText(hint);
 }
 
-QWidget* QmitkFeedbackDialog::CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
-  bool detailsShown)
+QWidget* QmitkFeedbackDialog::CreateItemRow(const QString& glyph, QWidget* title, QWidget* summary, QWidget* trailing,
+  QWidget* details, bool detailsShown)
 {
   auto* top = new QHBoxLayout;
   top->setSpacing(8);
@@ -818,11 +825,19 @@ QWidget* QmitkFeedbackDialog::CreateItemRow(QWidget* title, QWidget* summary, QW
   if (trailing != nullptr)
     top->addWidget(trailing);
 
-  auto* row = new QWidget;
-  auto* layout = new QVBoxLayout(row);
-  layout->setContentsMargins(0, 8, 0, 8);
+  auto* icon = new QLabel;
+  icon->setPixmap(QmitkIconTheme::GetIcon(glyph).pixmap(QSize(RowGlyphSize, RowGlyphSize), this->devicePixelRatioF()));
+
+  auto* layout = new QVBoxLayout;
   layout->setSpacing(4);
   layout->addLayout(top);
+
+  auto* row = new QWidget;
+  auto* rowLayout = new QHBoxLayout(row);
+  rowLayout->setContentsMargins(0, 8, 0, 8);
+  rowLayout->setSpacing(12);
+  rowLayout->addWidget(icon, 0, Qt::AlignTop);
+  rowLayout->addLayout(layout, 1);
 
   if (summary != nullptr)
   {
@@ -947,7 +962,8 @@ void QmitkFeedbackDialog::AddEnvironmentRow(QVBoxLayout* layout)
   m_EnvironmentSummary = CreateMutedLabel();
   connect(m_EnvironmentInclude, &QCheckBox::clicked, this, &QmitkFeedbackDialog::OnEnvironmentClicked);
 
-  layout->addWidget(this->CreateItemRow(m_EnvironmentInclude, m_EnvironmentSummary, nullptr, details));
+  layout->addWidget(this->CreateItemRow(FeedbackGlyph("system"), m_EnvironmentInclude, m_EnvironmentSummary, nullptr,
+    details));
 }
 
 void QmitkFeedbackDialog::AddLogRows(QVBoxLayout* layout)
@@ -968,7 +984,7 @@ void QmitkFeedbackDialog::AddLogRows(QVBoxLayout* layout)
     {
       row.include->setEnabled(false);
       row.summary = CreateMutedLabel(source.unavailableReason);
-      row.row = this->CreateItemRow(row.include, row.summary, nullptr, nullptr);
+      row.row = this->CreateItemRow(FeedbackGlyph("log"), row.include, row.summary, nullptr, nullptr);
       layout->addWidget(row.row);
       m_LogRows.push_back(row);
       continue;
@@ -989,7 +1005,7 @@ void QmitkFeedbackDialog::AddLogRows(QVBoxLayout* layout)
     connect(row.include, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
     connect(row.text, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnPublicItemChanged);
 
-    row.row = this->CreateItemRow(row.include, row.summary, nullptr, row.text);
+    row.row = this->CreateItemRow(FeedbackGlyph("log"), row.include, row.summary, nullptr, row.text);
     layout->addWidget(row.row);
     m_LogRows.push_back(row);
   }
@@ -1026,7 +1042,7 @@ void QmitkFeedbackDialog::AddScreenshotRow(QVBoxLayout* layout)
   summaryLayout->addWidget(CreateMutedLabel("Taken just before this dialog opened."));
   summaryLayout->addWidget(m_ScreenshotPreview, 0, Qt::AlignLeft);
 
-  layout->addWidget(this->CreateItemRow(title, summary, nullptr, nullptr));
+  layout->addWidget(this->CreateItemRow(FeedbackGlyph("screenshot"), title, summary, nullptr, nullptr));
 
   connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPhiItemIncluded);
   connect(m_ScreenshotInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnPublicItemChanged);
@@ -1084,7 +1100,7 @@ void QmitkFeedbackDialog::AddDumpsRow(QVBoxLayout* layout)
   summaryLayout->addWidget(m_DumpSummary);
   summaryLayout->addWidget(m_DumpDetails);
 
-  layout->addWidget(this->CreateItemRow(m_DumpsInclude, summary, nullptr, nullptr));
+  layout->addWidget(this->CreateItemRow(FeedbackGlyph("diagnostics"), m_DumpsInclude, summary, nullptr, nullptr));
 
   connect(m_DumpsInclude, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnDumpsChanged);
   connect(m_DumpList, &QmitkCrashDumpListWidget::CheckedChanged, this, &QmitkFeedbackDialog::OnDumpsChanged);
@@ -1110,7 +1126,8 @@ void QmitkFeedbackDialog::AddImagesRow(QVBoxLayout* layout)
   m_ImageList->setSpacing(6);
   summaryLayout->addLayout(m_ImageList);
 
-  layout->addWidget(this->CreateItemRow(new QLabel("Images from files"), summary, addButton, nullptr));
+  layout->addWidget(this->CreateItemRow(FeedbackGlyph("images"), new QLabel("Images from files"), summary, addButton,
+    nullptr));
 }
 
 void QmitkFeedbackDialog::OnAddImages()

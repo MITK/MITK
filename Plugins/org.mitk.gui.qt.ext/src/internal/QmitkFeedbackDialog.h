@@ -144,10 +144,11 @@ private:
    *  what keeps the user from going on. */
   void UpdateNavigation(const mitk::FeedbackReport& report);
 
-  /** A row of a list of items or ways to send: \p title (a check box or a
-   *  label) with \p summary below it, an optional \p trailing widget, and,
-   *  if given, \p details that a Details button shows and hides. */
-  QWidget* CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
+  /** A row of a list of items or ways to send: the themed \p glyph (a
+   *  resource path) beside \p title (a check box or a label) with \p summary
+   *  below it, an optional \p trailing widget, and, if given, \p details that
+   *  a Details button shows and hides. */
+  QWidget* CreateItemRow(const QString& glyph, QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
     bool detailsShown = false);
 
   /** A framed panel with a check box for \p statement and an explanatory

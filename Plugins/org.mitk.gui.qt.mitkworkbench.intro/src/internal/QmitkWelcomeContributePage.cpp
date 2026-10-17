@@ -46,7 +46,7 @@ QmitkWelcomeContributePage::QmitkWelcomeContributePage(const QmitkWelcomePalette
     this->CreateButton("Send Feedback...", &QmitkWelcomeContributePage::OnSendFeedback)));
 
 #ifdef MITK_HAS_CRASHHANDLING
-  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.welcomescreen/img/contribute/diagnostics.svg", "Share crash data",
+  cards.push_back(this->CreateCard(":/org.mitk.gui.qt.ext/feedback/diagnostics.svg", "Share crash data",
     "If MITK crashed or froze, the saved diagnostic data shows us what went wrong. "
     "It stays on your computer until you decide to share it.",
     this->CreateButton("Diagnostic Data...", &QmitkWelcomeContributePage::OnShowDiagnosticData)));

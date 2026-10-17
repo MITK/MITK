@@ -38,6 +38,7 @@ class QLabel;
 class QPlainTextEdit;
 class QProgressBar;
 class QPushButton;
+class QStackedWidget;
 class QTextBrowser;
 class QToolButton;
 class QVBoxLayout;
@@ -46,11 +47,11 @@ class QmitkCrashDumpListWidget;
 /**
  * \brief Lets the user assemble, review, and hand off a feedback report.
  *
- * Every item that may go into the report is listed with its own include
- * choice, and the preview shows the report text that a hand-off emits. A
- * hand-off writes the bundle to a temporary folder and opens the user's
- * mail program, web browser, or file manager; the dialog itself sends
- * nothing.
+ * The user describes the report, chooses what to include, and picks how to
+ * send it, in three steps; throughout, the preview shows the report text that
+ * a hand-off emits. A hand-off writes the bundle to a temporary folder and
+ * opens the user's mail program, web browser, or file manager; the dialog
+ * itself sends nothing.
  */
 class QmitkFeedbackDialog : public QDialog
 {
@@ -109,6 +110,13 @@ protected:
   bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
+  enum class Step
+  {
+    Describe,
+    Include,
+    Send
+  };
+
   struct LogRow
   {
     QWidget* row = nullptr;
@@ -121,12 +129,22 @@ private:
   };
 
   QWidget* CreateHeader();
-  QWidget* CreateForm();
+  QWidget* CreateWizard();
+  QWidget* CreateDescribePage();
+  QWidget* CreateIncludePage();
+  QWidget* CreateSendPage();
+  QWidget* CreateNavigation();
   QWidget* CreatePreview();
   void SetPreviewVisible(bool visible);
   QWidget* CreateFooter();
 
-  /** A row of the list of included items: \p title (a check box or a
+  void SetStep(Step step);
+
+  /** Steps after the description are open once there is one; the hint says
+   *  what keeps the user from going on. */
+  void UpdateNavigation(const mitk::FeedbackReport& report);
+
+  /** A row of a list of items or ways to send: \p title (a check box or a
    *  label) with \p summary below it, an optional \p trailing widget, and,
    *  if given, \p details that a Details button shows and hides. */
   QWidget* CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
@@ -179,8 +197,9 @@ private:
   /** Re-reads every listed image whose file differs in size or modification
    *  time from when it was read; an image whose file is gone or can no
    *  longer be read as an image is removed, with a warning. If any image
-   *  changed, the sharing confirmations are withdrawn and the status line
-   *  asks the user to review the images. Returns whether any image changed. */
+   *  changed, the sharing confirmations are withdrawn, the dialog returns to
+   *  the step that lists the images, and the status line asks the user to
+   *  review them. Returns whether any image changed. */
   bool ReloadChangedImages();
 
   void UpdateSummaries();
@@ -264,16 +283,23 @@ private:
    *  up, else null. A release clicks only on the target it started on. */
   QObject* m_PressTarget = nullptr;
 
+  QButtonGroup* m_StepGroup = nullptr;
+  QStackedWidget* m_Steps = nullptr;
+
   QWidget* m_PreviewPane = nullptr;
   QTextBrowser* m_Preview = nullptr;
   QToolButton* m_PreviewToggle = nullptr;
 
-  QProgressBar* m_BusyIndicator = nullptr;
-  QLabel* m_Status = nullptr;
   QLabel* m_GitHubReason = nullptr;
   QPushButton* m_EmailButton = nullptr;
   QPushButton* m_IssueButton = nullptr;
   QPushButton* m_ShowBundleButton = nullptr;
+
+  QProgressBar* m_BusyIndicator = nullptr;
+  QLabel* m_Status = nullptr;
+  QLabel* m_Hint = nullptr;
+  QPushButton* m_BackButton = nullptr;
+  QPushButton* m_NextButton = nullptr;
   QPushButton* m_CloseButton = nullptr;
 
   /** Incremented on every change of the report; a bundle is reusable only

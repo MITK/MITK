@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QScrollBar>
 #include <QSignalBlocker>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <QTemporaryDir>
 #include <QTextBlock>
 #include <QTextBrowser>
@@ -62,6 +63,7 @@ found in the LICENSE file.
 #include <QtConcurrentRun>
 
 #include <algorithm>
+#include <tuple>
 
 namespace
 {
@@ -70,6 +72,11 @@ namespace
   constexpr qint64 LargeBundleSize = 25 * 1024 * 1024;
 
   constexpr int IconSize = 40;
+  constexpr int TileIconSize = 48;
+
+  // The description is what the user writes; a larger font makes it easier
+  // to read back.
+  constexpr qreal DescriptionFontScale = 1.2;
 
   // Below this dialog width, form and preview side by side are both cramped.
   constexpr int MinimumWidthWithPreview = 1100;
@@ -114,6 +121,113 @@ namespace
     divider->setFixedHeight(1);
     divider->setStyleSheet("background-color: rgba(128, 128, 128, 70); border: none;");
     return divider;
+  }
+
+  QString PictogramPath(mitk::FeedbackCategory category)
+  {
+    switch (category)
+    {
+      case mitk::FeedbackCategory::Feature:
+        return ":/org.mitk.gui.qt.ext/feedback/feature.svg";
+
+      case mitk::FeedbackCategory::Idea:
+        return ":/org.mitk.gui.qt.ext/feedback/idea.svg";
+
+      case mitk::FeedbackCategory::Bug:
+      default:
+        return ":/org.mitk.gui.qt.ext/feedback/bug.svg";
+    }
+  }
+
+  QString CategoryDescription(mitk::FeedbackCategory category)
+  {
+    switch (category)
+    {
+      case mitk::FeedbackCategory::Feature:
+        return "Something MITK should be able to do.";
+
+      case mitk::FeedbackCategory::Idea:
+        return "A thought on how MITK could be better.";
+
+      case mitk::FeedbackCategory::Bug:
+      default:
+        return "Something does not work as expected.";
+    }
+  }
+
+  QString DescriptionPlaceholder(mitk::FeedbackCategory category)
+  {
+    switch (category)
+    {
+      case mitk::FeedbackCategory::Feature:
+        return "What would you like MITK to do, and what would it help you with?";
+
+      case mitk::FeedbackCategory::Idea:
+        return "What is your idea, and what would it improve?";
+
+      case mitk::FeedbackCategory::Bug:
+      default:
+        return "What happened, and what did you expect instead? How can we reproduce it?";
+    }
+  }
+
+  /** A checkable tile with the pictogram and name of \p category. Its labels
+   *  let clicks through to the tile. */
+  QPushButton* CreateCategoryTile(mitk::FeedbackCategory category, qreal ratio)
+  {
+    const auto name = QString::fromStdString(mitk::ToString(category));
+    const auto description = CategoryDescription(category);
+
+    auto* tile = new QPushButton;
+    tile->setObjectName("feedbackCategory");
+    tile->setCheckable(true);
+    tile->setAutoDefault(false);
+    tile->setCursor(Qt::PointingHandCursor);
+    tile->setToolTip(description);
+    tile->setAccessibleName(name);
+    tile->setAccessibleDescription(description);
+    tile->setStyleSheet(QString(
+      "QPushButton#feedbackCategory { border: 2px solid rgba(128, 128, 128, 70); border-radius: 4px; "
+      "background-color: transparent; padding: 0; }"
+      "QPushButton#feedbackCategory:hover { background-color: rgba(128, 128, 128, 20); }"
+      "QPushButton#feedbackCategory:checked { border-color: %1; background-color: rgba(128, 128, 128, 28); }")
+      .arg(QmitkIconTheme::GetAccentColor()));
+
+    auto* icon = new QLabel;
+    icon->setPixmap(QmitkIconTheme::GetIcon(PictogramPath(category)).pixmap(QSize(TileIconSize, TileIconSize), ratio));
+
+    auto* title = CreateHeading(name);
+
+    for (auto* label : { icon, title })
+      label->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+    // A push button sizes itself by its own text, which the tile does not
+    // have; the layout has to set its minimum size instead.
+    auto* layout = new QHBoxLayout(tile);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
+    layout->setContentsMargins(12, 10, 12, 10);
+    layout->setSpacing(12);
+    layout->addWidget(icon);
+    layout->addWidget(title, 1);
+
+    return tile;
+  }
+
+  /** \p page in a scroll area that scrolls vertically only. */
+  QScrollArea* CreatePageScrollArea(QWidget* page)
+  {
+    auto* scrollArea = new QScrollArea;
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidget(page);
+
+    // A scroll area claims hardly any width of its own, so without this the
+    // splitter would squeeze the page below what its rows need and the
+    // preview would keep the space.
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setMinimumWidth(page->minimumSizeHint().width() + scrollArea->verticalScrollBar()->sizeHint().width());
+
+    return scrollArea;
   }
 
   std::vector<unsigned char> EncodePng(const QPixmap& pixmap)
@@ -211,13 +325,13 @@ QmitkFeedbackDialog::QmitkFeedbackDialog(const Input& input, QWidget* parent)
   // preview starts hidden where the form would otherwise be cramped.
   const auto* screen = parent != nullptr ? parent->screen() : QGuiApplication::primaryScreen();
   const auto available = screen != nullptr ? screen->availableGeometry() : QRect(0, 0, 1280, 800);
-  const int width = std::clamp(static_cast<int>(available.width() * 0.8), std::min(720, available.width()), 1500);
-  const int height = std::clamp(static_cast<int>(available.height() * 0.85), std::min(560, available.height()), 1050);
+  const int width = std::clamp(static_cast<int>(available.width() * 0.8), std::min(720, available.width()), 1200);
+  const int height = std::clamp(static_cast<int>(available.height() * 0.85), std::min(560, available.height()), 840);
   this->resize(width, height);
 
   auto* splitter = new QSplitter(Qt::Horizontal);
   splitter->setChildrenCollapsible(false);
-  splitter->addWidget(this->CreateForm());
+  splitter->addWidget(this->CreateWizard());
   splitter->addWidget(this->CreatePreview());
   splitter->setStretchFactor(0, 3);
   splitter->setStretchFactor(1, 2);
@@ -241,7 +355,7 @@ QmitkFeedbackDialog::QmitkFeedbackDialog(const Input& input, QWidget* parent)
   m_IncludedDumpCount = this->GetIncludedDumps().size();
   this->UpdateDumpRows();
   this->OnReportChanged();
-  m_Description->setFocus();
+  this->SetStep(Step::Describe);
 }
 
 QmitkFeedbackDialog::~QmitkFeedbackDialog() = default;
@@ -352,45 +466,150 @@ QWidget* QmitkFeedbackDialog::CreateHeader()
   return header;
 }
 
-QWidget* QmitkFeedbackDialog::CreateForm()
+QWidget* QmitkFeedbackDialog::CreateWizard()
 {
-  auto* form = new QWidget;
-  auto* layout = new QVBoxLayout(form);
-  layout->setContentsMargins(16, 14, 12, 14);
-  layout->setSpacing(10);
+  m_StepGroup = new QButtonGroup(this);
 
-  m_CategoryGroup = new QButtonGroup(this);
-  auto* categories = new QHBoxLayout;
-  categories->setSpacing(6);
+  auto* stepBar = new QHBoxLayout;
+  stepBar->setContentsMargins(10, 6, 12, 0);
+  stepBar->setSpacing(4);
 
-  for (const auto category : { mitk::FeedbackCategory::Bug, mitk::FeedbackCategory::Feature, mitk::FeedbackCategory::Idea })
+  const std::tuple<Step, QString, QString> steps[] = {
+    { Step::Describe, "Describe", "describeStep" },
+    { Step::Include, "Include", "includeStep" },
+    { Step::Send, "Send", "sendStep" }
+  };
+
+  for (const auto& [step, title, name] : steps)
   {
-    auto* button = new QPushButton(QString::fromStdString(mitk::ToString(category)));
+    auto* button = new QToolButton;
+    button->setObjectName(name);
+    button->setText(QString("%1  %2").arg(static_cast<int>(step) + 1).arg(title));
     button->setCheckable(true);
-    button->setChecked(category == mitk::FeedbackCategory::Bug);
-    m_CategoryGroup->addButton(button, static_cast<int>(category));
-    categories->addWidget(button);
+    button->setCursor(Qt::PointingHandCursor);
+    button->setStyleSheet(QString(
+      "QToolButton { border: none; border-bottom: 3px solid transparent; background-color: transparent; "
+      "padding: 6px 8px 5px 8px; }"
+      "QToolButton:hover { border-bottom-color: rgba(128, 128, 128, 90); }"
+      "QToolButton:checked { border-bottom-color: %1; }").arg(QmitkIconTheme::GetAccentColor()));
+    m_StepGroup->addButton(button, static_cast<int>(step));
+    stepBar->addWidget(button);
   }
 
-  categories->addStretch(1);
+  connect(m_StepGroup, &QButtonGroup::idClicked, this, [this](int id) { this->SetStep(static_cast<Step>(id)); });
+
+  stepBar->addStretch(1);
 
   m_PreviewToggle = new QToolButton;
   m_PreviewToggle->setAutoRaise(true);
   m_PreviewToggle->setCursor(Qt::PointingHandCursor);
   connect(m_PreviewToggle, &QToolButton::clicked, this,
     [this] { this->SetPreviewVisible(m_PreviewPane->isHidden()); });
-  categories->addWidget(m_PreviewToggle);
+  stepBar->addWidget(m_PreviewToggle, 0, Qt::AlignVCenter);
 
-  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::UpdateHeaderIcon);
-  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::OnReportChanged);
+  m_Steps = new QStackedWidget;
+  m_Steps->addWidget(CreatePageScrollArea(this->CreateDescribePage()));
+  m_Steps->addWidget(CreatePageScrollArea(this->CreateIncludePage()));
+  m_Steps->addWidget(CreatePageScrollArea(this->CreateSendPage()));
+
+  auto* wizard = new QWidget;
+  auto* layout = new QVBoxLayout(wizard);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addLayout(stepBar);
+  layout->addWidget(CreateDivider());
+  layout->addWidget(m_Steps, 1);
+  layout->addWidget(CreateDivider());
+  layout->addWidget(this->CreateNavigation());
+
+  return wizard;
+}
+
+QWidget* QmitkFeedbackDialog::CreateNavigation()
+{
+  // What keeps the user from going on must not be overlooked.
+  m_Hint = new QLabel;
+  m_Hint->setWordWrap(true);
+  m_Hint->setStyleSheet(QString("color: %1; font-weight: bold;").arg(WarningColor()));
+
+  m_BackButton = new QPushButton("Back");
+  m_BackButton->setAutoDefault(false);
+
+  m_NextButton = new QPushButton("Next");
+
+  for (auto* button : { m_BackButton, m_NextButton })
+    button->setMinimumWidth(90);
+
+  connect(m_BackButton, &QPushButton::clicked, this,
+    [this] { this->SetStep(static_cast<Step>(m_Steps->currentIndex() - 1)); });
+  connect(m_NextButton, &QPushButton::clicked, this,
+    [this] { this->SetStep(static_cast<Step>(m_Steps->currentIndex() + 1)); });
+
+  auto* navigation = new QWidget;
+  auto* layout = new QHBoxLayout(navigation);
+  layout->setContentsMargins(16, 8, 12, 10);
+  layout->setSpacing(8);
+  layout->addWidget(m_Hint, 1);
+  layout->addSpacing(12);
+  layout->addWidget(m_BackButton);
+  layout->addWidget(m_NextButton);
+
+  return navigation;
+}
+
+QWidget* QmitkFeedbackDialog::CreateDescribePage()
+{
+  m_CategoryGroup = new QButtonGroup(this);
+  auto* categories = new QHBoxLayout;
+  categories->setSpacing(8);
+
+  for (const auto category : { mitk::FeedbackCategory::Bug, mitk::FeedbackCategory::Feature, mitk::FeedbackCategory::Idea })
+  {
+    auto* tile = CreateCategoryTile(category, this->devicePixelRatioF());
+    tile->setChecked(category == mitk::FeedbackCategory::Bug);
+    m_CategoryGroup->addButton(tile, static_cast<int>(category));
+    categories->addWidget(tile, 1);
+  }
 
   m_Description = new QPlainTextEdit;
-  m_Description->setPlaceholderText(
-    "What happened, and what did you expect instead? How can we reproduce it? Or: what would you like MITK to do?");
-  m_Description->setMinimumHeight(90);
-  m_Description->setMaximumHeight(120);
+  m_Description->setPlaceholderText(DescriptionPlaceholder(mitk::FeedbackCategory::Bug));
+  m_Description->setMinimumHeight(160);
+
+  // The border, as in the preview, since the dark theme draws none and the
+  // field fills the page. The font size in a style sheet, as the application
+  // sets its font size in one, which a font set on the widget would not
+  // override.
+  QString descriptionStyleSheet = "QPlainTextEdit { border: 1px solid rgba(128, 128, 128, 90); }";
+  m_Description->ensurePolished();
+
+  if (const auto fontSize = m_Description->font().pointSizeF(); fontSize > 0)
+    descriptionStyleSheet += QString("QPlainTextEdit { font-size: %1pt; }").arg(fontSize * DescriptionFontScale);
+
+  m_Description->setStyleSheet(descriptionStyleSheet);
+
   connect(m_Description, &QPlainTextEdit::textChanged, this, &QmitkFeedbackDialog::OnReportChanged);
 
+  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::UpdateHeaderIcon);
+  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, [this](int id) {
+    m_Description->setPlaceholderText(DescriptionPlaceholder(static_cast<mitk::FeedbackCategory>(id)));
+  });
+  connect(m_CategoryGroup, &QButtonGroup::idClicked, this, &QmitkFeedbackDialog::OnReportChanged);
+
+  auto* page = new QWidget;
+  auto* layout = new QVBoxLayout(page);
+  layout->setContentsMargins(16, 14, 12, 14);
+  layout->setSpacing(10);
+  layout->addWidget(CreateHeading("Category"));
+  layout->addLayout(categories);
+  layout->addSpacing(8);
+  layout->addWidget(CreateHeading("Description"));
+  layout->addWidget(m_Description, 1);
+
+  return page;
+}
+
+QWidget* QmitkFeedbackDialog::CreateIncludePage()
+{
   auto* items = new QVBoxLayout;
   items->setSpacing(0);
   // In a report filed for crash dumps, they are what the report is about;
@@ -414,6 +633,20 @@ QWidget* QmitkFeedbackDialog::CreateForm()
 
   items->addWidget(CreateDivider());
 
+  auto* page = new QWidget;
+  auto* layout = new QVBoxLayout(page);
+  layout->setContentsMargins(16, 14, 12, 14);
+  layout->setSpacing(10);
+  layout->addWidget(CreateMutedLabel("Choose what helps us understand your report. Before you send it, you confirm "
+    "that you may share any logs, screenshots, images, and crash dumps you include."));
+  layout->addLayout(items);
+  layout->addStretch(1);
+
+  return page;
+}
+
+QWidget* QmitkFeedbackDialog::CreateSendPage()
+{
   m_SharingConfirmation = new QCheckBox;
   m_SharingPanel = this->CreateConfirmation(m_SharingConfirmation,
     QString::fromStdString(mitk::GetSharingConfirmationStatement()),
@@ -424,32 +657,60 @@ QWidget* QmitkFeedbackDialog::CreateForm()
   m_PublicConfirmation = new QCheckBox;
   m_PublicPanel = this->CreateConfirmation(m_PublicConfirmation,
     QString::fromStdString(mitk::GetPublicSharingConfirmationStatement()),
-    "Needed only to open a GitHub issue. Email goes to the MITK team alone.");
+    "Email does not need this, as it goes to the MITK team alone.");
   connect(m_PublicConfirmation, &QCheckBox::toggled, this, &QmitkFeedbackDialog::OnReportChanged);
 
-  layout->addLayout(categories);
-  layout->addSpacing(4);
-  layout->addWidget(CreateHeading("Description"));
-  layout->addWidget(m_Description);
-  layout->addSpacing(8);
-  layout->addWidget(CreateHeading("Included in the report"));
-  layout->addLayout(items);
+  m_EmailButton = new QPushButton("Send email...");
+  m_EmailButton->setToolTip("Saves the report as a .zip file and opens your mail program. Attach the file before sending.");
+
+  m_IssueButton = new QPushButton("Open issue...");
+  m_IssueButton->setToolTip("Saves the report as a .zip file and opens a prefilled, public GitHub issue in your browser.");
+
+  m_ShowBundleButton = new QPushButton("Show file");
+  m_ShowBundleButton->setToolTip("Saves the report as a .zip file and shows it in your file manager.");
+
+  for (auto* button : { m_EmailButton, m_IssueButton, m_ShowBundleButton })
+    button->setMinimumWidth(110);
+
+  connect(m_EmailButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenEmail);
+  connect(m_IssueButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenIssue);
+  connect(m_ShowBundleButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnShowBundle);
+
+  m_GitHubReason = CreateMutedLabel();
+
+  auto* gitHubSummary = new QWidget;
+  auto* gitHubSummaryLayout = new QVBoxLayout(gitHubSummary);
+  gitHubSummaryLayout->setContentsMargins(0, 0, 0, 0);
+  gitHubSummaryLayout->setSpacing(4);
+  gitHubSummaryLayout->addWidget(CreateMutedLabel("Public: anyone can read it. Opens a prefilled issue in your web "
+    "browser; drag the report file into the issue text before submitting."));
+  gitHubSummaryLayout->addWidget(m_GitHubReason);
+  // Only this route needs the public confirmation, so it sits here.
+  gitHubSummaryLayout->addWidget(m_PublicPanel);
+
+  auto* routes = new QVBoxLayout;
+  routes->setSpacing(0);
+  routes->addWidget(this->CreateItemRow(CreateHeading("Email to the MITK team"),
+    CreateMutedLabel("Only the MITK team reads it. Opens your mail program; attach the report file before sending."),
+    m_EmailButton, nullptr));
+  routes->addWidget(this->CreateItemRow(CreateHeading("GitHub issue"), gitHubSummary, m_IssueButton, nullptr));
+  routes->addWidget(this->CreateItemRow(CreateHeading("Report file only"),
+    CreateMutedLabel("Shows the report file in your file manager, to pass on in another way."),
+    m_ShowBundleButton, nullptr));
+  routes->addWidget(CreateDivider());
+
+  auto* page = new QWidget;
+  auto* layout = new QVBoxLayout(page);
+  layout->setContentsMargins(16, 14, 12, 14);
+  layout->setSpacing(10);
   layout->addWidget(m_SharingPanel);
-  layout->addWidget(m_PublicPanel);
+  layout->addSpacing(4);
+  layout->addWidget(CreateHeading("How to send it"));
+  layout->addWidget(CreateMutedLabel("Each way saves the report as a .zip file first."));
+  layout->addLayout(routes);
   layout->addStretch(1);
 
-  auto* scrollArea = new QScrollArea;
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidgetResizable(true);
-  scrollArea->setWidget(form);
-
-  // The form scrolls vertically only. A scroll area claims hardly any width
-  // of its own, so without this the splitter would squeeze the form below
-  // what its rows need and the preview would keep the space.
-  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  scrollArea->setMinimumWidth(form->minimumSizeHint().width() + scrollArea->verticalScrollBar()->sizeHint().width());
-
-  return scrollArea;
+  return page;
 }
 
 QWidget* QmitkFeedbackDialog::CreatePreview()
@@ -491,29 +752,8 @@ QWidget* QmitkFeedbackDialog::CreateFooter()
   m_Status->setTextFormat(Qt::RichText);
   m_Status->setWordWrap(true);
 
-  m_GitHubReason = CreateMutedLabel();
-
-  auto* text = new QVBoxLayout;
-  text->setSpacing(2);
-  text->addWidget(m_Status);
-  text->addWidget(m_GitHubReason);
-
-  m_EmailButton = new QPushButton("Email to the MITK team...");
-  m_EmailButton->setDefault(true);
-  m_EmailButton->setToolTip("Saves the report as a .zip file and opens your mail program. Attach the file before sending.");
-
-  m_IssueButton = new QPushButton("Open GitHub issue...");
-  m_IssueButton->setToolTip("Saves the report as a .zip file and opens a prefilled, public GitHub issue in your browser.");
-
-  m_ShowBundleButton = new QPushButton("Show report file");
-  m_ShowBundleButton->setToolTip("Saves the report as a .zip file and shows it in your file manager.");
-
   m_CloseButton = new QPushButton("Close");
   m_CloseButton->setAutoDefault(false);
-
-  connect(m_EmailButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenEmail);
-  connect(m_IssueButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnOpenIssue);
-  connect(m_ShowBundleButton, &QPushButton::clicked, this, &QmitkFeedbackDialog::OnShowBundle);
   connect(m_CloseButton, &QPushButton::clicked, this, &QDialog::reject);
 
   auto* footer = new QWidget;
@@ -521,15 +761,50 @@ QWidget* QmitkFeedbackDialog::CreateFooter()
   layout->setContentsMargins(16, 10, 16, 12);
   layout->setSpacing(8);
   layout->addWidget(m_BusyIndicator, 0, Qt::AlignVCenter);
-  layout->addLayout(text, 1);
-  layout->addSpacing(12);
-  layout->addWidget(m_EmailButton);
-  layout->addWidget(m_IssueButton);
-  layout->addWidget(m_ShowBundleButton);
+  layout->addWidget(m_Status, 1);
   layout->addSpacing(12);
   layout->addWidget(m_CloseButton);
 
   return footer;
+}
+
+void QmitkFeedbackDialog::SetStep(Step step)
+{
+  m_Steps->setCurrentIndex(static_cast<int>(step));
+  m_StepGroup->button(static_cast<int>(step))->setChecked(true);
+
+  // Next is hidden on the last step and must not stay the default there.
+  m_NextButton->setDefault(step != Step::Send);
+  m_EmailButton->setDefault(step == Step::Send);
+
+  this->UpdateNavigation(this->AssembleReport());
+
+  if (step == Step::Describe)
+    m_Description->setFocus();
+}
+
+void QmitkFeedbackDialog::UpdateNavigation(const mitk::FeedbackReport& report)
+{
+  const auto step = static_cast<Step>(m_Steps->currentIndex());
+  const bool described = !report.description.empty();
+
+  for (auto* button : m_StepGroup->buttons())
+    button->setEnabled(described || m_StepGroup->id(button) == static_cast<int>(Step::Describe));
+
+  m_BackButton->setEnabled(step != Step::Describe);
+  m_NextButton->setVisible(step != Step::Send);
+  m_NextButton->setEnabled(described);
+
+  QString hint;
+
+  if (!described)
+    hint = "Describe the problem or idea to continue.";
+  else if (step == Step::Send && report.NeedsSharingConfirmation() && !report.sharingConfirmed)
+    hint = "Confirm that you may share the included items to send the report.";
+
+  // Shown even when empty: it takes the spare width of the row, which would
+  // otherwise stretch the buttons.
+  m_Hint->setText(hint);
 }
 
 QWidget* QmitkFeedbackDialog::CreateItemRow(QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
@@ -994,7 +1269,8 @@ bool QmitkFeedbackDialog::ReloadChangedImages()
   this->UpdateImageList();
   m_SharingConfirmation->setChecked(false);
   this->OnPublicItemChanged();
-  m_Status->setText("<b>An image changed on disk. Review the images and confirm again before you continue.</b>");
+  this->SetStep(Step::Include);
+  m_Status->setText("<b>An image changed on disk. Review the images and confirm again before you send.</b>");
 
   if (!removed.isEmpty())
   {
@@ -1008,25 +1284,9 @@ bool QmitkFeedbackDialog::ReloadChangedImages()
 
 void QmitkFeedbackDialog::UpdateHeaderIcon()
 {
-  QString pictogram;
+  const auto category = static_cast<mitk::FeedbackCategory>(m_CategoryGroup->checkedId());
 
-  switch (static_cast<mitk::FeedbackCategory>(m_CategoryGroup->checkedId()))
-  {
-    case mitk::FeedbackCategory::Feature:
-      pictogram = "feature";
-      break;
-
-    case mitk::FeedbackCategory::Idea:
-      pictogram = "idea";
-      break;
-
-    case mitk::FeedbackCategory::Bug:
-    default:
-      pictogram = "bug";
-      break;
-  }
-
-  m_HeaderIcon->setPixmap(QmitkIconTheme::GetIcon(":/org.mitk.gui.qt.ext/feedback/" + pictogram + ".svg")
+  m_HeaderIcon->setPixmap(QmitkIconTheme::GetIcon(PictogramPath(category))
     .pixmap(QSize(IconSize, IconSize), this->devicePixelRatioF()));
 }
 
@@ -1144,6 +1404,7 @@ void QmitkFeedbackDialog::OnReportChanged()
 
   this->UpdateSummaries();
   this->UpdateConfirmations(report);
+  this->UpdateNavigation(report);
   this->UpdateHandoffEnabled(report);
   this->UpdateScreenshotPreview();
 }
@@ -1379,35 +1640,13 @@ void QmitkFeedbackDialog::UpdateHandoffEnabled(const mitk::FeedbackReport& repor
   m_IssueButton->setEnabled(ready && report.CanUsePublicTracker());
   m_CloseButton->setEnabled(!writing);
 
-  QString hint;
-  bool blocking = true;
+  // Without crash dumps, what else keeps this route closed is the public
+  // confirmation, which the row shows itself.
+  const bool hasAttachment = std::any_of(report.attachments.begin(), report.attachments.end(),
+    [](const auto& attachment) { return attachment.included; });
 
-  if (report.description.empty())
-  {
-    hint = "Describe the problem or idea to continue.";
-  }
-  else if (!confirmed)
-  {
-    hint = "Confirm that you may share the included items to continue.";
-  }
-  else if (!report.CanUsePublicTracker())
-  {
-    const bool hasAttachment = std::any_of(report.attachments.begin(), report.attachments.end(),
-      [](const auto& attachment) { return attachment.included; });
-
-    hint = hasAttachment
-      ? QString("Reports with crash dumps are sent by email.")
-      : QString("To open a GitHub issue, confirm that the included logs and images may be published.");
-    blocking = false;
-  }
-
-  // What keeps every hand-off disabled must not be overlooked; a note on
-  // the GitHub route alone stays in the background.
-  m_GitHubReason->setStyleSheet(blocking
-    ? QString("color: %1; font-weight: bold;").arg(WarningColor())
-    : QString("color: %1;").arg(MutedColor()));
-  m_GitHubReason->setText(hint);
-  m_GitHubReason->setVisible(!hint.isEmpty());
+  m_GitHubReason->setText("Not available: reports with crash dumps are sent by email.");
+  m_GitHubReason->setVisible(hasAttachment);
 }
 
 void QmitkFeedbackDialog::UpdateScreenshotPreview()
@@ -1516,7 +1755,7 @@ void QmitkFeedbackDialog::OnBundleWritten()
   if (size > LargeBundleSize)
   {
     status += QString(" <span style=\"color: %1;\">It is larger than 25 MB, which GitHub and many mail servers "
-      "reject. Use Show report file to pass it on another way.</span>").arg(WarningColor());
+      "reject. Use Show file to pass it on another way.</span>").arg(WarningColor());
   }
 
   m_BundleStatus = status;

@@ -1052,6 +1052,11 @@ bool QmitkMxNCellOverlay::IsThreeD() const
   return m_ThreeD;
 }
 
+mitk::DataNode* QmitkMxNCellOverlay::LevelWindowNode() const
+{
+  return m_TopNode;
+}
+
 void QmitkMxNCellOverlay::SetNavigatorExpanded(bool expanded)
 {
   if (expanded == m_NavigatorExpanded)
@@ -2968,6 +2973,15 @@ mitk::DataNode::Pointer QmitkMxNCellOverlay::ResolveTopImageNode() const
   for (const auto& node : *imageNodes)
   {
     if (node.IsNull() || !node->IsVisible(renderer))
+    {
+      continue;
+    }
+    // A mask drawn over an image has no level/window to show; like the level
+    // window manager, the furniture skips it for the image underneath.
+    bool binary = false;
+    mitk::LevelWindow levelWindow;
+    if ((node->GetBoolProperty("binary", binary, renderer) && binary)
+        || !node->GetLevelWindow(levelWindow, renderer))
     {
       continue;
     }

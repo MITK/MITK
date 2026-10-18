@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkException.h>
 #include <mitkImageGenerator.h>
 #include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
@@ -95,6 +96,7 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Title_HiddenWithoutNameInCleanViewOrWhenSwitchedOff);
   MITK_TEST(Title_NarrowWindowHidesBothTitles);
   MITK_TEST(Title_RenameRepaintsAndResizes);
+  MITK_TEST(LevelWindow_ActsOnTheImageUnderABinaryOverlay);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -973,6 +975,28 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("A rename repaints the title", paints.count > 0);
     CPPUNIT_ASSERT_MESSAGE("The title fits the new name", this->Overlay(0)->TitleRect().width() > before.width());
+  }
+
+  // --- Level/window target -------------------------------------------------
+
+  void LevelWindow_ActsOnTheImageUnderABinaryOverlay()
+  {
+    // A binary mask drawn above an image, as a segmentation overlay is, has no
+    // level/window of its own; the furniture must act on the image under it.
+    m_ImageNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 50.0)));
+    auto maskNode = mitk::DataNode::New();
+    maskNode->SetName("mask");
+    maskNode->SetData(mitk::ImageGenerator::GenerateGradientImage<unsigned char>(16, 16, 8, 1.0f, 1.0f, 1.0f));
+    maskNode->SetBoolProperty("binary", true);
+    maskNode->SetIntProperty("layer", 1);
+    m_DataStorage->Add(maskNode);
+    this->ShowEditor();
+
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the mask is drawn in the cell",
+                           maskNode->IsVisible(mitk::BaseRenderer::GetInstance(
+                             m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow()->GetVtkRenderWindow())));
+    CPPUNIT_ASSERT_MESSAGE("The level/window furniture acts on the image, not on the mask",
+                           m_ImageNode.GetPointer() == this->Overlay(0)->LevelWindowNode());
   }
 };
 

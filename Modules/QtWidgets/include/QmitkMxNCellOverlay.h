@@ -350,6 +350,11 @@ public:
    *         value refresh. Exposed for verification. */
   bool IsThreeD() const;
 
+  /** \brief The node the level/window readout, the colorbar and its colormap
+   *         picker act on, as of the last value refresh; null in a 3D cell or
+   *         while the cell shows no such image. Exposed for verification. */
+  mitk::DataNode* LevelWindowNode() const;
+
   /**
   * \brief Add the direction picker's entries to 'menu': the standard planes,
   *        'Free' for a 3D cell (disabled with the reason where the cell's
@@ -626,7 +631,8 @@ private:
   /** \brief Re-read node, level/window, and LUT; repaint on change. */
   void RefreshValues();
 
-  /** \brief Topmost image node visible in this cell's renderer, or null. */
+  /** \brief Topmost image visible in this cell's renderer that is not binary
+   *         and has a level/window, or null. */
   mitk::DataNode::Pointer ResolveTopImageNode() const;
 
   void RebuildLutStrip();

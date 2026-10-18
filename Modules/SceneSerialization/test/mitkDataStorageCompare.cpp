@@ -49,6 +49,7 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
   DescribeHierarchyOfNodes(m_TestDS, m_TestNodesByHierarchy);
 
   m_HierarchyPassed = true;
+  m_NodesMatched = true;
   m_DataPassed = true;
   m_PropertiesPassed = true;
   m_MappersPassed = true;
@@ -58,9 +59,14 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
   if (m_TestAspects & CMP_Hierarchy)
     m_HierarchyPassed = CompareHierarchy(verbose);
 
+  // A node without a partner could not be compared in any aspect.
   if (m_TestAspects != CMP_Nothing)
-    CompareDataNodes(verbose);
+    m_NodesMatched = CompareDataNodes(verbose);
 
+  if ((m_TestAspects & CMP_Hierarchy) && !m_HierarchyPassed)
+    ++m_AspectsFailed;
+  if (!m_NodesMatched)
+    ++m_AspectsFailed;
   if ((m_TestAspects & CMP_Data) && !m_DataPassed)
     ++m_AspectsFailed;
   if ((m_TestAspects & CMP_Properties) && !m_PropertiesPassed)
@@ -81,6 +87,8 @@ void mitk::DataStorageCompare::Report()
   MITK_INFO << "Comparison results:";
   MITK_INFO << "  Hierarchy comparison:   "
             << (m_TestAspects & CMP_Hierarchy ? (m_HierarchyPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Node matching:          "
+            << (m_TestAspects != CMP_Nothing ? (m_NodesMatched ? "pass" : "fail") : "skipped");
   MITK_INFO << "  Data comparison:        "
             << (m_TestAspects & CMP_Data ? (m_DataPassed ? "pass" : "fail") : "skipped");
   MITK_INFO << "  Properties comparison:  "
@@ -253,19 +261,32 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode *reference, co
     return false;
   }
 
+  bool equal = true;
+
   if (m_TestAspects & CMP_Data)
-    m_DataPassed &= IsDataEqual(reference->GetData(), test->GetData(), verbose);
+  {
+    const bool dataEqual = IsDataEqual(reference->GetData(), test->GetData(), verbose);
+    m_DataPassed &= dataEqual;
+    equal &= dataEqual;
+  }
 
   if (m_TestAspects & CMP_Properties)
-    m_PropertiesPassed &= ArePropertyListsEqual(*reference, *test, verbose);
+  {
+    const bool propertiesEqual = ArePropertyListsEqual(*reference, *test, verbose);
+    m_PropertiesPassed &= propertiesEqual;
+    equal &= propertiesEqual;
+  }
 
   if (m_TestAspects & CMP_Mappers)
-    m_MappersPassed &= AreMappersEqual(*reference, *test, verbose);
+  {
+    const bool mappersEqual = AreMappersEqual(*reference, *test, verbose);
+    m_MappersPassed &= mappersEqual;
+    equal &= mappersEqual;
+  }
 
   // .. add interactors/mappers
 
-  // two real nodes, need to really compare
-  return m_AspectsFailed == 0;
+  return equal;
 }
 
 bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData *reference, const mitk::BaseData *test, bool verbose)
@@ -497,7 +518,7 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode &reference,
 
 bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
 {
-  int numberOfMisMatches = 0;
+  int numberOfUnmatchedNodes = 0;
 
   for (const auto &entry : m_RefNodesByHierarchy)
   {
@@ -512,19 +533,15 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
       // go on an compare those two
       auto testEntry = m_TestNodesByHierarchy.find(key);
       mitk::DataNode::Pointer testNode = testEntry->second;
-      if (!AreNodesEqual(refNode, testNode, verbose))
+      if (!AreNodesEqual(refNode, testNode, verbose) && verbose)
       {
-        ++numberOfMisMatches;
-        if (verbose)
-        {
-          MITK_WARN << "### DataNode mismatch problem";
-          MITK_WARN << "  Node '" << key << "' did not compare to equal (see warnings above).";
-        }
+        MITK_WARN << "### DataNode mismatch problem";
+        MITK_WARN << "  Node '" << key << "' did not compare to equal (see warnings above).";
       }
     }
     else
     {
-      ++numberOfMisMatches;
+      ++numberOfUnmatchedNodes;
       if (verbose)
       {
         MITK_WARN << "### DataNode mismatch problem";
@@ -534,5 +551,5 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
     }
   }
 
-  return numberOfMisMatches == 0;
+  return numberOfUnmatchedNodes == 0;
 }

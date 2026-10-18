@@ -34,10 +34,14 @@ std::string mitk::SurfaceSerializer::Serialize()
     return "";
   }
 
+  // VTK XML PolyData holds a single time step without its time, and several
+  // time steps would be split into files the scene cannot reference. VTKHDF
+  // holds all time steps with their times. Surfaces without time, like 3D
+  // images, stay VTK XML PolyData, which older versions of MITK can read.
   std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".vtp";
+  filename += surface->GetTimeGeometry()->IsValidAtEveryTimePoint() ? ".vtp" : ".vtkhdf";
 
   std::string fullname(m_WorkingDirectory);
   fullname += IOUtil::GetDirectorySeparator();

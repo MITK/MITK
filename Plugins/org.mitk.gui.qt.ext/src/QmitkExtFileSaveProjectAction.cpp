@@ -151,6 +151,19 @@ void QmitkExtFileSaveProjectAction::Run()
       }
 
       MITK_WARN << ss.str();
+
+      // A scene that is otherwise written is reported as saved, so without
+      // this, the data would be found missing only when loading the scene.
+      if (saved)
+      {
+        QString message = "The project was saved without the following data, which could not be written. "
+                          "The log tells why.\n";
+
+        for (const auto& node : *failedNodes)
+          message += "\n- " + QString::fromStdString(node->GetName());
+
+        QMessageBox::warning(nullptr, "Scene saving", message);
+      }
     }
 
     mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();

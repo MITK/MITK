@@ -81,9 +81,13 @@ namespace mitk::SceneReaderHelpers
     float value = 0.0f;
     if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
     {
+      // A float holds the first time point of a geometry that is valid at
+      // every time point as -inf. Anything but the exact value it stands for
+      // would give the geometry a time.
       if (value == -std::numeric_limits<float>::infinity())
-        value = std::numeric_limits<float>::lowest();
-      geometry->SetFirstTimePoint(value);
+        geometry->SetFirstTimePoint(-std::numeric_limits<TimePointType>::max());
+      else
+        geometry->SetFirstTimePoint(value);
     }
     if (properties->GetFloatProperty("ProportionalTimeGeometry.StepDuration", value))
       geometry->SetStepDuration(value);

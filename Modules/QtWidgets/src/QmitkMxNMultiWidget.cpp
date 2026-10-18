@@ -1064,7 +1064,81 @@ bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
   }
   const auto& senderGroup = senderLinks->second.groups[DimensionIndex(dimension)];
   const auto& targetGroup = targetLinks->second.groups[DimensionIndex(dimension)];
-  return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
+  if (!senderGroup.has_value() || !targetGroup.has_value() || *senderGroup != *targetGroup)
+  {
+    return false;
+  }
+
+  // Core's crosshair relay puts every target on the crosshair's slice. Within
+  // a slice group that would undo the offsets, so it reaches one member, and
+  // the others follow that member through the group.
+  if (QmitkMxNSyncDimension::Crosshair == dimension)
+  {
+    const auto& sliceGroup = targetLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Slice)];
+    if (sliceGroup.has_value() && IsAxisApplicableTo(target, QmitkMxNSyncAxis::Slice))
+    {
+      return this->CrosshairRepresentative(*sliceGroup, sender) == targetId;
+    }
+  }
+  return true;
+}
+
+QString QmitkMxNMultiWidget::CrosshairRepresentative(const std::string& sliceGroup,
+                                                    const mitk::BaseRenderer* sender) const
+{
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto linksOf = [this](const QString& windowId) -> const CellSyncLinks*
+  {
+    const auto it = m_CellSyncLinks.find(windowId);
+    return it != m_CellSyncLinks.end() ? &it->second : nullptr;
+  };
+
+  const auto* senderLinks = linksOf(senderId);
+  if (nullptr == senderLinks)
+  {
+    return {};
+  }
+  // The sender always receives its own gesture, so a member sender is the one.
+  if (senderLinks->groups[DimensionIndex(QmitkMxNSyncDimension::Slice)] == sliceGroup
+      && IsAxisApplicableTo(sender, QmitkMxNSyncAxis::Slice))
+  {
+    return senderId;
+  }
+
+  const auto& crosshairGroup = senderLinks->groups[DimensionIndex(QmitkMxNSyncDimension::Crosshair)];
+  QString firstMember;
+  std::vector<WindowDescriptor> descriptors;
+  try
+  {
+    descriptors = this->ListWindowDescriptors();
+  }
+  catch (const mitk::Exception&)
+  {
+    return {};  // mid-layout-change; the relay then reaches no member
+  }
+  for (const auto& descriptor : descriptors)
+  {
+    const auto* links = linksOf(descriptor.id);
+    const auto widget = this->GetRenderWindowWidget(descriptor.id);
+    if (nullptr == links || nullptr == widget
+        || links->groups[DimensionIndex(QmitkMxNSyncDimension::Slice)] != sliceGroup
+        || links->groups[DimensionIndex(QmitkMxNSyncDimension::Crosshair)] != crosshairGroup
+        || !IsAxisApplicableTo(RendererOf(widget.get()), QmitkMxNSyncAxis::Slice))
+    {
+      continue;
+    }
+    // A member without offset shows the group's reference slice, which is
+    // where the crosshair is.
+    if (0 == links->sliceOffset)
+    {
+      return descriptor.id;
+    }
+    if (firstMember.isEmpty())
+    {
+      firstMember = descriptor.id;
+    }
+  }
+  return firstMember;
 }
 
 mitk::DisplayActionEventFunctions::LevelWindowScope QmitkMxNMultiWidget::WindowingScopeOf(

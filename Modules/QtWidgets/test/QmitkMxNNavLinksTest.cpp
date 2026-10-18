@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
+
+#include <itkCommand.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -40,6 +42,7 @@ found in the LICENSE file.
 #include <QColor>
 
 #include <array>
+#include <vector>
 
 /**
  * Behavior tests for the MxN per-dimension navigation links: predicate
@@ -59,7 +62,7 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation);
   MITK_TEST(Crosshair_MovedPeer_ConvergesItsSliceGroup);
   MITK_TEST(Crosshair_MovedSender_AnchorsItsSliceGroup);
-  MITK_TEST(Crosshair_SeveralMovedMembers_AnchorOnTheFirstInPreOrder);
+  MITK_TEST(Crosshair_ReachesOnlyTheReferenceMemberOfASliceGroup);
   MITK_TEST(Crosshair_ClickInTheShownPlane_ConvergesNothing);
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
@@ -387,24 +390,58 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The group follows the sender, keeping its offset", 3u, ShownSlice(1));
   }
 
-  void Crosshair_SeveralMovedMembers_AnchorOnTheFirstInPreOrder()
+  /** Records every position a stepper takes while it is watched. */
+  struct StepperMoves
   {
-    // Both members of the slice group are crosshair targets and land on the
-    // same slice; the group converges once, to the first of them.
+    explicit StepperMoves(mitk::Stepper* watched)
+      : stepper(watched)
+    {
+      auto command = itk::SimpleMemberCommand<StepperMoves>::New();
+      command->SetCallbackFunction(this, &StepperMoves::Record);
+      tag = stepper->AddObserver(itk::ModifiedEvent(), command);
+    }
+    ~StepperMoves()
+    {
+      stepper->RemoveObserver(tag);
+    }
+    StepperMoves(const StepperMoves&) = delete;
+    StepperMoves& operator=(const StepperMoves&) = delete;
+
+    void Record()
+    {
+      positions.push_back(stepper->GetPos());
+    }
+
+    mitk::Stepper* stepper;
+    unsigned long tag = 0;
+    std::vector<unsigned int> positions;
+  };
+
+  void Crosshair_ReachesOnlyTheReferenceMemberOfASliceGroup()
+  {
+    // "Slice context" with every window on the crosshair: the working slice
+    // (offset 0) takes the crosshair's slice, and its neighbour follows. Were
+    // the crosshair to reach both, both would land on the crosshair's slice
+    // first and one of them would have to move again.
     m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
     m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
-    SetShownSlice(0, 4);
-    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
-    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "ctx");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "ctx", -1);
     for (std::size_t i = 0; i < 3; ++i)
     {
       m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "main");
     }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the neighbour shows the previous slice", 3u, ShownSlice(0));
 
-    FireCrosshair(2, PointOnAxialSlice(2.0));
+    const StepperMoves previous(SliceStepper(0));
+    const StepperMoves working(SliceStepper(1));
+    FireCrosshair(2, PointOnAxialSlice(6.0));
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first moved member keeps the crosshair's slice", 2u, ShownSlice(0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The later member converges to it with its offset", 3u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The working slice is where the crosshair is", 6u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour shows the slice before it", 5u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The working slice moves once", std::size_t(1), working.positions.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour moves once", std::size_t(1), previous.positions.size());
   }
 
   void Crosshair_ClickInTheShownPlane_ConvergesNothing()

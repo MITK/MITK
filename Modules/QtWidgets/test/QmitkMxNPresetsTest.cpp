@@ -200,7 +200,8 @@ public:
     for (int i = 0; i < 9; ++i)
     {
       lightbox.push_back({ QString(), ViewDirection::Axial, false, "main",
-                           { { Dimension::Slice, "main", i - 4 }, { Dimension::Zoom, "main" },
+                           { { Dimension::Crosshair, "main" }, { Dimension::Slice, "main", i - 4 },
+                             { Dimension::Zoom, "main" },
                              { Dimension::Pan, "main" }, { Dimension::Windowing, "main" },
                              { Dimension::Lut, "main" } } });
     }
@@ -228,13 +229,13 @@ public:
       { "Lightbox 3x3", lightbox, mainOnly },
       { "Slice context",
         { { "Previous slice", ViewDirection::Axial, false, "main",
-            { { Dimension::Slice, "ctx", -1 }, { Dimension::Zoom, "ctx" }, { Dimension::Pan, "ctx" },
+            { { Dimension::Crosshair, "main" }, { Dimension::Slice, "ctx", -1 }, { Dimension::Zoom, "ctx" }, { Dimension::Pan, "ctx" },
               { Dimension::Windowing, "main" }, { Dimension::Lut, "main" } } },
           { "Working slice", ViewDirection::Axial, false, "main",
             { { Dimension::Crosshair, "main" }, { Dimension::Slice, "ctx" }, { Dimension::Zoom, "ctx" },
               { Dimension::Pan, "ctx" }, { Dimension::Windowing, "main" }, { Dimension::Lut, "main" } } },
           { "Next slice", ViewDirection::Axial, false, "main",
-            { { Dimension::Slice, "ctx", 1 }, { Dimension::Zoom, "ctx" }, { Dimension::Pan, "ctx" },
+            { { Dimension::Crosshair, "main" }, { Dimension::Slice, "ctx", 1 }, { Dimension::Zoom, "ctx" }, { Dimension::Pan, "ctx" },
               { Dimension::Windowing, "main" }, { Dimension::Lut, "main" } } },
           mpr("Context 1", ViewDirection::Sagittal), mpr("Context 2", ViewDirection::Coronal) },
         { { "main", "main" }, { "ctx", "Slice context" } } },

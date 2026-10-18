@@ -24,6 +24,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "ctx",
                 "offset": -1
@@ -58,6 +59,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "ctx",
                 "offset": 1

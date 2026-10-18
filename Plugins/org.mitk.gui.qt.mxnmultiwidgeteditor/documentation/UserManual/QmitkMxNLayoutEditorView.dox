@@ -90,19 +90,19 @@
 
 	\imageMacroEx{QmitkMxN_Preset_TwoLooks.png, "The Same data\, two looks preset", 16, 720px}
 
-	<b>Lightbox 3x3.</b> Nine axial windows that share zoom, pan, level/window and colormap
-	and show nine consecutive slices: their slice offsets run from -4 to +4 in reading
-	order, so scrolling any of them moves the whole sheet. "Ramp" in the <b>Advanced</b>
-	matrix sets larger steps. The film sheet, for figures, quality control and teaching. The
-	windows share no crosshair, which would put all of them on one slice.
+	<b>Lightbox 3x3.</b> Nine axial windows that share the crosshair, zoom, pan,
+	level/window and colormap and show nine consecutive slices: their slice offsets run
+	from -4 to +4 in reading order, so scrolling any of them, or setting the crosshair in
+	one, moves the whole sheet. "Ramp" in the <b>Advanced</b> matrix sets larger steps. The
+	film sheet, for figures, quality control and teaching.
 
 	\imageMacroEx{QmitkMxN_Preset_Lightbox.png, "The Lightbox 3x3 preset", 16, 720px}
 
 	<b>Slice context.</b> The working slice with the previous and the next slice beside
-	it, all axial and sharing zoom and pan, above a sagittal and a coronal context window
-	on the working slice's crosshair. For manual segmentation and delineation: whether a
-	structure continues, splits or ends shows in the neighboring slices. A click in a
-	context window moves the working slice, and the previous and next slices follow.
+	it, all axial and sharing zoom and pan, above a sagittal and a coronal context window,
+	all five on one crosshair. For manual segmentation and delineation: whether a structure
+	continues, splits or ends shows in the neighboring slices. A click in a context window
+	puts the working slice where the crosshair is, and the previous and next slices follow.
 
 	\imageMacroEx{QmitkMxN_Preset_SliceContext.png, "The Slice context preset", 16, 720px}
 

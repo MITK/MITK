@@ -1849,6 +1849,14 @@ private:
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
 
   /**
+  * \brief The one member of 'sliceGroup' that a crosshair gesture of 'sender'
+  *        reaches: the sender if it is a member, else the first member in
+  *        pre-order on the sender's crosshair group without a slice offset,
+  *        else the first such member with one. Empty when there is none.
+  */
+  QString CrosshairRepresentative(const std::string& sliceGroup, const mitk::BaseRenderer* sender) const;
+
+  /**
   * \brief The slice positions of the cells a crosshair gesture of 'sender'
   *        can move: its 2D crosshair targets, the sender included, by
   *        window id.

@@ -20,6 +20,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": -4
@@ -36,6 +37,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": -3
@@ -52,6 +54,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": -2
@@ -74,6 +77,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": -1
@@ -90,6 +94,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": "main",
               "zoom": "main",
               "pan": "main",
@@ -103,6 +108,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": 1
@@ -125,6 +131,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": 2
@@ -141,6 +148,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": 3
@@ -157,6 +165,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "crosshair": "main",
               "slice": {
                 "target": "main",
                 "offset": 4

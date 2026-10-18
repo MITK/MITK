@@ -613,7 +613,11 @@ namespace
    *     Core's action may have clamped (ConstrainZoomingAndPanning);
    *   - the slice groups of the cells a crosshair gesture moved converge,
    *     because Core's crosshair relay moves slices without the scroll event
-   *     that slice links relay.
+   *     that slice links relay;
+   *   - after a zoom gesture, the 2D members of the sender's zoom group are
+   *     set to the sender's zoom and their offsets. Core zooms every member
+   *     by the gesture's factor, which a member at its zoom-out limit does
+   *     not follow; the group's ratios would be lost from then on.
    * Both compare a state recorded by an observer connected before Core's
    * action with the state an observer connected after it sees. Observers of
    * the broadcast run in the order they were connected.
@@ -626,13 +630,15 @@ namespace
     using SliceSnapshot = std::map<QString, unsigned int>;
     using SnapshotSlices = std::function<SliceSnapshot(const mitk::BaseRenderer* sender)>;
     using ConvergeMovedSlices = std::function<void(const mitk::BaseRenderer* sender, const SliceSnapshot& before)>;
+    using ConvergeZoom = std::function<void(const mitk::BaseRenderer* sender)>;
 
     MxNSynchronizedEventHandler(const Predicates& predicates, Relay relay, SnapshotSlices snapshotSlices,
-                                ConvergeMovedSlices convergeMovedSlices)
+                                ConvergeMovedSlices convergeMovedSlices, ConvergeZoom convergeZoom)
       : DisplayActionEventHandlerSynchronized(predicates)
       , m_Relay(std::move(relay))
       , m_SnapshotSlices(std::move(snapshotSlices))
       , m_ConvergeMovedSlices(std::move(convergeMovedSlices))
+      , m_ConvergeZoom(std::move(convergeZoom))
     {
     }
 
@@ -703,6 +709,7 @@ namespace
       }
       else
       {
+        m_ConvergeZoom(sender);
         const double scaleAfter = sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
         if (scaleAfter <= 0.0)
         {
@@ -716,6 +723,7 @@ namespace
     Relay m_Relay;
     SnapshotSlices m_SnapshotSlices;
     ConvergeMovedSlices m_ConvergeMovedSlices;
+    ConvergeZoom m_ConvergeZoom;
     const mitk::BaseRenderer* m_Sender = nullptr;
     mitk::Point2D m_PositionBefore;
     double m_ScaleBefore = 1.0;
@@ -1013,6 +1021,10 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
     [this](const mitk::BaseRenderer* sender, const std::map<QString, unsigned int>& before)
     {
       this->ConvergeSlicesMovedByCrosshair(sender, before);
+    },
+    [this](const mitk::BaseRenderer* sender)
+    {
+      this->ConvergeZoomGroupToSender(sender);
     });
   this->SetDisplayActionEventHandler(std::move(handler));
 
@@ -5035,6 +5047,42 @@ void QmitkMxNMultiWidget::RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sen
     {
       mitk::RenderingManager::GetInstance()->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
     }
+  }
+}
+
+void QmitkMxNMultiWidget::ConvergeZoomGroupToSender(const mitk::BaseRenderer* sender)
+{
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto link = this->GetSyncLink(senderId, QmitkMxNSyncDimension::Zoom);
+  if (!link.has_value())
+  {
+    return;
+  }
+  const double referenceHalfHeight =
+    sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale() * std::get<double>(link->offset);
+
+  for (const auto& [memberId, member] : this->GetRenderWindowWidgets())
+  {
+    auto* memberRenderer = RendererOf(member.get());
+    const auto memberLink = this->GetSyncLink(memberId, QmitkMxNSyncDimension::Zoom);
+    // 3D members follow the gesture through the 2D-to-3D relay.
+    if (memberId == senderId || !memberLink.has_value() || memberLink->group != link->group
+        || nullptr == memberRenderer || IsThreeD(memberRenderer)
+        || nullptr == memberRenderer->GetCurrentWorldGeometry())
+    {
+      continue;
+    }
+    auto* camera = memberRenderer->GetVtkRenderer()->GetActiveCamera();
+    const double targetHalfHeight = referenceHalfHeight / std::get<double>(memberLink->offset);
+    if (std::abs(camera->GetParallelScale() - targetHalfHeight) <= 1e-9 * targetHalfHeight)
+    {
+      continue;
+    }
+    camera->SetParallelScale(targetHalfHeight);
+    // Within the member's zoom-out limit, as Core's own zoom keeps it; the
+    // ratio returns once the sender zooms back in.
+    memberRenderer->GetCameraController()->AdjustCameraToPlane();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
   }
 }
 

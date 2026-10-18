@@ -1849,6 +1849,13 @@ private:
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
 
   /**
+  * \brief Set the 2D members of the zoom group of 'sender' to the zoom of
+  *        'sender' and their offsets, within each member's zoom-out limit.
+  *        Members that already agree are left untouched.
+  */
+  void ConvergeZoomGroupToSender(const mitk::BaseRenderer* sender);
+
+  /**
   * \brief The one member of 'sliceGroup' that a crosshair gesture of 'sender'
   *        reaches: the sender if it is a member, else the first member in
   *        pre-order on the sender's crosshair group without a slice offset,

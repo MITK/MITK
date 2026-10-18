@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 
 #include <QColor>
+#include <QCoreApplication>
 
 #include <array>
 #include <vector>
@@ -67,6 +68,7 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
   MITK_TEST(Converge_Zoom_FactorOffset);
+  MITK_TEST(Zoom_MemberAtTheLimitKeepsTheRatio);
   MITK_TEST(Converge_Pan_WorldOffset);
   MITK_TEST(Converge_JoinFromEarlierCell_ConvergesJoiner);
   MITK_TEST(Converge_Slice_OffsetOnSeed_ShiftsSeed);
@@ -514,6 +516,39 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(seedScale / 2.0, Camera(0)->GetParallelScale(), 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Identical factors preserve the zoom ratio",
       seedScale / 4.0, Camera(1)->GetParallelScale(), 1e-6);
+  }
+
+  void Zoom_MemberAtTheLimitKeepsTheRatio()
+  {
+    // "Overview + detail": zooming the overview out stops at its limit, while
+    // the detail could still go on. The detail must stay four times as far
+    // zoomed in, and zooming back in must find the ratio intact.
+    m_Editor->resize(900, 300);
+    m_Editor->show();
+    QCoreApplication::processEvents();
+    RealiseViews();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "zoom");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "zoom", 4.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: the detail starts at four times the zoom", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
+
+    for (int i = 0; i < 12; ++i)
+    {
+      FireZoom(0, 0.5f);
+    }
+    const double atTheLimit = Camera(0)->GetParallelScale();
+    FireZoom(0, 0.5f);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: the overview is at its zoom-out limit", atTheLimit,
+                                         Camera(0)->GetParallelScale(), 1e-9 * atTheLimit);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("At the limit the detail keeps its ratio", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
+
+    for (int i = 0; i < 3; ++i)
+    {
+      FireZoom(0, 2.0f);
+    }
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Back from the limit the ratio is intact", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
   }
 
   void Converge_Pan_WorldOffset()

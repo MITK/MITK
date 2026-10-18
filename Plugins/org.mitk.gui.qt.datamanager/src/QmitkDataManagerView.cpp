@@ -77,7 +77,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_NodeTreeModel = new QmitkDataStorageTreeModel(GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
   m_NodeTreeModel->setParent(parent);
-  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
+  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", true));
 
   // Prepare filters
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
@@ -231,7 +231,7 @@ void QmitkDataManagerView::OnPreferencesChanged(const mitk::IPreferences* prefs)
   }
   m_NodeTreeView->expandAll();
 
-  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
+  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", true));
 
   GlobalReinitAction::Run(GetSite(), GetDataStorage());
 }

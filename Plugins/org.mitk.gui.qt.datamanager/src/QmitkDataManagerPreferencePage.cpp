@@ -94,5 +94,5 @@ void QmitkDataManagerPreferencePage::Update()
   m_PlaceNewNodesOnTop->setChecked(prefs->GetBool("Place new nodes on top", true));
   m_ShowHelperObjects->setChecked(prefs->GetBool("Show helper objects", false));
   m_ShowNodesContainingNoData->setChecked(prefs->GetBool("Show nodes containing no data", false));
-  m_AllowParentChange->setChecked(prefs->GetBool("Allow changing of parent node", false));
+  m_AllowParentChange->setChecked(prefs->GetBool("Allow changing of parent node", true));
 }

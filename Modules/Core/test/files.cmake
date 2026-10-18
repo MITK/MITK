@@ -74,6 +74,7 @@ set(MODULE_TESTS
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
+  mitkSurfaceVtkHdfIOTest.cpp
   mitkSurfaceVtkIOTest.cpp
   mitkTimeGeometryTest.cpp
   mitkProportionalTimeGeometryTest.cpp

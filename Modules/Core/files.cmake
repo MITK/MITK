@@ -352,6 +352,7 @@ set(CPP_FILES
   IO/mitkStringUtil.cpp
   IO/mitkSurfaceIOHelper.cpp
   IO/mitkSurfaceStlIO.cpp
+  IO/mitkSurfaceVtkHdfIO.cpp
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp

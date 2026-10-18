@@ -26,6 +26,9 @@ namespace mitk
   SurfaceVtkXmlIO::SurfaceVtkXmlIO()
     : SurfaceVtkIO(IOMimeTypes::VTK_POLYDATA_MIMETYPE(), "VTK XML PolyData")
   {
+    // The default among the formats that fully support surfaces without time,
+    // since older versions of MITK cannot read VTKHDF.
+    this->SetWriterRanking(1);
     this->RegisterService();
   }
 

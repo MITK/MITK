@@ -227,6 +227,24 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="currentTimeStepCheckBox">
+        <property name="text">
+         <string>Remesh current time step only</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="keepTimeLayout">
+        <item>
+         <widget class="QCheckBox" name="keepTimeCheckBox">
+          <property name="text">
+           <string>Keep time of the time step</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
@@ -295,6 +313,8 @@
   <tabstop>replaceCheckBox</tabstop>
   <tabstop>hideCheckBox</tabstop>
   <tabstop>wireframeCheckBox</tabstop>
+  <tabstop>currentTimeStepCheckBox</tabstop>
+  <tabstop>keepTimeCheckBox</tabstop>
   <tabstop>remeshPushButton</tabstop>
  </tabstops>
  <resources>

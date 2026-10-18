@@ -26,11 +26,14 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProgressTask.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkRemeshing.h>
 #include <mitkRenderingManager.h>
 #include <mitkScopedProgressTask.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkVtkRepresentationProperty.h>
 
+#include <itkCommand.h>
 #include <itkMacro.h>
 
 #include <vtkPolyData.h>
@@ -40,6 +43,7 @@ found in the LICENSE file.
 #include <QColor>
 #include <QLocale>
 #include <QMessageBox>
+#include <QStyle>
 #include <QtConcurrentRun>
 
 #include <mutex>
@@ -63,12 +67,58 @@ namespace
     return QColor(244, 67, 54);
   }
 
-  /** \brief The data of the surface node that remeshing works on, or nullptr if there is none. */
-  vtkPolyData* GetPolyData(const mitk::DataNode* node)
+  /** \brief The surface that remeshing works on, or nullptr if there is none. */
+  const mitk::Surface* GetSurface(const mitk::DataNode* node)
   {
     return nullptr != node
-      ? static_cast<const mitk::Surface*>(node->GetData())->GetVtkPolyData(0)
+      ? static_cast<const mitk::Surface*>(node->GetData())
       : nullptr;
+  }
+
+  /** \brief The time step of the surface at the time point selected in MITK, if it has one there. */
+  std::optional<mitk::TimeStepType> GetCurrentTimeStep(const mitk::Surface* surface)
+  {
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto* timeGeometry = surface->GetTimeGeometry();
+
+    if (!timeGeometry->IsValidTimePoint(timePoint))
+      return std::nullopt;
+
+    return timeGeometry->TimePointToTimeStep(timePoint);
+  }
+
+  /**
+   * \brief A surface of a single time step of the given one.
+   *
+   * Like other surfaces without time steps, it is shown at every time point,
+   * unless it keeps the time of the time step.
+   */
+  mitk::Surface::Pointer ExtractTimeStep(const mitk::Surface* surface, mitk::TimeStepType timeStep, bool copy, bool keepTime)
+  {
+    vtkSmartPointer<vtkPolyData> polyData = surface->GetVtkPolyData(static_cast<unsigned int>(timeStep));
+
+    if (copy && nullptr != polyData)
+    {
+      auto polyDataCopy = vtkSmartPointer<vtkPolyData>::New();
+      polyDataCopy->DeepCopy(polyData);
+      polyData = polyDataCopy;
+    }
+
+    auto timeGeometry = mitk::ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(surface->GetGeometry(static_cast<int>(timeStep)), 1);
+
+    if (keepTime)
+    {
+      const auto timeBounds = surface->GetTimeGeometry()->GetTimeBounds(timeStep);
+      timeGeometry->SetFirstTimePoint(timeBounds[0]);
+      timeGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+    }
+
+    auto timeStepSurface = mitk::Surface::New();
+    timeStepSurface->SetTimeGeometry(timeGeometry);
+    timeStepSurface->SetVtkPolyData(polyData);
+
+    return timeStepSurface;
   }
 
   void SetPulsing(mitk::DataNode* node, bool pulsing)
@@ -151,6 +201,9 @@ QmitkRemeshingView::QmitkRemeshingView()
 
 QmitkRemeshingView::~QmitkRemeshingView()
 {
+  if (m_TimeObserverTag.has_value())
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->RemoveObserver(*m_TimeObserverTag);
+
   // Without the view, a result would have nowhere to go.
   this->CancelRemeshing();
 
@@ -168,6 +221,14 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->infoCard->setVisible(false);
   this->SetUpHoverInfo(parent);
+
+  // The sub-option lines up with the text of the option it belongs to.
+  auto* currentTimeStepCheckBox = m_Controls->currentTimeStepCheckBox;
+  const auto* style = currentTimeStepCheckBox->style();
+  m_Controls->keepTimeLayout->setContentsMargins(
+    style->pixelMetric(QStyle::PM_IndicatorWidth, nullptr, currentTimeStepCheckBox) +
+      style->pixelMetric(QStyle::PM_CheckBoxLabelSpacing, nullptr, currentTimeStepCheckBox),
+    0, 0, 0);
 
   m_Controls->selectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->selectionWidget->SetSelectionIsOptional(true);
@@ -188,10 +249,58 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 
   // A replaced original has nothing left to hide.
   connect(m_Controls->replaceCheckBox, &QCheckBox::toggled, this, [this]() {
-    this->EnableWidgets(nullptr != GetPolyData(m_Controls->selectionWidget->GetSelectedNode()));
+    this->EnableWidgets(nullptr != GetSurface(m_Controls->selectionWidget->GetSelectedNode()));
   });
 
+  connect(m_Controls->currentTimeStepCheckBox, &QCheckBox::toggled, this, [this]() {
+    this->EnableWidgets(nullptr != GetSurface(m_Controls->selectionWidget->GetSelectedNode()));
+    this->UpdateMemoryEstimate();
+  });
+
+  auto timeCommand = itk::SimpleMemberCommand<QmitkRemeshingView>::New();
+  timeCommand->SetCallbackFunction(this, &QmitkRemeshingView::OnTimeChanged);
+  m_TimeObserverTag = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->AddObserver(
+    mitk::TimeNavigationController::TimeEvent(0), timeCommand);
+
   this->OnSurfaceChanged(m_Controls->selectionWidget->GetSelectedNodes());
+}
+
+void QmitkRemeshingView::OnTimeChanged()
+{
+  const auto* surface = GetSurface(m_Controls->selectionWidget->GetSelectedNode());
+
+  // Only the current time step on its own depends on the time point.
+  if (nullptr == surface || !this->IsCurrentTimeStepOnly(surface))
+    return;
+
+  this->EnableWidgets(true);
+  this->UpdateMemoryEstimate();
+}
+
+bool QmitkRemeshingView::IsCurrentTimeStepOnly(const mitk::Surface* surface) const
+{
+  return m_Controls->currentTimeStepCheckBox->isChecked() && surface->GetTimeSteps() > 1;
+}
+
+mitk::Surface::ConstPointer QmitkRemeshingView::GetRemeshingInput(const mitk::Surface* surface, bool copy) const
+{
+  if (!this->IsCurrentTimeStepOnly(surface))
+  {
+    return copy
+      ? surface->Clone().GetPointer()
+      : surface;
+  }
+
+  const auto timeStep = GetCurrentTimeStep(surface);
+
+  if (!timeStep.has_value())
+    return nullptr;
+
+  // A time step that replaces its original has the time of the original, and
+  // so has the result if it ends up in a new node because the original changed.
+  const bool keepTime = m_Controls->replaceCheckBox->isChecked() || m_Controls->keepTimeCheckBox->isChecked();
+
+  return ExtractTimeStep(surface, *timeStep, copy, keepTime).GetPointer();
 }
 
 void QmitkRemeshingView::SetUpHoverInfo(QWidget* parent)
@@ -199,8 +308,8 @@ void QmitkRemeshingView::SetUpHoverInfo(QWidget* parent)
   const QString quality = "<b>Quality:</b> High suits nearly every surface. Higher settings make triangles a little "
                           "more uniform, but take much longer and need far more memory.";
 
-  const QString density = "<b>Density:</b> Vertex count of the result relative to the input. 50% halves it, and "
-                          "overly dense surfaces often do well with 1-10%.";
+  const QString density = "<b>Density:</b> Vertex count of the result relative to the input, in each time step. 50% "
+                          "halves it, and overly dense surfaces often do well with 1-10%.";
 
   const QString remeshing = "<b>Remeshing:</b> Adaptive places more vertices where the surface bends and fewer where "
                             "it is flat, which keeps fine details even at low density. Regular spreads them evenly.";
@@ -213,6 +322,13 @@ void QmitkRemeshingView::SetUpHoverInfo(QWidget* parent)
 
   const QString wireframe = "<b>Show remeshed surface as wireframe:</b> Shows the edges of the triangles instead of "
                             "a closed surface.";
+
+  const QString currentTimeStep = "<b>Remesh current time step only:</b> Of a surface with several time steps, only "
+                                  "the one at the current time point is remeshed. The result is a surface without time "
+                                  "steps, or replaces just that time step of the original.";
+
+  const QString keepTime = "<b>Keep time of the time step:</b> The remeshed time step is shown only at its time, as in "
+                           "the original, instead of at every time point.";
 
   m_HoverInfo = {
     { parent, QString() },
@@ -231,7 +347,9 @@ void QmitkRemeshingView::SetUpHoverInfo(QWidget* parent)
     { m_Controls->optionsGroupBox, QString() },
     { m_Controls->replaceCheckBox, replace },
     { m_Controls->hideCheckBox, hide },
-    { m_Controls->wireframeCheckBox, wireframe }
+    { m_Controls->wireframeCheckBox, wireframe },
+    { m_Controls->currentTimeStepCheckBox, currentTimeStep },
+    { m_Controls->keepTimeCheckBox, keepTime }
   };
 
   for (const auto& [widget, info] : m_HoverInfo)
@@ -261,21 +379,7 @@ bool QmitkRemeshingView::eventFilter(QObject* watched, QEvent* event)
 
 void QmitkRemeshingView::OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
 {
-  auto* polyData = !nodes.empty()
-    ? GetPolyData(nodes.front())
-    : nullptr;
-
-  if (nullptr != polyData)
-  {
-    m_MaxNumberOfVertices = static_cast<int>(polyData->GetNumberOfPoints());
-    this->EnableWidgets(true);
-  }
-  else
-  {
-    m_MaxNumberOfVertices = 0;
-    this->EnableWidgets(false);
-  }
-
+  this->EnableWidgets(!nodes.empty() && nullptr != GetSurface(nodes.front()));
   this->UpdateMemoryEstimate();
 }
 
@@ -288,11 +392,6 @@ void QmitkRemeshingView::OnDensityChanged(int density)
     m_Controls->densitySpinBox->setValue(density);
 
   this->UpdateMemoryEstimate();
-}
-
-int QmitkRemeshingView::GetNumberOfVertices(int density) const
-{
-  return std::max(100, static_cast<int>(m_MaxNumberOfVertices * (density * 0.01)));
 }
 
 int QmitkRemeshingView::GetSubsampling() const
@@ -317,18 +416,29 @@ void QmitkRemeshingView::UpdateMemoryEstimate()
   memoryBar->SetColors({});
   memoryBar->SetCaption(QString());
 
-  auto selectedNode = m_Controls->selectionWidget->GetSelectedNode();
+  const auto* surface = GetSurface(m_Controls->selectionWidget->GetSelectedNode());
 
-  if (selectedNode.IsNull())
+  if (nullptr == surface)
     return;
 
-  const auto* surface = static_cast<const mitk::Surface*>(selectedNode->GetData());
-  const int subsampling = this->GetSubsampling();
+  const auto input = this->GetRemeshingInput(surface, false);
+
+  if (input.IsNull())
+  {
+    memoryBar->SetCaption(QStringLiteral("No time step at the current time point"));
+    return;
+  }
+
+  auto estimator = mitk::RemeshFilter::New();
+  estimator->SetInput(input);
+  estimator->SetSubsampling(this->GetSubsampling());
+  estimator->SetDensity(m_Controls->densitySpinBox->value() * 0.01);
+
   size_t needed = 0;
 
   try
   {
-    needed = mitk::EstimateRemeshingMemory(surface, 0, this->GetNumberOfVertices(m_Controls->densitySpinBox->value()), subsampling);
+    needed = estimator->EstimateMemory();
   }
   catch (const mitk::Exception&)
   {
@@ -359,8 +469,8 @@ void QmitkRemeshingView::UpdateMemoryEstimate()
 
     for (int density = densitySlider->minimum(); density <= densitySlider->maximum(); ++density)
     {
-      const auto neededAtDensity = mitk::EstimateRemeshingMemory(surface, 0, this->GetNumberOfVertices(density), subsampling);
-      colors.push_back(GetMemoryColor(static_cast<double>(neededAtDensity) / available));
+      estimator->SetDensity(density * 0.01);
+      colors.push_back(GetMemoryColor(static_cast<double>(estimator->EstimateMemory()) / available));
     }
 
     memoryBar->SetColors(colors);
@@ -370,12 +480,17 @@ void QmitkRemeshingView::UpdateMemoryEstimate()
 void QmitkRemeshingView::OnRemeshButtonClicked()
 {
   auto selectedNode = m_Controls->selectionWidget->GetSelectedNode();
-  auto* selectedPolyData = GetPolyData(selectedNode);
+  const auto* selectedSurface = GetSurface(selectedNode);
 
-  if (this->IsRemeshing() || nullptr == selectedPolyData)
+  if (this->IsRemeshing() || nullptr == selectedSurface)
     return;
 
-  int numVertices = this->GetNumberOfVertices(m_Controls->densitySpinBox->value());
+  // A copy, as the original stays on display and open to changes while the
+  // worker reads it. The memory estimate includes it.
+  const auto input = this->GetRemeshingInput(selectedSurface, true);
+
+  if (input.IsNull())
+    return;
 
   // A stronger gradation follows sharp bends more closely but turns a growing
   // share of the triangles into slivers.
@@ -385,19 +500,9 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
 
   int subsampling = this->GetSubsampling();
 
-  // A copy, as the original stays on display and open to changes while the
-  // worker reads it. Only of the time step that is remeshed, which is also
-  // the copy of the input that the memory estimate includes.
-  auto polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData->DeepCopy(selectedPolyData);
-
-  auto input = mitk::Surface::New();
-  input->SetVtkPolyData(polyData);
-
   auto remesher = mitk::RemeshFilter::New();
   remesher->SetInput(input);
-  remesher->SetTimeStep(0);
-  remesher->SetNumVertices(numVertices);
+  remesher->SetDensity(m_Controls->densitySpinBox->value() * 0.01);
   remesher->SetGradation(gradation);
   remesher->SetSubsampling(subsampling);
   remesher->SetEdgeSplitting(0.0);
@@ -408,6 +513,7 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   // What the result takes from the original, in case the original is gone
   // by the time the result is ready.
   m_Original = selectedNode;
+  m_OriginalData = selectedNode->GetData();
   m_OriginalName = selectedNode->GetName();
   m_OriginalColor = { 1.0f, 1.0f, 1.0f };
   selectedNode->GetColor(m_OriginalColor.data());
@@ -415,6 +521,9 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   m_ResultOptions.ReplaceOriginal = m_Controls->replaceCheckBox->isChecked();
   m_ResultOptions.HideOriginal = m_Controls->hideCheckBox->isChecked();
   m_ResultOptions.Wireframe = m_Controls->wireframeCheckBox->isChecked();
+  m_ResultOptions.TimeStep = this->IsCurrentTimeStepOnly(selectedSurface)
+    ? GetCurrentTimeStep(selectedSurface)
+    : std::nullopt;
 
   // The original pulses until remeshing ends, however it ends.
   m_OriginalWasPulsing = false;
@@ -508,10 +617,13 @@ void QmitkRemeshingView::OnRemeshingFinished()
   auto original = m_Original.Lock();
   m_Original = nullptr;
 
+  const auto originalData = m_OriginalData.Lock();
+  m_OriginalData = nullptr;
+
   if (original.IsNotNull())
     SetPulsing(original, m_OriginalWasPulsing);
 
-  this->EnableWidgets(nullptr != GetPolyData(m_Controls->selectionWidget->GetSelectedNode()));
+  this->EnableWidgets(nullptr != GetSurface(m_Controls->selectionWidget->GetSelectedNode()));
 
   if (result.Error)
   {
@@ -530,10 +642,28 @@ void QmitkRemeshingView::OnRemeshingFinished()
 
   const auto& options = m_ResultOptions;
 
-  if (options.ReplaceOriginal && original.IsNotNull())
+  // Only the surface the result was made from is replaced. A node that got
+  // other data in the meantime keeps it, and the result is added below it.
+  auto* originalSurface = original.IsNotNull() && original->GetData() == originalData.GetPointer()
+    ? dynamic_cast<mitk::Surface*>(original->GetData())
+    : nullptr;
+
+  const bool replace = options.ReplaceOriginal && nullptr != originalSurface &&
+    (!options.TimeStep.has_value() || *options.TimeStep < originalSurface->GetTimeSteps());
+
+  if (replace)
   {
-    // The node keeps everything else it had, its opacity and its children included.
-    original->SetData(result.Surface);
+    if (options.TimeStep.has_value())
+    {
+      // The other time steps stay as they are. The remeshed points are in the
+      // coordinates of the geometry that the time step keeps.
+      originalSurface->SetVtkPolyData(result.Surface->GetVtkPolyData(), static_cast<unsigned int>(*options.TimeStep));
+    }
+    else
+    {
+      // The node keeps everything else it had, its opacity and its children included.
+      original->SetData(result.Surface);
+    }
 
     if (options.Wireframe)
       original->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
@@ -556,7 +686,8 @@ void QmitkRemeshingView::OnRemeshingFinished()
     {
       dataStorage->Add(newNode, original);
 
-      if (options.HideOriginal)
+      // Replacing offers no option to hide the original.
+      if (options.HideOriginal && !options.ReplaceOriginal)
         original->SetVisibility(false);
     }
     else
@@ -574,6 +705,10 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
   const bool remeshing = this->IsRemeshing();
   enable = enable && !remeshing;
 
+  const auto* surface = GetSurface(m_Controls->selectionWidget->GetSelectedNode());
+  const bool hasTimeSteps = nullptr != surface && surface->GetTimeSteps() > 1;
+  const bool hasInput = nullptr != surface && this->GetRemeshingInput(surface, false).IsNotNull();
+
   m_Controls->selectionWidget->setEnabled(!remeshing);
   m_Controls->densitySlider->setEnabled(enable);
   m_Controls->densitySpinBox->setEnabled(enable);
@@ -581,10 +716,15 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
   m_Controls->adaptiveButton->setEnabled(enable);
   m_Controls->regularButton->setEnabled(enable);
   m_Controls->qualityComboBox->setEnabled(enable);
-  m_Controls->remeshPushButton->setEnabled(enable);
+  m_Controls->remeshPushButton->setEnabled(enable && hasInput);
   m_Controls->replaceCheckBox->setEnabled(enable);
   m_Controls->hideCheckBox->setEnabled(enable && !m_Controls->replaceCheckBox->isChecked());
   m_Controls->wireframeCheckBox->setEnabled(enable);
+  m_Controls->currentTimeStepCheckBox->setEnabled(enable && hasTimeSteps);
+
+  // A time step that replaces its original has the time of the original anyway.
+  m_Controls->keepTimeCheckBox->setEnabled(enable && hasTimeSteps &&
+    m_Controls->currentTimeStepCheckBox->isChecked() && !m_Controls->replaceCheckBox->isChecked());
 }
 
 void QmitkRemeshingView::SetFocus()

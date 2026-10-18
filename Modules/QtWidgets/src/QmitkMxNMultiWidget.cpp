@@ -1099,81 +1099,7 @@ bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
   }
   const auto& senderGroup = senderLinks->second.groups[DimensionIndex(dimension)];
   const auto& targetGroup = targetLinks->second.groups[DimensionIndex(dimension)];
-  if (!senderGroup.has_value() || !targetGroup.has_value() || *senderGroup != *targetGroup)
-  {
-    return false;
-  }
-
-  // Core's crosshair relay puts every target on the crosshair's slice. Within
-  // a slice group that would undo the offsets, so it reaches one member, and
-  // the others follow that member through the group.
-  if (QmitkMxNSyncDimension::Crosshair == dimension)
-  {
-    const auto& sliceGroup = targetLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Slice)];
-    if (sliceGroup.has_value() && IsAxisApplicableTo(target, QmitkMxNSyncAxis::Slice))
-    {
-      return this->CrosshairRepresentative(*sliceGroup, sender) == targetId;
-    }
-  }
-  return true;
-}
-
-QString QmitkMxNMultiWidget::CrosshairRepresentative(const std::string& sliceGroup,
-                                                    const mitk::BaseRenderer* sender) const
-{
-  const auto senderId = QString::fromUtf8(sender->GetName());
-  const auto linksOf = [this](const QString& windowId) -> const CellSyncLinks*
-  {
-    const auto it = m_CellSyncLinks.find(windowId);
-    return it != m_CellSyncLinks.end() ? &it->second : nullptr;
-  };
-
-  const auto* senderLinks = linksOf(senderId);
-  if (nullptr == senderLinks)
-  {
-    return {};
-  }
-  // The sender always receives its own gesture, so a member sender is the one.
-  if (senderLinks->groups[DimensionIndex(QmitkMxNSyncDimension::Slice)] == sliceGroup
-      && IsAxisApplicableTo(sender, QmitkMxNSyncAxis::Slice))
-  {
-    return senderId;
-  }
-
-  const auto& crosshairGroup = senderLinks->groups[DimensionIndex(QmitkMxNSyncDimension::Crosshair)];
-  QString firstMember;
-  std::vector<WindowDescriptor> descriptors;
-  try
-  {
-    descriptors = this->ListWindowDescriptors();
-  }
-  catch (const mitk::Exception&)
-  {
-    return {};  // mid-layout-change; the relay then reaches no member
-  }
-  for (const auto& descriptor : descriptors)
-  {
-    const auto* links = linksOf(descriptor.id);
-    const auto widget = this->GetRenderWindowWidget(descriptor.id);
-    if (nullptr == links || nullptr == widget
-        || links->groups[DimensionIndex(QmitkMxNSyncDimension::Slice)] != sliceGroup
-        || links->groups[DimensionIndex(QmitkMxNSyncDimension::Crosshair)] != crosshairGroup
-        || !IsAxisApplicableTo(RendererOf(widget.get()), QmitkMxNSyncAxis::Slice))
-    {
-      continue;
-    }
-    // A member without offset shows the group's reference slice, which is
-    // where the crosshair is.
-    if (0 == links->sliceOffset)
-    {
-      return descriptor.id;
-    }
-    if (firstMember.isEmpty())
-    {
-      firstMember = descriptor.id;
-    }
-  }
-  return firstMember;
+  return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
 }
 
 mitk::DisplayActionEventFunctions::LevelWindowScope QmitkMxNMultiWidget::WindowingScopeOf(
@@ -5300,8 +5226,14 @@ void QmitkMxNMultiWidget::ConvergeSlicesMovedByCrosshair(const mitk::BaseRendere
   const auto senderId = QString::fromUtf8(sender->GetName());
   try
   {
-    // Slice group and its anchor, in the pre-order of the group's first moved member.
-    std::vector<std::pair<std::string, QString>> anchors;
+    struct GroupMembers
+    {
+      std::string group;
+      QString sender;
+      QString firstWithoutOffset;
+      QString firstMoved;
+    };
+    std::vector<GroupMembers> groups;
     for (const auto& descriptor : this->ListWindowDescriptors())
     {
       const auto slice = before.find(descriptor.id);
@@ -5310,26 +5242,41 @@ void QmitkMxNMultiWidget::ConvergeSlicesMovedByCrosshair(const mitk::BaseRendere
       {
         continue;
       }
+      auto members = std::find_if(groups.begin(), groups.end(),
+                                  [&link](const auto& entry) { return entry.group == link->group; });
+      if (members == groups.end())
+      {
+        members = groups.insert(groups.end(), GroupMembers{ link->group, {}, {}, {} });
+      }
+      if (descriptor.id == senderId)
+      {
+        members->sender = descriptor.id;
+      }
+      if (0 == std::get<int>(link->offset) && members->firstWithoutOffset.isEmpty())
+      {
+        members->firstWithoutOffset = descriptor.id;
+      }
       auto* renderer = RendererOf(this->GetRenderWindowWidget(descriptor.id).get());
-      if (renderer->GetSliceNavigationController()->GetStepper()->GetPos() == slice->second)
+      if (renderer->GetSliceNavigationController()->GetStepper()->GetPos() != slice->second
+          && members->firstMoved.isEmpty())
       {
-        continue;
-      }
-      auto anchor = std::find_if(anchors.begin(), anchors.end(),
-                                 [&link](const auto& entry) { return entry.first == link->group; });
-      if (anchor == anchors.end())
-      {
-        anchors.emplace_back(link->group, descriptor.id);
-      }
-      else if (descriptor.id == senderId)
-      {
-        anchor->second = descriptor.id;
+        members->firstMoved = descriptor.id;
       }
     }
 
-    for (const auto& [group, anchorId] : anchors)
+    for (const auto& members : groups)
     {
-      this->ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension::Slice, group, anchorId);
+      if (members.firstMoved.isEmpty())
+      {
+        continue;
+      }
+      // Core's relay put every member it reached on the crosshair's slice. The
+      // anchor is the member meant to show that slice: the sender, where the
+      // user clicked, else a member showing the group's reference slice.
+      const auto& anchorId = !members.sender.isEmpty()               ? members.sender
+                             : !members.firstWithoutOffset.isEmpty() ? members.firstWithoutOffset
+                                                                     : members.firstMoved;
+      this->ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension::Slice, members.group, anchorId);
     }
   }
   catch (const mitk::Exception& e)

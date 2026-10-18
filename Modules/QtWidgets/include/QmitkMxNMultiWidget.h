@@ -1889,14 +1889,6 @@ private:
   void ConvergeZoomGroupToSender(const mitk::BaseRenderer* sender);
 
   /**
-  * \brief The one member of 'sliceGroup' that a crosshair gesture of 'sender'
-  *        reaches: the sender if it is a member, else the first member in
-  *        pre-order on the sender's crosshair group without a slice offset,
-  *        else the first such member with one. Empty when there is none.
-  */
-  QString CrosshairRepresentative(const std::string& sliceGroup, const mitk::BaseRenderer* sender) const;
-
-  /**
   * \brief The slice positions of the cells a crosshair gesture of 'sender'
   *        can move: its 2D crosshair targets, the sender included, by
   *        window id.
@@ -1906,11 +1898,13 @@ private:
   /**
   * \brief Converge the slice groups of the cells a crosshair gesture moved.
   *
-  *   Core's crosshair relay moves its targets' slices without the scroll
-  *   event that slice links relay, so a moved cell would leave its slice
-  *   group. Each slice group with a moved member converges once: to the
-  *   sender when it moved and is a member, else to the group's first moved
-  *   member in pre-order. A cell counts as moved when its slice differs from
+  *   Core's crosshair relay puts each of its targets on the crosshair's
+  *   slice, without the scroll event that slice links relay, so a moved cell
+  *   would leave its slice group, and members on the crosshair would lose
+  *   their offsets. Each slice group with a moved target converges once,
+  *   anchored on one of its targets: the sender when it is a member, else
+  *   the first target in pre-order without a slice offset, else the first
+  *   moved target. A target counts as moved when its slice differs from
   *   'before', the snapshot taken ahead of Core's relay.
   */
   void ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,

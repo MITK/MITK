@@ -30,8 +30,6 @@ found in the LICENSE file.
 #include <mitkSliceNavigationHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
-
-#include <itkCommand.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -43,7 +41,6 @@ found in the LICENSE file.
 #include <QCoreApplication>
 
 #include <array>
-#include <vector>
 
 /**
  * Behavior tests for the MxN per-dimension navigation links: predicate
@@ -63,7 +60,9 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation);
   MITK_TEST(Crosshair_MovedPeer_ConvergesItsSliceGroup);
   MITK_TEST(Crosshair_MovedSender_AnchorsItsSliceGroup);
-  MITK_TEST(Crosshair_ReachesOnlyTheReferenceMemberOfASliceGroup);
+  MITK_TEST(Crosshair_SliceGroupOnTheCrosshair_KeepsItsOffsets);
+  MITK_TEST(Crosshair_ClickInALightboxWindow_KeepsTheSheet);
+  MITK_TEST(Crosshair_EveryLinkedWindowShowsIt);
   MITK_TEST(Crosshair_ClickInTheShownPlane_ConvergesNothing);
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
@@ -392,39 +391,22 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The group follows the sender, keeping its offset", 3u, ShownSlice(1));
   }
 
-  /** Records every position a stepper takes while it is watched. */
-  struct StepperMoves
+  /** For an axial window. */
+  void AssertShowsCrosshair(std::size_t index, const mitk::Point3D& target)
   {
-    explicit StepperMoves(mitk::Stepper* watched)
-      : stepper(watched)
-    {
-      auto command = itk::SimpleMemberCommand<StepperMoves>::New();
-      command->SetCallbackFunction(this, &StepperMoves::Record);
-      tag = stepper->AddObserver(itk::ModifiedEvent(), command);
-    }
-    ~StepperMoves()
-    {
-      stepper->RemoveObserver(tag);
-    }
-    StepperMoves(const StepperMoves&) = delete;
-    StepperMoves& operator=(const StepperMoves&) = delete;
+    // x and y only: they lie in the axial plane, while the stored z follows
+    // the window's slice.
+    const auto crosshair = m_Editor->GetSelectedPosition(CellId(index));
+    const std::string where = " in window " + std::to_string(index);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The crosshair follows in x" + where, target[0], crosshair[0], 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The crosshair follows in y" + where, target[1], crosshair[1], 1e-3);
+  }
 
-    void Record()
-    {
-      positions.push_back(stepper->GetPos());
-    }
-
-    mitk::Stepper* stepper;
-    unsigned long tag = 0;
-    std::vector<unsigned int> positions;
-  };
-
-  void Crosshair_ReachesOnlyTheReferenceMemberOfASliceGroup()
+  void Crosshair_SliceGroupOnTheCrosshair_KeepsItsOffsets()
   {
-    // "Slice context" with every window on the crosshair: the working slice
-    // (offset 0) takes the crosshair's slice, and its neighbour follows. Were
-    // the crosshair to reach both, both would land on the crosshair's slice
-    // first and one of them would have to move again.
+    // "Slice context" with every window on the crosshair: a click in a
+    // context window puts the working slice (offset 0) on the crosshair's
+    // slice and its neighbour on the slice before, and both show the point.
     m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
     m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
     SetShownSlice(1, 4);
@@ -436,14 +418,70 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the neighbour shows the previous slice", 3u, ShownSlice(0));
 
-    const StepperMoves previous(SliceStepper(0));
-    const StepperMoves working(SliceStepper(1));
-    FireCrosshair(2, PointOnAxialSlice(6.0));
+    const auto target = PointOnAxialSlice(6.0);
+    FireCrosshair(2, target);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The working slice is where the crosshair is", 6u, ShownSlice(1));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour shows the slice before it", 5u, ShownSlice(0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The working slice moves once", std::size_t(1), working.positions.size());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour moves once", std::size_t(1), previous.positions.size());
+    AssertShowsCrosshair(0, target);
+    AssertShowsCrosshair(1, target);
+  }
+
+  void Crosshair_ClickInALightboxWindow_KeepsTheSheet()
+  {
+    // "Lightbox": a click in the slice a window shows changes no slice the
+    // sheet shows, whichever window of the sheet it is in, and every window
+    // shows the point.
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetViewDirection(CellId(i), mitk::AnatomicalPlane::Axial);
+    }
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "sheet");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "sheet", -1);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "sheet", 1);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "main");
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the first window shows the previous slice", 3u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the last window shows the next slice", 5u, ShownSlice(2));
+
+    const auto target = PointOnAxialSlice(5.0);
+    FireCrosshair(2, target);
+
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The sheet stays in window " + std::to_string(i),
+                                   static_cast<unsigned int>(3 + i), ShownSlice(i));
+      AssertShowsCrosshair(i, target);
+    }
+  }
+
+  void Crosshair_EveryLinkedWindowShowsIt()
+  {
+    // "Datasets x planes", aligned: the axial windows of two datasets share
+    // a slice group and, with a third window, the crosshair. Every member of
+    // the slice group shows the crosshair where it was set.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Slice, "ax");
+    }
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "nav");
+    }
+
+    const auto target = PointOnAxialSlice(6.0);
+    FireCrosshair(2, target);
+
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The slice follows in window " + std::to_string(i), 6u, ShownSlice(i));
+      AssertShowsCrosshair(i, target);
+    }
   }
 
   void Crosshair_ClickInTheShownPlane_ConvergesNothing()

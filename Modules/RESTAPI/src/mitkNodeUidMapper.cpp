@@ -158,23 +158,6 @@ bool NodeUidMapper::HasUid(const std::string& uid) const
   return m_UidToNode.find(uid) != m_UidToNode.end();
 }
 
-void NodeUidMapper::RestoreUid(const DataNode* node, const std::string& uid)
-{
-  if (node == nullptr)
-  {
-    throw std::invalid_argument("Node cannot be null");
-  }
-
-  std::lock_guard<std::mutex> lock(m_Mutex);
-
-  // Restore the mapping in both directions
-  m_UidToNode[uid] = const_cast<DataNode*>(node);
-  m_NodeToUid[node] = uid;
-
-  // Restore as property for debugging visibility
-  const_cast<DataNode*>(node)->SetStringProperty(UID_PROPERTY_KEY, uid.c_str());
-}
-
 std::string NodeUidMapper::GenerateUid()
 {
   // Format: "node_<counter>" - simple, unique within session
@@ -191,9 +174,8 @@ void NodeUidMapper::OnNodeAdded(const DataNode* node)
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Only clear the UID property if the node is not in our cache.
-  // Nodes in the cache have UIDs assigned this session (e.g., via RestoreUid
-  // during reparenting). Nodes not in the cache may carry stale UIDs
-  // from a loaded session file.
+  // Nodes in the cache have UIDs assigned this session. Nodes not in the
+  // cache may carry stale UIDs from a loaded session file.
   if (m_NodeToUid.find(node) == m_NodeToUid.end())
   {
     const_cast<DataNode*>(node)->GetPropertyList()->DeleteProperty(UID_PROPERTY_KEY);

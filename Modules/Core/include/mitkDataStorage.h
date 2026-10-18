@@ -37,7 +37,8 @@ namespace mitk
    * graph data structure.
    *
    * The DataStorage emits events when nodes are added (AddNodeEvent), removed (RemoveNodeEvent),
-   * modified (ChangedNodeEvent), or deleted (DeleteNodeEvent). It also provides methods
+   * modified (ChangedNodeEvent), deleted (DeleteNodeEvent), or given other sources
+   * (SourcesChangedNodeEvent). It also provides methods
    * for querying nodes by predicates (GetSubset), computing bounding geometries, and
    * traversing source/derivation relationships.
    *
@@ -109,10 +110,31 @@ namespace mitk
      *
      * The RemoveNodeEvent is emitted before the node is actually removed.
      *
+     * The nodes derived from the removed node take over its sources in its place,
+     * so they stay derived from what the removed node was derived from. Nodes
+     * derived from a removed node without sources lose that source. After the
+     * removal, SourcesChangedNodeEvent is emitted for each of these nodes.
+     *
      * \param[in] node  The node to remove. If nullptr, the call is ignored.
      * \sa Add, RemoveNodeEvent
      */
     virtual void Remove(const DataNode *node) = 0;
+
+    /**
+     * \brief Replace the sources (parents) of a node in the DataStorage.
+     *
+     * The node keeps the nodes derived from it. Unlike removing the node and adding
+     * it again, neither RemoveNodeEvent nor AddNodeEvent is emitted; observers learn
+     * about the change from SourcesChangedNodeEvent, which is emitted afterwards
+     * unless the sources stay the same.
+     *
+     * \param[in] node     The node whose sources are replaced.
+     * \param[in] sources  The new sources, in order. nullptr or an empty set leaves the node without sources.
+     * \throw std::invalid_argument if \a node or one of the \a sources is not in the DataStorage,
+     *        or if a source is \a node itself or derived from it.
+     * \sa GetSources, SourcesChangedNodeEvent
+     */
+    virtual void SetSources(DataNode *node, const SetOfObjects *sources) = 0;
 
     /**
      * \brief Check whether a node exists in the DataStorage.
@@ -380,6 +402,15 @@ namespace mitk
     DataStorageEvent InteractorChangedNodeEvent;
 
     /**
+     * \brief Event emitted after the sources of a managed node changed.
+     *
+     * Emitted after SetSources() replaced the sources of a node, and after a node was
+     * removed, for each node derived from it.
+     * This event is thread-safe.
+     */
+    DataStorageEvent SourcesChangedNodeEvent;
+
+    /**
      * \brief Compute the axis-parallel bounding geometry encompassing the given set of nodes.
      *
      * Nodes whose specified BoolProperty is false are excluded from the computation.
@@ -521,6 +552,12 @@ namespace mitk
     //##
     //## This method should be called by subclasses to emit the RemoveNodeEvent
     void EmitRemoveNodeEvent(const DataNode *node);
+
+    //##Documentation
+    //## @brief  EmitSourcesChangedNodeEvent emits the SourcesChangedNodeEvent
+    //##
+    //## This method should be called by subclasses to emit the SourcesChangedNodeEvent
+    void EmitSourcesChangedNodeEvent(const DataNode *node);
 
     void OnNodeInteractorChanged(itk::Object *caller, const itk::EventObject &event);
 

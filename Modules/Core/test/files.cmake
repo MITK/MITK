@@ -22,6 +22,7 @@ set(MODULE_TESTS
   ################# RUNNING TESTS ###################################################
   mitkAccessByItkTest.cpp
   mitkDataNodeTest.cpp
+  mitkDataStorageSourcesTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
   mitkDispatcherTest.cpp

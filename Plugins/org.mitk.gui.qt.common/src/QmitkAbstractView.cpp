@@ -111,6 +111,22 @@ public:
   }
 
   /**
+   * Called when a DataStorage sources changed event was thrown. Sets
+   * m_InDataStorageChanged to true and calls NodeSourcesChanged afterwards.
+   * \see m_InDataStorageChanged
+   */
+  void NodeSourcesChangedProxy(const mitk::DataNode* node)
+  {
+    if(!m_InDataStorageChanged)
+    {
+      m_InDataStorageChanged = true;
+      q->NodeSourcesChanged(node);
+      q->DataStorageModified();
+      m_InDataStorageChanged = false;
+    }
+  }
+
+  /**
    * reactions to selection events from views
    */
   void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
@@ -229,6 +245,8 @@ void QmitkAbstractView::AfterCreateQtPartControl()
                                                         ( d.data(), &QmitkAbstractViewPrivate::NodeChangedProxy ) );
   this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
                                                        ( d.data(), &QmitkAbstractViewPrivate::NodeRemovedProxy ) );
+  this->GetDataStorage()->SourcesChangedNodeEvent.AddListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
+                                                               ( d.data(), &QmitkAbstractViewPrivate::NodeSourcesChangedProxy ) );
 
   // REGISTER PREFERENCES LISTENER
   d->m_Preferences = this->GetPreferences();
@@ -264,6 +282,8 @@ QmitkAbstractView::~QmitkAbstractView()
                                                           ( d.data(), &QmitkAbstractViewPrivate::NodeRemovedProxy) );
   this->GetDataStorage()->ChangedNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
                                                            ( d.data(), &QmitkAbstractViewPrivate::NodeChangedProxy ) );
+  this->GetDataStorage()->SourcesChangedNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
+                                                                  ( d.data(), &QmitkAbstractViewPrivate::NodeSourcesChangedProxy ) );
 
   if (d->m_Preferences != nullptr)
     d->m_Preferences->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
@@ -476,6 +496,10 @@ void QmitkAbstractView::NodeRemoved( const mitk::DataNode*  /*node*/ )
 }
 
 void QmitkAbstractView::NodeChanged( const mitk::DataNode* /*node*/ )
+{
+}
+
+void QmitkAbstractView::NodeSourcesChanged( const mitk::DataNode* /*node*/ )
 {
 }
 

@@ -9,6 +9,7 @@ endif()
 
 set(MODULE_CUSTOM_TESTS
   QmitkDataStorageListModelTest.cpp
+  QmitkDataStorageSimpleTreeModelTest.cpp
   QmitkDataStorageTreeModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
   QmitkSingleNodeSelectionWidgetTest.cpp
@@ -35,6 +36,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNSyncPeekTest.cpp
   QmitkMxNUtilityStripTest.cpp
+  QmitkRenderWindowDataStorageTreeModelTest.cpp
   QmitkRenderWindowProximityTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
   QmitkRunInputBlockingTest.cpp

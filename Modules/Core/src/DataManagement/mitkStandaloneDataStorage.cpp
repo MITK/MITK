@@ -21,6 +21,49 @@ found in the LICENSE file.
 
 #include <mitkUndoController.h>
 
+#include <algorithm>
+
+namespace
+{
+  using SetOfObjects = mitk::DataStorage::SetOfObjects;
+
+  bool Contains(const SetOfObjects *nodes, const mitk::DataNode *node)
+  {
+    return std::find(nodes->begin(), nodes->end(), node) != nodes->end();
+  }
+
+  /** \brief A copy of the nodes with the node appended, unless they hold it already. */
+  SetOfObjects::ConstPointer Append(const SetOfObjects *nodes, mitk::DataNode *node)
+  {
+    auto result = SetOfObjects::New();
+
+    if (nodes != nullptr)
+      result->CastToSTLContainer() = nodes->CastToSTLConstContainer();
+
+    if (!Contains(result, node))
+      result->push_back(node);
+
+    return result.GetPointer();
+  }
+
+  /** \brief A copy of the nodes without the node. */
+  SetOfObjects::ConstPointer Erase(const SetOfObjects *nodes, const mitk::DataNode *node)
+  {
+    auto result = SetOfObjects::New();
+
+    if (nodes != nullptr)
+    {
+      for (const auto &otherNode : *nodes)
+      {
+        if (otherNode.GetPointer() != node)
+          result->push_back(otherNode);
+      }
+    }
+
+    return result.GetPointer();
+  }
+}
+
 mitk::StandaloneDataStorage::StandaloneDataStorage() : mitk::DataStorage()
 {
 }
@@ -115,8 +158,15 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
+
+  SetOfObjects::ConstPointer derivations;
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
+
+    if (const auto derivationsIt = m_DerivedNodes.find(node); derivationsIt != m_DerivedNodes.end())
+      derivations = derivationsIt->second;
+
+    this->PassSourcesToDerivations(node);
     /* remove node from both relation adjacency lists */
     this->RemoveFromRelation(node, m_SourceNodes);
     this->RemoveFromRelation(node, m_DerivedNodes);
@@ -127,6 +177,112 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
   {
     undoModel->RemoveInvalidOperations();
   }
+
+  // Observers of RemoveNodeEvent could only guess where the derivations go.
+  if (derivations.IsNotNull())
+  {
+    for (const auto &derivation : *derivations)
+      this->EmitSourcesChangedNodeEvent(derivation);
+  }
+}
+
+void mitk::StandaloneDataStorage::PassSourcesToDerivations(const mitk::DataNode *node)
+{
+  const auto sourcesIt = m_SourceNodes.find(node);
+  const auto derivationsIt = m_DerivedNodes.find(node);
+
+  if (sourcesIt == m_SourceNodes.end() || derivationsIt == m_DerivedNodes.end())
+    return;
+
+  const SetOfObjects::ConstPointer sources = sourcesIt->second;
+  const SetOfObjects::ConstPointer derivations = derivationsIt->second;
+
+  for (const auto &derivation : *derivations)
+  {
+    auto newSources = SetOfObjects::New();
+
+    // The sources take the place of the node in the list, so a derivation
+    // whose first source, which views show as its parent, was the node gets
+    // the first source of the node instead.
+    for (const auto &derivationSource : *m_SourceNodes[derivation.GetPointer()])
+    {
+      if (derivationSource.GetPointer() == node)
+      {
+        for (const auto &source : *sources)
+        {
+          if (!Contains(newSources, source))
+            newSources->push_back(source);
+        }
+      }
+      else if (!Contains(newSources, derivationSource))
+      {
+        newSources->push_back(derivationSource);
+      }
+    }
+
+    this->ReplaceSources(derivation, newSources);
+  }
+}
+
+void mitk::StandaloneDataStorage::ReplaceSources(mitk::DataNode *node, const SetOfObjects *newSources)
+{
+  auto &sources = m_SourceNodes[node];
+
+  for (const auto &oldSource : *sources)
+  {
+    if (!Contains(newSources, oldSource))
+      m_DerivedNodes[oldSource.GetPointer()] = Erase(m_DerivedNodes[oldSource.GetPointer()], node);
+  }
+
+  for (const auto &newSource : *newSources)
+  {
+    if (!Contains(sources, newSource))
+      m_DerivedNodes[newSource.GetPointer()] = Append(m_DerivedNodes[newSource.GetPointer()], node);
+  }
+
+  sources = newSources;
+}
+
+void mitk::StandaloneDataStorage::SetSources(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *sources)
+{
+  // The task blocks until it has run, so both arguments stay alive.
+  if (DispatchToStorageThread([this, node, sources]() { this->SetSources(node, sources); }))
+    return;
+
+  {
+    std::lock_guard<std::mutex> locked(m_Mutex);
+
+    const auto sourcesIt = m_SourceNodes.find(node);
+
+    if (sourcesIt == m_SourceNodes.end())
+      throw std::invalid_argument("Node is not in DataStorage");
+
+    auto newSources = SetOfObjects::New();
+
+    if (sources != nullptr)
+    {
+      const auto derivations = this->GetRelations(node, m_DerivedNodes, nullptr, false);
+
+      for (const auto &source : *sources)
+      {
+        if (m_SourceNodes.find(source.GetPointer()) == m_SourceNodes.end())
+          throw std::invalid_argument("Source is not in DataStorage");
+
+        if (source.GetPointer() == node || Contains(derivations, source))
+          throw std::invalid_argument("Source is the node itself or derived from it");
+
+        if (!Contains(newSources, source))
+          newSources->push_back(source);
+      }
+    }
+
+    if (sourcesIt->second->CastToSTLConstContainer() == newSources->CastToSTLConstContainer())
+      return;
+
+    this->ReplaceSources(node, newSources);
+  }
+
+  this->EmitSourcesChangedNodeEvent(node);
 }
 
 bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode *node) const

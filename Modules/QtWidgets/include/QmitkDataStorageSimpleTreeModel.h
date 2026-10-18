@@ -30,9 +30,9 @@ class QmitkDataStorageTreeModelInternalItem;
  *
  * - Drag-and-drop is not supported.
  * - Node hierarchy and layer properties cannot be modified through the model.
- * - When a node is removed, the entire tree is rebuilt rather than re-parenting
- *   orphaned children, ensuring the model always reflects the actual data
- *   storage graph.
+ * - Items are placed by layer, also when they move because a node was removed
+ *   or got other sources. A node is shown only below a shown parent, so the
+ *   tree is built anew when a node appears or disappears with its new parent.
  *
  * \sa QmitkAbstractDataStorageModel
  * \sa QmitkDataStorageTreeModel
@@ -73,6 +73,12 @@ public:
    * \param[in] node The node that was removed.
    */
   void NodeRemoved(const mitk::DataNode *node) override;
+
+  /**
+   * \brief Called after the sources of a node were replaced. Rebuilds the tree.
+   * \param[in] node The node whose sources were replaced.
+   */
+  void NodeSourcesChanged(const mitk::DataNode *node) override;
 
   /**
    * \brief Returns the model index for the given row and column under the given parent.
@@ -151,11 +157,23 @@ private:
 
   void ResetTree();
 
+  /** \brief Builds the tree anew from the data storage, announced as a model reset. */
+  void RebuildTree();
+
+  /** \brief Moves an item, with the items below it, to a new parent item, placed by layer. */
+  void MoveTreeItem(TreeItem *item, TreeItem *newParentItem);
+
+  /** \brief The row of a child item for the node among the children of the parent item, by layer. */
+  int GetLayerRow(TreeItem *parentItem, const mitk::DataNode *node) const;
+
   TreeItem *m_Root;
 
   /**helper structure to check, if a tree item is really part of the model.
   Preferred over iterating over the tree by hand because we can use std::find.*/
   std::list<const TreeItem*> m_TreeItems;
+
+  /** \brief Set while RebuildTree() refills the tree, whose rows a model reset announces as a whole. */
+  bool m_IsRebuilding = false;
 };
 
 #endif

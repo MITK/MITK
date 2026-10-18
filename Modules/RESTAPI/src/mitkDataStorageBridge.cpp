@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <regex>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -736,40 +737,22 @@ namespace mitk
         newParent = m_UidMapper->FindNodeByUid(newParentUid);
       }
 
-      if (newParent == node)
-      { // Prevent circular references: new parent cannot be the node itself or a descendant
-        return false;
-      }
-
-      // Check if newParent is a descendant of node
-      auto descendants = dataStorage->GetDerivations(node, nullptr, true);
-      for (auto it = descendants->Begin(); it != descendants->End(); ++it)
-      {
-        if (it->Value() == newParent)
-        {
-          return false;  // Would create circular reference
-        }
-      }
-
-      // Reparent: remove and re-add under new parent
-      // This is the same approach used by QmitkDataStorageTreeModel
-      //
-      // Important: Preserve the UID across reparenting operation.
-      // The NodeUidMapper clears mappings when a node is removed from DataStorage,
-      // so we save the UID and restore the mapping after re-adding.
-      const std::string preservedUid = uid;
-
-      dataStorage->Remove(node);
+      auto sources = DataStorage::SetOfObjects::New();
       if (newParent != nullptr)
       {
-        dataStorage->Add(node, newParent);
-      }
-      else
-      {
-        dataStorage->Add(node);  // Move to root level
+        sources->push_back(newParent);
       }
 
-      m_UidMapper->RestoreUid(node, preservedUid);
+      // The node stays in the DataStorage, so it keeps its UID and the nodes
+      // derived from it.
+      try
+      {
+        dataStorage->SetSources(node, sources);
+      }
+      catch (const std::invalid_argument&)
+      {
+        return false;  // The new parent is the node itself or derived from it
+      }
 
       MarkNodeAsModified(node, "reparented");
 

@@ -34,6 +34,8 @@ found in the LICENSE file.
 #include <QMimeData>
 #include <QTextStream>
 
+#include <algorithm>
+#include <iterator>
 #include <map>
 
 #include <mitkCoreServices.h>
@@ -45,7 +47,6 @@ QmitkDataStorageTreeModel::QmitkDataStorageTreeModel(mitk::DataStorage *_DataSto
     m_DataStorage(nullptr),
     m_PlaceNewNodesOnTop(_PlaceNewNodesOnTop),
     m_Root(nullptr),
-    m_BlockDataStorageEvents(false),
     m_AllowHierarchyChange(false)
 {
   this->SetDataStorage(_DataStorage);
@@ -230,107 +231,99 @@ bool QmitkDataStorageTreeModel::dropMimeData(
       }
     }
 
+    // dragging on one of the dragged nodes
+    if (listOfItemsToDrop.contains(dropItem))
+      isValidDragAndDropOperation = false;
+
+    auto dataStorage = m_DataStorage.Lock();
+
+    // Dragging on a node derived from one of the dragged nodes, also through a
+    // source the tree does not show, as the data storage would refuse it.
+    if (m_AllowHierarchyChange && isValidDragAndDropOperation && dropItem != m_Root && dataStorage.IsNotNull())
+    {
+      for (TreeItem *const itemToDrop : listOfItemsToDrop)
+      {
+        const auto derivations = dataStorage->GetDerivations(itemToDrop->GetDataNode(), nullptr, false);
+        if (std::find(derivations->begin(), derivations->end(), dropItem->GetDataNode()) != derivations->end())
+          isValidDragAndDropOperation = false;
+      }
+    }
+
     if (!isValidDragAndDropOperation)
       return isValidDragAndDropOperation;
 
-    if (listOfItemsToDrop[0] != dropItem && isValidDragAndDropOperation)
+    TreeItem *const insertTargetItem = m_AllowHierarchyChange ? dropItem : (row == -1 ? parentItem : dropItem);
+
+    // The drop position is computed among the children of the insert target
+    // that stay where they are, as if the dragged items were taken out first.
+    std::vector<TreeItem *> remainingChildren;
+    for (TreeItem *child : insertTargetItem->GetChildren())
     {
-      // Removing the dragged items shifts every later position - including the
-      // drop row - up by the number of dragged items lying above it. Count them
-      // now, on the original indices: GetIndex() shifts as the removal loop
-      // below deletes items one at a time, so it cannot be counted there.
-      int itemsAboveDropRow = 0;
-      if (row != -1)
-      {
-        for (TreeItem *const itemToDrop : listOfItemsToDrop)
-        {
-          if ((itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
-            ++itemsAboveDropRow;
-        }
-      }
-
-      // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
-      QList<TreeItem *>::iterator diIter;
-      for (diIter = listOfItemsToDrop.begin(); diIter != listOfItemsToDrop.end(); diIter++)
-      {
-        TreeItem *itemToDrop = *diIter;
-
-        // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
-        this->beginRemoveRows(
-          this->IndexFromTreeItem(itemToDrop->GetParent()), itemToDrop->GetIndex(), itemToDrop->GetIndex());
-        itemToDrop->GetParent()->RemoveChild(itemToDrop);
-        this->endRemoveRows();
-      }
-
-      // The parent announced to beginInsertRows must be the item the rows are
-      // actually inserted into. Announcing the insertion under a different
-      // parent corrupts the row bookkeeping that QTreeView and
-      // QSortFilterProxyModel maintain.
-      TreeItem *const insertTargetItem = m_AllowHierarchyChange ? dropItem : (row == -1 ? parentItem : dropItem);
-      const QModelIndex insertTargetModelIndex = this->IndexFromTreeItem(insertTargetItem);
-
-      // row = -1 dropped on an item, row != -1 dropped in between two items.
-      int dropIndex = 0;
-      if (row != -1)
-      {
-        // GetChildCount() is a valid append position - InsertChild push_backs
-        // when the index is out of range - so clamping to it keeps the last
-        // slot reachable. itemsAboveDropRow compensates for the dragged items
-        // already removed above the drop row.
-        dropIndex = std::min(row - itemsAboveDropRow, insertTargetItem->GetChildCount());
-      }
-      else if (m_AllowHierarchyChange)
-      {
-        // Reparent onto dropItem: append as a new child. dropItem->GetIndex() is
-        // dropItem's own sibling row, not a child position, so using it here
-        // would announce an insertion range that does not match its child count.
-        dropIndex = dropItem->GetChildCount();
-      }
-      else
-      {
-        // Sibling reorder onto dropItem: insert into the shared parent at
-        // dropItem's position among its siblings.
-        dropIndex = dropItem->GetIndex();
-      }
-
-      // The out-of-range fallback only fires for a drop onto empty space /
-      // the root; there dropItem == m_Root, so parentItem, dropItem and the
-      // insert target coincide and this value is in the right coordinate space.
-      QModelIndex dropItemModelIndex = this->IndexFromTreeItem(dropItem);
-      if ((row == -1 && dropItemModelIndex.row() == -1) || dropItemModelIndex.row() > parentItem->GetChildCount())
-        dropIndex = parentItem->GetChildCount() - 1;
-
-      // Dragging a node's entire child set empties the insert target in the
-      // removal loop above, so the clamps can leave dropIndex at -1. Both
-      // beginInsertRows and InsertChild require a non-negative position.
-      dropIndex = std::max(0, dropIndex);
-
-      // Now insert items again at the drop item position
-      this->beginInsertRows(insertTargetModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
-
-      for (diIter = listOfItemsToDrop.begin(); diIter != listOfItemsToDrop.end(); diIter++)
-      {
-        if (m_AllowHierarchyChange)
-        {
-          auto dataStorage = m_DataStorage.Lock();
-
-          m_BlockDataStorageEvents = true;
-          mitk::DataNode::Pointer droppedNode = (*diIter)->GetDataNode();
-          mitk::DataNode *dropOntoNode = dropItem->GetDataNode();
-          dataStorage->Remove(droppedNode);
-          dataStorage->Add(droppedNode, dropOntoNode);
-          m_BlockDataStorageEvents = false;
-        }
-
-        insertTargetItem->InsertChild((*diIter), dropIndex);
-
-        dropIndex++;
-      }
-      this->endInsertRows();
-
-      // Change Layers to match.
-      this->AdjustLayerProperty();
+      if (!listOfItemsToDrop.contains(child))
+        remainingChildren.push_back(child);
     }
+
+    const int remainingCount = static_cast<int>(remainingChildren.size());
+
+    // row = -1 dropped on an item, row != -1 dropped in between two items.
+    int dropIndex = 0;
+    if (row != -1)
+    {
+      // The drop row counts the dragged items above it, which do not stay.
+      int itemsAboveDropRow = 0;
+      for (TreeItem *const itemToDrop : listOfItemsToDrop)
+      {
+        if ((itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
+          ++itemsAboveDropRow;
+      }
+
+      dropIndex = std::min(row - itemsAboveDropRow, remainingCount);
+    }
+    else if (m_AllowHierarchyChange)
+    {
+      // Reparent onto dropItem: append as new children.
+      dropIndex = remainingCount;
+    }
+    else
+    {
+      // Sibling reorder onto dropItem: take its position among its siblings.
+      const auto dropItemIt = std::find(remainingChildren.begin(), remainingChildren.end(), dropItem);
+      dropIndex = static_cast<int>(std::distance(remainingChildren.begin(), dropItemIt));
+    }
+
+    // A drop onto empty space appends to the top-level items.
+    if (row == -1 && dropItem == m_Root)
+      dropIndex = remainingCount;
+
+    dropIndex = std::max(0, dropIndex);
+
+    // Each dragged item goes before the child that follows the dropped items,
+    // so they keep their order among each other.
+    TreeItem *const nextItem = dropIndex < remainingCount ? remainingChildren[dropIndex] : nullptr;
+
+    for (TreeItem *itemToDrop : listOfItemsToDrop)
+    {
+      // A reorder keeps all sources of a node, also those the tree does not show.
+      const bool changesParent = itemToDrop->GetParent() != insertTargetItem;
+
+      this->MoveTreeItem(itemToDrop, insertTargetItem, nextItem);
+
+      if (m_AllowHierarchyChange && changesParent && dataStorage.IsNotNull())
+      {
+        // The root item holds a placeholder node that is not in the data storage.
+        auto sources = mitk::DataStorage::SetOfObjects::New();
+        if (dropItem != m_Root)
+          sources->push_back(dropItem->GetDataNode());
+
+        // Removing the node and adding it again would detach the nodes derived
+        // from it, which the tree keeps below it. The item is in place already,
+        // so UpdateNodeParent() leaves it there.
+        dataStorage->SetSources(itemToDrop->GetDataNode(), sources);
+      }
+    }
+
+    // Change Layers to match.
+    this->AdjustLayerProperty();
   }
   else if (data->hasFormat("application/x-mitk-datanodes"))
   {
@@ -526,6 +519,10 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
       dataStorage->RemoveNodeEvent.RemoveListener(
         mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTreeModel::RemoveNode));
+
+      dataStorage->SourcesChangedNodeEvent.RemoveListener(
+        mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTreeModel::UpdateNodeParent));
     }
 
     this->beginResetModel();
@@ -559,6 +556,10 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
       dataStorage->RemoveNodeEvent.AddListener(
         mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTreeModel::RemoveNode));
+
+      dataStorage->SourcesChangedNodeEvent.AddListener(
+        mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTreeModel::UpdateNodeParent));
 
       // finally add all nodes to the model
       this->Update();
@@ -601,36 +602,10 @@ void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
   }
 
   // add node
-  if (m_PlaceNewNodesOnTop)
-  {
-    // emit beginInsertRows event
-    beginInsertRows(index, 0, 0);
-    parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode *>(node)), 0);
-  }
-  else
-  {
-    int firstRowWithASiblingBelow = 0;
-    int nodeLayer = -1;
-    node->GetIntProperty("layer", nodeLayer);
-    for (TreeItem* siblingTreeItem: parentTreeItem->GetChildren())
-    {
-      int siblingLayer = -1;
-      if (mitk::DataNode* siblingNode = siblingTreeItem->GetDataNode())
-      {
-        siblingNode->GetIntProperty("layer", siblingLayer);
-      }
-      if (nodeLayer > siblingLayer)
-      {
-        break;
-      }
-      ++firstRowWithASiblingBelow;
-    }
-    beginInsertRows(index, firstRowWithASiblingBelow, firstRowWithASiblingBelow);
-    parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode*>(node)), firstRowWithASiblingBelow);
-  }
-
-  // emit endInsertRows event
-  endInsertRows();
+  const int row = this->GetNewChildRow(parentTreeItem, node);
+  this->beginInsertRows(index, row, row);
+  parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode *>(node)), row);
+  this->endInsertRows();
 
   if(m_PlaceNewNodesOnTop)
   {
@@ -638,11 +613,35 @@ void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
   }
 }
 
+int QmitkDataStorageTreeModel::GetNewChildRow(TreeItem *parentItem, const mitk::DataNode *node) const
+{
+  if (m_PlaceNewNodesOnTop)
+    return 0;
+
+  int nodeLayer = -1;
+  node->GetIntProperty("layer", nodeLayer);
+
+  int row = 0;
+  for (TreeItem *siblingTreeItem : parentItem->GetChildren())
+  {
+    int siblingLayer = -1;
+    if (mitk::DataNode *siblingNode = siblingTreeItem->GetDataNode())
+      siblingNode->GetIntProperty("layer", siblingLayer);
+
+    if (nodeLayer > siblingLayer)
+      break;
+
+    ++row;
+  }
+
+  return row;
+}
+
 void QmitkDataStorageTreeModel::AddNode(const mitk::DataNode *node)
 {
   auto dataStorage = m_DataStorage.Lock();
 
-  if (node == nullptr || m_BlockDataStorageEvents || dataStorage.IsNull() || !dataStorage->Exists(node) ||
+  if (node == nullptr || dataStorage.IsNull() || !dataStorage->Exists(node) ||
       m_Root->Find(node) != nullptr)
     return;
 
@@ -664,40 +663,83 @@ void QmitkDataStorageTreeModel::RemoveNodeInternal(const mitk::DataNode *node)
     return; // return because there is no treeitem containing this node
 
   TreeItem *parentTreeItem = treeItem->GetParent();
-  QModelIndex parentIndex = this->IndexFromTreeItem(parentTreeItem);
 
-  // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
-  this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());
+  // The children take over the sources of the node in the data storage, so
+  // they move to the item of its first source.
+  for (TreeItem *child : treeItem->GetChildren())
+    this->MoveTreeItem(child, parentTreeItem);
 
-  // remove node
-  std::vector<TreeItem*> children = treeItem->GetChildren();
+  this->beginRemoveRows(this->IndexFromTreeItem(parentTreeItem), treeItem->GetIndex(), treeItem->GetIndex());
   delete treeItem;
-
-  // emit endRemoveRows event
-  endRemoveRows();
-
-  // move all children of deleted node into its parent
-  for (std::vector<TreeItem*>::iterator it = children.begin(); it != children.end(); it++)
-  {
-    // emit beginInsertRows event
-    beginInsertRows(parentIndex, parentTreeItem->GetChildCount(), parentTreeItem->GetChildCount());
-
-    // add nodes again
-    parentTreeItem->AddChild(*it);
-
-    // emit endInsertRows event
-    endInsertRows();
-  }
+  this->endRemoveRows();
 
   this->AdjustLayerProperty();
 }
 
 void QmitkDataStorageTreeModel::RemoveNode(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_BlockDataStorageEvents)
+  if (node == nullptr)
     return;
 
   this->RemoveNodeInternal(node);
+}
+
+void QmitkDataStorageTreeModel::UpdateNodeParent(const mitk::DataNode *node)
+{
+  if (node == nullptr || m_Root == nullptr)
+    return;
+
+  TreeItem *treeItem = m_Root->Find(node);
+  if (treeItem == nullptr)
+    return;
+
+  TreeItem *parentTreeItem = m_Root;
+
+  if (mitk::DataNode *parentDataNode = this->GetParentNode(node); parentDataNode != nullptr)
+  {
+    parentTreeItem = m_Root->Find(parentDataNode);
+    if (parentTreeItem == nullptr)
+    {
+      this->AddNode(parentDataNode);
+      parentTreeItem = m_Root->Find(parentDataNode);
+      if (parentTreeItem == nullptr)
+        return;
+    }
+  }
+
+  if (parentTreeItem == treeItem->GetParent())
+    return;
+
+  // The item goes where a new node would, so a node that code gives a new
+  // parent is drawn as if it had been added there.
+  const int row = this->GetNewChildRow(parentTreeItem, node);
+  const auto children = parentTreeItem->GetChildren();
+  this->MoveTreeItem(treeItem, parentTreeItem, row < static_cast<int>(children.size()) ? children[row] : nullptr);
+  this->AdjustLayerProperty();
+}
+
+void QmitkDataStorageTreeModel::MoveTreeItem(TreeItem *item, TreeItem *newParentItem, TreeItem *nextItem)
+{
+  TreeItem *oldParentItem = item->GetParent();
+  const int oldRow = item->GetIndex();
+
+  // Rows before the move, as beginMoveRows() expects them.
+  const int newRow = nextItem != nullptr ? nextItem->GetIndex() : newParentItem->GetChildCount();
+
+  // beginMoveRows() refuses to move an item to where it already is.
+  if (oldParentItem == newParentItem && (newRow == oldRow || newRow == oldRow + 1))
+    return;
+
+  if (!this->beginMoveRows(
+        this->IndexFromTreeItem(oldParentItem), oldRow, oldRow, this->IndexFromTreeItem(newParentItem), newRow))
+  {
+    return;
+  }
+
+  oldParentItem->RemoveChild(item);
+  newParentItem->InsertChild(item, oldParentItem == newParentItem && oldRow < newRow ? newRow - 1 : newRow);
+
+  this->endMoveRows();
 }
 
 void QmitkDataStorageTreeModel::SetNodeModified(const mitk::DataNode *node)

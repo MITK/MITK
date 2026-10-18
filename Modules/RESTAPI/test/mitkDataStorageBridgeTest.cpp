@@ -68,6 +68,8 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(UpdateNodeReparentToAnotherParent);
   MITK_TEST(UpdateNodeReparentToRoot);
   MITK_TEST(UpdateNodeReparentFromRootToParent);
+  MITK_TEST(UpdateNodeReparentKeepsChildrenAndUid);
+  MITK_TEST(UpdateNodeReparentToGrandchildFails);
   MITK_TEST(DeleteLeafNode);
   MITK_TEST(DeleteNodeWithChildrenNonRecursive);
   MITK_TEST(DeleteNodeWithChildrenRecursive);
@@ -677,6 +679,40 @@ public:
     // Verify Root2 now has 3 children (Child1, Child2, Root1)
     auto root2Children = m_DataStorage->GetDerivations(m_Root2);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), root2Children->Size());
+  }
+
+  void UpdateNodeReparentKeepsChildrenAndUid()
+  {
+    // Move Child2, which has two children, from Root2 to Root3
+    nlohmann::json updates;
+    updates["parent_uid"] = m_Root3Uid;
+
+    bool success = m_Bridge->UpdateNode(m_Child2Uid, updates);
+    CPPUNIT_ASSERT(success);
+
+    auto child2Children = m_DataStorage->GetDerivations(m_Child2);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), child2Children->Size());
+
+    auto grandchild1Sources = m_DataStorage->GetSources(m_Grandchild1);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), grandchild1Sources->Size());
+    CPPUNIT_ASSERT(grandchild1Sources->front() == m_Child2.GetPointer());
+
+    auto nodeResult = m_Bridge->GetNode(m_Child2Uid);
+    CPPUNIT_ASSERT(nodeResult.has_value());
+    CPPUNIT_ASSERT_EQUAL(m_Root3Uid, nodeResult.value()["parent_uid"].get<std::string>());
+  }
+
+  void UpdateNodeReparentToGrandchildFails()
+  {
+    // Grandchild1 is derived from Root2 through Child2
+    nlohmann::json updates;
+    updates["parent_uid"] = m_Grandchild1Uid;
+
+    bool success = m_Bridge->UpdateNode(m_Root2Uid, updates);
+    CPPUNIT_ASSERT(!success);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), m_DataStorage->GetSources(m_Root2)->Size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), m_DataStorage->GetDerivations(m_Child2)->Size());
   }
 
   void DeleteLeafNode()

@@ -44,6 +44,8 @@ QmitkAbstractDataStorageModel::~QmitkAbstractDataStorageModel()
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
     dataStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
+    dataStorage->SourcesChangedNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeSourcesChanged));
   }
 }
 
@@ -68,6 +70,8 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
     lockedDataStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
+    lockedDataStorage->SourcesChangedNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeSourcesChanged));
   }
 
   m_DataStorage = dataStorage;
@@ -87,9 +91,15 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
     lockedDataStorage->ChangedNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
+    lockedDataStorage->SourcesChangedNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeSourcesChanged));
   }
   // update model if the data storage has been changed
   DataStorageChanged();
+}
+
+void QmitkAbstractDataStorageModel::NodeSourcesChanged(const mitk::DataNode*)
+{
 }
 
 mitk::DataStorage::Pointer QmitkAbstractDataStorageModel::GetDataStorage() const

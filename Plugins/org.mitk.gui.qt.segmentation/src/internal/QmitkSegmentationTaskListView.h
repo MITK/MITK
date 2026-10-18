@@ -37,6 +37,7 @@ private:
   void SetFocus() override;
   void NodeAdded(const mitk::DataNode*) override;
   void NodeRemoved(const mitk::DataNode* removedNode) override;
+  void NodeSourcesChanged(const mitk::DataNode*) override;
 
   bool PreShutdown(berry::IWorkbench*, bool) override;
 

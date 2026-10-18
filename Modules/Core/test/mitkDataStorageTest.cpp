@@ -714,13 +714,13 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       MITK_TEST_CONDITION(
         (ds->GetNamedNode("extra") == nullptr) && (ds->GetNamedNode("d1x") == d1) && (ds->GetNamedNode("d2x") == d2) &&
           (refCountbeforeDS == watcher->GetReferenceCount()) &&
-          (ds->GetDerivations(n1)->Size() == 1) // after remove, only n2 should be derived from n1
+          (ds->GetDerivations(n1)->Size() == 3) // after remove, n2, d1 and d2 should be derived from n1
           &&
-          (ds->GetDerivations(n2)->Size() == 2) // after remove, only n3 and n4 should be derived from n2
+          (ds->GetDerivations(n2)->Size() == 4) // after remove, n3, n4, d1 and d2 should be derived from n2
           &&
-          (ds->GetSources(d1)->Size() == 0) // after remove, d1 should not have a source anymore
+          (ds->GetSources(d1)->Size() == 2) // after remove, d1 should have taken over n1 and n2 from extra
           &&
-          (ds->GetSources(d2)->Size() == 0) // after remove, d2 should not have a source anymore
+          (ds->GetSources(d2)->Size() == 2) // after remove, d2 should have taken over n1 and n2 from extra
         ,
         "Checking removal of a node with two parents and two derived nodes");
       extra = nullptr;

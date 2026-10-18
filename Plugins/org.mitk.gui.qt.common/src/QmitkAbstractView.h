@@ -316,8 +316,14 @@ private:
   virtual void NodeRemoved(const mitk::DataNode* node);
 
   /**
-   * Called when a DataStorage add *or* remove *or* change event from the currently active
-   * data storage is thrown.
+   * Called when a DataStorage SourcesChanged event was thrown, after the sources
+   * of the node changed. May be reimplemented by deriving classes.
+   */
+  virtual void NodeSourcesChanged(const mitk::DataNode* node);
+
+  /**
+   * Called when a DataStorage add *or* remove *or* change *or* sources changed event from the
+   * currently active data storage is thrown.
    *
    * May be reimplemented by deriving classes.
    */

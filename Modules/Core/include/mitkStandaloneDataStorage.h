@@ -64,13 +64,28 @@ namespace mitk
      * \brief Remove a node from the StandaloneDataStorage.
      *
      * Removes the node from both adjacency lists and emits RemoveNodeEvent before removal.
-     * If \a node is nullptr, the call is ignored.
+     * The nodes derived from it take over its sources in its place, without
+     * duplicates. If \a node is nullptr, the call is ignored.
      *
      * \param[in] node  The node to remove.
      * \throw std::logic_error if the DataStorage is not initialized.
      * \sa Add
      */
     void Remove(const mitk::DataNode *node) override;
+
+    /**
+     * \brief Replace the sources of a node, keeping the nodes derived from it.
+     *
+     * Duplicates among \a sources are ignored. Emits SourcesChangedNodeEvent unless
+     * the sources stay the same.
+     *
+     * \param[in] node     The node whose sources are replaced.
+     * \param[in] sources  The new sources, in order. May be nullptr.
+     * \throw std::invalid_argument if \a node or one of the \a sources is not in the DataStorage,
+     *        or if a source is \a node itself or derived from it.
+     * \sa DataStorage::SetSources
+     */
+    void SetSources(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *sources) override;
 
     /**
      * \brief Check whether a node exists in this StandaloneDataStorage.
@@ -156,6 +171,16 @@ namespace mitk
     //##Documentation
     //## @brief Nodes are stored in reverse relation for easier traversal in the opposite direction of the relation
     AdjacencyList m_DerivedNodes;
+
+  private:
+    /** \brief Give the nodes derived from the node its sources in its place. Requires m_Mutex to be locked. */
+    void PassSourcesToDerivations(const mitk::DataNode *node);
+
+    /**
+     * \brief Replace the sources of a node in both adjacency lists, without checks or events.
+     * Requires m_Mutex to be locked.
+     */
+    void ReplaceSources(mitk::DataNode *node, const SetOfObjects *newSources);
   };
 } // namespace mitk
 #endif

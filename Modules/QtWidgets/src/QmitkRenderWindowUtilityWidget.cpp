@@ -55,6 +55,7 @@ public:
     this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     this->setMinimumWidth(0);
     this->setAttribute(Qt::WA_TransparentForMouseEvents);
+    this->setObjectName(QStringLiteral("WindowTitle"));
   }
 
   void SetText(const QString& text)
@@ -188,7 +189,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
     "QToolButton:hover { background: rgba(255, 255, 255, 26); }"
     "QToolButton:checked { background: rgba(255, 255, 255, 38); border-color: %1; }"
     "QToolButton:focus { border-color: %1; }"
-    "QToolButton::menu-indicator { image: none; }").arg(QmitkIconTheme::GetAccentColor()));
+    "QToolButton::menu-indicator { image: none; }"
+    // A style that gives plain widgets a background (the dark Workbench style
+    // does) would paint one behind the window title.
+    "QWidget#WindowTitle { background: transparent; }").arg(QmitkIconTheme::GetAccentColor()));
 
   m_DataButton = new QToolButton(this);
   m_DataButton->setAutoRaise(true);

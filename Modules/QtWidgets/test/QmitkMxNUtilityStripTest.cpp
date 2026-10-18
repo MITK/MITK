@@ -25,6 +25,10 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QApplication>
+#include <QColor>
+#include <QImage>
+#include <QPixmap>
 #include <QToolButton>
 
 #include <cstdlib>
@@ -46,6 +50,7 @@ class QmitkMxNUtilityStripTestSuite : public mitk::TestFixture
   MITK_TEST(Title_HiddenBelowTheMinimumWidth);
   MITK_TEST(Title_HiddenWhenEmptyOrSwitchedOff);
   MITK_TEST(Title_BarcodeKeepsItsWidth);
+  MITK_TEST(Title_HasNoBackgroundUnderAWidgetStyleSheet);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -208,6 +213,37 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The title takes only leftover room: the barcode keeps its glyph width",
                                  barcode->sizeHint().width(), barcode->width());
+  }
+
+  /** Sets an application style sheet for its lifetime. */
+  struct ScopedApplicationStyleSheet
+  {
+    explicit ScopedApplicationStyleSheet(const QString& styleSheet)
+    {
+      qApp->setStyleSheet(styleSheet);
+    }
+    ~ScopedApplicationStyleSheet()
+    {
+      qApp->setStyleSheet(QString());
+    }
+  };
+
+  void Title_HasNoBackgroundUnderAWidgetStyleSheet()
+  {
+    // The dark Workbench style gives every plain QWidget a background; the
+    // strip's own translucent backing must show through around the title.
+    const QColor styledBackground(0x2d, 0x2d, 0x30);
+    const ScopedApplicationStyleSheet style(
+      QStringLiteral("QWidget { background-color: %1; }").arg(styledBackground.name()));
+    m_Editor->SetCellDisplayName(QStringLiteral("mxn__widget0"), QStringLiteral("Edit"));
+    this->Reveal();
+
+    const QRect title = this->Strip()->TitleRect();
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the title shows", title.isValid());
+    const QPoint besideTheText(title.left() - 20, title.center().y());
+    const QColor pixel = this->Strip()->grab().toImage().pixelColor(besideTheText);
+    CPPUNIT_ASSERT_MESSAGE("The title paints no background of its own: " + pixel.name(QColor::HexArgb).toStdString(),
+                           pixel.rgb() != styledBackground.rgb() && pixel.alpha() < 255);
   }
 };
 

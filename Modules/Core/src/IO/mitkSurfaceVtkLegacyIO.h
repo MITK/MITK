@@ -13,9 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSurfaceVtkLegacyIO_h
 #define mitkSurfaceVtkLegacyIO_h
 
-#include "mitkSurfaceVtkIO.h"
-
-#include <mitkBaseData.h>
+#include <mitkSurfaceVtkIO.h>
 
 namespace mitk
 {
@@ -49,25 +47,9 @@ namespace mitk
      */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-    // -------------- AbstractFileWriter -------------
-
-    /**
-     * \brief Write a mitk::Surface in VTK legacy poly data format.
-     *
-     * Supports optional binary output via the "Save as binary file" option.
-     * For multi-timestep data, each time step is written to a separate file.
-     *
-     * \throw mitk::Exception on write failure.
-     */
-    void Write() override;
-
   protected:
-    /**
-     * \brief Read VTK legacy poly data into a mitk::Surface.
-     * \return A vector containing the read Surface.
-     * \throw mitk::Exception on read failure.
-     */
-    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+    vtkSmartPointer<vtkPolyData> ReadPolyData(const std::string &fileName) override;
+    void WritePolyData(vtkPolyData *polyData, const std::string &fileName) override;
 
   private:
     SurfaceVtkLegacyIO *IOClone() const override;

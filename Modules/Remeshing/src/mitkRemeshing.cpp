@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
 
+#include <algorithm>
 #include <array>
 #include <vector>
 
@@ -102,6 +103,41 @@ namespace
     const mitk::ProgressTask* m_ProgressTask;
     int m_LoopBudget;
   };
+
+  bool HasPolygons(const mitk::Surface* surface, mitk::TimeStepType t)
+  {
+    if (t >= surface->GetSizeOfPolyDataSeries())
+      return false;
+
+    auto* polyData = surface->GetVtkPolyData(t);
+    return polyData != nullptr && polyData->GetNumberOfPolys() != 0;
+  }
+
+  int GetNumVertices(const mitk::Surface* surface, mitk::TimeStepType t, double density, int minNumVertices)
+  {
+    const auto numInputVertices = surface->GetVtkPolyData(t)->GetNumberOfPoints();
+    return std::max(minNumVertices, static_cast<int>(numInputVertices * density));
+  }
+
+  /** \brief The time steps of the surface that have polygons to remesh. */
+  std::vector<mitk::TimeStepType> GetTimeStepsToRemesh(const mitk::Surface* surface)
+  {
+    if (surface == nullptr)
+      mitkThrow() << "Input surface is nullptr!";
+
+    std::vector<mitk::TimeStepType> timeSteps;
+
+    for (mitk::TimeStepType t = 0; t < surface->GetSizeOfPolyDataSeries(); ++t)
+    {
+      if (HasPolygons(surface, t))
+        timeSteps.push_back(t);
+    }
+
+    if (timeSteps.empty())
+      mitkThrow() << "Input surface has no polygons!";
+
+    return timeSteps;
+  }
 
   void ValidateSurface(const mitk::Surface* surface, mitk::TimeStepType t)
   {
@@ -204,6 +240,11 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
                                     bool boundaryFixing,
                                     ProgressTask* progressTask)
 {
+  // ACVD polls for a cancel only once it clusters, after subsampling the
+  // input, which takes long and much memory for a cancelled time step.
+  if (progressTask != nullptr && progressTask->IsCancelRequested())
+    throw itk::ProcessAborted(__FILE__, __LINE__);
+
   ValidateSurface(surface, t);
 
   auto surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -298,8 +339,8 @@ size_t mitk::EstimateRemeshingMemory(const Surface* surface, TimeStepType t, int
 }
 
 mitk::RemeshFilter::RemeshFilter()
-  : m_TimeStep(0),
-    m_NumVertices(0),
+  : m_Density(1.0),
+    m_MinNumVertices(100),
     m_Gradation(0.5),
     m_Subsampling(10),
     m_EdgeSplitting(0.0),
@@ -316,6 +357,10 @@ mitk::RemeshFilter::~RemeshFilter()
 {
 }
 
+void mitk::RemeshFilter::CreateOutputForInput(unsigned int)
+{
+}
+
 void mitk::RemeshFilter::SetProgressTask(ProgressTask* task)
 {
   m_ProgressTask = task;
@@ -326,18 +371,73 @@ mitk::ProgressTask* mitk::RemeshFilter::GetProgressTask() const
   return m_ProgressTask;
 }
 
+size_t mitk::RemeshFilter::EstimateMemory() const
+{
+  const auto* input = dynamic_cast<const Surface*>(this->itk::ProcessObject::GetInput(0));
+  const auto timeStepsToRemesh = GetTimeStepsToRemesh(input);
+
+  size_t peak = 0;
+  size_t inputSize = 0;
+  size_t peakTimeStepSize = 0;
+
+  for (TimeStepType t = 0; t < input->GetSizeOfPolyDataSeries(); ++t)
+  {
+    if (auto* polyData = input->GetVtkPolyData(t); polyData != nullptr)
+      inputSize += static_cast<size_t>(polyData->GetActualMemorySize()) * 1024;
+  }
+
+  for (const auto t : timeStepsToRemesh)
+  {
+    const auto needed = EstimateRemeshingMemory(input, t, GetNumVertices(input, t, m_Density, m_MinNumVertices), m_Subsampling);
+
+    if (needed > peak)
+    {
+      peak = needed;
+      peakTimeStepSize = static_cast<size_t>(input->GetVtkPolyData(t)->GetActualMemorySize()) * 1024;
+    }
+  }
+
+  // The estimate of a time step includes its own copy of the input.
+  return peak + inputSize - peakTimeStepSize;
+}
+
 void mitk::RemeshFilter::GenerateData()
 {
-  auto output = Remesh(this->GetInput(),
-                       m_TimeStep,
-                       m_NumVertices,
-                       m_Gradation,
-                       m_Subsampling,
-                       m_EdgeSplitting,
-                       m_OptimizationLevel,
-                       m_ForceManifold,
-                       m_BoundaryFixing,
-                       m_ProgressTask);
+  const auto* input = this->GetInput();
+  const auto timeStepsToRemesh = GetTimeStepsToRemesh(input);
+  const auto timeSteps = static_cast<unsigned int>(input->GetSizeOfPolyDataSeries());
+
+  if (m_ProgressTask != nullptr && timeStepsToRemesh.size() > 1)
+    m_ProgressTask->AddStepsToDo(static_cast<unsigned int>(timeStepsToRemesh.size()));
+
+  // The remeshed points stay in the coordinates of the input points, so the
+  // geometries of the input apply to them as well.
+  auto output = Surface::New();
+  output->SetTimeGeometry(input->GetTimeGeometry()->Clone());
+  output->Expand(timeSteps);
+
+  // Time steps without polygons stay empty, but get poly data like the others.
+  for (unsigned int t = 0; t < timeSteps; ++t)
+    output->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), t);
+
+  for (const auto t : timeStepsToRemesh)
+  {
+    auto remeshedSurface = Remesh(input,
+                                  t,
+                                  GetNumVertices(input, t, m_Density, m_MinNumVertices),
+                                  m_Gradation,
+                                  m_Subsampling,
+                                  m_EdgeSplitting,
+                                  m_OptimizationLevel,
+                                  m_ForceManifold,
+                                  m_BoundaryFixing,
+                                  m_ProgressTask);
+
+    output->SetVtkPolyData(remeshedSurface->GetVtkPolyData(), static_cast<unsigned int>(t));
+
+    if (m_ProgressTask != nullptr)
+      m_ProgressTask->Progress();
+  }
 
   this->SetNthOutput(0, output);
 }

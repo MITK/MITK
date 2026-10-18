@@ -49,6 +49,7 @@ This makes the triangles of the result a little more uniform, but multiplies com
 
 The density sets the number of vertices of the result relative to the input: 50% halves it, and surfaces that are much denser than necessary often do well with 1-10%.
 The result has at least 100 vertices.
+Of a surface with several time steps, each time step is remeshed to the density of its own number of vertices, again to at least 100 vertices.
 
 The bar below the slider shows how much memory remeshing needs at each density, compared to the memory currently available:
 
@@ -59,6 +60,7 @@ The bar below the slider shows how much memory remeshing needs at each density, 
 </ul>
 
 The text below the bar gives the estimated share for the current density, and turns red as well.
+Time steps are remeshed one after the other, so for a surface with several of them, the estimate is that of the most demanding time step plus a copy of the others.
 
 Memory grows in steps rather than with every percent of density, because refining the input quadruples its number of vertices each time.
 The steps lie at about 10% and 40% for High, 2%, 8% and 32% for Very high, and 3.2%, 12.8% and 51.2% for Maximum.
@@ -72,6 +74,12 @@ A density just above a step therefore needs two and a half to four times the mem
   <li> <b>Hide original surface:</b> once the remeshed surface is added, the original is hidden so that it does not cover the result.
        This option does not apply when the original is replaced.
   <li> <b>Show remeshed surface as wireframe:</b> shows the edges of the triangles of the result instead of a closed surface.
+  <li> <b>Remesh current time step only:</b> of a surface with several time steps, only the time step at the current time point is remeshed instead of all of them.
+       The result is a surface without time steps, which is shown at every time point unless it keeps the time of the time step.
+       With <b>Replace original surface</b>, it replaces just that time step of the original, and the other time steps stay as they are.
+       The option is off by default and available only for surfaces with several time steps.
+  <li> <b>Keep time of the time step:</b> the remeshed time step keeps its time, so that it is shown only at that time, as in the original.
+       This option is off by default and applies only when the current time step is remeshed on its own and does not replace its original.
 </ul>
 
 By default, the result is added as a new node, shown as wireframe, and the original is hidden.
@@ -83,7 +91,8 @@ The settings of the view are locked until it is done.
 
 <ul>
   <li> A notification in the bottom right corner of the window shows that remeshing is running.
-       It has no percentage, since how long remeshing takes depends too much on the shape of the surface to be predicted.
+       When a single time step is remeshed, it has no percentage, since how long remeshing takes depends too much on the shape of the surface to be predicted.
+       When several time steps are remeshed, it shows the share of them that is done.
        Its <b>cancel</b> button stops the remeshing.
   <li> The original surface pulses in the 3D view until the result is ready.
   <li> Closing the view cancels the remeshing.
@@ -98,8 +107,8 @@ If the original was removed while remeshing ran, the result is added at the top 
 <ul>
   <li> Surfaces made of polygons other than triangles are triangulated first.
        Triangle strips, lines and single points are ignored.
-  <li> Of a surface with several time steps, only the first one is remeshed.
-       Replacing such a surface leaves it with that single time step.
+  <li> Of a surface with several time steps, every time step is remeshed, and the result keeps the time steps of the original, unless only the \ref org_mitk_views_remeshingOptions "current time step" is remeshed.
+       Time steps in which the surface is empty stay empty.
   <li> Open surfaces keep their borders.
        For this, remeshing adds vertices along the borders, so the result has somewhat more vertices than the density sets, and its triangles along the borders are less evenly shaped than elsewhere.
   <li> Remeshing the same surface twice gives slightly different, equally good results.

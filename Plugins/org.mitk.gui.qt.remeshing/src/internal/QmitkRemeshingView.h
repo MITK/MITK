@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <exception>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace Ui
@@ -70,20 +71,34 @@ private:
     bool ReplaceOriginal = false;
     bool HideOriginal = true;
     bool Wireframe = true;
+
+    /** \brief The only time step that is remeshed, unless all of them are. */
+    std::optional<mitk::TimeStepType> TimeStep;
   };
 
   void EnableWidgets(bool enable);
-  int GetNumberOfVertices(int density) const;
   int GetSubsampling() const;
   void UpdateMemoryEstimate();
   void SetUpHoverInfo(QWidget* parent);
+  void OnTimeChanged();
+
+  bool IsCurrentTimeStepOnly(const mitk::Surface* surface) const;
+
+  /**
+   * \brief The whole surface, or its current time step as a surface of its own.
+   *
+   * \param[in] surface The selected surface.
+   * \param[in] copy Whether the poly data is copied, as the worker needs it.
+   * \return The input of remeshing, or nullptr if the surface has no time step at the current time point.
+   */
+  mitk::Surface::ConstPointer GetRemeshingInput(const mitk::Surface* surface, bool copy) const;
 
   bool IsRemeshing() const;
   void CancelRemeshing();
   void OnRemeshingFinished();
 
   std::unique_ptr<Ui::QmitkRemeshingViewControls> m_Controls;
-  int m_MaxNumberOfVertices;
+  std::optional<unsigned long> m_TimeObserverTag;
 
   /** \brief What the info label shows while the mouse is over a widget. */
   std::map<QObject*, QString> m_HoverInfo;
@@ -92,8 +107,9 @@ private:
   QFutureWatcher<RemeshingResult> m_Watcher;
   std::shared_ptr<RemeshingRun> m_Run;
 
-  /** \brief The node of the surface being remeshed, and what the result takes from it. */
+  /** \brief The node of the surface being remeshed, the surface, and what the result takes from them. */
   mitk::WeakPointer<mitk::DataNode> m_Original;
+  mitk::WeakPointer<mitk::BaseData> m_OriginalData;
   std::string m_OriginalName;
   std::array<float, 3> m_OriginalColor;
   bool m_OriginalWasPulsing;

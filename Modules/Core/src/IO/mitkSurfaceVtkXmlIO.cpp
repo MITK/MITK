@@ -14,75 +14,38 @@ found in the LICENSE file.
 #include "mitkVtkFileIOProgressObserver.h"
 
 #include <mitkIOMimeTypes.h>
-#include <mitkSurface.h>
 
 #include <vtkErrorCode.h>
+#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#include <iterator>
-#include <string>
-
 namespace mitk
 {
-  class VtkXMLPolyDataWriter : public ::vtkXMLPolyDataWriter
-  {
-  public:
-    static VtkXMLPolyDataWriter *New() { return new VtkXMLPolyDataWriter(); }
-    vtkTypeMacro(VtkXMLPolyDataWriter, vtkXMLPolyDataWriter)
-
-      void SetStream(std::ostream *os)
-    {
-      this->Stream = os;
-    }
-    std::ostream *GetStream() const { return this->Stream; }
-  };
-
   SurfaceVtkXmlIO::SurfaceVtkXmlIO()
-    : SurfaceVtkIO(Surface::GetStaticNameOfClass(), IOMimeTypes::VTK_POLYDATA_MIMETYPE(), "VTK XML PolyData")
+    : SurfaceVtkIO(IOMimeTypes::VTK_POLYDATA_MIMETYPE(), "VTK XML PolyData")
   {
+    // The default among the formats that fully support surfaces without time,
+    // since older versions of MITK cannot read VTKHDF.
+    this->SetWriterRanking(1);
     this->RegisterService();
   }
 
-  std::vector<itk::SmartPointer<BaseData>> SurfaceVtkXmlIO::DoRead()
+  vtkSmartPointer<vtkPolyData> SurfaceVtkXmlIO::ReadPolyData(const std::string &fileName)
   {
-    mitk::Surface::Pointer output = mitk::Surface::New();
-
     auto reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    reader->SetFileName(fileName.c_str());
 
-    if (auto *stream = this->GetInputStream(); stream != nullptr)
-    {
-      // vtkXMLReader drops a stream handed to it as soon as its information
-      // pass closes the stream, so the data pass would find nothing to read.
-      // An input string stays with the reader for both passes.
-      const std::string content((std::istreambuf_iterator<char>(*stream)), std::istreambuf_iterator<char>());
-      reader->SetBinaryInputString(content.data(), static_cast<int>(content.size()));
-      reader->ReadFromInputStringOn();
-    }
-    else
-    {
-      reader->SetFileName(this->GetInputLocation().c_str());
-    }
     VtkFileIOProgressObserver progress(reader, [this](float p)
       {
-        this->AbstractFileReader::ReportProgress(p);
+        this->ReportReadProgress(p);
       });
 
-    reader->Update();
+    if (!reader->Update())
+      mitkThrow() << "Could not read \"" << fileName << "\".";
 
-    if (reader->GetOutput() != nullptr)
-    {
-      output->SetVtkPolyData(reader->GetOutput());
-    }
-    else
-    {
-      mitkThrow() << "vtkXMLPolyDataReader error: " << vtkErrorCode::GetStringFromErrorCode(reader->GetErrorCode());
-    }
-
-    std::vector<BaseData::Pointer> result;
-    result.push_back(output.GetPointer());
-    return result;
+    return reader->GetOutput();
   }
 
   IFileIO::ConfidenceLevel SurfaceVtkXmlIO::GetReaderConfidenceLevel() const
@@ -104,54 +67,23 @@ namespace mitk
     return Supported;
   }
 
-  void SurfaceVtkXmlIO::Write()
+  void SurfaceVtkXmlIO::WritePolyData(vtkPolyData *polyData, const std::string &fileName)
   {
-    ValidateOutputLocation();
+    auto writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+    writer->SetInputData(polyData);
+    writer->SetFileName(fileName.c_str());
 
-    const auto *input = dynamic_cast<const Surface *>(this->GetInput());
+    VtkFileIOProgressObserver progress(writer, [this](float p)
+      {
+        this->ReportWriteProgress(p);
+      });
 
-    const unsigned int timesteps = input->GetTimeGeometry()->CountTimeSteps();
-    for (unsigned int t = 0; t < timesteps; ++t)
+    if (writer->Write() == 0 || writer->GetErrorCode() != 0)
     {
-      std::string fileName;
-      vtkSmartPointer<vtkPolyData> polyData = this->GetPolyData(t, fileName);
-      if (polyData.Get() == nullptr)
-      {
-        mitkThrow() << "Cannot write empty surface";
-      }
-
-      vtkSmartPointer<VtkXMLPolyDataWriter> writer = vtkSmartPointer<VtkXMLPolyDataWriter>::New();
-      writer->SetInputData(polyData);
-
-      if (this->GetOutputStream())
-      {
-        if (input->GetTimeGeometry()->CountTimeSteps() > 1)
-        {
-          MITK_WARN << "Writing multiple time-steps to output streams is not supported. "
-                    << "Only the first time-step will be written";
-        }
-        writer->SetStream(this->GetOutputStream());
-      }
-      else
-      {
-        writer->SetFileName(fileName.c_str());
-      }
-
-      VtkFileIOProgressObserver progress(writer, [this, t, timesteps](float p)
-        {
-          this->AbstractFileWriter::ReportProgress((t + p) / timesteps);
-        });
-
-      if (writer->Write() == 0 || writer->GetErrorCode() != 0)
-      {
-        mitkThrow() << "Error during surface writing"
-                    << (writer->GetErrorCode() ?
-                          std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
-                          std::string());
-      }
-
-      if (this->GetOutputStream())
-        break;
+      mitkThrow() << "Error during surface writing"
+                  << (writer->GetErrorCode() ?
+                        std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
+                        std::string());
     }
   }
 

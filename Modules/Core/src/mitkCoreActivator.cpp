@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include "mitkPointSetWriterService.h"
 #include "mitkRawImageFileReader.h"
 #include "mitkSurfaceStlIO.h"
+#include "mitkSurfaceVtkHdfIO.h"
 #include "mitkSurfaceVtkLegacyIO.h"
 #include "mitkSurfaceVtkXmlIO.h"
 
@@ -446,6 +447,7 @@ void MitkCoreActivator::RegisterVtkReaderWriter()
   m_FileIOs.push_back(new mitk::SurfaceVtkXmlIO());
   m_FileIOs.push_back(new mitk::SurfaceStlIO());
   m_FileIOs.push_back(new mitk::SurfaceVtkLegacyIO());
+  m_FileIOs.push_back(new mitk::SurfaceVtkHdfIO());
 
   m_FileIOs.push_back(new mitk::ImageVtkXmlIO());
   m_FileIOs.push_back(new mitk::ImageVtkLegacyIO());

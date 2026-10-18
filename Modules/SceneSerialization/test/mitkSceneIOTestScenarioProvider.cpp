@@ -319,6 +319,44 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Surface() const
   return storage;
 }
 
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::TimeResolvedSurface() const
+{
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
+
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  surface->Expand(3);
+
+  for (unsigned int timeStep = 0; timeStep < 3; ++timeStep)
+  {
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    points->InsertNextPoint(timeStep, 0.0, 0.0);
+    points->InsertNextPoint(timeStep + 1.0, 0.0, 0.0);
+    points->InsertNextPoint(timeStep, 1.0, 0.0);
+
+    vtkSmartPointer<vtkPolygon> triangle = vtkSmartPointer<vtkPolygon>::New();
+    triangle->GetPointIds()->SetNumberOfIds(3);
+
+    for (vtkIdType id = 0; id < 3; ++id)
+      triangle->GetPointIds()->SetId(id, id);
+
+    vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
+    polygons->InsertNextCell(triangle);
+
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->SetPoints(points);
+    polyData->SetPolys(polygons);
+
+    surface->SetVtkPolyData(polyData, timeStep);
+  }
+
+  mitk::DataNode::Pointer node = DataNode::New();
+  node->SetName("TimeResolvedSurface");
+  node->SetData(surface);
+  storage->Add(node);
+
+  return storage;
+}
+
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::PointSet() const
 {
   mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();

@@ -19,8 +19,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class AbstractFileIO;
   struct IFileReader;
-  struct IFileWriter;
   class IMapperProvider;
 
   /**
@@ -41,9 +41,7 @@ namespace mitk
 
   private:
     std::unique_ptr<IFileReader> m_ObjReader;
-    std::unique_ptr<IFileWriter> m_ObjWriter;
-
-    std::unique_ptr<IFileReader> m_PlyReader;
+    std::unique_ptr<AbstractFileIO> m_PlyIO;
 
     std::unique_ptr<IMapperProvider> m_VolumeMapperProvider;
   };

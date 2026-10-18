@@ -13,8 +13,7 @@ found in the LICENSE file.
 #include "mitkIOExtActivator.h"
 
 #include "mitkObjFileReaderService.h"
-#include "mitkPlyFileReaderService.h"
-#include "mitkPlyFileWriterService.h"
+#include "mitkSurfacePlyIO.h"
 
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
@@ -57,8 +56,7 @@ namespace mitk
   {
     m_ObjReader.reset(new ObjFileReaderService());
 
-    m_PlyReader.reset(new PlyFileReaderService());
-    m_ObjWriter.reset(new PlyFileWriterService());
+    m_PlyIO.reset(new SurfacePlyIO());
 
     m_VolumeMapperProvider.reset(new VolumeMapperProvider(BaseRenderer::Standard3D));
   }

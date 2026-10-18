@@ -133,6 +133,14 @@ namespace mitk
     virtual bool IsValidTimeStep(TimeStepType timeStep) const = 0;
 
     /**
+    * \brief Tests if this object has a single time step that covers every time point
+    *
+    * This is the time geometry of 3D data, as ProportionalTimeGeometry::Initialize()
+    * makes it for a single time step.
+    */
+    bool IsValidAtEveryTimePoint() const;
+
+    /**
     * \brief Converts a time step to a time point
     *
     * Converts a time step to a time point in a way that

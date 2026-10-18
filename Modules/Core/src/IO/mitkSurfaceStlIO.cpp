@@ -15,10 +15,9 @@ found in the LICENSE file.
 
 #include <mitkIOMimeTypes.h>
 #include <mitkLocaleSwitch.h>
-#include <mitkSurface.h>
 
-#include <vtkCleanPolyData.h>
 #include <vtkErrorCode.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -27,146 +26,62 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  // std::string SurfaceStlIO::OPTION_MERGE_POINTS()
-  // {
-  //   static std::string s = "Merge points";
-  //   return s;
-  // }
-
-  std::string SurfaceStlIO::OPTION_TAG_SOLIDS()
-  {
-    static std::string s = "Tag solids";
-    return s;
-  }
-
-  std::string SurfaceStlIO::OPTION_CLEAN()
-  {
-    static std::string s = "Clean poly data";
-    return s;
-  }
-
   SurfaceStlIO::SurfaceStlIO()
-    : SurfaceVtkIO(Surface::GetStaticNameOfClass(), IOMimeTypes::STEREOLITHOGRAPHY_MIMETYPE(), "Stereolithography")
+    : SurfaceVtkIO(IOMimeTypes::STEREOLITHOGRAPHY_MIMETYPE(), "Stereolithography")
   {
-    Options defaultOptions;
-
-    // defaultOptions[OPTION_MERGE_POINTS()] = us::Any(true);
-    defaultOptions[OPTION_TAG_SOLIDS()] = us::Any(false);
-    defaultOptions[OPTION_CLEAN()] = us::Any(true);
-
-    this->SetDefaultReaderOptions(defaultOptions);
-
     this->RegisterService();
   }
 
-  std::vector<itk::SmartPointer<BaseData>> SurfaceStlIO::DoRead()
+  vtkSmartPointer<vtkPolyData> SurfaceStlIO::ReadPolyData(const std::string &fileName)
   {
     LocaleSwitch localeSwitch("C");
 
-    Options options = this->GetReaderOptions();
+    // STL repeats the points of each triangle. The reader merges them and
+    // drops the triangles that collapse in doing so.
+    auto stlReader = vtkSmartPointer<vtkSTLReader>::New();
+    stlReader->SetFileName(fileName.c_str());
 
-    mitk::Surface::Pointer output = mitk::Surface::New();
-
-    vtkSmartPointer<vtkSTLReader> stlReader = vtkSmartPointer<vtkSTLReader>::New();
-    stlReader->SetFileName(this->GetLocalFileName().c_str());
-
-    // bool mergePoints = true;
-    bool tagSolids = false;
-    bool cleanData = true;
-
-    try
-    {
-      // mergePoints = us::any_cast<bool>(options[OPTION_MERGE_POINTS()]);
-      tagSolids = us::any_cast<bool>(options[OPTION_TAG_SOLIDS()]);
-      cleanData = us::any_cast<bool>(options[OPTION_CLEAN()]);
-    }
-    catch (const us::BadAnyCastException &e)
-    {
-      MITK_WARN << "Unexpected error: " << e.what();
-    }
-
-    // stlReader->SetMerging(mergePoints);
-    stlReader->SetScalarTags(tagSolids);
-
-    vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+    // STL holds no point normals. Splitting would duplicate the points along
+    // sharp edges and leave the surface unwelded there.
+    auto normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
     normalsGenerator->SetInputConnection(stlReader->GetOutputPort());
+    normalsGenerator->SplittingOff();
 
-    vtkSmartPointer<vtkPolyDataAlgorithm> algo = normalsGenerator;
-    if (cleanData)
-    {
-      vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-      cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());
-      cleanPolyDataFilter->PieceInvariantOff();
-      cleanPolyDataFilter->ConvertLinesToPointsOff();
-      cleanPolyDataFilter->ConvertPolysToLinesOff();
-      cleanPolyDataFilter->ConvertStripsToPolysOff();
-      // if (mergePoints)
-      // {
-        cleanPolyDataFilter->PointMergingOn();
-      // }
-      algo = cleanPolyDataFilter;
-    }
     // The reader rather than the tail of the pipeline: reading the file is
     // the part that grows with the file, and each filter reports only its
     // own share of the work.
     VtkFileIOProgressObserver progress(stlReader, [this](float p)
       {
-        this->AbstractFileReader::ReportProgress(p);
+        this->ReportReadProgress(p);
       });
 
-    algo->Update();
+    if (!normalsGenerator->Update())
+      mitkThrow() << "Could not read \"" << fileName << "\".";
 
-    if (algo->GetOutput() != nullptr)
-    {
-      vtkSmartPointer<vtkPolyData> surfaceWithNormals = algo->GetOutput();
-      output->SetVtkPolyData(surfaceWithNormals);
-    }
-
-    std::vector<BaseData::Pointer> result;
-    result.push_back(output.GetPointer());
-    return result;
+    return normalsGenerator->GetOutput();
   }
 
-  void SurfaceStlIO::Write()
+  void SurfaceStlIO::WritePolyData(vtkPolyData *polyData, const std::string &fileName)
   {
     LocaleSwitch localeSwitch("C");
 
-    ValidateOutputLocation();
-    const auto *input = dynamic_cast<const Surface *>(this->GetInput());
+    vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
+    triangleFilter->SetInputData(polyData);
+    vtkSmartPointer<vtkSTLWriter> writer = vtkSmartPointer<vtkSTLWriter>::New();
+    writer->SetInputConnection(triangleFilter->GetOutputPort());
+    writer->SetFileName(fileName.c_str());
 
-    const unsigned int timesteps = input->GetTimeGeometry()->CountTimeSteps();
-    for (unsigned int t = 0; t < timesteps; ++t)
+    VtkFileIOProgressObserver progress(writer, [this](float p)
+      {
+        this->ReportWriteProgress(p);
+      });
+
+    if (writer->Write() == 0 || writer->GetErrorCode() != 0)
     {
-      std::string fileName;
-      vtkSmartPointer<vtkPolyData> polyData = this->GetPolyData(t, fileName);
-      vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
-      triangleFilter->SetInputData(polyData);
-      vtkSmartPointer<vtkSTLWriter> writer = vtkSmartPointer<vtkSTLWriter>::New();
-      writer->SetInputConnection(triangleFilter->GetOutputPort());
-
-      // The vtk stl writer cannot write to streams
-      LocalFile localFile(this);
-      writer->SetFileName(localFile.GetFileName().c_str());
-
-      VtkFileIOProgressObserver progress(writer, [this, t, timesteps](float p)
-        {
-          this->AbstractFileWriter::ReportProgress((t + p) / timesteps);
-        });
-
-      if (writer->Write() == 0 || writer->GetErrorCode() != 0)
-      {
-        mitkThrow() << "Error during surface writing"
-                    << (writer->GetErrorCode() ?
-                          std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
-                          std::string());
-      }
-
-      if (this->GetOutputStream() && input->GetTimeGeometry()->CountTimeSteps() > 1)
-      {
-        MITK_WARN << "Writing multiple time-steps to output streams is not supported. "
-                  << "Only the first time-step will be written";
-        break;
-      }
+      mitkThrow() << "Error during surface writing"
+                  << (writer->GetErrorCode() ?
+                        std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
+                        std::string());
     }
   }
 

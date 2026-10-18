@@ -1,7 +1,9 @@
-# test fails easily on MacOS, rarely on Windows, needs to be fixed before permanent activation (bug 15479)
-set(MODULE_TESTS)
+set(MODULE_TESTS
+  QmitkIOUtilSaveFilterTest.cpp
+)
 
 if(BUG_15479_FIXED)
+  # test fails easily on MacOS, rarely on Windows, needs to be fixed before permanent activation (bug 15479)
   list(APPEND MODULE_TESTS QmitkThreadedLogTest.cpp)
 endif()
 

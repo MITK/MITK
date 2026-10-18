@@ -56,7 +56,7 @@ namespace mitk
    * indeterminate task is the one to pass.
    * \return The remeshed surface.
    * \throw mitk::Exception The input surface is missing or has no polygons at time step \p t.
-   * \throw itk::ProcessAborted A cancel was requested through \p progressTask.
+   * \throw itk::ProcessAborted A cancel was requested through \p progressTask, also before remeshing started.
    */
   MITKREMESHING_EXPORT Surface::Pointer Remesh(const Surface* surface,
                                                TimeStepType t,
@@ -92,16 +92,15 @@ namespace mitk
                                                       int subsampling = 10);
 
   /**
-   * \brief ITK/VTK-style filter that encapsulates the mitk::Remesh() function.
+   * \brief ITK/VTK-style filter that remeshes every time step of a surface with mitk::Remesh().
    *
-   * This filter wraps the free-standing Remesh() function into an ITK pipeline filter
-   * derived from SurfaceToSurfaceFilter. Set the desired remeshing parameters via the
-   * provided setter macros, assign an input surface, and call Update() to produce
-   * a remeshed output surface.
+   * Each time step with polygons is remeshed to the given density of its own vertex count, but to at least the
+   * minimum number of vertices. Time steps without polygons stay empty. The output keeps the time geometry of the
+   * input, so its time steps and their geometries match those of the input.
    *
    * Default parameter values:
-   * - TimeStep: 0
-   * - NumVertices: 0 (keep original vertex count)
+   * - Density: 1.0 (keep the vertex count of each time step)
+   * - MinNumVertices: 100
    * - Gradation: 0.5
    * - Subsampling: 10
    * - EdgeSplitting: 0.0 (disabled)
@@ -119,10 +118,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    /** \brief Set the time step of the input surface to remesh. */
-    itkSetMacro(TimeStep, unsigned int);
-    /** \brief Set the desired number of vertices (0 to keep original count). */
-    itkSetMacro(NumVertices, int);
+    /** \brief Set the vertex count of each remeshed time step relative to that of the input time step. */
+    itkSetMacro(Density, double);
+    /** \brief Set the lower bound of the vertex count of each remeshed time step. */
+    itkSetMacro(MinNumVertices, int);
     /** \brief Set the gradation parameter controlling curvature influence on polygon size. */
     itkSetMacro(Gradation, double);
     /** \brief Set the subsampling factor for input surface refinement before remeshing. */
@@ -139,22 +138,43 @@ namespace mitk
     /**
      * \brief Poll the given task for a cancel request, or nothing if it is nullptr.
      *
-     * A requested cancel makes Update() throw itk::ProcessAborted.
+     * A requested cancel makes Update() throw itk::ProcessAborted. With several time steps to remesh, the task gets
+     * one step per time step, which is reported once the time step is remeshed.
      *
      * \sa Remesh()
      */
     void SetProgressTask(ProgressTask* task);
     ProgressTask* GetProgressTask() const;
 
+    /**
+     * \brief Estimate how much memory Update() needs at its peak.
+     *
+     * The estimate of EstimateRemeshingMemory() for the most demanding time step, plus the other time steps of the
+     * input, which should be a copy if the original stays on display while the filter runs on another thread. It
+     * leaves out the time steps that are already remeshed.
+     *
+     * \return The estimated peak memory in bytes.
+     * \throw mitk::Exception The input surface is missing or has no polygons at any time step.
+     */
+    size_t EstimateMemory() const;
+
   protected:
     void GenerateData() override;
+
+    /**
+     * \brief Unlike other surface filters, does not copy the input into the output.
+     *
+     * GenerateData() replaces the output anyway, and a copy of every time step
+     * would double the memory of the input on each SetInput().
+     */
+    void CreateOutputForInput(unsigned int idx) override;
 
   private:
     RemeshFilter();
     ~RemeshFilter() override;
 
-    TimeStepType m_TimeStep;
-    int m_NumVertices;
+    double m_Density;
+    int m_MinNumVertices;
     double m_Gradation;
     int m_Subsampling;
     double m_EdgeSplitting;

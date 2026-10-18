@@ -160,6 +160,11 @@ namespace mitk
     DataStorage::Pointer Surface() const;
 
     /**
+      Surface with several time steps.
+    */
+    DataStorage::Pointer TimeResolvedSurface() const;
+
+    /**
       Basic core type PointSet.
     */
     DataStorage::Pointer PointSet() const;
@@ -192,6 +197,7 @@ namespace mitk
 
       AddSaveAndRestoreScenario(Image);
       AddSaveAndRestoreScenario(Surface);
+      AddSaveAndRestoreScenario(TimeResolvedSurface);
       AddSaveAndRestoreScenario(PointSet);
 
       if (sizeof(size_t) != 4)

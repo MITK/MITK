@@ -173,22 +173,27 @@ reserved for future versions.
 
 ### Time geometry
 
-v1 does not encode `TimeGeometry` as a first-class scene field. When the
-data file referenced by `transfer.file_path` cannot persist
-`ProportionalTimeGeometry` (notably Surface formats), MITK's runtime
-stamps `ProportionalTimeGeometry.FirstTimePoint` and
-`ProportionalTimeGeometry.StepDuration` onto the BaseData's property list
-at export time so the values can ride along. On load, if those keys are
-present on the BaseData (whether populated by the file reader or by
-`data_properties`), the scene reader applies them back to the
-`ProportionalTimeGeometry`.
+v1 does not encode `TimeGeometry` as a first-class scene field; the data
+files keep the time of their data. Surfaces with a time are stored as
+VTKHDF, which keeps the time bounds of every time step, while surfaces
+without a time stay VTK XML PolyData.
+
+Older versions of MITK stored surfaces without their time and stamped
+`ProportionalTimeGeometry.FirstTimePoint` and
+`ProportionalTimeGeometry.StepDuration` as float properties onto the
+BaseData of some surfaces, like those of the 3D interpolation, so that
+the time could ride along. On load, if those keys are present on the
+BaseData (whether populated by the file reader or by `data_properties`),
+the scene reader applies them to its `ProportionalTimeGeometry`, after
+the data file was read.
 
 This is a pragmatic compatibility mechanism shared with the legacy XML
 reader. A first-class `time_geometry` block under each node is reserved
 for a future format version; until then, authors who need to override
 time geometry pass the two `ProportionalTimeGeometry.*` keys via
 `data_properties` on a node whose underlying data carries a
-`ProportionalTimeGeometry`.
+`ProportionalTimeGeometry`. The values are floats, so they override the
+time of the data file at single precision.
 
 ### `data_type` is informative
 

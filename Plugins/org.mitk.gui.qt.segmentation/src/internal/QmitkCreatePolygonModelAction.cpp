@@ -14,10 +14,11 @@ found in the LICENSE file.
 // MITK
 #include <mitkColorProperty.h>
 #include <mitkDataStorage.h>
+#include <mitkGeometry3D.h>
 #include <mitkLabelSetImage.h>
 #include <mitkMultiLabelSurfaceNetsExtractor.h>
+#include <mitkProgressTask.h>
 #include <mitkProperties.h>
-#include <mitkStatusBar.h>
 #include <mitkSurface.h>
 
 #include <vtkImageData.h>
@@ -29,6 +30,8 @@ found in the LICENSE file.
 #include <vtkTransformFilter.h>
 
 #include <QApplication>
+
+#include <map>
 
 using namespace berry;
 using namespace mitk;
@@ -57,6 +60,27 @@ namespace
       return label->GetName();
 
     return "label_" + std::to_string(value);
+  }
+
+  Surface::Pointer CreateSurface(const TimeGeometry* referenceTimeGeometry)
+  {
+    // The polydata is baked into world space, so only the time bounds are taken over
+    // from the source image while each time step keeps an identity spatial geometry.
+    auto timeGeometry = referenceTimeGeometry->Clone();
+    timeGeometry->ReplaceTimeStepGeometries(Geometry3D::New());
+
+    auto surface = Surface::New();
+    surface->SetTimeGeometry(timeGeometry);
+
+    const auto timeSteps = static_cast<unsigned int>(timeGeometry->CountTimeSteps());
+    surface->Expand(timeSteps);
+
+    // Time steps without a boundary still get (empty) polydata, as the surface
+    // writers reject time steps that have none.
+    for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+      surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), timeStep);
+
+    return surface;
   }
 
   void AddSurfaceNode(
@@ -141,8 +165,13 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     return;
   }
 
-  StatusBar::GetInstance()->DisplayText(
-    m_IsSmoothed ? "Smoothed surface creation started..." : "Surface creation started...");
+  // One step per time step of each group. The conversion runs on the GUI
+  // thread, where the progress notification paints itself as it advances.
+  const auto steps = nullptr != segmentation
+    ? static_cast<unsigned int>(segmentation->GetNumberOfGroups() * segmentation->GetTimeSteps())
+    : imageMask->GetTimeSteps();
+
+  ProgressTask task(m_IsSmoothed ? "Creating smoothed polygon models" : "Creating polygon models", steps);
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   const std::string parentName = selectedNode->GetName();
@@ -154,9 +183,9 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 
     if (nullptr != segmentation)
     {
-      const TimeStepType timeStep = 0;
-
       const auto numGroups = segmentation->GetNumberOfGroups();
+      const auto groupTimeSteps = segmentation->GetTimeSteps();
+
       for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < numGroups; ++groupID)
       {
         auto groupImage = segmentation->GetGroupImage(groupID);
@@ -165,24 +194,41 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
           continue;
         }
 
-        auto vtkImage = groupImage->GetVtkImageData(timeStep);
         const auto labelValues = segmentation->GetLabelValuesByGroup(groupID);
         if (labelValues.empty())
         {
           continue;
         }
 
-        auto results = extractor.ExtractPerLabel(vtkImage, labelValues);
-        for (const auto& [labelValue, polyData] : results)
+        // Created on the first time step in which a label has a boundary, so labels
+        // that are empty throughout get no node.
+        std::map<MultiLabelSegmentation::LabelValueType, Surface::Pointer> surfaces;
+
+        const auto timeSteps = groupImage->GetTimeSteps();
+        for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
         {
-          if (nullptr == polyData || polyData->GetNumberOfCells() == 0)
+          task.SetProgress(static_cast<unsigned int>(groupID * groupTimeSteps + timeStep));
+
+          auto results = extractor.ExtractPerLabel(groupImage->GetVtkImageData(timeStep), labelValues);
+          for (const auto& [labelValue, polyData] : results)
           {
-            continue;
+            if (nullptr == polyData || polyData->GetNumberOfCells() == 0)
+            {
+              continue;
+            }
+
+            auto& surface = surfaces[labelValue];
+            if (surface.IsNull())
+            {
+              surface = CreateSurface(groupImage->GetTimeGeometry());
+            }
+
+            surface->SetVtkPolyData(ApplyImageToWorld(polyData, groupImage->GetGeometry(timeStep)), timeStep);
           }
+        }
 
-          auto surface = Surface::New();
-          surface->SetVtkPolyData(ApplyImageToWorld(polyData, groupImage->GetGeometry()));
-
+        for (const auto& [labelValue, surface] : surfaces)
+        {
           const auto label = segmentation->GetLabel(labelValue);
           const Color labelColor = label != nullptr ? label->GetColor() : Color{};
 
@@ -192,14 +238,31 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     }
     else
     {
-      auto binarized = BinarizeMask(imageMask->GetVtkImageData(0));
-      auto results = extractor.ExtractPerLabel(binarized, {1});
-      auto it = results.find(1);
-      if (it != results.end() && it->second != nullptr && it->second->GetNumberOfCells() > 0)
-      {
-        auto surface = Surface::New();
-        surface->SetVtkPolyData(ApplyImageToWorld(it->second, imageMask->GetGeometry()));
+      Surface::Pointer surface;
 
+      const auto timeSteps = imageMask->GetTimeSteps();
+      for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+      {
+        task.SetProgress(timeStep);
+
+        auto binarized = BinarizeMask(imageMask->GetVtkImageData(timeStep));
+        auto results = extractor.ExtractPerLabel(binarized, {1});
+        auto it = results.find(1);
+        if (it == results.end() || it->second == nullptr || it->second->GetNumberOfCells() == 0)
+        {
+          continue;
+        }
+
+        if (surface.IsNull())
+        {
+          surface = CreateSurface(imageMask->GetTimeGeometry());
+        }
+
+        surface->SetVtkPolyData(ApplyImageToWorld(it->second, imageMask->GetGeometry(timeStep)), timeStep);
+      }
+
+      if (surface.IsNotNull())
+      {
         Color color;
         color.Set(1.0f, 1.0f, 1.0f);
         AddSurfaceNode(m_DataStorage, selectedNode, surface, parentName, std::string(), color, m_IsSmoothed);
@@ -216,7 +279,6 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
   }
 
   QApplication::restoreOverrideCursor();
-  StatusBar::GetInstance()->Clear();
 }
 
 void QmitkCreatePolygonModelAction::SetDataStorage(DataStorage *dataStorage)

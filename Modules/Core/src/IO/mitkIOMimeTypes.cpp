@@ -132,6 +132,7 @@ namespace mitk
     mimeTypes.push_back(VTK_POLYDATA_MIMETYPE().Clone());
     mimeTypes.push_back(VTK_PARALLEL_POLYDATA_MIMETYPE().Clone());
     mimeTypes.push_back(VTK_POLYDATA_LEGACY_MIMETYPE().Clone());
+    mimeTypes.push_back(VTKHDF_MIMETYPE().Clone());
 
     mimeTypes.push_back(STEREOLITHOGRAPHY_MIMETYPE().Clone());
     mimeTypes.push_back(WAVEFRONT_OBJ_MIMETYPE().Clone());
@@ -193,6 +194,15 @@ namespace mitk
     mimeType.AddExtension("pvtp");
     mimeType.SetCategory(CATEGORY_SURFACES());
     mimeType.SetComment("VTK Parallel PolyData");
+    return mimeType;
+  }
+
+  CustomMimeType IOMimeTypes::VTKHDF_MIMETYPE()
+  {
+    CustomMimeType mimeType(VTKHDF_NAME());
+    mimeType.AddExtension("vtkhdf");
+    mimeType.SetCategory(CATEGORY_SURFACES());
+    mimeType.SetComment("VTKHDF PolyData");
     return mimeType;
   }
 
@@ -292,6 +302,12 @@ namespace mitk
   std::string IOMimeTypes::VTK_PARALLEL_POLYDATA_NAME()
   {
     static std::string name = DEFAULT_BASE_NAME() + ".vtk.parallel.polydata";
+    return name;
+  }
+
+  std::string IOMimeTypes::VTKHDF_NAME()
+  {
+    static std::string name = DEFAULT_BASE_NAME() + ".vtkhdf";
     return name;
   }
 

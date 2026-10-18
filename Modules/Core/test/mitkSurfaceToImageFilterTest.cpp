@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkTestingMacros.h>
 
 #include <mitkSurfaceToImageFilter.h>
@@ -28,6 +29,7 @@ class mitkSurfaceToImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(test3DSurfaceValidOutput);
   MITK_TEST(test3DSurfaceCorrect);
   MITK_TEST(test3DSurfaceIn4DImage);
+  MITK_TEST(testTimeBoundSurfaceIn4DImage);
   MITK_TEST(test3DSurfaceKeepsInputValues);
   CPPUNIT_TEST_SUITE_END();
 
@@ -132,14 +134,30 @@ public:
 
   void test3DSurfaceIn4DImage()
   {
+    // Like a 3D image, a surface with a single time step is valid at every
+    // time point, so it is stamped into every time step.
+    CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_BallSurfaceAsInput_Output4DCorrect", IsBallStampedIn4DImage(true));
+  }
+
+  void testTimeBoundSurfaceIn4DImage()
+  {
+    auto timeGeometry = mitk::ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(m_Surface->GetGeometry(), 1);
+    timeGeometry->SetFirstTimePoint(0.0);
+    timeGeometry->SetStepDuration(1.0);
+    m_Surface->SetTimeGeometry(timeGeometry);
+
+    // The second time step of the image starts when the time step of the surface ends.
+    CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_TimeBoundBallSurfaceAsInput_OnlyInFirstTimeStep",
+                           IsBallStampedIn4DImage(false));
+  }
+
+  bool IsBallStampedIn4DImage(bool inSecondTimeStep)
+  {
     mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
 
     mitk::Image::Pointer additionalInputImage = mitk::Image::New();
-    auto *dims = new unsigned int[4];
-    dims[0] = 32;
-    dims[1] = 32;
-    dims[2] = 32;
-    dims[3] = 2;
+    unsigned int dims[] = { 32, 32, 32, 2 };
     additionalInputImage->Initialize(mitk::MakeScalarPixelType<unsigned int>(), 4, dims);
     additionalInputImage->SetOrigin(m_Surface->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry()->SetIndexToWorldTransform(m_Surface->GetGeometry()->GetIndexToWorldTransform());
@@ -224,33 +242,39 @@ public:
     idx[1] = 9, idx[2] = 23;
     idx[3] = 0;
     valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    // Values inside the ball but in the second timestep should be 0
+    // Values inside the ball in the second time step
+    const unsigned char inside = inSecondTimeStep ? 1 : 0;
     idx[0] = 15;
     idx[1] = 15, idx[2] = 15;
     idx[3] = 1;
-    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
     idx[0] = 31;
     idx[1] = 15, idx[2] = 15;
     idx[3] = 1;
-    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
     idx[0] = 2;
     idx[1] = 15, idx[2] = 15;
     idx[3] = 1;
-    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
     idx[0] = 15;
     idx[1] = 15, idx[2] = 2;
     idx[3] = 1;
-    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
     idx[0] = 15;
     idx[1] = 2, idx[2] = 15;
     idx[3] = 1;
-    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
     idx[0] = 6;
     idx[1] = 9, idx[2] = 23;
     idx[3] = 1;
+    valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == inside);
+    // Values outside the ball in the second time step
+    idx[0] = 0;
+    idx[1] = 0, idx[2] = 0;
+    idx[3] = 1;
     valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
 
-    CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_BallSurfaceAsInput_Output4DCorrect", valuesCorrect == true);
+    return valuesCorrect;
   }
 
   void test3DSurfaceKeepsInputValues()

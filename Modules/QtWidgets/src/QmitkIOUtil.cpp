@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <QThread>
 
 #include <algorithm>
+#include <map>
+#include <utility>
 
 namespace
 {
@@ -478,16 +480,33 @@ struct QmitkIOUtil::SaveFilter::Impl
     m_MimeTypes.push_back(ALL_MIMETYPE());
     m_FilterStrings.push_back("All (*.*)");
 
-    // Get all writers and their mime types for the given base data type
-    // (this is sorted already)
+    // Get all writers and their mime types for the given base data type,
+    // highest ranked first
     std::vector<mitk::MimeType> mimeTypes = saveInfo.m_WriterSelector.GetMimeTypes();
+    std::reverse(mimeTypes.begin(), mimeTypes.end());
 
-    for (std::vector<mitk::MimeType>::const_reverse_iterator iter = mimeTypes.rbegin(), iterEnd = mimeTypes.rend();
-         iter != iterEnd;
-         ++iter)
+    // Formats that fully support the data go first, so that the default
+    // filter does not lose part of it, e.g. the time steps of a surface.
+    std::map<std::string, mitk::IFileWriter::ConfidenceLevel> confidenceLevels;
+
+    for (const auto &item : saveInfo.m_WriterSelector.Get(std::string()))
+    {
+      auto &confidenceLevel = confidenceLevels[item.GetMimeType().GetName()];
+      confidenceLevel = std::max(confidenceLevel, item.GetConfidenceLevel());
+    }
+
+    const auto getConfidenceLevel = [&confidenceLevels = std::as_const(confidenceLevels)](const mitk::MimeType &mimeType) {
+      const auto iter = confidenceLevels.find(mimeType.GetName());
+      return iter != confidenceLevels.end() ? iter->second : mitk::IFileWriter::Unsupported;
+    };
+
+    std::stable_sort(mimeTypes.begin(), mimeTypes.end(), [&getConfidenceLevel](const mitk::MimeType &lhs, const mitk::MimeType &rhs) {
+      return getConfidenceLevel(lhs) > getConfidenceLevel(rhs);
+    });
+
+    for (const auto &mimeType : mimeTypes)
     {
       QList<QString> filterExtensions;
-      mitk::MimeType mimeType = *iter;
       std::vector<std::string> extensions = mimeType.GetExtensions();
       for (auto &extension : extensions)
       {
@@ -528,6 +547,8 @@ QmitkIOUtil::SaveFilter::SaveFilter(const QmitkIOUtil::SaveFilter &other) : d(ne
 QmitkIOUtil::SaveFilter::SaveFilter(const SaveInfo &saveInfo) : d(new Impl(saveInfo))
 {
 }
+
+QmitkIOUtil::SaveFilter::~SaveFilter() = default;
 
 QmitkIOUtil::SaveFilter &QmitkIOUtil::SaveFilter::operator=(const QmitkIOUtil::SaveFilter &other)
 {

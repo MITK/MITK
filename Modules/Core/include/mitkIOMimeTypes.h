@@ -143,6 +143,10 @@ namespace mitk
      *  \return A CustomMimeType for VTK parallel polydata surfaces. */
     static CustomMimeType VTK_PARALLEL_POLYDATA_MIMETYPE();
 
+    /** \brief Create a CustomMimeType for VTKHDF polydata files (.vtkhdf).
+     *  \return A CustomMimeType for VTKHDF polydata surfaces. */
+    static CustomMimeType VTKHDF_MIMETYPE();
+
     /** \brief Create a CustomMimeType for STL surface files (.stl).
      *  \return A CustomMimeType for stereolithography surfaces. */
     static CustomMimeType STEREOLITHOGRAPHY_MIMETYPE();
@@ -169,6 +173,8 @@ namespace mitk
     static std::string VTK_POLYDATA_LEGACY_NAME();
     /** \brief Get the mime-type name for VTK parallel polydata. \return "application/vnd.mitk.vtk.parallel.polydata" */
     static std::string VTK_PARALLEL_POLYDATA_NAME();
+    /** \brief Get the mime-type name for VTKHDF polydata. \return "application/vnd.mitk.vtkhdf" */
+    static std::string VTKHDF_NAME();
     /** \brief Get the mime-type name for Wavefront OBJ. \return "application/vnd.mitk.obj" */
     static std::string WAVEFRONT_OBJ_NAME();
     /** \brief Get the mime-type name for Stanford PLY. \return "application/vnd.mitk.ply" */

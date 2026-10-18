@@ -58,6 +58,8 @@ public:
 
     SaveFilter(const SaveInfo &saveInfo);
 
+    ~SaveFilter();
+
     SaveFilter &operator=(const SaveFilter &other);
 
     std::vector<mitk::MimeType> GetMimeTypes() const;

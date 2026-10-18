@@ -130,6 +130,9 @@ namespace mitk
      * Identifies nodes pairs and calls AreNodesEqual() for
      * pairs that are clearly identified. Warnings are issues
      * for unclear cases.
+     *
+     * \return Whether every reference node has exactly one partner in the
+     *         test storage. Mismatches within a pair count for the aspects.
      */
     bool CompareDataNodes(bool verbose);
 
@@ -141,6 +144,8 @@ namespace mitk
      * via the Tests flags.
      *
      * Calls to specific methods for each type of comparison.
+     *
+     * \return Whether the two nodes agree in all aspects that were compared.
      *
      * \sa IsDataEqual()
      * \sa ArePropertyListsEqual()
@@ -226,6 +231,7 @@ namespace mitk
     std::string GenerateHierarchyDescriptor(DataNode::Pointer node, DataStorage::ConstPointer storage);
 
     bool m_HierarchyPassed;
+    bool m_NodesMatched;
     bool m_DataPassed;
     bool m_PropertiesPassed;
     bool m_MappersPassed;

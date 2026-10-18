@@ -11,11 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkSurface.h>
+#include <mitkGeometry3D.h>
 #include <mitkInteractionConst.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkSurfaceOperation.h>
 #include <mitkStorageThreadDispatcherBase.h>
 
 #include <algorithm>
+#include <vtkBoundingBox.h>
 #include <vtkPolyData.h>
 
 static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData *other)
@@ -101,7 +104,11 @@ void mitk::Surface::InitializeEmpty()
   if (!m_PolyDatas.empty())
     this->ClearData();
 
-  Superclass::InitializeTimeGeometry();
+  // Like an image with a single time step, the surface is valid at every time
+  // point until it gets more time steps.
+  auto timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(Geometry3D::New(), 1);
+  this->SetTimeGeometry(timeGeometry);
 
   m_PolyDatas.push_back(nullptr);
   m_Initialized = true;
@@ -185,6 +192,20 @@ void mitk::Surface::CalculateBoundingBox()
   if (timeGeometry->CountTimeSteps() != m_PolyDatas.size())
     mitkThrow() << "Number of geometry time steps is inconsistent with number of poly data pointers.";
 
+  // Time steps without points, like those of a polygon model in which a
+  // label is absent, get the bounds of all other time steps. Bounds of their
+  // own would pull the bounding box of the surface to the origin.
+  vtkBoundingBox unionOfTimeSteps;
+
+  for (const auto &polyData : m_PolyDatas)
+  {
+    if (polyData != nullptr && polyData->GetNumberOfPoints() > 0)
+    {
+      polyData->ComputeBounds();
+      unionOfTimeSteps.AddBounds(polyData->GetBounds());
+    }
+  }
+
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
     vtkPolyData *polyData = m_PolyDatas[i].GetPointer();
@@ -192,9 +213,11 @@ void mitk::Surface::CalculateBoundingBox()
 
     if (polyData != nullptr && polyData->GetNumberOfPoints() > 0)
     {
-      //      polyData->Update(); //VTK6_TODO vtk pipeline
-      polyData->ComputeBounds();
       polyData->GetBounds(bounds);
+    }
+    else if (unionOfTimeSteps.IsValid())
+    {
+      unionOfTimeSteps.GetBounds(bounds);
     }
 
     BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);

@@ -46,8 +46,7 @@ Out of the box, the wheel supports the formats MITK supports natively:
 - **NIfTI** (`.nii`, `.nii.gz`)
 - **MetaImage** (`.mha`, `.mhd`)
 - **DICOM** (`.dcm`, plus DICOM series via a directory path)
-- **Surface meshes**: `.stl`, `.ply`, `.obj`, `.vtk`, `.vtp`
-- **Point sets**: `.mps`
+- **Surface meshes** (`.stl`, `.ply`, `.obj`, `.vtk`, `.vtp`, `.vtkhdf`) and **point sets** (`.mps`): supported by MITK, but not yet bound in Python. `IOUtil.load` skips them and `IOUtil.save` accepts only images and segmentations.
 
 Auto-loaded modules are listed at runtime via:
 

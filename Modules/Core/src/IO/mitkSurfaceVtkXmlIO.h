@@ -13,17 +13,12 @@ found in the LICENSE file.
 #ifndef mitkSurfaceVtkXmlIO_h
 #define mitkSurfaceVtkXmlIO_h
 
-#include "mitkSurfaceVtkIO.h"
-
-#include <mitkBaseData.h>
+#include <mitkSurfaceVtkIO.h>
 
 namespace mitk
 {
   /**
    * \brief Reader and writer for VTK XML poly data surface format (.vtp).
-   *
-   * Handles reading and writing of mitk::Surface data using VTK's XML poly
-   * data format. Supports both file-based and stream-based I/O.
    *
    * \sa SurfaceVtkIO
    * \sa SurfaceVtkLegacyIO
@@ -49,28 +44,9 @@ namespace mitk
      */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-    // -------------- AbstractFileWriter -------------
-
-    /**
-     * \brief Write a mitk::Surface in VTK XML poly data format.
-     *
-     * Supports writing to both files and output streams. For multi-timestep
-     * data with streams, only the first timestep is written.
-     *
-     * \throw mitk::Exception on write failure or if the surface is empty.
-     */
-    void Write() override;
-
   protected:
-    /**
-     * \brief Read VTK XML poly data into a mitk::Surface.
-     *
-     * Supports reading from both files and input streams.
-     *
-     * \return A vector containing the read Surface.
-     * \throw mitk::Exception on read failure.
-     */
-    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+    vtkSmartPointer<vtkPolyData> ReadPolyData(const std::string &fileName) override;
+    void WritePolyData(vtkPolyData *polyData, const std::string &fileName) override;
 
   private:
     SurfaceVtkXmlIO *IOClone() const override;

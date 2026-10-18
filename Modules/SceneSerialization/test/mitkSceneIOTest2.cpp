@@ -21,7 +21,19 @@ found in the LICENSE file.
 
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
+#include <mitkProperties.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkSurface.h>
+
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
+
+#include <itksys/SystemTools.hxx>
+
+#include <limits>
 
 /**
   \brief Test cases for SceneIO.
@@ -84,15 +96,104 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   MITK_TEST(Test_ReconstructionOfScenes);
   MITK_TEST(Test_SelectedPropertyNotPersisted);
   MITK_TEST(Test_SelectedPropertyNotPersistedForDataLessNode);
+  MITK_TEST(Test_SurfaceTimeKept);
+  MITK_TEST(Test_StaticSurfaceWithTimePropertiesStaysStatic);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
+  std::string m_Directory;
+
+  static mitk::DataNode::Pointer CreateSurfaceNode(const std::string &name)
+  {
+    auto points = vtkSmartPointer<vtkPoints>::New();
+    points->InsertNextPoint(0.0, 0.0, 0.0);
+    points->InsertNextPoint(1.0, 0.0, 0.0);
+    points->InsertNextPoint(0.0, 1.0, 0.0);
+
+    const vtkIdType ids[] = { 0, 1, 2 };
+    auto polys = vtkSmartPointer<vtkCellArray>::New();
+    polys->InsertNextCell(3, ids);
+
+    auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->SetPoints(points);
+    polyData->SetPolys(polys);
+
+    auto surface = mitk::Surface::New();
+    surface->SetVtkPolyData(polyData);
+
+    auto node = mitk::DataNode::New();
+    node->SetName(name);
+    node->SetData(surface);
+    return node;
+  }
 
 public:
+  void setUp() override
+  {
+    m_Directory = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTest_XXXXXX");
+  }
+
+  void tearDown() override
+  {
+    itksys::SystemTools::RemoveADirectory(m_Directory);
+  }
+
+  // The scene comparison does not compare time geometries.
+  void Test_SurfaceTimeKept()
+  {
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
+
+    auto timelessNode = CreateSurfaceNode("timeless");
+
+    // Not representable as floats, like the time points of DICOM series.
+    auto timedNode = CreateSurfaceNode("timed");
+    auto *timeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry *>(timedNode->GetData()->GetTimeGeometry());
+    timeGeometry->SetFirstTimePoint(1234.567);
+    timeGeometry->SetStepDuration(1234.567);
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    originalStorage->Add(timelessNode);
+    originalStorage->Add(timedNode);
+
+    mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
+    CPPUNIT_ASSERT(writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::SceneIO::Pointer reader = mitk::SceneIO::New();
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
+
+    const auto *restoredTimeless = restoredStorage->GetNamedNode("timeless")->GetData();
+    CPPUNIT_ASSERT(restoredTimeless->GetTimeGeometry()->IsValidAtEveryTimePoint());
+
+    const auto timeBounds = restoredStorage->GetNamedNode("timed")->GetData()->GetTimeGeometry()->GetTimeBounds(0);
+    CPPUNIT_ASSERT_EQUAL(1234.567, timeBounds[0]);
+    CPPUNIT_ASSERT_EQUAL(1234.567 + 1234.567, timeBounds[1]);
+  }
+  void Test_StaticSurfaceWithTimePropertiesStaysStatic()
+  {
+    // Older versions of MITK stamped the time of some surfaces, like those of
+    // the 3D interpolation, as float properties, in which the first time point
+    // of a surface that is valid at every time point is -inf.
+    auto node = CreateSurfaceNode("static");
+    node->GetData()->SetProperty("ProportionalTimeGeometry.FirstTimePoint",
+                                 mitk::FloatProperty::New(-std::numeric_limits<float>::infinity()));
+    node->GetData()->SetProperty("ProportionalTimeGeometry.StepDuration",
+                                 mitk::FloatProperty::New(std::numeric_limits<float>::infinity()));
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    originalStorage->Add(node);
+
+    const auto archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
+    CPPUNIT_ASSERT(mitk::SceneIO::New()->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = mitk::SceneIO::New()->LoadScene(archiveFilename));
+    CPPUNIT_ASSERT(restoredStorage->GetNamedNode("static")->GetData()->GetTimeGeometry()->IsValidAtEveryTimePoint());
+  }
+
   void Test_SceneIOInterfaces() { CPPUNIT_ASSERT_MESSAGE("Not urgent", true); }
   void Test_ReconstructionOfScenes()
   {
-    std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTest_XXXXXX");
 
     mitk::SceneIOTestScenarioProvider::ScenarioList scenarios = m_TestCaseProvider.GetAllScenarios();
     MITK_TEST_OUTPUT(<< "Executing " << scenarios.size() << " test scenarios");
@@ -100,7 +201,7 @@ public:
     {
       MITK_TEST_OUTPUT(<< "\n===== Test_ReconstructionOfScenes, scenario '" << scenario.key << "' =====");
 
-      std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+      std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
       mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
       mitk::DataStorage::Pointer originalStorage = scenario.BuildDataStorage();
       CPPUNIT_ASSERT_MESSAGE(
@@ -133,8 +234,7 @@ public:
 
   void Test_SelectedPropertyNotPersisted()
   {
-    std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTransientTest_XXXXXX");
-    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
 
     auto originalStorage = mitk::StandaloneDataStorage::New();
     auto node = mitk::DataNode::New();
@@ -165,8 +265,7 @@ public:
     // "selected" is registered transient for any BaseData type, including
     // data-less nodes (GetData() == nullptr). Filtering must not be skipped
     // just because the node carries no data.
-    std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTransientTest_XXXXXX");
-    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
 
     auto originalStorage = mitk::StandaloneDataStorage::New();
     auto node = mitk::DataNode::New(); // no SetData: a data-less node

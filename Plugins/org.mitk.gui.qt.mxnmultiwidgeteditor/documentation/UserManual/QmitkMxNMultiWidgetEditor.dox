@@ -38,12 +38,13 @@
 		<li> The grid controls in the row below it add or remove a trailing row or column in
 			place, which leaves the existing window views and their settings untouched.
 		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
-			widget layout"), or for an arrangement derived from the loaded data ("Data-based
-			layout"). A new grid size re-flows the window views, in reading order, into a plain
+			widget layout"), or for a layout built from the selected data ("Dynamic layout...", see
+			\ref org_mitk_views_mxnlayouteditor_Dynamic). A new grid size re-flows the window views,
+			in reading order, into a plain
 			grid: window views beyond the new size are removed, additional ones are added at the
 			end with a sagittal view direction, and the others keep their settings,
 			synchronization and selected data.
-			A data-based layout replaces all window views and synchronization groups, so the
+			A dynamic layout replaces all window views and synchronization groups, so the
 			view asks for confirmation first when synchronization goes beyond the default: a
 			second group, any link other than the default group's windowing, LUT and data
 			selection, or a window view detached from windowing or LUT. The window arrangement
@@ -106,8 +107,7 @@
 			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
 			taken out of windowing or LUT synchronization drops its own value and shows the image's
 			global level/window or colormap again; its controls then behave like the classic global
-			controls. The windows of a data-based layout are the
-			exception: they start without windowing and LUT synchronization.
+			controls.
 	</ul>
 
 	Slice and orientation links also decide which windows share a reference geometry: every
@@ -474,7 +474,7 @@
 			Drag the bar's body to shift the level and its ends to move the window bounds.
 	</ul>
 	For a window in a windowing or LUT group - which every new window is, through the default
-	group, except the windows of a data-based layout - these controls drive every group member (each keeping its relative
+	group - these controls drive every group member (each keeping its relative
 	difference during drags) and leave other windows and the node-global values untouched;
 	the global level/window slider intentionally does not affect grouped windows. Only a
 	window taken out of windowing or LUT synchronization altogether behaves like the classic

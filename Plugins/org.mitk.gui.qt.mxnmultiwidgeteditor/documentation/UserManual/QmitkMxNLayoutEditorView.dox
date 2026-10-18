@@ -43,7 +43,7 @@
 			a change made purely on the synchronization side is kept.
 	</ul>
 
-	Applying a preset, a file or a data-based arrangement replaces the window arrangement
+	Applying a preset, a file or a dynamic layout replaces the window arrangement
 	and discards the current synchronization groups, so the view asks for confirmation
 	first when synchronization goes beyond the default: a second group, any link other
 	than the default group's windowing, LUT and data selection, or a window detached from
@@ -53,13 +53,10 @@
 	The grid of the arrangement is edited in the row below: the row and column buttons
 	add or remove a trailing row or column in place, which leaves the existing windows
 	and their settings untouched, while <b>Edit grid...</b> opens the picker for a grid of
-	a chosen size or for an arrangement derived from the loaded data.
+	a chosen size or for a dynamic layout (see \ref org_mitk_views_mxnlayouteditor_Dynamic).
 
-	A new grid size keeps the remaining windows and their synchronization; a data-based
-	arrangement replaces all windows and synchronization groups and is confirmed like a
-	preset. Its windows are not linked on windowing or LUT, so a fresh data-based
-	arrangement already counts as synchronization beyond the default, and applying a
-	preset or a file over it asks for confirmation as well.
+	A new grid size keeps the remaining windows and their synchronization; a dynamic layout
+	replaces all windows and synchronization groups and is confirmed like a preset.
 
 \subsection org_mitk_views_mxnlayouteditor_Presets Presets
 	A preset is a starting point for one way of working: it sets up the windows, their
@@ -141,6 +138,70 @@
 			free window shows the others.
 		<li> Zooming at the pointer moves the centers of "Overview + detail" apart;
 			"Re-converge sync groups" brings them back together.
+	</ul>
+
+\subsection org_mitk_views_mxnlayouteditor_Dynamic Dynamic layouts
+	A dynamic layout is built from the data it is to show: its windows, their
+	synchronization and the data every window shows. <b>Dynamic layout...</b> in the
+	<b>Edit grid...</b> picker opens a dialog with four templates. Select the data in the
+	Data Manager first: the dialog fills the template's data slots from that selection, in
+	the order the Data Manager reports it, and sets the options from the data. Everything
+	can be changed there; an option you set keeps your choice while you change the data,
+	and switching the template starts it afresh. <b>Apply</b> stays disabled, with a line
+	naming the missing data, until every slot holds what it needs. Applying replaces the
+	layout like a preset and asks for the same confirmation.
+
+	The options follow the data's structure. Datasets count as aligned when they have
+	identical geometry, and only aligned datasets share navigation. DICOM tags only refine
+	that: one Frame of Reference counts as aligned too, the Modality chooses the roles and
+	the look of a fusion, and acquisition dates order the datasets. Data without DICOM tags
+	gets the same layouts.
+
+	A dataset is an image together with the segmentations, surfaces, point sets and masks
+	derived from it. Every window that shows a dataset shows all of them; an image derived
+	from another one is a dataset of its own.
+
+	<b>Datasets x planes.</b> Up to four datasets, one row each, with an axial, a sagittal
+	and a coronal window and, when a dataset has a segmentation or a surface, a 3D window.
+	The windows of a dataset share the crosshair, the level/window and the colormap. Aligned
+	datasets share the crosshair across the rows as well, and every plane shares slice,
+	zoom and pan with the same plane of the other datasets. "Datasets as columns" turns the
+	rows into columns.
+
+	<b>One view per dataset.</b> Two to sixteen datasets, one window each, in a grid shaped
+	to the display. Aligned datasets share slice, zoom, pan and the crosshair; every window
+	keeps its image's own level/window. The view is axial, sagittal, coronal, or 3D when
+	every dataset has a segmentation or a surface - the 3D windows then turn and zoom
+	together. When every dataset has an acquisition date, the earliest comes first.
+
+	<b>Shared base, varying overlay.</b> One image and up to four overlays (segmentations,
+	surfaces, point sets or masks): one axial window per overlay, showing the image with
+	that overlay, optionally a last window with all of them, and a row of 3D windows under
+	them when an overlay is a segmentation or a surface. All windows share the crosshair,
+	slice, zoom and pan, and the image's level/window and colormap. The image is the
+	selected one, or the one the selected overlays derive from; the overlays are the
+	selected ones, or those of the image.
+
+	<b>Fusion pair.</b> An anatomy and a fused image, typically CT and PET: an axial and a
+	coronal row with the anatomy, the fused image and the fusion of both, all on one
+	crosshair, and a maximum intensity projection (MIP) of the fused image. "Swap roles"
+	exchanges the two images. With the Modality tag, the CT is the anatomy and the PT the
+	fused image, and a fused image that is not a PT gets hot iron and no MIP window. With
+	the PET colour colormap, the fused column shows the PET in inverted gray. Both images
+	keep their own level/window, so the anatomy looks the same alone and under the fusion.
+
+	Things to know:
+	<ul>
+		<li> The fusion opacity is set per window. The Data Manager's opacity slider does not
+			reach the fusion windows; the Properties view, which edits a window's own values,
+			does, and so does applying the layout again.
+		<li> Data created later from a bound image appears in every window that shows that
+			image: a new segmentation of the shared image or of the anatomy appears in every
+			column.
+		<li> A layout file keeps the windows and their synchronization, not which data the
+			windows show: a saved dynamic layout reloads with every window showing all data.
+		<li> Under a mask, the level/window readout and colorbar of a window act on the image
+			below; the right-drag windowing gesture does not reach it yet.
 	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows

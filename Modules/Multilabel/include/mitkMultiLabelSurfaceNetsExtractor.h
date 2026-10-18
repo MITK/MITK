@@ -39,9 +39,9 @@ namespace mitk
    * vtkSurfaceNets3D extracts all labels in a single threaded pass and shares cells
    * between adjacent regions, producing gap-free, label-aware meshes.
    *
-   * Output cells carry a 2-component "BoundaryLabels" cell-data array that
-   * vtkSurfaceNets3D writes; component 0 holds the foreground label of each face
-   * (background or higher labels go to component 1).
+   * The cells of Extract() carry a 2-component "BoundaryLabels" cell-data array
+   * that vtkSurfaceNets3D writes; component 0 holds the foreground label of each
+   * face (background or higher labels go to component 1).
    *
    * The class also encapsulates a workaround for a vtkSurfaceNets3D caching hazard
    * (present up to at least VTK 9.7): label or input changes alone do not invalidate
@@ -85,9 +85,9 @@ namespace mitk
      *
      * The surface net is extracted once for all labels in the input list and split
      * per label by vtkSurfaceNetsAtlas, so the per-label output keeps consistent
-     * boundaries with adjacent labels. Component 0 of "BoundaryLabels" is always the
-     * label itself and normals point outward. Labels with no boundary in the group
-     * are absent from the returned map.
+     * boundaries with adjacent labels. Unlike the output of Extract(), it carries
+     * no cell data, only point normals, which point outward. Labels with no
+     * boundary in the group are absent from the returned map.
      */
     std::map<LabelValueType, vtkSmartPointer<vtkPolyData>> ExtractPerLabel(
       vtkImageData* groupImage,

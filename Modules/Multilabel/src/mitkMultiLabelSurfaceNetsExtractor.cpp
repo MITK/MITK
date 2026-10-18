@@ -182,9 +182,12 @@ mitk::MultiLabelSurfaceNetsExtractor::ExtractPerLabel(
 
     auto polyData = ComputeNormals(m_NormalsFilter, region);
 
-    // Atlas bookkeeping that is not part of this class's output contract.
+    // Atlas bookkeeping that is not part of this class's output contract. The
+    // boundary labels only hold the label itself and its neighbors here, which
+    // nothing uses, and a time step remeshed later would lack them.
     polyData->GetCellData()->RemoveArray("Label");
     polyData->GetCellData()->RemoveArray("LID");
+    polyData->GetCellData()->RemoveArray("BoundaryLabels");
     polyData->GetFieldData()->RemoveArray("AdjacentLabels");
     polyData->GetFieldData()->RemoveArray("PatchIDs");
 

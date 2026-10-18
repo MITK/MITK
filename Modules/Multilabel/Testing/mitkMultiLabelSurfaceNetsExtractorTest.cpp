@@ -33,6 +33,7 @@ class mitkMultiLabelSurfaceNetsExtractorTestSuite : public mitk::TestFixture
   MITK_TEST(Extract_TwoLabels_BoundaryLabelsCarryForegroundValue);
   MITK_TEST(ExtractPerLabel_ReturnsOnePolyDataPerPresentLabel);
   MITK_TEST(ExtractPerLabel_OmitsLabelsWithNoBoundary);
+  MITK_TEST(ExtractPerLabel_NoCellData);
   MITK_TEST(Extract_SingleSliceImage_ProducesClosedSlab);
   MITK_TEST(ExtractPerLabel_SingleSliceImage_ReturnsLabel);
   MITK_TEST(SmoothingToggle_ChangesPointPositions);
@@ -163,6 +164,17 @@ public:
     CPPUNIT_ASSERT(results.find(2) != results.end());
     CPPUNIT_ASSERT(results[1]->GetNumberOfCells() > 0);
     CPPUNIT_ASSERT(results[2]->GetNumberOfCells() > 0);
+  }
+
+  void ExtractPerLabel_NoCellData()
+  {
+    // Polygon models keep the same arrays in every time step, also when one
+    // time step is remeshed, which drops cell data.
+    auto image = MakeLabeledImage(true);
+    mitk::MultiLabelSurfaceNetsExtractor extractor;
+
+    for (const auto &[label, polyData] : extractor.ExtractPerLabel(image, {1, 2}))
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Label " + std::to_string(label), 0, polyData->GetCellData()->GetNumberOfArrays());
   }
 
   void ExtractPerLabel_OmitsLabelsWithNoBoundary()

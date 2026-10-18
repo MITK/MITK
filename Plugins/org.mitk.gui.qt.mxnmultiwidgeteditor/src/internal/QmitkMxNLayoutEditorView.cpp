@@ -254,12 +254,15 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
   }
 
   // The layout editor reports what the user asked for; applying it is this
-  // view's job. A data-based layout, a preset and a layout file each rebuild
+  // view's job. A dynamic layout, a preset and a layout file each rebuild
   // every window and replace the synchronization groups, so they are gated
   // behind ConfirmDestructiveLayoutChange. A grid-size change is applied
   // directly, like the +/- grid buttons: the remaining windows keep their
   // synchronization links. SaveLayout is read-only and stays direct.
   m_LayoutEditorWidget->SetDataStorage(this->GetDataStorage());
+  // Read when the dynamic layout dialog opens: a selection another view posts
+  // later is not the user's choice for it.
+  m_LayoutEditorWidget->SetDataManagerSelectionProvider([this]() { return this->GetDataManagerSelection(); });
   m_LayoutConnections.push_back(connect(
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LayoutSet,
     m_LayoutEditorWidget, [this, multiWidgetEditor](int row, int column)
@@ -275,22 +278,43 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
       }
     }));
   m_LayoutConnections.push_back(connect(
-    m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout,
-    m_LayoutEditorWidget, [this, multiWidget](const QList<mitk::DataNode::Pointer>& nodes)
+    m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::DynamicLayoutRequested,
+    m_LayoutEditorWidget, [this, multiWidget](const QmitkMxNDynamicLayout& requested)
     {
       if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
       {
         return;
       }
-      try
+
+      // Applied from a short timer for the reason given at LoadLayout below;
+      // the layout is copied, as the reference dies with this emit.
+      auto layout = std::make_shared<QmitkMxNDynamicLayout>(requested);
+      multiWidget->ShowLayoutLoadFeedback();
+      const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
+      QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, layout]()
       {
-        multiWidget->SetDataBasedLayout(nodes);
-      }
-      catch (const mitk::Exception& e)
-      {
-        QMessageBox::warning(m_LayoutEditorWidget, tr("Data-based layout failed"),
-                             QString::fromStdString(e.GetDescription()));
-      }
+        if (!IsBindable(multiWidget))
+        {
+          multiWidget->HideLayoutLoadFeedback();
+          return;
+        }
+
+        std::optional<QString> failure;
+        try
+        {
+          multiWidget->ApplyDynamicLayout(*layout);
+        }
+        catch (const std::exception& e)
+        {
+          failure = QString::fromUtf8(e.what());
+        }
+        multiWidget->HideLayoutLoadFeedback();
+        if (failure.has_value())
+        {
+          QMessageBox::warning(dialogParent.isNull() ? static_cast<QWidget*>(multiWidget) : dialogParent.data(),
+                               QmitkMxNLayoutEditorView::tr("Dynamic layout failed"), *failure);
+        }
+      });
     }));
   // Direct connection: the stream pointer is only valid during the emit.
   m_LayoutConnections.push_back(connect(

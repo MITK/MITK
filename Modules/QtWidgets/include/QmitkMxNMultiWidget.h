@@ -47,6 +47,7 @@ found in the LICENSE file.
 #include <vector>
 
 class QmitkMxNArrangeMode;
+struct QmitkMxNDynamicLayout;
 class QmitkRenderWindowProximity;
 struct QmitkMxN3DCameraState;
 class QDialog;
@@ -115,15 +116,15 @@ enum class QmitkMxNLayoutLock
   Structure = 0x1,
   /** A cell's view direction through the cell's own chrome (context menu and
       plane label). Without 'Structure', the Layout Editor view can still change
-      directions through a grid change, a data-based layout or a layout load. */
+      directions through a grid change, a dynamic layout or a layout load. */
   Direction = 0x2,
   /** The proportions between cells through the splitter handles. Without
       'Structure', the Layout Editor view can still change them through a grid
-      change, a data-based layout or a layout load. */
+      change, a dynamic layout or a layout load. */
   Proportions = 0x4,
   /** The data a cell shows through the cell's own chrome (its node selection,
       which propagates to its selection group). Without 'Structure', the Layout
-      Editor view can still change content through a data-based layout or a
+      Editor view can still change content through a dynamic layout or a
       layout load. */
   Content = 0x8
 };
@@ -1125,6 +1126,32 @@ public:
   nlohmann::json SerializeLayout() const;
 
   /**
+  * \brief Replace the layout with a dynamic layout and bind its data.
+  *
+  *   Validates the whole layout first, against the document and the data
+  *   storage, and throws before anything changes:
+  *   - every 'groupNodes' entry names a selection group the document
+  *     declares;
+  *   - every assignment and fit names a window of the document;
+  *   - lookup tables only go to windows the document links on LUT;
+  *   - volume renderings only go to 3D windows;
+  *   - every node is in the data storage.
+  *
+  *   Then it loads 'layout.document' as 'ApplyLayout' does. It makes every
+  *   bound group show exactly its nodes, drawn bottom to top in the given
+  *   order, writes the lookup tables (through 'SetLookupTable'), opacities
+  *   and volume renderings for the named windows' renderers, runs the fits,
+  *   and restores the global time step the fits reset. 'IsApplyingLayout' is
+  *   true throughout. Only renderer-specific properties are written. Nothing
+  *   throws after the document is loaded.
+  *
+  * \throws QmitkMxNLayoutBusyException and mitk::Exception as 'ApplyLayout'
+  *         does (from validation or loading), with the current layout
+  *         untouched by validation failures.
+  */
+  void ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout);
+
+  /**
   * \brief Plain-data summary of one cell leaf in the layout tree.
   *
   *   Holds the per-cell fields that the layout document persists for a
@@ -1351,16 +1378,6 @@ public Q_SLOTS:
   */
   void SaveLayout(std::ostream* outStream);
 
-  /**
-  * \brief Replace the layout with one row per node, each row holding an axial,
-  *        a coronal and a sagittal window that show only that node.
-  *
-  *   Each row gets a selection group of its own. Unlike the cells of
-  *   'SetLayout' and the grid operations, the cells built here carry no
-  *   Windowing or LUT link, so a level/window or LUT change in one of them
-  *   writes the node's properties for every renderer.
-  */
-  void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
 Q_SIGNALS:
 
@@ -1509,7 +1526,7 @@ private:
   *        'LayoutProportionsChanged' and make its children non-collapsible.
   *
   *        Splitters are created in several places (grid builder, layout
-  *        loader, data-based layout, grid operations), so the tree is walked
+  *        loader, grid operations), so the tree is walked
   *        after a structural change instead of wiring each construction
   *        site. The connection is unique, which makes re-walking idempotent,
   *        and the walk is by child index rather than findChildren so
@@ -1778,6 +1795,13 @@ private:
   void RemoveCellRendererProperties(const QString& windowId, std::initializer_list<const char*> propertyKeys);
 
   /**
+  * \brief Clear the whole renderer-specific property list of cell 'windowId'
+  *        on every node, for a cell that goes away: whatever was written for
+  *        its renderer would otherwise restyle the next cell under its id.
+  */
+  void ClearCellRendererProperties(const QString& windowId);
+
+  /**
   * \brief Shared member loop of 'SetLevelWindow' / 'AdjustLevelWindow':
   *        validate, resolve the cell's `Windowing` group, and run 'modify'
   *        on the level window of every target (renderer-specific for group
@@ -1847,6 +1871,15 @@ private:
   * \param zoomFactor The sender's zoom-in factor (> 1 magnifies).
   */
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
+
+  /** \brief The body of 'ApplyLayout'; the caller holds the busy flag. */
+  void LoadLayoutDocument(const nlohmann::json& doc);
+
+  /** \brief The checks 'ApplyDynamicLayout' runs before it changes anything. */
+  void ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const;
+
+  /** \brief Fit one cell, alone, to the data visible in it. */
+  void FitCellToVisibleData(const QString& windowId);
 
   /**
   * \brief Set the 2D members of the zoom group of 'sender' to the zoom of

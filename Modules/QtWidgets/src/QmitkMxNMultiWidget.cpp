@@ -39,6 +39,7 @@ found in the LICENSE file.
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxN3DCamera.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellOverlay.h>
@@ -931,7 +932,7 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
   // A reopened editor takes the same cell ids again.
   for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
   {
-    this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+    this->ClearCellRendererProperties(windowId);
     // The cells outlive this destructor (the base class releases them), but
     // their overlays query this editor; they go while it is still whole.
     delete cell->findChild<QmitkMxNCellOverlay*>();
@@ -942,13 +943,35 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
 {
-  this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
   // Cell ids are reused; a new cell under this id starts canonical, with
-  // nothing remembered.
+  // nothing remembered - not its appearance either, which a dynamic layout
+  // writes beyond level/window and lookup table (opacity, volume rendering).
+  this->ClearCellRendererProperties(widgetName);
   m_FreeCells.erase(widgetName);
   m_SeenRenderModes.erase(widgetName);
   m_TwoDViews.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
+}
+
+void QmitkMxNMultiWidget::ClearCellRendererProperties(const QString& windowId)
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  const auto context = windowId.toStdString();
+  const auto nodes = dataStorage->GetAll();
+  for (const auto& node : *nodes)
+  {
+    const auto contexts = node->GetPropertyListNames();
+    // GetPropertyList would create the list of a context the node lacks.
+    if (std::find(contexts.begin(), contexts.end(), context) != contexts.end())
+    {
+      node->GetPropertyList(context)->Clear();
+    }
+  }
 }
 
 void QmitkMxNMultiWidget::RemoveCellRendererProperties(const QString& windowId,
@@ -3099,10 +3122,244 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     mitkThrowException(QmitkMxNLayoutBusyException)
       << "A layout is already being applied to this editor; retry once it has finished.";
   }
-  // Outside the try so the rollback in the handlers below, which pumps the
-  // event loop as well, still runs with the flag set.
+  // Outside the load so its rollback, which pumps the event loop as well,
+  // still runs with the flag set.
   const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  this->LoadLayoutDocument(doc);
+}
 
+void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout)
+{
+  if (m_ApplyingLayout)
+  {
+    mitkThrowException(QmitkMxNLayoutBusyException)
+      << "A layout is already being applied to this editor; retry once it has finished.";
+  }
+  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  this->ValidateDynamicLayout(layout);
+  // Every view initialization resets the global time step: the new cells'
+  // own on creation, and the fits below.
+  auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  const auto timePoint = timeNavigation->GetSelectedTimePoint();
+  this->LoadLayoutDocument(layout.document);
+
+  // Validated above, so a throw from here on is a defect; it must not leave a
+  // half-applied layout behind a caller that expects a clean failure.
+  const auto guarded = [](const char* step, const std::function<void()>& action)
+  {
+    try
+    {
+      action();
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Dynamic layout: " << step << " failed: " << e.GetDescription();
+    }
+  };
+
+  guarded("binding the selection groups", [this, &layout]()
+  {
+    for (const auto& [group, nodes] : layout.groupNodes)
+    {
+      const auto index = std::find_if(m_GroupNameByIndex.begin(), m_GroupNameByIndex.end(),
+                                      [&group = group](const auto& entry) { return entry.second == group; });
+      auto* connector = index != m_GroupNameByIndex.end() ? this->GetSyncGroupConnector(index->first) : nullptr;
+      if (nullptr == connector)
+      {
+        continue;
+      }
+      connector->ChangeSelectionMode(false);
+      connector->ChangeSelection(QmitkSynchronizedWidgetConnector::NodeList(nodes.begin(), nodes.end()));
+
+      // The selection group copies the node-global layers, so the order the
+      // layout asks for is written per renderer.
+      for (const auto& descriptor : this->ListWindowDescriptors())
+      {
+        if (descriptor.selectionGroup.toStdString() != group)
+        {
+          continue;
+        }
+        auto* renderer = RendererOf(this->GetRenderWindowWidget(descriptor.id).get());
+        for (std::size_t layer = 0; layer < nodes.size(); ++layer)
+        {
+          nodes[layer]->SetIntProperty("layer", static_cast<int>(layer), renderer);
+        }
+      }
+    }
+  });
+
+  guarded("writing the lookup tables", [this, &layout]()
+  {
+    for (const auto& assignment : layout.lookupTables)
+    {
+      auto lookupTable = mitk::LookupTable::New();
+      lookupTable->SetType(assignment.type);
+      this->SetLookupTable(assignment.windowId, assignment.node, lookupTable);
+    }
+  });
+
+  guarded("writing the opacities and volume renderings", [this, &layout]()
+  {
+    for (const auto& assignment : layout.opacities)
+    {
+      assignment.node->SetOpacity(assignment.opacity, RendererOf(this->GetRenderWindowWidget(assignment.windowId).get()));
+    }
+    for (const auto& assignment : layout.volumeRenderings)
+    {
+      auto* renderer = RendererOf(this->GetRenderWindowWidget(assignment.windowId).get());
+      assignment.node->SetBoolProperty("volumerendering", true, renderer);
+      assignment.node->SetIntProperty("volumerendering.blendmode", assignment.blendMode, renderer);
+    }
+  });
+
+  guarded("fitting the views", [this, &layout, timeNavigation, timePoint]()
+  {
+    for (const auto& fit : layout.fits)
+    {
+      if (fit.wholeComponent)
+      {
+        this->ReinitSyncGroupGeometry(fit.windowId);
+      }
+      else
+      {
+        this->FitCellToVisibleData(fit.windowId);
+      }
+    }
+    const auto* timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
+    if (nullptr != timeGeometry && timeGeometry->IsValidTimePoint(timePoint))
+    {
+      timeNavigation->GetStepper()->SetPos(timeGeometry->TimePointToTimeStep(timePoint));
+    }
+  });
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const
+{
+  struct WindowFacts
+  {
+    std::string selection;
+    bool threeD = false;
+    bool linkedOnLut = false;
+  };
+  std::map<QString, WindowFacts> windows;
+  std::function<void(const nlohmann::json&)> collect = [&windows, &collect](const nlohmann::json& node)
+  {
+    if (!node.is_object())
+    {
+      return;
+    }
+    if ("window" == node.value("type", std::string()) && node.contains("id") && node.at("id").is_string())
+    {
+      WindowFacts facts;
+      const auto& links = node.value("links", nlohmann::json::object());
+      facts.selection = links.value("selection", std::string());
+      facts.threeD = "3d" == node.value("render_mode", std::string());
+      facts.linkedOnLut = links.contains("lut");
+      windows[QString::fromStdString(node.at("id").get<std::string>())] = facts;
+    }
+    if (node.contains("children") && node.at("children").is_array())
+    {
+      for (const auto& child : node.at("children"))
+      {
+        collect(child);
+      }
+    }
+  };
+  if (layout.document.is_object() && layout.document.contains("root"))
+  {
+    collect(layout.document.at("root"));
+  }
+
+  const auto groups = layout.document.is_object() ? layout.document.value("groups", nlohmann::json::object())
+                                                  : nlohmann::json::object();
+  const auto* dataStorage = this->GetDataStorage();
+  const auto checkNode = [dataStorage](const mitk::DataNode::Pointer& node, const std::string& where)
+  {
+    if (node.IsNull() || nullptr == dataStorage || !dataStorage->Exists(node))
+    {
+      mitkThrow() << "ApplyDynamicLayout: " << where << " names a node that is not in the data storage.";
+    }
+  };
+  const auto checkWindow = [&windows](const QString& windowId, const std::string& where) -> const WindowFacts&
+  {
+    const auto it = windows.find(windowId);
+    if (it == windows.end())
+    {
+      mitkThrow() << "ApplyDynamicLayout: " << where << " names window '" << windowId.toStdString()
+                  << "', which the document does not have.";
+    }
+    return it->second;
+  };
+
+  for (const auto& [group, nodes] : layout.groupNodes)
+  {
+    const bool isSelectionGroup = std::any_of(windows.begin(), windows.end(),
+                                              [&group = group](const auto& entry) { return entry.second.selection == group; });
+    if (!groups.contains(group) || !isSelectionGroup)
+    {
+      mitkThrow() << "ApplyDynamicLayout: the data of group '" << group
+                  << "' is bound to no selection group the document declares.";
+    }
+    for (const auto& node : nodes)
+    {
+      checkNode(node, "group '" + group + "'");
+    }
+  }
+  for (const auto& assignment : layout.lookupTables)
+  {
+    if (!checkWindow(assignment.windowId, "a lookup table").linkedOnLut)
+    {
+      mitkThrow() << "ApplyDynamicLayout: a lookup table goes to window '" << assignment.windowId.toStdString()
+                  << "', which the document does not link on 'lut'.";
+    }
+    checkNode(assignment.node, "a lookup table");
+  }
+  for (const auto& assignment : layout.opacities)
+  {
+    checkWindow(assignment.windowId, "an opacity");
+    checkNode(assignment.node, "an opacity");
+  }
+  for (const auto& assignment : layout.volumeRenderings)
+  {
+    if (!checkWindow(assignment.windowId, "a volume rendering").threeD)
+    {
+      mitkThrow() << "ApplyDynamicLayout: a volume rendering goes to window '" << assignment.windowId.toStdString()
+                  << "', which is not a 3D window.";
+    }
+    checkNode(assignment.node, "a volume rendering");
+  }
+  for (const auto& fit : layout.fits)
+  {
+    checkWindow(fit.windowId, "a fit");
+  }
+}
+
+void QmitkMxNMultiWidget::FitCellToVisibleData(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == widget || nullptr == dataStorage)
+  {
+    return;
+  }
+  // The data a single-cell reinit would fit to, as in ReinitSyncGroupGeometry.
+  const auto includeInBoundingBox =
+    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
+  const auto helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  const auto predicate = mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(includeInBoundingBox),
+                                                     mitk::NodePredicateNot::New(helperObject));
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetSubset(predicate), "visible",
+                                                             RendererOf(widget.get()));
+  if (bounds.IsNotNull())
+  {
+    mitk::RenderingManager::GetInstance()->InitializeView(widget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+  }
+}
+
+void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
+{
   // 'didMutate' guards rollback. As long as we are in the validation phase
   // (no engine state touched yet) a throw must rethrow without rolling back,
   // so a malformed document does not destroy the user's existing layout.
@@ -3474,73 +3731,6 @@ void QmitkMxNMultiWidget::ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell)
 QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const
 {
   return m_LayoutLocks;
-}
-
-void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
-{
-  // Tear the existing cell tree down first rather than recycling 'widget<i>'
-  // cells by positional index: after a layout with custom ids is loaded,
-  // those lookups return null, new cells are appended while the custom-named
-  // ones stay in the map, and both are then deleted twice by
-  // 'delete this->layout()'. Mirroring 'ApplyLayout's structure (tear down,
-  // allocate groups, build fresh) works whatever the prior naming scheme.
-  this->ResetGridState();
-  this->TearDownAllCells();
-
-  auto vSplit = new QSplitter(Qt::Vertical);
-
-  unsigned int rowCounter = 0;
-  unsigned int cellCounter = 0;
-  for (auto node : nodes)
-  {
-    rowCounter++;
-    // Pre-create the row's synchronization group via the canonical API so that
-    // its connector and hue exist before SetSyncGroup() binds cells to it.
-    this->AddSynchronizationGroup(rowCounter);
-
-    auto hSplit = new QSplitter(Qt::Horizontal);
-    for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
-    {
-      // Use the explicit-id overload (which leaves cells unattached) and
-      // place each cell directly into its row group via the canonical API,
-      // mirroring ApplyLayout. Avoids the churn of the positional overload's
-      // initial seeding into group 1 followed by an immediate move.
-      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER
-                      + QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(id, viewPlane);
-      this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
-
-      auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
-      node->SetVisibility(true, baseRenderer);
-      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());
-      hSplit->addWidget(window.get());
-      window->show();
-    }
-
-    auto* const rowConnector = this->GetSyncGroupConnector(rowCounter);
-    rowConnector->ChangeSelectionMode(false);
-    rowConnector->ChangeSelection(QList({ node }));
-
-    auto sizes = QList<int>({1, 1, 1});
-    hSplit->setSizes(sizes);
-    vSplit->addWidget(hSplit);
-  }
-
-  auto hBoxLayout = new QHBoxLayout(this);
-  this->setLayout(hBoxLayout);
-  hBoxLayout->addWidget(vSplit);
-
-  // Deterministic active-cell assignment after rebuild. ResetGridState()
-  // nulled out the previous active pointer; without this the editor would
-  // be left with a null active cell until the user clicks one.
-  if (auto firstCell = this->FirstCellInReadingOrder())
-  {
-    this->SetActiveRenderWindowWidget(firstCell);
-  }
-
-  this->EnableCrosshair();
-  this->ConfigureLayoutSplitters();
-  emit LayoutChanged();
 }
 
 void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name)

@@ -15,9 +15,12 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNSyncDimension.h>
+
+#include <mitkWeakPointer.h>
 
 #include <QPointer>
 #include <QStringList>
@@ -45,7 +48,7 @@ class QVBoxLayout;
  *
  * One structural surface for both jobs the layout document describes: the
  * cell arrangement (presets, load and save in the header row; grid size and
- * the data-based arrangement behind "Edit grid...") and the per-dimension
+ * the way to a dynamic layout behind "Edit grid...") and the per-dimension
  * synchronization groups.
  *
  * The windows themselves are arranged in the display: while the hosting view
@@ -103,10 +106,17 @@ public:
   bool eventFilter(QObject* watched, QEvent* event) override;
 
   /**
-   * \brief The data storage the data-based layout option derives an
-   *        arrangement from. Without it that option has nothing to offer.
+   * \brief The data storage the dynamic layout dialog chooses its data from.
+   *        Without it, "Dynamic layout..." opens no dialog.
    */
   void SetDataStorage(mitk::DataStorage* dataStorage);
+
+  /**
+   * \brief What the dynamic layout dialog starts from: the nodes it fills
+   *        its slots with, asked for each time the dialog opens. Without a
+   *        provider, the dialog starts empty.
+   */
+  void SetDataManagerSelectionProvider(std::function<QList<mitk::DataNode::Pointer>()> provider);
 
   /**
    * \brief Add every given cell to 'group' on the group's currently
@@ -279,13 +289,14 @@ Q_SIGNALS:
    *        to its editor part; the widget itself never applies them.
    *        LayoutSet changes the grid size: the windows are re-flowed into a
    *        plain grid, windows beyond the new size are removed, and the others
-   *        keep their synchronization links. SetDataBasedLayout and LoadLayout
-   *        rebuild every window and replace the synchronization groups, so a
-   *        host is expected to confirm them. A handler reports its own
-   *        failures and must not throw through the emit.
+   *        keep their synchronization links. DynamicLayoutRequested and
+   *        LoadLayout rebuild every window and replace the synchronization
+   *        groups, so a host is expected to confirm them; a dynamic layout is
+   *        applied with QmitkMxNMultiWidget::ApplyDynamicLayout. A handler
+   *        reports its own failures and must not throw through the emit.
    */
   void LayoutSet(int row, int column);
-  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
+  void DynamicLayoutRequested(const QmitkMxNDynamicLayout& layout);
   void LoadLayout(const nlohmann::json* jsonData);
 
   /** \brief Write the current layout into the given stream. Connect directly:
@@ -335,11 +346,15 @@ private:
    *         attached multi widget. */
   void ClearCardsAndMatrix();
 
-  /** \brief Open the grid-shape picker (grid size or a data-based
-   *         arrangement) in an on-demand modal dialog, re-parenting the shared
-   *         picker into it and resetting its transient state so it opens
-   *         fresh. */
+  /** \brief Open the grid-shape picker (a grid size, or the way to a
+   *         dynamic layout) in an on-demand modal dialog, re-parenting the
+   *         shared picker into it and resetting its transient state so it
+   *         opens fresh. */
   void ShowGridDialog();
+
+  /** \brief Choose a dynamic layout for the bound widget, starting from the
+   *         template chosen last, and emit DynamicLayoutRequested on accept. */
+  void OpenDynamicLayoutDialog();
 
   /** \brief Rebuild the advanced matrix from the current engine state: headers,
    *         rows, and the column widths measured from the content. Restores the
@@ -511,6 +526,10 @@ private:
   // without a change writes nothing.
   bool m_OffsetEdited = false;
   QDialog* m_GridDialog = nullptr;      // on-demand modal grid-shape picker host
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  std::function<QList<mitk::DataNode::Pointer>()> m_SelectionProvider;
+  QmitkMxNDynamicTemplate m_LastDynamicTemplate = QmitkMxNDynamicTemplate::DatasetsByPlanes;
+  bool m_DynamicLayoutRequested = false;  // set by the picker, acted on once its dialog has closed
   QToolButton* m_AddGroupButton;
   QToolButton* m_MatrixAddGroupButton = nullptr;
   QToolButton* m_EditGridButton;

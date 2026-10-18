@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNCellOverlay.h>
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 #include <QmitkRenderWindow.h>
@@ -73,7 +74,7 @@ class QmitkMxNLayoutLockTestSuite : public mitk::TestFixture
   MITK_TEST(LockedCells_FromSetLayout);
   MITK_TEST(LockedCells_FromGridOperation);
   MITK_TEST(LockedCells_FromApplyLayout);
-  MITK_TEST(LockedSplitters_FromDataBasedLayout);
+  MITK_TEST(LockedSplitters_FromDynamicLayout);
   MITK_TEST(LiveLock_ClosesAndReopensExistingCells);
   MITK_TEST(SingleAspects_CloseOnlyTheirSeams);
   MITK_TEST(Barcode_LiveLockUnderThePointerDropsTheHighlight);
@@ -493,11 +494,13 @@ public:
     this->CheckAllSeams(*widget, AllLocks());
   }
 
-  void LockedSplitters_FromDataBasedLayout()
+  void LockedSplitters_FromDynamicLayout()
   {
     auto widget = this->MakeWidget(AllLocks());
-    widget->SetDataBasedLayout({ m_ImageNode });
-    CPPUNIT_ASSERT_MESSAGE("A data-based layout's handles are disabled",
+    widget->ApplyDynamicLayout(QmitkMxNDynamicLayouts::Generate(
+      { { QmitkMxNSlot::Datasets, { m_ImageNode } } }, QmitkMxNDatasetsByPlanesOptions{}, widget->GetMultiWidgetName(),
+      1.0, *m_DataStorage));
+    CPPUNIT_ASSERT_MESSAGE("A dynamic layout's handles are disabled",
                            AllSplitterHandlesEnabled(*widget, false));
   }
 

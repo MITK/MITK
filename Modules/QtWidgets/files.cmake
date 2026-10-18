@@ -11,7 +11,6 @@ set(CPP_FILES
   QmitkAbstractMultiWidget.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkApplicationCursor.cpp
-  QmitkAutomatedLayoutWidget.cpp
   QmitkDataStorageComboBox.cpp
   QmitkDataStorageDefaultListModel.cpp
   QmitkDataStorageHistoryModel.cpp
@@ -76,6 +75,8 @@ set(CPP_FILES
   QmitkMxNArrangeMode.cpp
   QmitkMxNAxisGlyph.cpp
   QmitkMxNCellOverlay.cpp
+  QmitkMxNDynamicLayout.cpp
+  QmitkMxNDynamicLayoutDialog.cpp
   QmitkMxNGroupJoinMode.cpp
   QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
@@ -105,7 +106,6 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  QmitkAutomatedLayoutWidget.ui
   QmitkFileReaderOptionsDialog.ui
   QmitkFileWriterOptionsDialog.ui
   QmitkLevelWindowPresetDefinition.ui

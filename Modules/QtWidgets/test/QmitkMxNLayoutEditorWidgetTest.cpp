@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
-#include <QmitkAutomatedLayoutWidget.h>
 #include <QmitkInfoCard.h>
 #include <QmitkMxNArrangeMode.h>
+#include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
@@ -123,7 +123,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(MultiTileDrop_AssignsEverySelectedCell);
   MITK_TEST(CardDrop_AskMenuIsParentless);
   MITK_TEST(CardDrop_AskMenuSurvivesCardRemoval);
-  MITK_TEST(GridDialog_DataBasedLayoutClosesDialogAndAnchorsPopup);
+  MITK_TEST(GridDialog_DynamicLayoutClosesThePickerAndOpensTheDialog);
 
   MITK_TEST(SyncHighlight_CellsSharingDimensionAxis);
   MITK_TEST(SyncHighlight_CellsSharingSelectionAxis);
@@ -1283,8 +1283,9 @@ public:
 
   // --- Grid dialog -------------------------------------------------------------
 
-  void GridDialog_DataBasedLayoutClosesDialogAndAnchorsPopup()
+  void GridDialog_DynamicLayoutClosesThePickerAndOpensTheDialog()
   {
+    m_Widget->SetDataStorage(m_DataStorage);
     QToolButton* editGrid = nullptr;
     for (auto* button : m_Widget->findChildren<QToolButton*>())
     {
@@ -1295,52 +1296,43 @@ public:
     }
     CPPUNIT_ASSERT(nullptr != editGrid);
 
-    bool dialogFound = false;
-    bool dialogClosed = false;
-    bool popupShown = false;
-    QPoint expectedTopRight;
-    QPoint popupTopRight;
-    QObject timerContext;
-    QTimer::singleShot(0, &timerContext, [&]()
+    // Each modal runs its own loop; the poll answers whichever is up.
+    QPointer<QDialog> gridDialog;
+    bool gridDialogClosed = false;
+    bool dynamicDialogFound = false;
+    QTimer poll;
+    poll.setInterval(5);
+    QObject::connect(&poll, &QTimer::timeout, [&]()
     {
-      auto* dialog = qobject_cast<QDialog*>(QApplication::activeModalWidget());
-      dialogFound = nullptr != dialog;
-      if (!dialogFound)
+      auto* modal = QApplication::activeModalWidget();
+      if (auto* dynamicDialog = qobject_cast<QmitkMxNDynamicLayoutDialog*>(modal))
       {
+        dynamicDialogFound = true;
+        gridDialogClosed = !gridDialog.isNull() && !gridDialog->isVisible();
+        dynamicDialog->reject();
         return;
       }
-      // Away from the screen origin, so a position taken relative to the dialog
-      // cannot land on the global anchor by accident.
-      dialog->move(300, 200);
-      auto* dataBased = dialog->findChild<QPushButton*>(QStringLiteral("dataBasedLayoutButton"));
-      if (nullptr != dataBased)
+      auto* dialog = qobject_cast<QDialog*>(modal);
+      if (nullptr != dialog && gridDialog.isNull())
       {
-        auto* picker = dataBased->parentWidget();
-        expectedTopRight = picker->mapToGlobal(QPoint(picker->width(), 0));
-        dataBased->click();
-        dialogClosed = !dialog->isVisible();
-        if (auto* popup = dialog->findChild<QmitkAutomatedLayoutWidget*>())
+        gridDialog = dialog;
+        if (auto* dynamicLayout = dialog->findChild<QPushButton*>(QStringLiteral("dynamicLayoutButton")))
         {
-          popupShown = popup->isVisible();
-          popupTopRight = popup->pos() + QPoint(popup->width(), 0);
-          popup->close();
+          dynamicLayout->click();
+        }
+        else
+        {
+          dialog->reject();
         }
       }
-      if (dialog->isVisible())
-      {
-        dialog->reject();
-      }
     });
+    poll.start();
     editGrid->click();
+    poll.stop();
 
-    CPPUNIT_ASSERT_MESSAGE("Edit grid opens the modal grid dialog", dialogFound);
-    CPPUNIT_ASSERT_MESSAGE("Data-based layout opens the image chooser", popupShown);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chooser's top-right corner sits on the picker's (x)",
-                                 expectedTopRight.x(), popupTopRight.x());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The chooser's top-right corner sits on the picker's (y)",
-                                 expectedTopRight.y(), popupTopRight.y());
-    CPPUNIT_ASSERT_MESSAGE("Data-based layout closes the grid dialog, so a dismissed chooser leaves nothing behind",
-                           dialogClosed);
+    CPPUNIT_ASSERT_MESSAGE("Edit grid opens the modal grid dialog", !gridDialog.isNull());
+    CPPUNIT_ASSERT_MESSAGE("Dynamic layout... opens the dynamic layout dialog", dynamicDialogFound);
+    CPPUNIT_ASSERT_MESSAGE("...once the grid dialog has closed", gridDialogClosed);
   }
 
   // --- Group removal -----------------------------------------------------------

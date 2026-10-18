@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 #include <QmitkInfoCard.h>
+#include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
 
@@ -429,8 +430,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
 
   // The grid-shape picker is not an always-on box: it opens on demand in a modal
   // "Edit grid..." dialog (ShowGridDialog). It is created here, hidden, so it can
-  // take the data storage and serve the presets before the dialog exists, and the
-  // same instance is reparented into the dialog and reused on each open.
+  // serve the presets before the dialog exists, and the same instance is
+  // reparented into the dialog and reused on each open.
   m_LayoutSelection = new QmitkMultiWidgetLayoutSelectionWidget(this);
   m_LayoutSelection->hide();
 
@@ -439,8 +440,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   // untouched rather than acted on here.
   connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
           this, &QmitkMxNLayoutEditorWidget::LayoutSet);
-  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout,
-          this, &QmitkMxNLayoutEditorWidget::SetDataBasedLayout);
+  connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::DynamicLayoutRequested,
+          this, [this]() { m_DynamicLayoutRequested = true; });
   connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout,
           this, &QmitkMxNLayoutEditorWidget::LoadLayout);
   connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::SaveLayout,
@@ -578,11 +579,11 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   gridRow->addWidget(m_AddColumnButton);
   gridRow->addSpacing(12);
   m_EditGridButton = makeGridButton(tr("Edit grid..."), QStringLiteral(":/Qmitk/mxn-grid-edit.svg"));
-  m_EditGridButton->setToolTip(tr("Edit grid: choose a grid size, or derive an arrangement from the "
-                                  "loaded data. A new grid size re-flows the windows into a plain "
+  m_EditGridButton->setToolTip(tr("Edit grid: choose a grid size, or build a dynamic layout from the "
+                                  "selected data. A new grid size re-flows the windows into a plain "
                                   "grid and removes those beyond it; the others keep their "
-                                  "synchronization. A data-based arrangement replaces all windows "
-                                  "and their synchronization groups."));
+                                  "synchronization. A dynamic layout replaces all windows and their "
+                                  "synchronization groups."));
   connect(m_EditGridButton, &QToolButton::clicked, this, [this]() { this->ShowGridDialog(); });
   gridRow->addWidget(m_EditGridButton);
   gridRow->addStretch();
@@ -914,7 +915,13 @@ QmitkMxNMultiWidget* QmitkMxNLayoutEditorWidget::GetMultiWidget() const
 
 void QmitkMxNLayoutEditorWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  m_LayoutSelection->SetDataStorage(dataStorage);
+  m_DataStorage = dataStorage;
+}
+
+void QmitkMxNLayoutEditorWidget::SetDataManagerSelectionProvider(
+  std::function<QList<mitk::DataNode::Pointer>()> provider)
+{
+  m_SelectionProvider = std::move(provider);
 }
 
 void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds,
@@ -2070,9 +2077,9 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
     // modal; the hosting view applies it.
     connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet,
             m_GridDialog, &QDialog::accept);
-    // The data-based chooser takes over from the dialog as its own popup; were
-    // the dialog left open, dismissing the chooser would strand it empty.
-    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::DataBasedLayoutStarted,
+    // The dynamic layout dialog takes over from the picker: one modal at a
+    // time, opened once this one has closed.
+    connect(m_LayoutSelection, &QmitkMultiWidgetLayoutSelectionWidget::DynamicLayoutRequested,
             m_GridDialog, &QDialog::reject);
   }
 
@@ -2081,7 +2088,35 @@ void QmitkMxNLayoutEditorWidget::ShowGridDialog()
   // parked in this widget, so show it inside the dialog.
   m_LayoutSelection->ResetSelection();
   m_LayoutSelection->show();
+  m_DynamicLayoutRequested = false;
   m_GridDialog->exec();
+  if (std::exchange(m_DynamicLayoutRequested, false))
+  {
+    this->OpenDynamicLayoutDialog();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::OpenDynamicLayoutDialog()
+{
+  const auto dataStorage = m_DataStorage.Lock();
+  if (m_MultiWidget.isNull() || dataStorage.IsNull())
+  {
+    return;
+  }
+
+  const auto selection = m_SelectionProvider ? m_SelectionProvider() : QList<mitk::DataNode::Pointer>();
+  // A widget that is not laid out yet has no shape to fit a grid to.
+  const double aspectRatio = m_MultiWidget->height() > 0
+                               ? static_cast<double>(m_MultiWidget->width()) / m_MultiWidget->height()
+                               : 1.0;
+  QmitkMxNDynamicLayoutDialog dialog(dataStorage, selection, m_MultiWidget->GetMultiWidgetName(), aspectRatio,
+                                     m_LastDynamicTemplate, this);
+  const bool accepted = QDialog::Accepted == dialog.exec();
+  m_LastDynamicTemplate = dialog.GetTemplate();
+  if (accepted)
+  {
+    emit DynamicLayoutRequested(dialog.GetLayout());
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::RebuildMatrixNow()

@@ -75,13 +75,9 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
                    "QTableWidget::item:selected { background-color: %2; }")
       .arg(palette.color(QPalette::Base).name(), palette.color(QPalette::Highlight).name()));
 
-  m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
-  connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);
-  m_AutomatedDataLayoutWidget->hide();
-
   connect(ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
   connect(ui->setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
-  connect(ui->dataBasedLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked);
+  connect(ui->dynamicLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::DynamicLayoutRequested);
 
   // The presets ship as module resources; they are read once here and offered
   // by name, so the host can present them without knowing about the resources.
@@ -95,13 +91,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
     auto data = nlohmann::json::parse(jsonStream);
     m_Presets.push_back({ QString::fromStdString(data["name"].get<std::string>()), data });
   }
-}
-
-void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  if (m_AutomatedDataLayoutWidget == nullptr)
-    return;
-  m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
@@ -164,21 +153,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
-}
-
-void QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked()
-{
-  // Taken before the host reacts to DataBasedLayoutStarted, while this picker is
-  // still on screen. A popup is a top-level window, so it is placed in global
-  // coordinates.
-  const QPoint topRight = this->mapToGlobal(QPoint(this->width(), 0));
-  emit DataBasedLayoutStarted();
-
-  m_AutomatedDataLayoutWidget->setWindowFlags(Qt::Popup);
-  // A widget that was never shown has no laid-out size yet.
-  m_AutomatedDataLayoutWidget->adjustSize();
-  m_AutomatedDataLayoutWidget->move(topRight.x() - m_AutomatedDataLayoutWidget->width(), topRight.y());
-  m_AutomatedDataLayoutWidget->show();
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::RequestSave()

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkMultiWidgetLayoutSelectionWidget_h
 #define QmitkMultiWidgetLayoutSelectionWidget_h
 
-#include <QmitkAutomatedLayoutWidget.h>
-
 #include <nlohmann/json.hpp>
 
 // qt
@@ -32,7 +30,7 @@ namespace Ui
 
 /**
 * \brief The layout-shape picker of an MxN editor: a table to define a custom
-*        row/column arrangement, the data-based alternative, and the file and
+*        row/column arrangement, the way to a dynamic layout, and the file and
 *        preset actions of the layout document.
 *
 * Module-internal. The surface a hosting view sees is QmitkMxNLayoutEditorWidget,
@@ -49,8 +47,6 @@ public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
   ~QmitkMultiWidgetLayoutSelectionWidget() override;
-
-  void SetDataStorage(mitk::DataStorage* dataStorage);
 
   /**
    * \brief Clear the transient grid-table selection, so the picker opens fresh
@@ -86,13 +82,10 @@ public Q_SLOTS:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
-  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
-  /** \brief The data-based chooser is about to open as a popup of its own; a
-   *         host that shows this picker in a dialog closes the dialog, so a
-   *         dismissed chooser leaves nothing behind. The picker survives the
-   *         host's reaction. */
-  void DataBasedLayoutStarted();
+  /** \brief The user asked for a dynamic layout; the host chooses it in a
+   *         dialog of its own. */
+  void DynamicLayoutRequested();
 
   // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);
@@ -103,7 +96,6 @@ private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();
-  void OnDataBasedLayoutButtonClicked();
 
 private:
 
@@ -117,7 +109,6 @@ private:
 
   std::unique_ptr<Ui::QmitkMultiWidgetLayoutSelectionWidget> ui;
   std::vector<Preset> m_Presets;
-  QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 
 };
 

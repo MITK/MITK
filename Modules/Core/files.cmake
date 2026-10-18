@@ -350,6 +350,7 @@ set(CPP_FILES
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkStringUtil.cpp
+  IO/mitkSurfaceIOHelper.cpp
   IO/mitkSurfaceStlIO.cpp
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp

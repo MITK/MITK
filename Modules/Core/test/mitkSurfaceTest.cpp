@@ -45,6 +45,7 @@ class mitkSurfaceTestSuite : public mitk::TestFixture
   MITK_TEST(SetClonedVtkPolyDataNotNullPointer_Failure);
 
   MITK_TEST(GetBoundingBox_Success);
+  MITK_TEST(GetBoundingBox_EmptyTimeStep_BoundsOfOtherTimeSteps);
 
   MITK_TEST(SurfaceExpandTimestepsAreFive_Success);
   MITK_TEST(Surface4DDataCreation_Success);
@@ -145,6 +146,27 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetBoundingBox()", passed);
   }
 
+  void GetBoundingBox_EmptyTimeStep_BoundsOfOtherTimeSteps()
+  {
+    // Like a polygon model of a label that is absent at one time step.
+    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+    sphere->SetCenter(100.0, 100.0, 100.0);
+    sphere->SetRadius(5.0);
+    sphere->Update();
+
+    m_Surface->Expand(3);
+    m_Surface->SetVtkPolyData(sphere->GetOutput(), 0);
+    m_Surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), 1);
+    m_Surface->SetVtkPolyData(sphere->GetOutput(), 2);
+    m_Surface->UpdateOutputInformation();
+
+    const auto *sphereBounds = sphere->GetOutput()->GetBounds();
+    const auto bounds = m_Surface->GetTimeGeometry()->GetBoundingBoxInWorld()->GetBounds();
+
+    for (int i = 0; i < 6; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(sphereBounds[i], bounds[i], 1e-6);
+  }
+
   void SurfaceExpandTimestepsAreFive_Success()
   {
     m_Surface->Expand(5);
@@ -193,9 +215,13 @@ public:
 
   void TimeGeometrySurface_Success()
   {
+    // Like an image with a single time step, a new surface is valid at every time point.
+    CPPUNIT_ASSERT_MESSAGE("Testing that a new surface is valid at every time point",
+                           m_InputTimeGeometry->IsValidTimePoint(m_Time));
+
     m_Timestep = m_InputTimeGeometry->TimePointToTimeStep(m_Time);
-    CPPUNIT_ASSERT_MESSAGE("Testing correctness of geometry for surface->GetUpdatedTimeGeometry()",
-                           m_Time == m_Timestep);
+    CPPUNIT_ASSERT_MESSAGE("Testing that every time point maps to the single time step of a new surface",
+                           0 == m_Timestep);
   }
 
   void ChangingDataOfSpecificTimestepSurface_Success()

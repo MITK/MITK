@@ -161,7 +161,6 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   surface->UpdateOutputInformation();
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  localStorage->m_PropAssembly->VisibilityOn();
 
   // check if something important has changed and we need to rerender
   if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
@@ -197,9 +196,14 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   if (time > itk::NumericTraits<ScalarType>::NonpositiveMin())
     timestep = dataTimeGeometry->TimePointToTimeStep(time);
 
+  // Without anything to cut, the cut made for the previously drawn time step
+  // or plane would stay on display.
   vtkSmartPointer<vtkPolyData> inputPolyData = surface->GetVtkPolyData(timestep);
   if ((inputPolyData == nullptr) || (inputPolyData->GetNumberOfPoints() < 1))
+  {
+    this->ResetMapper(renderer);
     return;
+  }
 
   // apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
@@ -207,8 +211,13 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   const PlaneGeometry *planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if ((planeGeometry == nullptr) || (!planeGeometry->IsValid()) || (!planeGeometry->HasReferenceGeometry()))
   {
+    this->ResetMapper(renderer);
     return;
   }
+
+  // Only here, as renders that do not regenerate the cut keep it hidden or
+  // shown as it is.
+  localStorage->m_PropAssembly->VisibilityOn();
 
   if (localStorage->m_Actor->GetMapper() == nullptr)
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);

@@ -14,6 +14,8 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkGeometry3D.h>
 
+#include <limits>
+
 mitk::TimeGeometry::TimeGeometry() : m_BoundingBox(BoundingBox::New())
 {
   typedef BoundingBox::PointsContainer ContainerType;
@@ -115,6 +117,19 @@ double mitk::TimeGeometry::GetDiagonalLengthInWorld() const
 bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D &p) const
 {
   return m_BoundingBox->IsInside(p);
+}
+
+bool mitk::TimeGeometry::IsValidAtEveryTimePoint() const
+{
+  using Limits = std::numeric_limits<TimePointType>;
+
+  if (this->CountTimeSteps() != 1)
+    return false;
+
+  // The end of such a time step is infinite, or the largest time point where
+  // it is clamped to that.
+  const auto timeBounds = this->GetTimeBounds(0);
+  return timeBounds[0] <= Limits::lowest() && timeBounds[1] >= Limits::max();
 }
 
 void mitk::TimeGeometry::UpdateBoundingBox()

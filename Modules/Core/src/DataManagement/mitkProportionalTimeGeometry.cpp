@@ -178,6 +178,15 @@ void mitk::ProportionalTimeGeometry::ReserveSpaceForGeometries(TimeStepType numb
 
 void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
 {
+  // A single time step that is valid at every time point, as Initialize()
+  // makes it, leaves no time for further steps. Growing it starts the time
+  // steps that Initialize() makes for several time steps instead.
+  if (m_GeometryVector.size() == 1 && size > 1 && m_StepDuration == std::numeric_limits<TimePointType>::infinity())
+  {
+    m_FirstTimePoint = 0.0;
+    m_StepDuration = 1.0;
+  }
+
   m_GeometryVector.reserve(size);
   if (m_GeometryVector.size() == 0)
   {

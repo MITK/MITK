@@ -23,6 +23,8 @@ class mitkProportionalTimeGeometryTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkProportionalTimeGeometryTestSuite);
   MITK_TEST(TestInheritance);
   MITK_TEST(TestProportionalTimeGeometryCloning);
+  MITK_TEST(Expand_SingleTimeStepValidAtEveryTimePoint_ConsecutiveTimeSteps);
+  MITK_TEST(IsValidAtEveryTimePoint_OnlySingleTimeStepWithoutTime);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -56,6 +58,38 @@ public:
 
     double spacing = planeGeom->GetSpacing()[0];
     CPPUNIT_ASSERT_MESSAGE("First Point of spacing of clone matches original", mitk::Equal(spacing, 31));
+  }
+
+  void Expand_SingleTimeStepValidAtEveryTimePoint_ConsecutiveTimeSteps()
+  {
+    auto geometry = mitk::ProportionalTimeGeometry::New();
+    geometry->Initialize(mitk::Geometry3D::New(), 1);
+    CPPUNIT_ASSERT(geometry->IsValidTimePoint(1e6));
+
+    geometry->Expand(3);
+
+    // The same time steps as initializing with three of them.
+    auto expected = mitk::ProportionalTimeGeometry::New();
+    expected->Initialize(mitk::Geometry3D::New(), 3);
+
+    CPPUNIT_ASSERT_EQUAL(expected->GetFirstTimePoint(), geometry->GetFirstTimePoint());
+    CPPUNIT_ASSERT_EQUAL(expected->GetStepDuration(), geometry->GetStepDuration());
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(2), geometry->TimePointToTimeStep(2.5));
+  }
+
+  void IsValidAtEveryTimePoint_OnlySingleTimeStepWithoutTime()
+  {
+    auto geometry = mitk::ProportionalTimeGeometry::New();
+    geometry->Initialize(mitk::Geometry3D::New(), 1);
+    CPPUNIT_ASSERT(geometry->IsValidAtEveryTimePoint());
+
+    auto timedGeometry = geometry->Clone();
+    timedGeometry->SetFirstTimePoint(100.0);
+    timedGeometry->SetStepDuration(50.0);
+    CPPUNIT_ASSERT(!timedGeometry->IsValidAtEveryTimePoint());
+
+    geometry->Expand(2);
+    CPPUNIT_ASSERT(!geometry->IsValidAtEveryTimePoint());
   }
 
 private:

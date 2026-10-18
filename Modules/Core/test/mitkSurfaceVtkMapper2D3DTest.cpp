@@ -14,23 +14,30 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkRenderingManager.h>
 #include <mitkRenderingTestHelper.h>
+#include <mitkSurface.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkTimeNavigationController.h>
 
 // VTK
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkSphereSource.h>
 
 /**
-  A couple of tests around Surface rendering with lookup tables (LUT).
+  A couple of tests around Surface rendering in 2D and 3D: with lookup tables
+  (LUT), and next to time-resolved data.
 */
 class mitkSurfaceVtkMapper2D3DTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSurfaceVtkMapper2D3DTestSuite);
   MITK_TEST(RenderLUT2D);
   MITK_TEST(RenderLUT3D);
+  MITK_TEST(RenderStaticSurfaceAtLaterTimeStep2D);
+  MITK_TEST(RenderStaticSurfaceAtLaterTimeStep3D);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -150,6 +157,51 @@ public:
     m_RenderingTestHelper.SetMapperIDToRender3D();
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv(), 50.0) == true);
     // m_RenderingTestHelper.SaveReferenceScreenShot("c:/dev/ballLUT3D_300x300.png");
+  }
+
+  // A surface without time next to time-resolved data, like a polygon model of
+  // a 3D segmentation on a 3D+t image, is drawn at every time step.
+  void RenderStaticSurfaceAtLaterTimeStep(bool render3D)
+  {
+    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+    sphere->SetRadius(10.0);
+    sphere->Update();
+
+    // Defines three time steps and draws nothing at the last one.
+    auto timedSurface = mitk::Surface::New();
+    timedSurface->SetVtkPolyData(sphere->GetOutput(), 0);
+    timedSurface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), 1);
+    timedSurface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), 2);
+
+    auto timedNode = mitk::DataNode::New();
+    timedNode->SetData(timedSurface);
+    m_RenderingTestHelper.AddNodeToStorage(timedNode);
+
+    auto staticSurface = mitk::Surface::New();
+    staticSurface->SetVtkPolyData(sphere->GetOutput());
+
+    auto staticNode = mitk::DataNode::New();
+    staticNode->SetData(staticSurface);
+    m_RenderingTestHelper.AddNodeToStorage(staticNode);
+
+    if (render3D)
+      m_RenderingTestHelper.SetMapperIDToRender3D();
+
+    auto *stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
+    CPPUNIT_ASSERT_EQUAL(3u, stepper->GetSteps());
+
+    stepper->SetPos(2);
+    CPPUNIT_ASSERT(m_RenderingTestHelper.RendersAnything());
+  }
+
+  void RenderStaticSurfaceAtLaterTimeStep2D()
+  {
+    RenderStaticSurfaceAtLaterTimeStep(false);
+  }
+
+  void RenderStaticSurfaceAtLaterTimeStep3D()
+  {
+    RenderStaticSurfaceAtLaterTimeStep(true);
   }
 };
 

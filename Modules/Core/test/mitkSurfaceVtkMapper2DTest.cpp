@@ -13,9 +13,21 @@ found in the LICENSE file.
 // MITK
 #include <mitkIOUtil.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkRenderingManager.h>
 #include <mitkRenderingTestHelper.h>
+#include <mitkSurface.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkTimeNavigationController.h>
+
+// VTK
+#include <vtkCamera.h>
+#include <vtkPolyData.h>
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
+
+#include <string>
 
 class mitkSurfaceVtkMapper2DTestSuite : public mitk::TestFixture
 {
@@ -25,6 +37,7 @@ class mitkSurfaceVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(RenderRedBall);
   MITK_TEST(RenderBallWithGeometry);
   MITK_TEST(RenderRedBinary);
+  MITK_TEST(RenderEmptyTimeStep_DrawsNothing);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -138,6 +151,41 @@ public:
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
+  }
+
+  void RenderEmptyTimeStep_DrawsNothing()
+  {
+    // A sphere in the first and the last time step and nothing in between,
+    // like polygon models of segmentations at time steps without the label.
+    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+    sphere->SetRadius(10.0);
+    sphere->Update();
+
+    auto surface = mitk::Surface::New();
+    surface->SetVtkPolyData(sphere->GetOutput(), 0);
+    surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), 1);
+    surface->SetVtkPolyData(sphere->GetOutput(), 2);
+
+    auto node = mitk::DataNode::New();
+    node->SetData(surface);
+    m_RenderingTestHelper.AddNodeToStorage(node);
+
+    auto *stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
+
+    // The empty time step is entered from both of its neighbors.
+    for (const unsigned int timeStep : { 0u, 1u, 2u, 1u })
+    {
+      stepper->SetPos(timeStep);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Time step " + std::to_string(timeStep),
+                                   timeStep != 1,
+                                   m_RenderingTestHelper.RendersAnything());
+    }
+
+    // A render that changes nothing about the surface or the slice, like
+    // zooming, must not bring back the cut of the previous time step.
+    m_RenderingTestHelper.GetVtkRenderer()->GetActiveCamera()->Zoom(1.5);
+    CPPUNIT_ASSERT_MESSAGE("Time step 1 after zooming", !m_RenderingTestHelper.RendersAnything());
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkSurfaceVtkMapper2D)

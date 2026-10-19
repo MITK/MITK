@@ -930,6 +930,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
 void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
+  if (nullptr == m_LastSNC)
+  {
+    return;
+  }
   auto* workingNode = m_ToolManager->GetWorkingData(0);
   auto* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
   auto* interpolatedPreview = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
@@ -1744,6 +1748,25 @@ void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Obje
   {
     m_ControllerToSliceObserverTag.remove(slicer);
     m_ControllerToDeleteObserverTag.remove(slicer);
+
+    // An editor may destroy its windows before it initializes this widget
+    // with the new ones, and time events still arrive in between.
+    if (m_LastSNC == slicer)
+    {
+      m_LastSNC = nullptr;
+    }
+    for (auto it = m_ActionToSlicerMap.begin(); it != m_ActionToSlicerMap.end();)
+    {
+      if (it->second == slicer)
+      {
+        delete it->first;
+        it = m_ActionToSlicerMap.erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
   }
 }
 

@@ -22,7 +22,7 @@
           "windowing": "main",
           "lut": "main"
         },
-        "size": 3
+        "size": 2
       },
       {
         "type": "split",

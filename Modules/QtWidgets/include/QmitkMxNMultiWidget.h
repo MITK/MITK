@@ -1882,11 +1882,12 @@ private:
   void FitCellToVisibleData(const QString& windowId);
 
   /**
-  * \brief Lay out the editor, then fit the camera of each 2D cell of
-  *        'windowIds' to the size it is laid out to.
+  * \brief Lay out the editor, then fit the camera of each cell of
+  *        'windowIds' to the size it is laid out to: a 2D cell's camera to
+  *        its plane, a 3D cell's view to its geometry.
   *
   *   For cells created since the event loop last ran. Nothing happens while
-  *   the editor is hidden.
+  *   the editor is hidden. The global time step is kept.
   */
   void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
 

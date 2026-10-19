@@ -3307,17 +3307,40 @@ void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& win
   // stays excluded, as while the load feedback is shown.
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  auto* timeNavigation = renderingManager->GetTimeNavigationController();
+  const auto timePoint = timeNavigation->GetSelectedTimePoint();
   for (const auto& windowId : windowIds)
   {
     const auto cell = this->GetRenderWindowWidget(windowId);
     auto* renderer = RendererOf(cell.get());
-    // The camera only: slice and time step stay as the construction set them.
-    if (nullptr != renderer && mitk::BaseRenderer::Standard2D == renderer->GetMapperID()
-        && nullptr != renderer->GetCurrentWorldPlaneGeometry())
+    if (nullptr == renderer)
     {
-      renderer->GetCameraController()->Fit();
-      mitk::RenderingManager::GetInstance()->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
+      continue;
     }
+    if (IsThreeD(renderer))
+    {
+      // A cell turned 3D while it was built still has the camera of its 2D
+      // construction. It gets the view initialization a cell switched to 3D
+      // later gets; the editor applies its direction afterwards.
+      const auto* geometry = cell->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+      if (nullptr != geometry)
+      {
+        renderingManager->InitializeView(cell->GetRenderWindow()->GetVtkRenderWindow(), geometry, true);
+      }
+    }
+    else if (nullptr != renderer->GetCurrentWorldPlaneGeometry())
+    {
+      // The camera only: slice and time step stay as the construction set them.
+      renderer->GetCameraController()->Fit();
+      renderingManager->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+  // A view initialization resets the application-global time.
+  const auto* timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
+  if (nullptr != timeGeometry && timeGeometry->IsValidTimePoint(timePoint))
+  {
+    timeNavigation->GetStepper()->SetPos(timeGeometry->TimePointToTimeStep(timePoint));
   }
 }
 

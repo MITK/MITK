@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxN3DCamera.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
@@ -103,6 +104,7 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_NarrowWindow_ShowsItsWholePlane);
   MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
+  MITK_TEST(Apply_ThreeDWindow_FramesTheData);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1063,6 +1065,35 @@ public:
     }
   }
 
+  void Apply_ThreeDWindow_FramesTheData()
+  {
+    // Every cell is constructed as 2D, with a camera hundreds of meters away
+    // from its plane. A window the layout declares 3D must be initialized like
+    // a cell switched to 3D later; kept, that camera shows nothing.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    editor->show();
+    Pump();
+    const VtkSizeFollowsWidget vtkSizes;
+
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
+          "links": { "selection": "main" } }
+      ] }
+    })json"));
+    Pump();
+
+    auto* renderer = mitk::BaseRenderer::GetInstance(
+      editor->GetRenderWindowWidget("mxn__volume")->GetRenderWindow()->GetVtkRenderWindow());
+    const double halfHeight = QmitkMxN3DCamera::VisibleHalfHeight(renderer->GetVtkRenderer()->GetActiveCamera());
+    CPPUNIT_ASSERT_MESSAGE("The 3D window frames the 16 mm image; it shows a half-height of "
+                             + std::to_string(halfHeight) + " mm",
+                           halfHeight < 100.0);
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkMxNLayoutV3)

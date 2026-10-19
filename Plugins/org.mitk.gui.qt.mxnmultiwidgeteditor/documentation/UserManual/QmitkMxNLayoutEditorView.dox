@@ -35,7 +35,9 @@
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
 	<ul>
-		<li> <b>Presets</b> applies one of the arrangements that ship with MITK.
+		<li> <b>Presets</b> applies one of the arrangements that ship with MITK. Its last entry,
+			<b>Dynamic layout...</b>, builds a layout from the loaded data instead (see
+			\ref org_mitk_views_mxnlayouteditor_Dynamic).
 		<li> <b>Load...</b> replaces the current layout with one read from a layout file
 			(see \ref org_mitk_editors_mxnmultiwidget_LayoutFile).
 		<li> <b>Save...</b> writes the current layout to a file. A saved layout carries the
@@ -142,9 +144,11 @@
 
 \subsection org_mitk_views_mxnlayouteditor_Dynamic Dynamic layouts
 	A dynamic layout is built from the data it is to show: its windows, their
-	synchronization and the data every window shows. <b>Dynamic layout...</b> in the
-	<b>Edit grid...</b> picker opens a dialog with four templates. Select the data in the
-	Data Manager first: the dialog fills the template's data slots from that selection, in
+	synchronization and the data every window shows. <b>Dynamic layout...</b>, the last entry
+	of the <b>Presets</b> menu and a button in the <b>Edit grid...</b> picker, opens a dialog
+	with four templates; the menu entry is available as soon as an image is loaded. Select
+	the data in the Data Manager first: the dialog fills the template's data slots from that
+	selection, in
 	the order the Data Manager reports it, and sets the options from the data. Everything
 	can be changed there; an option you set keeps your choice while you change the data,
 	and switching the template starts it afresh. <b>Apply</b> stays disabled, with a line

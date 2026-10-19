@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <QmitkIconTheme.h>
 #include <QmitkInfoCard.h>
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNSyncBarcodeWidget.h>
@@ -72,6 +73,18 @@ found in the LICENSE file.
 
 namespace
 {
+  /** Whether 'dataStorage' holds an image a dynamic layout can be built from. */
+  bool HoldsImageData(const mitk::DataStorage* dataStorage)
+  {
+    if (nullptr == dataStorage)
+    {
+      return false;
+    }
+    const auto nodes = dataStorage->GetAll();
+    return std::any_of(nodes->begin(), nodes->end(), [](const mitk::DataNode::Pointer& node)
+      { return nullptr != node && QmitkMxNDynamicLayouts::IsOfDataClass(*node, QmitkMxNSlotDataClass::Image); });
+  }
+
   const char* DimensionLabel(QmitkMxNSyncDimension dimension)
   {
     switch (dimension)
@@ -469,7 +482,7 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   presetButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   presetButton->setIconSize(documentIconSize);
   presetButton->setToolTip(tr("Replace the current layout with one of the arrangements that ship "
-                              "with MITK"));
+                              "with MITK, or with one built from the loaded data"));
   presetButton->setPopupMode(QToolButton::InstantPopup);
   // An instant-popup button draws its arrow inside the content box, over the
   // text; room on the right keeps the arrow as a separate mark.
@@ -491,8 +504,21 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
               m_LayoutSelection->ApplyPreset(preset, m_MultiWidget->GetMultiWidgetName());
             });
   }
+  presetMenu->addSeparator();
+  auto* dynamicLayout = presetMenu->addAction(tr("Dynamic layout..."));
+  connect(dynamicLayout, &QAction::triggered, this, &QmitkMxNLayoutEditorWidget::OpenDynamicLayoutDialog);
+  // Data comes and goes at any time, so whether there is an image to build a
+  // layout from is decided whenever the menu opens.
+  presetMenu->setToolTipsVisible(true);
+  connect(presetMenu, &QMenu::aboutToShow, this, [this, dynamicLayout]()
+  {
+    const bool holdsImageData = HoldsImageData(m_DataStorage.Lock());
+    dynamicLayout->setEnabled(holdsImageData);
+    dynamicLayout->setToolTip(holdsImageData
+                                ? tr("Build a layout from the loaded data")
+                                : tr("Load an image first: a dynamic layout is built from the data"));
+  });
   presetButton->setMenu(presetMenu);
-  presetButton->setEnabled(!presetNames.isEmpty());
   documentRow->addWidget(presetButton);
 
   auto* loadButton = new QToolButton(this);

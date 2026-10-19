@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
@@ -31,8 +32,10 @@ found in the LICENSE file.
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QMenu>
+#include <QTimer>
 #include <QStringList>
 #include <QToolButton>
 
@@ -55,6 +58,9 @@ class QmitkMxNPresetsTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkMxNPresetsTestSuite);
 
   MITK_TEST(Menu_ListsThePresetsInOrder);
+  MITK_TEST(Menu_EndsWithTheDynamicLayoutEntry);
+  MITK_TEST(DynamicLayoutEntry_NeedsImageData);
+  MITK_TEST(DynamicLayoutEntry_OpensTheDialog);
   MITK_TEST(Presets_MatchTheirSpecification_OnTheDefaultNamedEditor);
   MITK_TEST(Presets_MatchTheirSpecification_OnAnotherNamedEditor);
   MITK_TEST(Lightbox_StartsOneSliceApartPerWindow);
@@ -330,10 +336,69 @@ public:
     QStringList listed;
     for (const auto* action : PresetMenu(*m_LayoutEditor)->actions())
     {
+      if (action->isSeparator())
+      {
+        break;
+      }
       listed << action->text();
     }
     CPPUNIT_ASSERT_EQUAL(expected.join(QStringLiteral(" | ")).toStdString(),
                          listed.join(QStringLiteral(" | ")).toStdString());
+  }
+
+  // --- The dynamic layout entry ----------------------------------------------
+
+  /** The last entry of the Presets menu, as it is when the menu opens. */
+  static QAction* DynamicLayoutEntry(QmitkMxNLayoutEditorWidget& layoutEditor)
+  {
+    auto* menu = PresetMenu(layoutEditor);
+    emit menu->aboutToShow();
+    const auto actions = menu->actions();
+    CPPUNIT_ASSERT(actions.size() >= 2);
+    return actions.back();
+  }
+
+  void Menu_EndsWithTheDynamicLayoutEntry()
+  {
+    const auto actions = PresetMenu(*m_LayoutEditor)->actions();
+    CPPUNIT_ASSERT_MESSAGE("A separator sets the entry apart from the presets",
+                           actions[actions.size() - 2]->isSeparator());
+    CPPUNIT_ASSERT_EQUAL(std::string("Dynamic layout..."), actions.back()->text().toStdString());
+  }
+
+  void DynamicLayoutEntry_NeedsImageData()
+  {
+    auto empty = mitk::StandaloneDataStorage::New();
+    m_LayoutEditor->SetDataStorage(empty);
+    CPPUNIT_ASSERT_MESSAGE("Without an image there is nothing to lay out",
+                           !DynamicLayoutEntry(*m_LayoutEditor)->isEnabled());
+
+    m_LayoutEditor->SetDataStorage(m_DataStorage);
+    CPPUNIT_ASSERT_MESSAGE("An image is enough", DynamicLayoutEntry(*m_LayoutEditor)->isEnabled());
+  }
+
+  void DynamicLayoutEntry_OpensTheDialog()
+  {
+    m_LayoutEditor->SetDataStorage(m_DataStorage);
+    auto* entry = DynamicLayoutEntry(*m_LayoutEditor);
+
+    // The dialog runs its own loop; the poll answers it.
+    bool dialogFound = false;
+    QTimer poll;
+    poll.setInterval(5);
+    QObject::connect(&poll, &QTimer::timeout, [&dialogFound]()
+    {
+      if (auto* dialog = qobject_cast<QmitkMxNDynamicLayoutDialog*>(QApplication::activeModalWidget()))
+      {
+        dialogFound = true;
+        dialog->reject();
+      }
+    });
+    poll.start();
+    entry->trigger();
+    poll.stop();
+
+    CPPUNIT_ASSERT_MESSAGE("The entry opens the dynamic layout dialog", dialogFound);
   }
 
   // --- Every preset ----------------------------------------------------------

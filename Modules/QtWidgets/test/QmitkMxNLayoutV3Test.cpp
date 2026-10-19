@@ -102,6 +102,7 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_WithDataLoaded_CellsShowTheirDeclaredDirection);
   MITK_TEST(Apply_NarrowWindow_ShowsItsWholePlane);
   MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1030,6 +1031,38 @@ public:
       }
     }
   }
+
+  void Apply_DeclaredSizes_SetTheProportions()
+  {
+    // Sizes are weights: only their ratio counts, however small they are.
+    auto editor = MakeEditor();
+    editor->resize(1200, 600);
+    editor->show();
+    Pump();
+
+    for (const int scale : { 1, 100 })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "version": "3.0",
+        "root": { "type": "split", "orientation": "horizontal", "children": [
+          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "split", "orientation": "vertical", "children": [
+            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main" } },
+            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main" } }
+          ] }
+        ] }
+      })json");
+      doc["root"]["children"][0]["size"] = 3 * scale;
+      doc["root"]["children"][1]["size"] = 1 * scale;
+      editor->ApplyLayout(doc);
+      Pump();
+
+      const double large = editor->GetRenderWindowWidget("mxn__large")->width();
+      const double top = editor->GetRenderWindowWidget("mxn__top")->width();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Weights 3:1 at scale " + std::to_string(scale), 3.0, large / top, 0.1);
+    }
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkMxNLayoutV3)

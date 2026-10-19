@@ -2693,8 +2693,7 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
     {
       const auto type = child["type"].get<std::string>();
       // 'size' is optional; default weight 1 matches the schema default.
-      // Only the ratio between siblings matters at runtime - QSplitter
-      // redistributes weights proportionally on resize. PrewalkValidate has
+      // Only the ratio between siblings matters. PrewalkValidate has
       // rejected anything but an integer >= 1.
       sizes.append(child.value("size", 1));
 
@@ -2771,6 +2770,14 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
     throw;
   }
 
+  // QSplitter takes sizes in pixels and raises each to its widget's minimum,
+  // so weights like 3:1 would come out about even. Scaled up they stay clear
+  // of any minimum, and the splitter keeps their ratio when it is laid out.
+  const double totalWeight = std::accumulate(sizes.begin(), sizes.end(), 0.0);
+  for (auto& size : sizes)
+  {
+    size = std::max(1, static_cast<int>(std::lround(size * 100000.0 / totalWeight)));
+  }
   split->setSizes(sizes);
   return split.release();
 }

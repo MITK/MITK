@@ -14,6 +14,8 @@ found in the LICENSE file.
 #include <ui_QmitkMxNMultiWidgetEditorPreferencePage.h>
 #include "QmitkMxNMultiWidgetEditor.h"
 
+#include <QmitkMxNPresets.h>
+
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -28,6 +30,8 @@ found in the LICENSE file.
 
 #include <QLabel>
 #include <QVBoxLayout>
+
+#include <algorithm>
 
 QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
   : m_Ui(std::make_unique<Ui::QmitkMxNMultiWidgetEditorPreferencePage>())
@@ -137,6 +141,17 @@ void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   connect(m_Ui->m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));
 
+  m_Ui->m_StartLayout->addItem(tr("One window"), QString());
+  for (const auto& preset : QmitkMxNPresets::All())
+  {
+    m_Ui->m_StartLayout->addItem(preset.name, preset.id);
+  }
+  // Only the stock display follows this choice; a display another plugin
+  // declares starts the way that plugin decides.
+  const bool stockDisplay = QmitkMxNMultiWidgetEditor::EDITOR_ID == m_EditorId;
+  m_Ui->m_StartLayoutLabel->setVisible(stockDisplay);
+  m_Ui->m_StartLayout->setVisible(stockDisplay);
+
   Update();
 }
 
@@ -160,6 +175,11 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
   prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
 
   prefs->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
+  if (QmitkMxNMultiWidgetEditor::EDITOR_ID == m_EditorId)
+  {
+    // The preset's file name, which survives renaming the preset.
+    prefs->Put("Layout when opened", m_Ui->m_StartLayout->currentData().toString().toStdString());
+  }
 
   return true;
 }
@@ -184,6 +204,9 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
 
   m_Ui->m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
+  // A preset that no longer exists shows as the default.
+  const auto startLayout = m_Ui->m_StartLayout->findData(QString::fromStdString(prefs->Get("Layout when opened", "")));
+  m_Ui->m_StartLayout->setCurrentIndex(std::max(0, startLayout));
 }
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()

@@ -80,6 +80,7 @@ set(CPP_FILES
   QmitkMxNGroupJoinMode.cpp
   QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
+  QmitkMxNPresets.cpp
   QmitkMxNSyncBarcodeWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp

@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #include <iosfwd>
 #include <memory>
-#include <vector>
 
 namespace Ui
 {
@@ -57,8 +56,8 @@ public:
   void ResetSelection();
 
   /**
-   * \brief The display names of the layout presets shipped as module
-   *        resources, indexed the way ApplyPreset expects.
+   * \brief The display names of the layout presets (QmitkMxNPresets::All),
+   *        indexed the way ApplyPreset expects.
    */
   QStringList PresetNames() const;
 
@@ -101,14 +100,7 @@ private:
 
   void Init();
 
-  struct Preset
-  {
-    QString name;
-    nlohmann::json layout;
-  };
-
   std::unique_ptr<Ui::QmitkMultiWidgetLayoutSelectionWidget> ui;
-  std::vector<Preset> m_Presets;
 
 };
 

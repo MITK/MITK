@@ -29,17 +29,45 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNPresets.h>
 #include <QmitkInteractionSchemeToolBar.h>
 
 // qt
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPointer>
+#include <QTimer>
 
 // c++
+#include <algorithm>
 #include <optional>
 
 const QString QmitkMxNMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.mxnmultiwidget";
+
+namespace
+{
+  void ApplyStartPreset(QmitkMxNMultiWidget& multiWidget, const QString& presetId)
+  {
+    const auto& presets = QmitkMxNPresets::All();
+    const auto preset = std::find_if(presets.begin(), presets.end(),
+                                     [&presetId](const auto& candidate) { return candidate.id == presetId; });
+    if (presets.end() == preset)
+    {
+      MITK_WARN << "The MxN Display starts with one window: its start layout '" << presetId.toStdString()
+                << "' is not a preset.";
+      return;
+    }
+    try
+    {
+      multiWidget.ApplyLayout(QmitkMxNPresets::DocumentFor(*preset, multiWidget.GetMultiWidgetName()));
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "The MxN Display starts with one window: its start layout '" << presetId.toStdString()
+                << "' could not be applied. " << e.GetDescription();
+    }
+  }
+}
 
 struct QmitkMxNMultiWidgetEditor::Impl final
 {
@@ -342,6 +370,19 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeApplied);
 
   layout->addWidget(multiWidget);
+
+  // Only the stock display starts with the layout the user chose; a display
+  // another plugin declares starts the way that plugin decides. The preset is
+  // applied once the display is shown, so that its windows are fitted to the
+  // size they are laid out to.
+  if (EDITOR_ID == m_Impl->m_EditorId)
+  {
+    const auto presetId = QString::fromStdString(preferences->Get("Layout when opened", ""));
+    if (!presetId.isEmpty())
+    {
+      QTimer::singleShot(0, multiWidget, [multiWidget, presetId]() { ApplyStartPreset(*multiWidget, presetId); });
+    }
+  }
 
   // No configuration toolbar: the editor-wide controls, the interaction-scheme
   // switch included, live in the MxN Layout Editor view.

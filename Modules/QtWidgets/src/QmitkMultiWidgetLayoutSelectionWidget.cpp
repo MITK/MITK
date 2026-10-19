@@ -13,43 +13,16 @@ found in the LICENSE file.
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 #include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
+#include <QmitkMxNPresets.h>
+
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPalette>
 #include <QSaveFile>
 
-#include <algorithm>
 #include <sstream>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usModuleResourceStream.h>
-
-namespace
-{
-  /** Replaces the editor segment of every window id below 'node'. An id without
-   *  the "__" separator is left for the loader to reject. */
-  void RequalifyWindowIds(nlohmann::json& node, const std::string& widgetName)
-  {
-    if (const auto id = node.find("id"); node.end() != id && id->is_string())
-    {
-      const auto separator = id->get_ref<const std::string&>().find("__");
-      if (std::string::npos != separator)
-      {
-        *id = widgetName + id->get_ref<const std::string&>().substr(separator);
-      }
-    }
-    if (const auto children = node.find("children"); node.end() != children && children->is_array())
-    {
-      for (auto& child : *children)
-      {
-        RequalifyWindowIds(child, widgetName);
-      }
-    }
-  }
-}
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
@@ -79,18 +52,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   connect(ui->setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
   connect(ui->dynamicLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::DynamicLayoutRequested);
 
-  // The presets ship as module resources; they are read once here and offered
-  // by name, so the host can present them without knowing about the resources.
-  auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
-  // FindResources promises no order; the two-digit prefixes of the file names
-  // define the menu order, and ModuleResource orders by resource path.
-  std::sort(presetResources.begin(), presetResources.end());
-  for (const auto& resource : presetResources)
-  {
-    us::ModuleResourceStream jsonStream(resource);
-    auto data = nlohmann::json::parse(jsonStream);
-    m_Presets.push_back({ QString::fromStdString(data["name"].get<std::string>()), data });
-  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
@@ -101,8 +62,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
 QStringList QmitkMultiWidgetLayoutSelectionWidget::PresetNames() const
 {
   QStringList names;
-  names.reserve(static_cast<int>(m_Presets.size()));
-  for (const auto& preset : m_Presets)
+  for (const auto& preset : QmitkMxNPresets::All())
   {
     names.append(preset.name);
   }
@@ -229,15 +189,12 @@ void QmitkMultiWidgetLayoutSelectionWidget::RequestLoad()
 
 void QmitkMultiWidgetLayoutSelectionWidget::ApplyPreset(int index, const QString& widgetName)
 {
-  if (index < 0 || static_cast<std::size_t>(index) >= m_Presets.size())
+  const auto& presets = QmitkMxNPresets::All();
+  if (index < 0 || static_cast<std::size_t>(index) >= presets.size())
   {
     return;
   }
 
-  nlohmann::json layout = m_Presets[index].layout;
-  if (auto root = layout.find("root"); layout.end() != root)
-  {
-    RequalifyWindowIds(*root, widgetName.toStdString());
-  }
+  auto layout = QmitkMxNPresets::DocumentFor(presets[index], widgetName);
   emit LoadLayout(&layout);
 }

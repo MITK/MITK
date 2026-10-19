@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkMxNPresets.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 
@@ -61,6 +62,8 @@ class QmitkMxNPresetsTestSuite : public mitk::TestFixture
   MITK_TEST(Menu_EndsWithTheDynamicLayoutEntry);
   MITK_TEST(DynamicLayoutEntry_NeedsImageData);
   MITK_TEST(DynamicLayoutEntry_OpensTheDialog);
+  MITK_TEST(Presets_AreIdentifiedByTheirFileNames);
+  MITK_TEST(DocumentFor_QualifiesTheWindowIds);
   MITK_TEST(Presets_MatchTheirSpecification_OnTheDefaultNamedEditor);
   MITK_TEST(Presets_MatchTheirSpecification_OnAnotherNamedEditor);
   MITK_TEST(Lightbox_StartsOneSliceApartPerWindow);
@@ -399,6 +402,69 @@ public:
     poll.stop();
 
     CPPUNIT_ASSERT_MESSAGE("The entry opens the dynamic layout dialog", dialogFound);
+  }
+
+  // --- The presets as a module service ---------------------------------------
+
+  void Presets_AreIdentifiedByTheirFileNames()
+  {
+    // Preferences store a preset by its id, so the ids must not follow the
+    // display names.
+    const QStringList expected = { "mxnLayout_01_mprAnd3d",     "mxnLayout_02_focusContext",
+                                   "mxnLayout_03_twoLooks",     "mxnLayout_04_lightbox",
+                                   "mxnLayout_05_sliceContext", "mxnLayout_06_2dAnd3d",
+                                   "mxnLayout_07_3dThreeSides", "mxnLayout_08_overviewDetail" };
+    QStringList ids;
+    QStringList names;
+    for (const auto& preset : QmitkMxNPresets::All())
+    {
+      ids << preset.id;
+      names << preset.name;
+    }
+    CPPUNIT_ASSERT_EQUAL(expected.join(QStringLiteral(" | ")).toStdString(),
+                         ids.join(QStringLiteral(" | ")).toStdString());
+
+    QStringList menuNames;
+    for (const auto& preset : Specification())
+    {
+      menuNames << preset.menuName;
+    }
+    CPPUNIT_ASSERT_EQUAL(menuNames.join(QStringLiteral(" | ")).toStdString(),
+                         names.join(QStringLiteral(" | ")).toStdString());
+  }
+
+  /** The window ids below 'node'. */
+  static void CollectWindowIds(const nlohmann::json& node, std::vector<std::string>& ids)
+  {
+    if ("window" == node.value("type", std::string()))
+    {
+      ids.push_back(node.at("id").get<std::string>());
+    }
+    for (const auto& child : node.value("children", nlohmann::json::array()))
+    {
+      CollectWindowIds(child, ids);
+    }
+  }
+
+  void DocumentFor_QualifiesTheWindowIds()
+  {
+    for (const auto& preset : QmitkMxNPresets::All())
+    {
+      std::vector<std::string> ids;
+      CollectWindowIds(QmitkMxNPresets::DocumentFor(preset, QStringLiteral("other")).at("root"), ids);
+      CPPUNIT_ASSERT_MESSAGE("Every preset has windows", !ids.empty());
+      for (const auto& id : ids)
+      {
+        CPPUNIT_ASSERT_MESSAGE(id + " is qualified for 'other'", 0 == id.rfind("other__", 0));
+      }
+
+      ids.clear();
+      CollectWindowIds(preset.document.at("root"), ids);
+      for (const auto& id : ids)
+      {
+        CPPUNIT_ASSERT_MESSAGE(id + " stays as shipped", 0 == id.rfind("mxn__", 0));
+      }
+    }
   }
 
   // --- Every preset ----------------------------------------------------------

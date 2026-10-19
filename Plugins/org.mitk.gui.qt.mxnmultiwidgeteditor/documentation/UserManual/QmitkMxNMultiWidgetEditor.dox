@@ -504,6 +504,9 @@
 			whole editor at any time.
 		<li> "Use PACS like mouse interaction" (default off): start in the PACS interaction
 			mouse mode (see \ref org_mitk_editors_mxnmultiwidget_Interaction_Mode).
+		<li> "Layout when opened" (default "One window"): the preset a newly opened MxN Display
+			starts with. Displays that other plugins add start with the layout their plugin
+			chooses, so their preference pages do not offer this choice.
 	</ul>
 
 */

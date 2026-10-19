@@ -2199,6 +2199,7 @@ void QmitkMxNMultiWidget::AddGridColumn()
   // have columns+1 cells, later rows still columns). Nothing reads
   // ResolveGridShape mid-loop; the furniture refreshes once, on the
   // LayoutChanged that FinalizeGridSurgery emits.
+  std::vector<QString> newCells;
   for (int r = 0; r < rows; ++r)
   {
     auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
@@ -2206,8 +2207,10 @@ void QmitkMxNMultiWidget::AddGridColumn()
     rowSplit->addWidget(cell.get());
     cell->show();
     SizeNewTrailingChild(rowSplit);
+    newCells.push_back(cell->GetWidgetName());
   }
 
+  this->FitNewCellsToTheirSize(newCells);
   this->FinalizeGridSurgery();
 }
 
@@ -2267,17 +2270,20 @@ void QmitkMxNMultiWidget::AddGridRow()
   // identical to constructing with 'root' as parent, with the trailing
   // placement made explicit.
   auto* rowSplit = new QSplitter(Qt::Horizontal);
+  std::vector<QString> newCells;
   for (int c = 0; c < columns; ++c)
   {
     auto cell = this->CreateRenderWindowWidget();
     rowSplit->addWidget(cell.get());
     cell->show();
+    newCells.push_back(cell->GetWidgetName());
   }
   DistributeSplitterEvenly(rowSplit);
   root->addWidget(rowSplit);
   rowSplit->show();
   SizeNewTrailingChild(root);
 
+  this->FitNewCellsToTheirSize(newCells);
   this->FinalizeGridSurgery();
 }
 

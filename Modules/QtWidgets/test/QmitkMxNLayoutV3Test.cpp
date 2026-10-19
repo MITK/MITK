@@ -103,6 +103,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_WithDataLoaded_CellsShowTheirDeclaredDirection);
   MITK_TEST(Apply_NarrowWindow_ShowsItsWholePlane);
   MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(AddGridColumn_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
   MITK_TEST(Apply_ThreeDWindow_FramesTheData);
 
@@ -1005,33 +1007,81 @@ public:
     AssertShowsWholePlane(*editor, "mxn__wide");
   }
 
+  static std::vector<QString> WindowIds(const QmitkMxNMultiWidget& editor)
+  {
+    std::vector<QString> ids;
+    for ([[maybe_unused]] const auto& [windowId, cell] : editor.GetRenderWindowWidgets())
+    {
+      ids.push_back(windowId);
+    }
+    return ids;
+  }
+
+  /** A cell that already existed keeps its zoom; only the new ones are checked. */
+  static void AssertNewWindowsShowTheirWholePlane(const QmitkMxNMultiWidget& editor,
+                                                  const std::vector<QString>& existing)
+  {
+    const auto ids = WindowIds(editor);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: windows were added", ids.size() > existing.size());
+    for (const auto& windowId : ids)
+    {
+      if (std::find(existing.begin(), existing.end(), windowId) == existing.end())
+      {
+        AssertShowsWholePlane(editor, windowId);
+      }
+    }
+  }
+
+  /** A shown editor of the given size, holding the square image. */
+  std::unique_ptr<QmitkMxNMultiWidget> MakeShownEditor(int width, int height)
+  {
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(width, height);
+    editor->show();
+    Pump();
+    return editor;
+  }
+
   void SetLayout_NarrowNewWindows_ShowTheirWholePlane()
   {
     // The grid picker's new cells are constructed before they are laid out,
-    // like a loaded layout's. A cell that already existed keeps its zoom.
-    AddSquareImage();
-    auto editor = MakeEditor();
-    editor->resize(900, 600);
-    editor->show();
-    Pump();
+    // like a loaded layout's.
+    auto editor = MakeShownEditor(900, 600);
     const VtkSizeFollowsWidget vtkSizes;
-    std::vector<QString> existing;
-    for ([[maybe_unused]] const auto& [windowId, cell] : editor->GetRenderWindowWidgets())
-    {
-      existing.push_back(windowId);
-    }
+    const auto existing = WindowIds(*editor);
 
     editor->SetLayout(1, 4);
     Pump();
 
     CPPUNIT_ASSERT_EQUAL(4u, editor->GetNumberOfRenderWindowWidgets());
-    for ([[maybe_unused]] const auto& [windowId, cell] : editor->GetRenderWindowWidgets())
-    {
-      if (std::find(existing.begin(), existing.end(), windowId) == existing.end())
-      {
-        AssertShowsWholePlane(*editor, windowId);
-      }
-    }
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
+  }
+
+  void AddGridColumn_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // A column added to a narrow editor makes windows taller than wide.
+    auto editor = MakeShownEditor(400, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    const auto existing = WindowIds(*editor);
+
+    editor->AddGridColumn();
+    Pump();
+
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
+  }
+
+  void AddGridRow_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // A row added to a tall editor makes windows taller than wide.
+    auto editor = MakeShownEditor(300, 900);
+    const VtkSizeFollowsWidget vtkSizes;
+    const auto existing = WindowIds(*editor);
+
+    editor->AddGridRow();
+    Pump();
+
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
   }
 
   void Apply_DeclaredSizes_SetTheProportions()

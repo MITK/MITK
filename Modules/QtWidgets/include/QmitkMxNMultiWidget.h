@@ -1882,6 +1882,15 @@ private:
   void FitCellToVisibleData(const QString& windowId);
 
   /**
+  * \brief Lay out the editor, then fit the camera of each 2D cell of
+  *        'windowIds' to the size it is laid out to.
+  *
+  *   For cells created since the event loop last ran. Nothing happens while
+  *   the editor is hidden.
+  */
+  void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
+
+  /**
   * \brief Set the 2D members of the zoom group of 'sender' to the zoom of
   *        'sender' and their offsets, within each member's zoom-out limit.
   *        Members that already agree are left untouched.

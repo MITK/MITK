@@ -1533,9 +1533,11 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   const int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
 
   int difference = requiredRenderWindowWidgets - existingRenderWindowWidgets;
+  std::vector<QString> newCells;
   while (0 < difference)
   {
-    readingOrder.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
+    newCells.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
+    readingOrder.push_back(newCells.back());
     --difference;
   }
 
@@ -1570,6 +1572,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   }
 
   this->BuildGridTree(readingOrder);
+  this->FitNewCellsToTheirSize(newCells);
 
   if (auto firstCell = this->FirstCellInReadingOrder())
   {
@@ -3284,6 +3287,33 @@ void QmitkMxNMultiWidget::FitCellToVisibleData(const QString& windowId)
   }
 }
 
+void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& windowIds)
+{
+  if (windowIds.empty() || !this->isVisible())
+  {
+    return;
+  }
+  // A cell fits its camera when it is constructed, before it is laid out.
+  // Core narrows a fit when a window shrinks but never widens it, so a cell
+  // laid out narrower than it was constructed would show its plane cut off at
+  // the sides. One pass of the event loop lays the new cells out; user input
+  // stays excluded, as while the load feedback is shown.
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+
+  for (const auto& windowId : windowIds)
+  {
+    const auto cell = this->GetRenderWindowWidget(windowId);
+    auto* renderer = RendererOf(cell.get());
+    // The camera only: slice and time step stay as the construction set them.
+    if (nullptr != renderer && mitk::BaseRenderer::Standard2D == renderer->GetMapperID()
+        && nullptr != renderer->GetCurrentWorldPlaneGeometry())
+    {
+      renderer->GetCameraController()->Fit();
+      mitk::RenderingManager::GetInstance()->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+}
+
 void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
 {
   // 'didMutate' guards rollback. As long as we are in the validation phase
@@ -3532,6 +3562,14 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(rootSplitter);
     this->StepLayoutLoadFeedback(LoadPercentCellsEnd, tr("Linking synchronization groups"));
+    // Before the links: the members of a zoom or pan group converge to their
+    // seed's camera, so the seed's fit has to be final.
+    std::vector<QString> newCells;
+    for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+    {
+      newCells.push_back(windowId);
+    }
+    this->FitNewCellsToTheirSize(newCells);
 
     // ----- Group seeding pass + divergence detection -----
     // Make the seed cell of each group authoritative for the group's runtime

@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 
 #include <vtkCamera.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -38,6 +39,8 @@ found in the LICENSE file.
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QEvent>
+#include <QResizeEvent>
 
 #include <algorithm>
 #include <fstream>
@@ -97,6 +100,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3Doc_ThreeDWindows_Load);
   MITK_TEST(InTreeV3Documents_Load);
   MITK_TEST(Apply_WithDataLoaded_CellsShowTheirDeclaredDirection);
+  MITK_TEST(Apply_NarrowWindow_ShowsItsWholePlane);
+  MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -900,6 +905,128 @@ public:
       {
         CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera is centered like a fresh view" + where,
                                              freshFocalPoint[i], focalPoint[i], 1e-6);
+      }
+    }
+  }
+
+  /**
+   * Stands in for the GL widget, which never sizes its VTK window headless:
+   * every render window's VTK window takes the size the window is laid out to.
+   */
+  class VtkSizeFollowsWidget : public QObject
+  {
+  public:
+    VtkSizeFollowsWidget()
+    {
+      QCoreApplication::instance()->installEventFilter(this);
+    }
+    ~VtkSizeFollowsWidget() override
+    {
+      QCoreApplication::instance()->removeEventFilter(this);
+    }
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (QEvent::Resize == event->type())
+      {
+        if (auto* renderWindow = qobject_cast<QmitkRenderWindow*>(watched))
+        {
+          const auto size = static_cast<QResizeEvent*>(event)->size();
+          renderWindow->GetVtkRenderWindow()->SetSize(size.width(), size.height());
+        }
+      }
+      return false;
+    }
+  };
+
+  /** A 16 x 16 mm axial plane: a fit to its height has a half-height of 8 mm. */
+  void AddSquareImage()
+  {
+    auto imageNode = mitk::DataNode::New();
+    imageNode->SetName("image");
+    imageNode->SetData(mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f));
+    imageNode->SetIntProperty("layer", 2);
+    m_DataStorage->Add(imageNode);
+  }
+
+  /** The half-height at which the cell shows its whole plane and no more. */
+  static double FittedHalfHeight(mitk::BaseRenderer* renderer)
+  {
+    const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
+    const double widthInMM = plane->GetExtentInMM(0);
+    double heightInMM = plane->GetExtentInMM(1);
+    const double displayWidth = renderer->GetViewportSize()[0];
+    const double displayHeight = renderer->GetViewportSize()[1];
+    if (displayWidth / widthInMM < displayHeight / heightInMM)
+    {
+      heightInMM = widthInMM / displayWidth * displayHeight;
+    }
+    return heightInMM * 0.5;
+  }
+
+  static void AssertShowsWholePlane(const QmitkMxNMultiWidget& editor, const QString& windowId)
+  {
+    auto* renderer = mitk::BaseRenderer::GetInstance(
+      editor.GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The window shows its whole plane (" + windowId.toStdString() + ")",
+                                         FittedHalfHeight(renderer),
+                                         renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_NarrowWindow_ShowsItsWholePlane()
+  {
+    // A cell fits its camera when it is constructed, before the editor has laid
+    // it out. Core narrows a fit when a window shrinks but never widens it, so
+    // a window laid out narrower than it was constructed would show its plane
+    // cut off at the sides. The wide window is the control.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    editor->show();
+    Pump();
+    const VtkSizeFollowsWidget vtkSizes;
+
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+      ] }
+    })json"));
+    Pump();
+
+    auto* narrow = mitk::BaseRenderer::GetInstance(
+      editor->GetRenderWindowWidget("mxn__narrow")->GetRenderWindow()->GetVtkRenderWindow());
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the narrow window is fitted to its width", FittedHalfHeight(narrow) > 8.5);
+    AssertShowsWholePlane(*editor, "mxn__narrow");
+    AssertShowsWholePlane(*editor, "mxn__wide");
+  }
+
+  void SetLayout_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // The grid picker's new cells are constructed before they are laid out,
+    // like a loaded layout's. A cell that already existed keeps its zoom.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    editor->show();
+    Pump();
+    const VtkSizeFollowsWidget vtkSizes;
+    std::vector<QString> existing;
+    for ([[maybe_unused]] const auto& [windowId, cell] : editor->GetRenderWindowWidgets())
+    {
+      existing.push_back(windowId);
+    }
+
+    editor->SetLayout(1, 4);
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL(4u, editor->GetNumberOfRenderWindowWidgets());
+    for ([[maybe_unused]] const auto& [windowId, cell] : editor->GetRenderWindowWidgets())
+    {
+      if (std::find(existing.begin(), existing.end(), windowId) == existing.end())
+      {
+        AssertShowsWholePlane(*editor, windowId);
       }
     }
   }

@@ -313,14 +313,14 @@ void DataStorageController::SetTempDirectory(const std::string& tempDir)
 
 void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory)
 {
-  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
-  {
-    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
-  }
-
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
   m_TempDirectory = tempDirectory;
+}
+
+void DataStorageController::SetFileAccessCheck(std::function<bool(const httplib::Request&)> check)
+{
+  m_FileAccessCheck = std::move(check);
 }
 
 void DataStorageController::SetMaxActiveTempDirsPerIp(size_t max)
@@ -768,10 +768,13 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
 
     const fs::path filePath(body[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH].get<std::string>());
 
-    if (!fs::exists(filePath))
+    // Both access checks come before the existence check, which would tell a
+    // client which files exist where it may not look.
+    if (m_FileAccessCheck && !m_FileAccessCheck(req))
     {
-      result.errorStatus = 422;
-      result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
+      result.errorStatus = 403;
+      result.errorResponse = ErrorResponse::FileAccessDenied(
+        "This client may not load data from files. Send the data in the request body instead.", req.path);
       return result;
     }
 
@@ -781,6 +784,13 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     {
       result.errorStatus = 403;
       result.errorResponse = ErrorResponse::FileAccessDenied(validationError, req.path);
+      return result;
+    }
+
+    if (!fs::exists(filePath))
+    {
+      result.errorStatus = 422;
+      result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
       return result;
     }
 
@@ -1500,6 +1510,13 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
   {
     this->SendErrorResponse(res, 406, ErrorResponse::TransferModeNotAvailable(
       e.mode, {TRANSFER_MODE_FILE_REFERENCE, TRANSFER_MODE_DIRECT}, req.path));
+    return;
+  }
+
+  if (transferMode == TRANSFER_MODE_FILE_REFERENCE && m_FileAccessCheck && !m_FileAccessCheck(req))
+  {
+    this->SendErrorResponse(res, 403, ErrorResponse::FileAccessDenied(
+      "This client may not get data as files. Use the direct transfer mode instead.", req.path));
     return;
   }
 

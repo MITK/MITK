@@ -4,8 +4,12 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkRestApiBridgeBindings.cpp
+  QmitkRestApiManualRoutes.cpp
   QmitkRestApiPreferencePage.cpp
+  QmitkRestApiRenderingRoutes.cpp
   QmitkRestApiView.cpp
+  QmitkRestApiWorkbenchRoutes.cpp
+  QmitkUserManual.cpp
 )
 
 set(UI_FILES

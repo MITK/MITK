@@ -296,6 +296,16 @@ namespace mitk
     DataNode::ConstPointer FindDataNode(const std::string& uid) const;
 
     /**
+     * \brief Look up a DataNode by UID, without waiting for the dispatch thread.
+     *
+     * Unlike FindDataNode(), it can be called from any thread, also while
+     * other requests hold the bridge and wait for the dispatch thread.
+     *
+     * \return The node, or null if the UID is not registered.
+     */
+    DataNode::Pointer FindNode(const std::string& uid) const;
+
+    /**
      * \brief Set or replace the data on a node.
      *
      * Thread-safe assignment of BaseData to a node. The data is assigned

@@ -10,4 +10,6 @@ set(MODULE_TESTS
   mitkInputValidationTest.cpp
   mitkRenderingControllerTest.cpp
   mitkRenderWindowBridgeTest.cpp
+  mitkRestRouteTest.cpp
+  mitkRestTimeTest.cpp
 )

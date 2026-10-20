@@ -112,6 +112,18 @@ GET /api/v1/info
 
 Returns API metadata including supported versions and deprecation notices.
 
+### Experimental Endpoints
+
+Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. They are experimental: until this specification documents them, they may change or go away without a new major version. They describe themselves:
+
+```http
+GET /api/v1/endpoints
+```
+
+lists all endpoints with method, path and summary, and marks the experimental ones with `"experimental": true`. The query parameter `path` limits the list to paths that start with it; `details=true` adds what each endpoint takes and returns.
+
+Experimental endpoints refuse requests that carry an `Origin` header (403 `ACCESS_DENIED`). Browsers send it, other clients do not, so web pages cannot use these endpoints through the user's browser.
+
 ---
 
 ## 4. Authentication {#sec-4-authentication}
@@ -2029,6 +2041,8 @@ Content-Type: application/json
 
 Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
 
+The step is the position of the window's slice stepper. Depending on the orientation of the image, it can run opposite to the slice index that the Image Navigator shows. The experimental `/api/v1/rendering/windows` endpoints count slices like the Image Navigator.
+
 **Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
 
 **Response 200 (`application/json`):**
@@ -2394,7 +2408,7 @@ Partial update. At least one camera field must be present. `standard_view` is ap
 
 #### GET /api/v1/rendering/editors/mxn/windows/{id}/selected-slice
 
-Returns the cell's selected-slice state: integer step, the live world position on the slice plane, and navigator bounds (`steps`, `min_position`, `max_position`). `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded.
+Returns the cell's selected-slice state: integer step, the live world position on the slice plane, and navigator bounds (`steps`, `min_position`, `max_position`). `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded. As for StdMulti, the step is the position of the cell's slice stepper, which can run opposite to the slice index that the Image Navigator shows.
 
 **Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
 

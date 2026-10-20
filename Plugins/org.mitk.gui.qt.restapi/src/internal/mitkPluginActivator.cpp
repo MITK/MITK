@@ -14,8 +14,12 @@ found in the LICENSE file.
 #include "QmitkRestApiPreferencePage.h"
 #include "QmitkRestApiView.h"
 #include "QmitkRestApiBridgeBindings.h"
+#include "QmitkRestApiManualRoutes.h"
+#include "QmitkRestApiRenderingRoutes.h"
+#include "QmitkRestApiWorkbenchRoutes.h"
 
 #include <mitkIRestServerService.h>
+#include <mitkLog.h>
 #include <mitkRenderWindowBridge.h>
 
 #include <usModuleRegistry.h>
@@ -137,6 +141,22 @@ namespace mitk
 
     ConfigureRestApiBridgeCallbacks(m_RenderWindowBridge);
 
+    try
+    {
+      for (const auto& route : CreateManualRoutes(service, m_Context))
+        m_Routes.push_back(service->AddRoute(route));
+
+      for (const auto& route : CreateWorkbenchRoutes(service))
+        m_Routes.push_back(service->AddRoute(route));
+
+      for (const auto& route : CreateRenderingRoutes(service))
+        m_Routes.push_back(service->AddRoute(route));
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Cannot offer the Workbench's REST endpoints: " << e.GetDescription();
+    }
+
     m_MitkContext->UngetService(typedRef);
   }
 
@@ -159,9 +179,13 @@ namespace mitk
       if (service->GetRenderWindowBridge() == m_RenderWindowBridge)
         service->GetRenderWindowBridge()->ResetCallbacks();
 
+      for (const auto id : m_Routes)
+        service->RemoveRoute(id);
+
       m_MitkContext->UngetService(typedRef);
     }
 
+    m_Routes.clear();
     m_RenderWindowBridge = nullptr;
   }
 }

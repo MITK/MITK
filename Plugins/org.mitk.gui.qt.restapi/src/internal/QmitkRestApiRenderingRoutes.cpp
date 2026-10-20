@@ -1,0 +1,979 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include "QmitkRestApiRenderingRoutes.h"
+
+#include <QmitkAbstractMultiWidgetEditor.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowScreenshot.h>
+#include <QmitkStdMultiWidget.h>
+
+#include <mitkCameraController.h>
+#include <mitkErrorResponse.h>
+#include <mitkException.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkIRenderWindowPart.h>
+#include <mitkIRestServerService.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkLabelSetImage.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkPixelTypeMultiplex.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkRestGuiThread.h>
+#include <mitkRestPoints.h>
+#include <mitkRestTime.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkSliceNavigationHelper.h>
+#include <mitkTimeNavigationController.h>
+
+#include <berryIWorkbench.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryPlatformUI.h>
+
+#include <vtkCamera.h>
+#include <vtkMath.h>
+#include <vtkRenderer.h>
+
+#include <QBuffer>
+#include <QImage>
+#include <QPainter>
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <optional>
+#include <set>
+
+namespace
+{
+  constexpr int DefaultMaxScreenshotSize = 1000;
+
+  /** The editor of the standard display, or nullptr if it is not open. */
+  berry::IWorkbenchPart::Pointer FindStdMultiWidgetEditor()
+  {
+    for (const auto& window : berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows())
+    {
+      const auto page = window->GetActivePage();
+
+      if (page.IsNull())
+        continue;
+
+      for (const auto& reference : page->GetEditorReferences())
+      {
+        if (reference->GetId() != "org.mitk.editors.stdmultiwidget")
+          continue;
+
+        if (auto part = reference->GetPart(false); part.IsNotNull())
+          return part;
+      }
+    }
+
+    return {};
+  }
+
+  QmitkRenderWindow* FindRenderWindow(const std::string& id, const std::string& path)
+  {
+    // Validates the id and that the window exists.
+    mitk::GetRestRenderer(id, path);
+
+    const auto editor = FindStdMultiWidgetEditor();
+    auto* renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
+    auto* renderWindow = renderWindowPart != nullptr ? renderWindowPart->GetQmitkRenderWindow(QString::fromStdString(id)) : nullptr;
+
+    if (renderWindow == nullptr)
+      throw mitk::RestException(mitk::ErrorResponse::RenderWindowNotAvailable(path));
+
+    return renderWindow;
+  }
+
+  QmitkStdMultiWidget* FindStdMultiWidget(const std::string& path)
+  {
+    const auto part = FindStdMultiWidgetEditor();
+    auto* editor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(part.GetPointer());
+    auto* multiWidget = editor != nullptr ? dynamic_cast<QmitkStdMultiWidget*>(editor->GetMultiWidget()) : nullptr;
+
+    if (multiWidget == nullptr)
+      throw mitk::RestException(mitk::ErrorResponse::RenderWindowNotAvailable(path));
+
+    return multiWidget;
+  }
+
+  /** Whether the crosshair shows in the 2D windows and in the 3D window, as the render window menus toggle it. */
+  nlohmann::json DescribeCrosshair(QmitkStdMultiWidget* multiWidget)
+  {
+    const auto isShownIn = [multiWidget](QmitkRenderWindow* window) {
+      const auto* renderer = window->GetRenderer();
+
+      for (const auto& plane : { multiWidget->GetWidgetPlane1(), multiWidget->GetWidgetPlane2(), multiWidget->GetWidgetPlane3() })
+      {
+        if (plane.IsNull() || !plane->IsVisible(renderer))
+          return false;
+      }
+
+      return true;
+    };
+
+    return {
+      { "visible", isShownIn(multiWidget->GetRenderWindow1()) },
+      { "visible_3d", isShownIn(multiWidget->GetRenderWindow4()) }
+    };
+  }
+
+  bool Is2D(QmitkRenderWindow* window)
+  {
+    return window->GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D;
+  }
+
+  /**
+   * Converts between positions of the stepper and slice indices as the Image
+   * Navigator shows them, which follow the image index. Whether the two run
+   * opposite depends on the orientation of the image. The conversion is its
+   * own inverse.
+   */
+  int ConvertSliceNumber(mitk::BaseRenderer* renderer, int count, int number)
+  {
+    return mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? count - 1 - number : number;
+  }
+
+  nlohmann::json DescribeWindow(const std::string& id, QmitkRenderWindow* window)
+  {
+    auto* renderer = window->GetRenderer();
+
+    nlohmann::json json = {
+      { "id", id },
+      { "kind", Is2D(window) ? "2d" : "3d" },
+      { "size", { renderer->GetSizeX(), renderer->GetSizeY() } },
+      { "timepoint_ms", renderer->GetTime() }
+    };
+
+    if (Is2D(window))
+    {
+      auto* navigation = window->GetSliceNavigationController();
+      const auto* stepper = navigation->GetStepper();
+      const auto count = static_cast<int>(stepper->GetSteps());
+      const auto position = static_cast<int>(stepper->GetPos());
+
+      json["view_direction"] = navigation->GetViewDirectionAsString();
+
+      if (count > 0)
+      {
+        json["slice"] = {
+          { "index", ConvertSliceNumber(renderer, count, position) },
+          { "count", count }
+        };
+      }
+    }
+
+    return json;
+  }
+
+  /** The capture options that the query asks for. */
+  QmitkRenderWindowScreenshot::Options GetScreenshotOptions(const mitk::RestRequest& request)
+  {
+    QmitkRenderWindowScreenshot::Options options;
+    options.MaxSize = DefaultMaxScreenshotSize;
+
+    if (const auto value = request.GetQueryParam("max_size"); value.has_value())
+    {
+      try
+      {
+        options.MaxSize = static_cast<unsigned int>(std::clamp(std::stoi(*value), 100, 4000));
+      }
+      catch (const std::exception&)
+      {
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("max_size must be a number of pixels.", request.Path));
+      }
+    }
+
+    if (const auto background = request.GetQueryParam("background"); background.has_value())
+    {
+      const auto color = QColor::fromString(QString::fromStdString(*background));
+
+      if (*background == "transparent")
+      {
+        options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Transparent;
+      }
+      else if (background->size() == 7 && background->front() == '#' && color.isValid())
+      {
+        options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Color;
+        options.BackgroundColor = color;
+      }
+      else
+      {
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(
+          "background must be transparent or a color like #ffffff.", request.Path));
+      }
+    }
+
+    if (const auto decorations = request.GetQueryParam("decorations"); decorations.has_value())
+      options.Decorations = *decorations != "false";
+
+    if (const auto scale = request.GetQueryParam("scale"); scale.has_value())
+    {
+      if (*scale != "1" && *scale != "2" && *scale != "3" && *scale != "4")
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("scale must be 1, 2, 3 or 4.", request.Path));
+
+      options.Magnification = static_cast<unsigned int>(std::stoi(*scale));
+    }
+
+    options.CropToContent = request.GetQueryParam("crop").value_or("") == "true";
+
+    if (const auto padding = request.GetQueryParam("padding"); padding.has_value())
+    {
+      if (!options.CropToContent)
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding needs crop=true.", request.Path));
+
+      int value = 0;
+
+      try
+      {
+        value = std::stoi(*padding);
+      }
+      catch (const std::exception&)
+      {
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding must be a number of pixels.", request.Path));
+      }
+
+      if (value < 0 || 2 * value >= static_cast<int>(options.MaxSize))
+        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding must be 0 or more and less than half of max_size.", request.Path));
+
+      options.Padding = static_cast<unsigned int>(value);
+    }
+
+    return options;
+  }
+
+  /** Faint lines every 50 pixels, labeled every 100, so that points can be read off. */
+  void DrawGrid(QImage& image)
+  {
+    QPainter painter(&image);
+    auto font = painter.font();
+    font.setPixelSize(11);
+    painter.setFont(font);
+
+    const QColor faint(255, 255, 0, 40);
+    const QColor label(255, 255, 0, 220);
+
+    for (int x = 50; x < image.width(); x += 50)
+    {
+      painter.setPen(faint);
+      painter.drawLine(x, 0, x, image.height());
+
+      if (x % 100 == 0)
+      {
+        painter.setPen(label);
+        painter.drawText(x + 2, 12, QString::number(x));
+      }
+    }
+
+    for (int y = 50; y < image.height(); y += 50)
+    {
+      painter.setPen(faint);
+      painter.drawLine(0, y, image.width(), y);
+
+      if (y % 100 == 0)
+      {
+        painter.setPen(label);
+        painter.drawText(2, y - 2, QString::number(y));
+      }
+    }
+  }
+
+  /**
+   * The time step of the data at the selected time point.
+   *
+   * \throw RestException with status 422 if the data has no time step there.
+   */
+  mitk::TimeStepType GetSelectedTimeStep(const mitk::DataNode* node, const std::string& path)
+  {
+    mitk::RestTimeSelection selection;
+    selection.TimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto timeSteps = selection.GetTimeSteps(node->GetData());
+
+    if (timeSteps.empty())
+    {
+      throw mitk::RestException(mitk::ErrorResponse::Create("NO_DATA_AT_TIME_POINT", "Unprocessable Content",
+        "\"" + node->GetName() + "\" has no data at the selected time point, " + std::to_string(selection.TimePoint) + " ms.", 422, path));
+    }
+
+    return timeSteps.front();
+  }
+
+  /** The corners of the box around the voxels of the labels, in world coordinates; empty if they have none. */
+  std::vector<mitk::Point3D> GetLabelCorners(const mitk::MultiLabelSegmentation* segmentation,
+    const std::vector<mitk::MultiLabelSegmentation::LabelValueType>& values, mitk::TimeStepType timeStep)
+  {
+    std::vector<bool> wanted(std::numeric_limits<mitk::Label::PixelType>::max() + 1, false);
+    std::set<mitk::MultiLabelSegmentation::GroupIndexType> groups;
+
+    for (const auto value : values)
+    {
+      wanted[value] = true;
+      groups.insert(segmentation->GetGroupIndexOfLabel(value));
+    }
+
+    std::array<unsigned int, 3> lower = { std::numeric_limits<unsigned int>::max(), std::numeric_limits<unsigned int>::max(), std::numeric_limits<unsigned int>::max() };
+    std::array<unsigned int, 3> upper = { 0, 0, 0 };
+    bool found = false;
+
+    for (const auto group : groups)
+    {
+      const auto* groupImage = segmentation->GetGroupImage(group);
+
+      if (groupImage->GetPixelType().GetComponentType() != itk::IOComponentEnum::USHORT)
+        continue;
+
+      mitk::ImageReadAccessor accessor(mitk::Image::ConstPointer(groupImage), groupImage->GetVolumeData(timeStep));
+      const auto* pixels = static_cast<const mitk::Label::PixelType*>(accessor.GetData());
+      const std::array<unsigned int, 3> size = { groupImage->GetDimension(0), groupImage->GetDimension(1), groupImage->GetDimension(2) };
+
+      for (unsigned int z = 0; z < size[2]; ++z)
+      {
+        for (unsigned int y = 0; y < size[1]; ++y)
+        {
+          const auto* row = pixels + (static_cast<std::size_t>(z) * size[1] + y) * size[0];
+
+          for (unsigned int x = 0; x < size[0]; ++x)
+          {
+            if (!wanted[row[x]])
+              continue;
+
+            lower = { std::min(lower[0], x), std::min(lower[1], y), std::min(lower[2], z) };
+            upper = { std::max(upper[0], x), std::max(upper[1], y), std::max(upper[2], z) };
+            found = true;
+          }
+        }
+      }
+    }
+
+    std::vector<mitk::Point3D> corners;
+
+    if (!found)
+      return corners;
+
+    // Voxels reach half a voxel beyond their centers, which the indices name.
+    const auto* geometry = segmentation->GetGeometry(timeStep);
+
+    for (int corner = 0; corner < 8; ++corner)
+    {
+      mitk::Point3D index;
+
+      for (int axis = 0; axis < 3; ++axis)
+        index[axis] = (corner >> axis) & 1 ? upper[axis] + 0.5 : lower[axis] - 0.5;
+
+      mitk::Point3D world;
+      geometry->IndexToWorld(index, world);
+      corners.push_back(world);
+    }
+
+    return corners;
+  }
+
+  mitk::Point3D GetCenter(const std::vector<mitk::Point3D>& corners)
+  {
+    mitk::Point3D lower = corners.front();
+    mitk::Point3D upper = corners.front();
+
+    for (const auto& corner : corners)
+    {
+      for (int axis = 0; axis < 3; ++axis)
+      {
+        lower[axis] = std::min(lower[axis], corner[axis]);
+        upper[axis] = std::max(upper[axis], corner[axis]);
+      }
+    }
+
+    mitk::Point3D center;
+
+    for (int axis = 0; axis < 3; ++axis)
+      center[axis] = (lower[axis] + upper[axis]) / 2.0;
+
+    return center;
+  }
+
+  /** Shows the slice through the center of the corners and zooms so that they fill the window. */
+  void Focus2D(QmitkRenderWindow* window, const std::vector<mitk::Point3D>& corners, double margin)
+  {
+    window->GetSliceNavigationController()->SelectSliceByPoint(GetCenter(corners));
+
+    auto* renderer = window->GetRenderer();
+    const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
+
+    mitk::Point2D lower;
+    mitk::Point2D upper;
+    bool first = true;
+
+    for (const auto& corner : corners)
+    {
+      mitk::Point2D point;
+      plane->Map(corner, point);
+
+      for (int axis = 0; axis < 2; ++axis)
+      {
+        lower[axis] = first ? point[axis] : std::min(lower[axis], point[axis]);
+        upper[axis] = first ? point[axis] : std::max(upper[axis], point[axis]);
+      }
+
+      first = false;
+    }
+
+    const auto viewport = renderer->GetViewportSize();
+    const auto millimetersPerPixel = (1.0 + margin) *
+      std::max((upper[0] - lower[0]) / std::max(viewport[0], 1), (upper[1] - lower[1]) / std::max(viewport[1], 1));
+
+    mitk::Point2D center;
+    center[0] = (lower[0] + upper[0]) / 2.0;
+    center[1] = (lower[1] + upper[1]) / 2.0;
+
+    renderer->GetCameraController()->SetScaleFactorInMMPerDisplayUnit(millimetersPerPixel);
+    renderer->GetCameraController()->MoveCameraToPoint(center);
+  }
+
+  /** Keeps the direction of the camera and moves it so that the corners fill the window. */
+  void Focus3D(QmitkRenderWindow* window, const std::vector<mitk::Point3D>& corners, double margin)
+  {
+    auto* renderer = window->GetRenderer()->GetVtkRenderer();
+    auto* camera = renderer->GetActiveCamera();
+    const auto center = GetCenter(corners);
+
+    double direction[3];
+    camera->GetDirectionOfProjection(direction);
+
+    double up[3];
+    camera->GetViewUp(up);
+
+    double right[3];
+    vtkMath::Cross(direction, up, right);
+    vtkMath::Normalize(right);
+    vtkMath::Cross(right, direction, up);
+    vtkMath::Normalize(up);
+
+    const auto* size = renderer->GetSize();
+    const auto aspect = size[1] > 0 ? static_cast<double>(size[0]) / size[1] : 1.0;
+
+    // Lateral extents of the corners and their depth toward the camera, around the center.
+    double extent = 0.0;
+    double distance = 0.0;
+
+    const auto halfAngle = std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()) / 2.0);
+    const auto tanVertical = camera->GetUseHorizontalViewAngle() ? halfAngle / aspect : halfAngle;
+    const auto tanHorizontal = tanVertical * aspect;
+
+    for (const auto& corner : corners)
+    {
+      const double offset[3] = { corner[0] - center[0], corner[1] - center[1], corner[2] - center[2] };
+      const auto x = std::abs(vtkMath::Dot(offset, right)) * (1.0 + margin);
+      const auto y = std::abs(vtkMath::Dot(offset, up)) * (1.0 + margin);
+      const auto depth = -vtkMath::Dot(offset, direction);
+
+      extent = std::max({ extent, y, x / aspect });
+      distance = std::max({ distance, depth + y / tanVertical, depth + x / tanHorizontal });
+    }
+
+    if (camera->GetParallelProjection())
+    {
+      camera->SetParallelScale(extent);
+      distance = camera->GetDistance();
+    }
+
+    camera->SetFocalPoint(center[0], center[1], center[2]);
+    camera->SetPosition(center[0] - direction[0] * distance, center[1] - direction[1] * distance, center[2] - direction[2] * distance);
+    camera->SetViewUp(up);
+    renderer->ResetCameraClippingRange();
+  }
+
+  std::optional<double> GetImageValue(mitk::Image* image, const mitk::Point3D& point, mitk::TimePointType timePoint)
+  {
+    const auto* timeGeometry = image->GetTimeGeometry();
+
+    if (!timeGeometry->IsValidTimePoint(timePoint) || image->GetDimension() < 3)
+      return std::nullopt;
+
+    const auto timeStep = timeGeometry->TimePointToTimeStep(timePoint);
+    const auto* geometry = image->GetGeometry(timeStep);
+
+    if (!geometry->IsInside(point))
+      return std::nullopt;
+
+    itk::Index<3> index;
+    geometry->WorldToIndex(point, index);
+
+    mitk::ScalarType value = 0;
+    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess, image->GetChannelDescriptor().GetPixelType(),
+      mitk::Image::Pointer(image), image->GetVolumeData(timeStep), index, value, 0);
+
+    return value;
+  }
+
+  /** The grey values and labels under a point, in the data that a window shows. */
+  nlohmann::json DescribeData(const mitk::Point3D& point, mitk::BaseRenderer* renderer,
+    const mitk::DataStorage* dataStorage, mitk::IRestServerService* server)
+  {
+    auto values = nlohmann::json::array();
+
+    if (dataStorage == nullptr)
+      return values;
+
+    const auto notHelper = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+    const auto timePoint = renderer->GetTime();
+
+    for (const auto& node : *dataStorage->GetSubset(notHelper))
+    {
+      if (!node->IsVisible(renderer))
+        continue;
+
+      nlohmann::json entry = { { "uid", server->GetNodeUid(node) }, { "name", node->GetName() } };
+
+      if (auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData()); segmentation != nullptr)
+      {
+        auto labels = nlohmann::json::array();
+
+        for (unsigned int group = 0; group < segmentation->GetNumberOfGroups(); ++group)
+        {
+          const auto value = GetImageValue(segmentation->GetGroupImage(group), point, timePoint);
+
+          if (!value.has_value() || *value == 0)
+            continue;
+
+          const auto labelValue = static_cast<mitk::MultiLabelSegmentation::LabelValueType>(*value);
+          const auto label = segmentation->GetLabel(labelValue);
+          labels.push_back({ { "value", labelValue }, { "name", label.IsNotNull() ? label->GetName() : std::string() } });
+        }
+
+        entry["labels"] = labels;
+      }
+      else if (auto* image = dynamic_cast<mitk::Image*>(node->GetData()); image != nullptr)
+      {
+        const auto value = GetImageValue(image, point, timePoint);
+
+        if (!value.has_value())
+          continue;
+
+        entry["value"] = *value;
+      }
+      else
+      {
+        continue;
+      }
+
+      values.push_back(std::move(entry));
+    }
+
+    return values;
+  }
+}
+
+std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* server)
+{
+  static const std::vector<std::string> WindowIds = { "axial", "sagittal", "coronal", "3d" };
+
+  std::vector<RestRoute> routes;
+
+  RestRoute windows;
+  windows.Method = "GET";
+  windows.Path = "/rendering/windows";
+  windows.Summary = "List the render windows of the standard display";
+  windows.Description =
+    "Returns {data: [{id, kind: 2d|3d, size: [width, height] in pixels, timepoint_ms, the time point the window "
+    "shows, view_direction and slice: {index, count} for 2D windows}]}. The slice index counts as the Image "
+    "Navigator does, and as PUT /api/v1/rendering/windows/{id}/slice takes it.";
+  windows.Handler = [server](const RestRequest& request) {
+    return RestResponse::FromData(CallInGuiThread(*server, [&request]() {
+      auto json = nlohmann::json::array();
+
+      for (const auto& id : WindowIds)
+        json.push_back(DescribeWindow(id, FindRenderWindow(id, request.Path)));
+
+      return json;
+    }));
+  };
+  routes.push_back(windows);
+
+  RestRoute slice;
+  slice.Method = "PUT";
+  slice.Path = "/rendering/windows/:id/slice";
+  slice.Summary = "Show a slice in a 2D render window";
+  slice.Description =
+    "Path parameter: id of a 2D window. Body: {index}, the slice to show, counted from 0 as GET "
+    "/api/v1/rendering/windows and the Image Navigator count them; to move k slices, send the current index "
+    "plus k. Returns {data: window} as GET /api/v1/rendering/windows describes it.";
+  slice.Handler = [server](const RestRequest& request) {
+    const auto body = request.GetJsonBody();
+
+    if (!body.contains("index") || !body["index"].is_number_integer())
+      throw RestException(ErrorResponse::InvalidRequest("\"index\", the number of a slice, is missing.", request.Path));
+
+    const auto index = body["index"].get<std::int64_t>();
+    const auto& id = request.PathParams.at("id");
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&request, &id, index]() {
+      auto* window = FindRenderWindow(id, request.Path);
+
+      if (!Is2D(window))
+        throw RestException(ErrorResponse::UnsupportedOperation("The " + id + " window shows no slices.", request.Path));
+
+      auto* stepper = window->GetSliceNavigationController()->GetStepper();
+      const auto count = static_cast<int>(stepper->GetSteps());
+
+      if (count == 0)
+      {
+        throw RestException(ErrorResponse::Create("NO_SLICES", "Conflict",
+          "The " + id + " window shows no data to step through.", 409, request.Path));
+      }
+
+      if (index < 0 || index >= count)
+      {
+        throw RestException(ErrorResponse::Create("SLICE_OUT_OF_RANGE", "Unprocessable Content",
+          "The " + id + " window has " + std::to_string(count) + " slices, numbered from 0 to " +
+          std::to_string(count - 1) + ".", 422, request.Path));
+      }
+
+      stepper->SetPos(static_cast<unsigned int>(ConvertSliceNumber(window->GetRenderer(), count, static_cast<int>(index))));
+      return DescribeWindow(id, window);
+    }));
+  };
+  routes.push_back(slice);
+
+  RestRoute focus;
+  focus.Method = "PUT";
+  focus.Path = "/rendering/windows/:id/focus";
+  focus.Summary = "Frame labels or data in a render window";
+  focus.Description =
+    "Path parameter: id, one of axial, sagittal, coronal, 3d. Body: {segmentation: uid, labels: [value]} to frame "
+    "labels of a segmentation, or {uids: [uid]} to frame data; margin (optional, default 0.2), the space around "
+    "them as a share of their size. A 2D window shows the slice through their center and zooms so that they fill "
+    "it. The 3D window keeps its direction, which the camera endpoint's standard_view sets, and moves so that they "
+    "fill it. Returns {data: window} as GET /api/v1/rendering/windows describes it.";
+  focus.Handler = [server](const RestRequest& request) {
+    const auto body = request.GetJsonBody();
+    const auto margin = body.value("margin", 0.2);
+
+    if (margin < 0.0 || margin > 10.0)
+      throw RestException(ErrorResponse::InvalidRequest("margin must lie between 0 and 10.", request.Path));
+
+    const auto findNode = [&](const nlohmann::json& uid) {
+      if (!uid.is_string())
+        throw RestException(ErrorResponse::InvalidRequest("Data is given by its uid, a string.", request.Path));
+
+      auto node = server->FindNode(uid.get<std::string>());
+
+      if (node.IsNull())
+        throw RestException(ErrorResponse::NodeNotFound(uid.get<std::string>(), request.Path));
+
+      return node;
+    };
+
+    DataNode::Pointer segmentationNode;
+    std::vector<MultiLabelSegmentation::LabelValueType> labels;
+    std::vector<DataNode::Pointer> nodes;
+
+    if (body.contains("segmentation"))
+    {
+      segmentationNode = findNode(body["segmentation"]);
+
+      for (const auto& value : body.value("labels", nlohmann::json::array()))
+      {
+        if (!value.is_number_unsigned())
+          throw RestException(ErrorResponse::InvalidRequest("labels are label values, numbers.", request.Path));
+
+        labels.push_back(value.get<MultiLabelSegmentation::LabelValueType>());
+      }
+
+      if (labels.empty())
+        throw RestException(ErrorResponse::InvalidRequest("Name the labels to frame by their values.", request.Path));
+    }
+    else
+    {
+      for (const auto& uid : body.value("uids", nlohmann::json::array()))
+        nodes.push_back(findNode(uid));
+
+      if (nodes.empty())
+        throw RestException(ErrorResponse::InvalidRequest("Give a segmentation with labels, or uids.", request.Path));
+    }
+
+    const auto& id = request.PathParams.at("id");
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      auto* window = FindRenderWindow(id, request.Path);
+      std::vector<Point3D> corners;
+
+      if (segmentationNode.IsNotNull())
+      {
+        const auto* segmentation = dynamic_cast<const MultiLabelSegmentation*>(segmentationNode->GetData());
+
+        if (segmentation == nullptr)
+        {
+          throw RestException(ErrorResponse::Create("NOT_A_SEGMENTATION", "Unprocessable Content",
+            "\"" + segmentationNode->GetName() + "\" is no segmentation.", 422, request.Path));
+        }
+
+        for (const auto value : labels)
+        {
+          if (!segmentation->ExistLabel(value))
+          {
+            throw RestException(ErrorResponse::Create("LABEL_NOT_FOUND", "Not Found",
+              "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path));
+          }
+        }
+
+        corners = GetLabelCorners(segmentation, labels, GetSelectedTimeStep(segmentationNode, request.Path));
+
+        if (corners.empty())
+        {
+          throw RestException(ErrorResponse::Create("LABELS_EMPTY", "Unprocessable Content",
+            "The labels are empty at the selected time point.", 422, request.Path));
+        }
+      }
+      else
+      {
+        for (const auto& node : nodes)
+        {
+          const auto* data = node->GetData();
+
+          if (data == nullptr)
+            continue;
+
+          const auto* geometry = data->GetGeometry(GetSelectedTimeStep(node, request.Path));
+
+          for (int corner = 0; corner < 8; ++corner)
+            corners.push_back(geometry->GetCornerPoint(corner));
+        }
+
+        if (corners.empty())
+          throw RestException(ErrorResponse::InvalidRequest("The data has no extent to frame.", request.Path));
+      }
+
+      if (Is2D(window))
+        Focus2D(window, corners, margin);
+      else
+        Focus3D(window, corners, margin);
+
+      RenderingManager::GetInstance()->RequestUpdate(window->GetVtkRenderWindow());
+      return DescribeWindow(id, window);
+    }));
+  };
+  routes.push_back(focus);
+
+  RestRoute crosshair;
+  crosshair.Method = "GET";
+  crosshair.Path = "/rendering/crosshair";
+  crosshair.Summary = "Tell whether the crosshair shows in the render windows";
+  crosshair.Description =
+    "Returns {data: {visible, visible_3d}}: whether the crosshair shows in the 2D windows, and in the 3D "
+    "window.";
+  crosshair.Handler = [server](const RestRequest& request) {
+    return RestResponse::FromData(CallInGuiThread(*server, [&request]() { return DescribeCrosshair(FindStdMultiWidget(request.Path)); }));
+  };
+  routes.push_back(crosshair);
+
+  RestRoute changeCrosshair;
+  changeCrosshair.Method = "PUT";
+  changeCrosshair.Path = "/rendering/crosshair";
+  changeCrosshair.Summary = "Show or hide the crosshair, as the render window menus do";
+  changeCrosshair.Description =
+    "Body, at least one of: {visible, visible_3d}. visible shows or hides the crosshair in all windows, as "
+    "the crosshair menu of each window does; visible_3d only in the 3D window, as the menu of the 3D window "
+    "does, and applies after visible. Returns {data: {visible, visible_3d}} as GET does.";
+  changeCrosshair.Handler = [server](const RestRequest& request) {
+    const auto body = request.GetJsonBody();
+    std::optional<bool> visible, visible3D;
+
+    try
+    {
+      if (body.contains("visible"))
+        visible = body["visible"].get<bool>();
+
+      if (body.contains("visible_3d"))
+        visible3D = body["visible_3d"].get<bool>();
+    }
+    catch (const nlohmann::json::exception&)
+    {
+      throw RestException(ErrorResponse::InvalidRequest("visible and visible_3d must be true or false.", request.Path));
+    }
+
+    if (!visible.has_value() && !visible3D.has_value())
+      throw RestException(ErrorResponse::InvalidRequest("Give visible, visible_3d or both.", request.Path));
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      auto* multiWidget = FindStdMultiWidget(request.Path);
+
+      if (visible.has_value())
+        multiWidget->SetCrosshairVisibility(*visible);
+
+      if (visible3D.has_value())
+        multiWidget->SetCrosshair3DVisibility(*visible3D);
+
+      return DescribeCrosshair(multiWidget);
+    }));
+  };
+  routes.push_back(changeCrosshair);
+
+  const auto describeLayout = [](const std::string& path) {
+    nlohmann::json maximized = nullptr;
+
+    for (const auto& id : WindowIds)
+    {
+      if (FindRenderWindow(id, path)->IsFullScreen())
+        maximized = id;
+    }
+
+    return nlohmann::json{ { "maximized", maximized } };
+  };
+
+  RestRoute layout;
+  layout.Method = "GET";
+  layout.Path = "/rendering/layout";
+  layout.Summary = "Tell which render window is shown alone, if any";
+  layout.Description =
+    "Returns {data: {maximized}}: the id of the window that its full screen button shows alone, or null if "
+    "the windows show in their layout.";
+  layout.Handler = [server, describeLayout](const RestRequest& request) {
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return describeLayout(request.Path); }));
+  };
+  routes.push_back(layout);
+
+  RestRoute changeLayout;
+  changeLayout.Method = "PUT";
+  changeLayout.Path = "/rendering/layout";
+  changeLayout.Summary = "Show one render window alone, or all of them again, as the full screen button does";
+  changeLayout.Description =
+    "Body: {maximized}, the id of a window (axial, sagittal, coronal, 3d) to show it alone, or null to bring "
+    "back the layout the windows had before. Returns {data: {maximized}} as GET does.";
+  changeLayout.Handler = [server, describeLayout](const RestRequest& request) {
+    const auto body = request.GetJsonBody();
+
+    if (!body.contains("maximized") || !(body["maximized"].is_null() || body["maximized"].is_string()))
+      throw RestException(ErrorResponse::InvalidRequest("\"maximized\" must be the id of a window or null.", request.Path));
+
+    const auto target = body["maximized"].is_null() ? std::string() : body["maximized"].get<std::string>();
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      auto* targetWindow = target.empty() ? nullptr : FindRenderWindow(target, request.Path);
+
+      try
+      {
+        // One window at a time: the others are hidden while it is shown alone,
+        // so their buttons cannot be pressed either.
+        for (const auto& id : WindowIds)
+        {
+          auto* window = FindRenderWindow(id, request.Path);
+
+          if (window != targetWindow && window->IsFullScreen())
+            window->SetFullScreen(false);
+        }
+
+        if (targetWindow != nullptr)
+          targetWindow->SetFullScreen(true);
+      }
+      catch (const Exception& e)
+      {
+        throw RestException(ErrorResponse::Create("LAYOUT_NOT_AVAILABLE", "Conflict", e.GetDescription(), 409, request.Path));
+      }
+
+      return describeLayout(request.Path);
+    }));
+  };
+  routes.push_back(changeLayout);
+
+  RestRoute screenshot;
+  screenshot.Method = "GET";
+  screenshot.Path = "/rendering/windows/:id/screenshot";
+  screenshot.Summary = "Take a screenshot of a render window that points can be read off";
+  screenshot.Description =
+    "Path parameter: id, one of axial, sagittal, coronal, 3d. Query parameters, all optional: max_size (default "
+    "1000), the longest side in pixels; grid=true draws faint lines every 50 pixels, labeled every 100; "
+    "background, transparent or a color like #ffffff instead of the window's; decorations=false leaves out "
+    "the corner texts, logo and border; scale, 2 to 4, renders that many pixels per window pixel, without "
+    "decorations, for sharper images (raise max_size with it); crop=true cuts the image down to the part of the "
+    "scene that is not background, without decorations, and padding keeps that many pixels of background "
+    "around it. As the Screenshot Maker view takes them; transparent is transparent where "
+    "the scene shows background, and partly so behind semitransparent objects. Returns a PNG. The header "
+    "X-MITK-Screenshot describes it as JSON: the window as GET /api/v1/rendering/windows does, plus image_size: "
+    "[width, height]. Endpoints that take points accept pixels of the screenshot with that window and image_size, "
+    "unless it is cropped: its pixels no longer map onto the window, so crop does not go with grid either.";
+  screenshot.Handler = [server](const RestRequest& request) {
+    const bool grid = request.GetQueryParam("grid").value_or("") == "true";
+    const auto options = GetScreenshotOptions(request);
+    const auto& id = request.PathParams.at("id");
+
+    if (grid && options.CropToContent)
+    {
+      throw RestException(ErrorResponse::InvalidRequest(
+        "crop and grid do not go together: the pixels of a cropped screenshot do not map onto the window.", request.Path));
+    }
+
+    return CallInGuiThread(*server, [&request, &id, &options, grid]() {
+      auto* window = FindRenderWindow(id, request.Path);
+      auto* renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(FindStdMultiWidgetEditor().GetPointer());
+
+      auto image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+
+      // With the window found, only a crop that finds nothing but background leaves no image.
+      if (image.isNull() && options.CropToContent)
+        throw RestException(ErrorResponse::InvalidRequest("The window shows only background, there is nothing to crop to.", request.Path));
+
+      if (image.isNull())
+        throw RestException(ErrorResponse::InternalError("The render window gave no image.", request.Path));
+
+      if (grid)
+        DrawGrid(image);
+
+      QByteArray png;
+      QBuffer buffer(&png);
+      buffer.open(QIODevice::WriteOnly);
+      image.save(&buffer, "PNG");
+
+      auto info = DescribeWindow(id, window);
+      info["image_size"] = { image.width(), image.height() };
+
+      auto response = RestResponse::FromBytes(png.toStdString(), "image/png");
+      response.Headers["X-MITK-Screenshot"] = info.dump();
+      return response;
+    });
+  };
+  routes.push_back(screenshot);
+
+  RestRoute pick;
+  pick.Method = "POST";
+  pick.Path = "/rendering/windows/:id/pick";
+  pick.Summary = "Find the world coordinates and data values under pixels of a screenshot";
+  pick.Description =
+    "Path parameter: id of a 2D window. Body: {pixels: [[x, y], ...], image_size: [width, height]} of a "
+    "screenshot of that window. Returns {data: [{position: [x, y, z] in millimeters, data: [{uid, name, "
+    "value} for images, {uid, name, labels: [{value, name}]} for segmentations]}]}, for the data the window "
+    "shows at each point.";
+  pick.Handler = [server](const RestRequest& request) {
+    auto body = request.GetJsonBody();
+    body["window"] = request.PathParams.at("id");
+
+    // Not in the GUI thread, which requests of the data storage may wait for.
+    const auto dataStorage = server->GetDataStorage();
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      auto* renderer = GetRestRenderer(body["window"].get<std::string>(), request.Path);
+      auto json = nlohmann::json::array();
+
+      for (const auto& point : GetRestWorldPoints(body, request.Path))
+        json.push_back({ { "position", ToRestJson(point) }, { "data", DescribeData(point, renderer, dataStorage, server) } });
+
+      return json;
+    }));
+  };
+  routes.push_back(pick);
+
+  return routes;
+}

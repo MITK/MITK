@@ -39,7 +39,7 @@ namespace mitk
   enum class FileAccessMode
   {
     Unrestricted,       ///< \brief No file path restrictions (default).
-    AllowedDirectories  ///< \brief Only allow paths under configured directories.
+    AllowedDirectories  ///< \brief Only allow paths under configured directories; none without any.
   };
 
   /**

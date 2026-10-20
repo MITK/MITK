@@ -95,9 +95,9 @@ namespace mitk
      * \brief Set the file access configuration.
      *
      * \pre \a mode must be a valid FileAccessMode value.
-     * \pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
      *
-     * \param mode The file access mode to apply.
+     * \param mode The file access mode to apply. AllowedDirectories without
+     *        directories allows no files at all.
      * \param allowedDirs Directories to allow when mode is AllowedDirectories.
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs);

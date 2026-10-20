@@ -197,7 +197,10 @@ void QmitkRestApiView::UpdateServerStatus()
   {
     // Green indicator for running
     m_Controls->m_StatusIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 8px;");
-    m_Controls->m_StatusLabel->setText("Running");
+    const auto startedBy = service->GetStartedBy();
+    m_Controls->m_StatusLabel->setText(startedBy.empty()
+      ? QString("Running")
+      : QString("Running, started by the %1 with its own settings").arg(QString::fromStdString(startedBy)));
     m_Controls->m_StartStopButton->setText("Stop Server");
 
     auto url = service->GetServerUrl();
@@ -281,7 +284,23 @@ void QmitkRestApiView::UpdateServerStatus()
       break;
   }
 
-  m_Controls->m_AuthStatusLabel->setText(config->requireAuth ? "Enabled" : "Disabled");
+  // Clients with tokens of their own have the rights of their token,
+  // whatever the server allows others.
+  QStringList clientTokens;
+
+  for (const auto& token : service->GetTokens())
+  {
+    clientTokens << QString("%1 with its own token, %2")
+      .arg(QString::fromStdString(token.Client))
+      .arg(token.Rights.FileAccess ? "with file access" : "without file access");
+  }
+
+  auto authStatus = QString(config->requireAuth ? "Enabled" : "Disabled");
+
+  if (!clientTokens.isEmpty())
+    authStatus += "; " + clientTokens.join("; ");
+
+  m_Controls->m_AuthStatusLabel->setText(authStatus);
 
   switch (config->fileAccessMode)
   {
@@ -289,8 +308,9 @@ void QmitkRestApiView::UpdateServerStatus()
       m_Controls->m_FileAccessLabel->setText("Unrestricted");
       break;
     case mitk::FileAccessMode::AllowedDirectories:
-      m_Controls->m_FileAccessLabel->setText(
-        QString("Restricted (%1 dirs)").arg(config->allowedFileDirectories.size()));
+      m_Controls->m_FileAccessLabel->setText(config->allowedFileDirectories.empty()
+        ? QString("None")
+        : QString("Restricted (%1 dirs)").arg(config->allowedFileDirectories.size()));
       break;
   }
 

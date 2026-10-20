@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <memory>
 #include <thread>
 #include <atomic>
+#include <functional>
+#include <map>
 #include <mutex>
 #include <set>
 #include <deque>
@@ -43,6 +45,7 @@ namespace mitk
   class SwaggerController;
   class RenderingController;
   class RenderWindowBridge;
+  class RestRouter;
 
   /**
    * \brief HTTP REST server implementation.
@@ -63,6 +66,8 @@ namespace mitk
     RestServer& operator=(RestServer&&) = delete;
 
     bool Start() override;
+    bool Start(const RestServerConfig& config, const std::string& startedBy) override;
+    std::string GetStartedBy() const override;
     void Stop() override;
     bool IsRunning() const override;
 
@@ -85,6 +90,20 @@ namespace mitk
 
     RenderWindowBridge* GetRenderWindowBridge() override;
 
+    RestRouteId AddRoute(RestRoute route) override;
+    void RemoveRoute(RestRouteId id) override;
+    RestResponse HandleRequest(RestRequest request) override;
+
+    std::shared_ptr<RestJob> CreateJob(const std::string& description) override;
+    DataNode::Pointer FindNode(const std::string& uid) const override;
+    std::string GetNodeUid(DataNode* node) const override;
+    void Dispatch(const std::function<void()>& task) const override;
+    void Post(std::function<void()> task) const override;
+
+    std::string CreateToken(const std::string& client, const RestTokenRights& rights) override;
+    void RemoveToken(const std::string& token) override;
+    std::vector<RestTokenInfo> GetTokens() const override;
+
     std::optional<std::string> GetServerUrl() const override;
     std::optional<std::string> GetLastError() const override;
 
@@ -100,10 +119,37 @@ namespace mitk
     std::optional<int64_t> GetUptimeSeconds() const override;
 
   private:
+    using HttpHandler = std::function<void(const httplib::Request&, httplib::Response&)>;
+
     void RecordRequest(const std::string& endpoint, const std::string& method,
                        int responseCode, const std::string& clientIP);
-    void RegisterRoutes();
+    void RegisterRoutes(const RestServerConfig& config);
     void ServerThreadFunc();
+
+    /**
+     * \brief Register a route of the server's own controllers with httplib, and
+     *        with the built-in router for HandleRequest(). Removed again by Stop().
+     */
+    void AddBuiltInRoute(const std::string& method, const std::string& pattern, HttpHandler handler);
+
+    /** \brief Answer a request that came over HTTP and that no built-in route took. */
+    void HandleRoutedHttp(const httplib::Request& req, httplib::Response& res);
+
+    /** \brief Find the route of a request, built-in routes first, and run its handler. */
+    RestResponse Route(RestRequest& request) const;
+
+    RestResponse HandleGET_endpoints(const RestRequest& request) const;
+    RestResponse HandleGET_jobs(const RestRequest& request) const;
+    RestResponse HandleGET_job(const RestRequest& request) const;
+    RestResponse HandleDELETE_job(const RestRequest& request);
+
+    std::shared_ptr<RestJob> FindJob(const RestRequest& request) const;
+
+    /** \brief The rights of a token of CreateToken(), or std::nullopt for any other token. */
+    std::optional<RestTokenRights> GetTokenRights(const std::string& token) const;
+
+    /** \brief Whether a request may name files on the server's file system. */
+    bool HasFileAccess(const httplib::Request& req) const;
 
     /** \brief Propagate the current dispatcher to the rendering controller if it exists.
      *  \pre m_Mutex is held by the caller. */
@@ -155,6 +201,23 @@ namespace mitk
     std::unique_ptr<SwaggerController> m_SwaggerController;
     std::unique_ptr<RenderingController> m_RenderingController;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+
+    /** \brief The routes of AddRoute() and the server's own newer endpoints. */
+    std::unique_ptr<RestRouter> m_Router;
+
+    /** \brief The routes of AddBuiltInRoute(): those of openapi.json, and the documentation. */
+    std::unique_ptr<RestRouter> m_BuiltInRouter;
+    std::vector<RestRouteId> m_BuiltInRoutes;
+
+    mutable std::mutex m_TokenMutex;
+    std::map<std::string, RestTokenInfo> m_Tokens;
+
+    std::string m_StartedBy;
+
+    /** \brief The jobs that run and the latest ended ones, oldest first. */
+    mutable std::mutex m_JobMutex;
+    std::deque<std::shared_ptr<RestJob>> m_Jobs;
+    uint64_t m_NextJobNumber{1};
 
     // State
     mutable std::mutex m_Mutex;

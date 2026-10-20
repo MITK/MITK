@@ -354,6 +354,14 @@ namespace mitk
     return m_UidMapper->GetOrCreateUid(node);
   }
 
+  DataNode::Pointer DataStorageBridge::FindNode(const std::string& uid) const
+  {
+    // Like GetNodeUid(), without m_Mutex: the mapper is thread-safe, and
+    // requests that hold m_Mutex wait for the dispatch thread, from which
+    // this may be called.
+    return m_UidMapper->FindNodeByUid(uid);
+  }
+
   NodePredicateBase::Pointer DataStorageBridge::BuildNodePredicate(const NodeQueryParams& params) const
   {
     auto dataStorage = m_DataStorage.Lock();

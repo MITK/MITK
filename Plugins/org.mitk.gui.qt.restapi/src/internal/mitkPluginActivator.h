@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <berryAbstractUICTKPlugin.h>
 
+#include <mitkRestRoute.h>
+
 #include <usModuleContext.h>
 #include <usServiceEvent.h>
 #include <usServiceReference.h>
@@ -53,6 +55,9 @@ namespace mitk
 
     us::ModuleContext* m_MitkContext = nullptr;
     RenderWindowBridge* m_RenderWindowBridge = nullptr;
+
+    /** \brief The routes below /api/v1 that the plugin added to the server. */
+    std::vector<RestRouteId> m_Routes;
   };
 }
 

@@ -14,6 +14,8 @@ found in the LICENSE file.
 #define mitkIRestServerService_h
 
 #include <mitkServiceInterface.h>
+#include <mitkRestJob.h>
+#include <mitkRestRoute.h>
 #include <mitkRestServerConfig.h>
 #include <mitkDataStorage.h>
 
@@ -80,6 +82,25 @@ namespace mitk
      * \return true if the server started successfully (or was already running), false otherwise.
      */
     virtual bool Start() = 0;
+
+    /**
+     * \brief Start the REST server with a configuration of the caller, leaving
+     *        the pending configuration as it is.
+     *
+     * For a component that needs the server for itself, like the Agent view,
+     * without changing what the user configured. Port 0 lets the system choose
+     * a free port; GetRunningConfig() tells which.
+     *
+     * \param startedBy Who started the server, like "Agent view", for the user to see.
+     * \return true if the server started or was running already, with the
+     *         configuration it was started with then.
+     *
+     * \warning See Start().
+     */
+    virtual bool Start(const RestServerConfig& config, const std::string& startedBy) = 0;
+
+    /** \brief Who started the running server with Start(config, startedBy); empty otherwise. */
+    virtual std::string GetStartedBy() const = 0;
 
     /**
      * \brief Stop the REST server.
@@ -155,6 +176,103 @@ namespace mitk
      * \return The connected DataStorage, or nullptr if none.
      */
     virtual DataStorage::Pointer GetDataStorage() const = 0;
+
+    // Endpoints of other modules and plugins
+
+    /**
+     * \brief Offer an endpoint below /api/v1.
+     *
+     * Routes can be added and removed at any time, also while the server runs,
+     * and they stay across restarts of the server. Their owner removes them
+     * before the objects their handlers use are destroyed. The endpoints of
+     * the server's own controllers come first: a route with the method and
+     * path of one of them is never reached. Clients see added routes as
+     * experimental, and browsers cannot reach them.
+     *
+     * \return An id for RemoveRoute().
+     * \throw mitk::Exception if the route is invalid, or one with the same
+     *        method and path exists.
+     */
+    virtual RestRouteId AddRoute(RestRoute route) = 0;
+
+    virtual void RemoveRoute(RestRouteId id) = 0;
+
+    /**
+     * \brief Answer a request without HTTP, as the server answers it over HTTP
+     *        from the local host.
+     *
+     * Authentication works as over HTTP: the request needs an "Authorization:
+     * Bearer" header if the server requires authentication, and a token of
+     * CreateToken() limits the request to the token's rights. Browser checks
+     * do not apply, as the request does not come from a browser.
+     *
+     * Meant for clients in the same process that relay requests of their own
+     * clients, like an endpoint for AI agents.
+     *
+     * \param request A request with a method and a target set by
+     *        RestRequest::SetTarget(), below /api/v1.
+     * \return The response; status 503 if the server is not running.
+     */
+    virtual RestResponse HandleRequest(RestRequest request) = 0;
+
+    /**
+     * \brief Make a job, which clients can follow below /api/v1/jobs.
+     *
+     * \param description What the job does, like "Run TotalSegmentator".
+     */
+    virtual std::shared_ptr<RestJob> CreateJob(const std::string& description) = 0;
+
+    /**
+     * \brief The node that a UID of the API stands for, or null.
+     *
+     * Can be called from any thread.
+     */
+    virtual DataNode::Pointer FindNode(const std::string& uid) const = 0;
+
+    /**
+     * \brief The UID of a node, as the API names it.
+     *
+     * Can be called from any thread.
+     */
+    virtual std::string GetNodeUid(DataNode* node) const = 0;
+
+    /**
+     * \brief Run a task in the thread that owns the data storage, the GUI
+     *        thread in the Workbench, and wait for it.
+     *
+     * For route handlers, which run on threads of the server. Without a
+     * dispatcher, the task runs right away. The task must not throw; see
+     * mitk::CallInGuiThread() for a variant that passes results and
+     * exceptions on.
+     */
+    virtual void Dispatch(const std::function<void()>& task) const = 0;
+
+    /**
+     * \brief Run a task in the thread that owns the data storage later,
+     *        without waiting for it.
+     *
+     * For long work that a job reports on, like starting a model. Without a
+     * dispatcher, the task runs right away.
+     */
+    virtual void Post(std::function<void()> task) const = 0;
+
+    // Tokens
+
+    /**
+     * \brief Make a token for a client that gets only the given rights.
+     *
+     * Requests with the token are accepted whether the server requires
+     * authentication or not. The token stays valid across restarts of the
+     * server until RemoveToken().
+     *
+     * \param client Who uses the token, like "Agent view", for the user to see.
+     */
+    virtual std::string CreateToken(const std::string& client, const RestTokenRights& rights) = 0;
+
+    virtual void RemoveToken(const std::string& token) = 0;
+
+    /** \brief The tokens of CreateToken() that are valid, without their secrets. */
+    virtual std::vector<RestTokenInfo> GetTokens() const = 0;
 
     // Status
 

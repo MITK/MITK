@@ -77,11 +77,6 @@ void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::
 
 void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs)
 {
-  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
-  {
-    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
-  }
-
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;

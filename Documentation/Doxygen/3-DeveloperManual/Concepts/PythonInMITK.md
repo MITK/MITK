@@ -7,7 +7,7 @@
 There are at least three closely intertwined aspects to consider when working with Python in MITK:
 
 1. **Embedding Python** using the Python C API by including Python.h and linking against the Python library in C++.
-2. **Running the Python interpreter** as a separate process, passing command-line arguments.
+2. **Running the Python interpreter** as a separate process, either as a command-line tool or as a worker that MITK keeps running and calls into (see \ref PythonInMITKWorkersSection).
 3. **Exposing MITK functionality to Python** via the mitk Python module, using pybind11 to generate the necessary bindings.
 
 Each of these aspects comes with its own challenges, and their integration imposes certain restrictions and pitfalls that can affect one another.
@@ -78,7 +78,7 @@ Developers should instead use the `RelWithDebInfo` configuration for debugging.
 
 ## Python modules in MITK
 
-Leaving Python wrapping aside for now, the Python integration in MITK is split into three modules:
+Leaving Python wrapping aside for now, the Python integration in MITK is split into four modules:
 
 1. **MitkPythonHelper**: This module **does not** link against the Python library.
 It primarily offers utility functions for retrieving paths such as the Python home directory, the Python library, and the Python executable — all of which can differ between the build tree and installed versions of MITK, and on macOS also between a plain install and a package (see the quirks below).
@@ -93,9 +93,13 @@ It provides the `mitk::PythonContext` class, which acts as the primary bridge be
 The first context starts the interpreter isolated from the user's own Python setup: neither the user site-packages (packages installed with `pip install --user`, including their `.pth` files) nor the current working directory end up on `sys.path`.
 Both would otherwise precede the site-packages of MITK and its virtual environments, so that, for example, a NumPy installed for some other Python of the same version would replace MITK's own.
 
+4. **MitkPythonWorker**: This module **does not** link against the Python library, and it does not use Qt.
+It provides `mitk::PythonWorker`, which runs Python code in a process of its own and calls its functions, and `mitk::SharedBuffer`, which passes arrays such as images to that process through shared memory.
+
 In most cases, you won't need to interact with the `MitkPreloadPython` module directly.
-To run the Python interpreter as a separate process, use `MitkPythonHelper`.
-To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
+To run the Python interpreter as a command-line tool, use `MitkPythonHelper`.
+To run the Python code of a tool in its own virtual environment and process, use `MitkPythonWorker`.
+To exchange data (e.g., images) with Python inside the MITK process, use `MitkPython`.
 
 ### Testing
 
@@ -185,11 +189,11 @@ Virtual environments created by `mitk::PythonContext` (or the corresponding func
 
 The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
 
-### Several environments in one interpreter (temporary)
+### Several environments in one interpreter
 
-**This is a temporary construct that will soon be obsolete.** MITK is going to host Python virtual environments in separate processes that the application talks to via inter-process communication (IPC). Every environment will then have its own interpreter. Once that is in place, the behavior described in this section and the way `mitk::PythonContext` activates environments will change. New code should not depend on the sharing described here.
+This section applies to virtual environments activated in the embedded interpreter through `mitk::PythonContext`. Code that needs packages of its own should run in a worker process instead, which has an interpreter of its own (see \ref PythonInMITKWorkersSection). New code should not depend on the sharing described here.
 
-Until then, a process hosts one interpreter, however many `mitk::PythonContext` instances exist. Every context has its own global variables, but the module search path and the loaded modules in `sys.modules` are shared.
+A process hosts one interpreter, however many `mitk::PythonContext` instances exist. Every context has its own global variables, but the module search path and the loaded modules in `sys.modules` are shared.
 
 Activating a context adds the `site-packages` folder of its virtual environment to `sys.path` and never removes it again. The environments of all tools used in an application run therefore end up on the path in the order of their activation. A context passes the path of its environment to Python explicitly. Python takes over the process environment only once, when the interpreter starts, so an environment that is activated later through environment variables alone would stay invisible.
 
@@ -200,7 +204,36 @@ This has consequences for tools that use different environments in the same appl
 - A tool that needs a different version of such a library does not get it until the application is restarted.
 - The check that refuses to update or uninstall an environment (`mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded()`) looks at the native libraries that are actually loaded. If a tool uses libraries of another tool's environment, that other environment is the one that stays locked until the application is restarted.
 
-All of this is benign as long as the environments that share packages request the same versions. The PyTorch based tools do so for `torch` (see `mitk::Torch::Requirements()`). Tools that run in a subprocess, like TotalSegmentator, are not affected.
+All of this is benign as long as the environments that share packages request the same versions. Tools that run in a separate process are not affected: nnInteractive, VoxTell and TotalSegmentator in their workers. Their checks whether a package is installed and in which version run in a short-lived worker as well (`mitk::PythonPackage::PackageProbe`), so they never activate an environment in the embedded interpreter.
+
+## Python worker processes {#PythonInMITKWorkersSection}
+
+The segmentation tools nnInteractive, VoxTell and TotalSegmentator run their Python code in worker processes. A `mitk::PythonWorker` starts the interpreter of a virtual environment, runs the Python modules of the tool in it, and then calls their functions on request. A separate process has three advantages over the embedded interpreter:
+
+- Every worker has an interpreter of its own, so the packages of one environment never reach another one.
+- A crash in a native library, for example in PyTorch or a CUDA driver, ends only the worker. The tool reports it together with the last lines the worker wrote and can be initialized again.
+- Ending the worker frees everything it held, including GPU memory.
+
+### How a worker runs
+
+- **Start:** Boost.Process starts `<python of the venv> -I -c <bootstrap>`. `-I` keeps `PYTHONPATH`, `PYTHONHOME` and the user site-packages out. The bootstrap reads the runtime (`Modules/PythonWorker/resource/mitk_worker.py`) and the modules of the tool from the first line on stdin. No Python file is installed or written to disk; the modules stay resources of the C++ module of the tool.
+- **Calls:** requests, results, errors and progress reports are JSON messages, one per line, on stdin and stdout of the worker. The runtime moves Python's own stdout to stderr, so a `print()` in some library cannot break the protocol. Everything on stderr goes to the MITK log, prefixed with the name of the tool. A message may have 16 MB, as large data goes through buffers: the runtime refuses to send a longer result, which fails with a Python error, and MITK ends a worker that sends one anyway.
+- **Arrays:** a `mitk::SharedBuffer` is shared memory (Boost.Interprocess) that the worker maps as a NumPy array through `multiprocessing.shared_memory`. MITK creates every buffer and passes it to one call only, so a crashed worker cannot leave shared memory behind. `mitk::SharedBuffer::AsImage()` wraps a buffer as an `mitk::Image` without copying, which lets a tool write its result directly into memory that MITK displays.
+- **Progress and cancellation:** `mitk::PythonWorker::Call()` returns once the call is done. Its progress hook receives the reports of `mitk_worker.report_progress()` and is called every 100 ms in between, so the GUI can stay responsive. When the hook returns false, `report_progress()` returns False in the worker, and the tool can stop. When the hook throws, the worker is ended, which stops a function that does not check for a cancellation. A call without a hook blocks without processing events and cannot be interrupted, so long calls pass one.
+- **Errors:** a Python exception arrives as `mitk::PythonWorkerError` with the Python type and traceback, and the worker keeps running. Once the process is gone, every call throws `mitk::PythonWorkerExitedException`, which contains the exit code and the last lines of stderr.
+- **Lifetime:** destroying the `mitk::PythonWorker` kills the process and every process it started, like the process pools of nnU-Net. A worker also exits when its stdin closes, so neither it nor its processes outlive MITK, not even a crash of MITK (see the platform details below). A worker that ends on its own takes its processes along as well. The tools start a worker per session and end it with the session, e.g. on a tool switch. Each start imports PyTorch and the tool package anew, which takes seconds; in return every session releases all memory it used, the GPU memory included.
+
+A virtual environment must not be updated or uninstalled while a process uses its files: on Windows the operation fails, possibly halfway, and on Linux and macOS it succeeds and breaks the code that runs from them. Only a check beforehand prevents this. For the environments of workers and of the embedded interpreter, that check is `mitk::GetVirtualEnvUse()`. It combines `mitk::PythonWorker::IsAnyRunning()`, which tells whether a worker of the environment runs, with the check for the embedded interpreter, and tells which of the two frees the environment.
+
+`mitkPythonWorkerTest` covers the transport, the shared buffers, progress and cancellation, Python errors, crashes, and the end of the processes that a worker started, also when MITK is killed. It uses the Python of MITK, and on Windows a virtual environment without packages for the launcher.
+
+### Platform details
+
+- **Windows:** the `python.exe` of a virtual environment is a launcher that starts the base interpreter as its child, in a job object of its own that ends the interpreter with the launcher but lets the children of the interpreter break away. Each worker therefore starts suspended in a job object of MITK that forbids breaking away. Killing the worker ends the job, and so does the system when it closes the last handle of the job as MITK crashes. Workers start without a console window, since every start would open one otherwise.
+- **Linux and macOS:** a worker leads a process group of its own, which the processes it starts join. MITK kills the group only while the worker is not reaped, as its process ID could name another group afterwards. When MITK crashes, the worker sees its stdin close and kills its group itself.
+- **NumPy:** the runtime creates arrays on shared memory with `np.frombuffer()`. An array from `np.ndarray(buffer=...)` does not hold on to the memory, so closing the segment would unmap memory still in use.
+- **Python before 3.13:** on Linux and macOS, attaching to shared memory registers it with the resource tracker, which would remove MITK's segments when the worker exits. The runtime suppresses that registration; Python 3.13 and later offer `track=False` for it.
+- **macOS:** see \ref PythonInMITKWorkersMacOSSection.
 
 ## Python Wheel
 
@@ -330,6 +363,12 @@ On macOS, `mitk::PythonContext` therefore passes the home determined by `mitk::P
 
 While Python Standalone Builds have proven to be the most reliable and isolated solution for us, we have encountered conflicts between the OpenMP libraries used by MITK and certain Python packages on macOS.
 To avoid these issues, OpenMP is automatically disabled on macOS whenever Python is enabled in the build system.
+
+### Worker processes on macOS {#PythonInMITKWorkersMacOSSection}
+
+Boost.Process normally waits for its children through a `SIGCHLD` handler, which would replace the one Qt installs for `QProcess`. Downloads and package installations run through `QProcess` and would then never notice that their process exited. `MitkPythonWorker` therefore builds with `BOOST_PROCESS_V2_DISABLE_SIGNALSET`, which no Boost release from 1.89 to 1.92 compiles on its own; `CMakeExternals/Boost/patches/process_disable_signalset.cmake` fixes that after the sources are fetched. A Boost that MITK does not provision (`MITK_USE_SYSTEM_Boost` or `Boost_ROOT`) needs the same fix and a compiled `boost_process` library.
+
+macOS reports `_POSIX_SHARED_MEMORY_OBJECTS` as -1, although it supports POSIX shared memory. Boost.Interprocess would then emulate shared memory with files that Python cannot open, so `MitkPythonWorker` defines `BOOST_INTERPROCESS_POSIX_SHARED_MEMORY_OBJECTS`.
 
 ### Python tests on macOS
 

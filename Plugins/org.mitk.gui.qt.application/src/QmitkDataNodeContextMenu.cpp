@@ -248,6 +248,9 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
 
     if (nullptr != action)
     {
+      // Identifies the action independently of its label.
+      action->setObjectName(actionClass);
+
       // See T26938. We do not know why but without the lambda function indirection, the
       // connection is lost after the content menu was shown for the first time.
       connect(action, &QAction::triggered, [action, this]()

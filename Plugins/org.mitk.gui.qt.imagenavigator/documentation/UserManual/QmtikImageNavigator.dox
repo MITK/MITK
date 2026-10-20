@@ -3,13 +3,39 @@
 
 \imageMacro{imagenavigator-dox.svg,"Icon of the Image Navigator",2.00}
 
-\imageMacro{QmtikImageNavigator_ImageNavigator.png,"Image Navigator",7.47}
+\imageMacroEx{QmtikImageNavigator_ImageNavigator.png,"The Image Navigator",8,384}
 
-Fast movement through the available data can be achieved by using the Image Navigator. 
-By moving the sliders around you can scroll quickly through the slides and timesteps. 
-By entering numbers in the relevant fields you can jump directly to your point of interest.
+The Image Navigator shows where the crosshair is and moves it to the position you enter: as a location in millimeters, as a slice of the axial, sagittal, and coronal render windows, and as a time step.
+All render windows follow.
+The view is disabled while no display is open.
 
-The "Show detail" checkbox enables you to see the world coordinates in millimetres
-and the index/voxel coordinates.  These may be edited to jump to a specific location.
+\section org_mitk_views_imagenavigator_location Location in millimeters
+
+The three fields in the "Loc. (mm)" row show the x, y, and z world coordinates of the crosshair in millimeters.
+Type a value and press Enter, or use the arrows of a field, to move the crosshair along that axis.
+Each field is limited to the extent of the data.
+
+The frame of each field has the color of the render window whose slice it moves.
+For data that is aligned with the world axes, x moves the sagittal slice, y the coronal slice, and z the axial slice.
+
+\section org_mitk_views_imagenavigator_slices Slices
+
+The "Axial", "Sagittal", and "Coronal" rows each have a slider and a number field for the slice that the render window of that direction shows.
+Move the slider or enter a number to show that slice; the crosshair moves along.
+
+Slices are counted from 0.
+If the display is initialized with an image, the number is the image's voxel index in that direction, even where the render window shows the slices in the opposite order.
+
+In a render window, the mouse wheel and the arrow up and down keys move through its slices as well.
+A row is disabled when the display has no render window for its direction.
+
+\section org_mitk_views_imagenavigator_time Time steps
+
+The "Time step" row appears only when the data has more than one time step, for example for a dynamic series.
+It selects the time step that all render windows show; time steps are counted from 0.
+In a render window, the arrow left and right keys go to the previous and next time step.
+
+The time step is common to all data.
+Where images have different time steps, the Pixel Value view shows the time step of the image at the crosshair.
 
 */

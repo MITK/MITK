@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindow.h>
 
+#include <mitkExceptionMacro.h>
 #include <mitkInteractionKeyEvent.h>
 #include <mitkInteractionKeyReleaseEvent.h>
 #include <mitkInternalEvent.h>
@@ -116,6 +117,33 @@ namespace
       return false;
     }
   };
+
+  /** The events that QWidget::event() drops while a widget is disabled. */
+  bool IsInputEvent(QEvent::Type type)
+  {
+    switch (type)
+    {
+      case QEvent::MouseButtonPress:
+      case QEvent::MouseButtonRelease:
+      case QEvent::MouseButtonDblClick:
+      case QEvent::MouseMove:
+      case QEvent::Wheel:
+      case QEvent::KeyPress:
+      case QEvent::KeyRelease:
+      case QEvent::TouchBegin:
+      case QEvent::TouchUpdate:
+      case QEvent::TouchEnd:
+      case QEvent::TouchCancel:
+      case QEvent::TabletPress:
+      case QEvent::TabletRelease:
+      case QEvent::TabletMove:
+      case QEvent::ContextMenu:
+        return true;
+
+      default:
+        return false;
+    }
+  }
 
   void EnsureModifierKeyForwarder()
   {
@@ -238,6 +266,20 @@ mitk::VtkPropRenderer::LightingMode QmitkRenderWindow::GetPreferredLightingMode(
     : mitk::VtkPropRenderer::LightingMode::Studio;
 }
 
+bool QmitkRenderWindow::IsFullScreen() const
+{
+  return nullptr != m_MenuWidget && m_MenuWidget->IsFullScreen();
+}
+
+void QmitkRenderWindow::SetFullScreen(bool fullScreen)
+{
+  // The menu remembers the layout to return to, so only it can toggle.
+  if (nullptr == m_MenuWidget)
+    mitkThrow() << "The render window has no menu to toggle full screen with.";
+
+  m_MenuWidget->SetFullScreen(fullScreen);
+}
+
 void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
@@ -319,6 +361,11 @@ void QmitkRenderWindow::hideEvent(QHideEvent *event)
 
 bool QmitkRenderWindow::event(QEvent* e)
 {
+  // QWidget::event() drops the input of a disabled widget, but this override
+  // and the one of QVTKOpenGLNativeWidget would handle it before.
+  if (!this->isEnabled() && IsInputEvent(e->type()))
+    return QWidget::event(e);
+
   mitk::InteractionEvent::Pointer mitkEvent = nullptr;
   mitk::Point2D mousePosition;
   bool updateStatusBar = false;

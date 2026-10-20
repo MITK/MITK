@@ -843,6 +843,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   viewNavigatorAction = new QAction(QmitkIconTheme::GetIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
+  viewNavigatorAction->setObjectName("viewNavigatorAction");
   viewNavigatorFound = mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator");
   if (viewNavigatorFound)
   {

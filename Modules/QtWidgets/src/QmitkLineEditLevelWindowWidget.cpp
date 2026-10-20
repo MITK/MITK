@@ -27,7 +27,6 @@ found in the LICENSE file.
 #include <itkCommand.h>
 
 // c++
-#include <limits>
 #include <sstream>
 
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
@@ -49,9 +48,11 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   m_LevelInput = new QLineEdit(this);
   m_LevelInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
   m_LevelInput->setToolTip("Edit this field to change the center of the levelwindow.");
+  m_LevelInput->setAccessibleName("Level window center");
 
   m_WindowInput = new QLineEdit(this);
   m_WindowInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+  m_WindowInput->setAccessibleName("Level window span");
   m_WindowInput->setToolTip(
     "Edit this field to change the span of the levelwindow. This number describes the whole span around the center.");
 
@@ -62,9 +63,16 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   connect(m_LevelInput, SIGNAL(editingFinished()), this, SLOT(SetLevelValue()));
   connect(m_WindowInput, SIGNAL(editingFinished()), this, SLOT(SetWindowValue()));
 
-  // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  QValidator *validatorWindowInput = new QDoubleValidator(0, std::numeric_limits<double>::max(), 2, this);
-  m_WindowInput->setValidator(validatorWindowInput);
+  // The fields are read with QString::toDouble(), which ignores the system
+  // locale, so their validators must not follow it either.
+  auto *levelValidator = new QDoubleValidator(this);
+  levelValidator->setLocale(QLocale::c());
+  m_LevelInput->setValidator(levelValidator);
+
+  auto *windowValidator = new QDoubleValidator(this);
+  windowValidator->setBottom(0);
+  windowValidator->setLocale(QLocale::c());
+  m_WindowInput->setValidator(windowValidator);
 
   this->hide();
 }

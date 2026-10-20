@@ -13,8 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkSpeechBubbleFrame_h
 #define QmitkSpeechBubbleFrame_h
 
-#include <MitkPythonSegmentationUIExports.h>
+#include <MitkQtWidgetsExports.h>
 
+#include <QColor>
+#include <QPalette>
 #include <QWidget>
 
 /**
@@ -24,16 +26,25 @@ found in the LICENSE file.
  * room for its outline and the tail around its layout. Give the text field
  * that it holds no frame and a transparent background, so the bubble shows.
  *
- * The outline turns into the blue of the icon while the text field has the
- * focus, and is grayed out while it is disabled.
+ * The outline turns into the blue of the VoxTell icon while the text field
+ * has the focus, and is grayed out while it is disabled.
  */
-class MITKPYTHONSEGMENTATIONUI_EXPORT QmitkSpeechBubbleFrame : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkSpeechBubbleFrame : public QWidget
 {
   Q_OBJECT
 
 public:
   explicit QmitkSpeechBubbleFrame(QWidget* parent = nullptr);
   ~QmitkSpeechBubbleFrame() override;
+
+  /**
+   * \brief The fill and outline colors of the bubble in the current theme.
+   *
+   * For other places that show what the user wrote, so that they look like
+   * the bubble.
+   */
+  static QColor GetFillColor(const QPalette& palette, bool enabled = true);
+  static QColor GetBorderColor(const QPalette& palette, bool enabled = true);
 
 protected:
   /** \brief Watches the children for changes of their focus and enabled state. */

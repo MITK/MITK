@@ -36,7 +36,7 @@ namespace
   // The blue of the VoxTell icon.
   const QColor FOCUS_COLOR("#00adff");
 
-  // Like the icon: a vertical right side and a slanted left side.
+  // Like the VoxTell icon: a vertical right side and a slanted left side.
   QPainterPath GetBubblePath(const QRectF& body)
   {
     const auto tailRight = body.right() - 3 * RADIUS;
@@ -68,6 +68,28 @@ QmitkSpeechBubbleFrame::QmitkSpeechBubbleFrame(QWidget* parent)
 }
 
 QmitkSpeechBubbleFrame::~QmitkSpeechBubbleFrame() = default;
+
+// The colors of the text fields of the theme. The dark theme sets them in its
+// style sheet and leaves the palette untouched.
+QColor QmitkSpeechBubbleFrame::GetFillColor(const QPalette& palette, bool enabled)
+{
+  if (QmitkIconTheme::IsDarkTheme())
+    return enabled ? QColor("#333337") : QColor("#2d2d30");
+
+  return palette.color(enabled ? QPalette::Base : QPalette::Window);
+}
+
+QColor QmitkSpeechBubbleFrame::GetBorderColor(const QPalette& palette, bool enabled)
+{
+  if (QmitkIconTheme::IsDarkTheme())
+    return QColor("#434346");
+
+  const auto border = palette.color(QPalette::Mid);
+
+  return enabled
+    ? border
+    : border.lighter(130);
+}
 
 void QmitkSpeechBubbleFrame::childEvent(QChildEvent* event)
 {
@@ -102,24 +124,8 @@ void QmitkSpeechBubbleFrame::paintEvent(QPaintEvent* /*event*/)
   const auto* focusWidget = QApplication::focusWidget();
   const bool focused = enabled && focusWidget != nullptr && this->isAncestorOf(focusWidget);
 
-  QColor fill;
-  QColor border;
-
-  // The colors of the text fields of the theme. The dark theme sets them in its
-  // style sheet and leaves the palette untouched.
-  if (QmitkIconTheme::IsDarkTheme())
-  {
-    fill = enabled ? QColor("#333337") : QColor("#2d2d30");
-    border = QColor("#434346");
-  }
-  else
-  {
-    fill = this->palette().color(enabled ? QPalette::Base : QPalette::Window);
-    border = this->palette().color(QPalette::Mid);
-
-    if (!enabled)
-      border = border.lighter(130);
-  }
+  const auto fill = GetFillColor(this->palette(), enabled);
+  const auto border = GetBorderColor(this->palette(), enabled);
 
   const auto borderWidth = focused ? FOCUS_BORDER_WIDTH : BORDER_WIDTH;
   const auto inset = borderWidth / 2;

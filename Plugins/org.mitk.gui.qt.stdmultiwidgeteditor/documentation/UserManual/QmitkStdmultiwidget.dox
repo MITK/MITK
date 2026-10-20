@@ -70,7 +70,9 @@ The pixels with a value between the lower and upper boundary are displayed in di
 
 You can pick the levelwindow with the mouse to move it up and down, while moving the mouse cursor to the left or right to change its size. Picking one of the boundaries with a left click allows you to change the size symmetrically. Holding CTRL and clicking a boundary adjusts only that value.
 
-With line edit fields below you can directly adjust the levelwindow. The upper field describes the center of the levelwindow, the bottom the span of the window around the center. By selecting one of fields and typing any number you can set these two parameters.
+With line edit fields below you can directly adjust the levelwindow. The upper field describes the center of the levelwindow, the bottom the span of the window around the center. By selecting one of fields and typing any number you can set these two parameters. Type decimal numbers with a point, whatever your system's language.
+
+Right-clicking the slider opens the context menu of the levelwindow. <i>Set slider fixed</i> locks the slider and the fields. <i>Use whole image grey values</i> spans the levelwindow over all grey values of the image, <i>Use optimized level-window</i> chooses a contrast from the image's statistics, <i>Set maximum window</i> spans it over the whole scale of the slider, and <i>Default level-window</i> restores the image's default. <i>Change scale range</i> sets the lower and upper end of the slider's scale, and <i>Default scale range</i> restores them. The <i>Presets</i> submenu applies a named levelwindow for CT images in Hounsfield units, for example for bones or the lung; <i>Preset definition</i> edits these presets for the current session.
 
 \subsection org_mitk_editors_stdmultiwidget_Levelwindow_Image Which image is adjusted
 

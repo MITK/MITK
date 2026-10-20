@@ -110,6 +110,17 @@ public:
   /** \brief Returns the lighting rig last selected from this window's menu. */
   mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
 
+  /** \brief Whether the window is shown alone, as the full screen button of its menu toggles it. */
+  bool IsFullScreen() const;
+
+  /**
+   * \brief Shows the window alone, or brings back the layout it was shown in
+   *        before, as the full screen button of its menu does.
+   *
+   * \throw mitk::Exception if the window has no menu.
+   */
+  void SetFullScreen(bool fullScreen);
+
   /**
    * \brief Shows or hides the geometry violation warning overlay.
    * \param[in] show True to show, false to hide.

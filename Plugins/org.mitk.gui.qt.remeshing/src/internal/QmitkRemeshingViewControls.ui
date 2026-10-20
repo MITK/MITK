@@ -112,6 +112,9 @@
      </item>
      <item row="2" column="1" colspan="2">
       <widget class="QComboBox" name="qualityComboBox">
+       <property name="accessibleName">
+        <string>Quality</string>
+       </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -147,6 +150,9 @@
      </item>
      <item row="3" column="1">
       <widget class="QSlider" name="densitySlider">
+       <property name="accessibleName">
+        <string>Density</string>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -172,6 +178,9 @@
      </item>
      <item row="3" column="2">
       <widget class="QSpinBox" name="densitySpinBox">
+       <property name="accessibleName">
+        <string>Density</string>
+       </property>
        <property name="suffix">
         <string>%</string>
        </property>

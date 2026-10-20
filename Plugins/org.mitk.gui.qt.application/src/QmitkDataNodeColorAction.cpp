@@ -38,6 +38,7 @@ void QmitkDataNodeColorAction::InitializeAction()
 {
   m_ColorButton = new QPushButton;
   m_ColorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  m_ColorButton->setAccessibleName(tr("Color"));
   connect(m_ColorButton, &QPushButton::clicked, this, &QmitkDataNodeColorAction::OnColorChanged);
 
   QLabel* colorLabel = new QLabel(tr("Color: "));

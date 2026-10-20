@@ -51,7 +51,7 @@ The Data Manager is the central component of MITK to manage medical data like im
 For a detailed description of the Data Manager please be referred to the view documentation:   \ref org_mitk_views_datamanager.
 
 \section MITKWorkbenchManualPage_ImageNavigator Image Navigator
-Fast movement through the available data can be achieved by using the Image Navigator. By moving the sliders around you can scroll through the slides and timesteps.
+Fast movement through the available data can be achieved by using the Image Navigator. By moving the sliders around you can scroll through the slices and time steps.
 For a detailed description of the Image Navigator please be referred to the Image Navigator view documentation:   \ref org_mitk_views_imagenavigator.
 
 \section MITKWorkbenchManualPage_FourWindowView Standard Display

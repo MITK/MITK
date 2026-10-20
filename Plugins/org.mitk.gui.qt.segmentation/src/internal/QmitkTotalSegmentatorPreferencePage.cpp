@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <mitkToolManagerProvider.h>
 #include <mitkTotalSegmentatorInstall.h>
 #include <mitkTotalSegmentatorTool.h>
+#include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
 #include <QmitkVenvProcess.h>
@@ -159,6 +160,24 @@ namespace
       "TotalSegmentator is running. Wait until it has finished or cancel it, then try again.");
 
     return true;
+  }
+
+  // The worker of the tool keeps files of the environment and the weights
+  // open. Ends it; the tool is started again when it is needed.
+  void EndToolWorker()
+  {
+    auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(
+      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetActiveTool());
+
+    try
+    {
+      if (tool != nullptr)
+        tool->Uninitialize();
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "TotalSegmentator: " << e.GetDescription();
+    }
   }
 #endif
 }
@@ -377,6 +396,8 @@ void QmitkTotalSegmentatorPreferencePage::OnClearModelWeightsClicked()
   if (answer != QMessageBox::Yes)
     return;
 
+  EndToolWorker();
+
   const auto result = QmitkRunAsyncBlocking<std::pair<bool, QString>>(
     m_Control, "TotalSegmentator", "Clearing model weights...", [] { return ClearModelWeights(); });
 
@@ -401,6 +422,8 @@ void QmitkTotalSegmentatorPreferencePage::OnUninstallButtonClicked()
 
   if (answer != QMessageBox::Yes)
     return;
+
+  EndToolWorker();
 
   const bool removed = QmitkRunAsyncBlocking<bool>(
     m_Control, "Uninstall TotalSegmentator", "Removing the TotalSegmentator virtual environment...",

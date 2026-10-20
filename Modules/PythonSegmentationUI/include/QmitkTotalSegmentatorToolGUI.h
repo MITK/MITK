@@ -20,9 +20,11 @@ found in the LICENSE file.
 
 #include <MitkPythonSegmentationUIExports.h>
 
+#include <QStringList>
+
 #include <memory>
-#include <string>
-#include <vector>
+
+class QListWidgetItem;
 
 namespace Ui
 {
@@ -32,12 +34,13 @@ namespace Ui
 /**
   \brief GUI for mitk::TotalSegmentatorTool.
 
-  A minimal panel: an Install button shown only until the managed environment
-  exists, a Settings button opening the preference page, a task combo box (with
-  fast / fastest variants for the whole-body tasks and disabled-but-visible
-  licensed tasks) and a Run button. The long-running segmentation is executed by
-  a subprocess through RunProcess() so the application stays responsive. The
-  progress notification of the tool shows the run and offers to cancel it.
+  An Install button shown only until the managed environment exists, a
+  Settings button opening the preference page, a task combo box (with the
+  coarser speeds of the tasks that have them, and visible licensed tasks), a
+  checkable list of the structures to segment for the tasks that take a subset,
+  and a Run button. Task, speed and structures are the tool's, so the panel
+  follows the tool when someone else chooses them, and its status follows
+  every run of the tool, whoever started it.
 
   \sa mitk::TotalSegmentatorTool
 */
@@ -54,33 +57,58 @@ protected slots:
   void OnRunButtonClicked();
   void OnInstallButtonClicked();
   void OnSettingsButtonClicked();
+  void OnTaskSelected();
+  void OnStructureChanged(QListWidgetItem* item);
+  void OnClearStructuresClicked();
+  void OnStructuresFilterChanged(const QString& text);
 
 protected:
   QmitkTotalSegmentatorToolGUI();
   ~QmitkTotalSegmentatorToolGUI() override;
 
   void InitializeUI(QBoxLayout* mainLayout) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
+  void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool) override;
+
+  /** \brief Shows that a run goes on, and its result once it ended. */
+  void BusyStateChanged(bool isBusy) override;
+
+  /** \brief Shortens the structure summary again when its label is resized. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
   mitk::TotalSegmentatorTool* GetTool();
 
-  /** \brief Shows the Install button or the task/run controls based on whether
-   *         the managed environment is present. */
+  /** \brief Shows the Install button, or the controls of the tool, which is started if it is not yet. */
   void RefreshInstallState();
 
-  /** \brief Fills the task combo box, marking licensed tasks and preserving the
-   *         current selection across rebuilds. */
+  /** \brief Starts the tool, which learns the tasks of TotalSegmentator. */
+  void InitializeTool();
+
+  void OnToolInitialized();
+  void OnToolOptionsChanged();
+
+  /** \brief Fills the task combo box with the tool's tasks, marking licensed ones. */
   void PopulateTasks();
+
+  /** \brief Shows the task, speed and structures of the tool. */
+  void ShowToolOptions();
+
+  /** \brief Shows the structures of the tool's task, or hides them for a task that segments all of its structures only. */
+  void ShowStructures();
+
+  /** \brief Shows or hides the structure summary, its Clear button, the filter and the list together. */
+  void SetStructuresVisible(bool visible);
+
+  /** \brief Names as many checked structures as fit the summary label, and counts the rest; the tool tip names all. */
+  void ShowStructuresSummary();
 
   /** \brief Enables the Run button and sets the status for the selected task, or
    *         disables it with a hint when the task needs a license that is not set. */
   void UpdateRunButtonState();
 
-  /** \brief Runs the TotalSegmentator CLI as a subprocess, keeping the GUI
-   *         responsive, until it ends or the tool asks to stop it. Injected into
-   *         the tool as its CommandRunner. Returns true on success (exit 0). */
-  bool RunProcess(const std::string& executable, const std::vector<std::string>& args,
-    const mitk::TotalSegmentatorTool::RunControl& control);
+  /** \brief Shows the preview of the run that just ended, or why there is none. */
+  void ShowRunResult();
 
   void SetStatus(const QString& message, bool isError = false);
 
@@ -88,6 +116,13 @@ private:
 
   std::unique_ptr<Ui::QmitkTotalSegmentatorToolGUI> m_Ui;
   mitk::IPreferences* m_Preferences = nullptr;
+  bool m_Running = false;
+
+  /** \brief The task whose structures the list shows. */
+  std::string m_ListedTask;
+
+  /** \brief The structures of the tool's subset, in the order of the task. */
+  QStringList m_CheckedStructures;
 };
 
 #endif

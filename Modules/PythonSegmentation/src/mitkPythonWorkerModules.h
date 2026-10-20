@@ -13,7 +13,10 @@ found in the LICENSE file.
 #ifndef mitkPythonWorkerModules_h
 #define mitkPythonWorkerModules_h
 
+#include <mitkBaseGeometry.h>
 #include <mitkPythonWorker.h>
+
+#include <nlohmann/json.hpp>
 
 #include <string>
 
@@ -32,6 +35,13 @@ namespace mitk
    * \throw mitk::Exception if the resource does not exist.
    */
   PythonWorker::Module ReadWorkerModule(const std::string& resourcePath);
+
+  /**
+   * \brief Returns the index-to-world transform of a geometry as the four rows of a 4x4 matrix.
+   *
+   * The workers derive the affine of an image from it.
+   */
+  nlohmann::json GetIndexToWorld(const BaseGeometry* geometry);
 }
 
 #endif

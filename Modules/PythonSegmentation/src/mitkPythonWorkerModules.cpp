@@ -37,3 +37,19 @@ mitk::PythonWorker::Module mitk::ReadWorkerModule(const std::string& resourcePat
 
   return { std::filesystem::path(resourcePath).stem().string(), source.str() };
 }
+
+nlohmann::json mitk::GetIndexToWorld(const BaseGeometry* geometry)
+{
+  const auto* transform = geometry->GetIndexToWorldTransform();
+  const auto& matrix = transform->GetMatrix();
+  const auto& offset = transform->GetOffset();
+
+  auto rows = nlohmann::json::array();
+
+  for (unsigned int row = 0; row < 3; ++row)
+    rows.push_back({ matrix[row][0], matrix[row][1], matrix[row][2], offset[row] });
+
+  rows.push_back({ 0.0, 0.0, 0.0, 1.0 });
+
+  return rows;
+}

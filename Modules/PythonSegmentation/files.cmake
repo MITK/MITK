@@ -17,6 +17,7 @@ set(RESOURCE_FILES
   package_checks.py
   torch_device.py
   nnInteractive/nninteractive_worker.py
+  TotalSegmentator/totalsegmentator_worker.py
   VoxTell/VoxTell.svg
   VoxTell/voxtell_bridge.py
   VoxTell/voxtell_hub_files.py

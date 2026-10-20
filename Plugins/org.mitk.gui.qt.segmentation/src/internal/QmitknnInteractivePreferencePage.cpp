@@ -468,6 +468,7 @@ void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()
     return;
 
   const bool removed = QmitkRunAsyncBlocking<bool>(
+    m_Control,
     "Uninstall nnInteractive",
     "Removing the nnInteractive virtual environment...",
     [] { return mitk::PythonHelper::RemoveVirtualEnv("nnInteractive"); });

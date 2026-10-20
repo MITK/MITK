@@ -276,7 +276,7 @@ void QmitkVoxTellPreferencePage::OnUninstallButtonClicked()
     return;
 
   const bool removed = QmitkRunAsyncBlocking<bool>(
-    "Uninstall VoxTell", "Removing the VoxTell virtual environment...",
+    m_Control, "Uninstall VoxTell", "Removing the VoxTell virtual environment...",
     [] { return mitk::PythonHelper::RemoveVirtualEnv(mitk::VoxTell::VENV_NAME); });
 
   if (removed)

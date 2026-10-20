@@ -239,9 +239,9 @@ void QmitkProcessEventsUntil(const std::function<bool()>& done)
   }
 }
 
-void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task)
+void QmitkRunAsyncBlocking(QWidget* parent, const QString& title, const QString& label, std::function<void()> task)
 {
-  QProgressDialog dialog(label, {}, 0, 0);
+  QProgressDialog dialog(label, {}, 0, 0, parent);
   dialog.setWindowModality(Qt::ApplicationModal);
   dialog.setWindowTitle(title);
   dialog.setMinimumDuration(250);

@@ -277,6 +277,8 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   if (selectedItems.empty())
     return;
 
+  auto* dialogParent = m_Ui->virtualEnvsTreeWidget->window();
+
   // Loaded modules and running workers are only known for THIS process, so
   // we can only gate venvs that belong to the running MITK instance. Venvs
   // owned by other instances are covered by the warning text below instead.
@@ -299,7 +301,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
       : appName;
 
     QMessageBox::information(
-      nullptr,
+      dialogParent,
       "Delete selected virtual environments",
       QString(
         "<h3 %1>Cannot delete in-use virtual environments</h3>"
@@ -312,7 +314,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   }
 
   const auto answer = QMessageBox::question(
-    nullptr,
+    dialogParent,
     "Delete selected virtual environments",
     QString(
       "<h3 %1>Delete selected virtual environments?</h3>"
@@ -336,6 +338,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   QStringList failedPaths;
 
   QmitkRunAsyncBlocking(
+    dialogParent,
     "Delete selected virtual environments",
     "Deleting virtual environments...",
     [&virtualEnvPaths, &failedPaths]() {
@@ -351,7 +354,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   if (!failedPaths.isEmpty())
   {
     QMessageBox::warning(
-      nullptr,
+      dialogParent,
       "Delete selected virtual environments",
       QString(
         "<h3 %1>Some virtual environments could not be deleted</h3>"

@@ -1375,7 +1375,9 @@ namespace mitk
         newLabel->SetName(labelName.c_str());
         newLabel->SetColor(Color(tmp));
         newLabel->SetValue(segValue);
-        labelSetImage->AddLabel(newLabel, groupID, true, true);
+        newLabel = labelSetImage->AddLabel(newLabel, groupID, true, true);
+        if (newLabel.IsNull())
+          mitkThrow() << "Cannot add label for segment " << segValue << "; the segmentation holds no free label value.";
 
         if (!assumeOverlappingSegments)
         {
@@ -1726,6 +1728,10 @@ namespace mitk
     const std::string dicomAlgorithmName = segmentAttribute->getSegmentAlgorithmName();
     if (!dicomAlgorithmName.empty())
       label->SetAlgorithmName(dicomAlgorithmName);
+
+    const std::string dicomDescription = segmentAttribute->getSegmentDescription();
+    if (!dicomDescription.empty())
+      label->SetDescription(dicomDescription);
 
     // Add Segmented Property Category Code Sequence tags
     auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();

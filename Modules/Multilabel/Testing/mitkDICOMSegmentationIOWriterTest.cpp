@@ -31,8 +31,10 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcitem.h>
 #include <dcmtk/ofstd/ofstring.h>
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -342,6 +344,162 @@ namespace
     return seg;
   }
 
+  // A label carrying every per-segment attribute the writer emits, each one
+  // derived from the label value so that a reader restoring one label's
+  // attributes onto another, or onto the first label only, is caught. The
+  // algorithm type is never MANUAL because dcmqi drops the algorithm name of
+  // MANUAL segments.
+  mitk::Label::Pointer BuildFullyAttributedLabel(mitk::Label::PixelType value)
+  {
+    const auto n = std::to_string(value);
+    auto label = mitk::Label::New(value, "Label " + n);
+    label->SetDescription("Description of label " + n);
+    label->SetTrackingID("track-id-" + n);
+    label->SetTrackingUID(Helper::MintSyntheticUID("TrackingUID"));
+    label->SetAlgorithmType(value % 2 == 0 ? mitk::Label::AlgorithmType::SEMIAUTOMATIC
+                                           : mitk::Label::AlgorithmType::AUTOMATIC);
+    label->SetAlgorithmName("RoundTripTest " + n);
+    label->SetSegmentedPropertyCategory(mitk::DICOMCodeSequence("C" + n, "99MITK", "Category " + n));
+
+    mitk::DICOMCodeSequenceWithModifiers type("T" + n, "99MITK", "Type " + n);
+    type.AddModifier(mitk::DICOMCodeSequence("TM" + n, "99MITK", "Type modifier " + n));
+    label->SetSegmentedPropertyType(type);
+
+    mitk::DICOMCodeSequenceWithModifiers region("R" + n, "99MITK", "Region " + n);
+    region.AddModifier(mitk::DICOMCodeSequence("RM" + n, "99MITK", "Region modifier " + n));
+    label->SetAnatomicRegion(region);
+
+    return label;
+  }
+
+  // One group holding fully attributed labels 1..labelCount, each on its own
+  // voxel column so every label becomes a segment with frames.
+  mitk::MultiLabelSegmentation::Pointer BuildFullyAttributedSingleGroupSeg(const mitk::Image* source,
+                                                                           mitk::Label::PixelType labelCount)
+  {
+    auto seg = mitk::MultiLabelSegmentation::New();
+    seg->Initialize(source);
+
+    for (mitk::Label::PixelType value = 1; value <= labelCount; ++value)
+      seg->AddLabel(BuildFullyAttributedLabel(value), 0, false, false);
+
+    {
+      auto groupImage = seg->GetGroupImage(0);
+      mitk::ImageWriteAccessor writeAccessor(groupImage);
+      auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
+      const auto dims = groupImage->GetDimensions();
+      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+      for (unsigned int z = 0; z < dims[2]; ++z)
+      {
+        for (mitk::Label::PixelType value = 1; value <= labelCount; ++value)
+          pixels[z * sliceSize + value - 1] = value;
+      }
+    }
+
+    Rule::Connect(seg, source);
+    return seg;
+  }
+
+  std::string Describe(const mitk::DICOMCodeSequence& code)
+  {
+    return "(" + code.GetValue() + ", " + code.GetScheme() + ", " + code.GetMeaning() + ")";
+  }
+
+  std::string Describe(const mitk::DICOMCodeSequenceWithModifiers& code)
+  {
+    auto result = Describe(static_cast<const mitk::DICOMCodeSequence&>(code));
+    for (const auto& modifier : code.GetModifiers())
+      result += " modifier " + Describe(modifier);
+    return result;
+  }
+
+  template <typename TCode>
+  std::string Describe(const std::optional<TCode>& code)
+  {
+    return code.has_value() ? Describe(*code) : std::string("<absent>");
+  }
+
+  std::string DescribeAnatomicRegions(const mitk::Label* label)
+  {
+    std::string result;
+    for (std::size_t i = 0; i < label->GetAnatomicRegionCount(); ++i)
+      result += (i == 0 ? "" : "; ") + Describe(label->GetAnatomicRegion(i));
+    return result.empty() ? std::string("<absent>") : result;
+  }
+
+  // Appends one line per attribute in which actual differs from expected, so
+  // a failing round trip reports every lost attribute of every label at once.
+  void CollectAttributeMismatches(const mitk::Label* expected, const mitk::Label* actual, std::ostringstream& diag)
+  {
+    const auto compare = [&diag, expected](const std::string& attribute,
+                                           const std::string& expectedValue,
+                                           const std::string& actualValue)
+    {
+      if (expectedValue != actualValue)
+        diag << "\n  " << expected->GetName() << ": " << attribute << " expected '" << expectedValue
+             << "', got '" << actualValue << "'";
+    };
+
+    compare("Tracking ID", expected->GetTrackingID(), actual->GetTrackingID());
+    compare("Tracking UID", expected->GetTrackingUID(), actual->GetTrackingUID());
+    compare("algorithm type", expected->GetAlgorithmTypeStr(), actual->GetAlgorithmTypeStr());
+    compare("algorithm name", expected->GetAlgorithmName(), actual->GetAlgorithmName());
+    compare("category", Describe(expected->GetSegmentedPropertyCategory()),
+            Describe(actual->GetSegmentedPropertyCategory()));
+    compare("type", Describe(expected->GetSegmentedPropertyType()), Describe(actual->GetSegmentedPropertyType()));
+    compare("anatomic region", DescribeAnatomicRegions(expected), DescribeAnatomicRegions(actual));
+    compare("description", expected->GetDescription(), actual->GetDescription());
+  }
+
+  // Loads the SEG at path and asserts that it restores every label of seg
+  // with all of its attributes. Labels are matched by name, which every
+  // encoding restores, so the check holds wherever the reader puts a label.
+  mitk::MultiLabelSegmentation::ConstPointer AssertReloadRestoresAttributesOfEveryLabel(
+    const mitk::MultiLabelSegmentation* seg, const std::string& path, const std::string& context)
+  {
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Round-trip load produced exactly one BaseData", std::size_t(1), loaded.size());
+    const mitk::MultiLabelSegmentation::ConstPointer loadedSeg =
+      dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Round-trip load produced a MultiLabelSegmentation", loadedSeg.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every label survives the round trip",
+                                 seg->GetTotalNumberOfLabels(), loadedSeg->GetTotalNumberOfLabels());
+
+    const auto loadedLabels = loadedSeg->GetConstLabelsByValue(loadedSeg->GetAllLabelValues());
+    std::ostringstream diag;
+    for (const auto& expected : seg->GetConstLabelsByValue(seg->GetAllLabelValues()))
+    {
+      const auto finding = std::find_if(loadedLabels.begin(), loadedLabels.end(),
+        [&expected](const mitk::Label* label) { return label->GetName() == expected->GetName(); });
+
+      if (finding == loadedLabels.end())
+        diag << "\n  " << expected->GetName() << ": missing after reload";
+      else
+        CollectAttributeMismatches(expected, *finding, diag);
+    }
+
+    if (!diag.str().empty())
+      CPPUNIT_FAIL(context + " round trip lost label attributes:" + diag.str());
+
+    return loadedSeg;
+  }
+
+  // Copies the SEG at segPath with SegmentsOverlap (0062,0013) set to
+  // UNDEFINED and returns the path of the copy. MITK always writes NO, so
+  // only this way does a test reach the reader's overlap-safe path that SEGs
+  // of other producers take.
+  std::string CopyWithSegmentsOverlapUndefined(const std::string& segPath)
+  {
+    DcmFileFormat ff;
+    CPPUNIT_ASSERT_MESSAGE("Written SEG can be opened", ff.loadFile(segPath.c_str()).good());
+    CPPUNIT_ASSERT_MESSAGE("SegmentsOverlap can be set",
+                           ff.getDataset()->putAndInsertString(DCM_SegmentsOverlap, "UNDEFINED").good());
+
+    const auto copyPath = segPath.substr(0, segPath.find_last_of('.')) + "-overlap-undefined.dcm";
+    CPPUNIT_ASSERT_MESSAGE("Patched SEG can be saved", ff.saveFile(copyPath.c_str()).good());
+    return copyPath;
+  }
+
   // Snapshot of one SegmentSequence item as read directly via DCMTK. Code-
   // triple fields are empty strings when the surrounding sequence is absent;
   // hasTrackingID / hasTrackingUID separate "absent" from "present but empty".
@@ -458,6 +616,9 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(DefaultEncodingProducesLegacySOPClass);
   MITK_TEST(LabelmapEncodingProducesSup243SOPClass);
   MITK_TEST(LabelmapRoundTripStripsAutoAddedBackgroundSegment);
+  MITK_TEST(BinaryRoundTripRestoresAttributesOfEveryLabel);
+  MITK_TEST(BinaryOverlapRoundTripRestoresAttributesOfEveryLabel);
+  MITK_TEST(LabelmapRoundTripRestoresAttributesOfEveryLabel);
   MITK_TEST(BinaryEncodingProducesLegacySOPClass);
   MITK_TEST(WriterPreservesEmptySlicesInOutput);
   MITK_TEST(MultiSourceSegRoundTripPreservesAtLeastOneRelation);
@@ -778,6 +939,47 @@ public:
         "No reloaded label may be named 'Background'",
         std::string(label->GetName()) != "Background");
     }
+  }
+
+  // Several labels in one group: the binary encoding writes them as separate
+  // segments of one SEG, which the reader rebuilds label by label, the
+  // labelmap encoding as one labelmap.
+  void BinaryRoundTripRestoresAttributesOfEveryLabel()
+  {
+    const auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    const auto seg = BuildFullyAttributedSingleGroupSeg(source, 3);
+
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("binary");
+    const auto path = WriteSegToTempFile(seg, options, "all-attributes-binary");
+
+    AssertReloadRestoresAttributesOfEveryLabel(seg, path, "binary");
+  }
+
+  void BinaryOverlapRoundTripRestoresAttributesOfEveryLabel()
+  {
+    const auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    const auto seg = BuildFullyAttributedSingleGroupSeg(source, 3);
+
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("binary");
+    const auto path = CopyWithSegmentsOverlapUndefined(WriteSegToTempFile(seg, options, "all-attributes-overlap"));
+
+    const auto loadedSeg = AssertReloadRestoresAttributesOfEveryLabel(seg, path, "binary, overlap undefined");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The overlap-safe path gives every segment a group of its own",
+                                 seg->GetTotalNumberOfLabels(), loadedSeg->GetNumberOfGroups());
+  }
+
+  void LabelmapRoundTripRestoresAttributesOfEveryLabel()
+  {
+    const auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    const auto seg = BuildFullyAttributedSingleGroupSeg(source, 3);
+
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
+    const auto path = WriteSegToTempFile(seg, options, "all-attributes-labelmap");
+
+    AssertReloadRestoresAttributesOfEveryLabel(seg, path, "labelmap");
   }
 
   void BinaryEncodingProducesLegacySOPClass()

@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_screenshotmaker The Screenshot Maker View
 
-\imageMacro{QmitkMovieMaker_ScreenshotMakerInterface.png,"The Screenshot Maker user interface",7.09}
+\imageMacroEx{QmitkMovieMaker_ScreenshotMakerInterface.png, "The Screenshot Maker user interface", 9, 341px}
 
 The Screenshot Maker saves screenshots of the display (render) windows. It works with any
 display editor, including the Standard Display and the MxN Display.
@@ -34,6 +34,11 @@ Coronal.png and 3D.png for the Standard Display).
 \li Background: choose the background of the screenshot: white, black, transparent, or a custom
 color (the last button opens a color dialog). Transparent screenshots are always saved as PNG,
 because JPEG does not support transparency.
+\li Crop: "To content" cuts the screenshot down to the part of the scene that is not background,
+and the padding keeps that many pixels of background around it. In 2D windows, the image slice
+counts as content, dark areas included, so the crop removes only the background around the
+slice. Screenshots of several windows or time points cropped this way differ in size and no
+longer line up. A window that shows only background is not saved.
 \li High resolution: an upsampling factor. 1x captures at the on-screen resolution; higher
 values (2x, 3x, ...) produce a correspondingly larger image. This works for both 2D and 3D
 display windows.

@@ -14,21 +14,13 @@ found in the LICENSE file.
 #include <ui_QmitkScreenshotMakerControls.h>
 
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowScreenshot.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkIRenderWindowPart.h>
-#include <mitkRenderingManager.h>
+#include <mitkLog.h>
 #include <mitkStatusBar.h>
 #include <mitkWorkbenchUtil.h>
-
-#include <vtkImageData.h>
-#include <vtkImageWriter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPNGWriter.h>
-#include <vtkRenderLargeImage.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <vtkSmartPointer.h>
 
 #include <QAbstractButton>
 #include <QApplication>
@@ -186,6 +178,8 @@ void QmitkScreenshotMaker::CreateConnections()
     connect(m_Controls->btnBgTransparent, &QAbstractButton::clicked, this,
             [this] { this->ApplyBackgroundSelection(QColor(), true, m_Controls->btnBgTransparent); });
     connect(m_Controls->btnBgCustom, &QAbstractButton::clicked, this, &QmitkScreenshotMaker::OnSelectCustomBackground);
+
+    connect(m_Controls->checkCropToContent, &QCheckBox::toggled, m_Controls->spinCropPadding, &QWidget::setEnabled);
   }
 }
 
@@ -446,14 +440,8 @@ void QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned in
   if (nullptr == window || scale < 1 || fileName.isEmpty())
     return;
 
-  auto* baseRenderer = window->GetRenderer();
   auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-  if (nullptr == baseRenderer || nullptr == renderWindowPart)
-    return;
-
-  auto* renderer = baseRenderer->GetVtkRenderer();
-  auto* renderWindow = baseRenderer->GetRenderWindow();
-  if (nullptr == renderer || nullptr == renderWindow)
+  if (nullptr == renderWindowPart)
     return;
 
   // Resolve the output file name and format. Transparency requires PNG (alpha).
@@ -480,132 +468,26 @@ void QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned in
     outputFileName += "png";
   }
 
-  // vtkRenderLargeImage magnifies one renderer by tiling its camera. Content that
-  // is view-independent (gradient background) or lives in a separate overlay
-  // (logo, corner annotation) would be repeated in every tile, so disable those
-  // decorations during capture and restore their prior state afterwards.
-  const QStringList decorations{
-    mitk::IRenderWindowPart::DECORATION_LOGO,
-    mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION,
-    mitk::IRenderWindowPart::DECORATION_BORDER,
-    mitk::IRenderWindowPart::DECORATION_MENU,
-    mitk::IRenderWindowPart::DECORATION_BACKGROUND};
+  QmitkRenderWindowScreenshot::Options options;
+  options.Magnification = scale;
+  options.Decorations = false;
+  options.BackgroundMode = m_TransparentBackground
+    ? QmitkRenderWindowScreenshot::Background::Transparent
+    : QmitkRenderWindowScreenshot::Background::Color;
+  options.BackgroundColor = m_BackgroundColor;
+  options.CropToContent = m_Controls->checkCropToContent->isChecked();
+  options.Padding = static_cast<unsigned int>(m_Controls->spinCropPadding->value());
 
-  QStringList decorationsToRestore;
-  for (const auto& decoration : decorations)
+  const auto image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+
+  if (image.isNull() && options.CropToContent)
   {
-    if (renderWindowPart->IsDecorationEnabled(decoration))
-      decorationsToRestore << decoration;
-  }
-  renderWindowPart->EnableDecorations(false, decorations);
-
-  const bool doubleBuffering = renderWindow->GetDoubleBuffer();
-  renderWindow->DoubleBufferOff();
-
-  double oldBackground[3];
-  renderer->GetBackground(oldBackground);
-
-  if (m_TransparentBackground)
-  {
-    this->WriteTransparentScreenshot(renderer, scale, outputFileName);
-  }
-  else
-  {
-    renderer->SetBackground(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF());
-
-    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
-    magnifier->SetInput(renderer);
-    magnifier->SetMagnification(static_cast<int>(scale));
-
-    vtkSmartPointer<vtkImageWriter> fileWriter;
-    if (useJpeg)
-    {
-      auto jpegWriter = vtkSmartPointer<vtkJPEGWriter>::New();
-      jpegWriter->SetQuality(100);
-      jpegWriter->ProgressiveOff();
-      fileWriter = jpegWriter;
-    }
-    else
-    {
-      fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
-    }
-
-    fileWriter->SetInputConnection(magnifier->GetOutputPort());
-    fileWriter->SetFileName(outputFileName.toLocal8Bit().constData());
-    fileWriter->Write();
-  }
-
-  renderer->SetBackground(oldBackground);
-  renderWindow->SetDoubleBuffer(doubleBuffering);
-  if (!decorationsToRestore.isEmpty())
-    renderWindowPart->EnableDecorations(true, decorationsToRestore);
-
-  // Re-render so MITK restores the (2D) camera and the decorations reappear.
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkScreenshotMaker::WriteTransparentScreenshot(vtkRenderer* renderer, unsigned int scale, const QString& fileName)
-{
-  auto capture = [renderer, scale](double r, double g, double b)
-  {
-    renderer->SetBackground(r, g, b);
-    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
-    magnifier->SetInput(renderer);
-    magnifier->SetMagnification(static_cast<int>(scale));
-    magnifier->Update();
-
-    auto image = vtkSmartPointer<vtkImageData>::New();
-    image->DeepCopy(magnifier->GetOutput());
-    return image;
-  };
-
-  auto imageOverBlack = capture(0.0, 0.0, 0.0);
-  auto imageOverWhite = capture(1.0, 1.0, 1.0);
-
-  int dimensions[3];
-  imageOverBlack->GetDimensions(dimensions);
-
-  auto rgbaImage = vtkSmartPointer<vtkImageData>::New();
-  rgbaImage->SetDimensions(dimensions);
-  rgbaImage->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-
-  auto* blackPixels = static_cast<unsigned char*>(imageOverBlack->GetScalarPointer());
-  auto* whitePixels = static_cast<unsigned char*>(imageOverWhite->GetScalarPointer());
-  auto* rgbaPixels = static_cast<unsigned char*>(rgbaImage->GetScalarPointer());
-  if (nullptr == blackPixels || nullptr == whitePixels || nullptr == rgbaPixels)
+    MITK_WARN << "Did not save the screenshot " << outputFileName.toStdString() << ": the window shows only background, there is nothing to crop to.";
     return;
-
-  const vtkIdType pixelCount = static_cast<vtkIdType>(dimensions[0]) * dimensions[1] * dimensions[2];
-  for (vtkIdType i = 0; i < pixelCount; ++i)
-  {
-    const unsigned char* overBlack = blackPixels + 3 * i;
-    const unsigned char* overWhite = whitePixels + 3 * i;
-
-    // A pixel with opacity a over black is a*C; over white it is a*C + (1-a)*255.
-    // The difference averaged over the channels yields (1-a)*255.
-    const int backgroundContribution =
-      ((overWhite[0] - overBlack[0]) + (overWhite[1] - overBlack[1]) + (overWhite[2] - overBlack[2])) / 3;
-    const int alpha = std::clamp(255 - backgroundContribution, 0, 255);
-
-    unsigned char* out = rgbaPixels + 4 * i;
-    if (0 == alpha)
-    {
-      out[0] = out[1] = out[2] = out[3] = 0;
-    }
-    else
-    {
-      // Un-premultiply the color captured over the black background.
-      out[0] = static_cast<unsigned char>(std::min(255, overBlack[0] * 255 / alpha));
-      out[1] = static_cast<unsigned char>(std::min(255, overBlack[1] * 255 / alpha));
-      out[2] = static_cast<unsigned char>(std::min(255, overBlack[2] * 255 / alpha));
-      out[3] = static_cast<unsigned char>(alpha);
-    }
   }
 
-  auto writer = vtkSmartPointer<vtkPNGWriter>::New();
-  writer->SetInputData(rgbaImage);
-  writer->SetFileName(fileName.toLocal8Bit().constData());
-  writer->Write();
+  if (image.isNull() || !image.save(outputFileName, useJpeg ? "JPG" : "PNG", useJpeg ? 100 : -1))
+    MITK_ERROR << "Cannot save the screenshot " << outputFileName.toStdString();
 }
 
 void QmitkScreenshotMaker::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)

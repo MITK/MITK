@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
   QmitkDataNodeSelectionProvider.cpp
   QmitkDnDFrameWidget.cpp
   QmitkPartLock.cpp
+  QmitkRenderWindowScreenshot.cpp
   QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
   QmitkMultiWidgetDecorationManager.cpp

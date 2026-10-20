@@ -1375,7 +1375,7 @@ namespace mitk
         newLabel->SetName(labelName.c_str());
         newLabel->SetColor(Color(tmp));
         newLabel->SetValue(segValue);
-        newLabel = labelSetImage->AddLabel(newLabel, groupID, true, true);
+        newLabel = labelSetImage->AddLabel(newLabel, groupID, false, true);
         if (newLabel.IsNull())
           mitkThrow() << "Cannot add label for segment " << segValue << "; the segmentation holds no free label value.";
 

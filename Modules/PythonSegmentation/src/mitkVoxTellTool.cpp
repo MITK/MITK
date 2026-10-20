@@ -18,21 +18,24 @@ found in the LICENSE file.
 #include <mitkLabelGroupPlacer.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkProgressTask.h>
-#include <mitkPythonContext.h>
-#include <mitkPythonUtil.h>
+#include <mitkPythonHelper.h>
+#include <mitkPythonWorker.h>
 #include <mitkRenderingManager.h>
+#include <mitkSharedBuffer.h>
 #include <mitkToolManager.h>
+
+#include "mitkInitializationHook.h"
+#include "mitkPythonWorkerModules.h"
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
-#include <usModuleResourceStream.h>
 
-#include <functional>
+#include <chrono>
 #include <map>
+#include <optional>
 #include <set>
-#include <sstream>
 
 namespace mitk
 {
@@ -45,6 +48,11 @@ namespace
   // conservative guess to be replaced by a measured value. A device that falls
   // short is replaced by the CPU, unless the GPU backend is enforced.
   constexpr int MIN_GPU_MEMORY_MB = 6000;
+
+  // A run checks for a cancellation after every patch of its sliding window,
+  // which takes a fraction of this even on the CPU. A run that takes longer
+  // to stop hangs, e.g. in the GPU driver, and its worker is ended.
+  constexpr auto STOP_GRACE_PERIOD = std::chrono::seconds(10);
 
   // The overlap tolerance of the LabelGroupPlacer for the results of VoxTell.
   // Measured on a chest CT with 20 prompts: the border of two neighbors took at
@@ -66,75 +74,51 @@ namespace
     return description != nullptr ? description : "";
   }
 
-  // The description of an error from Python is the exception ("Type: message")
-  // followed by the frames it passed. Only the exception is of use to the user.
-  std::string ShortenPythonError(std::string description)
+  // What the user can make sense of: the Python exception without its frames,
+  // or that the worker is gone.
+  std::string DescribeFailure(const mitk::Exception& e)
   {
-    static const std::string prefix = "An error occurred while executing Python code: ";
+    if (dynamic_cast<const mitk::PythonWorkerExitedException*>(&e) != nullptr)
+      return "VoxTell stopped unexpectedly.";
 
-    if (description.starts_with(prefix))
-      description.erase(0, prefix.size());
-
-    if (const auto frames = description.find("\n\nAt:"); frames != std::string::npos)
-      description.erase(frames);
-
-    const auto end = description.find_last_not_of(" \t\r\n");
-    description.erase(end == std::string::npos ? 0 : end + 1);
-
-    return description;
+    return Description(e);
   }
 
-  // Runs code whose failure the caller has to tell the user about. The failure
-  // is logged with the frames it passed and thrown with just the error.
-  void ExecuteWithReadableError(mitk::PythonContext& context, const std::string& code)
+  // Calls the worker for a result the caller has to tell the user about. The
+  // failure is logged in full and thrown with just the error.
+  nlohmann::json CallWithReadableError(mitk::PythonWorker& worker, const std::string& method, const nlohmann::json& params = nullptr)
   {
     try
     {
-      context.Execute(code);
+      return worker.Call(method, params);
+    }
+    catch (const mitk::PythonWorkerError& e)
+    {
+      MITK_ERROR << "VoxTell: " << e.GetTraceback();
+      mitkThrow() << "VoxTell: " << DescribeFailure(e);
+    }
+    catch (const mitk::PythonWorkerExitedException& e)
+    {
+      MITK_ERROR << "VoxTell: " << Description(e);
+      mitkThrow() << DescribeFailure(e);
     }
     catch (const mitk::Exception& e)
     {
       MITK_ERROR << "VoxTell: " << Description(e);
-      mitkThrow() << "VoxTell: " << ShortenPythonError(Description(e));
+      mitkThrow() << "VoxTell: " << DescribeFailure(e);
     }
   }
 
-  // The Python code of the tool lives in resources, so it can be tested and
-  // reused without the tool.
-  std::string ReadPythonResource(const std::string& name)
+  // Calls a function of the hub files module, which returns (repo_id, patterns) pairs.
+  std::vector<mitk::VoxTell::RepoFiles> QueryRepoFiles(mitk::PythonWorker& worker, const std::string& function, const mitk::PythonWorker::ProgressHook& progress = {})
   {
-    auto module = us::GetModuleContext()->GetModule();
-    auto resource = module->GetResource(name);
-
-    if (!resource.IsValid())
-      mitkThrow() << "VoxTell: The resource " << name << " could not be found.";
-
-    us::ModuleResourceStream stream(resource);
-
-    std::ostringstream code;
-    code << stream.rdbuf();
-
-    return code.str();
-  }
-
-  // Calls a function of the hub files code and reads its (repo_id, patterns)
-  // pairs back from rows of tab-separated fields, the repository first.
-  std::vector<mitk::VoxTell::RepoFiles> QueryRepoFiles(mitk::PythonContext& context, const std::string& function)
-  {
-    context.Execute("voxtell_hub_rows = '\\n'.join('\\t'.join([_r, *_p]) for _r, _p in " + function + "())\n");
-
     std::vector<mitk::VoxTell::RepoFiles> files;
-    std::istringstream rows(context.GetVariableAsString("voxtell_hub_rows").value_or(""));
 
-    for (std::string row; std::getline(rows, row);)
+    for (const auto& pair : worker.Call("voxtell_hub_files." + function, {}, {}, progress))
     {
-      std::istringstream fields(row);
       mitk::VoxTell::RepoFiles repoFiles;
-
-      std::getline(fields, repoFiles.RepoId, '\t');
-
-      for (std::string pattern; std::getline(fields, pattern, '\t');)
-        repoFiles.Patterns.push_back(pattern);
+      repoFiles.RepoId = pair.at(0).get<std::string>();
+      repoFiles.Patterns = pair.at(1).get<std::vector<std::string>>();
 
       if (!repoFiles.RepoId.empty())
         files.push_back(std::move(repoFiles));
@@ -143,30 +127,13 @@ namespace
     return files;
   }
 
-  // Python source of a list of strings, e.g. ['liver', 'left kidney'].
-  std::string PyStringList(const std::vector<std::string>& strings)
-  {
-    std::ostringstream list;
-    list << '[';
-
-    for (const auto& string : strings)
-      list << mitk::PyQuote(string) << ", ";
-
-    list << ']';
-
-    return list.str();
-  }
-
-  // Whatever a run leaves behind in the context is not kept: the arrays are as
-  // large as the image, and the embeddings live on the device. Unbinding the
-  // callable that VoxTell polls for cancellation keeps the tool that it
-  // captured from being reachable once the run is over, and the images from
-  // being kept alive by the context.
+  // The masks of a run are as large as the image and are not kept by the
+  // worker once the run is over.
   class ScopedRun
   {
   public:
-    explicit ScopedRun(mitk::PythonContext& context)
-      : m_Context(context)
+    explicit ScopedRun(mitk::PythonWorker& worker)
+      : m_Worker(worker)
     {
     }
 
@@ -174,10 +141,8 @@ namespace
     {
       try
       {
-        m_Context.Execute("voxtell_input = voxtell_embeddings = voxtell_masks = None\n");
-        m_Context.BindFunction("progress_callback", {});
-        m_Context.BindImage(nullptr, "mitk_image");
-        m_Context.BindImage(nullptr, "mitk_mask_buffer");
+        if (m_Worker.IsRunning())
+          m_Worker.Call("voxtell_worker.release_run");
       }
       catch (...)
       {
@@ -190,7 +155,7 @@ namespace
     ScopedRun& operator=(const ScopedRun&) = delete;
 
   private:
-    mitk::PythonContext& m_Context;
+    mitk::PythonWorker& m_Worker;
   };
 }
 
@@ -205,9 +170,25 @@ mitk::VoxTell::ModelSource mitk::VoxTell::ParseModelSource(const std::string& va
   mitkThrow() << "Unknown model source \"" << value << "\". Expected \"huggingface\" or \"local\".";
 }
 
+nlohmann::json mitk::VoxTell::IndexToWorld(const BaseGeometry* geometry)
+{
+  const auto* transform = geometry->GetIndexToWorldTransform();
+  const auto& matrix = transform->GetMatrix();
+  const auto& offset = transform->GetOffset();
+
+  auto rows = nlohmann::json::array();
+
+  for (unsigned int row = 0; row < 3; ++row)
+    rows.push_back({ matrix[row][0], matrix[row][1], matrix[row][2], offset[row] });
+
+  rows.push_back({ 0.0, 0.0, 0.0, 1.0 });
+
+  return rows;
+}
+
 std::string mitk::VoxTell::ReadHubFilesCode()
 {
-  return ReadPythonResource("VoxTell/voxtell_hub_files.py");
+  return ReadWorkerModule("VoxTell/voxtell_hub_files.py").Source;
 }
 
 namespace mitk
@@ -226,7 +207,8 @@ namespace mitk
       bool operator==(const Run&) const = default;
     };
 
-    std::unique_ptr<PythonContext> Context;
+    std::unique_ptr<PythonWorker> Worker;
+    bool ModelLoaded = false;
     std::optional<Torch::Backend> Backend;
     std::optional<VoxTell::ModelSource> ModelSource;
     std::string Device;
@@ -250,6 +232,10 @@ namespace mitk
     std::string LastErrorMessage;
     bool RunFailed = false;
     bool AbortRequested = false;
+
+    // GetModelFiles() and LoadModel() process events, during which the tool
+    // may be deactivated. They unload the model once they have stopped.
+    bool Initializing = false;
   };
 }
 
@@ -302,9 +288,10 @@ void mitk::VoxTellTool::Activated()
 
 void mitk::VoxTellTool::Deactivated()
 {
-  // The model cannot be unloaded while Python still runs it. UpdateCleanUp()
-  // does it once the run has stopped, which the progress callback makes happen.
-  if (this->IsUpdating())
+  // The worker cannot be destroyed while a call of it is on the stack. The
+  // progress callback ends the worker at once, and UpdateCleanUp() or the
+  // initialization unloads the model once the call has unwound.
+  if (this->IsUpdating() || m_Impl->Initializing)
     m_Impl->AbortRequested = true;
   else
     this->UnloadModel();
@@ -327,55 +314,6 @@ std::string mitk::VoxTellTool::GetVirtualEnvName() const
   return VoxTell::VENV_NAME;
 }
 
-bool mitk::VoxTellTool::CreatePythonContext()
-{
-  try
-  {
-    m_Impl->Context = std::make_unique<PythonContext>(this->GetVirtualEnvName());
-
-    // Activate without bindings: the install and version checks that run right
-    // after creation must not map any venv native library (on Linux the venv is
-    // sys.prefix, so importing NumPy would load it from there and make the
-    // "loaded?" guard block the very update it is checking for). The bindings
-    // are imported later, in PrepareContext(), once the model or its files are
-    // needed.
-    m_Impl->Context->Activate(false);
-  }
-  catch (const Exception& e)
-  {
-    MITK_ERROR << Description(e);
-    m_Impl->Context.reset();
-    return false;
-  }
-  catch (const std::exception& e)
-  {
-    // The PythonContext constructor can throw a non-mitk exception (e.g. a
-    // std::runtime_error from initializing the embedded interpreter for the
-    // first time).
-    MITK_ERROR << e.what();
-    m_Impl->Context.reset();
-    return false;
-  }
-
-  return true;
-}
-
-mitk::PythonContext* mitk::VoxTellTool::GetPythonContext() const
-{
-  return m_Impl->Context.get();
-}
-
-bool mitk::VoxTellTool::IsInstalled() const
-{
-  auto* context = m_Impl->Context.get();
-
-  ExecuteWithReadableError(*context,
-    "import importlib.util\n"
-    "voxtell_is_installed = importlib.util.find_spec('voxtell') is not None\n");
-
-  return context->GetVariableAsBool("voxtell_is_installed").value_or(false);
-}
-
 const std::vector<std::pair<std::string, std::string>>& mitk::VoxTellTool::GetSessionDefiningPreferences()
 {
   // Key, default-as-stored. The defaults must match what LoadModel() reads and
@@ -391,79 +329,92 @@ const std::vector<std::pair<std::string, std::string>>& mitk::VoxTellTool::GetSe
   return keys;
 }
 
-void mitk::VoxTellTool::PrepareContext()
+mitk::PythonWorker& mitk::VoxTellTool::GetWorker()
 {
-  auto* context = m_Impl->Context.get();
-
-  // The context was created lightweight (see CreatePythonContext). Running the
-  // model needs the bindings (NumPy and the MITK module) to exchange images.
-  // Activate() is idempotent, so this only adds them.
-  context->Activate();
-  context->Execute(ReadPythonResource("VoxTell/voxtell_bridge.py"));
-
-  // Both are read when torch and nnU-Net are imported, so they have to be set
-  // before VoxTell is. The allocator setting is what the napari plugin of
-  // VoxTell uses, to keep the memory of the large buffers of a run from
-  // fragmenting; PyTorch does not support it on Windows and warns about it
-  // there. nnU-Net warns about paths that it needs for training only; dummies
-  // keep it quiet.
-  std::ostringstream environment; environment
-    << "import os\n"
-#if !defined(_WIN32)
-    << "os.environ.setdefault('PYTORCH_CUDA_ALLOC_CONF', 'expandable_segments:True')\n"
-#endif
-    << "os.environ.setdefault('nnUNet_raw', '/tmp/nnUNet/raw')\n"
-    << "os.environ.setdefault('nnUNet_preprocessed', '/tmp/nnUNet/preprocessed')\n"
-    << "os.environ.setdefault('nnUNet_results', '/tmp/nnUNet/results')\n";
-
-  context->Execute(environment.str());
-  context->Execute(VoxTell::ReadHubFilesCode());
-}
-
-std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetModelFiles()
-{
-  auto* context = m_Impl->Context.get();
-
-  if (context == nullptr)
-    mitkThrow() << "VoxTell: The files of the model cannot be determined without a Python context.";
-
-  this->PrepareContext();
-
-  // VoxTell loads the embeddings of the prompts it knows with a local model as well.
-  std::vector<std::string> functions = { "voxtell_prompt_list_files" };
-
-  if (VoxTell::ParseModelSource(GetPreferences()->Get("VoxTell/modelSource", "huggingface")) == VoxTell::ModelSource::HuggingFace)
-    functions.push_back("voxtell_model_files");
-
-  std::vector<VoxTell::RepoFiles> files;
-
-  for (const auto& function : functions)
+  if (m_Impl->Worker == nullptr || !m_Impl->Worker->IsRunning())
   {
-    try
-    {
-      const auto functionFiles = QueryRepoFiles(*context, function);
-      files.insert(files.end(), functionFiles.begin(), functionFiles.end());
-    }
-    catch (const Exception& e)
-    {
-      // VoxTell downloads them itself then, only without telling how far it is.
-      MITK_WARN << "VoxTell: " << function << "() failed: " << ShortenPythonError(Description(e));
-    }
+    m_Impl->Worker.reset();
+    m_Impl->ModelLoaded = false;
+
+    const auto python = PythonHelper::GetVirtualEnvExecutablePath(this->GetVirtualEnvName());
+
+    if (python.empty())
+      mitkThrow() << "VoxTell is not installed.";
+
+    m_Impl->Worker = std::make_unique<PythonWorker>(python, std::vector<PythonWorker::Module> {
+      ReadWorkerModule("torch_device.py"),
+      ReadWorkerModule("VoxTell/voxtell_bridge.py"),
+      ReadWorkerModule("VoxTell/voxtell_hub_files.py"),
+      ReadWorkerModule("VoxTell/voxtell_worker.py")
+    }, "VoxTell");
   }
 
-  return files;
+  return *m_Impl->Worker;
 }
 
-void mitk::VoxTellTool::LoadModel()
+std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetModelFiles(ProgressTask* task)
 {
-  auto* context = m_Impl->Context.get();
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
 
-  if (context == nullptr)
-    mitkThrow() << "VoxTell: The model cannot be loaded without a Python context.";
+  try
+  {
+    auto& worker = this->GetWorker();
 
+    // VoxTell loads the embeddings of the prompts it knows with a local model as well.
+    std::vector<std::string> functions = { "voxtell_prompt_list_files" };
+
+    if (VoxTell::ParseModelSource(GetPreferences()->Get("VoxTell/modelSource", "huggingface")) == VoxTell::ModelSource::HuggingFace)
+      functions.push_back("voxtell_model_files");
+
+    std::vector<VoxTell::RepoFiles> files;
+
+    for (const auto& function : functions)
+    {
+      try
+      {
+        const auto functionFiles = QueryRepoFiles(worker, function, progress);
+        files.insert(files.end(), functionFiles.begin(), functionFiles.end());
+      }
+      catch (const PythonWorkerError& e)
+      {
+        // VoxTell downloads them itself then, only without telling how far it is.
+        // A cancelled call or a worker that is gone has to reach the caller.
+        MITK_WARN << "VoxTell: " << function << "() failed: " << DescribeFailure(e);
+      }
+    }
+
+    m_Impl->Initializing = false;
+    return files;
+  }
+  catch (...)
+  {
+    this->EndFailedInitialization();
+    throw;
+  }
+}
+
+void mitk::VoxTellTool::EndFailedInitialization()
+{
+  m_Impl->Worker.reset();
+  m_Impl->Initializing = false;
+
+  // Deactivated meanwhile, see Deactivated().
+  if (m_Impl->AbortRequested)
+  {
+    m_Impl->AbortRequested = false;
+    this->UnloadModel();
+  }
+}
+
+void mitk::VoxTellTool::LoadModel(ProgressTask* task)
+{
+  // A fresh process frees whatever the previous model held.
   if (this->IsModelLoaded())
-    this->ReleaseModel();
+    m_Impl->Worker.reset();
 
+  m_Impl->ModelLoaded = false;
   m_Impl->Backend.reset();
   m_Impl->ModelSource.reset();
   m_Impl->Device.clear();
@@ -488,37 +439,27 @@ void mitk::VoxTellTool::LoadModel()
     mitkThrow() << "VoxTell: Local model mode is selected but no model folder is configured. "
                    "Set the path in Preferences -> Segmentation -> VoxTell.";
 
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
+
   try
   {
-    this->PrepareContext();
+    auto& worker = this->GetWorker();
 
-    const auto selection = Torch::SelectDevice(*context,
-      Torch::ParseBackendPreference(prefs->Get("VoxTell/backend", "auto")), prefs->Get("VoxTell/gpuBackend", "cuda:0"), MIN_GPU_MEMORY_MB);
+    const auto selection = Torch::SelectDevice(worker,
+      Torch::ParseBackendPreference(prefs->Get("VoxTell/backend", "auto")), prefs->Get("VoxTell/gpuBackend", "cuda:0"), MIN_GPU_MEMORY_MB, progress);
 
     // Without a model folder VoxTell downloads its default model on first use
     // and takes it from its cache afterwards. The same goes for the embeddings
-    // of the prompts it knows. Failures are mapped to a message for the user
+    // of the prompts it knows. Failures come back as a message for the user
     // instead of a traceback.
-    std::ostringstream pyCommands; pyCommands
-      << "import torch\n"
-      << "from pathlib import Path\n"
-      << "from voxtell.inference.predictor import VoxTellPredictor\n"
-      << "voxtell_model_error = ''\n"
-      << "try:\n"
-      << "    voxtell_model_dir = " << (useLocalModel ? PyQuote(localModelPath) : std::string("None")) << "\n"
-      << "    if voxtell_model_dir is not None and not Path(voxtell_model_dir).is_dir():\n"
-      << "        raise FileNotFoundError('Folder not found: ' + voxtell_model_dir)\n"
-      << "    voxtell_predictor = VoxTellPredictor(model_dir=voxtell_model_dir, device=torch.device("
-      << PyQuote(selection.Device) << "))\n"
-      << "    voxtell_known_prompts = set(voxtell_predictor.list_available_embeddings())\n"
-      << "except Exception as _voxtell_e:\n"
-      << "    voxtell_model_error = str(_voxtell_e) or type(_voxtell_e).__name__\n";
+    const auto result = worker.Call("voxtell_worker.load_model", {
+      { "model_dir", useLocalModel ? nlohmann::json(localModelPath) : nlohmann::json(nullptr) },
+      { "device", selection.Device }
+    }, {}, progress);
 
-    context->Execute(pyCommands.str());
-
-    const auto modelError = context->GetVariableAsString("voxtell_model_error").value_or("");
-
-    if (!modelError.empty())
+    if (const auto modelError = result.value("error", std::string()); !modelError.empty())
     {
       if (useLocalModel)
         mitkThrow() << "VoxTell: Could not load the model from the configured folder. (" << modelError << ")";
@@ -528,57 +469,25 @@ void mitk::VoxTellTool::LoadModel()
                   << modelError << ")";
     }
 
+    m_Impl->ModelLoaded = true;
     m_Impl->Backend = selection.SelectedBackend;
     m_Impl->ModelSource = modelSource;
     m_Impl->Device = selection.Device;
+    m_Impl->Initializing = false;
   }
   catch (...)
   {
-    this->ReleaseModel();
+    this->EndFailedInitialization();
     throw;
-  }
-}
-
-void mitk::VoxTellTool::ReleaseModel()
-{
-  auto* context = m_Impl->Context.get();
-
-  if (context == nullptr)
-    return;
-
-  std::ostringstream pyCommands; pyCommands
-    << "try:\n"
-    << "    del voxtell_predictor\n"
-    << "except NameError:\n"
-    << "    pass\n"
-    << "import gc\n"
-    << "gc.collect()\n";
-
-  if (m_Impl->Backend == Torch::Backend::CUDA)
-  {
-    pyCommands
-      << "import torch\n"
-      << "torch.cuda.empty_cache()\n";
-  }
-
-  try
-  {
-    context->Execute(pyCommands.str());
-  }
-  catch (const Exception& e)
-  {
-    MITK_WARN << "VoxTell: error while releasing the model (ignored): " << Description(e);
   }
 }
 
 void mitk::VoxTellTool::UnloadModel()
 {
-  if (m_Impl->Context == nullptr)
-    return;
+  // Ending the process frees the memory of the device.
+  m_Impl->Worker.reset();
+  m_Impl->ModelLoaded = false;
 
-  this->ReleaseModel();
-
-  m_Impl->Context.reset();
   m_Impl->Backend.reset();
   m_Impl->ModelSource.reset();
   m_Impl->Device.clear();
@@ -588,9 +497,12 @@ void mitk::VoxTellTool::UnloadModel()
 
 bool mitk::VoxTellTool::IsModelLoaded() const
 {
-  auto* context = m_Impl->Context.get();
+  return m_Impl->ModelLoaded && m_Impl->Worker != nullptr && m_Impl->Worker->IsRunning();
+}
 
-  return context != nullptr && context->HasVariable("voxtell_predictor");
+std::string mitk::VoxTellTool::GetWorkerExitDescription() const
+{
+  return m_Impl->Worker != nullptr ? m_Impl->Worker->GetExitDescription() : std::string();
 }
 
 std::optional<mitk::Torch::Backend> mitk::VoxTellTool::GetBackend() const
@@ -625,49 +537,21 @@ bool mitk::VoxTellTool::GetCreateGroupsAsNeeded() const
 
 std::vector<std::string> mitk::VoxTellTool::GetPromptsWithoutPrecomputedEmbedding(const std::vector<std::string>& prompts) const
 {
-  std::vector<std::string> unknown;
-
   if (!this->IsModelLoaded())
-    return unknown;
+    return {};
 
   // VoxTell turns prompts into lower case before it looks them up. Asking it
-  // here keeps this in agreement with what it does for any alphabet.
-  auto* context = m_Impl->Context.get();
-
-  std::ostringstream pyCommands; pyCommands
-    << "voxtell_unknown_prompts = '\\n'.join(_p for _p in " << PyStringList(prompts)
-    << " if _p.lower() not in voxtell_known_prompts)\n";
-
-  ExecuteWithReadableError(*context, pyCommands.str());
-
-  const auto joined = context->GetVariableAsString("voxtell_unknown_prompts").value_or("");
-  std::istringstream lines(joined);
-
-  for (std::string line; std::getline(lines, line);)
-    unknown.push_back(line);
-
-  return unknown;
+  // keeps this in agreement with what it does for any alphabet.
+  return CallWithReadableError(*m_Impl->Worker, "voxtell_worker.unknown_prompts", { { "prompts", prompts } })
+    .get<std::vector<std::string>>();
 }
 
 std::vector<std::string> mitk::VoxTellTool::GetKnownPrompts() const
 {
-  std::vector<std::string> prompts;
-
   if (!this->IsModelLoaded())
-    return prompts;
+    return {};
 
-  auto* context = m_Impl->Context.get();
-  ExecuteWithReadableError(*context, "voxtell_known_prompt_rows = '\\n'.join(sorted(voxtell_known_prompts))\n");
-
-  std::istringstream rows(context->GetVariableAsString("voxtell_known_prompt_rows").value_or(""));
-
-  for (std::string row; std::getline(rows, row);)
-  {
-    if (!row.empty())
-      prompts.push_back(row);
-  }
-
-  return prompts;
+  return CallWithReadableError(*m_Impl->Worker, "voxtell_worker.known_prompts").get<std::vector<std::string>>();
 }
 
 std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetTextModelFiles()
@@ -677,12 +561,12 @@ std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetTextModelFiles()
 
   try
   {
-    return QueryRepoFiles(*m_Impl->Context, "voxtell_text_model_files");
+    return QueryRepoFiles(*m_Impl->Worker, "voxtell_text_model_files");
   }
   catch (const Exception& e)
   {
     // VoxTell downloads them itself then, only without telling how far it is.
-    MITK_WARN << "VoxTell: voxtell_text_model_files() failed: " << ShortenPythonError(Description(e));
+    MITK_WARN << "VoxTell: voxtell_text_model_files() failed: " << DescribeFailure(e);
     return {};
   }
 }
@@ -692,10 +576,7 @@ bool mitk::VoxTellTool::IsTextModelLoaded() const
   if (!this->IsModelLoaded())
     return false;
 
-  auto* context = m_Impl->Context.get();
-  ExecuteWithReadableError(*context, "voxtell_text_model_loaded = voxtell_predictor.text_backbone is not None\n");
-
-  return context->GetVariableAsBool("voxtell_text_model_loaded").value_or(false);
+  return CallWithReadableError(*m_Impl->Worker, "voxtell_worker.is_text_model_loaded").get<bool>();
 }
 
 bool mitk::VoxTellTool::IsTextModelCached() const
@@ -703,13 +584,10 @@ bool mitk::VoxTellTool::IsTextModelCached() const
   if (!this->IsModelLoaded())
     return false;
 
-  auto* context = m_Impl->Context.get();
-  ExecuteWithReadableError(*context, "voxtell_text_model_is_cached = voxtell_text_model_cached()\n");
-
-  return context->GetVariableAsBool("voxtell_text_model_is_cached").value_or(false);
+  return CallWithReadableError(*m_Impl->Worker, "voxtell_hub_files.voxtell_text_model_cached").get<bool>();
 }
 
-void mitk::VoxTellTool::EmbedPrompts(const std::vector<std::string>& prompts)
+void mitk::VoxTellTool::EmbedPrompts(const std::vector<std::string>& prompts, ProgressTask* task)
 {
   if (!this->IsModelLoaded())
     mitkThrow() << "VoxTell is not initialized.";
@@ -717,12 +595,40 @@ void mitk::VoxTellTool::EmbedPrompts(const std::vector<std::string>& prompts)
   if (prompts.empty())
     return;
 
-  // VoxTell keeps the embeddings it computes for the session, so the run that
-  // follows finds them.
-  ExecuteWithReadableError(*m_Impl->Context,
-    "voxtell_prompts = " + PyStringList(prompts) + "\n"
-    "voxtell_predictor.embed_text_prompts(voxtell_prompts)\n"
-    "voxtell_known_prompts.update(_p.lower() for _p in voxtell_prompts)\n");
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
+
+  try
+  {
+    // VoxTell keeps the embeddings it computes for the session, so the run that
+    // follows finds them.
+    m_Impl->Worker->Call("voxtell_worker.embed_prompts", { { "prompts", prompts } }, {}, progress);
+    m_Impl->Initializing = false;
+  }
+  catch (const PythonWorkerError& e)
+  {
+    // The worker and its model survive an exception in Python, e.g. for lack
+    // of memory.
+    m_Impl->Initializing = false;
+    MITK_ERROR << "VoxTell: " << e.GetTraceback();
+    mitkThrow() << "VoxTell: " << DescribeFailure(e);
+  }
+  catch (...)
+  {
+    // A cancellation ended the worker, or it is gone. It is kept, so that
+    // GetWorkerExitDescription() can tell why.
+    m_Impl->Initializing = false;
+
+    // Deactivated meanwhile, see Deactivated().
+    if (m_Impl->AbortRequested)
+    {
+      m_Impl->AbortRequested = false;
+      this->UnloadModel();
+    }
+
+    throw;
+  }
 }
 
 const std::string& mitk::VoxTellTool::GetLastErrorMessage() const
@@ -870,9 +776,6 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
 
   try
   {
-    if (!this->IsModelLoaded())
-      mitkThrow() << "VoxTell is not initialized.";
-
     auto* referenceNode = this->GetToolManager()->GetReferenceData(0);
     auto* referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
 
@@ -892,9 +795,13 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     // which makes no difference to VoxTell. Running the model again would take
     // just as long as the first time. Where the results go is decided anew, as
     // the segmentation may have changed. Only the last run is kept, so every
-    // other time step of a dynamic image is a run of its own.
+    // other time step of a dynamic image is a run of its own. Placing cached
+    // masks needs no worker, so they survive a worker that ended meanwhile.
     if (m_Impl->CachedRun != run)
     {
+      if (!this->IsModelLoaded())
+        mitkThrow() << "VoxTell is not initialized.";
+
       m_Impl->CachedRun.reset();
       m_Impl->CachedMasks.clear();
 
@@ -902,27 +809,29 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       const auto referenceTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
       // Not the input of the base class: a region of interest is not supported
-      // by the transfer of the preview into the segmentation, and the image is
-      // bound to Python without const.
+      // by the transfer of the preview into the segmentation.
       auto imageAtTimeStep = this->GetImageByTimeStep(referenceImage, referenceTimeStep);
 
-      auto maskBuffer = Image::New();
-      maskBuffer->Initialize(MakeScalarPixelType<unsigned char>(), *(imageAtTimeStep->GetTimeGeometry()));
-      maskBuffer->AllocateZeroedVolume();
+      auto& worker = *m_Impl->Worker;
+      const ScopedRun scopedRun(worker);
 
-      auto* context = m_Impl->Context.get();
-      const ScopedRun scopedRun(*context);
+      const auto imageSegment = SharedBuffer::CopyOf(imageAtTimeStep);
+      SharedBuffer maskSegment(MakeScalarPixelType<unsigned char>(), imageSegment->GetShape());
+      const auto maskBuffer = maskSegment.AsImage(*imageAtTimeStep->GetTimeGeometry());
 
-      context->BindImage(imageAtTimeStep, "mitk_image");
-      context->BindImage(maskBuffer, "mitk_mask_buffer");
+      const auto isStopRequested = [this, task]() {
+        return m_Impl->AbortRequested || (task != nullptr && task->IsCancelRequested());
+      };
 
-      // Called by VoxTell after every patch of its sliding window. It is what
-      // keeps the application responsive during the run, and the only chance to
-      // stop it.
-      context->BindFunction("progress_callback", [this, task](int done, int total)
+      std::optional<std::chrono::steady_clock::time_point> stopRequestedAt;
+
+      // Called with every progress report of VoxTell, after every patch of its
+      // sliding window, and in between. It is what keeps the application
+      // responsive during the run, and the only chance to stop it.
+      const auto progress = [this, &isStopRequested, &stopRequestedAt](const nlohmann::json& fields)
       {
-        if (total > 0)
-          m_ProgressCommand->ReportFraction(static_cast<float>(done) / static_cast<float>(total));
+        if (const auto total = fields.is_object() ? fields.value("total", 0) : 0; total > 0)
+          m_ProgressCommand->ReportFraction(static_cast<float>(fields.value("done", 0)) / static_cast<float>(total));
 
         try
         {
@@ -933,30 +842,44 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
           MITK_WARN << "VoxTell: error while processing events (ignored): " << e.what();
         }
 
-        return !m_Impl->AbortRequested && (task == nullptr || !task->IsCancelRequested());
-      });
+        // The tool was deactivated. The model is unloaded anyway, so a throw,
+        // which makes the worker end right away, loses nothing and does not
+        // wait for VoxTell to check for a cancellation.
+        if (m_Impl->AbortRequested)
+          mitkThrow() << "VoxTell: the run was aborted.";
+
+        if (!isStopRequested())
+          return true;
+
+        const auto now = std::chrono::steady_clock::now();
+
+        if (!stopRequestedAt.has_value())
+          stopRequestedAt = now;
+        else if (now - *stopRequestedAt > STOP_GRACE_PERIOD)
+          mitkThrow() << "VoxTell: the run did not stop when it was cancelled and was ended.";
+
+        return false;
+      };
 
       // The text encoder of VoxTell is loaded here if a prompt needs it that
-      // EmbedPrompts() did not process before. That takes long and cannot be
-      // cancelled. The sliding window below can.
+      // EmbedPrompts() did not process before. That takes long and does not
+      // check for a cancellation, so a cancellation ends the worker after the
+      // grace period. The sliding window below stops on its own.
       if (task != nullptr)
         task->SetName("VoxTell: embedding prompts");
 
-      this->GUIProcessEventsMessage.Send();
+      worker.Call("voxtell_worker.embed_prompts", { { "prompts", m_Impl->Prompts } }, {}, progress);
 
-      context->Execute(
-        "voxtell_prompts = " + PyStringList(m_Impl->Prompts) + "\n"
-        "voxtell_embeddings = voxtell_predictor.embed_text_prompts(voxtell_prompts)\n");
+      if (isStopRequested())
+        mitkThrow() << "VoxTell: the run was cancelled.";
 
       if (task != nullptr)
         task->SetName("VoxTell: segmenting");
 
-      context->Execute(
-        "voxtell_input, voxtell_ornt = voxtell_prepare_input(mitk_image)\n"
-        "voxtell_masks = voxtell_predictor.predict_single_image(\n"
-        "    voxtell_input, text_embeddings=voxtell_embeddings, progress_callback=progress_callback)\n"
-        "voxtell_input = None\n"
-        "voxtell_known_prompts.update(_p.lower() for _p in voxtell_prompts)\n");
+      worker.Call("voxtell_worker.segment",
+        { { "prompts", m_Impl->Prompts }, { "index_to_world", VoxTell::IndexToWorld(imageAtTimeStep->GetGeometry()) } },
+        { { "image", imageSegment.get() }, { "mask", &maskSegment } },
+        progress);
 
       // Masks can overlap, so they cannot share a label image. Each of them is
       // kept as the runs of its voxels, which take far less memory than a
@@ -965,9 +888,7 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
 
       for (std::size_t index = 0; index < m_Impl->Prompts.size(); ++index)
       {
-        context->Execute("voxtell_write_mask(voxtell_masks, " + std::to_string(index) +
-          ", voxtell_ornt, mitk_mask_buffer.as_numpy(writeable=True))\n");
-
+        worker.Call("voxtell_worker.write_mask", { { "index", index } });
         masks.push_back(ExtractMaskRuns(maskBuffer));
       }
 
@@ -995,8 +916,12 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     if (task != nullptr && task->IsCancelRequested())
       throw;
 
-    MITK_ERROR << "VoxTell: " << Description(e);
-    m_Impl->LastErrorMessage = ShortenPythonError(Description(e));
+    if (const auto* error = dynamic_cast<const PythonWorkerError*>(&e))
+      MITK_ERROR << "VoxTell: " << error->GetTraceback();
+    else
+      MITK_ERROR << "VoxTell: " << Description(e);
+
+    m_Impl->LastErrorMessage = DescribeFailure(e);
   }
   catch (...)
   {

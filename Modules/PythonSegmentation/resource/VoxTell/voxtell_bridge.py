@@ -16,25 +16,21 @@
 # nothing about geometry, so the reorientation a NIfTI reader does implicitly has
 # to be done here from the geometry of the MITK image. That keeps the tool
 # independent of the file format the image was loaded from.
+#
+# An image is passed as its array in the order of MITK, (Z, Y, X), with the 4x4
+# index-to-world matrix of its geometry.
 
 import numpy as np
 
 
-def voxtell_ras_affine(image, time_step=0):
-    """Returns the index-to-world matrix of an mitk.Image the way nibabel expects it.
+def voxtell_ras_affine(index_to_world):
+    """Returns the index-to-world matrix of a MITK geometry the way nibabel expects it.
 
-    The voxel index is in (x, y, z) order and the world is RAS. MITK worlds are LPS
-    and column j of the direction matrix is the world direction of index axis j.
+    The voxel index is in (x, y, z) order and the world is RAS. MITK worlds are
+    LPS: the columns of the matrix are the world directions of the index axes,
+    scaled by the spacing, and the last column is the origin.
     """
-    spacing = np.asarray(image.get_spacing(time_step), dtype=np.float64)
-    origin = np.asarray(image.get_origin(time_step), dtype=np.float64)
-    direction = np.asarray(image.get_direction(time_step), dtype=np.float64)
-
-    affine = np.eye(4)
-    affine[:3, :3] = direction * spacing
-    affine[:3, 3] = origin
-
-    return np.diag([-1.0, -1.0, 1.0, 1.0]) @ affine
+    return np.diag([-1.0, -1.0, 1.0, 1.0]) @ np.asarray(index_to_world, dtype=np.float64)
 
 
 def voxtell_apply_orientation(array, ornt):
@@ -62,8 +58,8 @@ def voxtell_inverse_orientation(ornt):
     return inverse
 
 
-def voxtell_prepare_input(image, time_step=0):
-    """Returns the array VoxTell expects for an mitk.Image, and how to undo it.
+def voxtell_prepare_input(image, index_to_world):
+    """Returns the array VoxTell expects for an image, and how to undo it.
 
     The result is float32 of shape (1, Z, Y, X) in closest canonical RAS
     orientation, exactly what the reader of nnU-Net returns for a NIfTI file of
@@ -73,10 +69,10 @@ def voxtell_prepare_input(image, time_step=0):
     # closest canonical orientation of an oblique image is.
     from nibabel.orientations import io_orientation
 
-    ornt = io_orientation(voxtell_ras_affine(image, time_step))
+    ornt = io_orientation(voxtell_ras_affine(index_to_world))
 
-    # MITK exposes (Z, Y, X), orientations are defined on (x, y, z).
-    xyz = image.as_numpy(writeable=False, time_step=time_step).transpose(2, 1, 0)
+    # MITK arrays are (Z, Y, X), orientations are defined on (x, y, z).
+    xyz = np.asarray(image).transpose(2, 1, 0)
     ras_xyz = voxtell_apply_orientation(xyz, ornt)
     data = np.ascontiguousarray(ras_xyz.transpose(2, 1, 0), dtype=np.float32)
 

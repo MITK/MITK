@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkPipPackageInfo.h>
-#include <mitkPythonContext.h>
+#include <mitkProgressTask.h>
 #include <mitkPythonHelper.h>
 #include <mitkPythonPackageUpdatePrompt.h>
 #include <mitkTorchDevice.h>
@@ -192,6 +192,11 @@ void QmitkVoxTellToolGUI::InitializeUI(QBoxLayout* mainLayout)
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
   connect(m_Ui->segmentButton, &QPushButton::clicked, this, &Self::OnSegmentButtonClicked);
 
+  // Runs after the confirmation of the base class, which needs a run for each
+  // time step without a cached result once all time steps are processed. If
+  // the worker stopped meanwhile, the tool only logs that.
+  connect(this->GetConfirmSegmentationButton(), &QPushButton::clicked, this, &Self::ResetIfWorkerStopped);
+
   // Enter starts a new line of the prompts, so it cannot also start the run.
   for (const auto key : { Qt::Key_Return, Qt::Key_Enter })
   {
@@ -298,35 +303,26 @@ bool QmitkVoxTellToolGUI::Install()
   // run the version check and offer an in-place update if one is needed.
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
   {
-    if (!tool->CreatePythonContext())
-      return false;
-
-    bool isInstalled = false;
-
     try
     {
-      isInstalled = tool->IsInstalled();
+      mitk::PythonPackage::PackageProbe probe(venvName);
+
+      if (probe.HasModule("voxtell"))
+      {
+        // A reused virtual environment can hold a VoxTell that predates this MITK
+        // build (the venv survives MITK upgrades).
+        const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this->window(), probe,
+          "VoxTell", mitk::VoxTell::DISTRIBUTION_NAME, mitk::VoxTell::SupportedVersions(), mitk::VoxTell::BuildUpgradeSpec(venvName));
+
+        return !self.isNull() && outcome != mitk::PythonPackage::VersionCheckOutcome::Aborted;
+      }
     }
     catch (const mitk::Exception& e)
     {
-      this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), QmitkInfoCard::Severity::Error);
+      if (!self.isNull())
+        mitk::PythonPackage::ShowInitializationError(this->window(), "VoxTell", e);
+
       return false;
-    }
-
-    if (isInstalled)
-    {
-      // A reused virtual environment can hold a VoxTell that predates this MITK
-      // build (the venv survives MITK upgrades).
-      const auto outcome = mitk::PythonPackage::CheckVersionAndOfferUpdate(this->window(), *tool->GetPythonContext(),
-        "VoxTell", mitk::VoxTell::DISTRIBUTION_NAME, mitk::VoxTell::SupportedVersions(), mitk::VoxTell::BuildUpgradeSpec(venvName));
-
-      if (self.isNull() || outcome == mitk::PythonPackage::VersionCheckOutcome::Aborted)
-        return false;
-
-      // After an update the interpreter sees the upgraded packages only in a
-      // fresh context. Safe, as an update is only offered while no VoxTell
-      // modules are loaded.
-      return outcome == mitk::PythonPackage::VersionCheckOutcome::KeptInstalled || tool->CreatePythonContext();
     }
   }
 
@@ -349,19 +345,15 @@ bool QmitkVoxTellToolGUI::Install()
 
   QmitkPipInstallDialog dialog(mitk::VoxTell::BuildInstallSpec(modelSource.value(), venvName, includeTextModel.value()), this->window());
 
-  if (dialog.exec() != QDialog::Accepted)
-    return false;
-
-  // The dialog populated the venv (and possibly created it). Create a fresh
-  // context so the embedded interpreter picks up the newly installed packages.
-  return tool->CreatePythonContext();
+  return dialog.exec() == QDialog::Accepted;
 }
 
 void QmitkVoxTellToolGUI::LoadModel()
 {
   const auto initMessage = QString(
     "<h3 %1>Initializing VoxTell</h3>"
-    "<p %1>Please wait while VoxTell is initialized.</p>").arg(LINE_HEIGHT_STYLE);
+    "<p %1>Please wait while VoxTell is initialized. You can cancel it in its "
+    "progress notification.</p>").arg(LINE_HEIGHT_STYLE);
 
   // The notice, the download and the dialogs run event loops, during which a
   // tool change can delete this GUI.
@@ -374,9 +366,33 @@ void QmitkVoxTellToolGUI::LoadModel()
   if (self.isNull())
     return;
 
+  // The download in between has a cancel of its own, so each of the two
+  // worker phases gets a task of its own.
+  bool cancelled = false;
+
   try
   {
-    if (const auto files = this->GetTool()->GetModelFiles(); !files.empty())
+    std::vector<mitk::VoxTell::RepoFiles> files;
+
+    {
+      mitk::ProgressTask task("Preparing VoxTell", mitk::ProgressTask::Indeterminate, true);
+      mitk::VoxTellTool::Pointer tool = this->GetTool();
+
+      try
+      {
+        files = tool->GetModelFiles(&task);
+      }
+      catch (const mitk::Exception&)
+      {
+        cancelled = task.IsCancelRequested();
+        throw;
+      }
+    }
+
+    if (self.isNull())
+      return;
+
+    if (!files.empty())
     {
       QString output;
       const auto result = this->Download("Downloading VoxTell model", files, output);
@@ -405,12 +421,31 @@ void QmitkVoxTellToolGUI::LoadModel()
       }
     }
 
-    this->GetTool()->LoadModel();
+    mitk::ProgressTask task("Loading VoxTell", mitk::ProgressTask::Indeterminate, true);
+    mitk::VoxTellTool::Pointer tool = this->GetTool();
+
+    try
+    {
+      tool->LoadModel(&task);
+    }
+    catch (const mitk::Exception&)
+    {
+      cancelled = task.IsCancelRequested();
+      throw;
+    }
   }
   catch (const mitk::Exception& e)
   {
     notice.reset();
-    mitk::PythonPackage::ShowInitializationError(window, "VoxTell", e);
+
+    // A deactivation of the tool meanwhile deleted this GUI.
+    if (self.isNull())
+      return;
+
+    if (cancelled)
+      this->SetStatus("The initialization was cancelled.");
+    else
+      mitk::PythonPackage::ShowInitializationError(window, "VoxTell", e);
 
     if (self.isNull())
       return;
@@ -420,11 +455,19 @@ void QmitkVoxTellToolGUI::LoadModel()
   }
 
   notice.reset();
+
+  if (self.isNull())
+    return;
+
   this->OnModelLoaded();
 }
 
 void QmitkVoxTellToolGUI::OnInitializationAborted()
 {
+  // Ends a worker that the initialization started, which holds VoxTell's
+  // imports and possibly a model.
+  this->GetTool()->UnloadModel();
+
   m_IsBusy = false;
   this->UncheckInitializeButton();
   this->EnableWidgets(true);
@@ -459,7 +502,7 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
     this->EnableWidgets(true);
 
     // There is no model left for the run then.
-    if (this->UnloadIfSettingsChanged())
+    if (this->UnloadIfSettingsChanged() || this->ResetIfWorkerStopped())
       return false;
 
     return succeeded;
@@ -498,13 +541,36 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
     const auto notice = ShowBlockingNotice(window, QString(
       "<h3 %1>Processing unknown prompts</h3>"
       "<p %1>VoxTell uses its text model to understand the prompts it does not know. Loading the "
-      "text model for the first time can take a minute, during which MITK does not respond.</p>")
+      "text model for the first time can take a minute. You can cancel it in its progress "
+      "notification.</p>")
       .arg(LINE_HEIGHT_STYLE));
 
     if (self.isNull())
       return false;
 
-    this->GetTool()->EmbedPrompts(prompts);
+    mitk::ProgressTask task("Processing prompts with the VoxTell text model", mitk::ProgressTask::Indeterminate, true);
+    mitk::VoxTellTool::Pointer tool = this->GetTool();
+
+    try
+    {
+      tool->EmbedPrompts(prompts, &task);
+    }
+    catch (const mitk::Exception&)
+    {
+      if (!task.IsCancelRequested())
+        throw;
+
+      // A deactivation of the tool meanwhile deleted this GUI.
+      if (self.isNull())
+        return false;
+
+      // The cancellation ended the worker, and the model with it.
+      m_IsBusy = false;
+      tool->UnloadModel();
+      this->OnModelUnloaded();
+      this->SetStatus("Processing the prompts was cancelled, which unloaded VoxTell. Initialize it again.");
+      return false;
+    }
   }
   catch (const mitk::Exception& e)
   {
@@ -623,8 +689,15 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
 {
   auto* tool = this->GetTool();
 
-  if (tool == nullptr || !tool->IsModelLoaded())
+  if (tool == nullptr)
     return;
+
+  // The worker may have ended while VoxTell was idle.
+  if (!tool->IsModelLoaded())
+  {
+    this->ResetIfWorkerStopped();
+    return;
+  }
 
   const auto enteredPrompts = this->ReadPrompts();
 
@@ -653,6 +726,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
   catch (const mitk::Exception& e)
   {
     this->SetStatus(QString::fromLocal8Bit(e.GetDescription()), QmitkInfoCard::Severity::Error);
+    this->ResetIfWorkerStopped();
     return;
   }
 
@@ -672,8 +746,8 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
       "<p %1>VoxTell does not know these prompts:</p>"
       "<ul %1>%2</ul>"
       "<p %1>To understand them, VoxTell uses a text model. It is downloaded once, about 8 GB, and "
-      "loading it can take a minute, during which MITK does not respond. It needs about 8 GB of "
-      "memory on the GPU, or about 16 GB on the CPU.</p>"
+      "loading it can take a minute. It needs about 8 GB of memory on the GPU, or about 16 GB on "
+      "the CPU.</p>"
       "<p %1><b>Do you want to use the text model for these prompts?</b></p>")
       .arg(LINE_HEIGHT_STYLE).arg(promptList), QMessageBox::NoButton, this->window());
 
@@ -739,7 +813,10 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
       return;
 
     this->SetStatus(QString("Error: %1").arg(e.what()), QmitkInfoCard::Severity::Error);
-    this->UnloadIfSettingsChanged();
+
+    if (!this->UnloadIfSettingsChanged())
+      this->ResetIfWorkerStopped();
+
     return;
   }
 
@@ -805,6 +882,15 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
   else if (const auto& error = tool->GetLastErrorMessage(); error.empty())
   {
     // A cancellation by the user leaves no error message, unlike a failure.
+    // A run that did not stop in time was ended with its worker.
+    if (!tool->IsModelLoaded())
+    {
+      tool->UnloadModel();
+      this->OnModelUnloaded();
+      this->SetStatus("Segmentation was cancelled. VoxTell did not stop in time and was unloaded. Initialize it again.");
+      return;
+    }
+
     this->SetStatus("Segmentation was cancelled.");
   }
   else
@@ -817,7 +903,7 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     this->SetStatus(message, QmitkInfoCard::Severity::Error);
   }
 
-  if (this->UnloadIfSettingsChanged())
+  if (this->UnloadIfSettingsChanged() || this->ResetIfWorkerStopped())
     return;
 
   // Prompts that the text encoder processed for this run are known now.
@@ -844,6 +930,32 @@ bool QmitkVoxTellToolGUI::UnloadIfSettingsChanged()
   tool->UnloadModel();
   this->OnModelUnloaded();
   this->SetStatus("The settings changed. Initialize VoxTell again to apply them.");
+
+  return true;
+}
+
+bool QmitkVoxTellToolGUI::ResetIfWorkerStopped()
+{
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr || !m_Ui->initializeButton->isChecked() || tool->IsModelLoaded())
+    return false;
+
+  // The process that ran VoxTell ended. MITK is not affected. The first line
+  // of the description states the exit, which tells an out-of-memory kill
+  // from a crash; the last output is in the log.
+  const auto exitDescription = QString::fromStdString(tool->GetWorkerExitDescription());
+  const auto exit = exitDescription.section('\n', 0, 0);
+
+  tool->UnloadModel();
+  this->OnModelUnloaded();
+
+  auto status = QStringLiteral("VoxTell stopped unexpectedly.");
+
+  if (!exit.isEmpty())
+    status += QLatin1Char(' ') + exit;
+
+  this->SetStatus(status + QStringLiteral(" Initialize it again."), QmitkInfoCard::Severity::Error);
 
   return true;
 }

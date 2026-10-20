@@ -5,16 +5,22 @@ set(CPP_FILES
   mitknnInteractiveVersion.cpp
   mitknnInteractiveBoundingBoxHelpers.cpp
   mitknnInteractiveRenderingHelpers.cpp
+  mitkInitializationHook.cpp
   mitkPythonPackageVersion.cpp
+  mitkPythonWorkerModules.cpp
   mitkTorchDevice.cpp
   mitkTotalSegmentatorTool.cpp
   mitkVoxTellTool.cpp
 )
 
 set(RESOURCE_FILES
+  package_checks.py
+  torch_device.py
+  nnInteractive/nninteractive_worker.py
   VoxTell/VoxTell.svg
   VoxTell/voxtell_bridge.py
   VoxTell/voxtell_hub_files.py
+  VoxTell/voxtell_worker.py
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

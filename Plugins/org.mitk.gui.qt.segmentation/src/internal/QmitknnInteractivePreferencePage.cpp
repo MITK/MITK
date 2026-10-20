@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <QmitkRun.h>
 
 #include <QApplication>
-#include <QCoreApplication>
 #include <QMessageBox>
 
 #include <QComboBox>
@@ -448,30 +447,20 @@ void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
 void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()
 {
 #if MITK_HAS_PYTHON
-  if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive"))
+  if (const auto use = mitk::GetVirtualEnvUse("nnInteractive"); use != mitk::VirtualEnvUse::None)
   {
-    const auto appName = QCoreApplication::applicationName();
-    const auto restartTarget = appName.isEmpty()
-      ? QStringLiteral("this application")
-      : appName;
-
     QMessageBox::information(
       m_Control,
       "Uninstall nnInteractive",
-      QStringLiteral(
-        "<p>nnInteractive cannot be uninstalled right now because Python "
-        "modules from its virtual environment are still loaded.</p>"
-        "<p>Restart %1 and try again.</p>").arg(restartTarget));
+      QString("<p>nnInteractive cannot be uninstalled while it is in use.</p><p>%1</p>")
+        .arg(mitk::PythonPackage::DescribeHowToFree(use, "nnInteractive")));
     return;
   }
 
   const auto answer = QMessageBox::warning(
     m_Control,
     "Uninstall nnInteractive",
-    "<p>Are you sure you want to uninstall nnInteractive?</p>"
-    "<p><b>Important:</b> This can only be safely done if nnInteractive has not "
-    "been initialized since application start. If it has, restart "
-    "the application before uninstalling.</p>",
+    "<p>Are you sure you want to uninstall nnInteractive?</p>",
     QMessageBox::Yes | QMessageBox::No,
     QMessageBox::No);
 
@@ -545,7 +534,7 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
 
   using mitk::PythonPackage::VersionStatus;
 
-  const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive");
+  const auto use = mitk::GetVirtualEnvUse("nnInteractive");
 
   const auto runUpdateAndReport = [&](bool client) {
     if (!this->RunUpdate(client))
@@ -562,7 +551,7 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
     case VersionStatus::UpdateAvailable:
       // Shared version-status dialog. Not in the init flow, so declining just
       // closes; only an explicit "Update now" triggers the in-place update.
-      if (mitk::PythonPackage::ShowUpdatePrompt(m_Control, "nnInteractive", mitk::nnInteractive::SupportedVersions(), result, modulesLoaded, false)
+      if (mitk::PythonPackage::ShowUpdatePrompt(m_Control, "nnInteractive", mitk::nnInteractive::SupportedVersions(), result, use, false)
             == mitk::PythonPackage::UpdatePromptChoice::Update)
         runUpdateAndReport(clientOnly);
       break;

@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkTorchDevice.h>
 #include <MitkPythonSegmentationExports.h>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <memory>
 #include <optional>
 #include <string>
@@ -26,7 +28,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PythonContext;
+  class ProgressTask;
+  class PythonWorker;
 
   namespace VoxTell
   {
@@ -62,6 +65,12 @@ namespace mitk
      */
     MITKPYTHONSEGMENTATION_EXPORT ModelSource ParseModelSource(const std::string& value);
 
+    /** \brief Returns the index-to-world transform of a geometry as the four rows of a 4x4 matrix.
+     *
+     * The VoxTell worker derives the RAS affine of the image from it.
+     */
+    MITKPYTHONSEGMENTATION_EXPORT nlohmann::json IndexToWorld(const BaseGeometry* geometry);
+
     /** \brief Files of a repository on the Hugging Face Hub. */
     struct RepoFiles
     {
@@ -85,8 +94,9 @@ namespace mitk
   /** \brief Segmentation tool that integrates the VoxTell deep learning model.
    *
    * VoxTell segments anatomical structures in a 3D image from free-text
-   * prompts, for example "liver" or "left kidney". The tool runs it in-process
-   * through a PythonContext on the virtual environment of VoxTell. Each prompt
+   * prompts, for example "liver" or "left kidney". The tool runs it in a
+   * PythonWorker process with the interpreter of the virtual environment of
+   * VoxTell, which also keeps the loaded model. Each prompt
    * becomes one label of the preview, named after the prompt. The results of
    * different prompts can overlap, a structure and a part of it for example,
    * and are kept apart in groups (see SetCreateGroupsAsNeeded()).
@@ -98,17 +108,20 @@ namespace mitk
    * to resample images of very uncommon spacings to about 1.5 mm.
    *
    * The typical lifecycle is:
-   * -# Create a Python context via CreatePythonContext()
+   * -# Check the installation of the virtual environment (GetVirtualEnvName())
+   *    with a PythonPackage::PackageProbe
    * -# Load the model via LoadModel() (downloads it on first use)
    * -# Set the prompts via SetPrompts() and call UpdatePreview()
    * -# Confirm the preview with ConfirmSegmentation()
    * -# Unload the model via UnloadModel() or by deactivating the tool
    *
-   * UpdatePreview() runs on the calling thread and keeps the application
+   * UpdatePreview() waits on the calling thread and keeps the application
    * responsive through GUIProcessEventsMessage while the model computes. It can
-   * be cancelled with the progress notification of the tool.
+   * be cancelled with the progress notification of the tool. A run that has not
+   * stopped seconds after the cancellation is ended with its worker. If the
+   * worker ends, the model is no longer loaded (see IsModelLoaded()).
    *
-   * \sa SegWithPreviewTool, PythonContext, QmitkVoxTellToolGUI
+   * \sa SegWithPreviewTool, PythonWorker, QmitkVoxTellToolGUI
    */
   class MITKPYTHONSEGMENTATION_EXPORT VoxTellTool : public SegWithPreviewTool
   {
@@ -151,33 +164,6 @@ namespace mitk
      */
     std::string GetVirtualEnvName() const;
 
-    /** \brief Creates and activates a Python context with the virtual environment.
-     *
-     * The context is activated without bindings, so that checks run before the
-     * model is loaded do not map any native library of the virtual environment.
-     * The bindings are imported by LoadModel().
-     *
-     * \warning The virtual environment is created if it does not exist yet.
-     *          Check PythonHelper::VirtualEnvExists() first.
-     *
-     * \return \c true if the Python context was created, \c false otherwise.
-     */
-    bool CreatePythonContext();
-
-    /** \brief Returns the current Python context.
-     *
-     * \return The context, or \c nullptr if none has been created yet.
-     */
-    PythonContext* GetPythonContext() const;
-
-    /** \brief Checks whether the VoxTell Python package is installed.
-     *
-     * \pre A Python context has been created via CreatePythonContext().
-     *
-     * \throw mitk::Exception with a message for the user if Python fails.
-     */
-    bool IsInstalled() const;
-
     /** \brief The preferences baked into a loaded model, each paired with its
      *         default value (as stored).
      *
@@ -193,14 +179,18 @@ namespace mitk
      * cached yet, without telling how far it is, so the caller can download them
      * up front instead.
      *
-     * Imports VoxTell into the context, which takes several seconds. Files that
-     * VoxTell does not name are left out and a warning is logged.
+     * Starts the worker if needed and imports VoxTell there, which takes several
+     * seconds. Files that VoxTell does not name are left out and a warning is
+     * logged.
      *
-     * \pre A Python context has been created via CreatePythonContext().
+     * Events are processed meanwhile, see LoadModel() for what that implies.
      *
-     * \throw mitk::Exception if the context cannot be readied for VoxTell.
+     * \param[in] task A cancelable task the user sees, or \c nullptr.
+     *
+     * \throw mitk::Exception if the worker cannot be started, or the call was
+     *        cancelled or aborted.
      */
-    std::vector<VoxTell::RepoFiles> GetModelFiles();
+    std::vector<VoxTell::RepoFiles> GetModelFiles(ProgressTask* task = nullptr);
 
     /** \brief Loads the model.
      *
@@ -208,22 +198,34 @@ namespace mitk
      * Hugging Face hub (downloading it on first use) or from the configured
      * local folder. A model that is already loaded is unloaded first.
      *
-     * \pre A Python context has been created via CreatePythonContext().
+     * Events are processed while the worker loads, so the application stays
+     * responsive. A deactivation of the tool meanwhile ends the loading, and so
+     * does cancelling \p task, which kills the worker right away.
      *
-     * \throw mitk::Exception if the model cannot be loaded.
+     * \param[in] task A cancelable task the user sees, or \c nullptr.
+     *
+     * \throw mitk::Exception if the model cannot be loaded, or the loading was
+     *        cancelled or aborted.
      */
-    void LoadModel();
+    void LoadModel(ProgressTask* task = nullptr);
 
-    /** \brief Unloads the model and releases the Python context.
+    /** \brief Unloads the model and ends the worker.
      *
-     * Frees the memory of the device. This is a no-op without a Python context.
+     * Frees the memory of the device and releases the Python context.
      *
      * \pre The preview is not being computed.
      */
     void UnloadModel();
 
-    /** \brief Checks whether a model is loaded. */
+    /** \brief Checks whether a model is loaded and its worker still runs. */
     bool IsModelLoaded() const;
+
+    /** \brief Why the worker stopped, see PythonWorker::GetExitDescription().
+     *
+     * \return The description, or an empty string if there is no worker or it
+     *         still runs.
+     */
+    std::string GetWorkerExitDescription() const;
 
     /** \brief Returns the backend the model was loaded on.
      *
@@ -324,12 +326,20 @@ namespace mitk
      * GetPromptsWithoutPrecomputedEmbedding() and segmenting them takes no
      * longer than segmenting any other prompt.
      *
+     * Events are processed meanwhile, see LoadModel() for what that implies.
+     * Cancelling \p task or deactivating the tool ends the worker right away,
+     * and the model with it.
+     *
+     * \param[in] prompts The prompts to make known.
+     * \param[in] task A cancelable task the user sees, or \c nullptr.
+     *
      * \pre A model is loaded.
      *
      * \throw mitk::Exception with a message for the user if the prompts cannot
-     *        be processed, for example for lack of memory.
+     *        be processed, for example for lack of memory, or if the call was
+     *        cancelled or aborted.
      */
-    void EmbedPrompts(const std::vector<std::string>& prompts);
+    void EmbedPrompts(const std::vector<std::string>& prompts, ProgressTask* task = nullptr);
 
     /** \brief Returns a human-readable reason that the last update produced no result.
      *
@@ -388,11 +398,13 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
 
   private:
-    /** \brief Readies the context for VoxTell: bindings, helper code, environment. */
-    void PrepareContext();
+    /** \brief Returns the worker, which is started if it is not running. */
+    PythonWorker& GetWorker();
 
-    /** \brief Frees the model from the context, but keeps the context. */
-    void ReleaseModel();
+    /** \brief Ends the worker after GetModelFiles() or LoadModel() failed, and
+     *         unloads the model if the tool was deactivated meanwhile.
+     */
+    void EndFailedInitialization();
 
     /** \brief Removes the labels that got no voxel in any time step of the update. */
     void RemoveLabelsWithoutResult();

@@ -30,7 +30,6 @@ found in the LICENSE file.
 class QAbstractButton;
 class QButtonGroup;
 class QPushButton;
-class QTimer;
 
 namespace Ui
 {
@@ -210,27 +209,19 @@ protected:
    */
   void OnSessionEnded();
 
-  /** \brief Handles the tool's SessionExpiredEvent.
+  /** \brief Handles the tool's SessionLostEvent.
    *
    * A remote session was lost server-side (idle timeout, server restart, or
-   * the server is at capacity / unreachable). The session is still live when
-   * this fires: it stops the heartbeat timer and defers teardown to the next
-   * event-loop tick (AbortSession(), which ends the session and clears the
-   * interactions and preview), then informs the user that they need to
-   * re-initialize. Deferring both the teardown and the dialog avoids
-   * re-entrancy when the event fires from within an interaction. A guard
-   * ensures a second expiry event cannot stack a duplicate teardown or dialog.
+   * the server is at capacity / unreachable), or the worker process hosting
+   * the session ended. The session is still nominally running when this
+   * fires: it defers teardown to the next event-loop tick (AbortSession(),
+   * which ends the session and clears the interactions and preview), then
+   * informs the user that they need to re-initialize. Deferring both the
+   * teardown and the dialog avoids re-entrancy when the event fires from
+   * within an interaction. A guard ensures a second loss event cannot stack a
+   * duplicate teardown or dialog.
    */
-  void OnSessionExpired();
-
-  /** \brief Sends a keep-alive heartbeat to the remote nnInteractive server.
-   *
-   * Connected to the heartbeat timer's timeout while a remote session runs.
-   * Delegates to nnInteractiveTool::Heartbeat(), which keeps the server-side
-   * lease alive and, on a definitive expiry, triggers the SessionExpiredEvent
-   * teardown path. Has no effect for local sessions.
-   */
-  void OnHeartbeatTimeout();
+  void OnSessionLost(const mitk::nnInteractiveTool::SessionLoss& loss);
 
   /** \brief Shows the model checkpoint license below the Initialize button, or
    *         clears it when passed \c std::nullopt.
@@ -424,13 +415,10 @@ private:
   // button; older versions report no support and the button stays disabled.
   bool m_SupportsUndo = false;
 
-  QTimer* m_HeartbeatTimer = nullptr;
-
-  // Set when a lost remote session is being torn down so a second
-  // SessionExpiredEvent (the tool emits it from both the heartbeat and a
-  // mid-interaction failure) cannot queue a duplicate teardown/dialog. Cleared
-  // in OnSessionEnded once teardown completes.
-  bool m_SessionExpiredHandled = false;
+  // Set when a lost session is being torn down so a second SessionLostEvent
+  // cannot queue a duplicate teardown/dialog. Cleared in OnSessionEnded once
+  // teardown completes.
+  bool m_SessionLossHandled = false;
 
   mitk::IPreferences* m_Preferences = nullptr;
   std::vector<ShortcutLabel> m_ShortcutLabels;

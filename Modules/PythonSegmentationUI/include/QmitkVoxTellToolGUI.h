@@ -143,6 +143,12 @@ private:
    */
   bool UnloadIfSettingsChanged();
 
+  /** \brief Returns to the uninitialized state if the worker that ran the model has stopped.
+   *
+   * \return \c true if it had stopped.
+   */
+  bool ResetIfWorkerStopped();
+
   std::unique_ptr<Ui::QmitkVoxTellToolGUI> m_Ui;
   mitk::IPreferences* m_Preferences = nullptr;
 

@@ -414,8 +414,8 @@ namespace
     const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
 
     mitk::Point2D lower;
-    mitk::Point2D upper;
-    bool first = true;
+    plane->Map(corners.front(), lower);
+    mitk::Point2D upper = lower;
 
     for (const auto& corner : corners)
     {
@@ -424,11 +424,9 @@ namespace
 
       for (int axis = 0; axis < 2; ++axis)
       {
-        lower[axis] = first ? point[axis] : std::min(lower[axis], point[axis]);
-        upper[axis] = first ? point[axis] : std::max(upper[axis], point[axis]);
+        lower[axis] = std::min(lower[axis], point[axis]);
+        upper[axis] = std::max(upper[axis], point[axis]);
       }
-
-      first = false;
     }
 
     const auto viewport = renderer->GetViewportSize();

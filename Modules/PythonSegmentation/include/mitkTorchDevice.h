@@ -15,12 +15,13 @@ found in the LICENSE file.
 
 #include <MitkPythonSegmentationExports.h>
 
+#include <mitkPythonWorker.h>
+
 #include <optional>
 #include <string>
 
 namespace mitk
 {
-  class PythonContext;
 
   namespace Torch
   {
@@ -70,19 +71,23 @@ namespace mitk
      */
     MITKPYTHONSEGMENTATION_EXPORT std::optional<int> ParseCUDADeviceIndex(const std::string& deviceString);
 
-    /** \brief Queries a CUDA device via PyTorch.
+    /** \brief Queries a CUDA device via PyTorch in a worker process.
      *
-     * Imports torch into the given context and reads the properties of the
-     * device. Never throws.
+     * Imports torch in the worker and reads the properties of the device.
      *
-     * \param[in] context A Python context with the virtual environment that has
-     *                    PyTorch installed.
+     * \param[in] worker A worker of the virtual environment that has PyTorch
+     *                   installed, running the module "torch_device.py" from the
+     *                   resources of this module.
      * \param[in] deviceIndex The index of the CUDA device.
+     * \param[in] progress Optional hook for the call, see PythonWorker::Call().
      *
      * \return The device information, or \c std::nullopt if PyTorch cannot be
      *         imported, CUDA is not available, or the device does not exist.
+     *
+     * \throw PythonWorkerExitedException if the worker is gone, and whatever
+     *        \p progress throws.
      */
-    MITKPYTHONSEGMENTATION_EXPORT std::optional<CUDADeviceInfo> QueryCUDADevice(PythonContext& context, int deviceIndex);
+    MITKPYTHONSEGMENTATION_EXPORT std::optional<CUDADeviceInfo> QueryCUDADevice(PythonWorker& worker, int deviceIndex, const PythonWorker::ProgressHook& progress = {});
 
     /** \brief Which device the user wants a PyTorch based tool to compute on. */
     enum class BackendPreference
@@ -116,15 +121,17 @@ namespace mitk
      * does not is replaced by the CPU for BackendPreference::Auto, while
      * BackendPreference::GPU uses it anyway. The decision is logged.
      *
-     * \param[in] context A Python context with the virtual environment that has
-     *                    PyTorch installed.
+     * \param[in] worker A worker as required by QueryCUDADevice().
      * \param[in] backend The device the user wants to compute on.
      * \param[in] gpuDevice The preferred GPU as a torch device string, e.g. "cuda:0".
      * \param[in] minTotalMemoryMB The least device memory, in megabytes, the workload needs.
+     * \param[in] progress Optional hook for the probe, see PythonWorker::Call().
      *
      * \return The selected device.
+     *
+     * \throw See QueryCUDADevice().
      */
-    MITKPYTHONSEGMENTATION_EXPORT DeviceSelection SelectDevice(PythonContext& context, BackendPreference backend, const std::string& gpuDevice, int minTotalMemoryMB);
+    MITKPYTHONSEGMENTATION_EXPORT DeviceSelection SelectDevice(PythonWorker& worker, BackendPreference backend, const std::string& gpuDevice, int minTotalMemoryMB, const PythonWorker::ProgressHook& progress = {});
   }
 }
 

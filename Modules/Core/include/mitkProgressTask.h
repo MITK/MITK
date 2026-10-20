@@ -42,7 +42,8 @@ namespace mitk
    *
    * Tasks are independent of each other, so concurrent operations report
    * without interfering. A handle belongs to a single thread; it is move-only
-   * and must not be shared, but different threads may each own one.
+   * and must not be shared, but different threads may each own one. Only
+   * IsCancelRequested() may be called from another thread, see there.
    *
    * Reporting is silently skipped when no IProgressService is available, which
    * is the normal situation in command-line tools and tests.
@@ -123,6 +124,10 @@ namespace mitk
      *
      * A lock-free read, so polling it in a tight loop is free. Always false
      * unless the task was started as cancelable.
+     *
+     * Another thread may poll it, like work that the owning thread runs in the
+     * background, as long as the owner neither moves nor finishes the handle
+     * meanwhile.
      */
     bool IsCancelRequested() const;
 

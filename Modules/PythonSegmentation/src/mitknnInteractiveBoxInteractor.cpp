@@ -85,9 +85,16 @@ namespace mitk::nnInteractive
 
       m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
 
-      // Finally, enable interaction for the next box.
+      // Finally, enable interaction for the next box. The box just completed
+      // has started a prompt already, which may suspend the input.
       m_Interactor->SetDataNode(m_NextBoxNode);
-      m_Interactor->EnableInteraction(true);
+      m_Interactor->EnableInteraction(!m_Owner->IsInputSuspended());
+    }
+
+    void SetInputSuspended(bool suspended)
+    {
+      if (m_NextBoxNode.IsNotNull())
+        m_Interactor->EnableInteraction(!suspended);
     }
 
     void ReleaseNextBoxNode()
@@ -235,6 +242,11 @@ void mitk::nnInteractive::BoxInteractor::OnEnable()
 void mitk::nnInteractive::BoxInteractor::OnDisable()
 {
   m_Impl->ReleaseNextBoxNode();
+}
+
+void mitk::nnInteractive::BoxInteractor::OnSetInputSuspended(bool suspended)
+{
+  m_Impl->SetInputSuspended(suspended);
 }
 
 void mitk::nnInteractive::BoxInteractor::OnReset()

@@ -191,6 +191,7 @@ bool mitk::LabelGroupPlacer::Fits(const MaskRuns& mask, GroupIndexType group)
   if (group < m_Segmentation->GetNumberOfGroups())
   {
     const auto* segmentationImage = m_Segmentation->GetGroupImage(group);
+    CheckMaskSize(mask, segmentationImage);
     segmentationAccessor.emplace(segmentationImage, segmentationImage->GetVolumeData(m_TimeStep));
     segmentationPixels = static_cast<const LabelPixelType*>(segmentationAccessor->GetData());
   }
@@ -309,6 +310,7 @@ void mitk::LabelGroupPlacer::Write(const MaskRuns& mask, GroupIndexType group, L
   if (mode == WriteMode::KeepOccupiedVoxels && group < m_Segmentation->GetNumberOfGroups())
   {
     const auto* segmentationImage = m_Segmentation->GetGroupImage(group);
+    CheckMaskSize(mask, segmentationImage);
     segmentationAccessor.emplace(segmentationImage, segmentationImage->GetVolumeData(m_TimeStep));
     segmentationPixels = static_cast<const LabelPixelType*>(segmentationAccessor->GetData());
   }

@@ -88,7 +88,7 @@ void QmitkCrashDumpListWidget::SetDumps(const std::vector<mitk::CrashDumpInfo>& 
     item->setData(KindColumn, Qt::UserRole, static_cast<qulonglong>(i));
     item->setText(KindColumn, QmitkCrashDumpUi::KindLabel(dump.Kind));
     item->setText(TimeColumn, QLocale().toString(QFileInfo(path).lastModified(), QLocale::ShortFormat));
-    item->setText(SizeColumn, QLocale().formattedDataSize(static_cast<qint64>(dump.SizeInBytes)));
+    item->setText(SizeColumn, QLocale().formattedDataSize(static_cast<qint64>(dump.SizeInBytes), 2, QLocale::DataSizeTraditionalFormat));
     item->setText(VersionColumn, VersionLabel(dump));
     item->setText(LogColumn, LogLabel(dump));
     item->setText(StatusColumn, status);

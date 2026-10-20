@@ -103,6 +103,8 @@ protected:
   QLabel* GetPreviewLabel() const;
 
 private:
+  void RestoreBusyCursor();
+
   QCheckBox* m_CheckIgnoreLocks = nullptr;
   QCheckBox* m_CheckMerge = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
@@ -115,6 +117,11 @@ private:
   /**Indicates if the tool is in 2D or 3D mode.*/
   bool m_Mode2D;
   bool m_EnableProcessingOfAllTimeSteps;
+
+  /** Whether this GUI set the busy cursor of the application. An update can
+      outlive the GUI or its connection to the tool, and a GUI must restore
+      only the cursor it set itself. */
+  bool m_BusyCursorSet = false;
 
   mitk::SegWithPreviewTool::Pointer m_Tool;
 };

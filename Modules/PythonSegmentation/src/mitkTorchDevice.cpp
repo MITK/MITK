@@ -14,12 +14,22 @@ found in the LICENSE file.
 
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
-#include <mitkPythonContext.h>
+#include <mitkMemoryUtilities.h>
 #include <mitkPythonHelper.h>
+#include <mitkPythonWorker.h>
 
 #include <charconv>
+#include <cstdint>
 #include <regex>
-#include <sstream>
+
+namespace
+{
+  // Device memory is given in megabytes of 1024 * 1024 bytes, as torch reports it.
+  std::uint64_t MegabytesToBytes(int megabytes)
+  {
+    return static_cast<std::uint64_t>(megabytes) * 1024 * 1024;
+  }
+}
 
 // The architectures follow the PyTorch build the install requests: torch 2.8
 // still runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
@@ -50,40 +60,29 @@ std::optional<int> mitk::Torch::ParseCUDADeviceIndex(const std::string& deviceSt
   return index;
 }
 
-std::optional<mitk::Torch::CUDADeviceInfo> mitk::Torch::QueryCUDADevice(PythonContext& context, int deviceIndex)
+std::optional<mitk::Torch::CUDADeviceInfo> mitk::Torch::QueryCUDADevice(PythonWorker& worker, int deviceIndex, const PythonWorker::ProgressHook& progress)
 {
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "mitk_cuda_found = False\n"
-    << "try:\n"
-    << "    if torch.cuda.is_available():\n"
-    << "        mitk_cuda_name = torch.cuda.get_device_name(" << deviceIndex << ")\n"
-    << "        mitk_cuda_props = torch.cuda.get_device_properties(" << deviceIndex << ")\n"
-    << "        mitk_cuda_memory_mb = mitk_cuda_props.total_memory // (1024 ** 2)\n"
-    << "        mitk_cuda_major = mitk_cuda_props.major\n"
-    << "        mitk_cuda_minor = mitk_cuda_props.minor\n"
-    << "        mitk_cuda_found = True\n"
-    << "except Exception:\n"
-    << "    pass\n";
-
   try
   {
-    context.Execute(pyCommands.str());
+    const auto result = worker.Call("torch_device.query_cuda_device", { { "index", deviceIndex } }, {}, progress);
 
-    if (!context.GetVariableAsBool("mitk_cuda_found").value_or(false))
+    if (result.is_null())
       return std::nullopt;
 
     CUDADeviceInfo info;
     info.Index = deviceIndex;
-    info.Name = context.GetVariableAsString("mitk_cuda_name").value_or("");
-    info.TotalMemoryMB = context.GetVariableAsInt("mitk_cuda_memory_mb").value_or(0);
-    info.Major = context.GetVariableAsInt("mitk_cuda_major").value_or(0);
-    info.Minor = context.GetVariableAsInt("mitk_cuda_minor").value_or(0);
+    info.Name = result.value("name", std::string());
+    info.TotalMemoryMB = result.value("total_memory_mb", 0);
+    info.Major = result.value("major", 0);
+    info.Minor = result.value("minor", 0);
 
     return info;
   }
-  catch (...)
+  catch (const PythonWorkerError& e)
   {
+    // Only a failure in Python means there is no usable device. A worker that
+    // is gone or a cancelled call has to reach the caller.
+    MITK_WARN << "Could not query CUDA device " << deviceIndex << ": " << e.GetDescription();
     return std::nullopt;
   }
 }
@@ -102,7 +101,7 @@ mitk::Torch::BackendPreference mitk::Torch::ParseBackendPreference(const std::st
   mitkThrow() << "Unknown backend preference \"" << value << "\". Expected \"auto\", \"cpu\", or \"gpu\".";
 }
 
-mitk::Torch::DeviceSelection mitk::Torch::SelectDevice(PythonContext& context, BackendPreference backend, const std::string& gpuDevice, int minTotalMemoryMB)
+mitk::Torch::DeviceSelection mitk::Torch::SelectDevice(PythonWorker& worker, BackendPreference backend, const std::string& gpuDevice, int minTotalMemoryMB, const PythonWorker::ProgressHook& progress)
 {
   DeviceSelection selection;
 
@@ -113,7 +112,7 @@ mitk::Torch::DeviceSelection mitk::Torch::SelectDevice(PythonContext& context, B
 
   if (const auto deviceIndex = ParseCUDADeviceIndex(gpuDevice); deviceIndex.has_value())
   {
-    selection.CUDADevice = QueryCUDADevice(context, deviceIndex.value());
+    selection.CUDADevice = QueryCUDADevice(worker, deviceIndex.value(), progress);
   }
 
   if (selection.CUDADevice.has_value())
@@ -122,7 +121,7 @@ mitk::Torch::DeviceSelection mitk::Torch::SelectDevice(PythonContext& context, B
 
     MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
     MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
-    MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
+    MITK_INFO << "  Total memory: " << MemoryUtilities::FormatSize(MegabytesToBytes(deviceInfo.TotalMemoryMB));
 
     useCUDADevice = true;
 
@@ -137,7 +136,7 @@ mitk::Torch::DeviceSelection mitk::Torch::SelectDevice(PythonContext& context, B
 
     if (deviceInfo.TotalMemoryMB < minTotalMemoryMB)
     {
-      MITK_WARN << "Minimum required total memory is " << minTotalMemoryMB / 1000 << " GB";
+      MITK_WARN << "Minimum required total memory is " << MemoryUtilities::FormatSize(MegabytesToBytes(minTotalMemoryMB));
       useCUDADevice = false;
     }
   }

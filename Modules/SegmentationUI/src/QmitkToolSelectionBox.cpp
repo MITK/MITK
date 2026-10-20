@@ -594,9 +594,6 @@ void QmitkToolSelectionBox::RecreateButtons()
     MITK_DEBUG << "m_ButtonIDForToolID[" << currentToolID << "] == " << currentButtonID;
     MITK_DEBUG << "m_ToolIDForButtonID[" << currentButtonID << "] == " << currentToolID;
 
-    tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>(
-      this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage); // will never add a listener twice, so we don't have
-                                                                    // to check here
     tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>(
       this,
       &QmitkToolSelectionBox::OnToolErrorMessage); // will never add a listener twice, so we don't have to check here
@@ -612,17 +609,12 @@ void QmitkToolSelectionBox::RecreateButtons()
   // this->update();
 }
 
-void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
-{
-  qApp->processEvents();
-}
-
 void QmitkToolSelectionBox::OnToolBusyStateChanged(bool isBusy)
 {
   if (m_IsToolBusy == isBusy)
     return;
 
-  // A tool that pumps the event loop while it computes would otherwise be
+  // A tool whose update computes off the GUI thread would otherwise be
   // deactivated mid-run by a click on another tool button.
   m_IsToolBusy = isBusy;
   this->UpdateButtonsEnabledState();

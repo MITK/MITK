@@ -558,6 +558,10 @@ While you work, the proposed segmentation is shown as a live preview in the colo
 The Confirm button names the label that the result will be written to and shows its color, for example <b>Confirm Liver</b>, so you always know where the segmentation will go.
 When you are satisfied with the result - often after only a single point or scribble - click it (or press <tt>C</tt>) to write the segmented pixels to that label.
 
+Each interaction is computed in the background, so the application stays responsive.
+Until the result is shown, the tool's controls are disabled and further interactions in the views are ignored.
+A progress notification offers to cancel a computation that takes too long; cancelling ends the session, so you initialize it again.
+
 The <b>Auto-zoom</b> option, enabled by default, lets the model widen the region it analyzes when a segment reaches the edge, so large structures are not cut off.
 It improves completeness at the cost of speed and is not available on the CPU.
 
@@ -589,8 +593,8 @@ The model that VoxTell downloads by default is licensed for non-commercial use o
 \subsubsection org_mitk_views_segmentationVoxTellWorkflow Workflow
 
 -# Select the VoxTell tool in the Segmentation View. If VoxTell is not installed yet, the first button reads "Install VoxTell". Click it, decide whether to download the text model for unknown prompts right away (see below), and confirm the installation dialog. This downloads PyTorch, VoxTell and its model, several gigabytes in total, and may take a while, but it is a one-time step.
--# Click "Initialize" to load the model onto the compute device. This takes several seconds, during which MITK does not respond. If the model has not been downloaded yet, a progress notification shows the download first and offers to cancel it. While the model is loaded, the button reads "Uninitialize"; click it to release the memory without leaving the tool. If no suitable GPU is found, a warning tells you that VoxTell runs on the CPU, which is significantly slower.
--# Type the structures you want to segment into the text field, one prompt per line, and click "Segment" (or press Ctrl+Enter). All prompts are computed in one run. A progress notification shows how far it has come and offers to cancel it.
+-# Click "Initialize" to load the model onto the compute device. This takes several seconds; a progress notification shows it and offers to cancel it. If the model has not been downloaded yet, a progress notification shows the download first and offers to cancel it. While the model is loaded, the button reads "Uninitialize"; click it to release the memory without leaving the tool. If no suitable GPU is found, a warning tells you that VoxTell runs on the CPU, which is significantly slower.
+-# Type the structures you want to segment into the text field, one prompt per line, and click "Segment" (or press Ctrl+Enter). All prompts are computed in one run. A progress notification shows how far it has come and offers to cancel it. If VoxTell has not stopped ten seconds after you cancel, for example because the GPU driver hangs, the tool ends it and unloads the model; initialize it again.
 -# The result has one label per prompt, named like the prompt. With "Auto-confirm on success" checked, as it is by default, the labels are added to your segmentation as soon as the run succeeds; Undo (Ctrl+Z) removes them again. Otherwise the result is shown as a preview: choose whether to transfer all labels or only selected ones, then confirm the preview to add the labels to your segmentation. With "Transfer selected labels", the preview waits for your selection even if auto-confirm is checked. The tool stays active, so you can continue with other prompts.
 
 Prompts that VoxTell finds nothing for get no label in the preview, so they cannot end up in your segmentation as empty labels. The info card below the Segment button lists them after the run. The image may not show these structures; if it does, try a different wording.
@@ -601,7 +605,7 @@ Results can overlap, for example <i>heart</i> and <i>left ventricle</i>, or <i>l
 
 VoxTell understands free text. It ships with prepared descriptions of a large number of anatomical terms, and prompts that match one of them run right away. While you type a prompt, the tool suggests the terms VoxTell knows that contain what you typed; choose one with the arrow keys and Enter or Tab to complete the line and start the next one, or keep typing. Any other wording needs an additional text model of about 8 GB. Before a run that needs it, the tool lists the prompts that VoxTell does not know and asks whether to use the text model. You can also continue with the known prompts only, or cancel. Prompts are not case sensitive, and a prompt that appears twice is segmented once.
 
-The text model is downloaded during the installation if you ask for it there, or otherwise the first time it is needed, with a progress notification that offers to cancel the download. Loading it into memory for the first time in a session can take a minute, during which MITK does not respond. It needs about 8 GB of memory on the GPU, or about 16 GB on the CPU.
+The text model is downloaded during the installation if you ask for it there, or otherwise the first time it is needed, with a progress notification that offers to cancel the download. Loading it into memory for the first time in a session can take a minute; a progress notification shows it and offers to cancel it, which unloads VoxTell, so that you initialize it again. It needs about 8 GB of memory on the GPU, or about 16 GB on the CPU.
 
 \subsubsection org_mitk_views_segmentationVoxTellImages Image requirements
 
@@ -616,20 +620,30 @@ Click "Settings" in the tool (or open Preferences (Ctrl+P) > Segmentation > VoxT
 
 \subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
 
-\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png,"TotalSegmentator tool",2.00}
+\imageMacroEx{QmitkSegmentation_TotalsegmentatorTool.png,"The TotalSegmentator tool with some of the structures of the task total checked",9.00,356}
 
-This tool provides a GUI to the deep learning-based segmentation algorithm called TotalSegmentator. With it you can predict segmentation masks for a large number of anatomical structures in CT and MR images loaded in MITK. For the list of tasks and supported classes, refer to https://github.com/wasserth/TotalSegmentator
+TotalSegmentator segments a large number of anatomical structures in CT and MR images in one run, from organs, bones and muscles to vessels. It offers several tasks: "total" segments the whole body, while other tasks cover particular regions or structures in more detail. For the tasks and their structures, refer to https://github.com/wasserth/TotalSegmentator
 
-TotalSegmentator runs in a Python virtual environment that MITK creates and manages for you using its own embedded Python; no separate system Python installation is required. For best performance, a CUDA-enabled GPU is recommended.
+TotalSegmentator runs in a Python virtual environment that MITK creates and manages for you using its own embedded Python; no separate system Python installation is required. A CUDA-enabled GPU is strongly recommended; on a CPU, a run can take many minutes.
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow
 
--# Select the TotalSegmentator tool in the Segmentation View. If TotalSegmentator is not installed yet, click "Install TotalSegmentator". A dialog shows the installation progress; it downloads several packages and may take a while, but this is a one-time step.
--# Once installed, choose a task from the drop-down. The default "total" segments the whole body. For the "total" and "total_mr" tasks, faster lower-resolution variants ("fast", 3 mm, and "fastest", 6 mm) are offered as separate entries. Tasks that require a (free, non-commercial) TotalSegmentator license are marked "License required:" and cannot be run until a license is set (see below).
--# Click "Run TotalSegmentator" to compute a preview. On the first run of a task, the required model weights are downloaded automatically. The run executes in a background process, so the application stays responsive. A progress notification shows the run, says when model weights are being downloaded, and offers to cancel the run. Selecting another image or segmentation stops the run as well.
--# Confirm the preview to transfer it into your segmentation.
+-# Select the TotalSegmentator tool in the Segmentation View. If TotalSegmentator is not installed yet, click "Install TotalSegmentator". A dialog shows the installation progress; it downloads PyTorch, TotalSegmentator and the packages they need, which may take a while, but this is a one-time step.
+-# When you select the tool, TotalSegmentator starts in the background and reads its tasks, which takes a few seconds. A progress notification shows it and offers to cancel it. If the installed release of TotalSegmentator is not the one this version of MITK needs, the tool says so; uninstall it in the settings and install it again.
+-# Choose a task from the drop-down. The whole-body tasks come first, then the other tasks, then the tasks that require a license. Tasks for MR images are marked "(MR)". A task that can also run at a lower resolution offers it as a separate entry, for example "total - fast (3 mm)" and "total - fastest (6 mm)", which are quicker but less detailed. Tasks that require a (free, non-commercial) TotalSegmentator license are marked "License required:" and cannot be run until a license is set (see below).
+-# For the whole-body tasks, you can choose which structures to segment (see below). By default, a task segments all of its structures.
+-# Click "Run TotalSegmentator" to compute a preview. On the first run of a task, its model weights are downloaded, which the progress notification says. The application stays responsive during the run, and the progress notification offers to cancel it, which stops TotalSegmentator at once.
+-# The preview has one label per structure that TotalSegmentator found, named like the structure. If it found none of them, the tool says so. Choose whether to transfer all labels or only selected ones, then confirm the preview to add the labels to your segmentation. The tool stays active, so you can run another task.
 
-Click "Settings" in the tool (or open Preferences (Ctrl+P) > TotalSegmentator) to choose the compute device (a specific GPU, or CPU), enter a TotalSegmentator license to unlock the licensed tasks, clear the downloaded model weights, or uninstall the managed environment.
+For a dynamic image, the currently selected time step is segmented. To segment all time steps, check "Process all time steps" before you confirm; the result of every time step is then computed, which can take long.
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorStructures Structures
+
+The tasks whose names start with "total" can segment a subset of their structures, which is quicker than segmenting all of them. For these tasks, the tool lists the structures of the task. Check the ones you want to segment; a click anywhere on an entry checks or unchecks it. To find a structure, type a part of its name into the filter field above the list. The line above the filter names the checked structures, as many as fit, and its tool tip names all of them. "Clear" unchecks all structures, so that the task segments all of them again, and so does choosing another task. For a subset, TotalSegmentator first locates the region of the chosen structures with an additional model, which it downloads on the first run that needs it.
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorSettings Settings
+
+Click "Settings" in the tool (or open Preferences (Ctrl+P) > Segmentation > TotalSegmentator) to choose the compute device (a GPU chosen automatically, a specific GPU, or the CPU), to enter a TotalSegmentator license that unlocks the licensed tasks, to clear the downloaded model weights, or to uninstall the managed environment. Clearing the weights or uninstalling stops TotalSegmentator first; weights that were cleared are downloaded again when a task needs them.
 
 \subsection org_mitk_views_segmentation3dthresholdtool 3D Threshold tool
 

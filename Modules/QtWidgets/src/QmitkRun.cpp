@@ -29,6 +29,9 @@ found in the LICENSE file.
 
 namespace
 {
+  // How many RunAndWait() calls on this thread are waiting for their task.
+  thread_local int blockingWaits = 0;
+
   /**
    * Whether a pointer event landed on a progress notification. The card
    * carries the cancel and the dismiss, which are the only controls an
@@ -163,6 +166,9 @@ namespace
    */
   void RunAndWait(const std::function<void()>& task, const std::function<void()>& onFinished)
   {
+    ++blockingWaits;
+    const auto endWait = qScopeGuard([]() { --blockingWaits; });
+
     std::exception_ptr exception;
 
     auto future = QtConcurrent::run([&]() {
@@ -226,6 +232,11 @@ namespace
   }
 }
 
+bool QmitkIsWaitingForBlockingTask()
+{
+  return 0 < blockingWaits;
+}
+
 void QmitkProcessEventsUntil(const std::function<bool()>& done)
 {
   while (!done())
@@ -239,9 +250,9 @@ void QmitkProcessEventsUntil(const std::function<bool()>& done)
   }
 }
 
-void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task)
+void QmitkRunAsyncBlocking(QWidget* parent, const QString& title, const QString& label, std::function<void()> task)
 {
-  QProgressDialog dialog(label, {}, 0, 0);
+  QProgressDialog dialog(label, {}, 0, 0, parent);
   dialog.setWindowModality(Qt::ApplicationModal);
   dialog.setWindowTitle(title);
   dialog.setMinimumDuration(250);

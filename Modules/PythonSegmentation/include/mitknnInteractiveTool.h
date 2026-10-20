@@ -16,6 +16,9 @@ found in the LICENSE file.
 #include <mitkSegWithPreviewTool.h>
 #include <mitknnInteractiveEnums.h>
 
+#include <exception>
+#include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
@@ -28,7 +31,7 @@ namespace mitk::nnInteractive
 
 namespace mitk
 {
-  class PythonContext;
+  class ProgressTask;
 
   /** \brief Segmentation tool integrating the nnInteractive deep learning model.
    *
@@ -39,18 +42,19 @@ namespace mitk
    *
    * The tool manages:
    * - A set of Interactor instances (one per InteractionType) for user input
-   * - A Python session that hosts the nnInteractive inference model
-   * - A virtual environment for Python dependency isolation
+   * - An inference session, hosted by a PythonWorker process that runs the
+   *   interpreter of the tool's virtual environment
    * - Backend selection (CUDA GPU or CPU)
    *
    * The typical lifecycle is:
-   * -# Create a Python context via CreatePythonContext()
+   * -# Check the installation of the virtual environment (GetVirtualEnvName())
+   *    with a PythonPackage::PackageProbe
    * -# Start a session via StartSession() (downloads and loads the model)
    * -# Enable an interactor via EnableInteractor() for user interaction
    * -# The tool automatically updates the preview segmentation on each interaction
    * -# End the session via EndSession() or tool deactivation
    *
-   * \sa SegWithPreviewTool, PythonContext, nnInteractive::Interactor,
+   * \sa SegWithPreviewTool, PythonWorker, nnInteractive::Interactor,
    *     QmitknnInteractiveToolGUI
    */
   class MITKPYTHONSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
@@ -76,6 +80,23 @@ namespace mitk
       bool Mask = true;     /**< \brief Initial-segmentation mask ("initial_label") supported. */
     };
 
+    /** \brief Why a running session was lost.
+     *
+     * \sa SessionLostEvent
+     */
+    struct SessionLoss
+    {
+      enum class Cause
+      {
+        RemoteConnection, /**< \brief The lease expired, or the server is at capacity or unreachable. */
+        WorkerExited,     /**< \brief The worker process that hosted the session ended unexpectedly. */
+        Cancelled         /**< \brief The user cancelled a prompt, which ended the worker process of the session. */
+      };
+
+      Cause Reason;
+      std::string Details; /**< \brief What was reported, e.g. the exit code and last output of the worker. */
+    };
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
     itkFactorylessNewMacro(Self)
 
@@ -99,6 +120,10 @@ namespace mitk
      * Python session. Emits DeactivatedEvent at the end so observers can
      * run cleanup that must not happen from the destructor path (e.g.
      * removing unused auto-created labels in the GUI).
+     *
+     * While a prompt computes, the session ends only once the prompt has
+     * stopped, after DeactivatedEvent. While StartSession() runs, the start
+     * ends itself, and DeactivatedEvent is not emitted.
      *
      * \sa DeactivatedEvent
      */
@@ -211,8 +236,8 @@ namespace mitk
 
     /** \brief Returns whether the running session's backend supports undo.
      *
-     * Reads the session's \c supports_undo capability (present on both local
-     * and remote sessions). Older nnInteractive versions without undo report
+     * The session's \c supports_undo capability (present on both local and
+     * remote sessions). Older nnInteractive versions without undo report
      * \c false, letting the GUI keep the Undo control disabled. Returns
      * \c false when no session is running.
      *
@@ -284,55 +309,6 @@ namespace mitk
      */
     std::string GetVirtualEnvName() const;
 
-    /** \brief Creates and activates a Python context with a virtual environment.
-     *
-     * The virtual environment name is determined by GetVirtualEnvName().
-     *
-     * \return \c true if the Python context was successfully created,
-     *         \c false if an error occurred.
-     *
-     * \sa GetPythonContext(), PythonContext
-     */
-    bool CreatePythonContext();
-
-    /** \brief Returns the current Python context.
-     *
-     * \return Pointer to the PythonContext, or \c nullptr if none has been
-     *         created yet.
-     *
-     * \sa CreatePythonContext()
-     */
-    PythonContext* GetPythonContext() const;
-
-    /** \brief Checks whether the nnInteractive Python package is installed.
-     *
-     * Uses Python's importlib to check for the presence of the nnInteractive
-     * package in the active virtual environment.
-     *
-     * \pre A Python context must have been created via CreatePythonContext().
-     *
-     * \return \c true if the package is installed, \c false otherwise.
-     */
-    bool IsInstalled() const;
-
-    /** \brief Checks whether local (in-process) inference is available.
-     *
-     * Local inference is provided by the full "nnInteractive" distribution (which
-     * installs PyTorch and the inference backend); the lightweight client-only
-     * "nninteractive-client" distribution shares the same "nnInteractive" import
-     * namespace but offers remote sessions only. Detection reads the installed
-     * distribution metadata rather than importing the package, so it stays cheap
-     * and, crucially, has no import side effects: importing an nnInteractive
-     * submodule would map native libraries from the virtual environment and block
-     * a later in-place update on Windows.
-     *
-     * \pre A Python context must have been created via CreatePythonContext().
-     *
-     * \return \c true if local inference is available (full install), \c false for
-     *         a client-only install.
-     */
-    bool IsLocalInferenceAvailable() const;
-
     /** \brief The preferences baked into a session at initialization, each paired
      *         with its default value (as stored).
      *
@@ -351,6 +327,7 @@ namespace mitk
 
     /** \brief Starts an nnInteractive inference session in the configured mode.
      *
+     * Starts a worker process with the interpreter of the virtual environment.
      * In local mode it downloads/loads the model checkpoint and initializes the
      * inference session on a CUDA or CPU backend (determined from CUDA device
      * availability and user preferences). In remote mode it claims a session on
@@ -359,93 +336,80 @@ namespace mitk
      *
      * If a session is already running, it is ended first.
      *
-     * \pre A Python context must have been created via CreatePythonContext().
-     * \pre A reference image must be available through the ToolManager.
+     * The worker downloads and loads off the GUI thread, so this returns before
+     * the session has started. A deactivation of the tool or an AbortSession()
+     * meanwhile ends the start, and so does cancelling \p task, which kills the
+     * worker right away.
      *
-     * \throw mitk::Exception if the session setup fails (local or remote).
+     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * \param[in] done Receives null once the session runs, or a mitk::Exception
+     *            if the session setup fails (local or remote), was cancelled or
+     *            was aborted. Runs on the GUI thread, before this returns if
+     *            the start fails right away, e.g. while the tool is busy or
+     *            no server is configured.
+     *
+     * \pre nnInteractive must be installed in the virtual environment.
+     * \pre A reference image must be available through the ToolManager.
      *
      * \sa EndSession(), IsSessionRunning(), IsRemoteSession()
      */
-    void StartSession();
+    void StartSession(std::shared_ptr<ProgressTask> task, std::function<void(std::exception_ptr error)> done);
 
     /** \brief Ends the current nnInteractive inference session.
      *
-     * For a local session it cleans up the Python session, releases model
-     * resources, and optionally empties the CUDA cache. For a remote session it
-     * releases the server lease (best-effort and idempotent) so the slot frees up
-     * for other users. This is a no-op if no session is running.
+     * For a remote session it first releases the server lease (best-effort) so
+     * the slot frees up for other users. Then it ends the worker process, which
+     * frees the model and all memory of the session. This is a no-op if no
+     * session is running.
      *
      * \sa StartSession(), IsSessionRunning()
      */
     void EndSession();
 
-    /** \brief Tears down a remote session whose connection was lost.
+    /** \brief Tears down a session that was lost.
      *
-     * Disables the active interactor, ends the (now dead) Python session,
-     * clears all interactions/prompts and the preview, and refreshes the
-     * render windows. SessionEndedEvent (emitted by the internal EndSession)
-     * lets the GUI revert its session-dependent controls so the user only has
-     * to click Initialize to reconnect.
+     * Disables the active interactor, ends the (now dead) session, clears all
+     * interactions/prompts and the preview, and refreshes the render windows.
+     * SessionEndedEvent (emitted by the internal EndSession) lets the GUI
+     * revert its session-dependent controls so the user only has to click
+     * Initialize to start over.
+     *
+     * While StartSession() runs or a prompt computes, this only asks them to
+     * stop. The teardown follows once they have.
      *
      * \warning Must be called from a clean call stack (e.g. deferred from the
      *          GUI), never from within an interactor's event handling, because
      *          it disables and resets the interactors.
      *
-     * \sa SessionExpiredEvent, EndSession()
+     * \sa SessionLostEvent, EndSession()
      */
     void AbortSession();
 
     /** \brief Checks whether an nnInteractive session is currently running.
      *
-     * \return \c true if a Python context exists and contains a valid
-     *         session variable, \c false otherwise.
+     * Stays \c true for a session whose worker has died until the session is
+     * ended, so that AbortSession() can clean up.
      */
     bool IsSessionRunning() const;
+
+    /** \brief Returns whether StartSession() has not ended yet.
+     *
+     * AbortSession() meanwhile ends the start once its work has stopped.
+     */
+    bool IsSessionStarting() const;
+
+    /** \brief Tells that a prompt can be cancelled, which ends the session. */
+    bool IsCancelable() const override;
 
     /** \brief Returns whether the running session is a remote (server) session.
      *
      * \return \c true if the current session was started in remote mode (i.e.
      *         it talks to an nninteractive-server), \c false for a local
-     *         in-process session or when no session is running.
+     *         session or when no session is running.
      *
      * \sa StartSession()
      */
     bool IsRemoteSession() const;
-
-    /** \brief Sends a single keep-alive heartbeat for a running remote session.
-     *
-     * Remote nnInteractive sessions are reaped server-side after a liveness
-     * timeout unless the client periodically proves it is alive. The client
-     * library ships its own background heartbeat daemon, but that Python thread
-     * cannot run while MITK is idle: the embedded interpreter holds the GIL on
-     * the Qt main thread between PythonContext::Execute() calls, so the daemon
-     * never gets to beat. This method drives the heartbeat from the Qt event
-     * loop instead and must be called periodically (see GetHeartbeatIntervalMs)
-     * by the GUI for as long as a remote session is running.
-     *
-     * A transient transport error is tolerated (the next beat retries), matching
-     * the library's own heartbeat loop. A definitive lease expiry emits
-     * SessionExpiredEvent so the GUI tears the dead session down. This is a no-op
-     * for local sessions or when no session is running, and never throws (it is
-     * invoked from a Qt timer slot).
-     *
-     * \sa GetHeartbeatIntervalMs(), SessionExpiredEvent
-     */
-    void Heartbeat();
-
-    /** \brief Returns the interval, in milliseconds, at which Heartbeat() should
-     *         be called for the running remote session.
-     *
-     * Derived from the server-provided liveness timeout: half of it, but never
-     * less often than every 5 seconds (max(5 s, liveness / 2)), mirroring the
-     * client library's own cadence. Returns \c 0 for local sessions, when no
-     * session is running, or when the server has disabled the liveness timeout
-     * (no heartbeat needed). The GUI starts a timer only when this is greater
-     * than zero.
-     *
-     * \sa Heartbeat()
-     */
-    int GetHeartbeatIntervalMs() const;
 
     /** \brief Returns which interaction types the running session supports.
      *
@@ -460,13 +424,12 @@ namespace mitk
 
     /** \brief Returns the running session's model checkpoint license, if any.
      *
-     * Reads the nnInteractive session's \c license attribute, populated
-     * identically for local sessions (first line of the checkpoint's LICENSE
-     * file, or a fallback for the official model) and remote sessions (mirrored
-     * from the server's /capabilities response). The special value
-     * "!!MISSING!!" means the license is unknown. Returns \c std::nullopt when
-     * no session is running or no license is reported. This is a cached local
-     * attribute read (no network call).
+     * The nnInteractive session reports it identically for local sessions
+     * (first line of the checkpoint's LICENSE file, or a fallback for the
+     * official model) and remote sessions (mirrored from the server's
+     * /capabilities response). The special value "!!MISSING!!" means the
+     * license is unknown. Returns \c std::nullopt when no session is running or
+     * no license is reported.
      *
      * \sa GetSupportedInteractions()
      */
@@ -480,7 +443,9 @@ namespace mitk
      * triggers a preview update.
      *
      * \param[in] mask Pointer to the mask Image to use as initial
-     *                 segmentation. If \c nullptr, this is a no-op.
+     *                 segmentation. If \c nullptr, this is a no-op. A mask
+     *                 with several time steps is read at the time step of
+     *                 the segmentation that the session works on.
      *
      * \sa ResetInteractions()
      */
@@ -496,9 +461,10 @@ namespace mitk
 
     /** \brief Event triggered after the preview has been updated from a user interaction.
      *
-     * Emitted at the end of DoUpdatePreview() when the update was driven by
-     * an enabled interactor (i.e., the user placed a point/box/scribble/lasso)
-     * and the prediction result has been written to the preview image.
+     * Emitted on the GUI thread once the prediction of an update driven by an
+     * enabled interactor (i.e., the user placed a point/box/scribble/lasso) has
+     * been written to the preview image. That is after DoUpdatePreview() has
+     * returned, as the prediction runs off the GUI thread.
      *
      * Not emitted for initial-mask-based updates or reset operations.
      */
@@ -507,37 +473,43 @@ namespace mitk
     /** \brief Event triggered at the end of Deactivated().
      *
      * Emitted after the tool has released interactors and ended its Python
-     * session. GUI code can subscribe to run teardown logic that must happen
+     * session, or before the session ends if a prompt still computes (see
+     * Deactivated()). GUI code can subscribe to run teardown logic that must happen
      * on a proper user-initiated deactivation (as opposed to the GUI's Qt
      * destructor, which may run during application shutdown when observers
      * and widgets are in a partially-destructed state).
      */
     Message<> DeactivatedEvent;
 
-    /** \brief Event triggered when the Python session has ended.
+    /** \brief Event triggered when the session has ended.
      *
-     * Emitted from EndSession() after the Python session has been torn down.
+     * Emitted from EndSession() after the session has been torn down.
      * Fires both on a normal Deactivated() (in which case DeactivatedEvent
-     * follows) and when the session is auto-ended because the current image
+     * follows, or precedes it if a prompt still computed) and when the session is auto-ended because the current image
      * or segmentation time step changed during a 4D session. GUI code can
      * subscribe to revert session-dependent UI controls to their pre-init
      * state.
      */
     Message<> SessionEndedEvent;
 
-    /** \brief Event triggered when a remote session was lost server-side.
+    /** \brief Event triggered when a running session was lost.
      *
-     * Emitted while the (now dead) remote session is still nominally running,
-     * when a remote operation or the heartbeat failed because the lease expired
-     * or the server is at capacity / unreachable. Teardown has NOT happened yet:
-     * the GUI must defer it, calling AbortSession() on the next event-loop tick
-     * (teardown must not run inside an interactor's event handling), which then
-     * ends the session and fires SessionEndedEvent. Do not assume the session is
-     * already ended when this fires.
+     * Emitted while the (now dead) session is still nominally running, when an
+     * operation failed because the remote lease expired, the server is at
+     * capacity or unreachable, the worker process ended, or the user cancelled
+     * a prompt, which ends the worker process as well. Teardown has NOT
+     * happened yet: the GUI must defer it, calling AbortSession() on the next
+     * event-loop tick (teardown must not run inside an interactor's event
+     * handling), which then ends the session and fires SessionEndedEvent. Do
+     * not assume the session is already ended when this fires.
+     *
+     * A loss is noticed only by the next operation: nothing watches an idle
+     * session, so a remote lease that expires meanwhile is reported when the
+     * user interacts again.
      *
      * \sa SessionEndedEvent, AbortSession()
      */
-    Message<> SessionExpiredEvent;
+    Message1<const SessionLoss&> SessionLostEvent;
 
   protected:
     /** \brief Default constructor. Initializes interactors and connects events.
@@ -558,7 +530,8 @@ namespace mitk
     /** \brief Updates the preview segmentation based on the latest interaction.
      *
      * Dispatches the latest interaction data to the nnInteractive Python
-     * model and writes the prediction result into the preview image.
+     * model and writes the prediction result into the preview image. The model
+     * predicts off the GUI thread.
      *
      * \param[in] inputAtTimeStep The input image at the current time step.
      * \param[in] oldSegAtTimeStep The previous segmentation at the current
@@ -607,61 +580,43 @@ namespace mitk
      */
     void SetPreviewLabel(MultiLabelSegmentation::LabelValueType value, const Color& color);
 
+    /** \brief Suspends the input of the interactors, so a prompt made while
+     *         this one computes is ignored.
+     */
+    void UpdatePrepare() override;
+
+    /** \brief Resumes the input of the interactors, and ends the session
+     *         once a prompt has stopped, if it was asked for meanwhile.
+     *
+     * The tool can be deactivated, the session aborted or the time point
+     * changed while a prompt computes off the GUI thread, which uses the worker.
+     */
+    void UpdateCleanUp() override;
+
   private:
-    /** \brief Constructs a local in-process inference session.
+    /** \brief Ends the session and clears the interactions and the preview.
      *
-     * Detects the backend (CUDA/CPU), resolves the model checkpoint, and
-     * instantiates the local nnInteractiveInferenceSession. Called by
-     * StartSession() when inference mode is "local".
+     * Runs through AbortSession() once nothing uses the worker: right away, or
+     * once a prompt that used it has stopped, also for a deactivation of the
+     * tool.
      */
-    void ConstructLocalSession();
+    void TearDownSession();
 
-    /** \brief Constructs a remote inference session against an nninteractive-server.
-     *
-     * Reads the server URL and API key from the preferences and instantiates
-     * nnInteractiveRemoteInferenceSession (which claims a session on the
-     * server). Called by StartSession() when inference mode is "remote".
-     *
-     * \throw mitk::Exception if no server URL is configured or the server
-     *        cannot be reached / is at capacity.
+    /** \brief Reports why a prompt failed: a lost or cancelled session goes to
+     *         SessionLostEvent, any other error is rethrown.
      */
-    void ConstructRemoteSession();
+    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task);
 
-    /** \brief Allocates the target buffer, binds the reference image and target
-     *         buffer to the Python session, and pins the session to the current
-     *         time step.
+    /** \brief If an error means the session is lost, request teardown and
+     *         report it as handled.
      *
-     * Shared by ConstructLocalSession() and ConstructRemoteSession(). For
-     * remote sessions the numpy target buffer is handed to the session
-     * directly (the server mirrors prediction diffs into it in place); for
-     * local sessions it is wrapped in a torch tensor as before.
+     * Emits SessionLostEvent (the GUI then tears the session down on the next
+     * event-loop tick via AbortSession(), since teardown must not run while an
+     * interactor is mid-event) and returns \c true so the caller can swallow
+     * the error. Returns \c false for any other error, which the caller should
+     * rethrow.
      */
-    void BindSessionImageAndTargetBuffer();
-
-    /** \brief Does this error indicate a lost or failed remote connection?
-     *
-     * Remote session calls are wrapped so that httpx transport and status
-     * errors (httpx.HTTPError, the base of all of them) and the typed lease
-     * errors are caught by type and re-raised as a single stable sentinel.
-     * This checks for that sentinel, so detection does not depend on httpx or
-     * OS error wording. Always \c false for local sessions.
-     *
-     * \param[in] message The description of a caught mitk::Exception.
-     */
-    bool IsRemoteConnectionError(const std::string& message) const;
-
-    /** \brief If an error indicates a lost remote connection, request teardown
-     *         and report it as handled.
-     *
-     * Emits SessionExpiredEvent (the GUI then tears the session down on the
-     * next event-loop tick via AbortSession(), since teardown must not run
-     * while an interactor is mid-event) and returns \c true so the caller can
-     * swallow the error. Returns \c false for any other error, which the
-     * caller should rethrow.
-     *
-     * \param[in] errorMessage The description of a caught mitk::Exception.
-     */
-    bool HandleSessionError(const std::string& errorMessage);
+    bool HandleSessionError(const Exception& error);
 
     class Impl;
     std::unique_ptr<Impl> m_Impl;

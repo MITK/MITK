@@ -381,6 +381,12 @@ QLineEdit:hover {
   border: 1px solid #2b7de1;
 }
 
+/* The native styles draw a dark clear button that does not fit the dark
+   theme. */
+QLineEdit {
+  lineedit-clear-button-icon: url(:/org.blueberry.ui.qt/dark/lineedit-clear.svg);
+}
+
 QLabel, QLabel:disabled {
   background-color: none;
 }
@@ -641,19 +647,21 @@ QTreeView::branch:open:has-children:!has-siblings:hover {
   image: url(:/org.blueberry.ui.qt/dark/down-arrow-hover.svg);
 }
 
-QTreeView::indicator:unchecked {
+QTreeView::indicator:unchecked, QListView::indicator:unchecked {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked.svg);
 }
 
-QTreeView::indicator:unchecked:selected {
+QTreeView::indicator:unchecked:selected, QListView::indicator:unchecked:selected {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-selected.svg);
 }
 
-QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
+QTreeView::indicator:checked, QTreeView::indicator:indeterminate,
+QListView::indicator:checked, QListView::indicator:indeterminate {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked.svg);
 }
 
-QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected {
+QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected,
+QListView::indicator:checked:selected, QListView::indicator:indeterminate:selected {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-selected.svg);
 }
 

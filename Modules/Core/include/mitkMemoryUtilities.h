@@ -16,6 +16,9 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 #include <itkMacro.h>
 
+#include <cstdint>
+#include <string>
+
 namespace mitk
 {
   /** \brief Utility functions for querying system and process memory information. */
@@ -52,6 +55,17 @@ namespace mitk
      * \return The available physical memory in bytes, or 0 if the value could not be determined.
      */
     MITKCORE_EXPORT size_t GetAvailableSizeOfPhysicalRam();
+
+    /**
+     * \brief Formats a size in bytes for people, e.g. "512 B", "4.0 KB" or "1.3 GB".
+     *
+     * The units are powers of 1024, named B, KB, MB, GB and TB as most user
+     * interfaces do, with one decimal above bytes. The format does not depend
+     * on the global locale, which suits log messages and exceptions. Qt user
+     * interfaces use QLocale::formattedDataSize() instead, which follows the
+     * locale of the user.
+     */
+    MITKCORE_EXPORT std::string FormatSize(std::uint64_t bytes);
   }
 }
 

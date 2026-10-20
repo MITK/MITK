@@ -46,9 +46,6 @@ public:
 
 private:
   void UpdateMemoryUsage();
-  std::string FormatMemorySize(size_t size);
-  std::string FormatPercentage(double val);
-  std::string GetMemoryDescription(size_t processSize, float percentage);
 
   std::unique_ptr<Ui::QmitkMemoryUsageIndicator> m_Ui;
   size_t m_PreviousState;

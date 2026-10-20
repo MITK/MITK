@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <mitkToolManagerProvider.h>
 #include <mitkTotalSegmentatorInstall.h>
 #include <mitkTotalSegmentatorTool.h>
+#include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
 #include <QmitkVenvProcess.h>
@@ -144,21 +145,39 @@ namespace
     return RunVenvExecutable(QmitkVenvProcess::ToQString(python), QStringList() << "-c" << CLEAR_WEIGHTS_CODE);
   }
 
-  // A run uses the environment and the model weights from a process of its
-  // own, which no check for loaded modules can see. Tells the user and returns
-  // true while one is in progress.
+  // A run or an initialization uses the environment and the model weights from
+  // a process of its own, which no check for loaded modules can see. Tells the
+  // user and returns true while one is in progress.
   bool RefuseDuringRun(QWidget* parent)
   {
     const auto* tool = dynamic_cast<const mitk::TotalSegmentatorTool*>(
       mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetActiveTool());
 
-    if (tool == nullptr || !tool->IsUpdating())
+    if (tool == nullptr || (!tool->IsUpdating() && !tool->IsInitializing()))
       return false;
 
     QMessageBox::information(parent, "TotalSegmentator",
-      "TotalSegmentator is running. Wait until it has finished or cancel it, then try again.");
+      "TotalSegmentator is busy. Wait until it has finished or cancel it, then try again.");
 
     return true;
+  }
+
+  // The worker of the tool keeps files of the environment and the weights
+  // open. Ends it; the tool is started again when it is needed.
+  void EndToolWorker()
+  {
+    auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(
+      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetActiveTool());
+
+    try
+    {
+      if (tool != nullptr)
+        tool->Uninitialize();
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "TotalSegmentator: " << e.GetDescription();
+    }
   }
 #endif
 }
@@ -266,7 +285,7 @@ void QmitkTotalSegmentatorPreferencePage::DetectLicense()
   // imports totalsegmentator (which pulls in torch), so running it directly on the
   // GUI thread froze the preferences dialog for seconds on every open.
   const auto license = QmitkRunAsyncBlocking<std::optional<QString>>(
-    "TotalSegmentator", "Reading the TotalSegmentator license...", [] { return ReadLicense(); });
+    m_Control, "TotalSegmentator", "Reading the TotalSegmentator license...", [] { return ReadLicense(); });
 
   // Leave the cached state untouched if the license could not be determined
   // (e.g. a transient subprocess failure), rather than falsely clearing it. This
@@ -329,7 +348,7 @@ void QmitkTotalSegmentatorPreferencePage::OnApplyLicenseClicked()
   }
 
   const auto result = QmitkRunAsyncBlocking<std::pair<bool, QString>>(
-    "TotalSegmentator", "Applying license...", [key] { return ApplyLicense(key); });
+    m_Control, "TotalSegmentator", "Applying license...", [key] { return ApplyLicense(key); });
 
   GetPreferences()->PutBool("TotalSeg/hasLicense", result.first);
 
@@ -347,7 +366,7 @@ void QmitkTotalSegmentatorPreferencePage::OnRemoveLicenseClicked()
 {
 #if MITK_HAS_PYTHON
   const auto result = QmitkRunAsyncBlocking<std::pair<bool, QString>>(
-    "TotalSegmentator", "Removing license...", [] { return ClearLicense(); });
+    m_Control, "TotalSegmentator", "Removing license...", [] { return ClearLicense(); });
 
   GetPreferences()->PutBool("TotalSeg/hasLicense", false);
   m_Ui->licenseLineEdit->clear();
@@ -377,8 +396,10 @@ void QmitkTotalSegmentatorPreferencePage::OnClearModelWeightsClicked()
   if (answer != QMessageBox::Yes)
     return;
 
+  EndToolWorker();
+
   const auto result = QmitkRunAsyncBlocking<std::pair<bool, QString>>(
-    "TotalSegmentator", "Clearing model weights...", [] { return ClearModelWeights(); });
+    m_Control, "TotalSegmentator", "Clearing model weights...", [] { return ClearModelWeights(); });
 
   if (result.first)
     QMessageBox::information(m_Control, "TotalSegmentator", "Model weights cleared.");
@@ -402,8 +423,10 @@ void QmitkTotalSegmentatorPreferencePage::OnUninstallButtonClicked()
   if (answer != QMessageBox::Yes)
     return;
 
+  EndToolWorker();
+
   const bool removed = QmitkRunAsyncBlocking<bool>(
-    "Uninstall TotalSegmentator", "Removing the TotalSegmentator virtual environment...",
+    m_Control, "Uninstall TotalSegmentator", "Removing the TotalSegmentator virtual environment...",
     [] { return mitk::PythonHelper::RemoveVirtualEnv(mitk::TotalSegmentator::VENV_NAME); });
 
   if (removed)

@@ -64,6 +64,40 @@ mitk::LogBackendText::~LogBackendText()
 
 static HANDLE g_hConsole;
 
+namespace
+{
+  /* Log messages are UTF-8, but a console decodes what it receives with its
+   * output code page, the OEM code page (e.g. 437) unless set otherwise. The
+   * activeCodePage of the application manifest only changes the ANSI code
+   * page. The previous code page is restored at a normal exit, since the
+   * console MITK was started from may outlive it. A crash or a kill leaves
+   * that console at UTF-8.
+   */
+  class ConsoleUtf8Output
+  {
+  public:
+    ConsoleUtf8Output()
+      : m_PreviousCodePage(GetConsoleOutputCP())
+    {
+      // 0 means that there is no console.
+      if (m_PreviousCodePage != 0 && m_PreviousCodePage != CP_UTF8)
+        SetConsoleOutputCP(CP_UTF8);
+    }
+
+    ~ConsoleUtf8Output()
+    {
+      if (m_PreviousCodePage != 0 && m_PreviousCodePage != CP_UTF8)
+        SetConsoleOutputCP(m_PreviousCodePage);
+    }
+
+    ConsoleUtf8Output(const ConsoleUtf8Output&) = delete;
+    ConsoleUtf8Output& operator=(const ConsoleUtf8Output&) = delete;
+
+  private:
+    const UINT m_PreviousCodePage;
+  };
+}
+
 class AutoCategorize
 {
 protected:
@@ -476,6 +510,8 @@ void mitk::LogBackendText::FormatSmartWindows(const LogMessage &message, int /*t
   {
     g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     g_init = true;
+
+    static const ConsoleUtf8Output consoleUtf8Output;
 
     std::string title = "MITK Log";
 

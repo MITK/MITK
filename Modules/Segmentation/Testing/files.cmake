@@ -12,6 +12,7 @@ set(MODULE_TESTS
   mitkToolInteractionTest.cpp
   mitkToolCanHandleTest.cpp
   mitkToolManagerExclusiveInteractionTest.cpp
+  mitkSegWithPreviewToolAsyncTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

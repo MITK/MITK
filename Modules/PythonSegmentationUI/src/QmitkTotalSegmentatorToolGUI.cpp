@@ -17,28 +17,22 @@ found in the LICENSE file.
 #include <mitkTotalSegmentatorTool.h>
 
 #include <mitkCoreServices.h>
-#include <mitkFileSystem.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
-#include <mitkPythonHelper.h>
+#include <mitkProgressTask.h>
 
 #include <QmitkPipInstallDialog.h>
 #include <QmitkIconTheme.h>
 #include <QmitkInfoCard.h>
-#include <QmitkVenvProcess.h>
 
-#include <QApplication>
 #include <QComboBox>
-#include <QEventLoop>
-#include <QIcon>
+#include <QMouseEvent>
 #include <QPointer>
-#include <QProcess>
-#include <QStringList>
+#include <QSignalBlocker>
+#include <QStyledItemDelegate>
 #include <QTimer>
 
-#include <nlohmann/json.hpp>
-
-#include <fstream>
+#include <algorithm>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitkTotalSegmentatorToolGUI, "")
 
@@ -52,115 +46,36 @@ namespace
   constexpr int SpeedRole = Qt::UserRole + 1;    // int: TotalSegmentatorTool::Speed
   constexpr int LicensedRole = Qt::UserRole + 2; // bool: task needs a license
 
-  // Single source of truth for the runnable TotalSegmentator tasks of the pinned
-  // 2.x line (the released package exposes no machine-readable task export).
-  // 'licensed' tasks stay visible but disabled until a license is set; 'multiRes'
-  // tasks additionally offer the fast (3 mm) and fastest (6 mm) variants (the
-  // others are single-resolution and TotalSegmentator rejects --fast for them).
-  // Modality is derived from the "_mr" suffix; label names come from the per-task
-  // JSON dumped at install time.
-  //
-  // Entries are listed in display order: the general-purpose "total"/"total_mr"
-  // first, then the remaining free tasks alphabetically, then the licensed tasks
-  // alphabetically. Keep this ordering when adding tasks.
-  struct TaskInfo
+  QString GetSpeedLabel(const mitk::TotalSegmentatorTool::SpeedInfo& speed)
   {
-    const char* name;
-    bool licensed;
-    bool multiRes;
-  };
+    const QString name = speed.Value == mitk::TotalSegmentatorTool::Speed::Fast ? "fast" : "fastest";
 
-  const TaskInfo TASKS[] = {
-    {"total", false, true},
-    {"total_mr", false, true},
-    {"abdominal_muscles", false, false},
-    {"body", false, false},
-    {"body_mr", false, false},
-    {"brain_aneurysm", false, false},
-    {"breasts", false, false},
-    {"cerebral_bleed", false, false},
-    {"craniofacial_structures", false, false},
-    {"head_glands_cavities", false, false},
-    {"head_muscles", false, false},
-    {"headneck_bones_vessels", false, false},
-    {"headneck_muscles", false, false},
-    {"hip_implant", false, false},
-    {"kidney_cysts", false, false},
-    {"liver_lesions", false, false},
-    {"liver_lesions_mr", false, false},
-    {"liver_segments", false, false},
-    {"liver_segments_mr", false, false},
-    {"liver_vessels", false, false},
-    {"lung_nodules", false, false},
-    {"lung_vessels", false, false},
-    {"oculomotor_muscles", false, false},
-    {"pleural_pericard_effusion", false, false},
-    {"teeth", false, false},
-    {"trunk_cavities", false, false},
-    {"ventricle_parts", false, false},
-    {"vertebrae_mr", false, false},
-    {"aortic_sinuses", true, false},
-    {"appendicular_bones", true, false},
-    {"appendicular_bones_mr", true, false},
-    {"brain_structures", true, false},
-    {"coronary_arteries", true, false},
-    {"face", true, false},
-    {"face_mr", true, false},
-    {"heartchambers_highres", true, false},
-    {"thigh_shoulder_muscles", true, false},
-    {"thigh_shoulder_muscles_mr", true, false},
-    {"tissue_4_types", true, false},
-    {"tissue_types", true, false},
-    {"tissue_types_mr", true, false},
-    {"vertebrae_body", true, false},
-    {"vertebrae_pp", true, false},
-    {"vertebrae_pp_refined", true, false}
-  };
-
-  // Absolute path to the managed environment's TotalSegmentator console script,
-  // or an empty path if the environment location cannot be resolved.
-  fs::path ExecutablePath()
-  {
-    return mitk::PythonHelper::GetVirtualEnvScriptPath(mitk::TotalSegmentator::VENV_NAME, "TotalSegmentator");
+    return speed.Resolution > 0
+      ? QString("%1 (%2 mm)").arg(name).arg(speed.Resolution)
+      : name;
   }
 
-  // Reads the { labelId: labelName } map for the given task from the JSON dumped at
-  // install time. Returns an empty map when the file or task is missing; the tool
-  // auto-names any label ids that are not covered.
-  std::map<mitk::Label::PixelType, std::string> ReadLabelNames(const fs::path& venvDir, const std::string& task)
+  // Toggles a checkable item on a click anywhere on it, not only on its check
+  // box. The view emits clicked() for a click on the box as well, after the
+  // base delegate toggled it, so toggling in a clicked() slot would toggle a
+  // click on the box twice.
+  class ToggleOnClickDelegate : public QStyledItemDelegate
   {
-    std::map<mitk::Label::PixelType, std::string> result;
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
 
-    if (venvDir.empty())
-      return result;
-
-    const auto jsonPath = venvDir / "mitk_totalseg_tasks.json";
-    std::error_code error;
-    if (!fs::exists(jsonPath, error))
-      return result;
-
-    try
+    bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) override
     {
-      std::ifstream stream(jsonPath);
-      nlohmann::json data;
-      stream >> data;
-
-      if (!data.contains(task))
-        return result;
-
-      for (auto it = data[task].begin(); it != data[task].end(); ++it)
+      if (event->type() == QEvent::MouseButtonRelease && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton &&
+          (index.flags() & Qt::ItemIsUserCheckable) && (index.flags() & Qt::ItemIsEnabled))
       {
-        const int id = std::stoi(it.key());
-        result[static_cast<mitk::Label::PixelType>(id)] = it.value().get<std::string>();
+        const auto state = index.data(Qt::CheckStateRole).value<Qt::CheckState>();
+        return model->setData(index, state == Qt::Checked ? Qt::Unchecked : Qt::Checked, Qt::CheckStateRole);
       }
-    }
-    catch (...)
-    {
-      result.clear();
-    }
 
-    return result;
-  }
+      return QStyledItemDelegate::editorEvent(event, model, option, index);
+    }
+  };
 }
 
 QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
@@ -185,6 +100,13 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
 
 QmitkTotalSegmentatorToolGUI::~QmitkTotalSegmentatorToolGUI()
 {
+  if (auto* tool = this->GetTool(); tool != nullptr)
+  {
+    tool->InitializedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent -= mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
+    tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
+  }
+
   if (m_Preferences != nullptr)
   {
     m_Preferences->OnPropertyChanged -=
@@ -206,13 +128,22 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_Ui->runButton->setIcon(QmitkIconTheme::GetIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg")));
 
+  m_Ui->structuresList->setItemDelegate(new ToggleOnClickDelegate(m_Ui->structuresList));
+
+  // How many names of the checked structures the summary shows depends on the
+  // width of its label, see ShowStructuresSummary().
+  m_Ui->structuresLabel->installEventFilter(this);
+
   // Hidden until the install state below sets the first message.
   this->SetStatus(QString());
 
   connect(m_Ui->installButton, &QPushButton::clicked, this, &Self::OnInstallButtonClicked);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
   connect(m_Ui->runButton, &QPushButton::clicked, this, &Self::OnRunButtonClicked);
-  connect(m_Ui->taskComboBox, &QComboBox::currentIndexChanged, this, &Self::UpdateRunButtonState);
+  connect(m_Ui->taskComboBox, &QComboBox::currentIndexChanged, this, &Self::OnTaskSelected);
+  connect(m_Ui->structuresList, &QListWidget::itemChanged, this, &Self::OnStructureChanged);
+  connect(m_Ui->clearStructuresButton, &QPushButton::clicked, this, &Self::OnClearStructuresClicked);
+  connect(m_Ui->structuresFilter, &QLineEdit::textChanged, this, &Self::OnStructuresFilterChanged);
 
   auto prefService = mitk::CoreServices::GetPreferencesService();
   m_Preferences = prefService->GetSystemPreferences()->Node(PREFERENCES_NODE.toStdString());
@@ -223,9 +154,33 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout* mainLayout)
         this, &QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent);
   }
 
-  this->RefreshInstallState();
-
   Superclass::InitializeUI(mainLayout);
+}
+
+void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  if (auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(newTool); tool != nullptr)
+  {
+    tool->InitializedEvent += mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent += mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
+    tool->OptionsChangedEvent += mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
+  }
+
+  this->RefreshInstallState();
+}
+
+void QmitkTotalSegmentatorToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
+{
+  if (auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(oldTool); tool != nullptr)
+  {
+    tool->InitializedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent -= mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
+    tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
+  }
+
+  Superclass::DisconnectOldTool(oldTool);
 }
 
 mitk::TotalSegmentatorTool* QmitkTotalSegmentatorToolGUI::GetTool()
@@ -235,99 +190,338 @@ mitk::TotalSegmentatorTool* QmitkTotalSegmentatorToolGUI::GetTool()
 
 void QmitkTotalSegmentatorToolGUI::RefreshInstallState()
 {
-  const bool installed =
-    mitk::PythonHelper::VirtualEnvExists(mitk::TotalSegmentator::VENV_NAME) && fs::exists(ExecutablePath());
+  const bool installed = mitk::TotalSegmentatorTool::IsInstalled();
+  const auto* tool = this->GetTool();
+  const bool initialized = tool != nullptr && tool->IsInitialized();
 
   m_Ui->installButton->setVisible(!installed);
   m_Ui->taskComboBox->setVisible(installed);
   m_Ui->runButton->setVisible(installed);
+  this->SetStructuresVisible(installed && initialized);
 
-  if (installed)
-  {
-    // PopulateTasks ends by calling UpdateRunButtonState, which sets the status
-    // (ready, or a license hint if the restored task needs one).
-    this->PopulateTasks();
-  }
-  else
+  if (!installed)
   {
     this->SetStatus("TotalSegmentator is not installed. Click 'Install TotalSegmentator'.");
+    return;
   }
+
+  if (initialized)
+  {
+    this->PopulateTasks();
+    return;
+  }
+
+  m_Ui->taskComboBox->setEnabled(false);
+  m_Ui->runButton->setEnabled(false);
+  this->SetStatus("Starting TotalSegmentator...");
+
+  // Not while the tool is being activated, which this may be called from.
+  QTimer::singleShot(0, this, &Self::InitializeTool);
 }
 
-void QmitkTotalSegmentatorToolGUI::PopulateTasks()
+void QmitkTotalSegmentatorToolGUI::InitializeTool()
 {
-  // Preserve the current selection across the rebuild: PopulateTasks runs on every
-  // RefreshInstallState (e.g. after merely opening Settings), so without this the
-  // user's chosen task would silently reset to "total".
-  const QString previousTask = m_Ui->taskComboBox->currentData(TaskRole).toString();
-  const int previousSpeed = m_Ui->taskComboBox->currentData(SpeedRole).toInt();
+  auto* tool = this->GetTool();
 
-  const bool hasLicense = m_Preferences != nullptr && m_Preferences->GetBool("TotalSeg/hasLicense", false);
+  if (tool == nullptr || tool->IsInitialized())
+    return;
 
-  // Rebuild without emitting currentIndexChanged for each intermediate state; the
-  // final UpdateRunButtonState() below reflects the restored selection once.
-  m_Ui->taskComboBox->blockSignals(true);
-  m_Ui->taskComboBox->clear();
+  // OnToolInitialized() shows the tasks, OnToolInitializationFailed() why there are none.
+  tool->Initialize(std::make_shared<mitk::ProgressTask>("Starting TotalSegmentator", mitk::ProgressTask::Indeterminate, true));
+}
 
-  auto addItem = [&](const QString& label, const QString& task, int speed, bool licensed)
-  {
-    m_Ui->taskComboBox->addItem(label);
-    const int index = m_Ui->taskComboBox->count() - 1;
-    m_Ui->taskComboBox->setItemData(index, task, TaskRole);
-    m_Ui->taskComboBox->setItemData(index, speed, SpeedRole);
-    m_Ui->taskComboBox->setItemData(index, licensed, LicensedRole);
+void QmitkTotalSegmentatorToolGUI::OnToolInitialized()
+{
+  this->SetStructuresVisible(true);
+  this->PopulateTasks();
 
-    // Licensed tasks stay selectable. Disabling them made the drop-down misbehave
-    // (clicking a disabled entry jumped to an arbitrary enabled one); instead they
-    // get a "License required: " prefix and the Run button is gated in
-    // UpdateRunButtonState.
-    if (licensed && !hasLicense)
-      m_Ui->taskComboBox->setItemData(
-        index, QStringLiteral("Requires a TotalSegmentator license. Set it in Settings."), Qt::ToolTipRole);
-  };
+  if (!m_RunAfterInitialization)
+    return;
 
-  for (const auto& info : TASKS)
-  {
-    const QString task = QString::fromLatin1(info.name);
+  m_RunAfterInitialization = false;
 
-    // Display-only annotations; the stored task id (TaskRole) stays the bare name
-    // that TotalSegmentator expects.
-    const QString modality = task.endsWith("_mr") ? QStringLiteral(" (MR)") : QString();
-    const QString prefix = info.licensed ? QStringLiteral("License required: ") : QString();
+  // Not from within the end of the start, and only what the Run button would
+  // run now, a licensed task without a license not.
+  QTimer::singleShot(0, this, [this]() {
+    if (m_Ui->runButton->isEnabled())
+      this->OnRunButtonClicked();
+  });
+}
 
-    addItem(prefix + task + modality, task, 0, info.licensed);
+void QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed(std::string message)
+{
+  m_RunAfterInitialization = false;
 
-    if (info.multiRes)
-    {
-      addItem(prefix + task + " - fast (3 mm)" + modality, task, 1, info.licensed);
-      addItem(prefix + task + " - fastest (6 mm)" + modality, task, 2, info.licensed);
-    }
-  }
-
-  // Restore the previous selection, but not a licensed task that is no longer
-  // runnable (e.g. the license was just removed) - fall back to the first entry.
-  int restored = -1;
-  for (int i = 0; i < m_Ui->taskComboBox->count(); ++i)
-  {
-    if (m_Ui->taskComboBox->itemData(i, TaskRole).toString() == previousTask &&
-        m_Ui->taskComboBox->itemData(i, SpeedRole).toInt() == previousSpeed)
-    {
-      const bool licensed = m_Ui->taskComboBox->itemData(i, LicensedRole).toBool();
-      if (!(licensed && !hasLicense))
-        restored = i;
-      break;
-    }
-  }
-
-  m_Ui->taskComboBox->setCurrentIndex(restored >= 0 ? restored : 0);
-  m_Ui->taskComboBox->blockSignals(false);
+  this->SetStatus(message.empty()
+    ? QString("Starting TotalSegmentator was cancelled. Click Run to try again.")
+    : QString::fromStdString(message), true);
 
   this->UpdateRunButtonState();
 }
 
+void QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged()
+{
+  this->ShowToolOptions();
+  this->UpdateRunButtonState();
+}
+
+void QmitkTotalSegmentatorToolGUI::PopulateTasks()
+{
+  const auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  const bool hasLicense = mitk::TotalSegmentatorTool::HasLicense();
+
+  // Rebuilt without emitting currentIndexChanged for each intermediate state,
+  // which would choose those tasks for the tool.
+  {
+    QSignalBlocker blocker(m_Ui->taskComboBox);
+    m_Ui->taskComboBox->clear();
+
+    for (const auto& info : tool->GetTasks())
+    {
+      const auto task = QString::fromStdString(info.Name);
+
+      // Display-only annotations; the stored task id (TaskRole) stays the bare name
+      // that TotalSegmentator expects.
+      const QString modality = info.MR ? QStringLiteral(" (MR)") : QString();
+      const QString prefix = info.Licensed ? QStringLiteral("License required: ") : QString();
+
+      for (const auto& speed : info.Speeds)
+      {
+        const auto label = speed.Value == mitk::TotalSegmentatorTool::Speed::Standard
+          ? prefix + task + modality
+          : prefix + task + " - " + GetSpeedLabel(speed) + modality;
+
+        m_Ui->taskComboBox->addItem(label);
+        const int index = m_Ui->taskComboBox->count() - 1;
+        m_Ui->taskComboBox->setItemData(index, task, TaskRole);
+        m_Ui->taskComboBox->setItemData(index, static_cast<int>(speed.Value), SpeedRole);
+        m_Ui->taskComboBox->setItemData(index, info.Licensed, LicensedRole);
+
+        // Licensed tasks stay selectable. Disabling them made the drop-down misbehave
+        // (clicking a disabled entry jumped to an arbitrary enabled one); instead they
+        // get a "License required: " prefix and the Run button is gated in
+        // UpdateRunButtonState.
+        if (info.Licensed && !hasLicense)
+          m_Ui->taskComboBox->setItemData(index, QStringLiteral("Requires a TotalSegmentator license. Set it in Settings."), Qt::ToolTipRole);
+      }
+    }
+  }
+
+  m_Ui->taskComboBox->setEnabled(!m_Running);
+  m_ListedTask.clear();
+
+  this->ShowToolOptions();
+  this->UpdateRunButtonState();
+}
+
+void QmitkTotalSegmentatorToolGUI::ShowToolOptions()
+{
+  const auto* tool = this->GetTool();
+
+  if (tool == nullptr || !tool->IsInitialized())
+    return;
+
+  const auto task = QString::fromStdString(tool->GetTask());
+  const auto speed = static_cast<int>(tool->GetSpeed());
+
+  for (int i = 0; i < m_Ui->taskComboBox->count(); ++i)
+  {
+    if (m_Ui->taskComboBox->itemData(i, TaskRole).toString() == task && m_Ui->taskComboBox->itemData(i, SpeedRole).toInt() == speed)
+    {
+      QSignalBlocker blocker(m_Ui->taskComboBox);
+      m_Ui->taskComboBox->setCurrentIndex(i);
+      break;
+    }
+  }
+
+  this->ShowStructures();
+}
+
+void QmitkTotalSegmentatorToolGUI::ShowStructures()
+{
+  const auto* tool = this->GetTool();
+  const auto* task = tool != nullptr ? tool->FindTask(tool->GetTask()) : nullptr;
+
+  if (task == nullptr || !task->SupportsRoiSubset)
+  {
+    this->SetStructuresVisible(false);
+    m_ListedTask.clear();
+    return;
+  }
+
+  this->SetStructuresVisible(true);
+
+  const auto& subset = tool->GetRoiSubset();
+
+  // The checks only change, unless the task does.
+  {
+    QSignalBlocker blocker(m_Ui->structuresList);
+
+    if (m_ListedTask != task->Name)
+    {
+      m_Ui->structuresList->clear();
+
+      for (const auto& [value, name] : task->Classes)
+      {
+        auto* item = new QListWidgetItem(QString::fromStdString(name), m_Ui->structuresList);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+      }
+
+      m_ListedTask = task->Name;
+      this->OnStructuresFilterChanged(m_Ui->structuresFilter->text());
+    }
+
+    for (int i = 0; i < m_Ui->structuresList->count(); ++i)
+    {
+      auto* item = m_Ui->structuresList->item(i);
+      const bool checked = std::find(subset.begin(), subset.end(), item->text().toStdString()) != subset.end();
+      item->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+    }
+  }
+
+  m_CheckedStructures.clear();
+
+  for (const auto& name : subset)
+    m_CheckedStructures << QString::fromStdString(name);
+
+  this->ShowStructuresSummary();
+  m_Ui->clearStructuresButton->setEnabled(!subset.empty() && !m_Running);
+}
+
+void QmitkTotalSegmentatorToolGUI::ShowStructuresSummary()
+{
+  auto* label = m_Ui->structuresLabel;
+  const auto count = m_CheckedStructures.size();
+
+  if (count == 0)
+  {
+    label->setText("Structures: all");
+    label->setToolTip(QString());
+    return;
+  }
+
+  const auto metrics = label->fontMetrics();
+  const int width = label->contentsRect().width();
+  auto text = QString("Structures: %1 selected").arg(count);
+
+  for (auto shown = count; shown > 0; --shown)
+  {
+    auto candidate = "Structures: " + m_CheckedStructures.first(shown).join(", ");
+
+    if (shown < count)
+      candidate += QString(" and %1 more").arg(count - shown);
+
+    if (metrics.horizontalAdvance(candidate) <= width)
+    {
+      text = candidate;
+      break;
+    }
+  }
+
+  // Only an extremely narrow panel cuts the fallback.
+  label->setText(metrics.elidedText(text, Qt::ElideRight, width));
+
+  // Rich text, which tool tips wrap.
+  label->setToolTip(QString("<p>%1 of %2: %3</p>")
+    .arg(count)
+    .arg(m_Ui->structuresList->count())
+    .arg(m_CheckedStructures.join(", ").toHtmlEscaped()));
+}
+
+bool QmitkTotalSegmentatorToolGUI::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched == m_Ui->structuresLabel && event->type() == QEvent::Resize)
+    this->ShowStructuresSummary();
+
+  return Superclass::eventFilter(watched, event);
+}
+
+void QmitkTotalSegmentatorToolGUI::SetStructuresVisible(bool visible)
+{
+  m_Ui->structuresLabel->setVisible(visible);
+  m_Ui->clearStructuresButton->setVisible(visible);
+  m_Ui->structuresFilter->setVisible(visible);
+  m_Ui->structuresList->setVisible(visible);
+}
+
+void QmitkTotalSegmentatorToolGUI::OnTaskSelected()
+{
+  auto* tool = this->GetTool();
+  const int index = m_Ui->taskComboBox->currentIndex();
+
+  if (tool != nullptr && index >= 0)
+  {
+    // The combo box offers only tasks and speeds that the tool accepts.
+    tool->SetTask(m_Ui->taskComboBox->itemData(index, TaskRole).toString().toStdString(),
+      static_cast<mitk::TotalSegmentatorTool::Speed>(m_Ui->taskComboBox->itemData(index, SpeedRole).toInt()));
+  }
+
+  this->UpdateRunButtonState();
+}
+
+void QmitkTotalSegmentatorToolGUI::OnStructureChanged(QListWidgetItem*)
+{
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  std::vector<std::string> subset;
+
+  for (int i = 0; i < m_Ui->structuresList->count(); ++i)
+  {
+    const auto* item = m_Ui->structuresList->item(i);
+
+    if (item->checkState() == Qt::Checked)
+      subset.push_back(item->text().toStdString());
+  }
+
+  // The list offers only the structures of the tool's task.
+  tool->SetRoiSubset(subset);
+}
+
+void QmitkTotalSegmentatorToolGUI::OnClearStructuresClicked()
+{
+  if (auto* tool = this->GetTool(); tool != nullptr)
+    tool->SetRoiSubset({});
+}
+
+void QmitkTotalSegmentatorToolGUI::OnStructuresFilterChanged(const QString& text)
+{
+  for (int i = 0; i < m_Ui->structuresList->count(); ++i)
+  {
+    auto* item = m_Ui->structuresList->item(i);
+    item->setHidden(!text.isEmpty() && !item->text().contains(text, Qt::CaseInsensitive));
+  }
+}
+
 void QmitkTotalSegmentatorToolGUI::UpdateRunButtonState()
 {
+  // A run keeps the button disabled and the status on itself.
+  if (m_Running)
+    return;
+
+  const auto* tool = this->GetTool();
   const int index = m_Ui->taskComboBox->currentIndex();
+
+  if (tool == nullptr)
+  {
+    m_Ui->runButton->setEnabled(false);
+    return;
+  }
+
+  // A tool that is not started, as after the settings cleared the model
+  // weights or after a failed start, starts with the next run.
+  if (!tool->IsInitialized())
+  {
+    m_Ui->runButton->setEnabled(!tool->IsInitializing());
+    return;
+  }
+
   if (index < 0)
   {
     m_Ui->runButton->setEnabled(false);
@@ -335,9 +529,8 @@ void QmitkTotalSegmentatorToolGUI::UpdateRunButtonState()
   }
 
   const bool licensed = m_Ui->taskComboBox->itemData(index, LicensedRole).toBool();
-  const bool hasLicense = m_Preferences != nullptr && m_Preferences->GetBool("TotalSeg/hasLicense", false);
 
-  if (licensed && !hasLicense)
+  if (licensed && !mitk::TotalSegmentatorTool::HasLicense())
   {
     m_Ui->runButton->setEnabled(false);
     this->SetStatus("This task requires a TotalSegmentator license. Set it in Settings.", true);
@@ -374,63 +567,20 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
   if (tool == nullptr)
     return;
 
-  const int index = m_Ui->taskComboBox->currentIndex();
-  if (index < 0)
-    return;
-
-  // Defensive: the Run button is already disabled for a licensed task without a
-  // license, but guard here too in case the cached license state lags a change.
-  const bool licensed = m_Ui->taskComboBox->itemData(index, LicensedRole).toBool();
-  const bool hasLicense = m_Preferences != nullptr && m_Preferences->GetBool("TotalSeg/hasLicense", false);
-  if (licensed && !hasLicense)
+  // Its worker ended, see UpdateRunButtonState(). The tool starts first, also
+  // showing what it can do now, and runs once it has, see OnToolInitialized().
+  // A missing installation is shown instead.
+  if (!tool->IsInitialized())
   {
-    this->SetStatus("This task requires a TotalSegmentator license. Set it in Settings.", true);
-    return;
-  }
-
-  const auto exe = ExecutablePath();
-  if (!fs::exists(exe))
-  {
-    this->SetStatus("TotalSegmentator executable not found. Please reinstall.", true);
+    m_RunAfterInitialization = mitk::TotalSegmentatorTool::IsInstalled();
     this->RefreshInstallState();
     return;
   }
 
-  const QString task = m_Ui->taskComboBox->itemData(index, TaskRole).toString();
-  const int speed = m_Ui->taskComboBox->itemData(index, SpeedRole).toInt();
-  const std::string device = m_Preferences != nullptr ? m_Preferences->Get("TotalSeg/device", "gpu") : std::string("gpu");
-  const auto venvDir = mitk::PythonHelper::GetVirtualEnvPath(mitk::TotalSegmentator::VENV_NAME);
-
-  tool->SetTask(task.toStdString());
-  tool->SetSpeed(static_cast<mitk::TotalSegmentatorTool::Speed>(speed));
-  tool->SetDevice(device);
-  // toStdString() yields UTF-8, which RunProcess decodes losslessly with
-  // QString::fromStdString; fs::path::string() would corrupt non-ASCII paths.
-  tool->SetExecutablePath(QmitkVenvProcess::ToQString(exe).toStdString());
-  tool->SetLabelNameLookup(ReadLabelNames(venvDir, task.toStdString()));
-  tool->SetCommandRunner(
-    [this](const std::string& executable, const std::vector<std::string>& args, const mitk::TotalSegmentatorTool::RunControl& control)
-    { return this->RunProcess(executable, args, control); });
-
-  // UpdatePreview() spins a nested event loop (in RunProcess), during which a
-  // tool-manager change can delete this GUI. Detect that via a QPointer and bail
-  // out before touching any members, rather than crashing on a freed 'this'.
+  // UpdatePreview() can report an error in a dialog, during which a tool
+  // change can delete this GUI. BusyStateChanged() shows the run and its
+  // result.
   QPointer<QmitkTotalSegmentatorToolGUI> self(this);
-
-  // The application stays usable during the run, but the task and the settings
-  // must not change while the run uses them.
-  const auto setRunning = [this](bool running)
-  {
-    m_Ui->runButton->setEnabled(!running);
-    m_Ui->taskComboBox->setEnabled(!running);
-    m_Ui->settingsButton->setEnabled(!running);
-  };
-
-  setRunning(true);
-  this->SetStatus("Running TotalSegmentator. This can take a while...");
-  qApp->processEvents();
-  if (self.isNull())
-    return;
 
   try
   {
@@ -438,29 +588,36 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
   }
   catch (const std::exception& e)
   {
-    if (self.isNull())
-      return;
-    this->SetStatus(QString("Error: %1").arg(e.what()), true);
-    setRunning(false);
-    return;
+    if (!self.isNull())
+      this->SetStatus(QString("Error: %1").arg(e.what()), true);
   }
-  catch (...)
+}
+
+void QmitkTotalSegmentatorToolGUI::BusyStateChanged(bool isBusy)
+{
+  Superclass::BusyStateChanged(isBusy);
+
+  // The task and the settings must not change while a run uses them.
+  m_Running = isBusy;
+  m_Ui->taskComboBox->setEnabled(!isBusy);
+  m_Ui->settingsButton->setEnabled(!isBusy);
+  m_Ui->structuresList->setEnabled(!isBusy);
+  m_Ui->clearStructuresButton->setEnabled(!isBusy && this->GetTool() != nullptr && !this->GetTool()->GetRoiSubset().empty());
+
+  if (isBusy)
   {
-    if (self.isNull())
-      return;
-    this->SetStatus("An unknown error occurred while running TotalSegmentator.", true);
-    setRunning(false);
+    m_Ui->runButton->setEnabled(false);
+    this->SetStatus("Running TotalSegmentator. This can take a while...");
     return;
   }
 
-  if (self.isNull())
-    return;
+  this->UpdateRunButtonState();
+  this->ShowRunResult();
+}
 
-  setRunning(false);
-
-  // Re-fetch: the connected tool could have changed while the nested event loop
-  // inside RunProcess was running.
-  tool = this->GetTool();
+void QmitkTotalSegmentatorToolGUI::ShowRunResult()
+{
+  auto* tool = this->GetTool();
   if (tool == nullptr)
     return;
 
@@ -471,6 +628,10 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
     this->ActualizePreviewLabelVisibility();
     this->SetStatus("Segmentation finished.");
   }
+  else if (tool->LastRunSucceeded())
+  {
+    this->SetStatus("TotalSegmentator found none of the structures in this image.");
+  }
   else
   {
     // Distinguish a genuine failure (which the tool records) from a user
@@ -479,93 +640,15 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
     if (!error.empty())
       this->SetStatus(QString::fromStdString(error), true);
     else
-      this->SetStatus("Segmentation was cancelled or produced no result.", true);
+      this->SetStatus("Segmentation was cancelled.", true);
   }
-}
-
-bool QmitkTotalSegmentatorToolGUI::RunProcess(const std::string& executable, const std::vector<std::string>& args,
-  const mitk::TotalSegmentatorTool::RunControl& control)
-{
-  // The executable is UTF-8 (set from ToQString(...).toStdString()) and is decoded
-  // below with QString::fromStdString. The arguments include filesystem paths that
-  // IOUtil produces in the platform's native narrow encoding, so decode those with
-  // fromLocal8Bit to match (ASCII flags decode identically either way).
-  QStringList arguments;
-  for (const auto& arg : args)
-    arguments << QString::fromLocal8Bit(arg.c_str());
-
-  QProcess process;
-  process.setProcessEnvironment(QmitkVenvProcess::CleanEnvironment());
-  process.setProcessChannelMode(QProcess::MergedChannels); // progress is printed to stderr
-
-  // No fixed timeout: a run can legitimately take many minutes (and download
-  // model weights on first use). Cancellation is offered by the progress
-  // notification of the tool. Nothing below touches this GUI, which a tool
-  // change delivered during the nested event loop can delete.
-  QEventLoop loop;
-  bool downloading = false;
-
-  QObject::connect(&process, &QProcess::readyRead, &process, [&]()
-  {
-    const QString chunk = QString::fromLocal8Bit(process.readAll());
-    MITK_INFO << chunk.toStdString();
-
-    // The first weights download for a task can take minutes; say so instead of
-    // leaving the user staring at an unexplained wait. A task of several parts
-    // downloads each of them, one after the other.
-    if (!downloading && chunk.contains("Downloading", Qt::CaseInsensitive))
-    {
-      downloading = true;
-      control.SetPhase("TotalSegmentator: downloading model weights");
-    }
-    else if (downloading && chunk.contains("Download finished", Qt::CaseInsensitive))
-    {
-      downloading = false;
-      control.SetPhase("TotalSegmentator");
-    }
-  });
-
-  QObject::connect(&process, &QProcess::finished, &loop, &QEventLoop::quit);
-  QObject::connect(&process, &QProcess::errorOccurred, &loop, &QEventLoop::quit);
-
-  QTimer stopPoll;
-  QObject::connect(&stopPoll, &QTimer::timeout, &loop, [&]()
-  {
-    if (control.IsStopRequested())
-      loop.quit();
-  });
-
-  process.start(QString::fromStdString(executable), arguments);
-
-  if (!process.waitForStarted(15000))
-  {
-    process.kill();
-    process.waitForFinished(2000);
-    return false;
-  }
-
-  stopPoll.start(100);
-
-  // The process can finish between waitForStarted() and here; only enter the loop
-  // while it is still running, otherwise quit() would never arrive.
-  if (process.state() != QProcess::NotRunning)
-    loop.exec();
-
-  if (process.state() != QProcess::NotRunning)
-  {
-    // Cancelled, or the tool was deactivated: stop the still-running process.
-    process.kill();
-    process.waitForFinished(2000);
-    return false;
-  }
-
-  return process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0;
 }
 
 void QmitkTotalSegmentatorToolGUI::SetStatus(const QString& message, bool isError)
 {
-  // Errors of TotalSegmentator can contain angle brackets.
-  m_Ui->statusCard->SetMessage(message.toHtmlEscaped(), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
+  // Errors of TotalSegmentator can contain angle brackets, and the lines of its
+  // last output.
+  m_Ui->statusCard->SetMessage(message.toHtmlEscaped().replace('\n', "<br>"), isError ? QmitkInfoCard::Severity::Error : QmitkInfoCard::Severity::Info);
   m_Ui->statusCard->setVisible(!message.isEmpty());
 }
 

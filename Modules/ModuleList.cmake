@@ -60,6 +60,7 @@ set(MITK_MODULES
   ROI
   PET
   PythonHelper
+  PythonWorker
   PythonInstaller
   PythonInstallerUI
   Python

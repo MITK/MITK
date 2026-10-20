@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <mitkException.h>
 #include <mitkLog.h>
-#include <mitkPythonHelper.h>
+#include <mitkPythonWorker.h>
 
 #include <QmitkPipInstallDialog.h>
 
@@ -30,7 +30,20 @@ namespace
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 }
 
-mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QWidget* parent, const std::string& packageName, const VersionRange& supportedVersions, const VersionCheckResult& result, bool modulesLoaded, bool inInitFlow)
+QString mitk::PythonPackage::DescribeHowToFree(VirtualEnvUse use, const std::string& packageName)
+{
+  const auto name = QString::fromStdString(packageName);
+
+  if (use == VirtualEnvUse::Worker)
+    return QString("Uninitialize %1, or switch to another tool, and try again.").arg(name);
+
+  const auto appName = QCoreApplication::applicationName();
+  const auto restartTarget = appName.isEmpty() ? QStringLiteral("the application") : appName;
+
+  return QString("Modules of %1 are loaded into %2. Restart %2 and try again.").arg(name, restartTarget);
+}
+
+mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QWidget* parent, const std::string& packageName, const VersionRange& supportedVersions, const VersionCheckResult& result, VirtualEnvUse use, bool inInitFlow)
 {
   const QString style = LINE_HEIGHT_STYLE;
   const auto name = QString::fromStdString(packageName);
@@ -38,8 +51,10 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
   const auto latest = QString::fromStdString(result.Latest);
   const auto minimum = QString::fromStdString(supportedVersions.Minimum);
 
-  const auto appName = QCoreApplication::applicationName();
-  const auto restartTarget = appName.isEmpty() ? QStringLiteral("the application") : appName;
+  const bool inUse = use != VirtualEnvUse::None;
+  const auto blocked = inUse
+    ? QString("%1 cannot be updated while it is in use. %2").arg(name, DescribeHowToFree(use, packageName))
+    : QString();
 
   if (result.Status == VersionStatus::BelowMinimum)
   {
@@ -49,14 +64,11 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
       "application requires (%4 or newer) and may not work correctly.</p>")
       .arg(style, name, installed, minimum);
 
-    if (modulesLoaded)
+    if (inUse)
     {
-      // An in-place update is impossible while the package is loaded; the user
-      // must restart first. Nothing actionable here.
-      QMessageBox::warning(parent, name, outdated + QString(
-        "<p %1>%2 is currently loaded, so it cannot be updated right now. "
-        "Restart %3 and try again.</p>")
-        .arg(style, name, restartTarget));
+      // An in-place update is impossible while the environment is in use.
+      // Nothing actionable here.
+      QMessageBox::warning(parent, name, outdated + QString("<p %1>%2</p>").arg(style, blocked));
       return UpdatePromptChoice::Cancel;
     }
 
@@ -79,15 +91,13 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
     "<p %1>%2 %3 is installed; %4 is available.</p>")
     .arg(style, name, installed, latest);
 
-  if (modulesLoaded)
+  if (inUse)
   {
     if (inInitFlow)
     {
       QMessageBox messageBox(QMessageBox::Information, name, available + QString(
-        "<p %1>%2 is currently loaded, so it cannot be updated right now. "
-        "Restart %3 and try again, or click <em>Continue</em> to keep using the "
-        "installed version.</p>")
-        .arg(style, name, restartTarget), QMessageBox::NoButton, parent);
+        "<p %1>%2 Or click <em>Continue</em> to keep using the installed version.</p>")
+        .arg(style, blocked), QMessageBox::NoButton, parent);
       auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
       messageBox.addButton(QMessageBox::Cancel);
       messageBox.setDefaultButton(continueButton);
@@ -102,14 +112,11 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
     }
 
     // Preferences page: nothing to do but acknowledge.
-    QMessageBox::information(parent, name, available + QString(
-      "<p %1>%2 is currently loaded, so it cannot be updated right now. "
-      "Restart %3 and try again.</p>")
-      .arg(style, name, restartTarget));
+    QMessageBox::information(parent, name, available + QString("<p %1>%2</p>").arg(style, blocked));
     return UpdatePromptChoice::ContinueInstalled;
   }
 
-  // UpdateAvailable and not loaded: an in-place update is possible.
+  // UpdateAvailable and not in use: an in-place update is possible.
   if (inInitFlow)
   {
     QMessageBox messageBox(QMessageBox::Information, name, available + QString(
@@ -146,24 +153,24 @@ mitk::PythonPackage::UpdatePromptChoice mitk::PythonPackage::ShowUpdatePrompt(QW
     : UpdatePromptChoice::Cancel;
 }
 
-mitk::PythonPackage::VersionCheckOutcome mitk::PythonPackage::CheckVersionAndOfferUpdate(QWidget* parent, PythonContext& context, const std::string& packageName, const std::string& distributionName, const VersionRange& supportedVersions, const PipInstallSpec& upgradeSpec)
+mitk::PythonPackage::VersionCheckOutcome mitk::PythonPackage::CheckVersionAndOfferUpdate(QWidget* parent, PackageProbe& probe, const std::string& packageName, const std::string& distributionName, const VersionRange& supportedVersions, const PipInstallSpec& upgradeSpec)
 {
   // The distributions that were looked up online in this run, whether the
   // lookup succeeded or not. Process-wide on purpose: the tool GUIs that call
-  // this are created anew with every activation of their tool, and once the
-  // modules of a virtual environment are loaded, an in-place update is blocked
-  // until the application restarts anyway.
+  // this are created anew with every activation of their tool, and a user
+  // without network should wait for the timeout only once per run.
   static std::set<std::string> onlineChecksDone;
 
   const bool checkForUpdate = onlineChecksDone.insert(distributionName).second;
-  const auto versionCheck = CheckInstalledVersion(context, distributionName, supportedVersions, checkForUpdate);
+  const auto versionCheck = probe.CheckVersion(distributionName, supportedVersions, checkForUpdate);
+
+  // Its worker would otherwise count as using the virtual environment.
+  probe.End();
 
   if (versionCheck.Status != VersionStatus::BelowMinimum && versionCheck.Status != VersionStatus::UpdateAvailable)
     return VersionCheckOutcome::KeptInstalled;
 
-  const bool modulesLoaded = PythonHelper::IsAnyVirtualEnvModuleLoaded(upgradeSpec.venvName);
-
-  switch (ShowUpdatePrompt(parent, packageName, supportedVersions, versionCheck, modulesLoaded, true))
+  switch (ShowUpdatePrompt(parent, packageName, supportedVersions, versionCheck, GetVirtualEnvUse(upgradeSpec.venvName), true))
   {
     case UpdatePromptChoice::Update:
     {
@@ -192,24 +199,37 @@ void mitk::PythonPackage::ShowInitializationError(QWidget* parent, const std::st
   const char* rawDescription = e.GetDescription();
   const auto description = QString::fromLocal8Bit(rawDescription != nullptr ? rawDescription : "");
 
-  MITK_ERROR << packageName << " initialization failed:\n" << description.toStdString();
+  // An error thrown from C++ carries a message for the user. A Python error
+  // carries a traceback and a worker that ended carries its last output; both
+  // go behind a generic headline into the details.
+  auto headline = description;
+  QString details;
 
-  // An error thrown from C++ carries a message for the user. An error from the
-  // embedded Python interpreter carries a traceback, which goes behind a
-  // generic headline into the details.
-  const bool isPythonError = description.contains("An error occurred while executing Python code:");
+  if (const auto* error = dynamic_cast<const PythonWorkerError*>(&e))
+  {
+    headline = QString("%1 reported an error during initialization (see details).").arg(name);
+    details = QString::fromStdString(error->GetTraceback());
+  }
+  else if (dynamic_cast<const PythonWorkerExitedException*>(&e) != nullptr)
+  {
+    headline = QString("%1 stopped unexpectedly during initialization (see details).").arg(name);
+    details = QString::fromStdString(rawDescription != nullptr ? rawDescription : "");
+  }
+  else if (description.contains("An error occurred while executing Python code:"))
+  {
+    headline = QString("%1 reported an error during initialization (see details).").arg(name);
+    details = description;
+  }
 
-  const auto headline = isPythonError
-    ? QString("%1 reported an error during initialization (see details).").arg(name)
-    : description;
+  MITK_ERROR << packageName << " initialization failed:\n" << (details.isEmpty() ? description : details).toStdString();
 
   // Escaped, since the description of a C++ error can embed characters that
   // the message box would read as HTML.
   QMessageBox messageBox(QMessageBox::Critical, name,
     QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()), QMessageBox::Ok, parent);
 
-  if (isPythonError)
-    messageBox.setDetailedText(description);
+  if (!details.isEmpty())
+    messageBox.setDetailedText(details);
 
   messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse);
   messageBox.exec();

@@ -68,14 +68,63 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="structuresLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Structures: all</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="clearStructuresButton">
+        <property name="toolTip">
+         <string>Segment all structures of the task.</string>
+        </property>
+        <property name="text">
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLineEdit" name="structuresFilter">
+        <property name="placeholderText">
+         <string>Filter structures</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QListWidget" name="structuresList">
+        <property name="toolTip">
+         <string>Check the structures to segment, or none for all of them. Fewer structures are quicker.</string>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>140</height>
+         </size>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
        <widget class="QPushButton" name="runButton">
         <property name="text">
          <string>Run TotalSegmentator</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="5" column="0" colspan="2">
        <widget class="QmitkInfoCard" name="statusCard"/>
       </item>
      </layout>

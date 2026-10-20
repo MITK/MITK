@@ -26,8 +26,7 @@ found in the LICENSE file.
 
 #include <mitkMemoryUtilities.h>
 
-#include <iomanip>
-
+#include <QLocale>
 #include <QTimer>
 
 #include <QmitkMemoryUsageIndicatorImagesGreen.xpm>
@@ -65,7 +64,11 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
   size_t totalSize = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
   float percentage = static_cast<float>(processSize) / totalSize * 100.0f;
 
-  m_Ui->label->setText(QString::fromStdString(this->GetMemoryDescription(processSize, percentage)));
+  const QLocale locale;
+
+  m_Ui->label->setText(QString("%1 (%2 %)")
+    .arg(locale.formattedDataSize(static_cast<qint64>(processSize), 2, QLocale::DataSizeTraditionalFormat))
+    .arg(locale.toString(percentage, 'f', 2)));
 
   for (size_t i = m_States.size(); i-- > 0;)
   {
@@ -80,51 +83,4 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
       break;
     }
   }
-}
-
-std::string QmitkMemoryUsageIndicatorView::FormatMemorySize(size_t size)
-{
-  double val = size;
-  std::string unit;
-
-  if (val >= 1024.0)
-  {
-    val /= 1024.0;
-    unit = "K";
-  }
-
-  if (val >= 1024.0)
-  {
-    val /= 1024.0;
-    unit = "M";
-  }
-
-  if (val >= 1024.0)
-  {
-    val /= 1024.0;
-    unit = "G";
-  }
-
-  unit += "B";
-
-  std::ostringstream str;
-  str.imbue(std::locale::classic());
-  str << std::fixed << std::setprecision(2) << val << " " << unit;
-  return str.str();
-}
-
-std::string QmitkMemoryUsageIndicatorView::FormatPercentage(double val)
-{
-  std::ostringstream str;
-  str.imbue(std::locale::classic());
-  str << std::fixed << std::setprecision(2) << val << " " << "%";
-  return str.str();
-}
-
-std::string QmitkMemoryUsageIndicatorView::GetMemoryDescription(size_t processSize, float percentage)
-{
-  std::ostringstream str;
-  str.imbue(std::locale::classic());
-  str << FormatMemorySize(processSize) << " (" << FormatPercentage(percentage) << ")";
-  return str.str();
 }

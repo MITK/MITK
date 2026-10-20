@@ -10,11 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkGeometry3D.h>
 #include <mitkPythonContext.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkVoxTellTool.h>
 
+#include <nlohmann/json.hpp>
+
+#include <array>
+#include <cmath>
 #include <memory>
+#include <vector>
 
 class mitkVoxTellBridgeTestSuite : public mitk::TestFixture
 {
@@ -71,26 +78,74 @@ public:
                            m_Context->GetVariableAsBool("round_trip_ok").value_or(false));
   }
 
-  // The affine handed to nibabel has to agree with the index-to-world transform
-  // of the image itself, which pins down the convention of the direction matrix,
-  // the order of the axes, and the conversion from LPS to RAS.
+  // The tool hands VoxTell the index-to-world matrix of the image, from which
+  // the bridge derives the affine for nibabel. Both have to agree with the
+  // geometry itself, which pins down the order of the axes and the conversion
+  // from LPS to RAS. The geometry is rotated, flipped and offset.
   void TestRasAffineFollowsGeometry()
   {
+    const double angle = 30.0 * 3.14159265358979323846 / 180.0;
+    const double c = std::cos(angle);
+    const double s = std::sin(angle);
+
+    // A rotation about z times a coronal orientation; the columns are the
+    // directions of the index axes.
+    const double direction[3][3] = { { c, 0.0, s }, { s, 0.0, -c }, { 0.0, 1.0, 0.0 } };
+    const double spacing[3] = { 0.7, 0.9, 2.5 };
+
+    mitk::AffineTransform3D::MatrixType matrix;
+
+    for (unsigned int row = 0; row < 3; ++row)
+    {
+      for (unsigned int column = 0; column < 3; ++column)
+        matrix[row][column] = direction[row][column] * spacing[column];
+    }
+
+    mitk::AffineTransform3D::OutputVectorType offset;
+    offset[0] = -12.5;
+    offset[1] = 33.0;
+    offset[2] = 101.25;
+
+    auto transform = mitk::AffineTransform3D::New();
+    transform->SetMatrix(matrix);
+    transform->SetOffset(offset);
+
+    auto geometry = mitk::Geometry3D::New();
+    geometry->SetIndexToWorldTransform(transform);
+
+    const auto rows = mitk::VoxTell::IndexToWorld(geometry);
+    const std::vector<std::array<double, 3>> indices = { { 0.0, 0.0, 0.0 }, { 3.0, 1.0, 2.0 }, { 10.0, 6.0, 4.0 } };
+    auto expectedRas = nlohmann::json::array();
+
+    for (const auto& index : indices)
+    {
+      mitk::Point3D indexPoint;
+
+      for (unsigned int axis = 0; axis < 3; ++axis)
+        indexPoint[axis] = index[axis];
+
+      mitk::Point3D world;
+      geometry->IndexToWorld(indexPoint, world);
+
+      for (unsigned int row = 0; row < 3; ++row)
+      {
+        double mapped = rows[row][3].get<double>();
+
+        for (unsigned int column = 0; column < 3; ++column)
+          mapped += rows[row][column].get<double>() * index[column];
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The matrix should map an index like the geometry", world[row], mapped, 1e-9);
+      }
+
+      expectedRas.push_back({ -world[0], -world[1], world[2] });
+    }
+
     m_Context->Execute(
-      "angle = np.radians(30.0)\n"
-      "rotation = np.array([[np.cos(angle), -np.sin(angle), 0.0], [np.sin(angle), np.cos(angle), 0.0], [0.0, 0.0, 1.0]])\n"
-      "coronal = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, -1.0], [0.0, 1.0, 0.0]])\n"
-      "image = mitk.Image(np.zeros((5, 7, 11), dtype=np.float32), spacing=(0.7, 0.9, 2.5),\n"
-      "                   origin=(-12.5, 33.0, 101.25), direction=rotation @ coronal)\n"
-      "geometry = image.get_geometry(time_step=0)\n"
-      "affine = voxtell_ras_affine(image)\n"
-      "geometry_ok = True\n"
-      "for index in [(0, 0, 0), (3, 1, 2), (10, 6, 4)]:\n"
-      "    world = mitk.Point3D()\n"
-      "    geometry.index_to_world(mitk.Point3D(*index), world)\n"
-      "    ras = affine @ np.array([*index, 1.0])\n"
-      "    expected = np.array([-world[0], -world[1], world[2]])\n"
-      "    geometry_ok = geometry_ok and np.allclose(ras[:3], expected)\n");
+      "index_to_world = np.array(" + rows.dump() + ")\n"
+      "indices = " + nlohmann::json(indices).dump() + "\n"
+      "expected = np.array(" + expectedRas.dump() + ")\n"
+      "affine = voxtell_ras_affine(index_to_world)\n"
+      "geometry_ok = all(np.allclose((affine @ np.array([*index, 1.0]))[:3], ras) for index, ras in zip(indices, expected))\n");
 
     CPPUNIT_ASSERT_MESSAGE("The affine should map voxel indices to the same RAS positions as the geometry of the image",
                            m_Context->GetVariableAsBool("geometry_ok").value_or(false));

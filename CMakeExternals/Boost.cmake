@@ -95,6 +95,9 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}
       -DBUILD_TESTING:BOOL=OFF
+      #[[ Boost.Process uses std::filesystem instead of linking the compiled
+          Boost.Filesystem (and Boost.Atomic with it). ]]
+      -DBOOST_PROCESS_USE_STD_FS:BOOL=ON
     CMAKE_CACHE_DEFAULT_ARGS
       ${ep_common_cache_default_args}
     DEPENDS ${proj_DEPENDENCIES}
@@ -115,6 +118,13 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     DEPENDEES install
   )
 
+  #[[ Not every generator reruns a step whose command line changed, so the
+      requested libraries also reach the step as a file that changes with
+      them. Features like MITK_USE_Python3 add libraries to an existing
+      build tree. ]]
+  set(boost_libraries_file "${ep_prefix}/tmp/${proj}-libraries.txt")
+  file(CONFIGURE OUTPUT "${boost_libraries_file}" CONTENT "${boost_all_arg}\n")
+
   #[[ After the clone, fetch the dependency closure of all requested
       libraries so it is present when Boost's CMake configures. ]]
   ExternalProject_Add_Step(${proj} provision
@@ -128,7 +138,21 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
             -P ${provision_dir}/BoostProvision.cmake
     DEPENDEES download
     DEPENDERS configure
+    DEPENDS ${boost_libraries_file}
     WORKING_DIRECTORY <SOURCE_DIR>
+  )
+
+  #[[ Fixes for the provisioned sources, see Boost/apply_patches.cmake. ]]
+  file(GLOB boost_patches CONFIGURE_DEPENDS "${provision_dir}/patches/*.cmake")
+
+  ExternalProject_Add_Step(${proj} patch_sources
+    COMMAND ${CMAKE_COMMAND}
+            -DBOOST_SRC=<SOURCE_DIR>
+            -DPATCH_DIR=${provision_dir}/patches
+            -P ${provision_dir}/apply_patches.cmake
+    DEPENDEES provision
+    DEPENDERS configure
+    DEPENDS ${boost_patches} ${provision_dir}/apply_patches.cmake
   )
 
 else()

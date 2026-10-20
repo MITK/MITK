@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <functional>
 #include <vector>
 
+class QWidget;
+
 namespace mitk
 {
   class BaseData;
@@ -35,6 +37,16 @@ namespace mitk
  */
 MITKQTWIDGETS_EXPORT void QmitkProcessEventsUntil(const std::function<bool()>& done);
 
+/** \brief Whether this thread waits for a task of QmitkRunAsyncBlocking() or
+ *         QmitkRunWithInputBlocked().
+ *
+ * The event loop keeps turning during the wait, while the task reads or writes
+ * data, a save for example. What was posted to this thread and changes data,
+ * like the result of a computation that ended meanwhile, can ask this first
+ * and run once the task has ended.
+ */
+MITKQTWIDGETS_EXPORT bool QmitkIsWaitingForBlockingTask();
+
 /** \brief Runs a long task in a background thread while keeping the UI responsive.
  *
  * The function blocks until the task finishes, but keeps processing events, so
@@ -44,8 +56,11 @@ MITKQTWIDGETS_EXPORT void QmitkProcessEventsUntil(const std::function<bool()>& d
  * While the task is running, a QProgressDialog is shown with a delay of 250ms.
  *
  * Exceptions are caught in the background thread and rethrown in the calling thread.
+ *
+ * \param[in] parent Parent of the progress dialog, usually the window() of the
+ *        calling widget, so the dialog is placed over it.
  */
-MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<void()> task);
+MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(QWidget* parent, const QString& title, const QString& label, std::function<void()> task);
 
 /** \brief Runs a long task that produces a value. \sa QmitkRunAsyncBlocking()
  *
@@ -53,13 +68,13 @@ MITKQTWIDGETS_EXPORT void QmitkRunAsyncBlocking(const QString& title, const QStr
  *         exception is rethrown here, as in the overload above.
  */
 template<typename T>
-T QmitkRunAsyncBlocking(const QString& title, const QString& label, std::function<T()> task)
+T QmitkRunAsyncBlocking(QWidget* parent, const QString& title, const QString& label, std::function<T()> task)
 {
   T result{};
 
   // Resolves to the overload above, which is the better match for an argument
   // that already is a std::function<void()>, so this does not recurse.
-  QmitkRunAsyncBlocking(title, label, std::function<void()>([&result, &task]() { result = task(); }));
+  QmitkRunAsyncBlocking(parent, title, label, std::function<void()>([&result, &task]() { result = task(); }));
 
   return result;
 }

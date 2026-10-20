@@ -75,6 +75,7 @@ namespace mitk::nnInteractive
   private:
     void OnEnable() override;
     void OnDisable() override;
+    void OnSetInputSuspended(bool suspended) override;
     void OnReset() override;
 
     class Impl;

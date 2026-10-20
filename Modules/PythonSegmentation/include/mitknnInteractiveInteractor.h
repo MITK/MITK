@@ -140,6 +140,19 @@ namespace mitk::nnInteractive
      */
     bool IsEnabled() const;
 
+    /** \brief Ignores or accepts input in the views, without disabling the interactor.
+     *
+     * The tool suspends the input while a prompt computes, as the session
+     * takes one prompt at a time: a prompt made meanwhile would be shown but
+     * never reach the session.
+     *
+     * \sa OnSetInputSuspended(), IsInputSuspended()
+     */
+    void SetInputSuspended(bool suspended);
+
+    /** \brief Checks whether the input is suspended, see SetInputSuspended(). */
+    bool IsInputSuspended() const;
+
     /** \brief Resets the interactor to its initial state.
      *
      * This function clears any ongoing interactions and restores the interactor
@@ -256,6 +269,17 @@ namespace mitk::nnInteractive
      * \see Disable()
      */
     virtual void OnDisable() = 0;
+
+    /** \brief Called when the input is suspended or resumed while the interactor is enabled.
+     *
+     * HandleEvent() already ignores events while the input is suspended.
+     * Derived classes whose events do not pass HandleEvent(), like data
+     * interactors that the dispatcher feeds directly, override this method to
+     * stop them, and respect IsInputSuspended() in OnEnable() as well.
+     *
+     * \see SetInputSuspended()
+     */
+    virtual void OnSetInputSuspended(bool suspended);
 
     /** \brief Called when the interactor is reset.
      *

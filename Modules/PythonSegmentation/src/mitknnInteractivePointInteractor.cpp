@@ -180,7 +180,12 @@ void mitk::nnInteractive::PointInteractor::OnEnable()
 
   m_Impl->Interactor->SetBounds(referenceGeometry);
   m_Impl->Interactor->SetDataNode(m_Impl->PointSetNodes.at(this->GetCurrentPromptType()));
-  m_Impl->Interactor->EnableInteraction(true);
+  m_Impl->Interactor->EnableInteraction(!this->IsInputSuspended());
+}
+
+void mitk::nnInteractive::PointInteractor::OnSetInputSuspended(bool suspended)
+{
+  m_Impl->Interactor->EnableInteraction(!suspended);
 }
 
 void mitk::nnInteractive::PointInteractor::OnDisable()

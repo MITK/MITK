@@ -77,7 +77,7 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::OnLabelSelectionChanged(const Qmi
     this->ActualizePreviewLabelVisibility();
 
     // Re-evaluates the Confirm button through its delegate. The selection also
-    // changes while a tool that processes events during its update replaces
+    // changes while a tool whose update computes off the GUI thread replaces
     // the labels of the preview; the controls must stay disabled then.
     this->EnableWidgets(!tool->IsUpdating());
   }

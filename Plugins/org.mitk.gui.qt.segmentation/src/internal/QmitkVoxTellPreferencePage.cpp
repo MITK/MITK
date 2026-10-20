@@ -37,7 +37,6 @@ found in the LICENSE file.
 #include <QmitkPipInstallDialog.h>
 
 #include <QApplication>
-#include <QCoreApplication>
 #endif
 
 namespace
@@ -209,12 +208,10 @@ void QmitkVoxTellPreferencePage::OnCheckForUpdatesButtonClicked()
     case VersionStatus::BelowMinimum:
     case VersionStatus::UpdateAvailable:
     {
-      const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(mitk::VoxTell::VENV_NAME);
-
       // Not in the init flow, so declining just closes; only an explicit
       // "Update now" triggers the in-place update.
-      const auto choice = mitk::PythonPackage::ShowUpdatePrompt(
-        m_Control, "VoxTell", mitk::VoxTell::SupportedVersions(), result, modulesLoaded, false);
+      const auto choice = mitk::PythonPackage::ShowUpdatePrompt(m_Control, "VoxTell", mitk::VoxTell::SupportedVersions(),
+        result, mitk::GetVirtualEnvUse(mitk::VoxTell::VENV_NAME), false);
 
       if (choice != mitk::PythonPackage::UpdatePromptChoice::Update)
         break;
@@ -257,21 +254,15 @@ void QmitkVoxTellPreferencePage::OnCheckForUpdatesButtonClicked()
 void QmitkVoxTellPreferencePage::OnUninstallButtonClicked()
 {
 #if MITK_HAS_PYTHON
-  // The model runs in this process, which maps native libraries of the virtual
-  // environment. They are not released until the application ends, and on
-  // Windows pip and the file system cannot remove what is mapped.
-  if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(mitk::VoxTell::VENV_NAME))
+  // On Windows, pip and the file system cannot remove what a running worker
+  // or this process has mapped.
+  if (const auto use = mitk::GetVirtualEnvUse(mitk::VoxTell::VENV_NAME); use != mitk::VirtualEnvUse::None)
   {
-    const auto appName = QCoreApplication::applicationName();
-    const auto restartTarget = appName.isEmpty() ? QStringLiteral("this application") : appName;
-
     QMessageBox::information(
       m_Control,
       "Uninstall VoxTell",
-      QStringLiteral(
-        "<p>VoxTell cannot be uninstalled right now because Python modules from its "
-        "virtual environment are still loaded.</p>"
-        "<p>Restart %1 and try again.</p>").arg(restartTarget));
+      QString("<p>VoxTell cannot be uninstalled while it is in use.</p><p>%1</p>")
+        .arg(mitk::PythonPackage::DescribeHowToFree(use, "VoxTell")));
     return;
   }
 
@@ -285,7 +276,7 @@ void QmitkVoxTellPreferencePage::OnUninstallButtonClicked()
     return;
 
   const bool removed = QmitkRunAsyncBlocking<bool>(
-    "Uninstall VoxTell", "Removing the VoxTell virtual environment...",
+    m_Control, "Uninstall VoxTell", "Removing the VoxTell virtual environment...",
     [] { return mitk::PythonHelper::RemoveVirtualEnv(mitk::VoxTell::VENV_NAME); });
 
   if (removed)

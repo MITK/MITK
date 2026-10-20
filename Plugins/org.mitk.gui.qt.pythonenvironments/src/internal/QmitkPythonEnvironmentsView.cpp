@@ -14,11 +14,10 @@ found in the LICENSE file.
 #include <ui_QmitkPythonEnvironmentsView.h>
 
 #include <mitkPythonHelper.h>
+#include <mitkVirtualEnvUse.h>
 
 #include <QmitkRun.h>
 #include <QmitkIconTheme.h>
-
-#include <array>
 
 #include <QCoreApplication>
 #include <QDesktopServices>
@@ -27,6 +26,7 @@ found in the LICENSE file.
 #include <QFile>
 #include <QFont>
 #include <QList>
+#include <QLocale>
 #include <QMessageBox>
 #include <QString>
 #include <QStringList>
@@ -84,23 +84,6 @@ namespace
     }
 
     return totalSize;
-  }
-
-  QString GetHumanReadableSize(quint64 bytes)
-  {
-    static std::array<const char*, 4> sizes = { "B", "KB", "MB", "GB" };
-    constexpr int maxSizeIndex = sizes.size() - 1;
-
-    int sizeIndex = 0;
-    double num = bytes;
-
-    while (num >= 1024.0 && sizeIndex < maxSizeIndex)
-    {
-      num /= 1024.0;
-      ++sizeIndex;
-    }
-
-    return QString::number(num, 'f', 2) + " " + sizes[sizeIndex];
   }
 
   void OpenVirtualEnvPath(const QString& virtualEnvPath)
@@ -168,7 +151,7 @@ public:
     font.setItalic(false);
 
     this->setData(2, Qt::UserRole, QVariant::fromValue(totalSize));
-    this->setText(2, GetHumanReadableSize(totalSize));
+    this->setText(2, QLocale().formattedDataSize(static_cast<qint64>(totalSize), 2, QLocale::DataSizeTraditionalFormat));
     this->setFont(2, font);
   }
 
@@ -294,23 +277,23 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   if (selectedItems.empty())
     return;
 
-  // IsAnyVirtualEnvModuleLoaded only sees modules loaded into THIS process,
-  // so we can only gate venvs that belong to the running MITK instance. Venvs
+  auto* dialogParent = m_Ui->virtualEnvsTreeWidget->window();
+
+  // Loaded modules and running workers are only known for THIS process, so
+  // we can only gate venvs that belong to the running MITK instance. Venvs
   // owned by other instances are covered by the warning text below instead.
-  QStringList loadedNames;
+  QStringList namesInUse;
 
   for (const auto* item : selectedItems)
   {
     if (!item->isOwn())
       continue;
 
-    const fs::path path(item->virtualEnvPath().toStdString());
-
-    if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(path))
-      loadedNames.append(item->name());
+    if (mitk::GetVirtualEnvUse(item->name().toStdString()) != mitk::VirtualEnvUse::None)
+      namesInUse.append(item->name());
   }
 
-  if (!loadedNames.isEmpty())
+  if (!namesInUse.isEmpty())
   {
     const auto appName = QCoreApplication::applicationName();
     const auto restartTarget = appName.isEmpty()
@@ -318,20 +301,20 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
       : appName;
 
     QMessageBox::information(
-      nullptr,
+      dialogParent,
       "Delete selected virtual environments",
       QString(
         "<h3 %1>Cannot delete in-use virtual environments</h3>"
-        "<p %1>The following virtual environments cannot be deleted because "
-        "Python modules from them are still loaded:</p>"
+        "<p %1>The following virtual environments are in use:</p>"
         "<ul %1><li>%2</li></ul>"
-        "<p %1>Restart %3 and try again.</p>")
-        .arg(LINE_HEIGHT_STYLE, loadedNames.join("</li><li>"), restartTarget));
+        "<p %1>Uninitialize the tools that use them, or restart %3, "
+        "and try again.</p>")
+        .arg(LINE_HEIGHT_STYLE, namesInUse.join("</li><li>"), restartTarget));
     return;
   }
 
   const auto answer = QMessageBox::question(
-    nullptr,
+    dialogParent,
     "Delete selected virtual environments",
     QString(
       "<h3 %1>Delete selected virtual environments?</h3>"
@@ -355,6 +338,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   QStringList failedPaths;
 
   QmitkRunAsyncBlocking(
+    dialogParent,
     "Delete selected virtual environments",
     "Deleting virtual environments...",
     [&virtualEnvPaths, &failedPaths]() {
@@ -370,7 +354,7 @@ void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
   if (!failedPaths.isEmpty())
   {
     QMessageBox::warning(
-      nullptr,
+      dialogParent,
       "Delete selected virtual environments",
       QString(
         "<h3 %1>Some virtual environments could not be deleted</h3>"

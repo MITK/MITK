@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.agent"
+          name="Agent"
+          class="QmitkAgentView"
+          icon="resources/Agent.svg"
+          category="Utilities">
+      <description>Chat with an AI agent that operates the Workbench.</description>
+    </view>
+  </extension>
+</plugin>

@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/org.mitk.gui.qt.agent">
+    <file>Agent.svg</file>
+    <file>AgentSystemPrompt.md</file>
+  </qresource>
+</RCC>

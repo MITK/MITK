@@ -113,6 +113,7 @@ include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
 include(mitkFunctionAddLibrarySearchPaths)
+include(mitkFunctionRequireBoostLibraries)
 
 # CRT deprecation warnings are suppressed via the MitkCompilerFlags target below.
 
@@ -468,6 +469,13 @@ endif()
 
 # Boost libraries that are compiled and linked (none by default; e.g. process).
 set(MITK_USE_Boost_COMPILED_LIBRARIES "" CACHE STRING "Semicolon-separated Boost libraries to compile and link (dependency closure resolved automatically)")
+
+# Boost libraries required by optional features.
+if(MITK_USE_Python3)
+  # MitkPythonWorker: worker processes and the shared memory they map.
+  mitkFunctionRequireBoostLibraries(HEADER MITK_USE_Python3 interprocess)
+  mitkFunctionRequireBoostLibraries(COMPILED MITK_USE_Python3 process)
+endif()
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")

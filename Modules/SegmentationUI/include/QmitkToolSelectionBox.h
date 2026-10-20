@@ -86,6 +86,9 @@ public:
   /** \brief Destroys and recreates all tool buttons based on the current ToolManager state. */
   void RecreateButtons();
 
+  /** \brief Whether the box has a button for the tool with the id \p toolId of its ToolManager. */
+  bool HasTool(int toolId) const;
+
 signals:
 
   /// Whenever a tool is activated. id is the index of the active tool. Counting starts at 0, -1 indicates "no tool

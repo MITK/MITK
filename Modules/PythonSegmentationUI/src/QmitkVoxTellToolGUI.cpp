@@ -444,7 +444,7 @@ void QmitkVoxTellToolGUI::LoadModel()
         return;
       }
 
-      self->OnModelLoaded();
+      self->OnModelLoaded(true);
     });
   });
 }
@@ -629,7 +629,65 @@ void QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
   });
 }
 
-void QmitkVoxTellToolGUI::OnModelLoaded()
+void QmitkVoxTellToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  if (auto* tool = dynamic_cast<mitk::VoxTellTool*>(newTool); tool != nullptr)
+  {
+    tool->ModelLoadedEvent += mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent += mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+}
+
+void QmitkVoxTellToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
+{
+  if (auto* tool = dynamic_cast<mitk::VoxTellTool*>(oldTool); tool != nullptr)
+  {
+    tool->ModelLoadedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+
+  Superclass::DisconnectOldTool(oldTool);
+}
+
+void QmitkVoxTellToolGUI::OnToolModelLoaded()
+{
+  // The initialization of this GUI finishes on its own.
+  if (m_IsBusy)
+    return;
+
+  {
+    QSignalBlocker blocker(m_Ui->initializeButton);
+    m_Ui->initializeButton->setChecked(true);
+  }
+
+  this->OnModelLoaded(false);
+}
+
+void QmitkVoxTellToolGUI::OnToolPromptsChanged()
+{
+  const auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  if (tool->GetPrompts() != this->ReadPrompts())
+  {
+    QStringList prompts;
+
+    for (const auto& prompt : tool->GetPrompts())
+      prompts << QString::fromStdString(prompt);
+
+    m_Ui->promptsTextEdit->setPlainText(prompts.join('\n'));
+  }
+
+  // Shown for this run, not kept as the user's preference.
+  QSignalBlocker blocker(m_Ui->createGroupsCheckBox);
+  m_Ui->createGroupsCheckBox->setChecked(tool->GetCreateGroupsAsNeeded());
+}
+
+void QmitkVoxTellToolGUI::OnModelLoaded(bool loadedHere)
 {
   m_IsBusy = false;
   m_SettingsChanged = false;
@@ -639,6 +697,11 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
   this->UpdatePromptCompletions();
   this->EnableWidgets(true);
   this->SetStatus("Ready. Enter one prompt per line and click Segment.");
+
+  // Who loaded it elsewhere, like the agent, does not need the focus here nor
+  // a dialog that waits for the user.
+  if (!loadedHere)
+    return;
 
   // Typing the prompts is all there is to do next. A warning shown below hands
   // the focus back when it closes.

@@ -58,18 +58,8 @@ namespace mitk::nnInteractive
       command->SetCallbackFunction(this, &Impl::OnEndPlacementPlanarFigureEvent);
       ITKEventObserverGuard observer(box, EndPlacementPlanarFigureEvent(), command);
 
-      const auto promptType = m_Owner->GetCurrentPromptType();
-
-      // Style the box using data node properties, taking into account the
-      // current prompt type. The box being drawn is vibrant, completed boxes
-      // are muted.
-      auto node = DataNode::New();
+      auto node = CreateBoxNode(box, m_Owner->GetCurrentPromptType());
       node->SetName(this->CreateNextBoxNodeName());
-      node->SetData(box);
-      node->SetColor(GetColor(promptType, ColorIntensity::Vibrant));
-      node->SetFloatProperty("line width", 3.0f);
-      node->SetBoolProperty("helper object", true);
-      HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
       // storing the next box data node as a persistent class member and
@@ -129,6 +119,27 @@ namespace mitk::nnInteractive
       iter->second.pop_back();
     }
 
+    const PlanarFigure* AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType)
+    {
+      // Spans the box as the planar figure interactor does when it is drawn
+      // with the mouse, from the corner where the mouse is pressed to the one
+      // where it is released.
+      auto box = PlanarRectangle::New();
+      box->SetPlaneGeometry(plane);
+
+      Point2D start;
+      Point2D end;
+      plane->Map(corner, start);
+      plane->Map(oppositeCorner, end);
+      box->SetFromSpan(start, end);
+
+      auto node = CreateBoxNode(box, promptType);
+      m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
+      this->CompleteBox(node, promptType);
+
+      return box;
+    }
+
     void DestroyBoxNodes()
     {
       // Remove all box nodes from the data storage and release their
@@ -148,13 +159,17 @@ namespace mitk::nnInteractive
     std::unordered_map<PromptType, std::vector<DataNode::Pointer>> BoxNodes;
 
   private:
+    // Adds a placed box to the list of completed boxes.
+    void CompleteBox(DataNode* node, PromptType promptType)
+    {
+      node->SetName(this->CreateBoxNodeName(promptType));
+      node->SetColor(GetColor(promptType, ColorIntensity::Muted));
+      this->BoxNodes[promptType].push_back(node);
+    }
+
     void OnEndPlacementPlanarFigureEvent()
     {
-      // Add the newly placed box to the list of completed boxes.
-      auto latestBoxNode = m_NextBoxNode;
-      latestBoxNode->SetName(this->CreateBoxNodeName());
-      latestBoxNode->SetColor(GetColor(m_Owner->GetCurrentPromptType(), ColorIntensity::Muted));
-      this->BoxNodes[m_Owner->GetCurrentPromptType()].push_back(latestBoxNode);
+      this->CompleteBox(m_NextBoxNode, m_Owner->GetCurrentPromptType());
 
       // Notify the nnInteractiveTool that an interaction has occurred.
       m_Owner->UpdatePreviewEvent(false);
@@ -174,10 +189,23 @@ namespace mitk::nnInteractive
       return "Next " + promptType + " box";
     }
 
-    std::string CreateBoxNodeName()
+    std::string CreateBoxNodeName(PromptType promptType)
     {
-      const auto& promptType = GetPromptTypeAsString(m_Owner->GetCurrentPromptType());
-      return m_Owner->GetDataStorage()->GetUniqueName(promptType + " box");
+      return m_Owner->GetDataStorage()->GetUniqueName(GetPromptTypeAsString(promptType) + " box");
+    }
+
+    // Styles the box using data node properties, taking into account the
+    // prompt type. The box being drawn is vibrant, completed boxes are muted.
+    static DataNode::Pointer CreateBoxNode(PlanarRectangle* box, PromptType promptType)
+    {
+      auto node = DataNode::New();
+      node->SetData(box);
+      node->SetColor(GetColor(promptType, ColorIntensity::Vibrant));
+      node->SetFloatProperty("line width", 3.0f);
+      node->SetBoolProperty("helper object", true);
+      HideNodeIn3DRenderWindows(node);
+
+      return node;
     }
 
     BoxInteractor* m_Owner;
@@ -221,6 +249,11 @@ const mitk::PlanarFigure* mitk::nnInteractive::BoxInteractor::GetLastBox() const
     return nullptr;
 
   return m_Impl->BoxNodes[promptType].back()->GetDataAs<PlanarFigure>();
+}
+
+const mitk::PlanarFigure* mitk::nnInteractive::BoxInteractor::AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType)
+{
+  return m_Impl->AddBox(plane, corner, oppositeCorner, promptType);
 }
 
 void mitk::nnInteractive::BoxInteractor::RemoveLastInteraction(PromptType promptType)

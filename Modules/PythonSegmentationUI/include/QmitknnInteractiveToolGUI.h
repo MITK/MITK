@@ -109,8 +109,10 @@ protected:
    */
   void EnableInitializeButtons(bool enabled);
 
-  /** \brief Brings the controls into the state of a running session, once it has started. */
-  void OnSessionStarted();
+  /** \brief Tells the user that the session of this GUI's Initialize button
+   *         runs on the CPU, which is slow, and how to do better.
+   */
+  void WarnAboutCpuBackend();
 
   /** \brief Handles the initialize button toggle event.
    *
@@ -135,7 +137,7 @@ protected:
    */
   void OnResetInteractionsButtonClicked();
 
-  /** \brief Undoes the last interaction and refreshes the Undo button state.
+  /** \brief Undoes the last interaction.
    *
    * Delegates to nnInteractiveTool::UndoLastInteraction(), which reverts the
    * most recent interaction (single-level) and removes its prompt
@@ -186,6 +188,12 @@ protected:
 
   /** \brief Handles cleanup confirmation from the tool.
    *
+   * Resets the interactions after any confirm. Only a confirm with the
+   * Confirm button of this GUI, by the user or auto-confirm, continues with
+   * the automations: auto-create-next-label and re-enabling the last
+   * interactor. Other callers, like the REST API, choose the next label
+   * themselves.
+   *
    * \param[in] isConfirmed Whether the cleanup was confirmed.
    */
   void OnConfirmCleanUp(bool isConfirmed);
@@ -193,9 +201,22 @@ protected:
   /** \brief Handles the tool's PreviewUpdatedEvent.
    *
    * When "auto-confirm" is enabled, schedules an auto-click of the Confirm
-   * button on the next event-loop tick. No-op otherwise.
+   * button on the next event-loop tick, unless the prompt came from a
+   * program instead of the user. No-op otherwise.
    */
   void OnPreviewUpdated();
+
+  /** \brief Handles the tool's InteractionsChangedEvent.
+   *
+   * Refreshes the Undo button and tells which prompt a program made last,
+   * as the interactor buttons only show the prompts of the user.
+   */
+  void OnInteractionsChanged();
+
+  /** \brief Shows the auto-zoom and auto-refine options of the tool, whoever
+   *         set them.
+   */
+  void OnToolOptionsChanged();
 
   /** \brief Handles the tool's DeactivatedEvent.
    *
@@ -206,6 +227,14 @@ protected:
    * destructor path.
    */
   void OnToolDeactivated();
+
+  /** \brief Handles the tool's SessionStartedEvent.
+   *
+   * Enables the session-dependent UI controls and seeds the session from the
+   * selected label, whether the Initialize button or another caller started
+   * the session. A session on the CPU gets no auto-zoom.
+   */
+  void OnSessionStarted();
 
   /** \brief Handles the tool's SessionEndedEvent.
    *
@@ -340,7 +369,8 @@ private:
   /** \brief Rebases the running session on the given label.
    *
    * No-op unless a session is running and the model advertises the mask
-   * interaction. Otherwise resets the current interactions and preview (so a
+   * interaction, and also if the session works on the label already.
+   * Otherwise resets the current interactions and preview (so a
    * mask seeded from the previously selected label does not linger when
    * switching labels) and, if the label has content, seeds the session from it.
    * No confirmation: the selection has already changed, so the next Confirm
@@ -419,6 +449,15 @@ private:
   // otherwise re-enter OnActiveLabelChanged and reset/re-seed the session
   // mid-confirm. The slot honours this guard and stays a no-op.
   bool m_SuppressActiveLabelChanged = false;
+
+  // The label the running session works on. The inspector reports the
+  // selection again after changes of its labels, like a rename through the
+  // REST API, which must not discard the prompts for that label.
+  std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_SessionLabelValue;
+
+  // Set while the Confirm button of this GUI confirms, as opposed to other
+  // callers like the REST API.
+  bool m_ConfirmingFromPanel = false;
 
   // Whether the running session reports undo support (nnInteractive >= 2.3.3).
   // Cached at session start (ApplyCapabilityGating) and used to gate the Undo

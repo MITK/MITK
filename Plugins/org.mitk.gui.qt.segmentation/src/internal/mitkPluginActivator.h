@@ -15,8 +15,13 @@ found in the LICENSE file.
 // Parent classes
 #include <berryAbstractUICTKPlugin.h>
 
+#include <cstdint>
+#include <vector>
+
 namespace mitk
 {
+  struct IRestServerService;
+
   class PluginActivator : public berry::AbstractUICTKPlugin
   {
     Q_OBJECT
@@ -39,6 +44,10 @@ namespace mitk
 
     static ctkPluginContext* m_context;
     static PluginActivator* m_Instance;
+
+    /** \brief The server that offers the plugin's REST endpoints, if there is one. */
+    IRestServerService* m_RestServer = nullptr;
+    std::vector<std::uint64_t> m_RestRoutes;
   };
 }
 

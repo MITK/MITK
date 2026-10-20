@@ -538,6 +538,8 @@ void mitk::VoxTellTool::LoadModel(std::shared_ptr<ProgressTask> task, DoneCallba
       m_Impl->Device = selection->Device;
       m_Impl->Initializing = false;
 
+      // Before done, so that a GUI whose own load this is can tell.
+      this->ModelLoadedEvent.Send();
       done(nullptr);
     });
 }
@@ -577,7 +579,11 @@ std::optional<mitk::VoxTell::ModelSource> mitk::VoxTellTool::GetModelSource() co
 
 void mitk::VoxTellTool::SetPrompts(const std::vector<std::string>& prompts)
 {
+  if (m_Impl->Prompts == prompts)
+    return;
+
   m_Impl->Prompts = prompts;
+  this->PromptsChangedEvent.Send();
 }
 
 const std::vector<std::string>& mitk::VoxTellTool::GetPrompts() const
@@ -587,7 +593,11 @@ const std::vector<std::string>& mitk::VoxTellTool::GetPrompts() const
 
 void mitk::VoxTellTool::SetCreateGroupsAsNeeded(bool createGroupsAsNeeded)
 {
+  if (m_Impl->CreateGroupsAsNeeded == createGroupsAsNeeded)
+    return;
+
   m_Impl->CreateGroupsAsNeeded = createGroupsAsNeeded;
+  this->PromptsChangedEvent.Send();
 }
 
 bool mitk::VoxTellTool::GetCreateGroupsAsNeeded() const

@@ -370,6 +370,12 @@ namespace mitk
      */
     const std::vector<std::string>& GetPromptsWithoutResult() const;
 
+    /** \brief Event triggered when LoadModel() has loaded the model, whoever called it. */
+    Message<> ModelLoadedEvent;
+
+    /** \brief Event triggered when SetPrompts() or SetCreateGroupsAsNeeded() changed what the next update does. */
+    Message<> PromptsChangedEvent;
+
   protected:
     VoxTellTool();
     ~VoxTellTool() override;

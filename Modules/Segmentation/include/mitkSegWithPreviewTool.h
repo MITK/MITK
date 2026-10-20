@@ -224,6 +224,15 @@ namespace mitk
     bool IsUpdating() const;
 
     /**
+     * \brief Whether work started with RunOffGUIThread() has not reached its \p done yet.
+     *
+     * Also work that is no update, like starting a model, during which the
+     * tool refuses updates and confirmations. False while \p done runs, so
+     * \p done can start further work.
+     */
+    bool IsRunningOffGUIThread() const;
+
+    /**
      * \brief Indicate whether an update of the preview can be stopped again.
      *
      * ToolCommand turns a cancel request into
@@ -439,13 +448,6 @@ namespace mitk
      * Callable from any thread. Without a GUI thread poster, \p function runs at once.
      */
     void PostToGUIThread(std::function<void()> function);
-
-    /**
-     * \brief Whether work started with RunOffGUIThread() has not reached its \p done yet.
-     *
-     * False while \p done runs, so \p done can start further work.
-     */
-    bool IsRunningOffGUIThread() const;
 
     /**
      * \brief Waits until work started with RunOffGUIThread() has finished.

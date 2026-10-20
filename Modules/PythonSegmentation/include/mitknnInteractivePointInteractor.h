@@ -59,6 +59,14 @@ namespace mitk::nnInteractive
      */
     std::optional<Point3D> GetLastPoint() const;
 
+    /** \brief Adds a point to the point set of its prompt type, as a click
+     *         with the mouse does.
+     *
+     * The point counts among the interactions, and RemoveLastInteraction()
+     * removes it. UpdatePreviewEvent is not emitted.
+     */
+    void AddPoint(const Point3D& point, PromptType promptType);
+
     /** \brief Removes the most recently placed point for the given prompt type.
      *
      * A no-op if no point set exists for \p promptType or it is already empty.

@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
 
+#include <vector>
+
 namespace mitk::nnInteractive
 {
   /** \brief %nnInteractive interactor for freehand brushstrokes.
@@ -80,6 +82,24 @@ namespace mitk::nnInteractive
      *         has been drawn yet.
      */
     const InteractionBoundingBox* GetLastScribbleBoundingBox() const;
+
+    /** \brief Paints a scribble along given points as the mouse paints one in
+     *         a render window that shows \p plane.
+     *
+     * The brush is stamped at each point and fills the gaps between them, as
+     * between the positions of the mouse. The scribble becomes the last one,
+     * whose mask and bounding box nnInteractive gets. It counts among the
+     * interactions, and RemoveLastInteraction() removes it.
+     * UpdatePreviewEvent is not emitted.
+     *
+     * \param[in] plane The plane the scribble lies in, like that of a render
+     *            window.
+     * \param[in] points In world coordinates, projected onto \p plane.
+     * \param[in] promptType The prompt type of the scribble.
+     *
+     * \throw mitk::Exception if the scribble does not cover the image.
+     */
+    void AddScribble(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType);
 
     /** \brief Removes the most recently drawn brushstroke for the given prompt type.
      *

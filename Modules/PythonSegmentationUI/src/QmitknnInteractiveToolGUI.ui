@@ -229,6 +229,19 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="programPromptLabel">
+        <property name="visible">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="autoRefineCheckBox">
         <property name="text">
          <string>Auto-refine preexisting label content</string>

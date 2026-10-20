@@ -129,6 +129,10 @@ QmitkSegmentationView::~QmitkSegmentationView()
 {
   if (nullptr != m_Controls)
   {
+    // Before deactivating the tools: the widgets may be gone already.
+    m_ToolManager->ActiveToolChanged -=
+      mitk::MessageDelegate<Self>(this, &Self::ShowActiveToolTab);
+
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
 
@@ -564,6 +568,10 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
+
+  // The tool manager only reports changes of its copy of the active label: one
+  // left behind by a click here would swallow a later request for its label.
+  m_ToolManager->SetActiveWorkingLabel(labelValue);
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType /*label*/, const mitk::Point3D& pos)
@@ -708,6 +716,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->toolSelectionBox3D->SetMultiLabelInspector(multiLabelInspector);
 
+   m_ToolManager->ActiveToolChanged +=
+     mitk::MessageDelegate<Self>(this, &Self::ShowActiveToolTab);
+
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
    this->UpdateLabelSuggestions();
@@ -808,6 +819,20 @@ void QmitkSegmentationView::OnActiveToolChanged()
 
   // set the interaction reference geometry for the render window part (might be nullptr)
   m_RenderWindowPart->SetInteractionReferenceGeometry(interactionReferenceGeometry);
+}
+
+void QmitkSegmentationView::ShowActiveToolTab()
+{
+  const auto id = m_ToolManager->GetActiveToolID();
+
+  if (m_Controls->toolSelectionBox2D->HasTool(id))
+  {
+    m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab2DTools);
+  }
+  else if (m_Controls->toolSelectionBox3D->HasTool(id))
+  {
+    m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab3DTools);
+  }
 }
 
 void QmitkSegmentationView::OnActiveWorkingLabelSelectionChanged()

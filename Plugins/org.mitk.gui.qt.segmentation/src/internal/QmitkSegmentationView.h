@@ -120,6 +120,14 @@ private:
   */
   void OnActiveToolChanged();
 
+  /**
+  * \brief Shows the tab with the active tool and its GUI.
+  *
+  * A tool can become active without a click on its tab, for example through
+  * a shortcut or the REST API.
+  */
+  void ShowActiveToolTab();
+
   void OnActiveWorkingLabelSelectionChanged();
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;

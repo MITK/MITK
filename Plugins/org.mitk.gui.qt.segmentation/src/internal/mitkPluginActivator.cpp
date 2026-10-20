@@ -30,6 +30,19 @@ found in the LICENSE file.
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
+#include <mitkSegmentationPluginConfig.h>
+
+#if MITK_HAS_RESTAPI
+#include "QmitkSegmentationRestRoutes.h"
+
+#include <mitkIRestServerService.h>
+#include <mitkLog.h>
+
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleRegistry.h>
+#endif
+
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE
@@ -69,10 +82,41 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelSegmentationAction, context)
   this->m_context = context;
+
+#if MITK_HAS_RESTAPI
+  // The REST server loads with the application's modules, before any plugin.
+  auto* mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+  const auto reference = mitkContext->GetServiceReference<IRestServerService>();
+  m_RestServer = reference ? mitkContext->GetService(reference) : nullptr;
+
+  if (m_RestServer != nullptr)
+  {
+    try
+    {
+      for (const auto& route : CreateSegmentationRoutes(m_RestServer))
+        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Cannot offer the segmentation's REST endpoints: " << e.GetDescription();
+    }
+  }
+#endif
 }
 
 void PluginActivator::stop(ctkPluginContext *)
 {
+#if MITK_HAS_RESTAPI
+  if (m_RestServer != nullptr)
+  {
+    for (const auto id : m_RestRoutes)
+      m_RestServer->RemoveRoute(id);
+  }
+
+  m_RestRoutes.clear();
+  m_RestServer = nullptr;
+#endif
+
   this->m_context = nullptr;
 }
 

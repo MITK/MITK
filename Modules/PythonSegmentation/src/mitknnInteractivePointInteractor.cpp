@@ -49,11 +49,9 @@ namespace mitk::nnInteractive
     {
     }
 
-    void CreatePointSetNode()
+    void CreatePointSetNode(PromptType promptType)
     {
-      const auto promptType = m_Owner->GetCurrentPromptType();
-
-      // Check if a point set node for the current prompt type has already been created.
+      // Check if a point set node for the prompt type has already been created.
       if (this->PointSetNodes.find(promptType) != this->PointSetNodes.end())
         return;
 
@@ -70,7 +68,7 @@ namespace mitk::nnInteractive
       pointSet->AddObserver(PointSetAddEvent(), command);
 
       // Style the point set using data node properties, taking into account
-      // the current prompt type.
+      // the prompt type.
       auto node = DataNode::New();
       node->SetData(pointSet);
       node->SetName(GetPromptTypeAsString(promptType) + " points");
@@ -87,8 +85,8 @@ namespace mitk::nnInteractive
       HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
-      // storing the point set data node for the current prompt type as a
-      // persistent class member and adding it to the data storage.
+      // storing the point set data node for the prompt type as a persistent
+      // class member and adding it to the data storage.
       this->PointSetNodes[promptType] = node;
       m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
     }
@@ -156,6 +154,15 @@ std::optional<mitk::Point3D> mitk::nnInteractive::PointInteractor::GetLastPoint(
   return pointSet->GetPoint(pointSet->GetSize() - 1);
 }
 
+void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, PromptType promptType)
+{
+  m_Impl->CreatePointSetNode(promptType);
+
+  // Unlike the point set interactor, this emits no PointSetAddEvent, which
+  // would prompt nnInteractive a second time.
+  m_Impl->PointSetNodes.at(promptType)->GetDataAs<PointSet>()->InsertPoint(point);
+}
+
 void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType promptType)
 {
   auto iter = m_Impl->PointSetNodes.find(promptType);
@@ -172,7 +179,7 @@ void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType prom
 void mitk::nnInteractive::PointInteractor::OnEnable()
 {
   // Create a point set for the current prompt type if it doesn't already exist.
-  m_Impl->CreatePointSetNode();
+  m_Impl->CreatePointSetNode(this->GetCurrentPromptType());
 
   // Enable the actual interactor for the appropriate point set and restrict
   // points to the bounds of the reference image.

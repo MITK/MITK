@@ -81,6 +81,9 @@ protected:
    *         no longer busy, or the outcome of its auto-confirmation. */
   void BusyStateChanged(bool isBusy) override;
 
+  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
+  void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool) override;
+
 private:
   mitk::VoxTellTool* GetTool();
 
@@ -136,8 +139,18 @@ private:
    *         worker, and prepares the prompts for the next run. */
   void PrepareNextRun();
 
-  /** \brief Brings the controls into the state of a model that is loaded. */
-  void OnModelLoaded();
+  /** \brief Brings the controls into the state of a model that is loaded.
+   *
+   * \param loadedHere Whether this GUI loaded the model, which then also
+   *        hands the focus to the prompts and warns about a slow device.
+   */
+  void OnModelLoaded(bool loadedHere);
+
+  /** \brief Follows a model that another caller than this GUI loaded, like the REST API. */
+  void OnToolModelLoaded();
+
+  /** \brief Shows the prompts and options of the tool, whoever set them. */
+  void OnToolPromptsChanged();
 
   /** \brief Brings the controls into the state of a model that is not loaded. */
   void OnModelUnloaded();

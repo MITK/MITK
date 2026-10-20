@@ -576,6 +576,11 @@ To discard all current interactions and start over, use <b>Reset</b> (or press <
 Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
 Two automation options on the preferences page streamline this workflow: <i>Auto-create next label</i> prepares a new empty label as soon as you confirm one, so you can keep segmenting, and <i>Auto-confirm after single interaction</i> confirms automatically after your first interaction, which is convenient when a single interaction per label is enough.
 
+With <i>Auto-create next label</i>, confirming adds a new, empty label to the same group and selects it, so that your next interactions segment the next structure.
+It gets the default label name, which you can change at any time.
+If the label is still empty when you close nnInteractive or switch to another tool, it is removed again and the label you confirmed last becomes active.
+The label is kept if you select a different label or click <b>Reset</b> in the meantime, or once it has content.
+
 The tool's <b>Undo</b> and the application-wide undo work at different levels, and both stay available while the tool is active.
 The tool's <b>Undo</b> (<tt>U</tt>) reverts only your most recent interaction within the current, unconfirmed result; there is no further interaction history to step back through.
 Confirming a segmentation is recorded as a single step on the application-wide undo stack, just like the other editing tools, so a confirmed label is reverted with the application-wide <b>Undo</b> in the toolbar (<tt>CTRL+Z</tt>) rather than with the tool's <b>Undo</b>.

@@ -34,9 +34,10 @@ namespace Ui { class QmitkSingleNodeSelectionWidget; }
 *
 * \remark This class provides a public function 'SetAutoSelectNewNodes' that can be used to enable
 *         the auto selection mode (default is false).
-*         The user of this class calling this function has to make sure that the base-class Q_SIGNAL
-*         'CurrentSelectionChanged', which will be emitted by this function, is already
-*         connected to a receiving slot, if the initial valid auto selection should not get lost.
+*         The initial auto selection is emitted via the base-class Q_SIGNAL 'CurrentSelectionChanged'
+*         by whichever call completes the configuration: 'SetAutoSelectNewNodes', 'SetDataStorage'
+*         or 'SetNodePredicate'. Connect a receiving slot before that call, if the initial valid
+*         auto selection should not get lost.
 */
 class MITKQTWIDGETS_EXPORT QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -64,10 +65,11 @@ public Q_SLOTS:
   *
   * \remark Enabling the auto selection mode by calling 'SetAutoSelectNewNodes(true)'
   *         will directly emit a 'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged' Q_SIGNAL
-  *         if a valid auto selection was made.
-  *         If this initial emission should not get lost, auto selection mode needs to be enabled after this
-  *         selection widget has been connected via the 'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged'
-  *         Q_SIGNAL to a receiving function.
+  *         if a valid auto selection was made. While auto selection is enabled, the same applies to
+  *         'SetDataStorage' and 'SetNodePredicate'.
+  *         If this initial emission should not get lost, connect the
+  *         'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged' Q_SIGNAL to a receiving function
+  *         before any of these calls.
   */
   void SetAutoSelectNewNodes(bool autoSelect);
 

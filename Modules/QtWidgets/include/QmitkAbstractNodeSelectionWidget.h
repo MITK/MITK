@@ -154,7 +154,7 @@ protected:
   */
   virtual void OnNodePredicateChanged();
 
-  /** Method is called if the data storage has changed. The selection will be automatically be reset afterwards.
+  /** Method is called if the data storage has changed, after the selection of the previous data storage has been reset.
   *   The default implementation does nothing.
   */
   virtual void OnDataStorageChanged();

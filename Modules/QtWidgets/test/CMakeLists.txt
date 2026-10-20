@@ -12,6 +12,10 @@ mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSe
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkSingleNodeSelectionWidgetTest QmitkSingleNodeSelectionWidgetTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkIconThemeTest QmitkIconThemeTest
   -platform minimal
 )

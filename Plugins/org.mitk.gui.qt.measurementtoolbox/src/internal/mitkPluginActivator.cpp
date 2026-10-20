@@ -14,6 +14,19 @@ found in the LICENSE file.
 #include "QmitkMeasurementView.h"
 #include "QmitkImageStatisticsView.h"
 
+#include <mitkMeasurementToolboxPluginConfig.h>
+
+#if MITK_HAS_RESTAPI
+#include "QmitkImageStatisticsRestRoutes.h"
+
+#include <mitkIRestServerService.h>
+#include <mitkLog.h>
+
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleRegistry.h>
+#endif
+
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
 ctkPluginContext* mitk::PluginActivator::GetContext()
@@ -26,10 +39,42 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMeasurementView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkImageStatisticsView, context)
   m_Context = context;
+
+#if MITK_HAS_RESTAPI
+  // The REST server loads with the application's modules, before any plugin.
+  auto* mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+  const auto reference = mitkContext->GetServiceReference<IRestServerService>();
+  m_RestServer = reference ? mitkContext->GetService(reference) : nullptr;
+
+  if (m_RestServer != nullptr)
+  {
+    try
+    {
+      for (const auto& route : CreateImageStatisticsRoutes(m_RestServer))
+        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Cannot offer the image statistics' REST endpoints: " << e.GetDescription();
+    }
+  }
+#endif
 }
 
 void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+#if MITK_HAS_RESTAPI
+  if (m_RestServer != nullptr)
+  {
+    for (const auto id : m_RestRoutes)
+      m_RestServer->RemoveRoute(id);
+  }
+
+  m_RestRoutes.clear();
+  m_RestServer = nullptr;
+#endif
+
   m_Context = nullptr;
 }

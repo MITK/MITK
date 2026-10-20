@@ -8,6 +8,10 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
 )
 
+if(MITK_HAS_RESTAPI)
+  list(APPEND INTERNAL_CPP_FILES QmitkImageStatisticsRestRoutes.cpp)
+endif()
+
 set(UI_FILES
   src/internal/QmitkImageStatisticsViewControls.ui
   src/internal/QmitkMeasurementViewControls.ui

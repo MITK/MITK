@@ -14,8 +14,13 @@ found in the LICENSE file.
 
 #include <ctkPluginActivator.h>
 
+#include <cstdint>
+#include <vector>
+
 namespace mitk
 {
+  struct IRestServerService;
+
   class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
@@ -30,6 +35,10 @@ namespace mitk
 
   private:
     static ctkPluginContext* m_Context;
+
+    /** \brief The server that offers the plugin's REST endpoints, if there is one. */
+    IRestServerService* m_RestServer = nullptr;
+    std::vector<std::uint64_t> m_RestRoutes;
   };
 }
 

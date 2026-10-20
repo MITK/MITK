@@ -23,6 +23,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.crashtest:OFF
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.restapi:OFF
+  org.mitk.gui.qt.reports:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF

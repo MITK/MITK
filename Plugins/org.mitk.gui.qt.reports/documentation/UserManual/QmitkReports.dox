@@ -1,0 +1,30 @@
+/**
+\page org_mitk_editors_report The Report Editor
+
+A report is a document about the data of the session, with text, tables, charts and images of
+the display windows. Programs that work with the Workbench through its REST API create reports,
+for example the Agent view after a segmentation. Each report opens in an editor of its own, next
+to the Standard Display; its tab shows the report's title.
+
+Reports follow the Workbench's theme: a dark page in the dark theme, a light one otherwise. A
+report that is saved or opened in the web browser keeps the theme the editor shows, and looks
+there as it does in the editor. Printed pages are always light. The editor shows the report but
+does not let you select or copy its text; open it in the web browser for that.
+
+\section org_mitk_editors_reportSave Saving a report
+
+"Save as HTML..." saves the report as a single HTML file. Its images are part of the file, so
+it can be passed on as it is and opened in any web browser. The file contains no scripts, and a
+content security policy keeps browsers from loading anything from elsewhere.
+
+"Open in Browser" shows the report in the web browser, for example to print it or to save it as
+a PDF. The browser opens a copy in a temporary folder, which the Workbench removes when it
+closes.
+
+\section org_mitk_editors_reportLifetime Closing a report
+
+A report exists only as long as its editor. Closing the editor discards the report, and reports
+are not restored when the Workbench starts again. Save a report you want to keep before you
+close it.
+
+*/

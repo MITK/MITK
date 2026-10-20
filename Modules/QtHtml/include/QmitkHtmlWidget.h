@@ -32,7 +32,8 @@ found in the LICENSE file.
  * JavaScript). It is a pure renderer: there is no text selection or find. The
  * page and its referenced resources (images, style sheets) are fetched through
  * a resource handler set by the owner, so any URL scheme (e.g. qthelp://) can
- * be served without a global URL scheme handler.
+ * be served without a global URL scheme handler. Inline SVG is drawn like an
+ * SVG image, so style sheets of the page do not reach into it.
  */
 class MITKQTHTML_EXPORT QmitkHtmlWidget : public QAbstractScrollArea
 {

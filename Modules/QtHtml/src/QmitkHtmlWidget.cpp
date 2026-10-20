@@ -27,10 +27,15 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QMovie>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPolygonF>
 #include <QRadialGradient>
+#include <QRegularExpression>
 #include <QScrollBar>
 #include <QSvgRenderer>
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstring>
 #include <string>
@@ -59,6 +64,240 @@ namespace
   {
     for (const auto &point : src.color_points)
       gradient.setColorAt(point.offset, toQColor(point.color));
+  }
+
+  bool hasRadius(const litehtml::border_radiuses &r)
+  {
+    return r.top_left_x > 0 || r.top_left_y > 0 || r.top_right_x > 0 || r.top_right_y > 0 || r.bottom_right_x > 0 ||
+           r.bottom_right_y > 0 || r.bottom_left_x > 0 || r.bottom_left_y > 0;
+  }
+
+  /** \brief The radii shrunk evenly where adjacent corners would overlap, as CSS does (border-radius: 999px makes a capsule). */
+  litehtml::border_radiuses fitRadii(litehtml::border_radiuses r, const QRectF &rect)
+  {
+    const std::array<litehtml::pixel_t *, 8> values = {
+      &r.top_left_x, &r.top_left_y, &r.top_right_x, &r.top_right_y, &r.bottom_right_x, &r.bottom_right_y, &r.bottom_left_x, &r.bottom_left_y };
+
+    for (auto *value : values)
+      *value = std::max<litehtml::pixel_t>(0, *value);
+
+    qreal factor = 1.0;
+
+    const auto limit = [&factor](qreal length, qreal sum) {
+      if (sum > length && sum > 0)
+        factor = std::min(factor, length / sum);
+    };
+
+    limit(rect.width(), r.top_left_x + r.top_right_x);
+    limit(rect.width(), r.bottom_left_x + r.bottom_right_x);
+    limit(rect.height(), r.top_left_y + r.bottom_left_y);
+    limit(rect.height(), r.top_right_y + r.bottom_right_y);
+
+    if (factor < 1.0)
+    {
+      for (auto *value : values)
+        *value = static_cast<litehtml::pixel_t>(*value * factor);
+    }
+
+    return r;
+  }
+
+  /** \brief The rectangle with elliptic corners of the given radii, which fitRadii() has made fit. */
+  QPainterPath roundedRect(const QRectF &rect, const litehtml::border_radiuses &r)
+  {
+    QPainterPath path;
+    path.moveTo(rect.left() + r.top_left_x, rect.top());
+    path.lineTo(rect.right() - r.top_right_x, rect.top());
+
+    if (r.top_right_x > 0 && r.top_right_y > 0)
+      path.arcTo(QRectF(rect.right() - 2 * r.top_right_x, rect.top(), 2 * r.top_right_x, 2 * r.top_right_y), 90, -90);
+
+    path.lineTo(rect.right(), rect.bottom() - r.bottom_right_y);
+
+    if (r.bottom_right_x > 0 && r.bottom_right_y > 0)
+      path.arcTo(QRectF(rect.right() - 2 * r.bottom_right_x, rect.bottom() - 2 * r.bottom_right_y, 2 * r.bottom_right_x, 2 * r.bottom_right_y), 0, -90);
+
+    path.lineTo(rect.left() + r.bottom_left_x, rect.bottom());
+
+    if (r.bottom_left_x > 0 && r.bottom_left_y > 0)
+      path.arcTo(QRectF(rect.left(), rect.bottom() - 2 * r.bottom_left_y, 2 * r.bottom_left_x, 2 * r.bottom_left_y), 270, -90);
+
+    path.lineTo(rect.left(), rect.top() + r.top_left_y);
+
+    if (r.top_left_x > 0 && r.top_left_y > 0)
+      path.arcTo(QRectF(rect.left(), rect.top(), 2 * r.top_left_x, 2 * r.top_left_y), 180, -90);
+
+    path.closeSubpath();
+    return path;
+  }
+
+  /** \brief Fills the background box, with its rounded corners if it has any. */
+  void fillBackground(QPainter *painter, const litehtml::background_layer &layer, const QBrush &brush)
+  {
+    const QRectF box = toRectF(layer.border_box);
+
+    if (hasRadius(layer.border_radius))
+      painter->fillPath(roundedRect(box, fitRadii(layer.border_radius, box)), brush);
+    else
+      painter->fillRect(box, brush);
+  }
+
+  bool isDrawn(const litehtml::border &border)
+  {
+    return border.width > 0 && border.style != litehtml::border_style_none && border.style != litehtml::border_style_hidden;
+  }
+
+  /**
+   * \brief Draws the ring between the rounded outer edge and the inner edge.
+   *
+   * Sides of different colors meet on the diagonals from the outer to the
+   * inner corners, as in browsers.
+   */
+  void drawRoundedBorders(QPainter *painter, const litehtml::borders &borders, const QRectF &rect)
+  {
+    const auto outerRadii = fitRadii(borders.radius, rect);
+    const QRectF inner = rect.adjusted(borders.left.width, borders.top.width, -borders.right.width, -borders.bottom.width);
+
+    litehtml::border_radiuses innerRadii;
+    innerRadii.top_left_x = outerRadii.top_left_x - borders.left.width;
+    innerRadii.top_left_y = outerRadii.top_left_y - borders.top.width;
+    innerRadii.top_right_x = outerRadii.top_right_x - borders.right.width;
+    innerRadii.top_right_y = outerRadii.top_right_y - borders.top.width;
+    innerRadii.bottom_right_x = outerRadii.bottom_right_x - borders.right.width;
+    innerRadii.bottom_right_y = outerRadii.bottom_right_y - borders.bottom.width;
+    innerRadii.bottom_left_x = outerRadii.bottom_left_x - borders.left.width;
+    innerRadii.bottom_left_y = outerRadii.bottom_left_y - borders.bottom.width;
+
+    QPainterPath ring = roundedRect(rect, outerRadii);
+
+    if (inner.width() > 0 && inner.height() > 0)
+      ring = ring.subtracted(roundedRect(inner, fitRadii(innerRadii, inner)));
+
+    const std::array<const litehtml::border *, 4> sides = { &borders.top, &borders.right, &borders.bottom, &borders.left };
+    const bool uniform = std::all_of(sides.begin(), sides.end(), [&borders](const litehtml::border *side) {
+      return isDrawn(*side) && side->color == borders.top.color;
+    });
+
+    if (uniform)
+    {
+      painter->fillPath(ring, toQColor(borders.top.color));
+      return;
+    }
+
+    const std::array<QPolygonF, 4> trapezoids = {
+      QPolygonF({ rect.topLeft(), rect.topRight(), inner.topRight(), inner.topLeft() }),
+      QPolygonF({ rect.topRight(), rect.bottomRight(), inner.bottomRight(), inner.topRight() }),
+      QPolygonF({ rect.bottomRight(), rect.bottomLeft(), inner.bottomLeft(), inner.bottomRight() }),
+      QPolygonF({ rect.bottomLeft(), rect.topLeft(), inner.topLeft(), inner.bottomLeft() })
+    };
+
+    for (std::size_t i = 0; i < sides.size(); ++i)
+    {
+      if (!isDrawn(*sides[i]))
+        continue;
+
+      QPainterPath trapezoid;
+      trapezoid.addPolygon(trapezoids[i]);
+      painter->fillPath(ring.intersected(trapezoid), toQColor(sides[i]->color));
+    }
+  }
+
+  /** \brief An &lt;img&gt; showing the SVG markup, with the attributes that size and style its box. */
+  QString svgAsImage(const QString &openTag, QString svg)
+  {
+    // A standalone SVG document needs the namespaces that HTML implies.
+    if (!openTag.contains(QStringLiteral("xmlns=")))
+      svg.insert(4, QStringLiteral(" xmlns=\"http://www.w3.org/2000/svg\""));
+
+    if (svg.contains(QStringLiteral("xlink:")) && !openTag.contains(QStringLiteral("xmlns:xlink=")))
+      svg.insert(4, QStringLiteral(" xmlns:xlink=\"http://www.w3.org/1999/xlink\""));
+
+    QString image = QStringLiteral("<img src=\"data:image/svg+xml;base64,") + QString::fromLatin1(svg.toUtf8().toBase64()) + QLatin1Char('"');
+
+    static const QRegularExpression attribute(QStringLiteral("([\\w:-]+)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')"));
+    static const QStringList keptAttributes = { "width", "height", "class", "style", "id" };
+
+    auto attributes = attribute.globalMatch(openTag);
+
+    while (attributes.hasNext())
+    {
+      const auto match = attributes.next();
+      const auto name = match.captured(1).toLower();
+
+      if (!keptAttributes.contains(name))
+        continue;
+
+      auto value = match.hasCaptured(2) ? match.captured(2) : match.captured(3);
+      image += QLatin1Char(' ') + name + QStringLiteral("=\"") + value.replace(QLatin1Char('"'), QStringLiteral("&quot;")) + QLatin1Char('"');
+    }
+
+    return image + QLatin1Char('>');
+  }
+
+  /**
+   * \brief The HTML with every outermost &lt;svg&gt; element replaced by an image of it.
+   *
+   * litehtml has no SVG element: inline SVG would be laid out as unknown HTML
+   * and draw nothing. As an image it takes the path of SVG files, drawn as
+   * vectors. Style sheets of the page no longer reach into it.
+   */
+  QString replaceInlineSvg(const QString &html)
+  {
+    // Case-sensitive like the XML that the markup becomes.
+    static const QRegularExpression svgTag(QStringLiteral("<(/?)svg\\b[^>]*>"));
+
+    QString result;
+    qsizetype copied = 0;
+    qsizetype start = 0;
+    QString openTag;
+    int depth = 0;
+
+    auto tags = svgTag.globalMatch(html);
+
+    while (tags.hasNext())
+    {
+      const auto tag = tags.next();
+      const bool closing = !tag.captured(1).isEmpty();
+      const bool selfClosing = !closing && tag.captured(0).endsWith(QStringLiteral("/>"));
+
+      if (depth == 0)
+      {
+        if (closing)
+          continue;
+
+        start = tag.capturedStart();
+        openTag = tag.captured(0);
+
+        if (!selfClosing)
+        {
+          depth = 1;
+          continue;
+        }
+      }
+      else if (closing)
+      {
+        if (--depth > 0)
+          continue;
+      }
+      else
+      {
+        if (!selfClosing)
+          ++depth;
+
+        continue;
+      }
+
+      const auto end = tag.capturedEnd();
+      result += QStringView(html).mid(copied, start - copied);
+      result += svgAsImage(openTag, html.mid(start, end - start));
+      copied = end;
+    }
+
+    if (copied == 0)
+      return html;
+
+    result += QStringView(html).mid(copied);
+    return result;
   }
 }
 
@@ -90,7 +329,7 @@ public:
     this->ClearAnimations();
     this->ClearSvgImages();
 
-    m_Document = litehtml::document::createFromString(html.toStdString(), this);
+    m_Document = litehtml::document::createFromString(replaceInlineSvg(html).toStdString(), this);
 
     q->horizontalScrollBar()->setValue(0);
     q->verticalScrollBar()->setValue(0);
@@ -228,6 +467,7 @@ public:
     clip.y = static_cast<litehtml::pixel_t>(vscroll / m_Zoom);
     clip.width = static_cast<litehtml::pixel_t>(q->viewport()->width() / m_Zoom);
     clip.height = static_cast<litehtml::pixel_t>(q->viewport()->height() / m_Zoom);
+    m_VisibleArea = toRectF(clip);
 
     m_Painter = &painter;
     m_Document->draw(reinterpret_cast<litehtml::uint_ptr>(&painter), 0, 0, &clip);
@@ -499,6 +739,12 @@ public:
     painter->save();
     painter->setClipRect(clip, Qt::IntersectClip);
 
+    if (hasRadius(layer.border_radius))
+    {
+      const QRectF box = toRectF(layer.border_box);
+      painter->setClipPath(roundedRect(box, fitRadii(layer.border_radius, box)), Qt::IntersectClip);
+    }
+
     for (qreal y = firstY; y <= lastY; y += stepY)
     {
       for (qreal x = firstX; x <= lastX; x += stepX)
@@ -519,29 +765,35 @@ public:
     if (color.alpha == 0)
       return;
 
-    auto *painter = reinterpret_cast<QPainter *>(hdc);
-    painter->fillRect(toRectF(layer.border_box), toQColor(color));
+    // CSS paints the root element's background over the whole canvas, below a short document too.
+    if (layer.is_root)
+    {
+      reinterpret_cast<QPainter *>(hdc)->fillRect(toRectF(layer.border_box).united(m_VisibleArea), toQColor(color));
+      return;
+    }
+
+    fillBackground(reinterpret_cast<QPainter *>(hdc), layer, toQColor(color));
   }
 
   void draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::linear_gradient &gradient) override
   {
     QLinearGradient brush(gradient.start.x, gradient.start.y, gradient.end.x, gradient.end.y);
     applyStops(brush, gradient);
-    reinterpret_cast<QPainter *>(hdc)->fillRect(toRectF(layer.border_box), brush);
+    fillBackground(reinterpret_cast<QPainter *>(hdc), layer, brush);
   }
 
   void draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::radial_gradient &gradient) override
   {
     QRadialGradient brush(QPointF(gradient.position.x, gradient.position.y), qMax(gradient.radius.x, gradient.radius.y));
     applyStops(brush, gradient);
-    reinterpret_cast<QPainter *>(hdc)->fillRect(toRectF(layer.border_box), brush);
+    fillBackground(reinterpret_cast<QPainter *>(hdc), layer, brush);
   }
 
   void draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer &layer, const litehtml::background_layer::conic_gradient &gradient) override
   {
     QConicalGradient brush(QPointF(gradient.position.x, gradient.position.y), gradient.angle);
     applyStops(brush, gradient);
-    reinterpret_cast<QPainter *>(hdc)->fillRect(toRectF(layer.border_box), brush);
+    fillBackground(reinterpret_cast<QPainter *>(hdc), layer, brush);
   }
 
   void draw_borders(litehtml::uint_ptr hdc, const litehtml::borders &borders, const litehtml::position &draw_pos, bool) override
@@ -549,9 +801,15 @@ public:
     auto *painter = reinterpret_cast<QPainter *>(hdc);
     const QRectF rect = toRectF(draw_pos);
 
+    if (hasRadius(borders.radius))
+    {
+      drawRoundedBorders(painter, borders, rect);
+      return;
+    }
+
     auto drawSide = [painter](const litehtml::border &border, const QRectF &sideRect)
     {
-      if (border.width <= 0 || border.style == litehtml::border_style_none || border.style == litehtml::border_style_hidden)
+      if (!isDrawn(border))
         return;
       painter->fillRect(sideRect, toQColor(border.color));
     };
@@ -640,13 +898,18 @@ public:
     baseurl = resolved.toString().toStdString();
   }
 
-  void set_clip(const litehtml::position &pos, const litehtml::border_radiuses &) override
+  void set_clip(const litehtml::position &pos, const litehtml::border_radiuses &radius) override
   {
     if (m_Painter == nullptr)
       return;
 
     m_Painter->save();
-    m_Painter->setClipRect(toRectF(pos), Qt::IntersectClip);
+    const QRectF rect = toRectF(pos);
+
+    if (hasRadius(radius))
+      m_Painter->setClipPath(roundedRect(rect, fitRadii(radius, rect)), Qt::IntersectClip);
+    else
+      m_Painter->setClipRect(rect, Qt::IntersectClip);
   }
 
   void del_clip() override
@@ -860,6 +1123,9 @@ private:
   QHash<QString, AnimatedImage> m_Animations;
   QHash<QString, QSvgRenderer *> m_SvgImages;
   QPainter *m_Painter = nullptr;
+
+  /** \brief The part of the document the current paint shows, in document coordinates. */
+  QRectF m_VisibleArea;
 };
 
 QmitkHtmlWidget::QmitkHtmlWidget(QWidget *parent)

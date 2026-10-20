@@ -1,0 +1,664 @@
+/* Only what litehtml renders as browsers do: block, inline-block, flex without
+   gap, tables, positioning, gradients, border-radius and var(). No grid, gap,
+   transform, box-shadow, filter, letter-spacing or color-mix(). Font weights
+   stay at 400, 600 and 700, which both pick the same faces. Containers have
+   padding, since litehtml does not collapse a child's margin through its
+   parent. */
+
+html {
+  --page: #ffffff;
+  --text: #1f2328;
+  --heading: #0d1117;
+  --muted: #59636e;
+  --faint: #b8c1cb;
+  --line: #d1d9e0;
+  --panel: #f6f8fa;
+  --raised: #ffffff;
+  --accent: #0969da;
+  --on-accent: #ffffff;
+  --hero-from: #eaf2fc;
+  --hero-to: #f8fafc;
+  --hero-glow: #dceafb;
+  --chip: #ffffff;
+  --row: #f8f9fa;
+  --head: #eef1f4;
+  --warn: #d97706;
+  --warn-text: #5c3200;
+  --warn-back: #fff6e6;
+  --warn-line: #f2c46d;
+  --info: #0969da;
+  --info-text: #0a3069;
+  --info-back: #eef5ff;
+  --info-line: #9cc4f5;
+  --ok: #2c8a3e;
+  --ok-text: #12391b;
+  --ok-back: #eefaf0;
+  --ok-line: #9fd4a9;
+  background: var(--page);
+}
+
+/* Dark on screen only: printed pages keep the light palette. */
+@media screen {
+  html.dark {
+    --page: #0d0f14;
+    --text: #c9ced8;
+    --heading: #f4f6fa;
+    --muted: #8a93a3;
+    --faint: #3a4256;
+    --line: #262c3a;
+    --panel: #12151d;
+    --raised: #181c27;
+    --accent: #7fd8ff;
+    --on-accent: #0d0f14;
+    --hero-from: #141824;
+    --hero-to: #0f121a;
+    --hero-glow: #1d2a44;
+    --chip: #1a1f2b;
+    --row: #151922;
+    --head: #181c27;
+    --warn: #f38400;
+    --warn-text: #e9dcc8;
+    --warn-back: #241a0e;
+    --warn-line: #6b4410;
+    --info: #7fd8ff;
+    --info-text: #cfe9f7;
+    --info-back: #0f1d29;
+    --info-line: #24506b;
+    --ok: #8db600;
+    --ok-text: #dbe9b8;
+    --ok-back: #151d0c;
+    --ok-line: #42560f;
+  }
+}
+
+body {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 40px 40px 40px;
+  color: var(--text);
+  background: var(--page);
+  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+main {
+  display: block;
+  padding-top: 20px;
+}
+
+.report-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.report-header h1 {
+  margin: 0;
+}
+
+.report-meta {
+  margin: 4px 0 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+h1, h2, h3, h4 {
+  color: var(--heading);
+}
+
+h1 {
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+h2 {
+  margin: 36px 0 14px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+h2 .num {
+  display: inline-block;
+  margin-right: 12px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  vertical-align: 3px;
+}
+
+h3 {
+  margin: 20px 0 8px 0;
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+p, ul, ol {
+  margin: 0 0 12px 0;
+}
+
+ul, ol {
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 4px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+code {
+  font-family: Consolas, "DejaVu Sans Mono", monospace;
+  font-size: 13px;
+}
+
+/* Blocks: browsers leave room for descenders below inline images, litehtml
+   does not. Inline SVG becomes an image in litehtml, so rules name both. */
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.center {
+  text-align: center;
+}
+
+.center img, .center svg {
+  margin: 0 auto;
+}
+
+.kicker {
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* A banner: text on the left, an image on the right. */
+.hero {
+  display: flex;
+  align-items: center;
+  margin: 0 0 24px 0;
+  padding: 30px 34px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: radial-gradient(circle at 85% 30%, var(--hero-glow), transparent 55%), linear-gradient(135deg, var(--hero-from), var(--hero-to));
+}
+
+.hero-text {
+  flex: 1 1 0;
+}
+
+.hero-media {
+  flex: 0 0 auto;
+  margin-left: 28px;
+}
+
+.hero-media img {
+  display: block;
+}
+
+/* With var(): litehtml applies declarations with var() after those without,
+   whatever their specificity, so h2's border would come back. */
+.hero h2 {
+  margin: 8px 0 12px 0;
+  padding: 0;
+  border-bottom: 0 solid var(--line);
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.hero p {
+  color: var(--muted);
+}
+
+.hl {
+  color: var(--accent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chip {
+  margin: 0 8px 8px 0;
+  padding: 3px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--text);
+  font-size: 12px;
+}
+
+/* Key numbers in a row; --c colors the edge. */
+.kpis {
+  display: flex;
+  margin: 0 0 24px 0;
+}
+
+.kpi {
+  flex: 1 1 0;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--c, var(--accent));
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.kpi + .kpi {
+  margin-left: 14px;
+}
+
+.value {
+  color: var(--heading);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.value small {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.label {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* A message with an icon; warn, info or ok. */
+.callout {
+  display: flex;
+  align-items: flex-start;
+  margin: 16px 0;
+  padding: 14px 18px;
+  border: 1px solid var(--info-line);
+  border-radius: 14px;
+  background: var(--info-back);
+  color: var(--info-text);
+}
+
+.callout .icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  margin-right: 14px;
+  border-radius: 10px;
+  background: var(--info);
+  color: var(--on-accent);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 34px;
+  text-align: center;
+}
+
+.callout .body {
+  flex: 1 1 0;
+}
+
+.callout p {
+  margin: 0 0 6px 0;
+}
+
+.callout.warn {
+  border-color: var(--warn-line);
+  background: var(--warn-back);
+  color: var(--warn-text);
+}
+
+.callout.warn .icon {
+  background: var(--warn);
+  color: #1a0f00;
+}
+
+.callout.ok {
+  border-color: var(--ok-line);
+  background: var(--ok-back);
+  color: var(--ok-text);
+}
+
+.callout.ok .icon {
+  background: var(--ok);
+  color: #ffffff;
+}
+
+.panel {
+  margin: 0 0 16px 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.panel-title {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* A small card; marked adds an edge of --c on top, num a large number. */
+.box {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.box.marked {
+  border-top: 3px solid var(--c, var(--accent));
+}
+
+.box .num {
+  color: var(--faint);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.box p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* One card per structure: header with badge, title and value; images; numbers and text. */
+.card {
+  margin: 0 0 18px 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 14px 20px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 17px 17px 0 0;
+  background: linear-gradient(90deg, var(--c-soft, transparent), transparent 60%);
+}
+
+.badge {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  margin-right: 16px;
+  border-radius: 16px;
+  background: var(--c, var(--accent));
+  color: var(--on-c, #ffffff);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 64px;
+  text-align: center;
+}
+
+.card-title {
+  flex: 1 1 0;
+}
+
+.card-title h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.card-title .sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.card-value {
+  flex: 0 0 auto;
+  margin-left: 16px;
+  text-align: right;
+}
+
+.card-body {
+  padding: 14px 14px 0 14px;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px 18px 20px;
+}
+
+.card-footer p {
+  flex: 1 1 0;
+  margin: 0 0 0 18px;
+  font-size: 13.5px;
+}
+
+.flags {
+  margin-top: 6px;
+}
+
+.flag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flag.warn {
+  border-color: var(--warn-line);
+  background: var(--warn-back);
+  color: var(--warn);
+}
+
+.flag.info {
+  border-color: var(--info-line);
+  background: var(--info-back);
+  color: var(--info);
+}
+
+.flag.ok {
+  border-color: var(--ok-line);
+  background: var(--ok-back);
+  color: var(--ok);
+}
+
+/* A share of a whole: <div class="meter"><i style="width: 40%"></i></div>. */
+.meter {
+  width: 160px;
+  height: 6px;
+  margin: 6px 0 0 auto;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.meter i {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--c, var(--accent));
+}
+
+.stats {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+/* A fixed width: litehtml leaves min-width out when it sizes the row. */
+.stat {
+  width: 62px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--raised);
+  text-align: center;
+}
+
+.stat + .stat {
+  margin-left: 6px;
+}
+
+.stat b {
+  display: block;
+  color: var(--heading);
+  font-size: 15px;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+/* An image with a label in its corner. */
+.shot {
+  position: relative;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.shot span {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: #0d0f14;
+  color: #e6eaf0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* A colored block, for example a segment in a schematic map. */
+.tile {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--c, var(--accent));
+  color: var(--on-c, #ffffff);
+  font-weight: 700;
+}
+
+.tile .value {
+  color: var(--on-c, #ffffff);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.tile .label {
+  color: var(--on-c, #ffffff);
+}
+
+/* Equal columns side by side: any number of children. */
+.columns {
+  display: flex;
+  margin: 0 0 16px 0;
+}
+
+.columns > * {
+  flex: 1 1 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.columns > * + * {
+  margin-left: 16px;
+}
+
+.columns.tight {
+  margin-bottom: 6px;
+}
+
+.columns.tight > * + * {
+  margin-left: 6px;
+}
+
+/* litehtml's default style sheet gives tables font-size: medium. */
+table {
+  margin: 8px 0 16px 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+th, td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--head);
+  color: var(--heading);
+  font-weight: 600;
+}
+
+tr:nth-child(even) td {
+  background: var(--row);
+}
+
+th.number, td.number {
+  text-align: right;
+}
+
+figure {
+  margin: 12px 0 20px 0;
+}
+
+figcaption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border: 1px solid var(--faint);
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.footer {
+  margin: 34px 0 10px 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}

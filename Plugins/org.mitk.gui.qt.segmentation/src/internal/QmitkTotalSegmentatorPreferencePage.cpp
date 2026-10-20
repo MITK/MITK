@@ -145,19 +145,19 @@ namespace
     return RunVenvExecutable(QmitkVenvProcess::ToQString(python), QStringList() << "-c" << CLEAR_WEIGHTS_CODE);
   }
 
-  // A run uses the environment and the model weights from a process of its
-  // own, which no check for loaded modules can see. Tells the user and returns
-  // true while one is in progress.
+  // A run or an initialization uses the environment and the model weights from
+  // a process of its own, which no check for loaded modules can see. Tells the
+  // user and returns true while one is in progress.
   bool RefuseDuringRun(QWidget* parent)
   {
     const auto* tool = dynamic_cast<const mitk::TotalSegmentatorTool*>(
       mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetActiveTool());
 
-    if (tool == nullptr || !tool->IsUpdating())
+    if (tool == nullptr || (!tool->IsUpdating() && !tool->IsInitializing()))
       return false;
 
     QMessageBox::information(parent, "TotalSegmentator",
-      "TotalSegmentator is running. Wait until it has finished or cancel it, then try again.");
+      "TotalSegmentator is busy. Wait until it has finished or cancel it, then try again.");
 
     return true;
   }

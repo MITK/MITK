@@ -93,7 +93,10 @@ namespace mitk
    * The destructor kills the process right away, which also frees everything it
    * held, like GPU memory.
    *
-   * All calls of a worker must come from the same thread.
+   * Calls block the calling thread, so long ones are made off the GUI thread.
+   * They may come from any thread, but must not overlap: a call that starts
+   * while another one runs throws. Neither may the worker be destroyed while a
+   * call runs on another thread; wait until that call has returned.
    */
   class MITKPYTHONWORKER_EXPORT PythonWorker
   {
@@ -106,15 +109,15 @@ namespace mitk
     };
 
     /**
-     * \brief Called while a call is in progress.
+     * \brief Called on the thread of a call while it is in progress.
      *
      * Receives the fields of each progress report, and null whenever 100 ms
      * pass without a report. Returning false asks the worker to cancel the call,
      * which is up to the called function. If the hook throws, the worker is
-     * ended and the exception propagates.
+     * ended and the exception propagates, which ends a call at once.
      *
-     * The hook must not destroy the worker, also not indirectly through events
-     * it processes. Defer that until Call() has returned.
+     * The hook must not destroy the worker. Defer that until Call() has
+     * returned.
      */
     using ProgressHook = std::function<bool(const nlohmann::json& progress)>;
 
@@ -139,8 +142,7 @@ namespace mitk
      * \param buffers Further keyword arguments, received as NumPy arrays. Each
      *        buffer can be passed to one call only.
      * \param progress Optional hook for progress and cancellation. Without it,
-     *        the call blocks the calling thread without processing events and
-     *        cannot be interrupted, so long calls pass one.
+     *        a call that hangs cannot be ended, so long calls pass one.
      *
      * \throw PythonWorkerError if the function raised an exception.
      * \throw PythonWorkerExitedException if the worker is gone.
@@ -150,7 +152,11 @@ namespace mitk
                         const Buffers& buffers = {},
                         const ProgressHook& progress = {});
 
-    /** \brief False once the process is known to be gone. */
+    /**
+     * \brief False once the process is known to be gone.
+     *
+     * A call on another thread may not have returned yet when this turns false.
+     */
     bool IsRunning() const;
 
     /**

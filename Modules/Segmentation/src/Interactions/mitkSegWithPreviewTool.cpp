@@ -39,31 +39,38 @@ found in the LICENSE file.
 #include <optional>
 #include <utility>
 
-namespace
+struct mitk::SegWithPreviewTool::UpdatePass
 {
-  // Calls a function when it goes out of scope, whether by return or by an
-  // exception.
-  template <typename TFunction>
-  class ScopeExit
-  {
-  public:
-    explicit ScopeExit(TFunction function)
-      : m_Function(std::move(function))
-    {
-    }
+  // Held, not just referenced: the work of an update can run off the GUI
+  // thread, during which the tool can be deactivated, and Deactivated()
+  // releases the input and the data of the preview node. The user can also
+  // remove the images from the data storage meanwhile.
+  Image::ConstPointer Input;
+  MultiLabelSegmentation::Pointer Preview;
+  Image::Pointer WorkingImage;
 
-    ~ScopeExit()
-    {
-      m_Function();
-    }
+  TimePointType TimePoint = 0.0;
 
-    ScopeExit(const ScopeExit&) = delete;
-    ScopeExit& operator=(const ScopeExit&) = delete;
+  /** Every time step of the preview, or the one at TimePoint. */
+  bool AllTimeSteps = false;
+  std::vector<TimeStepType> TimeSteps;
+  std::size_t NextTimeStep = 0;
 
-  private:
-    TFunction m_Function;
-  };
-}
+  bool Cancelled = false;
+  bool Failed = false;
+  bool Computed = false;
+
+  /** Set by Deactivated(): the update ends once its running work has, and
+      leaves the state of the tool alone, which may be activated anew. */
+  bool Abandoned = false;
+
+  /** What follows the update, like the transfer of a confirmation. */
+  std::function<void()> Then;
+
+  // Declared in this order, so that the task is taken from the command before it ends.
+  std::unique_ptr<ProgressTask> Task;
+  std::optional<ScopedProgressTask<ToolCommand>> ScopedTask;
+};
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -77,6 +84,9 @@ mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews, const cha
 
 mitk::SegWithPreviewTool::~SegWithPreviewTool()
 {
+  // Work reads the token when it posts to the GUI thread.
+  this->WaitForWorkOffGUIThread();
+  m_Alive.reset();
 }
 
 void mitk::SegWithPreviewTool::SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle)
@@ -201,6 +211,16 @@ void mitk::SegWithPreviewTool::Deactivated()
   m_ReferenceDataNode = nullptr;
   m_WorkingPlaneGeometry = nullptr;
 
+  // An update whose work still runs ends once the work has, without further
+  // time steps and without a confirmation following it. IsUpdating() stays
+  // true until then, which tells derived tools that the work still uses what
+  // they would otherwise release now.
+  if (m_UpdatePass != nullptr)
+  {
+    m_UpdatePass->Abandoned = true;
+    m_UpdatePass->Then = nullptr;
+  }
+
   try
   {
     if (DataStorage *storage = this->GetToolManager()->GetDataStorage())
@@ -224,6 +244,9 @@ void mitk::SegWithPreviewTool::Deactivated()
 
 void mitk::SegWithPreviewTool::ConfirmSegmentation()
 {
+  if (m_IsUpdating || m_WorkRunning)
+    mitkThrow() << this->GetName() << ": the preview cannot be confirmed while the tool is busy.";
+
   bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
 
   // A lazy tool has computed the current time step only, which is all that is
@@ -232,9 +255,20 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
   const bool updateAllTimeSteps = m_LazyDynamicPreviews && m_CreateAllTimeSteps;
 
   if (updateAllTimeSteps || labelChanged)
-    this->UpdatePreview(updateAllTimeSteps);
+  {
+    // The user can select another time point while the update computes off
+    // the GUI thread. The preview holds the one the update computed, which
+    // EndUpdate() has recorded once this runs.
+    this->StartUpdate(updateAllTimeSteps, [this]() { this->FinishConfirmation(m_LastTimePointOfUpdate); });
+    return;
+  }
 
-  CreateResultSegmentationFromPreview();
+  this->FinishConfirmation();
+}
+
+void mitk::SegWithPreviewTool::FinishConfirmation(std::optional<TimePointType> timePoint)
+{
+  this->CreateResultSegmentationFromPreview(timePoint);
 
   // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
   // hook ends up flagged again.
@@ -368,7 +402,9 @@ mitk::Color mitk::SegWithPreviewTool::GetSpecialPreviewColor() const
 
 void mitk::SegWithPreviewTool::ResetPreviewNode()
 {
-  if (m_IsUpdating)
+  // An update abandoned by a deactivation holds its own preview, so an
+  // activation while its work ends can set up a new one.
+  if (m_IsUpdating && !(m_UpdatePass != nullptr && m_UpdatePass->Abandoned))
   {
     mitkThrow() << "Used tool is implemented incorrectly. ResetPreviewNode is called while preview update is ongoing. Check implementation!";
   }
@@ -561,7 +597,7 @@ void mitk::SegWithPreviewTool::TransferSegmentationsAtTimeStep(const MultiLabelS
   }
 }
 
-void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
+void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview(std::optional<TimePointType> timePoint)
 {
   const auto segInput = this->GetSegmentationInput();
   auto previewImage = this->GetPreviewSegmentation();
@@ -573,9 +609,12 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
     {
       // A lazy tool that ignores time point changes holds the preview of the
       // time point of its last update only, wherever the user has gone since.
-      const TimePointType timePoint = m_LazyDynamicPreviews && !m_IsTimePointChangeAware
-        ? m_LastTimePointOfUpdate
-        : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      if (!timePoint.has_value())
+      {
+        timePoint = m_LazyDynamicPreviews && !m_IsTimePointChangeAware
+          ? m_LastTimePointOfUpdate
+          : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      }
 
       auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
       if (nullptr == resultSegmentation)
@@ -595,7 +634,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
 
       auto labelMapping = this->GetLabelMapping();
 
-      const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+      const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(*timePoint);
       const auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
 
       // The existing groups that receive labels. Groups that the transfer adds
@@ -757,110 +796,201 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
 
 void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
-  // Held, not just referenced: a tool that pumps the event loop while it
-  // computes can be deactivated mid-run, and Deactivated() releases the input
-  // and the data of the preview node. The user can also remove the images
-  // from the data storage meanwhile.
-  const Image::ConstPointer inputImage = this->GetSegmentationInput();
-  const MultiLabelSegmentation::Pointer previewImage = this->GetPreviewSegmentation();
+  // An update whose work runs off the GUI thread computes what the tool was
+  // asked for when it started. Other work, like starting a model, uses the
+  // resources an update needs, and only one work runs at a time.
+  if (m_IsUpdating || m_WorkRunning)
+  {
+    MITK_WARN << this->GetName() << ": the tool is busy, the preview is not updated.";
+    return;
+  }
+
+  this->StartUpdate(ignoreLazyPreviewSetting, {});
+}
+
+void mitk::SegWithPreviewTool::StartUpdate(bool ignoreLazyPreviewSetting, std::function<void()> then)
+{
+  auto pass = std::make_unique<UpdatePass>();
+  pass->Input = this->GetSegmentationInput();
+  pass->Preview = this->GetPreviewSegmentation();
   this->EnsureUpToDateUserDefinedActiveLabel();
 
-  mitk::ProgressTask task(this->GetName(), 100, this->IsCancelable());
-  ScopedProgressTask<ToolCommand> scopedTask(m_ProgressCommand, &task);
+  pass->Task = std::make_unique<ProgressTask>(this->GetName(), 100, this->IsCancelable());
+  pass->ScopedTask.emplace(m_ProgressCommand.GetPointer(), pass->Task.get());
 
   const auto workingSegmentation = this->GetTargetSegmentation();
-  const Image::Pointer workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
+  pass->WorkingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
+  pass->TimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  pass->Then = std::move(then);
+
+  if (nullptr != pass->Input && nullptr != pass->Preview)
+  {
+    if (pass->Preview->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
+    {
+      pass->AllTimeSteps = true;
+
+      for (TimeStepType timeStep = 0; timeStep < pass->Preview->GetTimeSteps(); ++timeStep)
+        pass->TimeSteps.push_back(timeStep);
+    }
+    else
+    {
+      pass->TimeSteps.push_back(pass->Preview->GetTimeGeometry()->TimePointToTimeStep(pass->TimePoint));
+    }
+  }
+
+  m_UpdatePass = std::move(pass);
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
-
-  // However the update ends, the tool is not busy afterwards. A tool left busy
-  // keeps the tools of the host disabled.
-  const ScopeExit endBusy([this]
-    {
-      m_IsUpdating = false;
-      this->CurrentlyBusy.Send(false);
-    });
-
   m_HasUnconfirmedPreview = false;
-  this->UpdatePrepare();
-
-  const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-
-  bool cancelled = false;
-  bool computed = false;
 
   try
   {
-    if (nullptr != inputImage && nullptr != previewImage)
+    this->UpdatePrepare();
+  }
+  catch (...)
+  {
+    // A tool left busy keeps the tools of the host disabled.
+    m_UpdatePass.reset();
+    m_IsUpdating = false;
+    this->CurrentlyBusy.Send(false);
+    throw;
+  }
+
+  this->ContinueUpdate();
+}
+
+void mitk::SegWithPreviewTool::ContinueUpdate()
+{
+  auto& pass = *m_UpdatePass;
+
+  while (!pass.Abandoned && pass.NextTimeStep < pass.TimeSteps.size())
+  {
+    const auto index = pass.NextTimeStep++;
+    const auto timeStep = pass.TimeSteps[index];
+
+    Image::ConstPointer feedBackImage;
+    Image::ConstPointer currentSegImage;
+
+    if (pass.AllTimeSteps)
     {
-      if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
-      {
-        const auto timeSteps = previewImage->GetTimeSteps();
+      // One run of the filter per time step, each reporting its own
+      // fraction, so each of them gets its own share of the task.
+      m_ProgressCommand->SetShare(static_cast<unsigned int>(index), static_cast<unsigned int>(pass.TimeSteps.size()));
 
-        for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
-        {
-          // One run of the filter per time step, each reporting its own
-          // fraction, so each of them gets its own share of the task.
-          m_ProgressCommand->SetShare(timeStep, timeSteps);
+      const auto previewTimePoint = pass.Preview->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+      const auto inputTimeStep = pass.Input->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
 
-          Image::ConstPointer feedBackImage;
-          Image::ConstPointer currentSegImage;
-
-          auto previewTimePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
-          auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
-
-          if (nullptr != this->GetWorkingPlaneGeometry())
-          { //only extract a specific slice defined by the working plane as feedback referenceImage.
-            feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, inputTimeStep);
-            currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), workingImage, previewTimePoint);
-          }
-          else
-          { //work on the whole feedback referenceImage
-            feedBackImage = this->GetImageByTimeStep(inputImage, inputTimeStep);
-            currentSegImage = this->GetImageByTimePoint(workingImage, previewTimePoint);
-          }
-
-          this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
-        }
+      if (nullptr != this->GetWorkingPlaneGeometry())
+      { //only extract a specific slice defined by the working plane as feedback referenceImage.
+        feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), pass.Input, inputTimeStep);
+        currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), pass.WorkingImage, previewTimePoint);
       }
       else
-      {
-        Image::ConstPointer feedBackImage;
-        Image::ConstPointer currentSegImage;
-
-        if (nullptr != this->GetWorkingPlaneGeometry())
-        {
-          feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), inputImage, timePoint);
-          currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), workingImage, timePoint);
-        }
-        else
-        {
-          feedBackImage = this->GetImageByTimePoint(inputImage, timePoint);
-          currentSegImage = this->GetImageByTimePoint(workingImage, timePoint);
-        }
-
-        auto timeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-
-        this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
+      { //work on the whole feedback referenceImage
+        feedBackImage = this->GetImageByTimeStep(pass.Input, inputTimeStep);
+        currentSegImage = this->GetImageByTimePoint(pass.WorkingImage, previewTimePoint);
       }
-      RenderingManager::GetInstance()->RequestUpdateAll();
-      computed = true;
     }
+    else if (nullptr != this->GetWorkingPlaneGeometry())
+    {
+      feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), pass.Input, pass.TimePoint);
+      currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), pass.WorkingImage, pass.TimePoint);
+    }
+    else
+    {
+      feedBackImage = this->GetImageByTimePoint(pass.Input, pass.TimePoint);
+      currentSegImage = this->GetImageByTimePoint(pass.WorkingImage, pass.TimePoint);
+    }
+
+    m_DefersWork = true;
+
+    try
+    {
+      this->DoUpdatePreview(feedBackImage, currentSegImage, pass.Preview, timeStep);
+    }
+    catch (...)
+    {
+      m_DefersWork = false;
+      m_DeferredWork.reset();
+      this->HandleUpdateError(std::current_exception());
+      this->EndUpdate();
+      return;
+    }
+
+    m_DefersWork = false;
+
+    if (m_DeferredWork.has_value())
+    {
+      auto deferred = std::move(*m_DeferredWork);
+      m_DeferredWork.reset();
+
+      // Neither the work nor its done runs if the work cannot start, so the
+      // update ends here, or the tool would stay busy.
+      try
+      {
+        this->StartWork(std::move(deferred.Work), [this, done = std::move(deferred.Done)](std::exception_ptr error) {
+          try
+          {
+            done(error);
+          }
+          catch (...)
+          {
+            this->HandleUpdateError(std::current_exception());
+            this->EndUpdate();
+            return;
+          }
+
+          this->ContinueUpdate();
+        });
+      }
+      catch (...)
+      {
+        this->HandleUpdateError(std::current_exception());
+        this->EndUpdate();
+      }
+
+      return;
+    }
+  }
+
+  if (!pass.Abandoned && !pass.TimeSteps.empty())
+  {
+    RenderingManager::GetInstance()->RequestUpdateAll();
+    pass.Computed = true;
+  }
+
+  this->EndUpdate();
+}
+
+void mitk::SegWithPreviewTool::HandleUpdateError(std::exception_ptr error)
+{
+  // Deactivated meanwhile: nobody waits for the outcome any more, and the
+  // preview on display is not the one of this update.
+  const bool abandoned = m_UpdatePass->Abandoned;
+
+  // Whether cancelled or failed, there is no result to transfer.
+  m_UpdatePass->Failed = true;
+
+  try
+  {
+    std::rethrow_exception(error);
   }
   catch (const itk::ExceptionObject& e)
   {
     // A cancelled preview aborts the filter, which reports the abort as an
     // exception. Reporting that back as an error would turn the user's own
     // decision into a failure message.
-    cancelled = task.IsCancelRequested();
+    m_UpdatePass->Cancelled = m_UpdatePass->Task->IsCancelRequested();
 
-    if (!cancelled)
+    if (!m_UpdatePass->Cancelled)
     {
       MITK_ERROR << "Exception caught: " << e.GetDescription();
-      ErrorMessage.Send(e.GetDescription());
+
+      if (!abandoned)
+        ErrorMessage.Send(e.GetDescription());
     }
-    else
+    else if (!abandoned)
     {
       // Whatever the filter managed to write before it stopped is not a
       // result. Left on display it offers the user half a segmentation that
@@ -875,21 +1005,201 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
     // unsupported pixel type ends up in the error message as well instead of
     // unwinding through the tool activation.
     MITK_ERROR << "Exception caught: " << e.what();
-    ErrorMessage.Send(e.what());
+
+    if (!abandoned)
+      ErrorMessage.Send(e.what());
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unknown exception caught.";
+
+    if (!abandoned)
+      ErrorMessage.Send("An unknown error occurred.");
+  }
+}
+
+void mitk::SegWithPreviewTool::EndUpdate()
+{
+  std::exception_ptr cleanUpError;
+
+  try
+  {
+    this->UpdateCleanUp();
+  }
+  catch (...)
+  {
+    cleanUpError = std::current_exception();
   }
 
-  this->UpdateCleanUp();
+  auto pass = std::move(m_UpdatePass);
 
-  // Decided only now, as UpdateCleanUp() can still change the labels of the
-  // preview, removing the ones that turned out empty for example.
-  if (computed && !previewImage->GetAllLabelValues().empty())
-    m_HasUnconfirmedPreview = true;
+  if (cleanUpError == nullptr && !pass->Abandoned)
+  {
+    // Decided only now, as UpdateCleanUp() can still change the labels of the
+    // preview, removing the ones that turned out empty for example.
+    if (pass->Computed && !pass->Preview->GetAllLabelValues().empty())
+      m_HasUnconfirmedPreview = true;
 
-  // A cancelled update leaves the time point unrecorded on purpose: recording
-  // it would tell OnTimePointChanged() that this time point is up to date, so
-  // the discarded preview would never be recomputed for it.
-  if (!cancelled)
-    m_LastTimePointOfUpdate = timePoint;
+    // A cancelled update leaves the time point unrecorded on purpose: recording
+    // it would tell OnTimePointChanged() that this time point is up to date, so
+    // the discarded preview would never be recomputed for it.
+    if (!pass->Cancelled)
+      m_LastTimePointOfUpdate = pass->TimePoint;
+  }
+
+  // A confirmation of a cancelled or failed update would transfer a preview
+  // that is empty or half written.
+  std::function<void()> then;
+
+  if (!pass->Failed)
+    then = std::move(pass->Then);
+
+  pass.reset();
+
+  // However the update ends, the tool is not busy afterwards. A tool left busy
+  // keeps the tools of the host disabled.
+  m_IsUpdating = false;
+  this->CurrentlyBusy.Send(false);
+
+  if (cleanUpError != nullptr)
+    std::rethrow_exception(cleanUpError);
+
+  if (then)
+    then();
+}
+
+void mitk::SegWithPreviewTool::SetGUIThreadPoster(GUIThreadPoster poster)
+{
+  std::lock_guard lock(m_GUIThreadPosterMutex);
+  m_GUIThreadPoster = std::move(poster);
+}
+
+mitk::SegWithPreviewTool::GUIThreadPoster mitk::SegWithPreviewTool::GetGUIThreadPoster() const
+{
+  std::lock_guard lock(m_GUIThreadPosterMutex);
+  return m_GUIThreadPoster;
+}
+
+void mitk::SegWithPreviewTool::RunOffGUIThread(std::function<void()> work, std::function<void(std::exception_ptr)> done)
+{
+  if (m_DefersWork)
+  {
+    if (m_DeferredWork.has_value())
+      mitkThrow() << this->GetName() << ": a time step of an update can run one work off the GUI thread only.";
+
+    m_DeferredWork = DeferredWork{ std::move(work), std::move(done) };
+    return;
+  }
+
+  this->StartWork(std::move(work), std::move(done));
+}
+
+void mitk::SegWithPreviewTool::StartWork(std::function<void()> work, std::function<void(std::exception_ptr)> done)
+{
+  if (m_WorkRunning)
+    mitkThrow() << this->GetName() << ": other work off the GUI thread has not finished yet.";
+
+  // Runs the done of the work, which is the end of the work for the caller.
+  // What it throws, like a failed transfer that followed an update, has no
+  // caller left to go to, so it goes to the user.
+  const auto finish = [this](const std::function<void(std::exception_ptr)>& done, std::exception_ptr error) {
+    try
+    {
+      done(error);
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      MITK_ERROR << this->GetName() << ": " << e.GetDescription();
+      this->ErrorMessage.Send(e.GetDescription());
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << this->GetName() << ": " << e.what();
+      this->ErrorMessage.Send(e.what());
+    }
+    catch (...)
+    {
+      MITK_ERROR << this->GetName() << ": unknown exception after work off the GUI thread.";
+      this->ErrorMessage.Send("An unknown error occurred.");
+    }
+  };
+
+  const auto poster = this->GetGUIThreadPoster();
+
+  if (!poster)
+  {
+    std::exception_ptr error;
+
+    try
+    {
+      work();
+    }
+    catch (...)
+    {
+      error = std::current_exception();
+    }
+
+    finish(done, error);
+    return;
+  }
+
+  // Set once the thread exists, which may fail. Its done cannot reset it
+  // before: that runs on this thread, after this function has returned.
+  m_WorkThread = std::thread([this, poster, finish, alive = std::weak_ptr<int>(m_Alive), work = std::move(work), done = std::move(done)]() mutable {
+    std::exception_ptr error;
+
+    try
+    {
+      work();
+    }
+    catch (...)
+    {
+      error = std::current_exception();
+    }
+
+    // Moved, not copied: what done holds, like widgets of a GUI, must be
+    // destroyed on the GUI thread, not when this thread ends.
+    poster([this, finish, alive, done = std::move(done), error]() {
+      // The tool is gone, and with it what done would work on.
+      if (alive.expired())
+        return;
+
+      if (m_WorkThread.joinable())
+        m_WorkThread.join();
+
+      m_WorkRunning = false;
+      finish(done, error);
+    });
+  });
+
+  m_WorkRunning = true;
+}
+
+void mitk::SegWithPreviewTool::PostToGUIThread(std::function<void()> function)
+{
+  const auto poster = this->GetGUIThreadPoster();
+
+  if (!poster)
+  {
+    function();
+    return;
+  }
+
+  poster([alive = std::weak_ptr<int>(m_Alive), function = std::move(function)]() {
+    if (!alive.expired())
+      function();
+  });
+}
+
+bool mitk::SegWithPreviewTool::IsRunningOffGUIThread() const
+{
+  return m_WorkRunning;
+}
+
+void mitk::SegWithPreviewTool::WaitForWorkOffGUIThread()
+{
+  if (m_WorkThread.joinable())
+    m_WorkThread.join();
 }
 
 bool mitk::SegWithPreviewTool::IsCancelable() const

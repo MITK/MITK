@@ -29,6 +29,7 @@ found in the LICENSE file.
 #endif
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -145,6 +146,7 @@ class mitkPythonWorkerTestSuite : public mitk::TestFixture
   MITK_TEST(TestImageOutlivesBuffer);
   MITK_TEST(TestKeptBuffer);
   MITK_TEST(TestProgressAndCancel);
+  MITK_TEST(TestCallsFromAnotherThread);
   MITK_TEST(TestThrowingHookEndsWorker);
   MITK_TEST(TestExit);
   MITK_TEST(TestCrash);
@@ -540,6 +542,71 @@ public:
       [](const nlohmann::json&) { return false; });
 
     CPPUNIT_ASSERT_EQUAL(nlohmann::json("done"), ignored);
+  }
+
+  void TestCallsFromAnotherThread()
+  {
+    auto worker = StartWorker();
+
+    // Tools make their calls off the GUI thread that started the worker.
+    nlohmann::json result;
+    std::thread([&] { result = worker->Call("mitk_worker_test.echo", { { "text", "off" } }); }).join();
+    CPPUNIT_ASSERT_EQUAL(nlohmann::json({ { "text", "off" } }), result);
+
+    // Calls take turns: one that starts while another one runs is refused.
+    std::atomic<bool> started = false;
+    std::atomic<bool> attempted = false;
+    bool longCallFailed = false;
+
+    std::thread longCall([&] {
+      try
+      {
+        worker->Call("mitk_worker_test.count", { { "total", 10 }, { "delay", 0.05 } }, {},
+          [&](const nlohmann::json&) {
+            started = true;
+
+            // Holds the call until the overlapping one was tried, however long a
+            // loaded machine takes to get there.
+            const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+
+            while (!attempted && std::chrono::steady_clock::now() < deadline)
+              std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
+            return true;
+          });
+      }
+      catch (...)
+      {
+        longCallFailed = true;
+      }
+    });
+
+    while (!started)
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    bool refused = false;
+
+    try
+    {
+      worker->Call("mitk_worker_test.echo");
+    }
+    catch (const mitk::PythonWorkerError&)
+    {
+    }
+    catch (const mitk::PythonWorkerExitedException&)
+    {
+    }
+    catch (const mitk::PythonWorkerException&)
+    {
+      refused = true;
+    }
+
+    attempted = true;
+    longCall.join();
+
+    CPPUNIT_ASSERT_MESSAGE("An overlapping call should be refused", refused);
+    CPPUNIT_ASSERT_MESSAGE("The running call should complete", !longCallFailed);
+    CPPUNIT_ASSERT_EQUAL(nlohmann::json::object(), worker->Call("mitk_worker_test.echo"));
   }
 
   void TestThrowingHookEndsWorker()

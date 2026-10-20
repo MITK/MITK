@@ -10,31 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInitializationHook.h"
+#include "mitkStopHook.h"
 
 #include <mitkExceptionMacro.h>
-#include <mitkLog.h>
 #include <mitkProgressTask.h>
 #include <mitkTool.h>
 
-mitk::PythonWorker::ProgressHook mitk::MakeInitializationHook(Tool* tool, const ProgressTask* task, std::function<bool()> abort)
+mitk::PythonWorker::ProgressHook mitk::MakeStopHook(const Tool* tool, const ProgressTask* task, std::function<bool()> abort)
 {
   return [tool, task, abort = std::move(abort)](const nlohmann::json&)
   {
-    try
-    {
-      tool->GUIProcessEventsMessage.Send();
-    }
-    catch (const std::exception& e)
-    {
-      MITK_WARN << tool->GetName() << ": error while processing events (ignored): " << e.what();
-    }
-
     if (task != nullptr && task->IsCancelRequested())
-      mitkThrow() << tool->GetName() << ": the initialization was cancelled.";
+      mitkThrow() << tool->GetName() << ": cancelled.";
 
     if (abort && abort())
-      mitkThrow() << tool->GetName() << ": the initialization was aborted.";
+      mitkThrow() << tool->GetName() << ": aborted.";
 
     return true;
   };

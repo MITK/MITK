@@ -29,6 +29,9 @@ found in the LICENSE file.
 
 namespace
 {
+  // How many RunAndWait() calls on this thread are waiting for their task.
+  thread_local int blockingWaits = 0;
+
   /**
    * Whether a pointer event landed on a progress notification. The card
    * carries the cancel and the dismiss, which are the only controls an
@@ -163,6 +166,9 @@ namespace
    */
   void RunAndWait(const std::function<void()>& task, const std::function<void()>& onFinished)
   {
+    ++blockingWaits;
+    const auto endWait = qScopeGuard([]() { --blockingWaits; });
+
     std::exception_ptr exception;
 
     auto future = QtConcurrent::run([&]() {
@@ -224,6 +230,11 @@ namespace
     if (exception)
       std::rethrow_exception(exception);
   }
+}
+
+bool QmitkIsWaitingForBlockingTask()
+{
+  return 0 < blockingWaits;
 }
 
 void QmitkProcessEventsUntil(const std::function<bool()>& done)

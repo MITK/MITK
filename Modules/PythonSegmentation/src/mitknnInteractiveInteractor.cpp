@@ -73,6 +73,7 @@ namespace mitk::nnInteractive
     InteractionType Type;
     PromptType CurrentPromptType;
     bool IsEnabled;
+    bool InputSuspended = false;
 
   private:
     DisplayActionEventBroadcast::LeftButtonBlock m_DisplayLeftButtonBlock;
@@ -103,7 +104,7 @@ void mitk::nnInteractive::Interactor::SetToolManager(ToolManager* toolManager)
 
 void mitk::nnInteractive::Interactor::HandleEvent(InteractionEvent* event)
 {
-  if (this->IsEnabled())
+  if (this->IsEnabled() && !m_Impl->InputSuspended)
     this->OnHandleEvent(event);
 }
 
@@ -141,6 +142,26 @@ void mitk::nnInteractive::Interactor::Disable()
 bool mitk::nnInteractive::Interactor::IsEnabled() const
 {
   return m_Impl->IsEnabled;
+}
+
+void mitk::nnInteractive::Interactor::SetInputSuspended(bool suspended)
+{
+  if (m_Impl->InputSuspended == suspended)
+    return;
+
+  m_Impl->InputSuspended = suspended;
+
+  if (this->IsEnabled())
+    this->OnSetInputSuspended(suspended);
+}
+
+bool mitk::nnInteractive::Interactor::IsInputSuspended() const
+{
+  return m_Impl->InputSuspended;
+}
+
+void mitk::nnInteractive::Interactor::OnSetInputSuspended(bool)
+{
 }
 
 void mitk::nnInteractive::Interactor::Reset()

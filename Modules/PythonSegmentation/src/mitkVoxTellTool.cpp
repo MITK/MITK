@@ -24,14 +24,15 @@ found in the LICENSE file.
 #include <mitkSharedBuffer.h>
 #include <mitkToolManager.h>
 
-#include "mitkInitializationHook.h"
 #include "mitkPythonWorkerModules.h"
+#include "mitkStopHook.h"
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <optional>
@@ -219,11 +220,14 @@ namespace mitk
 
     std::vector<std::string> PromptsWithoutResult;
     std::string LastErrorMessage;
+    bool LastUpdateCancelled = false;
     bool RunFailed = false;
-    bool AbortRequested = false;
+    // Read by the work off the GUI thread, which it stops.
+    std::atomic<bool> AbortRequested = false;
 
-    // GetModelFiles() and LoadModel() process events, during which the tool
-    // may be deactivated. They unload the model once they have stopped.
+    // GetModelFiles(), LoadModel() and EmbedPrompts() run off the GUI thread,
+    // during which the tool may be deactivated. They unload the model once they
+    // have stopped.
     bool Initializing = false;
   };
 }
@@ -249,7 +253,12 @@ mitk::VoxTellTool::VoxTellTool()
   this->TransfersAllPreviewGroupsOn();
 }
 
-mitk::VoxTellTool::~VoxTellTool() = default;
+mitk::VoxTellTool::~VoxTellTool()
+{
+  // The work uses the worker.
+  m_Impl->AbortRequested = true;
+  this->WaitForWorkOffGUIThread();
+}
 
 const char* mitk::VoxTellTool::GetName() const
 {
@@ -267,7 +276,6 @@ void mitk::VoxTellTool::Activated()
   m_Impl->CachedRun.reset();
   m_Impl->LastErrorMessage.clear();
   m_Impl->RunFailed = false;
-  m_Impl->AbortRequested = false;
 
   Superclass::Activated();
 
@@ -277,9 +285,9 @@ void mitk::VoxTellTool::Activated()
 
 void mitk::VoxTellTool::Deactivated()
 {
-  // The worker cannot be destroyed while a call of it is on the stack. The
-  // progress callback ends the worker at once, and UpdateCleanUp() or the
-  // initialization unloads the model once the call has unwound.
+  // The worker cannot be destroyed while work off the GUI thread uses it. The
+  // progress hook ends the worker at once, and UpdateCleanUp() or the end of
+  // the initialization unloads the model once the work has ended.
   if (this->IsUpdating() || m_Impl->Initializing)
     m_Impl->AbortRequested = true;
   else
@@ -341,47 +349,74 @@ mitk::PythonWorker& mitk::VoxTellTool::GetWorker()
   return *m_Impl->Worker;
 }
 
-std::vector<mitk::VoxTell::RepoFiles> mitk::VoxTellTool::GetModelFiles(ProgressTask* task)
+void mitk::VoxTellTool::GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done)
 {
-  m_Impl->Initializing = true;
-  m_Impl->AbortRequested = false;
-  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
+  // Before anything changes: the running work still uses the worker and
+  // reads the abort request.
+  if (this->IsUpdating() || this->IsRunningOffGUIThread())
+  {
+    done(MakeExceptionPtr("VoxTell is busy."), {});
+    return;
+  }
+
+  PythonWorker* worker = nullptr;
+  std::vector<std::string> functions;
 
   try
   {
-    auto& worker = this->GetWorker();
+    worker = &this->GetWorker();
 
     // VoxTell loads the embeddings of the prompts it knows with a local model as well.
-    std::vector<std::string> functions = { "voxtell_prompt_list_files" };
+    functions.push_back("voxtell_prompt_list_files");
 
     if (VoxTell::ParseModelSource(GetPreferences()->Get("VoxTell/modelSource", "huggingface")) == VoxTell::ModelSource::HuggingFace)
       functions.push_back("voxtell_model_files");
-
-    std::vector<VoxTell::RepoFiles> files;
-
-    for (const auto& function : functions)
-    {
-      try
-      {
-        const auto functionFiles = QueryRepoFiles(worker, function, progress);
-        files.insert(files.end(), functionFiles.begin(), functionFiles.end());
-      }
-      catch (const PythonWorkerError& e)
-      {
-        // VoxTell downloads them itself then, only without telling how far it is.
-        // A cancelled call or a worker that is gone has to reach the caller.
-        MITK_WARN << "VoxTell: " << function << "() failed: " << DescribeFailure(e);
-      }
-    }
-
-    m_Impl->Initializing = false;
-    return files;
   }
   catch (...)
   {
     this->EndFailedInitialization();
-    throw;
+    done(std::current_exception(), {});
+    return;
   }
+
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+
+  const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
+  auto files = std::make_shared<std::vector<VoxTell::RepoFiles>>();
+
+  this->RunOffGUIThread(
+    [worker, progress, functions, files]() {
+      for (const auto& function : functions)
+      {
+        try
+        {
+          const auto functionFiles = QueryRepoFiles(*worker, function, progress);
+          files->insert(files->end(), functionFiles.begin(), functionFiles.end());
+        }
+        catch (const PythonWorkerError& e)
+        {
+          // VoxTell downloads them itself then, only without telling how far it is.
+          // A cancelled call or a worker that is gone has to reach the caller.
+          MITK_WARN << "VoxTell: " << function << "() failed: " << DescribeFailure(e);
+        }
+      }
+    },
+    [this, task, files, done](std::exception_ptr error) {
+      // Deactivated after the files were known: the model is not loaded any more.
+      if (error == nullptr && m_Impl->AbortRequested)
+        error = MakeExceptionPtr("VoxTell: aborted.");
+
+      if (error != nullptr)
+      {
+        this->EndFailedInitialization();
+        done(error, {});
+        return;
+      }
+
+      m_Impl->Initializing = false;
+      done(nullptr, *files);
+    });
 }
 
 void mitk::VoxTellTool::EndFailedInitialization()
@@ -397,8 +432,16 @@ void mitk::VoxTellTool::EndFailedInitialization()
   }
 }
 
-void mitk::VoxTellTool::LoadModel(ProgressTask* task)
+void mitk::VoxTellTool::LoadModel(std::shared_ptr<ProgressTask> task, DoneCallback done)
 {
+  // Before anything changes: the running work still uses the worker and
+  // reads the abort request.
+  if (this->IsUpdating() || this->IsRunningOffGUIThread())
+  {
+    done(MakeExceptionPtr("VoxTell is busy."));
+    return;
+  }
+
   // A fresh process frees whatever the previous model held.
   if (this->IsModelLoaded())
     m_Impl->Worker.reset();
@@ -425,50 +468,78 @@ void mitk::VoxTellTool::LoadModel(ProgressTask* task)
   const auto localModelPath = prefs->Get("VoxTell/localModelPath", "");
 
   if (useLocalModel && localModelPath.empty())
-    mitkThrow() << "VoxTell: Local model mode is selected but no model folder is configured. "
-                   "Set the path in Preferences -> Segmentation -> VoxTell.";
+  {
+    done(MakeExceptionPtr("VoxTell: Local model mode is selected but no model folder is configured. "
+                   "Set the path in Preferences -> Segmentation -> VoxTell."));
+    return;
+  }
 
-  m_Impl->Initializing = true;
-  m_Impl->AbortRequested = false;
-  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
+  PythonWorker* worker = nullptr;
+  auto backend = Torch::BackendPreference::Auto;
 
   try
   {
-    auto& worker = this->GetWorker();
-
-    const auto selection = Torch::SelectDevice(worker,
-      Torch::ParseBackendPreference(prefs->Get("VoxTell/backend", "auto")), prefs->Get("VoxTell/gpuBackend", "cuda:0"), MIN_GPU_MEMORY_MB, progress);
-
-    // Without a model folder VoxTell downloads its default model on first use
-    // and takes it from its cache afterwards. The same goes for the embeddings
-    // of the prompts it knows. Failures come back as a message for the user
-    // instead of a traceback.
-    const auto result = worker.Call("voxtell_worker.load_model", {
-      { "model_dir", useLocalModel ? nlohmann::json(localModelPath) : nlohmann::json(nullptr) },
-      { "device", selection.Device }
-    }, {}, progress);
-
-    if (const auto modelError = result.value("error", std::string()); !modelError.empty())
-    {
-      if (useLocalModel)
-        mitkThrow() << "VoxTell: Could not load the model from the configured folder. (" << modelError << ")";
-
-      mitkThrow() << "VoxTell: Could not obtain the model. Check your internet connection, or set a local "
-                     "model folder in Preferences -> Segmentation -> VoxTell. ("
-                  << modelError << ")";
-    }
-
-    m_Impl->ModelLoaded = true;
-    m_Impl->Backend = selection.SelectedBackend;
-    m_Impl->ModelSource = modelSource;
-    m_Impl->Device = selection.Device;
-    m_Impl->Initializing = false;
+    worker = &this->GetWorker();
+    backend = Torch::ParseBackendPreference(prefs->Get("VoxTell/backend", "auto"));
   }
   catch (...)
   {
     this->EndFailedInitialization();
-    throw;
+    done(std::current_exception());
+    return;
   }
+
+  const auto gpuDevice = prefs->Get("VoxTell/gpuBackend", "cuda:0");
+
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+
+  const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
+  auto selection = std::make_shared<Torch::DeviceSelection>();
+
+  this->RunOffGUIThread(
+    [worker, progress, backend, gpuDevice, useLocalModel, localModelPath, selection]() {
+      *selection = Torch::SelectDevice(*worker, backend, gpuDevice, MIN_GPU_MEMORY_MB, progress);
+
+      // Without a model folder VoxTell downloads its default model on first use
+      // and takes it from its cache afterwards. The same goes for the embeddings
+      // of the prompts it knows. Failures come back as a message for the user
+      // instead of a traceback.
+      const auto result = worker->Call("voxtell_worker.load_model", {
+        { "model_dir", useLocalModel ? nlohmann::json(localModelPath) : nlohmann::json(nullptr) },
+        { "device", selection->Device }
+      }, {}, progress);
+
+      if (const auto modelError = result.value("error", std::string()); !modelError.empty())
+      {
+        if (useLocalModel)
+          mitkThrow() << "VoxTell: Could not load the model from the configured folder. (" << modelError << ")";
+
+        mitkThrow() << "VoxTell: Could not obtain the model. Check your internet connection, or set a local "
+                       "model folder in Preferences -> Segmentation -> VoxTell. ("
+                    << modelError << ")";
+      }
+    },
+    [this, task, selection, modelSource, done](std::exception_ptr error) {
+      // Deactivated after the model was loaded: it is not wanted any more.
+      if (error == nullptr && m_Impl->AbortRequested)
+        error = MakeExceptionPtr("VoxTell: aborted.");
+
+      if (error != nullptr)
+      {
+        this->EndFailedInitialization();
+        done(error);
+        return;
+      }
+
+      m_Impl->ModelLoaded = true;
+      m_Impl->Backend = selection->SelectedBackend;
+      m_Impl->ModelSource = modelSource;
+      m_Impl->Device = selection->Device;
+      m_Impl->Initializing = false;
+
+      done(nullptr);
+    });
 }
 
 void mitk::VoxTellTool::UnloadModel()
@@ -576,53 +647,83 @@ bool mitk::VoxTellTool::IsTextModelCached() const
   return CallWithReadableError(*m_Impl->Worker, "voxtell_hub_files.voxtell_text_model_cached").get<bool>();
 }
 
-void mitk::VoxTellTool::EmbedPrompts(const std::vector<std::string>& prompts, ProgressTask* task)
+void mitk::VoxTellTool::EmbedPrompts(const std::vector<std::string>& prompts, std::shared_ptr<ProgressTask> task, DoneCallback done)
 {
+  // Before anything changes: the running work still uses the worker and
+  // reads the abort request.
+  if (this->IsUpdating() || this->IsRunningOffGUIThread())
+  {
+    done(MakeExceptionPtr("VoxTell is busy."));
+    return;
+  }
+
   if (!this->IsModelLoaded())
-    mitkThrow() << "VoxTell is not initialized.";
+  {
+    done(MakeExceptionPtr("VoxTell is not initialized."));
+    return;
+  }
 
   if (prompts.empty())
+  {
+    done(nullptr);
     return;
+  }
 
   m_Impl->Initializing = true;
   m_Impl->AbortRequested = false;
-  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
 
-  try
-  {
-    // VoxTell keeps the embeddings it computes for the session, so the run that
-    // follows finds them.
-    m_Impl->Worker->Call("voxtell_worker.embed_prompts", { { "prompts", prompts } }, {}, progress);
-    m_Impl->Initializing = false;
-  }
-  catch (const PythonWorkerError& e)
-  {
-    // The worker and its model survive an exception in Python, e.g. for lack
-    // of memory.
-    m_Impl->Initializing = false;
-    MITK_ERROR << "VoxTell: " << e.GetTraceback();
-    mitkThrow() << "VoxTell: " << DescribeFailure(e);
-  }
-  catch (...)
-  {
-    // A cancellation ended the worker, or it is gone. It is kept, so that
-    // GetWorkerExitDescription() can tell why.
-    m_Impl->Initializing = false;
+  auto* worker = m_Impl->Worker.get();
+  const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
 
-    // Deactivated meanwhile, see Deactivated().
-    if (m_Impl->AbortRequested)
-    {
-      m_Impl->AbortRequested = false;
-      this->UnloadModel();
-    }
+  this->RunOffGUIThread(
+    [worker, progress, prompts]() {
+      // VoxTell keeps the embeddings it computes for the session, so the run that
+      // follows finds them.
+      worker->Call("voxtell_worker.embed_prompts", { { "prompts", prompts } }, {}, progress);
+    },
+    [this, task, done](std::exception_ptr error) {
+      m_Impl->Initializing = false;
 
-    throw;
-  }
+      if (error != nullptr)
+      {
+        try
+        {
+          std::rethrow_exception(error);
+        }
+        catch (const PythonWorkerError& e)
+        {
+          // The worker and its model survive an exception in Python, e.g. for
+          // lack of memory.
+          MITK_ERROR << "VoxTell: " << e.GetTraceback();
+          error = MakeExceptionPtr("VoxTell: " + DescribeFailure(e));
+        }
+        catch (...)
+        {
+          // A cancellation ended the worker, or it is gone. It is kept, so that
+          // GetWorkerExitDescription() can tell why.
+        }
+      }
+      else if (m_Impl->AbortRequested)
+      {
+        error = MakeExceptionPtr("VoxTell: aborted.");
+      }
+
+      // Deactivated meanwhile, see Deactivated().
+      if (m_Impl->AbortRequested.exchange(false))
+        this->UnloadModel();
+
+      done(error);
+    });
 }
 
 const std::string& mitk::VoxTellTool::GetLastErrorMessage() const
 {
   return m_Impl->LastErrorMessage;
+}
+
+bool mitk::VoxTellTool::WasLastUpdateCancelled() const
+{
+  return m_Impl->LastUpdateCancelled;
 }
 
 void mitk::VoxTellTool::InitiateToolByInput()
@@ -635,6 +736,7 @@ void mitk::VoxTellTool::UpdatePrepare()
   Superclass::UpdatePrepare();
 
   m_Impl->LastErrorMessage.clear();
+  m_Impl->LastUpdateCancelled = false;
   m_Impl->PreviewLabels.clear();
   m_Impl->LabelGroups.clear();
   m_Impl->LabelValuesWithResult.clear();
@@ -771,6 +873,10 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     if (referenceImage == nullptr)
       mitkThrow() << "VoxTell needs an image to segment.";
 
+    // Held for the result: the tool can be deactivated while the model
+    // computes, and another segmentation selected meanwhile.
+    const MultiLabelSegmentation::ConstPointer segmentation = this->GetTargetSegmentation();
+
     const Impl::Run run{
       m_Impl->Prompts,
       static_cast<unsigned long long>(referenceImage->GetMTime()),
@@ -786,116 +892,153 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     // the segmentation may have changed. Only the last run is kept, so every
     // other time step of a dynamic image is a run of its own. Placing cached
     // masks needs no worker, so they survive a worker that ended meanwhile.
-    if (m_Impl->CachedRun != run)
+    if (m_Impl->CachedRun == run)
     {
-      if (!this->IsModelLoaded())
-        mitkThrow() << "VoxTell is not initialized.";
-
-      m_Impl->CachedRun.reset();
-      m_Impl->CachedMasks.clear();
-
-      const auto timePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
-      const auto referenceTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-
-      // Not the input of the base class: a region of interest is not supported
-      // by the transfer of the preview into the segmentation.
-      auto imageAtTimeStep = this->GetImageByTimeStep(referenceImage, referenceTimeStep);
-
-      auto& worker = *m_Impl->Worker;
-      const ScopedRun scopedRun(worker);
-
-      const auto imageSegment = SharedBuffer::CopyOf(imageAtTimeStep);
-      SharedBuffer maskSegment(MakeScalarPixelType<unsigned char>(), imageSegment->GetShape());
-      const auto maskBuffer = maskSegment.AsImage(*imageAtTimeStep->GetTimeGeometry());
-
-      const auto isStopRequested = [this, task]() {
-        return m_Impl->AbortRequested || (task != nullptr && task->IsCancelRequested());
-      };
-
-      std::optional<std::chrono::steady_clock::time_point> stopRequestedAt;
-
-      // Called with every progress report of VoxTell, after every patch of its
-      // sliding window, and in between. It is what keeps the application
-      // responsive during the run, and the only chance to stop it.
-      const auto progress = [this, &isStopRequested, &stopRequestedAt](const nlohmann::json& fields)
-      {
-        if (const auto total = fields.is_object() ? fields.value("total", 0) : 0; total > 0)
-          m_ProgressCommand->ReportFraction(static_cast<float>(fields.value("done", 0)) / static_cast<float>(total));
-
-        try
-        {
-          this->GUIProcessEventsMessage.Send();
-        }
-        catch (const std::exception& e)
-        {
-          MITK_WARN << "VoxTell: error while processing events (ignored): " << e.what();
-        }
-
-        // The tool was deactivated. The model is unloaded anyway, so a throw,
-        // which makes the worker end right away, loses nothing and does not
-        // wait for VoxTell to check for a cancellation.
-        if (m_Impl->AbortRequested)
-          mitkThrow() << "VoxTell: the run was aborted.";
-
-        if (!isStopRequested())
-          return true;
-
-        const auto now = std::chrono::steady_clock::now();
-
-        if (!stopRequestedAt.has_value())
-          stopRequestedAt = now;
-        else if (now - *stopRequestedAt > STOP_GRACE_PERIOD)
-          mitkThrow() << "VoxTell: the run did not stop when it was cancelled and was ended.";
-
-        return false;
-      };
-
-      // The text encoder of VoxTell is loaded here if a prompt needs it that
-      // EmbedPrompts() did not process before. That takes long and does not
-      // check for a cancellation, so a cancellation ends the worker after the
-      // grace period. The sliding window below stops on its own.
-      if (task != nullptr)
-        task->SetName("VoxTell: embedding prompts");
-
-      worker.Call("voxtell_worker.embed_prompts", { { "prompts", m_Impl->Prompts } }, {}, progress);
-
-      if (isStopRequested())
-        mitkThrow() << "VoxTell: the run was cancelled.";
-
-      if (task != nullptr)
-        task->SetName("VoxTell: segmenting");
-
-      worker.Call("voxtell_worker.segment",
-        { { "prompts", m_Impl->Prompts }, { "index_to_world", VoxTell::IndexToWorld(imageAtTimeStep->GetGeometry()) } },
-        { { "image", imageSegment.get() }, { "mask", &maskSegment } },
-        progress);
-
-      // Masks can overlap, so they cannot share a label image. Each of them is
-      // kept as the runs of its voxels, which take far less memory than a
-      // buffer per prompt.
-      std::vector<MaskRuns> masks;
-
-      for (std::size_t index = 0; index < m_Impl->Prompts.size(); ++index)
-      {
-        worker.Call("voxtell_worker.write_mask", { { "index", index } });
-        masks.push_back(ExtractMaskRuns(maskBuffer));
-      }
-
-      m_Impl->CachedMasks = std::move(masks);
-      m_Impl->CachedRun = run;
+      this->PlaceMasks(segmentation, previewImage, timeStep);
+      return;
     }
 
-    this->PlaceMasks(previewImage, timeStep);
+    if (!this->IsModelLoaded())
+      mitkThrow() << "VoxTell is not initialized.";
+
+    m_Impl->CachedRun.reset();
+    m_Impl->CachedMasks.clear();
+
+    const auto timePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+    const auto referenceTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+    // Not the input of the base class: a region of interest is not supported
+    // by the transfer of the preview into the segmentation.
+    auto imageAtTimeStep = this->GetImageByTimeStep(referenceImage, referenceTimeStep);
+
+    auto* worker = m_Impl->Worker.get();
+
+    std::shared_ptr<SharedBuffer> imageSegment = SharedBuffer::CopyOf(imageAtTimeStep);
+    auto maskSegment = std::make_shared<SharedBuffer>(MakeScalarPixelType<unsigned char>(), imageSegment->GetShape());
+    const auto maskBuffer = maskSegment->AsImage(*imageAtTimeStep->GetTimeGeometry());
+
+    const auto prompts = m_Impl->Prompts;
+    const auto indexToWorld = VoxTell::IndexToWorld(imageAtTimeStep->GetGeometry());
+
+    const auto isStopRequested = [this, task]() {
+      return m_Impl->AbortRequested || (task != nullptr && task->IsCancelRequested());
+    };
+
+    auto stopRequestedAt = std::make_shared<std::optional<std::chrono::steady_clock::time_point>>();
+
+    // Called with every progress report of VoxTell, after every patch of its
+    // sliding window, and in between. It is the only chance to stop the run.
+    const auto progress = [this, isStopRequested, stopRequestedAt](const nlohmann::json& fields)
+    {
+      if (const auto total = fields.is_object() ? fields.value("total", 0) : 0; total > 0)
+      {
+        const auto fraction = static_cast<float>(fields.value("done", 0)) / static_cast<float>(total);
+        this->PostToGUIThread([this, fraction]() { m_ProgressCommand->ReportFraction(fraction); });
+      }
+
+      // The tool was deactivated. The model is unloaded anyway, so a throw,
+      // which makes the worker end right away, loses nothing and does not
+      // wait for VoxTell to check for a cancellation.
+      if (m_Impl->AbortRequested)
+        mitkThrow() << "VoxTell: the run was aborted.";
+
+      if (!isStopRequested())
+        return true;
+
+      const auto now = std::chrono::steady_clock::now();
+
+      if (!stopRequestedAt->has_value())
+        *stopRequestedAt = now;
+      else if (now - **stopRequestedAt > STOP_GRACE_PERIOD)
+        mitkThrow() << "VoxTell: the run did not stop when it was cancelled and was ended.";
+
+      return false;
+    };
+
+    const auto setPhase = [this](const std::string& phase) {
+      this->PostToGUIThread([this, phase]() {
+        if (auto* updateTask = m_ProgressCommand->GetProgressTask(); updateTask != nullptr)
+          updateTask->SetName(phase);
+      });
+    };
+
+    auto masks = std::make_shared<std::vector<MaskRuns>>();
+
+    // Held for the result, as the tool can be deactivated meanwhile.
+    const MultiLabelSegmentation::Pointer preview = previewImage;
+
+    this->RunOffGUIThread(
+      [worker, imageSegment, maskSegment, maskBuffer, prompts, indexToWorld, isStopRequested, progress, setPhase, masks]() {
+        const ScopedRun scopedRun(*worker);
+
+        // The text encoder of VoxTell is loaded here if a prompt needs it that
+        // EmbedPrompts() did not process before. That takes long and does not
+        // check for a cancellation, so a cancellation ends the worker after the
+        // grace period. The sliding window below stops on its own.
+        setPhase("VoxTell: embedding prompts");
+        worker->Call("voxtell_worker.embed_prompts", { { "prompts", prompts } }, {}, progress);
+
+        if (isStopRequested())
+          mitkThrow() << "VoxTell: the run was cancelled.";
+
+        setPhase("VoxTell: segmenting");
+
+        worker->Call("voxtell_worker.segment",
+          { { "prompts", prompts }, { "index_to_world", indexToWorld } },
+          { { "image", imageSegment.get() }, { "mask", maskSegment.get() } },
+          progress);
+
+        // Masks can overlap, so they cannot share a label image. Each of them is
+        // kept as the runs of its voxels, which take far less memory than a
+        // buffer per prompt.
+        for (std::size_t index = 0; index < prompts.size(); ++index)
+        {
+          worker->Call("voxtell_worker.write_mask", { { "index", index } });
+          masks->push_back(ExtractMaskRuns(maskBuffer));
+        }
+      },
+      [this, task, segmentation, preview, timeStep, run, masks](std::exception_ptr error) {
+        try
+        {
+          if (error != nullptr)
+            std::rethrow_exception(error);
+
+          // Deactivated after the work had passed its last check for a stop.
+          if (m_Impl->AbortRequested)
+            mitkThrow() << "VoxTell: aborted.";
+
+          m_Impl->CachedMasks = std::move(*masks);
+          m_Impl->CachedRun = run;
+
+          this->PlaceMasks(segmentation, preview, timeStep);
+        }
+        catch (...)
+        {
+          this->EndFailedRun(std::current_exception(), task);
+        }
+      });
+  }
+  catch (...)
+  {
+    this->EndFailedRun(std::current_exception(), task);
+  }
+}
+
+void mitk::VoxTellTool::EndFailedRun(std::exception_ptr error, const ProgressTask* task)
+{
+  // Labels without content would let the user confirm nothing, and the
+  // preview may be half written.
+  this->RemoveAllPreviewLabels();
+  m_Impl->CachedRun.reset();
+  m_Impl->CachedMasks.clear();
+  m_Impl->RunFailed = true;
+
+  try
+  {
+    std::rethrow_exception(error);
   }
   catch (const Exception& e)
   {
-    // Labels without content would let the user confirm nothing, and the
-    // preview may be half written.
-    this->RemoveAllPreviewLabels();
-    m_Impl->CachedRun.reset();
-    m_Impl->CachedMasks.clear();
-    m_Impl->RunFailed = true;
-
     // The tool was deactivated while it computed. There is nobody left to tell.
     if (m_Impl->AbortRequested)
       return;
@@ -903,30 +1046,22 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
     // Let the base class treat it as the cancellation it is, instead of as an
     // error to report.
     if (task != nullptr && task->IsCancelRequested())
+    {
+      m_Impl->LastUpdateCancelled = true;
       throw;
+    }
 
-    if (const auto* error = dynamic_cast<const PythonWorkerError*>(&e))
-      MITK_ERROR << "VoxTell: " << error->GetTraceback();
+    if (const auto* workerError = dynamic_cast<const PythonWorkerError*>(&e))
+      MITK_ERROR << "VoxTell: " << workerError->GetTraceback();
     else
       MITK_ERROR << "VoxTell: " << Description(e);
 
     m_Impl->LastErrorMessage = DescribeFailure(e);
   }
-  catch (...)
-  {
-    this->RemoveAllPreviewLabels();
-    m_Impl->CachedRun.reset();
-    m_Impl->CachedMasks.clear();
-    m_Impl->RunFailed = true;
-
-    throw;
-  }
 }
 
-void mitk::VoxTellTool::PlaceMasks(MultiLabelSegmentation* preview, TimeStepType timeStep)
+void mitk::VoxTellTool::PlaceMasks(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep)
 {
-  const auto* segmentation = this->GetTargetSegmentation();
-
   if (segmentation == nullptr)
     mitkThrow() << "VoxTell needs a segmentation to add its results to.";
 

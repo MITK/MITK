@@ -561,7 +561,7 @@ struct mitk::PythonWorker::Impl
   std::atomic<bool> Exited = false;
 
   std::int64_t NextId = 1;
-  bool InCall = false;
+  std::atomic<bool> InCall = false;
 };
 
 mitk::PythonWorker::PythonWorker(const std::filesystem::path& python, const std::vector<Module>& modules, const std::string& logPrefix)
@@ -625,8 +625,14 @@ nlohmann::json mitk::PythonWorker::Call(const std::string& method, const nlohman
 {
   auto& impl = *m_Impl;
 
-  if (impl.InCall)
-    mitkThrowException(PythonWorkerException) << "Calls of a Python worker must not be nested.";
+  if (impl.InCall.exchange(true))
+    mitkThrowException(PythonWorkerException) << "Calls of a Python worker must not overlap.";
+
+  struct InCallScope
+  {
+    ~InCallScope() { m_InCall = false; }
+    std::atomic<bool>& m_InCall;
+  } inCallScope{ impl.InCall };
 
   if (!params.is_object() && !params.is_null())
     mitkThrowException(PythonWorkerException) << "The parameters of " << method << " must be a JSON object.";
@@ -656,20 +662,17 @@ nlohmann::json mitk::PythonWorker::Call(const std::string& method, const nlohman
 
   struct CallScope
   {
-    CallScope(Impl& impl, const Buffers& buffers) : m_Impl(impl), m_Buffers(buffers) { m_Impl.InCall = true; }
+    explicit CallScope(const Buffers& buffers) : m_Buffers(buffers) {}
 
     ~CallScope()
     {
       // Nothing may attach any more, so a crash cannot leave a buffer behind.
       for (const auto& [key, buffer] : m_Buffers)
         buffer->Unpublish();
-
-      m_Impl.InCall = false;
     }
 
-    Impl& m_Impl;
     const Buffers& m_Buffers;
-  } scope(impl, buffers);
+  } scope(buffers);
 
   impl.Send(request);
 

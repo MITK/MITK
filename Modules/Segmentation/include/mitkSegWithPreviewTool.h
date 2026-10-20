@@ -19,6 +19,13 @@ found in the LICENSE file.
 #include <mitkToolCommand.h>
 #include <MitkSegmentationExports.h>
 
+#include <exception>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <thread>
+
 namespace mitk
 {
   /**
@@ -53,8 +60,32 @@ namespace mitk
      *
      * The transfer behavior is controlled by LabelTransferScope, LabelTransferMode,
      * MergeStyle, and OverwriteStyle.
+     *
+     * If the preview has to be updated first, for further time steps or a changed
+     * active label, the transfer follows the update: at once, or once the work of
+     * the update has run off the GUI thread (see RunOffGUIThread()). A transfer
+     * that follows such work reports a failure through ErrorMessage. If the
+     * update is cancelled or fails, nothing is transferred.
+     *
+     * \throw mitk::Exception if an update of the preview or other work off the
+     *        GUI thread is running.
      */
     void ConfirmSegmentation();
+
+    /** \brief Posts a function to the GUI thread, to run there after the current event.
+     *
+     * Must be callable from any thread.
+     */
+    using GUIThreadPoster = std::function<void(std::function<void()>)>;
+
+    /**
+     * \brief Lets the tool run work off the GUI thread, see RunOffGUIThread().
+     *
+     * A GUI installs it, as the tool does not know the GUI toolkit. Without it,
+     * work runs on the calling thread, which is what tests and command-line
+     * tools need.
+     */
+    void SetGUIThreadPoster(GUIThreadPoster poster);
 
     /** \brief If true, the preview is computed for all time steps at once. */
     itkSetMacro(CreateAllTimeSteps, bool);
@@ -181,6 +212,11 @@ namespace mitk
      *
      * To define the update generation for time steps, implement DoUpdatePreview().
      * To alter behavior before/after the preview update, reimplement UpdatePrepare() or UpdateCleanUp().
+     *
+     * An update whose DoUpdatePreview() runs work off the GUI thread (see
+     * RunOffGUIThread()) returns before it is done. It ends with
+     * CurrentlyBusy reporting false. A call while an update or other work off
+     * the GUI thread runs does nothing.
      */
     void UpdatePreview(bool ignoreLazyPreviewSetting = false);
 
@@ -316,7 +352,9 @@ namespace mitk
 
     /** This member function offers derived classes the possibility to alter what should
     happen directly after the update of the preview is performed. It is called by
-    UpdatePreview. Default implementation does nothing.*/
+    UpdatePreview. Default implementation does nothing.
+    It is also called for an update whose work off the GUI thread outlived a
+    deactivation of the tool (see RunOffGUIThread()).*/
     virtual void UpdateCleanUp();
 
     /** This member function offers derived classes the possibility to alter what should
@@ -355,8 +393,68 @@ namespace mitk
      * preview image at the passed time step.
      * It also provides the current/old segmentation at the time point,
      * which can be used, if the preview depends on the the segmentation so far.
+     *
+     * Work that takes long can run off the GUI thread: prepare it here, and
+     * call RunOffGUIThread() with it and with what writes its result into the
+     * preview.
      */
     virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) = 0;
+
+    /**
+     * \brief Runs work on a thread of its own and continues on the GUI thread.
+     *
+     * For work that takes long, like the calls of a Python worker, so that the
+     * GUI thread keeps processing events meanwhile instead of waiting. \p work
+     * must not touch data that the GUI thread uses, like images on display or
+     * the preview. \p done runs on the GUI thread once \p work has finished,
+     * with what \p work threw, or null, and can throw like DoUpdatePreview().
+     *
+     * Called from DoUpdatePreview(), \p work starts once DoUpdatePreview() has
+     * returned, and the update goes on with the next time step, or ends, once
+     * \p done has run. IsUpdating() stays true until then. Otherwise \p work
+     * starts at once. What \p done throws, and what the end of the update
+     * throws, is reported through ErrorMessage.
+     *
+     * The tool can be deactivated, and even activated anew, before \p done
+     * runs. \p done still runs, and so does UpdateCleanUp(); the update then
+     * ends without further time steps and without a confirmation following
+     * it. \p done therefore works on what DoUpdatePreview() was given or what
+     * it captured, not on GetPreviewSegmentation() or the data of the
+     * ToolManager, which may belong to the new activation.
+     *
+     * Work runs one at a time. Without a GUI thread poster (see
+     * SetGUIThreadPoster()), \p work and \p done run at once on the calling
+     * thread.
+     *
+     * \throw mitk::Exception if other work has not finished yet, or if
+     *        DoUpdatePreview() calls this more than once. Called from
+     *        DoUpdatePreview(), the first cannot happen, as no update starts
+     *        while other work runs.
+     */
+    void RunOffGUIThread(std::function<void()> work, std::function<void(std::exception_ptr)> done);
+
+    /**
+     * \brief Runs a function on the GUI thread, for example to report the progress of work.
+     *
+     * Callable from any thread. Without a GUI thread poster, \p function runs at once.
+     */
+    void PostToGUIThread(std::function<void()> function);
+
+    /**
+     * \brief Whether work started with RunOffGUIThread() has not reached its \p done yet.
+     *
+     * False while \p done runs, so \p done can start further work.
+     */
+    bool IsRunningOffGUIThread() const;
+
+    /**
+     * \brief Waits until work started with RunOffGUIThread() has finished.
+     *
+     * For the destructor of a derived tool whose work uses members of the tool:
+     * make the work stop, then wait. Once the tool is destroyed, the \p done of
+     * the work does not run.
+     */
+    void WaitForWorkOffGUIThread();
 
     /** Returns the input that should be used for any segmentation/preview or tool update.
      * It is either the data of ReferenceDataNode itself or a part of it defined by a ROI mask
@@ -404,13 +502,47 @@ namespace mitk
      * by the base class on Activated()). The default implementation calls UpdatePreview() if the tool
      * is in lazy-dynamic mode or has a static segmentation on a dynamic reference image. Derived tools
      * may override this hook to implement different time-point change semantics, for example to discard
-     * unconfirmed state when the bound time step is no longer current.*/
+     * unconfirmed state when the bound time step is no longer current.
+     * A change while an update or other work runs off the GUI thread is not applied by the default
+     * implementation, as UpdatePreview() does nothing then; such a tool remembers the change and
+     * applies it once the work has ended.*/
     virtual void OnTimePointChanged();
 
   private:
+    struct UpdatePass;
+
+    struct DeferredWork
+    {
+      std::function<void()> Work;
+      std::function<void(std::exception_ptr)> Done;
+    };
+
+    /** Starts an update of the preview and runs \p then once it has ended. */
+    void StartUpdate(bool ignoreLazyPreviewSetting, std::function<void()> then);
+
+    /** Updates the remaining time steps of the running update, until one of them runs work off the GUI thread. */
+    void ContinueUpdate();
+
+    /** Reports what a time step of the running update threw, as the base class reports it. */
+    void HandleUpdateError(std::exception_ptr error);
+
+    void EndUpdate();
+
+    void StartWork(std::function<void()> work, std::function<void(std::exception_ptr)> done);
+
+    GUIThreadPoster GetGUIThreadPoster() const;
+
+    /**
+     * The part of ConfirmSegmentation() that follows the update of the preview.
+     *
+     * \param timePoint The time point that the update computed, if the transfer follows one.
+     */
+    void FinishConfirmation(std::optional<TimePointType> timePoint = {});
+
     void TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
-    void CreateResultSegmentationFromPreview();
+    /** \param timePoint The time point to transfer instead of the one the tool would choose. */
+    void CreateResultSegmentationFromPreview(std::optional<TimePointType> timePoint = {});
 
     void OnRoiDataChanged();
 
@@ -463,6 +595,22 @@ namespace mitk
     TimePointType m_LastTimePointOfUpdate = 0.;
 
     bool m_IsUpdating = false;
+
+    /** The running update, from UpdatePreview() until it has ended. */
+    std::unique_ptr<UpdatePass> m_UpdatePass;
+
+    /** Set while DoUpdatePreview() runs, whose work RunOffGUIThread() defers. */
+    bool m_DefersWork = false;
+    std::optional<DeferredWork> m_DeferredWork;
+
+    mutable std::mutex m_GUIThreadPosterMutex;
+    GUIThreadPoster m_GUIThreadPoster;
+
+    std::thread m_WorkThread;
+    bool m_WorkRunning = false;
+
+    /** Expires with the tool, so that what is posted to the GUI thread afterwards does nothing. */
+    std::shared_ptr<int> m_Alive = std::make_shared<int>(0);
 
     Label::PixelType m_UserDefinedActiveLabel = 1;
 

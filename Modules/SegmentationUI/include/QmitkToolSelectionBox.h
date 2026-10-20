@@ -78,8 +78,6 @@ public:
   /** \brief Called when working data is modified. Public for itk::Command callbacks. */
   void OnToolManagerWorkingDataModified();
 
-  /** \brief Called to process pending GUI events from a tool. Public for itk::Command callbacks. */
-  void OnToolGUIProcessEventsMessage();
   /** \brief Called when a tool reports an error message. Public for itk::Command callbacks. */
   void OnToolErrorMessage(std::string s);
   /** \brief Called when a tool reports a general status message. Public for itk::Command callbacks. */

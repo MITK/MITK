@@ -29,7 +29,6 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QCheckBox>
-#include <QEventLoop>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -90,26 +89,45 @@ namespace
     return textModelCheckBox->isChecked();
   }
 
-  // A message for an operation that blocks the application. It is shown for a
-  // moment before the operation starts, so that it is painted in time, and it
-  // closes when the returned pointer goes out of scope. Not modal, so that a
-  // progress notification shown meanwhile can still be cancelled.
-  std::unique_ptr<QMessageBox> ShowBlockingNotice(QWidget* window, const QString& text)
+  // A message that stays up while an operation runs, until Close() or until
+  // its last holder is gone. The window owns the message box as its parent and
+  // can delete it first, at exit for example. Not modal, so that a progress
+  // notification shown meanwhile can still be cancelled.
+  class Notice
   {
-    auto messageBox = std::make_unique<QMessageBox>(QMessageBox::Information, "VoxTell", text, QMessageBox::NoButton, window);
+  public:
+    Notice(QWidget* window, const QString& text)
+      : m_MessageBox(new QMessageBox(QMessageBox::Information, "VoxTell", text, QMessageBox::NoButton, window))
+    {
+      // Set explicitly, since a message box without buttons gets an OK button
+      // when it is shown. There is nothing to confirm while the operation runs.
+      m_MessageBox->setStandardButtons(QMessageBox::NoButton);
+      m_MessageBox->setWindowModality(Qt::NonModal);
+      m_MessageBox->show();
+    }
 
-    // Set explicitly, since a message box without buttons gets an OK button
-    // when it is shown. There is nothing to confirm while the operation runs.
-    messageBox->setStandardButtons(QMessageBox::NoButton);
-    messageBox->setWindowModality(Qt::NonModal);
-    messageBox->show();
+    ~Notice()
+    {
+      this->Close();
+    }
 
-    QEventLoop loop;
-    QTimer::singleShot(100, &loop, &QEventLoop::quit);
-    loop.exec();
+    Notice(const Notice&) = delete;
+    Notice& operator=(const Notice&) = delete;
 
-    return messageBox;
-  }
+    void Close()
+    {
+      if (!m_MessageBox.isNull())
+      {
+        m_MessageBox->close();
+        m_MessageBox->deleteLater();
+      }
+
+      m_MessageBox = nullptr;
+    }
+
+  private:
+    QPointer<QMessageBox> m_MessageBox;
+  };
 
   // The prompts as a comma-separated list, e.g. for a status line.
   QString JoinPrompts(const std::vector<std::string>& prompts)
@@ -355,54 +373,44 @@ void QmitkVoxTellToolGUI::LoadModel()
     "<p %1>Please wait while VoxTell is initialized. You can cancel it in its "
     "progress notification.</p>").arg(LINE_HEIGHT_STYLE);
 
-  // The notice, the download and the dialogs run event loops, during which a
-  // tool change can delete this GUI.
+  // The download and the dialogs run event loops, during which a tool change
+  // can delete this GUI, and the worker calls end after this function has
+  // returned.
   QPointer<QmitkVoxTellToolGUI> self(this);
   auto* window = this->window();
 
   // One notice for the whole initialization, a download included.
-  auto notice = ShowBlockingNotice(window, initMessage);
-
-  if (self.isNull())
-    return;
+  auto notice = std::make_shared<Notice>(window, initMessage);
 
   // The download in between has a cancel of its own, so each of the two
   // worker phases gets a task of its own.
-  bool cancelled = false;
+  auto task = std::make_shared<mitk::ProgressTask>("Preparing VoxTell", mitk::ProgressTask::Indeterminate, true);
+  mitk::VoxTellTool::Pointer tool = this->GetTool();
 
-  try
+  tool->GetModelFiles(task, [self, window, notice, task, tool](std::exception_ptr error, const std::vector<mitk::VoxTell::RepoFiles>& files)
   {
-    std::vector<mitk::VoxTell::RepoFiles> files;
-
-    {
-      mitk::ProgressTask task("Preparing VoxTell", mitk::ProgressTask::Indeterminate, true);
-      mitk::VoxTellTool::Pointer tool = this->GetTool();
-
-      try
-      {
-        files = tool->GetModelFiles(&task);
-      }
-      catch (const mitk::Exception&)
-      {
-        cancelled = task.IsCancelRequested();
-        throw;
-      }
-    }
-
+    // A deactivation of the tool meanwhile deleted this GUI.
     if (self.isNull())
       return;
+
+    if (error != nullptr)
+    {
+      notice->Close();
+      self->OnInitializationFailed(error, task->IsCancelRequested());
+      return;
+    }
 
     if (!files.empty())
     {
       QString output;
-      const auto result = this->Download("Downloading VoxTell model", files, output);
+      const auto result = self->Download("Downloading VoxTell model", files, output);
 
       if (self.isNull())
         return;
 
       if (result != QmitkVenvProcess::StepResult::Succeeded)
       {
-        notice.reset();
+        notice->Close();
 
         if (result == QmitkVenvProcess::StepResult::Failed)
         {
@@ -413,53 +421,63 @@ void QmitkVoxTellToolGUI::LoadModel()
         }
         else
         {
-          this->SetStatus("The download was cancelled.");
+          self->SetStatus("The download was cancelled.");
         }
 
-        this->OnInitializationAborted();
+        self->OnInitializationAborted();
         return;
       }
     }
 
-    mitk::ProgressTask task("Loading VoxTell", mitk::ProgressTask::Indeterminate, true);
-    mitk::VoxTellTool::Pointer tool = this->GetTool();
+    auto loadTask = std::make_shared<mitk::ProgressTask>("Loading VoxTell", mitk::ProgressTask::Indeterminate, true);
 
+    tool->LoadModel(loadTask, [self, notice, loadTask](std::exception_ptr loadError)
+    {
+      notice->Close();
+
+      if (self.isNull())
+        return;
+
+      if (loadError != nullptr)
+      {
+        self->OnInitializationFailed(loadError, loadTask->IsCancelRequested());
+        return;
+      }
+
+      self->OnModelLoaded();
+    });
+  });
+}
+
+void QmitkVoxTellToolGUI::OnInitializationFailed(std::exception_ptr error, bool cancelled)
+{
+  QPointer<QmitkVoxTellToolGUI> self(this);
+
+  if (cancelled)
+  {
+    this->SetStatus("The initialization was cancelled.");
+  }
+  else
+  {
     try
     {
-      tool->LoadModel(&task);
+      std::rethrow_exception(error);
     }
-    catch (const mitk::Exception&)
+    catch (const mitk::Exception& e)
     {
-      cancelled = task.IsCancelRequested();
-      throw;
+      mitk::PythonPackage::ShowInitializationError(this->window(), "VoxTell", e);
     }
-  }
-  catch (const mitk::Exception& e)
-  {
-    notice.reset();
+    catch (const std::exception& e)
+    {
+      this->SetStatus(QString::fromLocal8Bit(e.what()), QmitkInfoCard::Severity::Error);
+    }
 
-    // A deactivation of the tool meanwhile deleted this GUI.
+    // The dialog runs an event loop, during which a tool change can delete this GUI.
     if (self.isNull())
       return;
-
-    if (cancelled)
-      this->SetStatus("The initialization was cancelled.");
-    else
-      mitk::PythonPackage::ShowInitializationError(window, "VoxTell", e);
-
-    if (self.isNull())
-      return;
-
-    this->OnInitializationAborted();
-    return;
   }
 
-  notice.reset();
-
-  if (self.isNull())
-    return;
-
-  this->OnModelLoaded();
+  this->OnInitializationAborted();
 }
 
 void QmitkVoxTellToolGUI::OnInitializationAborted()
@@ -483,29 +501,45 @@ QmitkVenvProcess::StepResult QmitkVoxTellToolGUI::Download(const std::string& di
   return result;
 }
 
-bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& prompts)
+void QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& prompts, std::function<void()> then)
 {
-  // The download, the notice and the dialogs run event loops, during which a
-  // tool change can delete this GUI.
+  // The download and the dialogs run event loops, during which a tool change
+  // can delete this GUI, and the text model is loaded after this function has
+  // returned.
   QPointer<QmitkVoxTellToolGUI> self(this);
   auto* window = this->window();
 
   m_IsBusy = true;
   this->EnableWidgets(false);
 
-  const auto finish = [this, &self](bool succeeded)
+  const auto finish = [self, then](bool succeeded)
   {
     if (self.isNull())
-      return false;
+      return;
 
-    m_IsBusy = false;
-    this->EnableWidgets(true);
+    self->m_IsBusy = false;
+    self->EnableWidgets(true);
 
     // There is no model left for the run then.
-    if (this->UnloadIfSettingsChanged() || this->ResetIfWorkerStopped())
-      return false;
+    if (self->UnloadIfSettingsChanged() || self->ResetIfWorkerStopped())
+      return;
 
-    return succeeded;
+    if (succeeded)
+      then();
+  };
+
+  const auto fail = [self, finish](const mitk::Exception& e)
+  {
+    if (self.isNull())
+      return;
+
+    QString message = QString::fromLocal8Bit(e.GetDescription());
+
+    if (message.contains("out of memory", Qt::CaseInsensitive))
+      message += " Try fewer prompts at once, or use the CPU in the VoxTell settings.";
+
+    self->SetStatus(message, QmitkInfoCard::Severity::Error);
+    finish(false);
   };
 
   try
@@ -520,7 +554,7 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
         const auto result = this->Download("Downloading VoxTell text model", files, output);
 
         if (self.isNull())
-          return false;
+          return;
 
         if (result != QmitkVenvProcess::StepResult::Succeeded)
         {
@@ -531,62 +565,68 @@ bool QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
           if (result == QmitkVenvProcess::StepResult::Failed)
             ShowDownloadError(window, output);
 
-          return finish(false);
+          finish(false);
+          return;
         }
       }
-    }
-
-    this->SetStatus("Processing the prompts with the text model...");
-
-    const auto notice = ShowBlockingNotice(window, QString(
-      "<h3 %1>Processing unknown prompts</h3>"
-      "<p %1>VoxTell uses its text model to understand the prompts it does not know. Loading the "
-      "text model for the first time can take a minute. You can cancel it in its progress "
-      "notification.</p>")
-      .arg(LINE_HEIGHT_STYLE));
-
-    if (self.isNull())
-      return false;
-
-    mitk::ProgressTask task("Processing prompts with the VoxTell text model", mitk::ProgressTask::Indeterminate, true);
-    mitk::VoxTellTool::Pointer tool = this->GetTool();
-
-    try
-    {
-      tool->EmbedPrompts(prompts, &task);
-    }
-    catch (const mitk::Exception&)
-    {
-      if (!task.IsCancelRequested())
-        throw;
-
-      // A deactivation of the tool meanwhile deleted this GUI.
-      if (self.isNull())
-        return false;
-
-      // The cancellation ended the worker, and the model with it.
-      m_IsBusy = false;
-      tool->UnloadModel();
-      this->OnModelUnloaded();
-      this->SetStatus("Processing the prompts was cancelled, which unloaded VoxTell. Initialize it again.");
-      return false;
     }
   }
   catch (const mitk::Exception& e)
   {
-    if (self.isNull())
-      return false;
-
-    QString message = QString::fromLocal8Bit(e.GetDescription());
-
-    if (message.contains("out of memory", Qt::CaseInsensitive))
-      message += " Try fewer prompts at once, or use the CPU in the VoxTell settings.";
-
-    this->SetStatus(message, QmitkInfoCard::Severity::Error);
-    return finish(false);
+    fail(e);
+    return;
   }
 
-  return finish(true);
+  this->SetStatus("Processing the prompts with the text model...");
+
+  auto notice = std::make_shared<Notice>(window, QString(
+    "<h3 %1>Processing unknown prompts</h3>"
+    "<p %1>VoxTell uses its text model to understand the prompts it does not know. Loading the "
+    "text model for the first time can take a minute. You can cancel it in its progress "
+    "notification.</p>")
+    .arg(LINE_HEIGHT_STYLE));
+
+  auto task = std::make_shared<mitk::ProgressTask>("Processing prompts with the VoxTell text model", mitk::ProgressTask::Indeterminate, true);
+  mitk::VoxTellTool::Pointer tool = this->GetTool();
+
+  tool->EmbedPrompts(prompts, task, [self, notice, task, tool, finish, fail](std::exception_ptr error)
+  {
+    notice->Close();
+
+    // A deactivation of the tool meanwhile deleted this GUI.
+    if (self.isNull())
+      return;
+
+    if (error == nullptr)
+    {
+      finish(true);
+      return;
+    }
+
+    if (task->IsCancelRequested())
+    {
+      // The cancellation ended the worker, and the model with it.
+      self->m_IsBusy = false;
+      tool->UnloadModel();
+      self->OnModelUnloaded();
+      self->SetStatus("Processing the prompts was cancelled, which unloaded VoxTell. Initialize it again.");
+      return;
+    }
+
+    try
+    {
+      std::rethrow_exception(error);
+    }
+    catch (const mitk::Exception& e)
+    {
+      fail(e);
+    }
+    catch (const std::exception& e)
+    {
+      self->SetStatus(QString::fromLocal8Bit(e.what()), QmitkInfoCard::Severity::Error);
+      finish(false);
+    }
+  });
 }
 
 void QmitkVoxTellToolGUI::OnModelLoaded()
@@ -707,9 +747,10 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     return;
   }
 
-  // The dialogs, the text model and the run process events, during which a
-  // tool change can delete this GUI. Detect that via a QPointer and bail out
-  // before touching any members, rather than crashing on a freed 'this'.
+  // The dialogs and the download run event loops, and the text model and the
+  // run end after this function has returned. A tool change meanwhile can
+  // delete this GUI. Detect that via a QPointer and bail out before touching
+  // any members, rather than crashing on a freed 'this'.
   QPointer<QmitkVoxTellToolGUI> self(this);
 
   auto prompts = enteredPrompts;
@@ -787,13 +828,23 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     }
   }
 
+  const auto run = [self, prompts]()
+  {
+    if (!self.isNull())
+      self->StartRun(prompts);
+  };
+
   // The text model is downloaded and loaded before the run, where the user can
   // be told about it, instead of in the middle of the run.
-  if (!unknownPrompts.empty() && !this->EmbedUnknownPrompts(unknownPrompts))
-    return;
+  if (!unknownPrompts.empty())
+    this->EmbedUnknownPrompts(unknownPrompts, run);
+  else
+    run();
+}
 
-  // Re-fetch: the download for the text model ran an event loop.
-  tool = this->GetTool();
+void QmitkVoxTellToolGUI::StartRun(const std::vector<std::string>& prompts)
+{
+  auto* tool = this->GetTool();
 
   if (tool == nullptr)
     return;
@@ -803,28 +854,63 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
 
   this->SetStatus("Segmenting. This can take a while...");
 
+  // BusyStateChanged() shows the result once the run has ended.
+  m_RunPending = true;
+
   try
   {
     tool->UpdatePreview();
   }
   catch (const std::exception& e)
   {
-    if (self.isNull())
-      return;
-
+    m_RunPending = false;
     this->SetStatus(QString("Error: %1").arg(e.what()), QmitkInfoCard::Severity::Error);
 
     if (!this->UnloadIfSettingsChanged())
       this->ResetIfWorkerStopped();
-
-    return;
   }
+}
 
-  if (self.isNull())
+void QmitkVoxTellToolGUI::BusyStateChanged(bool isBusy)
+{
+  Superclass::BusyStateChanged(isBusy);
+
+  if (isBusy)
     return;
 
-  // Re-fetch: the connected tool could have changed while the run pumped events.
-  tool = this->GetTool();
+  // Both after the tool has told everyone that the update ended: the result
+  // may be confirmed right away, which updates the preview again, and a
+  // confirmation that waited for an update transfers the preview only then.
+  if (m_PendingConfirmationStatus.has_value())
+  {
+    auto status = *m_PendingConfirmationStatus;
+    m_PendingConfirmationStatus.reset();
+
+    QTimer::singleShot(0, this, [this, status]() mutable {
+      // A cancelled or failed update ends the confirmation without a transfer.
+      if (const auto* tool = this->GetTool(); tool != nullptr)
+      {
+        if (const auto& error = tool->GetLastErrorMessage(); !error.empty())
+          status = { QString("The result could not be confirmed: %1").arg(QString::fromStdString(error)), QmitkInfoCard::Severity::Error };
+        else if (tool->WasLastUpdateCancelled())
+          status = { QString("Segmentation finished. Confirming it was cancelled."), QmitkInfoCard::Severity::Info };
+      }
+
+      this->SetStatus(status.first, status.second);
+      this->PrepareNextRun();
+    });
+  }
+  else if (m_RunPending)
+  {
+    m_RunPending = false;
+    QTimer::singleShot(0, this, &Self::ShowRunResult);
+  }
+}
+
+void QmitkVoxTellToolGUI::ShowRunResult()
+{
+  QPointer<QmitkVoxTellToolGUI> self(this);
+  auto* tool = this->GetTool();
 
   if (tool == nullptr)
     return;
@@ -855,8 +941,8 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
         confirmFailed = true;
       }
 
-      // Confirming computes the preview of further time steps if needed, which
-      // processes events.
+      // Confirming can show a dialog, during which a tool change can delete
+      // this GUI.
       if (self.isNull())
         return;
     }
@@ -871,6 +957,16 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     {
       status += QString(" Nothing found for: %1.").arg(JoinPrompts(promptsWithoutResult));
       severity = QmitkInfoCard::Severity::Warning;
+    }
+
+    // A confirmation of further time steps or of a changed active label
+    // updates the preview first, which uses the worker. The transfer follows
+    // that update, and so does everything that comes after the result.
+    if (!confirmFailed && tool->IsUpdating())
+    {
+      m_PendingConfirmationStatus.emplace(status, severity);
+      this->SetStatus("Segmentation finished. Confirming it...");
+      return;
     }
 
     this->SetStatus(status, severity);
@@ -903,6 +999,11 @@ void QmitkVoxTellToolGUI::OnSegmentButtonClicked()
     this->SetStatus(message, QmitkInfoCard::Severity::Error);
   }
 
+  this->PrepareNextRun();
+}
+
+void QmitkVoxTellToolGUI::PrepareNextRun()
+{
   if (this->UnloadIfSettingsChanged() || this->ResetIfWorkerStopped())
     return;
 
@@ -1027,9 +1128,9 @@ void QmitkVoxTellToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::Cha
 
   m_SettingsChanged = true;
 
-  // The settings can be changed while a run or its preparation process events.
-  // The model cannot be unloaded while it is in use, so that waits until the
-  // run or its preparation is over.
+  // The settings can be changed while a run or its preparation computes off
+  // the GUI thread. The model cannot be unloaded while it is in use, so that
+  // waits until the run or its preparation is over.
   if (!tool->IsUpdating() && !m_IsBusy)
     this->UnloadIfSettingsChanged();
 }

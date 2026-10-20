@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkSegWithPreviewTool.h>
 #include <MitkPythonSegmentationExports.h>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <map>
 #include <memory>
 #include <string>
@@ -58,9 +60,9 @@ namespace mitk
 
     Runs TotalSegmentator in a worker process with the interpreter of its virtual
     environment, which keeps MITK's own interpreter free of that environment.
-    Images pass through shared memory. UpdatePreview() waits on the calling
-    thread and keeps the application responsive through GUIProcessEventsMessage.
-    The progress notification of the tool shows a run and cancels it.
+    Images pass through shared memory. The calls of the worker run off the GUI
+    thread (see RunOffGUIThread()), so UpdatePreview() returns before a run is
+    done. The progress notification of the tool shows a run and cancels it.
 
     Initialize() starts the worker and learns the tasks of TotalSegmentator from
     its registry. Device and license are the user's settings in the preferences.
@@ -150,17 +152,22 @@ namespace mitk
     /**
      * \brief Starts the worker and learns the tasks of TotalSegmentator.
      *
-     * Events are processed meanwhile. Does nothing if the tool is initialized
+     * Returns at once, as the worker calls run off the GUI thread.
+     * InitializedEvent follows, or InitializationFailedEvent if
+     * TotalSegmentator is not installed, is not TotalSegmentator::REQUIRED_VERSION,
+     * or does not start. Does nothing if the tool is initialized or starting
      * already.
      *
-     * \param task Shows what goes on, and stops the start when cancelled.
-     * \throw mitk::Exception if TotalSegmentator is not installed, is not
-     *        TotalSegmentator::REQUIRED_VERSION, or does not start.
+     * \param task Shows what goes on, and stops the start when cancelled. The
+     *        tool keeps it until the start has ended.
      */
-    void Initialize(ProgressTask* task);
+    void Initialize(std::shared_ptr<ProgressTask> task);
 
     /** \brief Whether the tasks are known, see Initialize(). */
     bool IsInitialized() const;
+
+    /** \brief Whether Initialize() has not ended yet. */
+    bool IsInitializing() const;
 
     /**
      * \brief Ends the worker and forgets the tasks, for example before the
@@ -233,6 +240,13 @@ namespace mitk
     /** \brief Event triggered when Initialize() has learned the tasks, whoever called it. */
     Message<> InitializedEvent;
 
+    /**
+     * \brief Event triggered when Initialize() has failed, with a message for the user.
+     *
+     * The message is empty if the start was cancelled or the tool deactivated.
+     */
+    Message1<std::string> InitializationFailedEvent;
+
     /** \brief Event triggered when the task, the speed or the subset of classes changed, whoever changed it. */
     Message<> OptionsChangedEvent;
 
@@ -245,6 +259,8 @@ namespace mitk
      *
      * Downloads the models of the task first if they are missing. On
      * cancellation or failure the preview is left empty.
+     *
+     * \pre The tool is initialized, see Initialize().
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;
@@ -259,8 +275,12 @@ namespace mitk
 
   private:
     PythonWorker& GetWorker();
-    void DownloadMissingWeights(ProgressTask* task);
-    void EndFailedInitialization();
+
+    /** \brief Learns the tasks from what the worker told, on the GUI thread. */
+    void EndInitialization(std::exception_ptr error, const nlohmann::json& info, const ProgressTask* task);
+
+    /** \brief Leaves the preview empty after a failed run, and tells why unless the user stopped it. */
+    void EndFailedRun(std::exception_ptr error, const ProgressTask* task);
 
     class Impl;
     std::unique_ptr<Impl> m_Impl;

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitknnInteractivePointInteractor.h>
 #include <mitknnInteractiveScribbleInteractor.h>
 #include <mitkPlanarFigure.h>
+#include <mitkProgressTask.h>
 #include <mitkPythonHelper.h>
 #include <mitkPythonWorker.h>
 #include <mitkRenderingManager.h>
@@ -28,13 +29,15 @@ found in the LICENSE file.
 #include <mitkToolManager.h>
 #include <mitkTorchDevice.h>
 
-#include "mitkInitializationHook.h"
 #include "mitkPythonWorkerModules.h"
+#include "mitkStopHook.h"
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
 #include <algorithm>
+#include <array>
+#include <atomic>
 
 using namespace mitk::nnInteractive;
 
@@ -159,12 +162,12 @@ namespace mitk
       m_Backend.reset();
     }
 
-    // Methods that call the worker are defined at the bottom of this file.
+    // Methods that call the worker or prepare its calls are defined at the
+    // bottom of this file.
     void SetAutoZoom() const;
-    void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
-    void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
-    void AddMaskInteraction(const std::string& method, const Image* mask, const InteractionBoundingBox* boundingBox) const;
-    void AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const;
+    nlohmann::json GetPointParams(const Point3D& point, const Image* inputAtTimeStep) const;
+    nlohmann::json GetBoxParams(const PlanarFigure* box, const Image* inputAtTimeStep) const;
+    nlohmann::json GetMaskParams(const InteractionBoundingBox* boundingBox) const;
     void ResetInteractions() const;
     bool Undo() const;
 
@@ -193,6 +196,15 @@ namespace mitk
       LastInteractionWasMask = false;
     }
 
+    void ClearInteractions()
+    {
+      for (auto& [interactionType, interactor] : this->Interactors)
+        interactor->Reset();
+
+      this->InitialSeg = nullptr;
+      this->ClearLastInteraction();
+    }
+
     std::unique_ptr<PythonWorker> Worker;
     bool SessionStarted = false;
     SupportedInteractions Interactions;
@@ -201,7 +213,7 @@ namespace mitk
 
     // The session writes its predictions into this shared memory. TargetBuffer
     // is an image on the same memory, without a copy.
-    std::unique_ptr<SharedBuffer> TargetSegment;
+    std::shared_ptr<SharedBuffer> TargetSegment;
     Image::Pointer TargetBuffer;
 
     nnInteractive::PromptType PromptType;
@@ -223,13 +235,16 @@ namespace mitk
     bool LastInteractionWasMask = false;
     bool UndoRefreshPending = false;
 
-    // StartSession() processes events through this hook, during which the
-    // tool may be deactivated, the session aborted or the time point changed.
-    // Those are deferred until StartSession() returns.
-    PythonWorker::ProgressHook StartHook;
+    // A start or a prompt runs off the GUI thread, during which the tool may be
+    // deactivated, the session aborted or the time point changed. Those wait
+    // until the work no longer uses the worker. The work reads AbortRequested,
+    // which stops it.
     bool Starting = false;
-    bool AbortRequested = false;
-    bool TimePointChangedWhileStarting = false;
+    std::atomic<bool> AbortRequested = false;
+    bool TimePointChangedMeanwhile = false;
+
+    // Set by the destructor, which must not wait for a server.
+    std::atomic<bool> Destroying = false;
 
   private:
     std::optional<Backend> m_Backend;
@@ -256,6 +271,11 @@ mitk::nnInteractiveTool::nnInteractiveTool()
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
 {
+  // The work uses the worker.
+  m_Impl->Destroying = true;
+  m_Impl->AbortRequested = true;
+  this->WaitForWorkOffGUIThread();
+
   for (const auto& [interactionType, interactor] : m_Impl->Interactors)
   {
     interactor->UpdatePreviewEvent -= MessageDelegate1<nnInteractiveTool, bool>(
@@ -277,12 +297,23 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 
 void mitk::nnInteractiveTool::Deactivated()
 {
-  // The worker is still on the stack of StartSession(), which tears down what
-  // it set up once it has stopped. No interaction can exist before a session.
+  // The worker is still in use by the start, which tears down what it set up
+  // once it has stopped. No interaction can exist before a session.
   if (m_Impl->Starting)
   {
     m_Impl->AbortRequested = true;
     Superclass::Deactivated();
+    return;
+  }
+
+  // A prompt still uses the worker. Once it has stopped, the session ends,
+  // see UpdateCleanUp().
+  if (this->IsUpdating())
+  {
+    m_Impl->AbortRequested = true;
+    this->DisableInteractor();
+    Superclass::Deactivated();
+    this->DeactivatedEvent.Send();
     return;
   }
 
@@ -353,11 +384,11 @@ void mitk::nnInteractiveTool::DisableInteractor(std::optional<InteractionType> i
 
 void mitk::nnInteractiveTool::ResetInteractions()
 {
-  for (auto& [interactionType, interactor] : m_Impl->Interactors)
-    interactor->Reset();
+  // A prompt still uses the worker. The panel offers no reset meanwhile.
+  if (this->IsUpdating())
+    return;
 
-  m_Impl->InitialSeg = nullptr;
-  m_Impl->ClearLastInteraction();
+  m_Impl->ClearInteractions();
 
   if (this->IsSessionRunning())
   {
@@ -395,7 +426,8 @@ bool mitk::nnInteractiveTool::HasInteractions() const
 
 void mitk::nnInteractiveTool::UndoLastInteraction()
 {
-  if (!this->IsSessionRunning() || !this->CanUndo())
+  // A prompt still uses the worker. The panel offers no undo meanwhile.
+  if (!this->IsSessionRunning() || !this->CanUndo() || this->IsUpdating())
     return;
 
   bool undone = false;
@@ -444,8 +476,8 @@ void mitk::nnInteractiveTool::UndoLastInteraction()
   m_Impl->UndoRefreshPending = true;
   this->UpdatePreview();
 
-  // UpdatePreview() is synchronous, so the one-shot refresh has happened by
-  // now. Clear the flag defensively: if UpdatePreview() returned before
+  // The refresh runs nothing off the GUI thread, so it has happened by now.
+  // Clear the flag defensively: if UpdatePreview() returned before
   // reaching DoUpdatePreview (no input or preview image), a stale true would
   // make the next interaction take the refresh branch and be dropped silently.
   m_Impl->UndoRefreshPending = false;
@@ -465,7 +497,8 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
 {
   m_Impl->AutoZoom = autoZoom;
 
-  if (this->IsSessionRunning())
+  // A prompt still uses the worker. The panel offers no change meanwhile.
+  if (this->IsSessionRunning() && !this->IsUpdating())
   {
     try
     {
@@ -510,6 +543,12 @@ void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
 {
   if (mask == nullptr)
     return;
+
+  if (this->IsUpdating())
+  {
+    MITK_WARN << "nnInteractive: a prompt is still computing, so the session is not initialized with the mask.";
+    return;
+  }
 
   m_Impl->InitialSeg = mask;
   this->UpdatePreview();
@@ -571,82 +610,165 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
   const auto* interactor = m_Impl->GetEnabledInteractor();
 
-  try
+  // What the session gets, read from the interactor and the images here on the
+  // GUI thread. The prediction runs off it.
+  std::string method;
+  nlohmann::json params;
+  std::shared_ptr<SharedBuffer> mask;
+  std::optional<InteractionType> interactionType;
+
+  if (interactor != nullptr)
   {
-    if (interactor != nullptr)
+    interactionType = interactor->GetType();
+
+    switch (*interactionType)
     {
-      switch (interactor->GetType())
+      case InteractionType::Point:
       {
-        case InteractionType::Point:
+        auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
+        method = "add_point";
+        params = m_Impl->GetPointParams(point.value(), inputAtTimeStep);
+        break;
+      }
+      case InteractionType::Box:
+      {
+        auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
+        method = "add_bbox";
+        params = m_Impl->GetBoxParams(box, inputAtTimeStep);
+        break;
+      }
+      case InteractionType::Scribble:
+      {
+        auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
+        auto scribbleMask = scribbleInteractor->GetLastScribbleMask();
+        if (scribbleMask.IsNull())
         {
-          auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
-          m_Impl->AddPointInteraction(point.value(), inputAtTimeStep);
-          break;
-        }
-        case InteractionType::Box:
-        {
-          auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
-          m_Impl->AddBoxInteraction(box, inputAtTimeStep);
-          break;
-        }
-        case InteractionType::Scribble:
-        {
-          auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
-          auto mask = scribbleInteractor->GetLastScribbleMask();
-          if (mask.IsNull())
-          {
-            MITK_WARN << "Skipping scribble preview update: no mask available.";
-            return;
-          }
-          m_Impl->AddMaskInteraction("add_scribble", mask.GetPointer(), scribbleInteractor->GetLastScribbleBoundingBox());
-          break;
-        }
-        case InteractionType::Lasso:
-        {
-          auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
-          auto mask = lassoInteractor->GetLastLassoMask();
-          if (mask.IsNull())
-          {
-            MITK_WARN << "Skipping lasso preview update: no mask available.";
-            return;
-          }
-          m_Impl->AddMaskInteraction("add_lasso", mask.GetPointer(), lassoInteractor->GetLastLassoBoundingBox());
-          break;
-        }
-        default:
-          MITK_ERROR << "Cannot update preview because of unknown interaction type!";
+          MITK_WARN << "Skipping scribble preview update: no mask available.";
           return;
+        }
+        method = "add_scribble";
+        params = m_Impl->GetMaskParams(scribbleInteractor->GetLastScribbleBoundingBox());
+        mask = SharedBuffer::CopyOf(scribbleMask.GetPointer());
+        break;
+      }
+      case InteractionType::Lasso:
+      {
+        auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
+        auto lassoMask = lassoInteractor->GetLastLassoMask();
+        if (lassoMask.IsNull())
+        {
+          MITK_WARN << "Skipping lasso preview update: no mask available.";
+          return;
+        }
+        method = "add_lasso";
+        params = m_Impl->GetMaskParams(lassoInteractor->GetLastLassoBoundingBox());
+        mask = SharedBuffer::CopyOf(lassoMask.GetPointer());
+        break;
+      }
+      default:
+        MITK_ERROR << "Cannot update preview because of unknown interaction type!";
+        return;
+    }
+  }
+  else if (m_Impl->InitialSeg.IsNotNull())
+  {
+    const auto maskTimeStep = m_Impl->InitialSeg->GetTimeSteps() > 1
+      ? m_Impl->SessionWorkingDataTimeStep
+      : 0;
+
+    method = "add_initial_seg";
+    params = { { "run_prediction", m_Impl->AutoRefine } };
+    mask = SharedBuffer::CopyOf(m_Impl->InitialSeg, maskTimeStep);
+  }
+  else
+  {
+    this->ResetPreviewContentAtTimeStep(timeStep);
+    m_Impl->ClearLastInteraction();
+    return;
+  }
+
+  auto* worker = m_Impl->Worker.get();
+  auto* task = m_ProgressCommand->GetProgressTask();
+
+  // A remote prompt is short. Ending its worker would leave the lease on the
+  // server until its idle timeout, so a deactivation or an aborted session
+  // waits for it, and the teardown releases the lease. A cancellation by the
+  // user and the destruction of the tool still end it at once.
+  const bool remote = m_Impl->Remote;
+  const auto progress = MakeStopHook(this, task, [this, remote]() {
+    return m_Impl->Destroying.load() || (!remote && m_Impl->AbortRequested.load());
+  });
+
+  const auto promptType = m_Impl->PromptType;
+
+  // Held for the result, as the tool can be deactivated meanwhile.
+  const MultiLabelSegmentation::Pointer preview = previewImage;
+
+  this->RunOffGUIThread(
+    [worker, progress, method, params, mask]() {
+      PythonWorker::Buffers buffers;
+
+      if (mask != nullptr)
+        buffers["mask"] = mask.get();
+
+      worker->Call("nninteractive_worker." + method, params, buffers, progress);
+    },
+    [this, task, preview, timeStep, interactionType, promptType](std::exception_ptr error) {
+      if (error != nullptr)
+      {
+        this->EndFailedPrompt(error, task);
+        return;
       }
 
-      previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
+      // Deactivated or aborted meanwhile, which ends the session in UpdateCleanUp().
+      if (m_Impl->AbortRequested)
+        return;
 
-      // Record this interaction so UndoLastInteraction() knows which prompt to
-      // remove. m_Impl->PromptType is the prompt type the enabled interactor
-      // was activated with, i.e. the one used for this interaction.
-      m_Impl->LastInteractionType = interactor->GetType();
-      m_Impl->LastInteractionPromptType = m_Impl->PromptType;
-      m_Impl->LastInteractionWasMask = false;
+      if (interactionType.has_value())
+      {
+        preview->UpdateGroupImage(preview->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
 
-      this->PreviewUpdatedEvent.Send();
-    }
-    else if (m_Impl->InitialSeg.IsNotNull())
-    {
-      m_Impl->AddInitialSegInteraction(previewImage, timeStep);
+        // Record this interaction so UndoLastInteraction() knows which prompt
+        // to remove: the prompt type the enabled interactor was activated with
+        // when the interaction was made.
+        m_Impl->LastInteractionType = interactionType;
+        m_Impl->LastInteractionPromptType = promptType;
+        m_Impl->LastInteractionWasMask = false;
 
-      // The initial-segmentation mask is one undoable step (the session
-      // snapshots before applying it); it has no prompt node to remove.
-      m_Impl->LastInteractionType.reset();
-      m_Impl->LastInteractionPromptType.reset();
-      m_Impl->LastInteractionWasMask = true;
-    }
-    else
-    {
-      this->ResetPreviewContentAtTimeStep(timeStep);
-      m_Impl->ClearLastInteraction();
-    }
+        this->PreviewUpdatedEvent.Send();
+      }
+      else
+      {
+        preview->UpdateGroupImage(preview->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
+
+        // The initial-segmentation mask is one undoable step (the session
+        // snapshots before applying it); it has no prompt node to remove.
+        m_Impl->LastInteractionType.reset();
+        m_Impl->LastInteractionPromptType.reset();
+        m_Impl->LastInteractionWasMask = true;
+      }
+    });
+}
+
+void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const ProgressTask* task)
+{
+  try
+  {
+    std::rethrow_exception(error);
   }
   catch (const Exception& e)
   {
+    // Deactivated or aborted meanwhile, which ends the session in UpdateCleanUp().
+    if (m_Impl->AbortRequested)
+      return;
+
+    // The cancellation ended the worker and with it the session.
+    if (task != nullptr && task->IsCancelRequested())
+    {
+      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription() });
+      return;
+    }
+
     // The session can be lost mid-interaction (lease expired, server gone or
     // at capacity, worker ended). Tear it down and notify the GUI; otherwise
     // propagate the error.
@@ -661,7 +783,8 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 void mitk::nnInteractiveTool::Notify(InteractionEvent* event, bool isHandled)
 {
   // If the event is not yet handled, forward it to the currently enabled
-  // interactor, if any.
+  // interactor, if any. It ignores the event while a prompt computes, see
+  // UpdatePrepare().
   if (!isHandled)
   {
     for (auto& [interactionType, interactor] : m_Impl->Interactors)
@@ -708,8 +831,145 @@ const std::vector<std::pair<std::string, std::string>>& mitk::nnInteractiveTool:
   return keys;
 }
 
-void mitk::nnInteractiveTool::StartSession(ProgressTask* task)
+namespace
 {
+  // What a session start reads on the GUI thread and what it brings back from
+  // the worker. The work off the GUI thread and its done share it, one after
+  // the other.
+  struct SessionStart
+  {
+    bool Remote = false;
+    std::string ServerUrl;
+    std::string ApiKey;
+
+    mitk::Torch::BackendPreference Backend = mitk::Torch::BackendPreference::Auto;
+    std::string GPUDevice;
+    std::string ModelSource;
+    std::string LocalModelPath;
+    std::string ModelCheckpoint;
+    bool TorchCompile = false;
+    std::string InteractionsStorage;
+    bool AutoZoom = true;
+
+    std::unique_ptr<mitk::SharedBuffer> Image;
+    nlohmann::json Spacing;
+    std::shared_ptr<mitk::SharedBuffer> TargetSegment;
+    mitk::Image::Pointer TargetBuffer;
+    mitk::TimeStepType ReferenceTimeStep = 0;
+    mitk::TimeStepType WorkingTimeStep = 0;
+
+    /** Whether the session runs in the worker, even if binding the image failed. */
+    bool Started = false;
+    nlohmann::json Capabilities;
+    std::optional<mitk::nnInteractive::Backend> SelectedBackend;
+    bool ProxyBypassed = false;
+  };
+
+  void SetSessionImage(mitk::PythonWorker& worker, SessionStart& start, const mitk::PythonWorker::ProgressHook& progress)
+  {
+    worker.Call("nninteractive_worker.set_image",
+      { { "spacing", start.Spacing } },
+      { { "image", start.Image.get() }, { "target", start.TargetSegment.get() } },
+      progress);
+
+    // The worker keeps its own mapping of the image.
+    start.Image.reset();
+  }
+
+  void StartRemoteSession(mitk::PythonWorker& worker, SessionStart& start, const mitk::PythonWorker::ProgressHook& progress)
+  {
+    // Expected failures, like an unreachable server or a rejected API key, come
+    // back as short user-facing messages. The server URL is shown without
+    // credentials.
+    const auto result = worker.Call("nninteractive_worker.start_remote", {
+      { "server_url", start.ServerUrl },
+      { "server_display", SanitizeUrlForDisplay(start.ServerUrl) },
+      { "api_key", start.ApiKey }
+    }, {}, progress);
+
+    if (const auto error = result.value("error", std::string()); !error.empty())
+      mitkThrow() << error;
+
+    start.ProxyBypassed = result.value("proxy_bypassed", false);
+    start.Capabilities = result["capabilities"];
+    start.Started = true;
+
+    // The lease is claimed. If configuring the session or uploading the image
+    // fails because the connection dropped mid-flight, ending the session
+    // releases the half-open lease, and a short message replaces the raw
+    // traceback.
+    try
+    {
+      worker.Call("nninteractive_worker.set_autozoom", { { "enabled", start.AutoZoom } }, {}, progress);
+      SetSessionImage(worker, start, progress);
+    }
+    catch (const mitk::Exception& e)
+    {
+      if (IsRemoteConnectionLost(e))
+        mitkThrow() << "Lost the connection to the nnInteractive server while starting the session. "
+                       "Check the server and try again.";
+
+      throw;
+    }
+  }
+
+  void StartLocalSession(mitk::PythonWorker& worker, SessionStart& start, const mitk::PythonWorker::ProgressHook& progress)
+  {
+    // A client-only install (nninteractive-client) has no local inference backend
+    // and no PyTorch. Fail fast with an actionable message instead of letting the
+    // torch import below raise a raw traceback.
+    if (!worker.Call("nninteractive_worker.is_local_inference_available", {}, {}, progress).get<bool>())
+      mitkThrow() << "This is a client-only nnInteractive installation, which supports remote "
+                     "sessions only. Select Remote in Preferences -> Segmentation -> nnInteractive, "
+                     "or uninstall and reinitialize in Full mode to enable local inference.";
+
+    const auto deviceSelection = mitk::Torch::SelectDevice(worker, start.Backend, start.GPUDevice, 6000, progress);
+    const bool useCUDADevice = deviceSelection.SelectedBackend == mitk::Torch::Backend::CUDA;
+
+    if (!useCUDADevice)
+      start.AutoZoom = false;
+
+    // torch.compile is only meaningful on Linux with a CUDA device (the library
+    // itself forces it off on Windows, and it relies on Triton/NVIDIA). The
+    // useCUDADevice guard also neutralizes a stale preference, e.g. enabled and
+    // then the backend switched to CPU or auto-fell back to CPU.
+    bool useTorchCompile = false;
+#if defined(__linux__)
+    useTorchCompile = useCUDADevice && start.TorchCompile;
+#endif
+
+    // The checkpoint is a local folder or managed by nnInteractive's model
+    // management, which downloads it if needed and works offline once it has.
+    // An empty checkpoint means the library's recommended default.
+    const auto result = worker.Call("nninteractive_worker.start_local", {
+      { "device", deviceSelection.Device },
+      { "model_source", start.ModelSource },
+      { "local_model_path", start.LocalModelPath },
+      { "model_checkpoint", start.ModelCheckpoint },
+      { "use_torch_compile", useTorchCompile },
+      { "do_autozoom", start.AutoZoom },
+      { "interactions_storage", start.InteractionsStorage }
+    }, {}, progress);
+
+    if (const auto error = result.value("error", std::string()); !error.empty())
+      mitkThrow() << error;
+
+    start.Capabilities = result["capabilities"];
+    start.Started = true;
+    start.SelectedBackend = deviceSelection.SelectedBackend;
+
+    SetSessionImage(worker, start, progress);
+  }
+}
+
+void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, std::function<void(std::exception_ptr error)> done)
+{
+  if (m_Impl->Starting || this->IsUpdating())
+  {
+    done(MakeExceptionPtr("nnInteractive: the session cannot be started while the tool is busy."));
+    return;
+  }
+
   if (this->IsSessionRunning())
     this->EndSession();
 
@@ -724,19 +984,66 @@ void mitk::nnInteractiveTool::StartSession(ProgressTask* task)
   for (const auto& [key, defaultValue] : GetSessionDefiningPreferences())
     prefs->Put(key, prefs->Get(key, defaultValue));
 
-  m_Impl->Starting = true;
-  m_Impl->AbortRequested = false;
-  m_Impl->TimePointChangedWhileStarting = false;
-  m_Impl->StartHook = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
-
-  const auto finishStart = [this]() {
-    m_Impl->Starting = false;
-    m_Impl->StartHook = nullptr;
-  };
+  auto start = std::make_shared<SessionStart>();
 
   try
   {
-    m_Impl->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
+    start->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
+
+    if (start->Remote)
+    {
+      start->ServerUrl = prefs->Get("nnInteractive/serverUrl", "");
+      start->ApiKey = prefs->Get("nnInteractive/apiKey", "");
+
+      if (start->ServerUrl.empty())
+        mitkThrow() << "Remote mode is selected but no server URL is configured. "
+                       "Click on Settings to configure a server URL.";
+    }
+    else
+    {
+      start->Backend = Torch::ParseBackendPreference(prefs->Get("nnInteractive/backend", "auto"));
+      start->GPUDevice = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
+      start->ModelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
+      start->LocalModelPath = prefs->Get("nnInteractive/localModelPath", "");
+      start->ModelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
+      start->TorchCompile = prefs->GetBool("nnInteractive/useTorchCompile", true);
+
+      if (start->ModelSource == "local" && start->LocalModelPath.empty())
+        mitkThrow() << "nnInteractive: Local model mode is selected but no checkpoint folder is configured. "
+                       "Set the path in Preferences -> Segmentation -> nnInteractive.";
+
+      // Storage backend for the interaction tensor. "auto" (the library default)
+      // uses a dense tensor for smaller images and blosc2 for larger ones; blosc2
+      // trades speed for lower RAM, tensor the other way around. Only applies to
+      // local sessions; a remote server decides this server-side.
+      start->InteractionsStorage = prefs->Get("nnInteractive/interactionsStorage", "auto");
+      if (start->InteractionsStorage != "blosc2" && start->InteractionsStorage != "tensor")
+        start->InteractionsStorage = "auto";
+    }
+
+    start->AutoZoom = m_Impl->AutoZoom;
+
+    auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
+
+    const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
+    start->ReferenceTimeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+    // Pin the session to the time steps that are active now. OnTimePointChanged()
+    // ends the session if either changes, since the Python model is bound to a
+    // single 3D slice.
+    const auto* workingSeg = this->GetTargetSegmentation();
+    start->WorkingTimeStep = workingSeg != nullptr
+      ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
+      : 0;
+
+    auto imageAtTimeStep = this->GetImageByTimeStep(image, start->ReferenceTimeStep);
+
+    start->Image = SharedBuffer::CopyOf(imageAtTimeStep);
+    start->TargetSegment = std::make_shared<SharedBuffer>(MultiLabelSegmentation::GetPixelType(), start->Image->GetShape());
+    start->TargetBuffer = start->TargetSegment->AsImage(*imageAtTimeStep->GetTimeGeometry());
+
+    const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
+    start->Spacing = { spacing[2], spacing[1], spacing[0] };
 
     const auto python = PythonHelper::GetVirtualEnvExecutablePath(this->GetVirtualEnvName());
 
@@ -747,215 +1054,87 @@ void mitk::nnInteractiveTool::StartSession(ProgressTask* task)
       ReadWorkerModule("torch_device.py"),
       ReadWorkerModule("nnInteractive/nninteractive_worker.py")
     }, "nnInteractive");
-
-    if (m_Impl->Remote)
-      this->ConstructRemoteSession();
-    else
-      this->ConstructLocalSession();
   }
   catch (...)
   {
-    finishStart();
-
-    // If construction failed before a session was established, do not leave the
-    // remote flag set: IsRemoteSession() must report false when nothing runs,
-    // and EndSession() (the usual reset path) is a no-op without a session.
-    if (!this->IsSessionRunning())
-    {
-      m_Impl->Worker.reset();
-      m_Impl->Remote = false;
-    }
-
-    // Deactivated or aborted meanwhile: nothing of the start may survive.
-    if (m_Impl->AbortRequested)
-    {
-      m_Impl->AbortRequested = false;
-      this->EndSession();
-    }
-
-    throw;
+    m_Impl->Worker.reset();
+    done(std::current_exception());
+    return;
   }
 
-  finishStart();
+  m_Impl->Starting = true;
+  m_Impl->AbortRequested = false;
+  m_Impl->TimePointChangedMeanwhile = false;
 
-  if (m_Impl->TimePointChangedWhileStarting)
-  {
-    m_Impl->TimePointChangedWhileStarting = false;
-    this->OnTimePointChanged();
-  }
-}
+  auto* worker = m_Impl->Worker.get();
+  const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
 
-void mitk::nnInteractiveTool::ConstructRemoteSession()
-{
-  auto prefs = GetPreferences();
-  const auto serverUrl = prefs->Get("nnInteractive/serverUrl", "");
-  const auto apiKey = prefs->Get("nnInteractive/apiKey", "");
+  this->RunOffGUIThread(
+    [worker, progress, start]() {
+      if (start->Remote)
+        StartRemoteSession(*worker, *start, progress);
+      else
+        StartLocalSession(*worker, *start, progress);
+    },
+    [this, task, start, done](std::exception_ptr error) {
+      m_Impl->Starting = false;
 
-  if (serverUrl.empty())
-    mitkThrow() << "Remote mode is selected but no server URL is configured. "
-                   "Click on Settings to configure a server URL.";
+      // Deactivated or aborted after the session had started: it is not wanted any more.
+      if (error == nullptr && m_Impl->AbortRequested)
+        error = MakeExceptionPtr("nnInteractive: aborted.");
 
-  m_Impl->ResetBackend();
+      m_Impl->SessionStarted = start->Started;
+      m_Impl->Remote = start->Remote;
 
-  // Expected failures, like an unreachable server or a rejected API key, come
-  // back as short user-facing messages. The server URL is shown without
-  // credentials.
-  const auto result = m_Impl->Worker->Call("nninteractive_worker.start_remote", {
-    { "server_url", serverUrl },
-    { "server_display", SanitizeUrlForDisplay(serverUrl) },
-    { "api_key", apiKey }
-  }, {}, m_Impl->StartHook);
+      if (error != nullptr)
+      {
+        // A remote session holds a lease on the server, which ending it releases.
+        // Otherwise the server slot is held until the idle reaper expires it.
+        if (this->IsSessionRunning())
+        {
+          this->EndSession();
+        }
+        else
+        {
+          m_Impl->Worker.reset();
+          m_Impl->SessionStarted = false;
+          m_Impl->Remote = false;
+        }
 
-  if (const auto error = result.value("error", std::string()); !error.empty())
-    mitkThrow() << error;
+        m_Impl->AbortRequested = false;
+        m_Impl->TimePointChangedMeanwhile = false;
 
-  if (result.value("proxy_bypassed", false))
-    MITK_INFO << "Connected to the nnInteractive server directly, bypassing the configured HTTP proxy.";
+        done(error);
+        return;
+      }
 
-  m_Impl->SetCapabilities(result["capabilities"]);
-  m_Impl->SessionStarted = true;
+      if (start->ProxyBypassed)
+        MITK_INFO << "Connected to the nnInteractive server directly, bypassing the configured HTTP proxy.";
 
-  // The lease is claimed. If configuring the session or uploading the image
-  // fails because the connection dropped mid-flight, release the half-open
-  // lease and surface a short message instead of a raw traceback.
-  try
-  {
-    m_Impl->SetAutoZoom();
-    this->BindSessionImageAndTargetBuffer();
-  }
-  catch (const Exception& e)
-  {
-    // The lease is already claimed, so any failure here must release it;
-    // otherwise the server slot is held until the idle reaper expires it.
-    const bool connectionLost = IsRemoteConnectionLost(e);
+      m_Impl->SetCapabilities(start->Capabilities);
+      m_Impl->AutoZoom = start->AutoZoom;
 
-    this->EndSession();
+      if (start->SelectedBackend.has_value())
+        m_Impl->SetBackend(*start->SelectedBackend);
 
-    if (connectionLost)
-      mitkThrow() << "Lost the connection to the nnInteractive server while starting the session. "
-                     "Check the server and try again.";
+      m_Impl->TargetSegment = start->TargetSegment;
+      m_Impl->TargetBuffer = start->TargetBuffer;
+      m_Impl->SessionReferenceDataTimeStep = start->ReferenceTimeStep;
+      m_Impl->SessionWorkingDataTimeStep = start->WorkingTimeStep;
 
-    throw;
-  }
-}
+      // A fresh session has nothing to undo (set_image resets the session's undo
+      // state); keep the tool's record in sync.
+      m_Impl->ClearLastInteraction();
+      m_Impl->UndoRefreshPending = false;
 
-void mitk::nnInteractiveTool::ConstructLocalSession()
-{
-  auto& worker = *m_Impl->Worker;
+      done(nullptr);
 
-  // A client-only install (nninteractive-client) has no local inference backend
-  // and no PyTorch. Fail fast with an actionable message instead of letting the
-  // torch import below raise a raw traceback.
-  if (!worker.Call("nninteractive_worker.is_local_inference_available", {}, {}, m_Impl->StartHook).get<bool>())
-    mitkThrow() << "This is a client-only nnInteractive installation, which supports remote "
-                   "sessions only. Select Remote in Preferences -> Segmentation -> nnInteractive, "
-                   "or uninstall and reinitialize in Full mode to enable local inference.";
-
-  auto prefs = GetPreferences();
-  const auto backend = Torch::ParseBackendPreference(prefs->Get("nnInteractive/backend", "auto"));
-  const auto gpuBackendPref = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
-
-  const auto deviceSelection = Torch::SelectDevice(worker, backend, gpuBackendPref, 6000, m_Impl->StartHook);
-  const bool useCUDADevice = deviceSelection.SelectedBackend == Torch::Backend::CUDA;
-
-  const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
-  const auto localModelPath = prefs->Get("nnInteractive/localModelPath", "");
-
-  if (modelSource == "local" && localModelPath.empty())
-    mitkThrow() << "nnInteractive: Local model mode is selected but no checkpoint folder is configured. "
-                   "Set the path in Preferences -> Segmentation -> nnInteractive.";
-
-  m_Impl->ResetBackend();
-
-  if (!useCUDADevice)
-    this->SetAutoZoom(false);
-
-  // torch.compile is only meaningful on Linux with a CUDA device (the library
-  // itself forces it off on Windows, and it relies on Triton/NVIDIA). The
-  // useCUDADevice guard also neutralizes a stale preference, e.g. enabled and
-  // then the backend switched to CPU or auto-fell back to CPU.
-  bool useTorchCompile = false;
-#if defined(__linux__)
-  useTorchCompile = useCUDADevice && prefs->GetBool("nnInteractive/useTorchCompile", true);
-#endif
-
-  // Storage backend for the interaction tensor. "auto" (the library default)
-  // uses a dense tensor for smaller images and blosc2 for larger ones; blosc2
-  // trades speed for lower RAM, tensor the other way around. Only applies to
-  // local sessions; a remote server decides this server-side.
-  auto storageBackend = prefs->Get("nnInteractive/interactionsStorage", "auto");
-  if (storageBackend != "blosc2" && storageBackend != "tensor")
-    storageBackend = "auto";
-
-  // The checkpoint is a local folder or managed by nnInteractive's model
-  // management, which downloads it if needed and works offline once it has.
-  // An empty checkpoint means the library's recommended default.
-  const auto result = worker.Call("nninteractive_worker.start_local", {
-    { "device", deviceSelection.Device },
-    { "model_source", modelSource },
-    { "local_model_path", localModelPath },
-    { "model_checkpoint", prefs->Get("nnInteractive/modelCheckpoint", "") },
-    { "use_torch_compile", useTorchCompile },
-    { "do_autozoom", m_Impl->AutoZoom },
-    { "interactions_storage", storageBackend }
-  }, {}, m_Impl->StartHook);
-
-  if (const auto error = result.value("error", std::string()); !error.empty())
-    mitkThrow() << error;
-
-  m_Impl->SetCapabilities(result["capabilities"]);
-  m_Impl->SessionStarted = true;
-  m_Impl->SetBackend(deviceSelection.SelectedBackend);
-
-  try
-  {
-    this->BindSessionImageAndTargetBuffer();
-  }
-  catch (...)
-  {
-    this->EndSession();
-    throw;
-  }
-}
-
-void mitk::nnInteractiveTool::BindSessionImageAndTargetBuffer()
-{
-  auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
-
-  const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
-  const auto timeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-
-  auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
-
-  // The worker keeps its own mapping of the image, so this copy can go once
-  // the session has it.
-  const auto imageSegment = SharedBuffer::CopyOf(imageAtTimeStep);
-
-  m_Impl->TargetBuffer = nullptr;
-  m_Impl->TargetSegment = std::make_unique<SharedBuffer>(MultiLabelSegmentation::GetPixelType(), imageSegment->GetShape());
-  m_Impl->TargetBuffer = m_Impl->TargetSegment->AsImage(*imageAtTimeStep->GetTimeGeometry());
-
-  const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
-
-  m_Impl->Worker->Call("nninteractive_worker.set_image",
-    { { "spacing", { spacing[2], spacing[1], spacing[0] } } },
-    { { "image", imageSegment.get() }, { "target", m_Impl->TargetSegment.get() } },
-    m_Impl->StartHook);
-
-  // Pin the session to the time steps that were active when it was started.
-  // OnTimePointChanged() ends the session if either changes, since the Python
-  // model is bound to a single 3D slice.
-  m_Impl->SessionReferenceDataTimeStep = timeStep;
-
-  const auto* workingSeg = this->GetTargetSegmentation();
-  m_Impl->SessionWorkingDataTimeStep = workingSeg != nullptr
-    ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
-    : 0;
-
-  // A fresh session has nothing to undo (set_image resets the session's undo
-  // state); keep the tool's record in sync.
-  m_Impl->ClearLastInteraction();
-  m_Impl->UndoRefreshPending = false;
+      if (m_Impl->TimePointChangedMeanwhile)
+      {
+        m_Impl->TimePointChangedMeanwhile = false;
+        this->OnTimePointChanged();
+      }
+    });
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -1043,22 +1222,65 @@ bool mitk::nnInteractiveTool::HandleSessionError(const Exception& error)
 
 void mitk::nnInteractiveTool::AbortSession()
 {
-  if (m_Impl->Starting)
+  // A start or a prompt still uses the worker. They end the session once they
+  // have stopped, see StartSession() and UpdateCleanUp().
+  if (m_Impl->Starting || this->IsUpdating())
   {
     m_Impl->AbortRequested = true;
     return;
   }
 
-  this->DisableInteractor();
+  this->TearDownSession();
+}
 
-  // End the dead session first so ResetInteractions() below skips the remote
-  // session.reset_interactions() call (guarded by IsSessionRunning()).
+void mitk::nnInteractiveTool::TearDownSession()
+{
+  m_Impl->AbortRequested = false;
+  m_Impl->TimePointChangedMeanwhile = false;
+
+  this->DisableInteractor();
   this->EndSession();
 
-  this->ResetInteractions();
+  // Not ResetInteractions(), which updates the preview of a tool that may have
+  // been deactivated meanwhile.
+  m_Impl->ClearInteractions();
   this->ResetPreviewContent();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::nnInteractiveTool::UpdatePrepare()
+{
+  Superclass::UpdatePrepare();
+
+  // The session takes one prompt at a time. A prompt made in the views while
+  // this one computes would be shown but never reach the session.
+  for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    interactor->SetInputSuspended(true);
+}
+
+void mitk::nnInteractiveTool::UpdateCleanUp()
+{
+  for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    interactor->SetInputSuspended(false);
+
+  // Posted, as the update has not ended yet. Through AbortSession(), which
+  // checks again: a prompt can start before the posted call runs, and then
+  // the teardown follows that one.
+  if (m_Impl->AbortRequested)
+  {
+    this->PostToGUIThread([this]() { this->AbortSession(); });
+  }
+  else if (m_Impl->TimePointChangedMeanwhile)
+  {
+    m_Impl->TimePointChangedMeanwhile = false;
+    this->PostToGUIThread([this]() { this->OnTimePointChanged(); });
+  }
+}
+
+bool mitk::nnInteractiveTool::IsCancelable() const
+{
+  return true;
 }
 
 void mitk::nnInteractiveTool::OnTimePointChanged()
@@ -1068,10 +1290,10 @@ void mitk::nnInteractiveTool::OnTimePointChanged()
   // nothing to reconcile, and DoUpdatePreview() short-circuits without a
   // session, so we deliberately do not call the base class handler (which
   // would invoke UpdatePreview against a stale binding). A session that is
-  // being started is reconciled once StartSession() has finished.
-  if (m_Impl->Starting)
+  // being started or computes a prompt is reconciled once that has ended.
+  if (m_Impl->Starting || this->IsUpdating())
   {
-    m_Impl->TimePointChangedWhileStarting = true;
+    m_Impl->TimePointChangedMeanwhile = true;
     return;
   }
 
@@ -1111,23 +1333,28 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
   return m_Impl->Worker != nullptr && m_Impl->SessionStarted;
 }
 
+bool mitk::nnInteractiveTool::IsSessionStarting() const
+{
+  return m_Impl->Starting;
+}
+
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
 {
   this->Worker->Call("nninteractive_worker.set_autozoom", { { "enabled", this->AutoZoom } });
 }
 
-void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetPointParams(const Point3D& point, const Image* inputAtTimeStep) const
 {
   itk::Index<3> index;
   inputAtTimeStep->GetGeometry()->WorldToIndex(point, index);
 
-  this->Worker->Call("nninteractive_worker.add_point", {
+  return {
     { "coordinates", { index[2], index[1], index[0] } },
     { "include", this->PromptType == PromptType::Positive }
-  });
+  };
 }
 
-void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetBoxParams(const PlanarFigure* box, const Image* inputAtTimeStep) const
 {
   const auto* geometry = inputAtTimeStep->GetGeometry();
 
@@ -1144,37 +1371,20 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
     bbox.push_back({ std::min(indices[0][i], indices[1][i]), std::max(indices[0][i], indices[1][i]) + 1 });
   }
 
-  this->Worker->Call("nninteractive_worker.add_bbox", {
+  return {
     { "bbox", bbox },
     { "include", this->PromptType == PromptType::Positive }
-  });
+  };
 }
 
-void mitk::nnInteractiveTool::Impl::AddMaskInteraction(const std::string& method, const Image* mask, const InteractionBoundingBox* boundingBox) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetMaskParams(const InteractionBoundingBox* boundingBox) const
 {
-  const auto maskSegment = SharedBuffer::CopyOf(mask);
-
   nlohmann::json params = { { "include", this->PromptType == PromptType::Positive } };
 
   if (boundingBox != nullptr)
     params["bbox"] = ToJson(*boundingBox);
 
-  this->Worker->Call("nninteractive_worker." + method, params, { { "mask", maskSegment.get() } });
-}
-
-void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const
-{
-  const auto maskTimeStep = this->InitialSeg->GetTimeSteps() > 1
-    ? this->SessionWorkingDataTimeStep
-    : 0;
-
-  const auto maskSegment = SharedBuffer::CopyOf(this->InitialSeg, maskTimeStep);
-
-  this->Worker->Call("nninteractive_worker.add_initial_seg",
-    { { "run_prediction", this->AutoRefine } },
-    { { "mask", maskSegment.get() } });
-
-  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), this->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
+  return params;
 }
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const

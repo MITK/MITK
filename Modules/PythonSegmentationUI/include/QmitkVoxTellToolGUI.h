@@ -22,11 +22,15 @@ found in the LICENSE file.
 
 #include <MitkPythonSegmentationUIExports.h>
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <QString>
 
-class QString;
+#include <exception>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace Ui
 {
@@ -73,6 +77,10 @@ protected:
    */
   void EnableWidgets(bool enabled) override;
 
+  /** \brief Shows the result of a run that this GUI started once the tool is
+   *         no longer busy, or the outcome of its auto-confirmation. */
+  void BusyStateChanged(bool isBusy) override;
+
 private:
   mitk::VoxTellTool* GetTool();
 
@@ -87,10 +95,13 @@ private:
 
   /** \brief Downloads the files the model needs, then loads the model.
    *
-   * The download shows a progress notification. Loading blocks the
-   * application, so a message says so first.
+   * The download shows a progress notification, and so does loading, which
+   * ends after this function has returned.
    */
   void LoadModel();
+
+  /** \brief Tells why the initialization failed, unless the user cancelled it, and restores the controls. */
+  void OnInitializationFailed(std::exception_ptr error, bool cancelled);
 
   /** \brief Restores the controls after an initialization that did not finish. */
   void OnInitializationAborted();
@@ -106,12 +117,24 @@ private:
   /** \brief Makes prompts that VoxTell does not know known with its text encoder.
    *
    * Downloads the text encoder if needed, then loads it after a message, since
-   * that blocks the application.
+   * that can take a minute.
    *
-   * \return \c false if that failed, was cancelled, or this GUI was deleted
-   *         meanwhile, in which case the caller must not touch it.
+   * \param prompts The prompts that VoxTell does not know yet.
+   * \param then Runs once the prompts are known, which can be after this
+   *        function has returned. Not if that failed, was cancelled, or this
+   *        GUI was deleted meanwhile.
    */
-  bool EmbedUnknownPrompts(const std::vector<std::string>& prompts);
+  void EmbedUnknownPrompts(const std::vector<std::string>& prompts, std::function<void()> then);
+
+  /** \brief Segments the prompts; BusyStateChanged() shows the result. */
+  void StartRun(const std::vector<std::string>& prompts);
+
+  /** \brief Shows the result of the run, and confirms it if the user chose auto-confirm. */
+  void ShowRunResult();
+
+  /** \brief Applies settings that changed during the run, notices a stopped
+   *         worker, and prepares the prompts for the next run. */
+  void PrepareNextRun();
 
   /** \brief Brings the controls into the state of a model that is loaded. */
   void OnModelLoaded();
@@ -160,6 +183,13 @@ private:
 
   /** Whether settings that the loaded model depends on changed while it was in use. */
   bool m_SettingsChanged = false;
+
+  /** Whether a run that this GUI started has not ended yet. */
+  bool m_RunPending = false;
+
+  /** The status to show once an auto-confirmation that has to update the
+      preview first has ended. */
+  std::optional<std::pair<QString, QmitkInfoCard::Severity>> m_PendingConfirmationStatus;
 };
 
 #endif

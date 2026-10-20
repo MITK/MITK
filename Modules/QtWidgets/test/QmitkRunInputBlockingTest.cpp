@@ -86,6 +86,7 @@ class QmitkRunInputBlockingTestSuite : public mitk::TestFixture
   MITK_TEST(WindowTheOperationRunsBehind_GetsNoInput_Success);
   MITK_TEST(OperationStartedWhileAnotherRuns_IsIgnored_Success);
   MITK_TEST(ProgressCardTheOperationPutsUp_StaysClickable_Success);
+  MITK_TEST(WaitForTheOperation_IsReported_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -166,6 +167,28 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("A second operation must not start while one is running",
                            !nestedRan);
+  }
+
+  void WaitForTheOperation_IsReported_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("No wait before the operation", !QmitkIsWaitingForBlockingTask());
+
+    auto ran = false;
+    auto waiting = false;
+
+    // From the event loop the call keeps turning, where the results of other
+    // work arrive that have to wait for the operation.
+    QTimer::singleShot(0, qApp, [&ran, &waiting]()
+      {
+        ran = true;
+        waiting = QmitkIsWaitingForBlockingTask();
+      });
+
+    QmitkRunWithInputBlocked([]() { QThread::msleep(200); });
+
+    CPPUNIT_ASSERT_MESSAGE("The timer has to have fired during the operation", ran);
+    CPPUNIT_ASSERT_MESSAGE("The wait has to be reported during the operation", waiting);
+    CPPUNIT_ASSERT_MESSAGE("No wait after the operation", !QmitkIsWaitingForBlockingTask());
   }
 
   void ProgressCardTheOperationPutsUp_StaysClickable_Success()

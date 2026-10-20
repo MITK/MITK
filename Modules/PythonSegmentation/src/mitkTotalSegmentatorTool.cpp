@@ -24,8 +24,8 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkSharedBuffer.h>
 
-#include "mitkInitializationHook.h"
 #include "mitkPythonWorkerModules.h"
+#include "mitkStopHook.h"
 
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -34,6 +34,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 
 namespace mitk
 {
@@ -114,10 +115,16 @@ public:
   std::vector<std::string> RoiSubset;
   std::string LastErrorMessage;
   bool LastRunSucceeded = false;
-  bool AbortRequested = false;
 
-  // Initialize() processes events, during which the tool may be deactivated or
-  // asked to start again.
+  // A failed, cancelled or aborted run of one time step ends the update, which
+  // runs once per time step for all of them.
+  bool RunFailed = false;
+
+  // Read by the work off the GUI thread, which it stops.
+  std::atomic<bool> AbortRequested = false;
+
+  // The start runs off the GUI thread, during which the tool may be
+  // deactivated or asked to start again.
   bool Initializing = false;
 };
 
@@ -152,7 +159,12 @@ mitk::TotalSegmentatorTool::TotalSegmentatorTool()
   this->RequiresReferenceGeometryOn();
 }
 
-mitk::TotalSegmentatorTool::~TotalSegmentatorTool() = default;
+mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
+{
+  // The work uses the worker.
+  m_Impl->AbortRequested = true;
+  this->WaitForWorkOffGUIThread();
+}
 
 void mitk::TotalSegmentatorTool::Activated()
 {
@@ -163,7 +175,7 @@ void mitk::TotalSegmentatorTool::Activated()
 
 void mitk::TotalSegmentatorTool::Deactivated()
 {
-  // The worker cannot be destroyed while a call of it is on the stack. The
+  // The worker cannot be destroyed while work off the GUI thread uses it. The
   // progress hook ends it at once, see DoUpdatePreview() and Initialize().
   if (this->IsUpdating() || m_Impl->Initializing)
     m_Impl->AbortRequested = true;
@@ -214,84 +226,135 @@ mitk::PythonWorker& mitk::TotalSegmentatorTool::GetWorker()
   return *m_Impl->Worker;
 }
 
-void mitk::TotalSegmentatorTool::Initialize(ProgressTask* task)
+void mitk::TotalSegmentatorTool::Initialize(std::shared_ptr<ProgressTask> task)
 {
-  if (this->IsInitialized())
+  if (this->IsInitialized() || m_Impl->Initializing)
     return;
 
-  if (m_Impl->Initializing)
-    mitkThrow() << "TotalSegmentator is starting already.";
+  PythonWorker* worker = nullptr;
+
+  try
+  {
+    worker = &this->GetWorker();
+  }
+  catch (const Exception& e)
+  {
+    this->InitializationFailedEvent.Send(Description(e));
+    return;
+  }
 
   m_Impl->Initializing = true;
   m_Impl->AbortRequested = false;
 
-  try
-  {
-    const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
-    auto& worker = this->GetWorker();
+  const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
+  auto info = std::make_shared<nlohmann::json>();
 
-    const auto version = worker.Call("totalsegmentator_worker.version", {}, {}, progress);
+  // No other work runs off the GUI thread here: a run needs an initialized
+  // tool, and a second start returns above.
+  this->RunOffGUIThread(
+    [worker, progress, info]() {
+      const auto version = worker->Call("totalsegmentator_worker.version", {}, {}, progress);
 
-    if (!version.is_string() || version.get<std::string>() != TotalSegmentator::REQUIRED_VERSION)
-    {
-      mitkThrow() << "TotalSegmentator " << (version.is_string() ? version.get<std::string>() : std::string("of an unknown release"))
-                  << " is installed, but MITK needs " << TotalSegmentator::REQUIRED_VERSION
-                  << ". Uninstall it in the settings of TotalSegmentator and install it again.";
-    }
+      if (!version.is_string() || version.get<std::string>() != TotalSegmentator::REQUIRED_VERSION)
+      {
+        mitkThrow() << "TotalSegmentator " << (version.is_string() ? version.get<std::string>() : std::string("of an unknown release"))
+                    << " is installed, but MITK needs " << TotalSegmentator::REQUIRED_VERSION
+                    << ". Uninstall it in the settings of TotalSegmentator and install it again.";
+      }
 
-    const auto info = worker.Call("totalsegmentator_worker.info", {}, {}, progress);
-    std::vector<TaskInfo> tasks;
-
-    for (const auto& json : info.at("tasks"))
-      tasks.push_back(ParseTask(json));
-
-    std::stable_sort(tasks.begin(), tasks.end(), [](const TaskInfo& a, const TaskInfo& b) {
-      return GetSortRank(a) != GetSortRank(b) ? GetSortRank(a) < GetSortRank(b) : a.Name < b.Name;
+      *info = worker->Call("totalsegmentator_worker.info", {}, {}, progress);
+    },
+    [this, task, info](std::exception_ptr error) {
+      this->EndInitialization(error, *info, task.get());
     });
-
-    m_Impl->Tasks = std::move(tasks);
-    m_Impl->Initializing = false;
-
-    // The task chosen before the start may not exist in this release.
-    if (const auto* current = this->FindTask(m_Impl->Task); current == nullptr || !current->HasSpeed(m_Impl->TaskSpeed))
-    {
-      m_Impl->Task = this->FindTask("total") != nullptr || m_Impl->Tasks.empty() ? std::string("total") : m_Impl->Tasks.front().Name;
-      m_Impl->TaskSpeed = Speed::Standard;
-      m_Impl->RoiSubset.clear();
-    }
-
-    // Deactivated meanwhile: the tasks stay known, the worker goes.
-    if (m_Impl->AbortRequested)
-    {
-      m_Impl->AbortRequested = false;
-      m_Impl->Worker.reset();
-    }
-
-    this->InitializedEvent.Send();
-  }
-  catch (const PythonWorkerError& e)
-  {
-    MITK_ERROR << "TotalSegmentator: " << e.GetTraceback();
-    this->EndFailedInitialization();
-    mitkThrow() << "TotalSegmentator does not start: " << Description(e);
-  }
-  catch (...)
-  {
-    this->EndFailedInitialization();
-    throw;
-  }
 }
 
-void mitk::TotalSegmentatorTool::EndFailedInitialization()
+void mitk::TotalSegmentatorTool::EndInitialization(std::exception_ptr error, const nlohmann::json& info, const ProgressTask* task)
 {
-  m_Impl->Worker.reset();
   m_Impl->Initializing = false;
-  m_Impl->AbortRequested = false;
+
+  // Deactivated meanwhile: the worker goes.
+  const bool aborted = m_Impl->AbortRequested.exchange(false);
+
+  std::vector<TaskInfo> tasks;
+
+  // A reply of another form than expected is a failed start like any other.
+  if (error == nullptr)
+  {
+    try
+    {
+      for (const auto& json : info.at("tasks"))
+        tasks.push_back(ParseTask(json));
+    }
+    catch (...)
+    {
+      error = std::current_exception();
+    }
+  }
+
+  if (error != nullptr)
+  {
+    m_Impl->Worker.reset();
+
+    std::string message;
+
+    try
+    {
+      std::rethrow_exception(error);
+    }
+    catch (const PythonWorkerError& e)
+    {
+      MITK_ERROR << "TotalSegmentator: " << e.GetTraceback();
+      message = "TotalSegmentator does not start: " + Description(e);
+    }
+    catch (const Exception& e)
+    {
+      message = Description(e);
+    }
+    catch (const std::exception& e)
+    {
+      message = e.what();
+    }
+
+    // The user stopped it: nothing to report.
+    if (aborted || (task != nullptr && task->IsCancelRequested()))
+      message.clear();
+    else
+      MITK_ERROR << message;
+
+    this->InitializationFailedEvent.Send(message);
+    return;
+  }
+
+  std::stable_sort(tasks.begin(), tasks.end(), [](const TaskInfo& a, const TaskInfo& b) {
+    return GetSortRank(a) != GetSortRank(b) ? GetSortRank(a) < GetSortRank(b) : a.Name < b.Name;
+  });
+
+  m_Impl->Tasks = std::move(tasks);
+
+  // The task chosen before the start may not exist in this release.
+  if (const auto* current = this->FindTask(m_Impl->Task); current == nullptr || !current->HasSpeed(m_Impl->TaskSpeed))
+  {
+    m_Impl->Task = this->FindTask("total") != nullptr || m_Impl->Tasks.empty() ? std::string("total") : m_Impl->Tasks.front().Name;
+    m_Impl->TaskSpeed = Speed::Standard;
+    m_Impl->RoiSubset.clear();
+  }
+
+  // The tasks stay known, the worker of a deactivated tool goes.
+  if (aborted)
+    m_Impl->Worker.reset();
+
+  this->InitializedEvent.Send();
 }
 
 bool mitk::TotalSegmentatorTool::IsInitialized() const
 {
   return !m_Impl->Tasks.empty();
+}
+
+bool mitk::TotalSegmentatorTool::IsInitializing() const
+{
+  return m_Impl->Initializing;
 }
 
 void mitk::TotalSegmentatorTool::Uninitialize()
@@ -398,6 +461,8 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   m_Impl->AbortRequested = false;
+  m_Impl->RunFailed = false;
+  m_Impl->LastErrorMessage.clear();
   this->RemoveAllPreviewLabels();
 }
 
@@ -407,36 +472,16 @@ void mitk::TotalSegmentatorTool::ConfirmCleanUp()
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::TotalSegmentatorTool::DownloadMissingWeights(ProgressTask* task)
-{
-  const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
-  auto& worker = this->GetWorker();
-
-  const auto missing = worker.Call("totalsegmentator_worker.missing_weights",
-    { { "task", m_Impl->Task }, { "speed", ToString(m_Impl->TaskSpeed) } }, {}, progress).get<std::vector<int>>();
-
-  for (std::size_t i = 0; i < missing.size(); ++i)
-  {
-    if (task != nullptr)
-    {
-      task->SetName(missing.size() > 1
-        ? "TotalSegmentator: downloading model weights (" + std::to_string(i + 1) + " of " + std::to_string(missing.size()) + ")"
-        : std::string("TotalSegmentator: downloading model weights"));
-    }
-
-    worker.Call("totalsegmentator_worker.download_weights", { { "task_id", missing[i] } }, {}, progress);
-  }
-
-  if (task != nullptr)
-    task->SetName(this->GetName());
-}
-
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  const Image * /*oldSegAtTimeStep*/,
                                                  MultiLabelSegmentation *previewImage,
                                                  TimeStepType timeStep)
 {
-  m_Impl->LastErrorMessage.clear();
+  // The failure stays what the GUI reports, and no worker starts again only to
+  // be stopped.
+  if (m_Impl->RunFailed)
+    return;
+
   m_Impl->LastRunSucceeded = false;
   auto* task = m_ProgressCommand->GetProgressTask();
 
@@ -445,62 +490,137 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   // failure locally and record it; the GUI shows that in its status.
   try
   {
-    this->Initialize(task);
+    if (!this->IsInitialized())
+      mitkThrow() << "TotalSegmentator has not started yet.";
 
     if (this->FindTask(m_Impl->Task)->Licensed && !HasLicense())
       mitkThrow() << "The TotalSegmentator task \"" << m_Impl->Task << "\" requires a license. Set it in the settings of TotalSegmentator.";
 
-    this->DownloadMissingWeights(task);
+    auto* worker = &this->GetWorker();
 
-    auto& worker = this->GetWorker();
+    std::shared_ptr<SharedBuffer> imageBuffer = SharedBuffer::CopyOf(inputAtTimeStep);
+    auto labelBuffer = std::make_shared<SharedBuffer>(MakeScalarPixelType<Label::PixelType>(), imageBuffer->GetShape());
+    const auto labelImage = labelBuffer->AsImage(*inputAtTimeStep->GetTimeGeometry());
 
-    const auto imageBuffer = SharedBuffer::CopyOf(inputAtTimeStep);
-    SharedBuffer labelBuffer(MakeScalarPixelType<Label::PixelType>(), imageBuffer->GetShape());
+    const auto taskName = m_Impl->Task;
+    const auto speed = ToString(m_Impl->TaskSpeed);
 
-    // TotalSegmentator reports no progress. The hook processes events every
-    // 100 ms, and a cancellation or a deactivation ends the worker at once.
-    const auto progress = MakeInitializationHook(this, task, [this]() { return m_Impl->AbortRequested; });
+    const nlohmann::json segmentParams = {
+      { "index_to_world", GetIndexToWorld(inputAtTimeStep->GetGeometry()) },
+      { "task", taskName },
+      { "speed", speed },
+      { "roi_subset", m_Impl->RoiSubset },
+      { "device", GetDevice() }
+    };
 
-    const auto classes = worker.Call("totalsegmentator_worker.segment",
-      {
-        { "index_to_world", GetIndexToWorld(inputAtTimeStep->GetGeometry()) },
-        { "task", m_Impl->Task },
-        { "speed", ToString(m_Impl->TaskSpeed) },
-        { "roi_subset", m_Impl->RoiSubset },
-        { "device", GetDevice() }
+    // TotalSegmentator reports no progress. A cancellation or a deactivation
+    // ends the worker at once.
+    const auto progress = MakeStopHook(this, task, [this]() { return m_Impl->AbortRequested.load(); });
+    auto classes = std::make_shared<nlohmann::json>();
+
+    // Held for the result, as the tool can be deactivated meanwhile.
+    const MultiLabelSegmentation::Pointer preview = previewImage;
+
+    this->RunOffGUIThread(
+      [this, worker, progress, imageBuffer, labelBuffer, classes, taskName, speed, segmentParams]() {
+        const auto missing = worker->Call("totalsegmentator_worker.missing_weights",
+          { { "task", taskName }, { "speed", speed } }, {}, progress).get<std::vector<int>>();
+
+        for (std::size_t i = 0; i < missing.size(); ++i)
+        {
+          const auto phase = missing.size() > 1
+            ? "TotalSegmentator: downloading model weights (" + std::to_string(i + 1) + " of " + std::to_string(missing.size()) + ")"
+            : std::string("TotalSegmentator: downloading model weights");
+
+          this->PostToGUIThread([this, phase]() {
+            if (auto* updateTask = m_ProgressCommand->GetProgressTask(); updateTask != nullptr)
+              updateTask->SetName(phase);
+          });
+
+          worker->Call("totalsegmentator_worker.download_weights", { { "task_id", missing[i] } }, {}, progress);
+        }
+
+        if (!missing.empty())
+        {
+          this->PostToGUIThread([this]() {
+            if (auto* updateTask = m_ProgressCommand->GetProgressTask(); updateTask != nullptr)
+              updateTask->SetName(this->GetName());
+          });
+        }
+
+        *classes = worker->Call("totalsegmentator_worker.segment", segmentParams,
+          { { "image", imageBuffer.get() }, { "labels", labelBuffer.get() } }, progress);
       },
-      { { "image", imageBuffer.get() }, { "labels", &labelBuffer } },
-      progress);
+      [this, task, preview, labelImage, classes, timeStep](std::exception_ptr error) {
+        if (error != nullptr)
+        {
+          this->EndFailedRun(error, task);
+          return;
+        }
 
-    auto lookupTable = LookupTable::New();
-    lookupTable->SetType(LookupTable::LookupTableType::MULTILABEL);
+        // A reply of another form than expected fails the run like any other
+        // failure, which removes the labels added so far.
+        try
+        {
+          auto lookupTable = LookupTable::New();
+          lookupTable->SetType(LookupTable::LookupTableType::MULTILABEL);
 
-    for (const auto& [index, name] : classes.items())
-    {
-      const auto value = static_cast<Label::PixelType>(std::stoi(index));
-      auto label = Label::New(value, name.get<std::string>());
+          for (const auto& [index, name] : classes->items())
+          {
+            const auto value = static_cast<Label::PixelType>(std::stoi(index));
 
-      std::array<double, 3> lookupTableColor;
-      lookupTable->GetColor(value, lookupTableColor.data());
+            // Added by an earlier time step of the same update.
+            if (preview->ExistLabel(value))
+              continue;
 
-      Color color;
-      color.SetRed(lookupTableColor[0]);
-      color.SetGreen(lookupTableColor[1]);
-      color.SetBlue(lookupTableColor[2]);
-      label->SetColor(color);
+            auto label = Label::New(value, name.get<std::string>());
 
-      previewImage->AddLabel(label, previewImage->GetActiveLayer(), false);
-    }
+            std::array<double, 3> lookupTableColor;
+            lookupTable->GetColor(value, lookupTableColor.data());
 
-    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), labelBuffer.AsImage(*inputAtTimeStep->GetTimeGeometry()), timeStep);
-    m_Impl->LastRunSucceeded = true;
+            Color color;
+            color.SetRed(lookupTableColor[0]);
+            color.SetGreen(lookupTableColor[1]);
+            color.SetBlue(lookupTableColor[2]);
+            label->SetColor(color);
+
+            preview->AddLabel(label, preview->GetActiveLayer(), false);
+          }
+
+          preview->UpdateGroupImage(preview->GetActiveLayer(), labelImage, timeStep);
+        }
+        catch (...)
+        {
+          this->EndFailedRun(std::current_exception(), task);
+          return;
+        }
+
+        m_Impl->LastRunSucceeded = true;
+
+        // Deactivated after the run had ended.
+        if (m_Impl->AbortRequested)
+          m_Impl->Worker.reset();
+      });
+  }
+  catch (...)
+  {
+    this->EndFailedRun(std::current_exception(), task);
+  }
+}
+
+void mitk::TotalSegmentatorTool::EndFailedRun(std::exception_ptr error, const ProgressTask* task)
+{
+  // Leave no half-populated preview behind: an empty preview is how the GUI
+  // tells a failure apart from a successful run.
+  this->RemoveAllPreviewLabels();
+  m_Impl->RunFailed = true;
+
+  try
+  {
+    std::rethrow_exception(error);
   }
   catch (const Exception& e)
   {
-    // Leave no half-populated preview behind: an empty preview is how the GUI
-    // tells a failure apart from a successful run.
-    this->RemoveAllPreviewLabels();
-
     // A cancellation ends the worker, which may not tell yet that it is gone,
     // and a failure may have left it in a state not worth keeping.
     m_Impl->Worker.reset();
@@ -509,8 +629,8 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     if (m_Impl->AbortRequested || (task != nullptr && task->IsCancelRequested()))
       return;
 
-    if (const auto* error = dynamic_cast<const PythonWorkerError*>(&e))
-      MITK_ERROR << "TotalSegmentator: " << error->GetTraceback();
+    if (const auto* workerError = dynamic_cast<const PythonWorkerError*>(&e))
+      MITK_ERROR << "TotalSegmentator: " << workerError->GetTraceback();
     else
       MITK_ERROR << "TotalSegmentator: " << Description(e);
 
@@ -518,7 +638,6 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
   catch (const std::exception& e)
   {
-    this->RemoveAllPreviewLabels();
     m_Impl->LastErrorMessage = e.what();
   }
 }

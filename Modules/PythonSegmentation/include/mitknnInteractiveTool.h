@@ -16,6 +16,9 @@ found in the LICENSE file.
 #include <mitkSegWithPreviewTool.h>
 #include <mitknnInteractiveEnums.h>
 
+#include <exception>
+#include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
@@ -86,7 +89,8 @@ namespace mitk
       enum class Cause
       {
         RemoteConnection, /**< \brief The lease expired, or the server is at capacity or unreachable. */
-        WorkerExited      /**< \brief The worker process that hosted the session ended unexpectedly. */
+        WorkerExited,     /**< \brief The worker process that hosted the session ended unexpectedly. */
+        Cancelled         /**< \brief The user cancelled a prompt, which ended the worker process of the session. */
       };
 
       Cause Reason;
@@ -116,6 +120,10 @@ namespace mitk
      * Python session. Emits DeactivatedEvent at the end so observers can
      * run cleanup that must not happen from the destructor path (e.g.
      * removing unused auto-created labels in the GUI).
+     *
+     * While a prompt computes, the session ends only once the prompt has
+     * stopped, after DeactivatedEvent. While StartSession() runs, the start
+     * ends itself, and DeactivatedEvent is not emitted.
      *
      * \sa DeactivatedEvent
      */
@@ -328,22 +336,24 @@ namespace mitk
      *
      * If a session is already running, it is ended first.
      *
-     * Events are processed while the worker downloads and loads, so the
-     * application stays responsive. A deactivation of the tool or an
-     * AbortSession() meanwhile ends the start, and so does cancelling \p task,
-     * which kills the worker right away.
+     * The worker downloads and loads off the GUI thread, so this returns before
+     * the session has started. A deactivation of the tool or an AbortSession()
+     * meanwhile ends the start, and so does cancelling \p task, which kills the
+     * worker right away.
      *
-     * \param[in] task A cancelable task the user sees, or \c nullptr.
+     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * \param[in] done Receives null once the session runs, or a mitk::Exception
+     *            if the session setup fails (local or remote), was cancelled or
+     *            was aborted. Runs on the GUI thread, before this returns if
+     *            the start fails right away, e.g. while the tool is busy or
+     *            no server is configured.
      *
      * \pre nnInteractive must be installed in the virtual environment.
      * \pre A reference image must be available through the ToolManager.
      *
-     * \throw mitk::Exception if the session setup fails (local or remote), was
-     *        cancelled or was aborted.
-     *
      * \sa EndSession(), IsSessionRunning(), IsRemoteSession()
      */
-    void StartSession(ProgressTask* task = nullptr);
+    void StartSession(std::shared_ptr<ProgressTask> task, std::function<void(std::exception_ptr error)> done);
 
     /** \brief Ends the current nnInteractive inference session.
      *
@@ -364,8 +374,8 @@ namespace mitk
      * revert its session-dependent controls so the user only has to click
      * Initialize to start over.
      *
-     * While StartSession() runs, this only asks it to stop; StartSession() then
-     * tears down what it set up.
+     * While StartSession() runs or a prompt computes, this only asks them to
+     * stop. The teardown follows once they have.
      *
      * \warning Must be called from a clean call stack (e.g. deferred from the
      *          GUI), never from within an interactor's event handling, because
@@ -381,6 +391,15 @@ namespace mitk
      * ended, so that AbortSession() can clean up.
      */
     bool IsSessionRunning() const;
+
+    /** \brief Returns whether StartSession() has not ended yet.
+     *
+     * AbortSession() meanwhile ends the start once its work has stopped.
+     */
+    bool IsSessionStarting() const;
+
+    /** \brief Tells that a prompt can be cancelled, which ends the session. */
+    bool IsCancelable() const override;
 
     /** \brief Returns whether the running session is a remote (server) session.
      *
@@ -442,9 +461,10 @@ namespace mitk
 
     /** \brief Event triggered after the preview has been updated from a user interaction.
      *
-     * Emitted at the end of DoUpdatePreview() when the update was driven by
-     * an enabled interactor (i.e., the user placed a point/box/scribble/lasso)
-     * and the prediction result has been written to the preview image.
+     * Emitted on the GUI thread once the prediction of an update driven by an
+     * enabled interactor (i.e., the user placed a point/box/scribble/lasso) has
+     * been written to the preview image. That is after DoUpdatePreview() has
+     * returned, as the prediction runs off the GUI thread.
      *
      * Not emitted for initial-mask-based updates or reset operations.
      */
@@ -453,7 +473,8 @@ namespace mitk
     /** \brief Event triggered at the end of Deactivated().
      *
      * Emitted after the tool has released interactors and ended its Python
-     * session. GUI code can subscribe to run teardown logic that must happen
+     * session, or before the session ends if a prompt still computes (see
+     * Deactivated()). GUI code can subscribe to run teardown logic that must happen
      * on a proper user-initiated deactivation (as opposed to the GUI's Qt
      * destructor, which may run during application shutdown when observers
      * and widgets are in a partially-destructed state).
@@ -464,7 +485,7 @@ namespace mitk
      *
      * Emitted from EndSession() after the session has been torn down.
      * Fires both on a normal Deactivated() (in which case DeactivatedEvent
-     * follows) and when the session is auto-ended because the current image
+     * follows, or precedes it if a prompt still computed) and when the session is auto-ended because the current image
      * or segmentation time step changed during a 4D session. GUI code can
      * subscribe to revert session-dependent UI controls to their pre-init
      * state.
@@ -475,7 +496,8 @@ namespace mitk
      *
      * Emitted while the (now dead) session is still nominally running, when an
      * operation failed because the remote lease expired, the server is at
-     * capacity or unreachable, or the worker process ended. Teardown has NOT
+     * capacity or unreachable, the worker process ended, or the user cancelled
+     * a prompt, which ends the worker process as well. Teardown has NOT
      * happened yet: the GUI must defer it, calling AbortSession() on the next
      * event-loop tick (teardown must not run inside an interactor's event
      * handling), which then ends the session and fires SessionEndedEvent. Do
@@ -508,7 +530,8 @@ namespace mitk
     /** \brief Updates the preview segmentation based on the latest interaction.
      *
      * Dispatches the latest interaction data to the nnInteractive Python
-     * model and writes the prediction result into the preview image.
+     * model and writes the prediction result into the preview image. The model
+     * predicts off the GUI thread.
      *
      * \param[in] inputAtTimeStep The input image at the current time step.
      * \param[in] oldSegAtTimeStep The previous segmentation at the current
@@ -557,35 +580,32 @@ namespace mitk
      */
     void SetPreviewLabel(MultiLabelSegmentation::LabelValueType value, const Color& color);
 
+    /** \brief Suspends the input of the interactors, so a prompt made while
+     *         this one computes is ignored.
+     */
+    void UpdatePrepare() override;
+
+    /** \brief Resumes the input of the interactors, and ends the session
+     *         once a prompt has stopped, if it was asked for meanwhile.
+     *
+     * The tool can be deactivated, the session aborted or the time point
+     * changed while a prompt computes off the GUI thread, which uses the worker.
+     */
+    void UpdateCleanUp() override;
+
   private:
-    /** \brief Constructs a local inference session in the worker process.
+    /** \brief Ends the session and clears the interactions and the preview.
      *
-     * Detects the backend (CUDA/CPU), resolves the model checkpoint, and
-     * instantiates the local nnInteractiveInferenceSession. Called by
-     * StartSession() when inference mode is "local".
+     * Runs through AbortSession() once nothing uses the worker: right away, or
+     * once a prompt that used it has stopped, also for a deactivation of the
+     * tool.
      */
-    void ConstructLocalSession();
+    void TearDownSession();
 
-    /** \brief Constructs a remote inference session against an nninteractive-server.
-     *
-     * Reads the server URL and API key from the preferences and instantiates
-     * nnInteractiveRemoteInferenceSession (which claims a session on the
-     * server). Called by StartSession() when inference mode is "remote".
-     *
-     * \throw mitk::Exception if no server URL is configured or the server
-     *        cannot be reached / is at capacity.
+    /** \brief Reports why a prompt failed: a lost or cancelled session goes to
+     *         SessionLostEvent, any other error is rethrown.
      */
-    void ConstructRemoteSession();
-
-    /** \brief Copies the reference image into shared memory, binds it and the
-     *         shared target buffer to the session, and pins the session to the
-     *         current time step.
-     *
-     * Shared by ConstructLocalSession() and ConstructRemoteSession().
-     * nnInteractive writes each prediction into the target buffer, which is
-     * shared with the worker.
-     */
-    void BindSessionImageAndTargetBuffer();
+    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task);
 
     /** \brief If an error means the session is lost, request teardown and
      *         report it as handled.

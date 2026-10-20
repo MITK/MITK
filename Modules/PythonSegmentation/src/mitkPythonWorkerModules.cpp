@@ -53,3 +53,15 @@ nlohmann::json mitk::GetIndexToWorld(const BaseGeometry* geometry)
 
   return rows;
 }
+
+std::exception_ptr mitk::MakeExceptionPtr(const std::string& message)
+{
+  try
+  {
+    mitkThrow() << message;
+  }
+  catch (...)
+  {
+    return std::current_exception();
+  }
+}

@@ -12,13 +12,80 @@ found in the LICENSE file.
 
 #include <QmitkSegWithPreviewToolGUIBase.h>
 
+#include <QmitkRun.h>
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QSlider>
+#include <QTimer>
 #include <QVBoxLayout>
+
+#include <deque>
+
+namespace
+{
+  // Functions posted while the GUI thread waited for a blocking task, in the
+  // order they were posted. Used on the GUI thread only. Never destroyed, as
+  // what is left at exit may hold objects of libraries unloaded before.
+  std::deque<std::function<void()>>& DeferredFunctions()
+  {
+    static auto* functions = new std::deque<std::function<void()>>;
+    return *functions;
+  }
+
+  void RunDeferredFunctions()
+  {
+    if (QmitkIsWaitingForBlockingTask())
+    {
+      QTimer::singleShot(100, QCoreApplication::instance(), &RunDeferredFunctions);
+      return;
+    }
+
+    auto& deferred = DeferredFunctions();
+
+    while (!deferred.empty())
+    {
+      auto function = std::move(deferred.front());
+      deferred.pop_front();
+      function();
+    }
+  }
+
+  // Not while the GUI thread waits for a blocking task like a save, whose
+  // event loop keeps turning: the end of the work of a tool can change the
+  // segmentation that the task reads. In order, so that the end does not
+  // overtake a progress report of the same work.
+  void RunOrDefer(std::function<void()> function)
+  {
+    auto& deferred = DeferredFunctions();
+
+    if (!QmitkIsWaitingForBlockingTask() && deferred.empty())
+    {
+      function();
+      return;
+    }
+
+    deferred.push_back(std::move(function));
+
+    if (deferred.size() == 1)
+      QTimer::singleShot(100, QCoreApplication::instance(), &RunDeferredFunctions);
+  }
+
+  // Queues a function in the event loop of the application, which runs on the
+  // GUI thread. Callable from any thread.
+  void PostToGUIThread(std::function<void()> function)
+  {
+    if (auto* application = QCoreApplication::instance(); application != nullptr)
+    {
+      QMetaObject::invokeMethod(application, [function = std::move(function)]() mutable {
+        RunOrDefer(std::move(function));
+      }, Qt::QueuedConnection);
+    }
+  }
+}
 
 bool DefaultEnableConfirmSegBtnFunction(bool enabled)
 {
@@ -40,6 +107,8 @@ QmitkSegWithPreviewToolGUIBase::~QmitkSegWithPreviewToolGUIBase()
   {
     m_Tool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
   }
+
+  this->RestoreBusyCursor();
 }
 
 void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
@@ -186,10 +255,13 @@ void QmitkSegWithPreviewToolGUIBase::OnPreviewVisibilityToggled(bool checked)
 void QmitkSegWithPreviewToolGUIBase::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
 {
   oldTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
+  this->RestoreBusyCursor();
 }
 
 void QmitkSegWithPreviewToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
+  newTool->SetGUIThreadPoster(PostToGUIThread);
+
   newTool->CurrentlyBusy +=
     mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
 
@@ -198,7 +270,9 @@ void QmitkSegWithPreviewToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* ne
     m_EnableProcessingOfAllTimeSteps &&
     newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
 
-  this->EnableWidgets(true);
+  // An update of an earlier activation can still be ending. Its end enables
+  // the widgets through BusyStateChanged().
+  this->EnableWidgets(!newTool->IsUpdating());
 }
 
 void QmitkSegWithPreviewToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)
@@ -208,16 +282,26 @@ void QmitkSegWithPreviewToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)
 
 void QmitkSegWithPreviewToolGUIBase::BusyStateChanged(bool isBusy)
 {
-  if (isBusy)
+  if (!isBusy)
+  {
+    this->RestoreBusyCursor();
+  }
+  else if (!m_BusyCursorSet)
   {
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  }
-  else
-  {
-    QApplication::restoreOverrideCursor();
+    m_BusyCursorSet = true;
   }
   this->EnableWidgets(!isBusy);
- }
+}
+
+void QmitkSegWithPreviewToolGUIBase::RestoreBusyCursor()
+{
+  if (!m_BusyCursorSet)
+    return;
+
+  QApplication::restoreOverrideCursor();
+  m_BusyCursorSet = false;
+}
 
 void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
 {

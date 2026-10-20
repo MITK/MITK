@@ -103,6 +103,7 @@ QmitkTotalSegmentatorToolGUI::~QmitkTotalSegmentatorToolGUI()
   if (auto* tool = this->GetTool(); tool != nullptr)
   {
     tool->InitializedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent -= mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
     tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
   }
 
@@ -163,6 +164,7 @@ void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newT
   if (auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(newTool); tool != nullptr)
   {
     tool->InitializedEvent += mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent += mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
     tool->OptionsChangedEvent += mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
   }
 
@@ -174,6 +176,7 @@ void QmitkTotalSegmentatorToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* o
   if (auto* tool = dynamic_cast<mitk::TotalSegmentatorTool*>(oldTool); tool != nullptr)
   {
     tool->InitializedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitialized);
+    tool->InitializationFailedEvent -= mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, std::string>(this, &QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed);
     tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitkTotalSegmentatorToolGUI>(this, &QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged);
   }
 
@@ -223,30 +226,37 @@ void QmitkTotalSegmentatorToolGUI::InitializeTool()
   if (tool == nullptr || tool->IsInitialized())
     return;
 
-  // Initialize() processes events, during which a tool-manager change can
-  // delete this GUI. OnToolInitialized() shows the tasks.
-  QPointer<QmitkTotalSegmentatorToolGUI> self(this);
-  mitk::ProgressTask task("Starting TotalSegmentator", mitk::ProgressTask::Indeterminate, true);
-
-  try
-  {
-    tool->Initialize(&task);
-  }
-  catch (const mitk::Exception& e)
-  {
-    if (self.isNull())
-      return;
-
-    this->SetStatus(task.IsCancelRequested()
-      ? QString("Starting TotalSegmentator was cancelled. Open the settings and close them to try again.")
-      : QString::fromStdString(e.GetDescription()), true);
-  }
+  // OnToolInitialized() shows the tasks, OnToolInitializationFailed() why there are none.
+  tool->Initialize(std::make_shared<mitk::ProgressTask>("Starting TotalSegmentator", mitk::ProgressTask::Indeterminate, true));
 }
 
 void QmitkTotalSegmentatorToolGUI::OnToolInitialized()
 {
   this->SetStructuresVisible(true);
   this->PopulateTasks();
+
+  if (!m_RunAfterInitialization)
+    return;
+
+  m_RunAfterInitialization = false;
+
+  // Not from within the end of the start, and only what the Run button would
+  // run now, a licensed task without a license not.
+  QTimer::singleShot(0, this, [this]() {
+    if (m_Ui->runButton->isEnabled())
+      this->OnRunButtonClicked();
+  });
+}
+
+void QmitkTotalSegmentatorToolGUI::OnToolInitializationFailed(std::string message)
+{
+  m_RunAfterInitialization = false;
+
+  this->SetStatus(message.empty()
+    ? QString("Starting TotalSegmentator was cancelled. Click Run to try again.")
+    : QString::fromStdString(message), true);
+
+  this->UpdateRunButtonState();
 }
 
 void QmitkTotalSegmentatorToolGUI::OnToolOptionsChanged()
@@ -498,7 +508,21 @@ void QmitkTotalSegmentatorToolGUI::UpdateRunButtonState()
   const auto* tool = this->GetTool();
   const int index = m_Ui->taskComboBox->currentIndex();
 
-  if (tool == nullptr || !tool->IsInitialized() || index < 0)
+  if (tool == nullptr)
+  {
+    m_Ui->runButton->setEnabled(false);
+    return;
+  }
+
+  // A tool that is not started, as after the settings cleared the model
+  // weights or after a failed start, starts with the next run.
+  if (!tool->IsInitialized())
+  {
+    m_Ui->runButton->setEnabled(!tool->IsInitializing());
+    return;
+  }
+
+  if (index < 0)
   {
     m_Ui->runButton->setEnabled(false);
     return;
@@ -543,8 +567,19 @@ void QmitkTotalSegmentatorToolGUI::OnRunButtonClicked()
   if (tool == nullptr)
     return;
 
-  // UpdatePreview() processes events, during which a tool-manager change can
-  // delete this GUI. BusyStateChanged() shows the run and its result.
+  // Its worker ended, see UpdateRunButtonState(). The tool starts first, also
+  // showing what it can do now, and runs once it has, see OnToolInitialized().
+  // A missing installation is shown instead.
+  if (!tool->IsInitialized())
+  {
+    m_RunAfterInitialization = mitk::TotalSegmentatorTool::IsInstalled();
+    this->RefreshInstallState();
+    return;
+  }
+
+  // UpdatePreview() can report an error in a dialog, during which a tool
+  // change can delete this GUI. BusyStateChanged() shows the run and its
+  // result.
   QPointer<QmitkTotalSegmentatorToolGUI> self(this);
 
   try

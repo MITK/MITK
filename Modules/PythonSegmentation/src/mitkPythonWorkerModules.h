@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <exception>
 #include <string>
 
 namespace mitk
@@ -42,6 +43,12 @@ namespace mitk
    * The workers derive the affine of an image from it.
    */
   nlohmann::json GetIndexToWorld(const BaseGeometry* geometry);
+
+  /**
+   * \brief Returns an mitk::Exception with the given message, for a callback
+   *        that reports how work off the GUI thread ended.
+   */
+  std::exception_ptr MakeExceptionPtr(const std::string& message);
 }
 
 #endif

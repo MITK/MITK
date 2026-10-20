@@ -86,6 +86,7 @@ private:
   void InitializeTool();
 
   void OnToolInitialized();
+  void OnToolInitializationFailed(std::string message);
   void OnToolOptionsChanged();
 
   /** \brief Fills the task combo box with the tool's tasks, marking licensed ones. */
@@ -117,6 +118,9 @@ private:
   std::unique_ptr<Ui::QmitkTotalSegmentatorToolGUI> m_Ui;
   mitk::IPreferences* m_Preferences = nullptr;
   bool m_Running = false;
+
+  /** \brief Whether Run started the tool, which runs once it has started. */
+  bool m_RunAfterInitialization = false;
 
   /** \brief The task whose structures the list shows. */
   std::string m_ListedTask;

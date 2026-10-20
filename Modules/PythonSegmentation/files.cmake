@@ -5,9 +5,9 @@ set(CPP_FILES
   mitknnInteractiveVersion.cpp
   mitknnInteractiveBoundingBoxHelpers.cpp
   mitknnInteractiveRenderingHelpers.cpp
-  mitkInitializationHook.cpp
   mitkPythonPackageVersion.cpp
   mitkPythonWorkerModules.cpp
+  mitkStopHook.cpp
   mitkTorchDevice.cpp
   mitkTotalSegmentatorTool.cpp
   mitkVoxTellTool.cpp

@@ -115,11 +115,13 @@ namespace mitk
    * -# Confirm the preview with ConfirmSegmentation()
    * -# Unload the model via UnloadModel() or by deactivating the tool
    *
-   * UpdatePreview() waits on the calling thread and keeps the application
-   * responsive through GUIProcessEventsMessage while the model computes. It can
-   * be cancelled with the progress notification of the tool. A run that has not
-   * stopped seconds after the cancellation is ended with its worker. If the
-   * worker ends, the model is no longer loaded (see IsModelLoaded()).
+   * The calls of the worker that take long run off the GUI thread (see
+   * RunOffGUIThread()): UpdatePreview() returns before the model has computed,
+   * and GetModelFiles(), LoadModel() and EmbedPrompts() report their end to a
+   * callback on the GUI thread. A run can be cancelled with the progress
+   * notification of the tool. A run that has not stopped seconds after the
+   * cancellation is ended with its worker. If the worker ends, the model is no
+   * longer loaded (see IsModelLoaded()).
    *
    * \sa SegWithPreviewTool, PythonWorker, QmitkVoxTellToolGUI
    */
@@ -172,42 +174,47 @@ namespace mitk
      */
     static const std::vector<std::pair<std::string, std::string>>& GetSessionDefiningPreferences();
 
-    /** \brief Returns the files that LoadModel() loads from the Hugging Face Hub.
+    /** \brief Receives the end of an operation of the tool on the GUI thread:
+     *         what it threw, or null.
+     */
+    using DoneCallback = std::function<void(std::exception_ptr error)>;
+
+    /** \brief Receives the files of GetModelFiles(), or what it threw. */
+    using ModelFilesCallback = std::function<void(std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files)>;
+
+    /** \brief Asks for the files that LoadModel() loads from the Hugging Face Hub.
      *
      * These are the embeddings of the prompts VoxTell knows and, unless a local
      * model folder is configured, the model. LoadModel() downloads what is not
      * cached yet, without telling how far it is, so the caller can download them
      * up front instead.
      *
-     * Starts the worker if needed and imports VoxTell there, which takes several
-     * seconds. Files that VoxTell does not name are left out and a warning is
-     * logged.
+     * Starts the worker if needed and imports VoxTell there off the GUI thread,
+     * which takes several seconds. Files that VoxTell does not name are left out
+     * and a warning is logged. Cancelling \p task or deactivating the tool ends
+     * the worker right away.
      *
-     * Events are processed meanwhile, see LoadModel() for what that implies.
-     *
-     * \param[in] task A cancelable task the user sees, or \c nullptr.
-     *
-     * \throw mitk::Exception if the worker cannot be started, or the call was
-     *        cancelled or aborted.
+     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * \param[in] done Receives the files, or a mitk::Exception if the tool is
+     *            busy, the worker cannot be started, or the call was
+     *            cancelled or aborted.
      */
-    std::vector<VoxTell::RepoFiles> GetModelFiles(ProgressTask* task = nullptr);
+    void GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done);
 
     /** \brief Loads the model.
      *
      * Selects the device from the preferences, then loads the model from the
      * Hugging Face hub (downloading it on first use) or from the configured
-     * local folder. A model that is already loaded is unloaded first.
+     * local folder, off the GUI thread. A model that is already loaded is
+     * unloaded first. Cancelling \p task or deactivating the tool ends the
+     * loading, which kills the worker right away.
      *
-     * Events are processed while the worker loads, so the application stays
-     * responsive. A deactivation of the tool meanwhile ends the loading, and so
-     * does cancelling \p task, which kills the worker right away.
-     *
-     * \param[in] task A cancelable task the user sees, or \c nullptr.
-     *
-     * \throw mitk::Exception if the model cannot be loaded, or the loading was
-     *        cancelled or aborted.
+     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * \param[in] done Receives null once the model is loaded, or a
+     *            mitk::Exception if the tool is busy, the model cannot be
+     *            loaded, or the loading was cancelled or aborted.
      */
-    void LoadModel(ProgressTask* task = nullptr);
+    void LoadModel(std::shared_ptr<ProgressTask> task, DoneCallback done);
 
     /** \brief Unloads the model and ends the worker.
      *
@@ -326,20 +333,18 @@ namespace mitk
      * GetPromptsWithoutPrecomputedEmbedding() and segmenting them takes no
      * longer than segmenting any other prompt.
      *
-     * Events are processed meanwhile, see LoadModel() for what that implies.
-     * Cancelling \p task or deactivating the tool ends the worker right away,
-     * and the model with it.
+     * Runs off the GUI thread. Cancelling \p task or deactivating the tool ends
+     * the worker right away, and the model with it.
      *
      * \param[in] prompts The prompts to make known.
-     * \param[in] task A cancelable task the user sees, or \c nullptr.
-     *
-     * \pre A model is loaded.
-     *
-     * \throw mitk::Exception with a message for the user if the prompts cannot
-     *        be processed, for example for lack of memory, or if the call was
-     *        cancelled or aborted.
+     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * \param[in] done Receives null once the prompts are known, or a
+     *            mitk::Exception with a message for the user if the prompts
+     *            cannot be processed, for example for lack of memory, if the
+     *            tool is busy, if no model is loaded, or if the call was
+     *            cancelled or aborted.
      */
-    void EmbedPrompts(const std::vector<std::string>& prompts, ProgressTask* task = nullptr);
+    void EmbedPrompts(const std::vector<std::string>& prompts, std::shared_ptr<ProgressTask> task, DoneCallback done);
 
     /** \brief Returns a human-readable reason that the last update produced no result.
      *
@@ -349,6 +354,13 @@ namespace mitk
      * of a run here instead, and the GUI presents it.
      */
     const std::string& GetLastErrorMessage() const;
+
+    /** \brief Returns whether the user cancelled the last update.
+     *
+     * Its preview is left empty, as after a failure, but GetLastErrorMessage()
+     * stays empty.
+     */
+    bool WasLastUpdateCancelled() const;
 
     /** \brief Returns the prompts that the last update found nothing for.
      *
@@ -406,14 +418,24 @@ namespace mitk
      */
     void EndFailedInitialization();
 
+    /** \brief Leaves the preview empty after a failed run, and records why.
+     *
+     * Rethrows a cancellation by the user, so the base class can tell it from a
+     * failure.
+     */
+    void EndFailedRun(std::exception_ptr error, const ProgressTask* task);
+
     /** \brief Removes the labels that got no voxel in any time step of the update. */
     void RemoveLabelsWithoutResult();
 
     /** \brief Writes the masks of the cached run into the preview as one label per prompt.
      *
      * The first time step of an update decides which group a label goes into.
+     *
+     * \param segmentation The segmentation the run was computed for, whose
+     *        groups and occupied voxels decide where the labels go.
      */
-    void PlaceMasks(MultiLabelSegmentation* preview, TimeStepType timeStep);
+    void PlaceMasks(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation* preview, TimeStepType timeStep);
 
     class Impl;
     std::unique_ptr<Impl> m_Impl;

@@ -53,6 +53,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <string>
+#include <utility>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -154,7 +155,7 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
   {
     if (auto tool = this->GetTool(); tool != nullptr)
     {
-      if (!tool->HasInteractions())
+      if (!tool->IsSessionRunning() || !tool->HasInteractions())
         return false;
     }
 
@@ -200,9 +201,9 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 {
-  auto wrapperWidget = new QWidget(this);
-  mainLayout->addWidget(wrapperWidget);
-  m_Ui->setupUi(wrapperWidget);
+  m_Panel = new QWidget(this);
+  mainLayout->addWidget(m_Panel);
+  m_Ui->setupUi(m_Panel);
 
   SetIcon(m_Ui->settingsButton, "Gear");
   SetIcon(m_Ui->resetButton, "Reset");
@@ -615,140 +616,155 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   qApp->processEvents();
 
   QTimer::singleShot(100, this, [=, this]() {
-    // Events are processed while the session starts, during which a tool
-    // change can delete this GUI. The tool stays alive for the call.
+    // The session starts off the GUI thread, during which a tool change can
+    // delete this GUI.
     QPointer<QmitknnInteractiveToolGUI> self(this);
     mitk::nnInteractiveTool::Pointer tool = this->GetTool();
+    auto task = std::make_shared<mitk::ProgressTask>("Initializing nnInteractive", mitk::ProgressTask::Indeterminate, true);
 
-    const auto closeMessageBox = [messageBox]() {
+    // The start configures the session with it, and its end would overwrite a
+    // change made meanwhile. OnSessionStarted() disables it again for the CPU.
+    m_Ui->autoZoomCheckBox->setEnabled(false);
+
+    tool->StartSession(task, [self, messageBox, task](std::exception_ptr error) {
       if (!messageBox.isNull())
         messageBox->accept();
-    };
-
-    mitk::ProgressTask task("Initializing nnInteractive", mitk::ProgressTask::Indeterminate, true);
-
-    try
-    {
-      tool->StartSession(&task);
-    }
-    catch (const mitk::Exception& e)
-    {
-      closeMessageBox();
 
       if (self.isNull())
         return;
 
-      if (!task.IsCancelRequested())
-        mitk::PythonPackage::ShowInitializationError(this->window(), "nnInteractive", e);
+      self->m_Ui->autoZoomCheckBox->setEnabled(true);
 
-      if (self.isNull())
+      const bool abortedBySettings = std::exchange(self->m_StartAbortedBySettings, false);
+
+      if (error != nullptr)
+      {
+        // Neither a cancellation nor a changed setting is an error to report.
+        if (!task->IsCancelRequested() && !abortedBySettings)
+        {
+          try
+          {
+            std::rethrow_exception(error);
+          }
+          catch (const mitk::Exception& e)
+          {
+            mitk::PythonPackage::ShowInitializationError(self->window(), "nnInteractive", e);
+          }
+          catch (const std::exception& e)
+          {
+            QMessageBox::warning(self->window(), "nnInteractive", QString::fromLocal8Bit(e.what()));
+          }
+
+          if (self.isNull())
+            return;
+        }
+
+        self->EnableInitializeButtons(true);
+        self->UncheckInitializeButton();
         return;
+      }
 
-      this->EnableInitializeButtons(true);
-      this->UncheckInitializeButton();
-      return;
-    }
-
-    task.Finish();
-    closeMessageBox();
-
-    if (self.isNull())
-      return;
-
-    // Keep the Initialize button enabled so a second click uninitializes the
-    // session; its label flips to "Uninitialize" while a session is running
-    // (see UpdateInitializeButtonText). Re-enable the settings button too so the
-    // user can adjust preferences that apply mid-session (e.g. interaction mode).
-    m_Ui->initializeButton->setEnabled(true);
-    this->UpdateInitializeButtonText();
-    m_Ui->settingsButton->setEnabled(true);
-
-    m_Ui->resetButton->setEnabled(true);
-    m_Ui->promptTypeGroupBox->setEnabled(true);
-    m_Ui->interactionToolsGroupBox->setEnabled(true);
-
-    this->ApplyCapabilityGating();
-
-    // Surface the model's license terms now that a session is bound.
-    this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
-
-    // While the session runs, selecting a non-empty label in the host's label
-    // inspector seeds the session from that label's mask. Connect once
-    // (Qt::UniqueConnection prevents repeated initializations from stacking
-    // duplicate connections); Qt drops it when this GUI is destroyed on tool
-    // deactivation. The inspector is null when hosted outside a segmentation view.
-    if (auto* inspector = this->GetMultiLabelInspector(); inspector != nullptr)
-    {
-      connect(inspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
-              this, &Self::OnActiveLabelChanged, Qt::UniqueConnection);
-    }
-
-    // Seed from the already-selected label at init time. Route it through the
-    // same handler as a running-session selection change so both entry points
-    // resolve and apply the label identically (set active label, seed the mask,
-    // refresh the Confirm button). No inspector signal is pending here, so the
-    // segmentation's active label is already authoritative.
-    if (const auto* segmentation = this->GetTool()->GetTargetSegmentation(); segmentation != nullptr)
-    {
-      if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
-        this->OnActiveLabelChanged({ activeLabel->GetValue() });
-    }
-
-    auto backend = this->GetTool()->GetBackend();
-
-    if (!backend.has_value())
-      return;
-
-    if (backend == mitk::nnInteractive::Backend::CUDA)
-      return;
-
-    m_Ui->autoZoomCheckBox->setEnabled(false);
-    m_Ui->autoZoomCheckBox->setChecked(false);
-    m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
-
-  #if defined(__APPLE__)
-    // On macOS nnInteractive has no GPU acceleration and always runs on the CPU,
-    // so the NVIDIA-specific guidance in the non-Apple branch does not apply.
-    // Point users at remote mode, which offloads inference to a server GPU.
-    const QString macCpuBackendMessage = QString(
-      "<h3 %1>Running on CPU</h3>"
-      "<p %1>nnInteractive has no GPU acceleration on macOS and runs on the CPU, "
-      "which is <em>significantly slower</em>.</p>"
-      "<p %1>For fast response times, run inference on a remote nnInteractive server "
-      "with a GPU. Enable it in the nnInteractive preferences under <em>Inference</em> "
-      "by selecting <em>Remote server</em>.</p>")
-      .arg(LINE_HEIGHT_STYLE);
-
-    QMessageBox::warning(this->window(), "nnInteractive", macCpuBackendMessage);
-  #else
-    // The architectures follow the PyTorch build we install: torch 2.8 still
-    // runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
-    // Turing. The floor is the one the device selection applies.
-    const QString gpuArchitectures = QString(
-      mitk::Torch::MinimumComputeCapability().Major >= 7
-        ? "<li %1>Minimum: Turing architecture (e.g., GeForce RTX 2060)</li>"
-          "<li %1>Better: Ampere architecture (e.g., GeForce RTX 3070)</li>"
-          "<li %1>Best: Ada Lovelace or newer (e.g., GeForce RTX 4080)</li>"
-        : "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
-          "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
-          "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>")
-      .arg(LINE_HEIGHT_STYLE);
-
-    const QString cpuBackendMessage = QString(
-      "<h3 %1>No compatible CUDA device detected</h3>"
-      "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
-      "<p %1>For smooth performance and fast response times, a compatible NVIDIA GPU with at "
-      "least 6 GB VRAM is required:</p>"
-      "<ul %1>%2</ul>"
-      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>"
-      "<p %1>Alternatively, you can run inference on a remote nnInteractive server with a GPU. "
-      "Enable it in the nnInteractive preferences under <em>Inference</em> by selecting "
-      "<em>Remote server</em>.</p>")
-      .arg(LINE_HEIGHT_STYLE, gpuArchitectures);
-
-    QMessageBox::warning(this->window(), "nnInteractive", cpuBackendMessage);
-  #endif
+      task->Finish();
+      self->OnSessionStarted();
+    });
   });
+}
+
+void QmitknnInteractiveToolGUI::OnSessionStarted()
+{
+  // Keep the Initialize button enabled so a second click uninitializes the
+  // session; its label flips to "Uninitialize" while a session is running
+  // (see UpdateInitializeButtonText). Re-enable the settings button too so the
+  // user can adjust preferences that apply mid-session (e.g. interaction mode).
+  m_Ui->initializeButton->setEnabled(true);
+  this->UpdateInitializeButtonText();
+  m_Ui->settingsButton->setEnabled(true);
+
+  m_Ui->resetButton->setEnabled(true);
+  m_Ui->promptTypeGroupBox->setEnabled(true);
+  m_Ui->interactionToolsGroupBox->setEnabled(true);
+
+  this->ApplyCapabilityGating();
+
+  // Surface the model's license terms now that a session is bound.
+  this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
+
+  // While the session runs, selecting a non-empty label in the host's label
+  // inspector seeds the session from that label's mask. Connect once
+  // (Qt::UniqueConnection prevents repeated initializations from stacking
+  // duplicate connections); Qt drops it when this GUI is destroyed on tool
+  // deactivation. The inspector is null when hosted outside a segmentation view.
+  if (auto* inspector = this->GetMultiLabelInspector(); inspector != nullptr)
+  {
+    connect(inspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
+            this, &Self::OnActiveLabelChanged, Qt::UniqueConnection);
+  }
+
+  // Seed from the already-selected label at init time. Route it through the
+  // same handler as a running-session selection change so both entry points
+  // resolve and apply the label identically (set active label, seed the mask,
+  // refresh the Confirm button). No inspector signal is pending here, so the
+  // segmentation's active label is already authoritative.
+  if (const auto* segmentation = this->GetTool()->GetTargetSegmentation(); segmentation != nullptr)
+  {
+    if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
+      this->OnActiveLabelChanged({ activeLabel->GetValue() });
+  }
+
+  auto backend = this->GetTool()->GetBackend();
+
+  if (!backend.has_value())
+    return;
+
+  if (backend == mitk::nnInteractive::Backend::CUDA)
+    return;
+
+  m_Ui->autoZoomCheckBox->setEnabled(false);
+  m_Ui->autoZoomCheckBox->setChecked(false);
+  m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
+
+#if defined(__APPLE__)
+  // On macOS nnInteractive has no GPU acceleration and always runs on the CPU,
+  // so the NVIDIA-specific guidance in the non-Apple branch does not apply.
+  // Point users at remote mode, which offloads inference to a server GPU.
+  const QString macCpuBackendMessage = QString(
+    "<h3 %1>Running on CPU</h3>"
+    "<p %1>nnInteractive has no GPU acceleration on macOS and runs on the CPU, "
+    "which is <em>significantly slower</em>.</p>"
+    "<p %1>For fast response times, run inference on a remote nnInteractive server "
+    "with a GPU. Enable it in the nnInteractive preferences under <em>Inference</em> "
+    "by selecting <em>Remote server</em>.</p>")
+    .arg(LINE_HEIGHT_STYLE);
+
+  QMessageBox::warning(this->window(), "nnInteractive", macCpuBackendMessage);
+#else
+  // The architectures follow the PyTorch build we install: torch 2.8 still
+  // runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
+  // Turing. The floor is the one the device selection applies.
+  const QString gpuArchitectures = QString(
+    mitk::Torch::MinimumComputeCapability().Major >= 7
+      ? "<li %1>Minimum: Turing architecture (e.g., GeForce RTX 2060)</li>"
+        "<li %1>Better: Ampere architecture (e.g., GeForce RTX 3070)</li>"
+        "<li %1>Best: Ada Lovelace or newer (e.g., GeForce RTX 4080)</li>"
+      : "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
+        "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
+        "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>")
+    .arg(LINE_HEIGHT_STYLE);
+
+  const QString cpuBackendMessage = QString(
+    "<h3 %1>No compatible CUDA device detected</h3>"
+    "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
+    "<p %1>For smooth performance and fast response times, a compatible NVIDIA GPU with at "
+    "least 6 GB VRAM is required:</p>"
+    "<ul %1>%2</ul>"
+    "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>"
+    "<p %1>Alternatively, you can run inference on a remote nnInteractive server with a GPU. "
+    "Enable it in the nnInteractive preferences under <em>Inference</em> by selecting "
+    "<em>Remote server</em>.</p>")
+    .arg(LINE_HEIGHT_STYLE, gpuArchitectures);
+
+  QMessageBox::warning(this->window(), "nnInteractive", cpuBackendMessage);
+#endif
 }
 
 void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
@@ -940,7 +956,17 @@ void QmitknnInteractiveToolGUI::OnActiveLabelChanged(const mitk::MultiLabelSegme
       segmentation->SetActiveLabel(labels.front());
   }
 
-  this->MaybeInitializeWithLabelMask(labels.front());
+  // The session takes the reset and the mask once the prompt that computes has
+  // ended, see BusyStateChanged().
+  if (tool->IsUpdating())
+  {
+    m_PendingActiveLabel = labels.front();
+  }
+  else
+  {
+    this->MaybeInitializeWithLabelMask(labels.front());
+  }
+
   this->UpdateConfirmButtonLabel();
 }
 
@@ -1124,6 +1150,12 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
 
   // No session is running now; revert the Confirm button to its base label.
   this->UpdateConfirmButtonLabel();
+
+  // The teardown clears the preview without updating it, so no busy state
+  // change disables Confirm. Left enabled, it would transfer the empty
+  // preview into the active label.
+  if (auto* tool = this->GetTool(); tool != nullptr)
+    this->EnableWidgets(!tool->IsUpdating());
 }
 
 void QmitknnInteractiveToolGUI::UpdateModelLicenseDisplay(const std::optional<std::string>& license)
@@ -1171,7 +1203,9 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
 
   m_SessionLossHandled = true;
 
-  const auto workerExited = loss.Reason == mitk::nnInteractiveTool::SessionLoss::Cause::WorkerExited;
+  using Cause = mitk::nnInteractiveTool::SessionLoss::Cause;
+
+  const auto cause = loss.Reason;
   const auto details = QString::fromStdString(loss.Details);
 
   // Tear the session down on the next event-loop tick rather than now: this
@@ -1180,32 +1214,80 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
   // clears all prompts and the preview, and -- via SessionEndedEvent ->
   // OnSessionEnded -- reverts the widget to its pre-init state, so the user just
   // clicks Initialize to start over.
-  QTimer::singleShot(0, this, [this, workerExited, details]() {
+  QTimer::singleShot(0, this, [this, cause, details]() {
     if (QCoreApplication::closingDown())
       return;
 
     if (auto* tool = this->GetTool())
       tool->AbortSession();
 
-    const auto message = workerExited
-      ? QString(
+    QString message;
+
+    switch (cause)
+    {
+      case Cause::WorkerExited:
+        message = QString(
           "<h3 %1>nnInteractive stopped unexpectedly</h3>"
           "<p %1>The process that ran nnInteractive ended. MITK is not affected, "
           "but your interactions were cleared. Click <em>Initialize</em> to start a "
-          "new session.</p>").arg(LINE_HEIGHT_STYLE)
-      : QString(
+          "new session.</p>").arg(LINE_HEIGHT_STYLE);
+        break;
+
+      case Cause::Cancelled:
+        message = QString(
+          "<h3 %1>Session ended</h3>"
+          "<p %1>Cancelling the prompt stopped nnInteractive, and your interactions "
+          "were cleared. Click <em>Initialize</em> to start a new session.</p>").arg(LINE_HEIGHT_STYLE);
+        break;
+
+      default:
+        message = QString(
           "<h3 %1>Remote session ended</h3>"
           "<p %1>The connection to the nnInteractive server was lost or the session "
           "expired (idle timeout, server restart, or the server is at capacity).</p>"
           "<p %1>Your interactions were cleared. Click <em>Initialize</em> to start a "
           "new session.</p>").arg(LINE_HEIGHT_STYLE);
+        break;
+    }
 
-    QMessageBox messageBox(QMessageBox::Warning, "nnInteractive", message, QMessageBox::Ok, this->window());
+    const auto icon = cause == Cause::Cancelled
+      ? QMessageBox::Information
+      : QMessageBox::Warning;
 
-    if (workerExited)
+    QMessageBox messageBox(icon, "nnInteractive", message, QMessageBox::Ok, this->window());
+
+    if (cause == Cause::WorkerExited)
       messageBox.setDetailedText(details);
 
     messageBox.exec();
+  });
+}
+
+void QmitknnInteractiveToolGUI::BusyStateChanged(bool isBusy)
+{
+  Superclass::BusyStateChanged(isBusy);
+
+  // A prompt computes off the GUI thread, and the session takes no other
+  // request meanwhile.
+  if (m_Panel != nullptr)
+    m_Panel->setEnabled(!isBusy);
+
+  if (isBusy)
+    return;
+
+  // An initial mask is undoable as well, but sends no PreviewUpdatedEvent.
+  this->UpdateUndoButtonState();
+
+  if (!m_PendingActiveLabel.has_value())
+    return;
+
+  const auto label = *m_PendingActiveLabel;
+  m_PendingActiveLabel.reset();
+
+  // After the tool has told everyone that the prompt ended, as a confirmation
+  // can follow it right away.
+  QTimer::singleShot(0, this, [this, label]() {
+    this->MaybeInitializeWithLabelMask(label);
   });
 }
 
@@ -1247,6 +1329,11 @@ void QmitknnInteractiveToolGUI::OnPreviewUpdated()
   this->UpdateUndoButtonState();
 
   if (m_AutoConfirmInProgress)
+    return;
+
+  // The label changed while the prompt computed, so its result is about to be
+  // discarded instead of confirmed into the new label, see BusyStateChanged().
+  if (m_PendingActiveLabel.has_value())
     return;
 
   if (!this->IsAutoConfirmEnabled())
@@ -1313,12 +1400,24 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
   // this only on an actual value change, so clicking OK without edits is a no-op.
   // It is idempotent when several such keys change in one OK: the first
   // AbortSession() tears the session down, the rest see no running session.
+  // A start read the settings when it began, so it is aborted as well and ends
+  // once its work has stopped.
   const auto& sessionDefiningKeys = mitk::nnInteractiveTool::GetSessionDefiningPreferences();
 
   if (std::any_of(sessionDefiningKeys.begin(), sessionDefiningKeys.end(), [&property](const auto& entry) { return entry.first == property; }))
   {
-    if (auto* tool = this->GetTool(); tool != nullptr && tool->IsSessionRunning())
-      tool->AbortSession();
+    if (auto* tool = this->GetTool(); tool != nullptr)
+    {
+      if (tool->IsSessionStarting())
+      {
+        m_StartAbortedBySettings = true;
+        tool->AbortSession();
+      }
+      else if (tool->IsSessionRunning())
+      {
+        tool->AbortSession();
+      }
+    }
   }
 
   if (property == "nnInteractive/showShortcutsInLabels")

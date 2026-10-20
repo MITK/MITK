@@ -37,6 +37,16 @@ namespace mitk
  */
 MITKQTWIDGETS_EXPORT void QmitkProcessEventsUntil(const std::function<bool()>& done);
 
+/** \brief Whether this thread waits for a task of QmitkRunAsyncBlocking() or
+ *         QmitkRunWithInputBlocked().
+ *
+ * The event loop keeps turning during the wait, while the task reads or writes
+ * data, a save for example. What was posted to this thread and changes data,
+ * like the result of a computation that ended meanwhile, can ask this first
+ * and run once the task has ended.
+ */
+MITKQTWIDGETS_EXPORT bool QmitkIsWaitingForBlockingTask();
+
 /** \brief Runs a long task in a background thread while keeping the UI responsive.
  *
  * The function blocks until the task finishes, but keeps processing events, so

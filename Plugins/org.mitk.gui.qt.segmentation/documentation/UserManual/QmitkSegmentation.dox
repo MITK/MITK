@@ -558,6 +558,10 @@ While you work, the proposed segmentation is shown as a live preview in the colo
 The Confirm button names the label that the result will be written to and shows its color, for example <b>Confirm Liver</b>, so you always know where the segmentation will go.
 When you are satisfied with the result - often after only a single point or scribble - click it (or press <tt>C</tt>) to write the segmented pixels to that label.
 
+Each interaction is computed in the background, so the application stays responsive.
+Until the result is shown, the tool's controls are disabled and further interactions in the views are ignored.
+A progress notification offers to cancel a computation that takes too long; cancelling ends the session, so you initialize it again.
+
 The <b>Auto-zoom</b> option, enabled by default, lets the model widen the region it analyzes when a segment reaches the edge, so large structures are not cut off.
 It improves completeness at the cost of speed and is not available on the CPU.
 

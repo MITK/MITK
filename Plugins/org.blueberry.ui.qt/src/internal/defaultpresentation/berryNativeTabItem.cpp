@@ -64,6 +64,9 @@ void NativeTabItem::SetInfo(const PartInfo& info)
   if (widget->tabText(index) != info.name)
   {
     widget->setTabText(index, info.name);
+
+    if (closeButton != nullptr)
+      closeButton->setAccessibleName(QString("Close %1").arg(info.name));
   }
 
   if (widget->tabToolTip(index) != info.toolTip)

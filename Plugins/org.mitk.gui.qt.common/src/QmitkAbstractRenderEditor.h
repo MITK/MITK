@@ -78,6 +78,12 @@ public:
   QmitkAbstractRenderEditor();
   ~QmitkAbstractRenderEditor() override;
 
+  /**
+   * Creates the editor's widgets with CreateQtPartControl() and makes them
+   * follow QmitkPartLock.
+   */
+  void CreatePartControl(QWidget* parent) override;
+
 protected:
 
   /**

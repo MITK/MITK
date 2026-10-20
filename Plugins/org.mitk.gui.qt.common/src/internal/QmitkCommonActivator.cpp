@@ -55,6 +55,8 @@ QmitkCommonActivator::start(ctkPluginContext* context)
     MITK_ERROR << "BlueBerry Workbench not running!";
   }
 
+  m_UncreatedViewLockFollower.reset(new QmitkUncreatedViewLockFollower);
+
   BERRY_REGISTER_EXTENSION_CLASS(QmitkNodeSelectionPreferencePage, context)
 }
 
@@ -62,6 +64,8 @@ void
 QmitkCommonActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+  m_UncreatedViewLockFollower.reset();
 
   m_ViewCoordinator->Stop();
   m_ViewCoordinator.reset();

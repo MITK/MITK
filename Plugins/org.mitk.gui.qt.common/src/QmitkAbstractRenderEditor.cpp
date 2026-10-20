@@ -13,6 +13,7 @@ found in the LICENSE file.
 
 #include "QmitkAbstractRenderEditor.h"
 #include "internal/QmitkCommonActivator.h"
+#include "internal/QmitkPartLockFollower.h"
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIRenderingManager.h>
@@ -23,6 +24,8 @@ found in the LICENSE file.
 #include <mitkTimeNavigationController.h>
 
 #include <berryUIException.h>
+
+#include <memory>
 
 class QmitkAbstractRenderEditorPrivate
 {
@@ -40,6 +43,7 @@ public:
 
   mitk::IRenderingManager* m_RenderingManagerInterface;
   mitk::IPreferences* m_Prefs;
+  std::unique_ptr<QmitkPartLockFollower> m_LockFollower;
 };
 
 QmitkAbstractRenderEditor::QmitkAbstractRenderEditor()
@@ -70,6 +74,16 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
     d->m_Prefs->OnChanged.AddListener(mitk::MessageDelegate1<QmitkAbstractRenderEditor, const mitk::IPreferences*>
                                       (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
+}
+
+void QmitkAbstractRenderEditor::CreatePartControl(QWidget* parent)
+{
+  berry::QtEditorPart::CreatePartControl(parent);
+
+  // The tool tip of an editor is the one of its input, so only the image shows the lock.
+  d->m_LockFollower = std::make_unique<QmitkPartLockFollower>(this, parent, [this](const QIcon& image, const QString&) {
+    this->SetTitleImage(image);
+  });
 }
 
 mitk::DataStorageReference QmitkAbstractRenderEditor::GetDataStorageReference() const

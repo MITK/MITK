@@ -198,14 +198,15 @@ void WorkbenchPartReference::RefreshFromPart()
   SetPartName(ComputePartName());
   SetContentDescription(ComputeContentDescription());
   SetToolTip(GetRawToolTip());
-  //SetImageDescriptor(ComputeImageDescriptor());
+  SetImageDescriptor(ComputeImageDescriptor());
 
   this->DeferEvents(false);
 }
 
 QIcon WorkbenchPartReference::ComputeImageDescriptor()
 {
-  if (part)
+  // A part without an image of its own shows the one of its descriptor.
+  if (part && !part->GetTitleImage().isNull())
   {
     return part->GetTitleImage();
   }

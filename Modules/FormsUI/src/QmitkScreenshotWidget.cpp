@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <QFileInfo>
+#include <QLocale>
 
 using Self = QmitkScreenshotWidget;
 
@@ -62,10 +63,10 @@ void QmitkScreenshotWidget::SetScreenshot(const QString& path)
 
   m_Ui->fileNameLabel->setText(fileInfo.fileName());
 
-  m_Ui->detailsLabel->setText(QString("<i>%1x%2 pixels, %3 KB</i>")
+  m_Ui->detailsLabel->setText(QString("<i>%1x%2 pixels, %3</i>")
     .arg(pixmap.width())
     .arg(pixmap.height())
-    .arg(fileInfo.size() / 1024));
+    .arg(QLocale().formattedDataSize(fileInfo.size(), 1, QLocale::DataSizeTraditionalFormat)));
 }
 
 QString QmitkScreenshotWidget::GetScreenshotPath() const

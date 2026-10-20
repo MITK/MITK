@@ -47,6 +47,7 @@ set(MODULE_TESTS
   mitkBaseRendererTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
+  mitkMemoryUtilitiesTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkLevelWindowTest.cpp
   mitkMapperProviderRegistryTest.cpp

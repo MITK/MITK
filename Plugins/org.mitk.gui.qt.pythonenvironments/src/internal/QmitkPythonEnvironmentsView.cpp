@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include <QmitkRun.h>
 #include <QmitkIconTheme.h>
 
-#include <array>
-
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDir>
@@ -27,6 +25,7 @@ found in the LICENSE file.
 #include <QFile>
 #include <QFont>
 #include <QList>
+#include <QLocale>
 #include <QMessageBox>
 #include <QString>
 #include <QStringList>
@@ -84,23 +83,6 @@ namespace
     }
 
     return totalSize;
-  }
-
-  QString GetHumanReadableSize(quint64 bytes)
-  {
-    static std::array<const char*, 4> sizes = { "B", "KB", "MB", "GB" };
-    constexpr int maxSizeIndex = sizes.size() - 1;
-
-    int sizeIndex = 0;
-    double num = bytes;
-
-    while (num >= 1024.0 && sizeIndex < maxSizeIndex)
-    {
-      num /= 1024.0;
-      ++sizeIndex;
-    }
-
-    return QString::number(num, 'f', 2) + " " + sizes[sizeIndex];
   }
 
   void OpenVirtualEnvPath(const QString& virtualEnvPath)
@@ -168,7 +150,7 @@ public:
     font.setItalic(false);
 
     this->setData(2, Qt::UserRole, QVariant::fromValue(totalSize));
-    this->setText(2, GetHumanReadableSize(totalSize));
+    this->setText(2, QLocale().formattedDataSize(static_cast<qint64>(totalSize), 2, QLocale::DataSizeTraditionalFormat));
     this->setFont(2, font);
   }
 

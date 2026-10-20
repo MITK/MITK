@@ -26,6 +26,36 @@ found in the LICENSE file.
 #include <string>
 #endif
 
+#include <array>
+#include <iomanip>
+#include <locale>
+#include <sstream>
+
+std::string mitk::MemoryUtilities::FormatSize(std::uint64_t bytes)
+{
+  if (bytes < 1024)
+    return std::to_string(bytes) + " B";
+
+  constexpr std::array<const char*, 4> units = { "KB", "MB", "GB", "TB" };
+
+  double value = static_cast<double>(bytes) / 1024.0;
+  std::size_t unit = 0;
+
+  // Compared with what rounds up to 1024.0, which would otherwise read
+  // "1024.0 KB" instead of "1.0 MB".
+  while (value >= 1023.95 && unit + 1 < units.size())
+  {
+    value /= 1024.0;
+    ++unit;
+  }
+
+  std::ostringstream stream;
+  stream.imbue(std::locale::classic());
+  stream << std::fixed << std::setprecision(1) << value << ' ' << units[unit];
+
+  return stream.str();
+}
+
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 {
   size_t size = 0;

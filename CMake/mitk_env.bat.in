@@ -1,0 +1,9 @@
+@echo off
+setlocal
+set "PATH=@MITK_RUNTIME_PATH@;%PATH%"
+if "%~1"=="" (
+  cmd /k prompt [mitk_env_@MITK_ENV_BUILD_TYPE@] $P$G
+  exit /b
+)
+%*
+exit /b %ERRORLEVEL%

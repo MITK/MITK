@@ -98,6 +98,11 @@ ctest -C Release -R mitkImage    # tests matching a pattern
 ctest -C Release -N              # list without running
 ```
 
+On Windows, use `bin/mitk_ctest_<config>.bat` instead, e.g.
+`bin/mitk_ctest_release.bat -R mitkImage`. It runs ctest for this
+build tree from any working directory, with `-C <config>` set and the
+DLL directories on `PATH` (see "Running from the build tree").
+
 Many tests read input from the MITK-Data repository, which the
 superbuild checks out automatically; `MITK_DATA_DIR` in the inner
 build tree points to it. When a test cannot find its input, check
@@ -109,12 +114,29 @@ there first.
 cmake --build ../MITK-superbuild/MITK-build --target doc
 ```
 
-### Running applications
+### Running from the build tree
 
-On Windows, launch via the generated start script (it sets up
-`PATH`):
-`MITK-superbuild/MITK-build/bin/startMitkWorkbench_release.bat`.
 On Linux and macOS the binaries in the build tree run directly.
+
+On Windows they need the DLL directories of the dependencies on
+`PATH`. Start everything through `bin/mitk_env_<config>.bat`, one per
+configuration of the build tree (e.g. `mitk_env_release.bat`). It
+runs the given command with that `PATH`, or opens a command prompt
+with it when called without arguments. The scripts
+`bin/mitk_ctest_<config>.bat` and `bin/<Executable>_<config>.bat`
+(e.g. `MitkWorkbench_release.bat`, `MitkFileConverter_release.bat`)
+wrap it.
+
+Arguments pass through cmd.exe, which interprets `| & ^ < > %`
+(a bare `^` is silently dropped). From PowerShell, wrap such
+arguments in embedded double quotes:
+
+```powershell
+& bin\mitk_ctest_release.bat -R '"^mitkImageCastTest$|^mitkPointSetTest$"'
+```
+
+Git Bash cannot pass such arguments to a batch file; use PowerShell
+for them.
 
 ## Architecture
 

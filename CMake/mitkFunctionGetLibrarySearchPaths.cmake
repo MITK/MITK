@@ -7,7 +7,9 @@
 #!
 #! The function creates the variable ${search_path}. The variable intermediate_dir contains
 #! paths that should be added to the search_path but should not be checked for existance,
-#! because the are not yet created. The option DEBUG, MINSIZEREL or RELWITHDEBINFO can be used to indicate that
+#! because the are not yet created. Pass an empty intermediate_dir for single-config generators,
+#! whose output directories have no configuration subdirectory.
+#! The option DEBUG, MINSIZEREL or RELWITHDEBINFO can be used to indicate that
 #! not the paths for release configuration are requested but the debug, min size release or "release with debug info"
 #! paths.
 #!
@@ -107,7 +109,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   set(_search_dirs )
   foreach(_dir ${_dir_candidates})
-    if(EXISTS "${_dir}/${intermediate_dir}")
+    if(intermediate_dir AND EXISTS "${_dir}/${intermediate_dir}")
       list(APPEND _search_dirs "${_dir}/${intermediate_dir}")
     else()
       list(APPEND _search_dirs "${_dir}")
@@ -140,7 +142,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   # might not have been created yet, so we can't check for its existence.
   # Hence we just add it for Windows without checking.
   set(_internal_search_dirs "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
-  if(WIN32)
+  if(WIN32 AND intermediate_dir)
     foreach(_dir ${_internal_search_dirs})
       set(_search_dirs "${_dir}/${intermediate_dir}" ${_search_dirs})
     endforeach()

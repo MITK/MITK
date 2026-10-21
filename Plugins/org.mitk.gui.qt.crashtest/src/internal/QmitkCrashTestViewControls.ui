@@ -24,7 +24,7 @@
    <item>
     <widget class="QLabel" name="debuggerNoteLabel">
      <property name="text">
-      <string>Note: under a debugger, a hard crash breaks into the debugger and no dump is written. On Windows use Start Without Debugging (Ctrl+F5) or startMitkWorkbench_release.bat; on Linux and macOS run the binary directly rather than under gdb or lldb. On-demand and freeze snapshots still work under a debugger.</string>
+      <string>Note: under a debugger, a hard crash breaks into the debugger and no dump is written. On Windows use Start Without Debugging (Ctrl+F5) or MitkWorkbench_release.bat; on Linux and macOS run the binary directly rather than under gdb or lldb. On-demand and freeze snapshots still work under a debugger.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

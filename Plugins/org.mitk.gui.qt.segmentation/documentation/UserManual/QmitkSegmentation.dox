@@ -123,6 +123,12 @@ It is just the plain pixel value of the label instance, which is unique across a
 
 \imageMacro{QmitkSegmentation_LabelInstances.png,"Label instances",16.00}
 
+Tools like TotalSegmentator or VoxTell put all findings of a kind, for example lung nodules, into a single label.
+To get one label instance per finding, choose <em>Split into instances</em> from the context menu of the label.
+The label keeps its largest separate part and every further part becomes a new instance, ordered by size.
+Voxels belong to the same part if they touch at a face, an edge or a corner.
+In a segmentation with several time steps, only the current time step is split.
+
 \section org_mitk_views_segmentationlock_color_visibility Unlocking, changing color of, and hiding label instances
 
 Label instances are locked by default: label instances from the same group cannot accidentally override pixels from other label instances.

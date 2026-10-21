@@ -211,6 +211,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
 
   /**
    * Returns the size to use for the window's shell when it is created.
+   * Defaults to 90% of the primary screen's available area.
    *
    * @return the initial size to use for the shell
    */
@@ -220,7 +221,8 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
    * Sets the size to use for the window's shell when it is created.
    * This method has no effect after the shell is created.
    * That is, it must be called within the <code>WorkbenchAdvisor#PreWindowOpen()</code>
-   * callback.
+   * callback. It also turns off the default of opening windows without saved
+   * state maximized on screens up to Full HD.
    *
    * @param initialSize the initial size to use for the shell
    */

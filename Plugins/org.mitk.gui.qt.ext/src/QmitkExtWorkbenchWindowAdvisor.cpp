@@ -527,7 +527,9 @@ namespace
   // composition (exclusive full-screen), throttling Qt widget repaints to a few
   // FPS. A frameless window overflowing the screen by one pixel keeps
   // composition active. Replace the flags (do not just add the frameless hint)
-  // so no title bar survives.
+  // so no title bar survives. Clear the maximized state: Windows fits a
+  // maximized frameless window to the work area, dropping the overflow, and
+  // with an auto-hidden taskbar the work area is the whole screen.
   QRect BorderlessFullScreenBounds(const QMainWindow* window)
   {
     return window->screen()->geometry().adjusted(-1, -1, 1, 1);
@@ -536,6 +538,7 @@ namespace
   void SetBorderlessFullScreen(QMainWindow* window)
   {
     window->setWindowFlags(Qt::FramelessWindowHint);
+    window->setWindowState(window->windowState() & ~Qt::WindowMaximized);
     window->setGeometry(BorderlessFullScreenBounds(window));
   }
 
@@ -552,11 +555,19 @@ namespace
   // still converts with zero margins, placing the outer frame on the requested
   // client rect, so the restored window shrinks by the frame size on every
   // toggle (and Qt warns "Unable to set geometry").
-  void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds)
+  //
+  // The window is shown unmaximized and maximized only after the geometry is
+  // set, so the bounds become its normal geometry.
+  void ReshowWithFlagsAndGeometry(QMainWindow* window, Qt::WindowFlags flags, const QRect& bounds, bool maximized)
   {
     window->setWindowFlags(flags);
+    window->setWindowState(window->windowState() & ~Qt::WindowMaximized);
     window->show();
-    QTimer::singleShot(0, window, [window, bounds]() { window->setGeometry(bounds); });
+    QTimer::singleShot(0, window, [window, bounds, maximized]() {
+      window->setGeometry(bounds);
+      if (maximized)
+        window->showMaximized();
+    });
   }
 #endif
 }
@@ -1151,21 +1162,23 @@ void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
   mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
 #else
   // Toggle borderless full-screen. See SetBorderlessFullScreen for why true
-  // full-screen is avoided on Windows. The original flags and geometry are
-  // saved so the decorated window can be restored on exit.
+  // full-screen is avoided on Windows. The original flags, normal geometry, and
+  // maximized state are saved so the decorated window can be restored on exit.
   if (mainWindow->property("mitkBorderlessFullScreen").toBool())
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", false);
     ReshowWithFlagsAndGeometry(mainWindow,
       Qt::WindowFlags(mainWindow->property("mitkWindowedFlags").toInt()),
-      mainWindow->property("mitkWindowedGeometry").toRect());
+      mainWindow->property("mitkWindowedGeometry").toRect(),
+      mainWindow->property("mitkWindowedMaximized").toBool());
   }
   else
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", true);
     mainWindow->setProperty("mitkWindowedFlags", static_cast<int>(mainWindow->windowFlags()));
-    mainWindow->setProperty("mitkWindowedGeometry", mainWindow->geometry());
-    ReshowWithFlagsAndGeometry(mainWindow, Qt::FramelessWindowHint, BorderlessFullScreenBounds(mainWindow));
+    mainWindow->setProperty("mitkWindowedGeometry", mainWindow->normalGeometry());
+    mainWindow->setProperty("mitkWindowedMaximized", mainWindow->isMaximized());
+    ReshowWithFlagsAndGeometry(mainWindow, Qt::FramelessWindowHint, BorderlessFullScreenBounds(mainWindow), false);
   }
 #endif
 }

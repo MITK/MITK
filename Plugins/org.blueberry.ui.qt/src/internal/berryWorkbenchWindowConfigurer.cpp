@@ -21,6 +21,29 @@ found in the LICENSE file.
 
 #include "berryQtDnDControlWidget.h"
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
+namespace
+{
+  // The window is centered on the primary screen, so its defaults derive from
+  // that screen. The available area excludes taskbar or dock.
+  QPoint DefaultInitialSize()
+  {
+    auto* tweaklet = berry::Tweaklets::Get(berry::GuiWidgetsTweaklet::KEY);
+    const auto size = tweaklet->GetAvailableScreenSize(tweaklet->GetPrimaryScreenNumber()).size() * 0.9;
+    return QPoint(size.width(), size.height());
+  }
+
+  // Up to Full HD in device-independent pixels, so a 4K screen at 200% scaling
+  // counts as Full HD.
+  bool DefaultInitialMaximized()
+  {
+    auto* tweaklet = berry::Tweaklets::Get(berry::GuiWidgetsTweaklet::KEY);
+    const auto size = tweaklet->GetScreenSize(tweaklet->GetPrimaryScreenNumber()).size();
+    return size.width() <= 1920 && size.height() <= 1080;
+  }
+}
+
 namespace berry
 {
 
@@ -67,7 +90,8 @@ WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(const WorkbenchWindow::Poin
  , showMenuBar(true)
  , showProgressIndicator(false)
  , dropTargetListener(nullptr)
- , initialSize(1632, 918) // 85% of 1920 x 1080 (FullHD, 1080p)
+ , initialSize(DefaultInitialSize())
+ , initialMaximized(DefaultInitialMaximized())
 {
   if (window.IsNull())
   {
@@ -256,6 +280,12 @@ QPoint WorkbenchWindowConfigurer::GetInitialSize() const
 void WorkbenchWindowConfigurer::SetInitialSize(QPoint size)
 {
   initialSize = size;
+  initialMaximized = false;
+}
+
+bool WorkbenchWindowConfigurer::GetInitialMaximized() const
+{
+  return initialMaximized;
 }
 
 void WorkbenchWindowConfigurer::CreateDefaultContents(Shell::Pointer shell)

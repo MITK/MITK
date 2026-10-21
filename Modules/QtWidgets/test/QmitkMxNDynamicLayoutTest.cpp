@@ -878,11 +878,11 @@ public:
   {
     auto a = mitk::DataNode::New();
     a->SetName("a");
-    a->SetData(mitk::ImageGenerator::GenerateRandomImage<short>(16, 16, 8, 3));
+    a->SetData(mitk::ImageGenerator::GenerateRandomImage<unsigned short>(16, 16, 8, 3));
     m_DataStorage->Add(a);
     auto b = mitk::DataNode::New();
     b->SetName("b");
-    b->SetData(mitk::ImageGenerator::GenerateRandomImage<short>(32, 24, 12, 3));
+    b->SetData(mitk::ImageGenerator::GenerateRandomImage<unsigned short>(32, 24, 12, 3));
     m_DataStorage->Add(b);
     this->ShowEditor();
     auto* renderingManager = mitk::RenderingManager::GetInstance();

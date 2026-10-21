@@ -320,6 +320,35 @@ in this order:
 When you report, say what you segmented, how you checked it (which windows
 and slices), how confident you are, and what a human should look at.
 
+## Planar figures
+
+Planar figures are the lines, circles, rectangles and other shapes of the
+Measurement view. Each lies in one slice and measures lengths and areas.
+They also point out a region, for example in an image for a report.
+
+- POST `/api/v1/planar-figures` with `{"type": "circle", "image": uid,
+  "window": "axial", "pixels": [...], "image_size": [...], "name": ...}`
+  draws one in the slice the window shows: a line from its two ends, a
+  circle from its center and a point on it, a rectangle from two opposite
+  corners. Name it after what it marks.
+- GET `/api/v1/planar-figures` lists the figures, the user's too, with
+  their measurements, like the length of a line or the radius and area of
+  a circle. GET `/api/v1/statistics?mask=<uid of the figure>` measures the
+  grey values inside it, or along a line.
+- A new figure is drawn in orange, with a black or white outline that
+  keeps it visible on any image and a halo while selected. Its name and
+  measurements show only while the mouse hovers over it. For a clean look,
+  like a highlight in a screenshot, PATCH its properties:
+  `{"selected": false, "color": {"type": "ColorProperty", "value": [1, 0.8, 0]},
+  "line width": 3}`. Pick a color that stands out against the image and
+  its labels. `"planarfigure.label": "Always"` shows the name and
+  measurements without hovering.
+- A figure shows only in its slice: show that slice before a screenshot,
+  for example with PUT `/api/v1/rendering/selected-position` at one of its
+  points.
+- DELETE `/api/v1/datastorage/nodes/{uid}` removes a figure. Ask the user
+  before removing a figure you did not draw.
+
 ## Reports
 
 A report is a page for the user about what you did and found, with tables,
@@ -335,7 +364,8 @@ can offer one.
   `/api/v1/reports/{id}` rewrites a report.
 - For an image, set the window up for what it should show: frame the
   structures with `.../focus`, choose the visible data, the crosshair and
-  the active label's outline. Then POST `/api/v1/reports/images` with the
+  the active label's outline. A planar figure with a clean look points out
+  a region. Then POST `/api/v1/reports/images` with the
   window, and refer to the image by the name it returns. Images are
   transparent where the window shows its background.
 - `"crop": true` cuts an image down to the scene, `"padding"` keeps pixels

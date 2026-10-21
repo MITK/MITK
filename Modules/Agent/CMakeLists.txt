@@ -4,6 +4,7 @@ mitk_create_module(
     PUBLIC MitkCore MitkRESTAPI
   PACKAGE_DEPENDS
     PUBLIC nlohmann_json Qt6|Core
+    PRIVATE Qt6|Concurrent
 )
 
 if(BUILD_TESTING)

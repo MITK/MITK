@@ -7,6 +7,10 @@ set(INTERNAL_CPP_FILES
   QmitkAgentView.cpp
 )
 
+set(UI_FILES
+  src/internal/QmitkAgentPreferencePage.ui
+)
+
 set(MOC_H_FILES
   src/internal/QmitkAgentPluginActivator.h
   src/internal/QmitkAgentPreferencePage.h

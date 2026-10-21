@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/Agent">
+    <file>AgentSystemPrompt.md</file>
+  </qresource>
+</RCC>

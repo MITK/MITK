@@ -17,10 +17,12 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 
-class QmitkInfoCard;
-class QCheckBox;
-class QLineEdit;
-class QPushButton;
+#include <memory>
+
+namespace Ui
+{
+  class QmitkAgentPreferencePage;
+}
 
 /**
  * \brief Settings of the agent: which Claude Code runs, how it signs in,
@@ -35,6 +37,9 @@ class QmitkAgentPreferencePage : public QObject, public berry::IQtPreferencePage
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
+  QmitkAgentPreferencePage();
+  ~QmitkAgentPreferencePage() override;
+
   void Init(berry::IWorkbench::Pointer workbench) override;
 
   void CreateQtControl(QWidget* parent) override;
@@ -54,15 +59,11 @@ private:
   void BrowseExecutable();
   void SignIn(QmitkAgentSignInDialog::Account account);
 
-  QWidget* m_Control = nullptr;
-  QLineEdit* m_ExecutableEdit = nullptr;
-  QCheckBox* m_IgnoreApiKeyCheckBox = nullptr;
-  QmitkInfoCard* m_StatusCard = nullptr;
-  QPushButton* m_SubscriptionButton = nullptr;
-  QPushButton* m_ConsoleButton = nullptr;
+  std::unique_ptr<Ui::QmitkAgentPreferencePage> m_Ui;
+  QWidget* m_Control;
 
   /** \brief Counts the queries of the sign-in, so that only the last one shows. */
-  int m_StatusQueries = 0;
+  int m_StatusQueries;
 };
 
 #endif

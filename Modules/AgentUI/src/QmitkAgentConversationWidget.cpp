@@ -138,7 +138,14 @@ QmitkAgentConversationWidget::QmitkAgentConversationWidget(QWidget* parent)
     m_FollowEnd = value == this->verticalScrollBar()->maximum();
   });
 
-  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this->viewport(), qOverload<>(&QWidget::update));
+  // The frames take the theme's colors when painted, the summaries of steps
+  // when written.
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]() {
+    for (std::size_t i = 0; i < m_StepGroups.size(); ++i)
+      this->UpdateStepSummary(i);
+
+    this->viewport()->update();
+  });
 }
 
 QmitkAgentConversationWidget::~QmitkAgentConversationWidget() = default;
@@ -464,8 +471,7 @@ void QmitkAgentConversationWidget::UpdateStepSummary(std::size_t index)
   QTextCharFormat format;
   format.setAnchor(true);
   format.setAnchorHref(QString("%1:%2").arg(StepsScheme).arg(index));
-  format.setForeground(NoteColor);
-  format.setFontUnderline(true);
+  format.setForeground(QColor(QmitkIconTheme::GetAccentColor()));
 
   if (m_NoteFontSize > 0)
     format.setFontPointSize(m_NoteFontSize);
@@ -483,10 +489,7 @@ void QmitkAgentConversationWidget::UpdateStepSummary(std::size_t index)
     memory << (group.DeletedNotes == 1 ? QString("deleted a note") : QString("deleted %1 notes").arg(group.DeletedNotes));
 
   if (!memory.isEmpty())
-  {
-    format.setFontUnderline(false);
     cursor.insertText(QString(" (%1)").arg(memory.join(", ")), format);
-  }
 }
 
 void QmitkAgentConversationWidget::SetStepGroupExpanded(std::size_t index, bool expanded)

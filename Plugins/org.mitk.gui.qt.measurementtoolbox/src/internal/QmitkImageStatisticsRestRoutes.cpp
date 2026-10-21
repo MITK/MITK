@@ -16,9 +16,12 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkImageStatisticsCalculator.h>
 #include <mitkImageStatisticsConstants.h>
+#include <mitkImageStatisticsPredicateHelper.h>
 #include <mitkIRestServerService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkMultiLabelMaskGenerator.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestTime.h>
 
@@ -48,10 +51,10 @@ namespace
     return node;
   }
 
-  /** The image a segmentation was created for: its source in the data storage. */
-  mitk::DataNode::Pointer FindReferenceImage(const mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation)
+  /** The image a mask belongs to: its source in the data storage. */
+  mitk::DataNode::Pointer FindReferenceImage(const mitk::DataStorage* dataStorage, const mitk::DataNode* mask)
   {
-    const auto sources = dataStorage->GetSources(segmentation, nullptr, true);
+    const auto sources = dataStorage->GetSources(mask, nullptr, true);
 
     for (const auto& source : *sources)
     {
@@ -111,15 +114,18 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
   statistics.Summary = "Measure the grey values of an image, in each label of a segmentation or as a whole";
   statistics.Description =
     "As the Image Statistics view measures them. Query parameters: image, the uid of an image; mask (optional), the "
-    "uid of a segmentation of it; timepoint_ms (optional), a time point in milliseconds, or all for each time step "
-    "of the image; the selected time point without it. With a mask, image is optional and defaults to the image the "
-    "segmentation belongs to, its parent in the Data Manager. Returns {data: {image: {uid, name, dimensions, "
-    "spacing_mm, time_steps: [{min_timepoint_ms, max_timepoint_ms}]}, mask: {uid, name} or null, timepoint_ms, "
-    "statistics: [{value, name, group, voxels, volume_ml, mean, median, standard_deviation, min, max}]}}: one entry "
-    "per label, or one for the whole image without value, name and group. With all, each entry has time_steps: "
-    "[{min_timepoint_ms, max_timepoint_ms, voxels, ...}] instead of the values. Grey values are in the image's "
-    "unit, Hounsfield units for CT; empty labels have none. Status 422 if the image or mask has no data at the "
-    "time point.";
+    "uid of a segmentation of it or of a planar figure on it, as GET /api/v1/planar-figures lists them; "
+    "timepoint_ms (optional), a time point in milliseconds, or all for each time step of the image; the selected "
+    "time point without it. With a mask, image is optional and defaults to the image the mask belongs to, its "
+    "parent in the Data Manager. Returns {data: {image: {uid, name, dimensions, spacing_mm, time_steps: "
+    "[{min_timepoint_ms, max_timepoint_ms}]}, mask: {uid, name} or null, timepoint_ms, statistics: [{value, name, "
+    "group, voxels, volume_ml, mean, median, standard_deviation, min, max}]}}: one entry per label, or one for a "
+    "planar figure or the whole image, without value, name and group. A planar figure measures the pixels of its "
+    "slice inside it, or along it for a line: voxels counts them, and there is no volume_ml, as the figure's area "
+    "is among its measurements. With all, each entry has time_steps: [{min_timepoint_ms, max_timepoint_ms, "
+    "voxels, ...}] instead of the values. Grey values are in the image's unit, Hounsfield units for CT; empty "
+    "labels have none. Status 422 if the image or mask has no data at the time point, or if a planar figure lies "
+    "tilted to the image's slices.";
   statistics.Handler = [server](const RestRequest& request) {
     const auto imageUid = request.GetQueryParam("image");
     const auto maskUid = request.GetQueryParam("mask");
@@ -136,6 +142,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
     mitk::Image::ConstPointer image;
     mitk::MultiLabelSegmentation::ConstPointer segmentation;
+    mitk::PlanarFigure::Pointer figure;
     auto labels = nlohmann::json::array();
     mitk::RestTimeSelection selection;
     std::vector<mitk::TimeStepType> timeSteps;
@@ -143,17 +150,26 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     CallInGuiThread(*server, [&]() {
       if (maskNode.IsNotNull())
       {
-        auto* mask = dynamic_cast<mitk::MultiLabelSegmentation*>(maskNode->GetData());
-
-        if (mask == nullptr)
-          Throw("NOT_A_SEGMENTATION", "Unprocessable Content", "The mask \"" + maskNode->GetName() + "\" is no segmentation.", 422, request.Path);
-
-        segmentation = mask;
-
-        for (const auto& label : mask->GetLabels())
+        if (auto* mask = dynamic_cast<mitk::MultiLabelSegmentation*>(maskNode->GetData()); mask != nullptr)
         {
-          const auto value = label->GetValue();
-          labels.push_back({ { "value", value }, { "name", label->GetName() }, { "group", mask->GetGroupIndexOfLabel(value) } });
+          segmentation = mask;
+
+          for (const auto& label : mask->GetLabels())
+          {
+            const auto value = label->GetValue();
+            labels.push_back({ { "value", value }, { "name", label->GetName() }, { "group", mask->GetGroupIndexOfLabel(value) } });
+          }
+        }
+        else if (mitk::GetImageStatisticsPlanarFigurePredicate()->CheckNode(maskNode))
+        {
+          // A copy, as the Image Statistics view takes one: the measurement below runs outside the GUI
+          // thread, where the user can move the figure meanwhile.
+          figure = static_cast<const mitk::PlanarFigure*>(maskNode->GetData())->Clone();
+        }
+        else
+        {
+          Throw("NOT_A_MASK", "Unprocessable Content", "The mask \"" + maskNode->GetName() + "\" is neither a "
+            "segmentation nor a planar figure that encloses a region or is a line.", 422, request.Path);
         }
 
         if (imageNode.IsNull())
@@ -161,7 +177,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
         if (imageNode.IsNull())
         {
-          Throw("REFERENCE_NOT_FOUND", "Unprocessable Content", "The segmentation \"" + maskNode->GetName() +
+          Throw("REFERENCE_NOT_FOUND", "Unprocessable Content", "The mask \"" + maskNode->GetName() +
             "\" belongs to no image. Name one with the query parameter image.", 422, request.Path);
         }
       }
@@ -170,6 +186,13 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
       if (image.IsNull())
         Throw("NOT_AN_IMAGE", "Unprocessable Content", "\"" + imageNode->GetName() + "\" is no image.", 422, request.Path);
+
+      if (figure.IsNotNull() && !mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(figure->GetPlaneGeometry(), image->GetGeometry()))
+      {
+        Throw("FIGURE_TILTED", "Unprocessable Content", "The planar figure \"" + maskNode->GetName() + "\" lies tilted to "
+          "the slices of \"" + imageNode->GetName() + "\". Statistics need a figure drawn in a window that shows the "
+          "image's slices.", 422, request.Path);
+      }
 
       selection = mitk::RestTimeSelection::FromRequest(request);
       timeSteps = GetTimeSteps(selection, imageNode, request.Path);
@@ -188,6 +211,13 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
       maskGenerator->SetMultiLabelSegmentation(segmentation);
       calculator->SetMask(maskGenerator);
     }
+    else if (figure.IsNotNull())
+    {
+      auto maskGenerator = mitk::PlanarFigureMaskGenerator::New();
+      maskGenerator->SetInputImage(image);
+      maskGenerator->SetPlanarFigure(figure);
+      calculator->SetMask(maskGenerator);
+    }
 
     const mitk::ImageStatisticsContainer* measured = nullptr;
 
@@ -199,9 +229,14 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     {
       Throw("STATISTICS_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
     }
+    catch (const std::exception& e)
+    {
+      // The planar figure mask generator throws std::runtime_error, too.
+      Throw("STATISTICS_FAILED", "Unprocessable Content", e.what(), 422, request.Path);
+    }
 
     // Values of a region at a time step; empty labels have no statistics of their own.
-    const auto addValues = [measured](nlohmann::json& json, mitk::ImageStatisticsContainer::LabelValueType value, mitk::TimeStepType timeStep) {
+    const auto addValues = [measured, &figure](nlohmann::json& json, mitk::ImageStatisticsContainer::LabelValueType value, mitk::TimeStepType timeStep) {
       if (measured->StatisticsExist(value, timeStep))
       {
         AddValues(json, measured->GetStatistics(value, timeStep));
@@ -211,6 +246,10 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
         json["voxels"] = 0;
         json["volume_ml"] = 0.0;
       }
+
+      // A planar figure covers a single slice, so its voxels make no volume.
+      if (figure.IsNotNull())
+        json.erase("volume_ml");
     };
 
     const auto addEntry = [&](nlohmann::json entry, mitk::ImageStatisticsContainer::LabelValueType value) {
@@ -237,14 +276,20 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
     auto entries = nlohmann::json::array();
 
-    if (segmentation.IsNull())
-    {
-      entries.push_back(addEntry(nlohmann::json::object(), mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE));
-    }
-    else
+    if (segmentation.IsNotNull())
     {
       for (const auto& label : labels)
         entries.push_back(addEntry(label, label["value"].get<mitk::MultiLabelSegmentation::LabelValueType>()));
+    }
+    else if (figure.IsNotNull())
+    {
+      // The mask of a figure has a single label, as the Image Statistics view reads it; none if it covers no pixel.
+      const auto values = measured->GetExistingLabelValues();
+      entries.push_back(addEntry(nlohmann::json::object(), values.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : values.front()));
+    }
+    else
+    {
+      entries.push_back(addEntry(nlohmann::json::object(), mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE));
     }
 
     auto dimensions = nlohmann::json::array();

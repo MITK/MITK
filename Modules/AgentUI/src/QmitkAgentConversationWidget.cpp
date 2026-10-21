@@ -1,0 +1,564 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <QmitkAgentConversationWidget.h>
+
+#include <QmitkIconTheme.h>
+#include <QmitkSpeechBubbleFrame.h>
+
+#include <QAbstractTextDocumentLayout>
+#include <QDesktopServices>
+#include <QDialog>
+#include <QImage>
+#include <QLabel>
+#include <QPainter>
+#include <QPixmap>
+#include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QTextBlock>
+#include <QTextFrame>
+#include <QTextImageFormat>
+#include <QTextList>
+#include <QVBoxLayout>
+
+namespace
+{
+  const QString ImageScheme = "agent-image";
+  const QString StepsScheme = "agent-steps";
+
+  // Gestures in render windows return a screenshot each, so thumbnails stay small.
+  const QSize ThumbnailSize(160, 100);
+
+  // Around groups of steps and around thumbnails. The same for both: a hidden
+  // block still passes its bottom margin on to the next visible one, so a
+  // larger thumbnail margin would widen the space after a collapsed group.
+  constexpr int StepSpacing = 6;
+
+  // Between the steps of a list, as a step runs over a line for its call and
+  // more for its result.
+  constexpr int StepItemSpacing = 3;
+
+  constexpr int MessagePadding = 6;
+
+  // Marks the frames around the user's messages, unlike those of tables.
+  constexpr int MessageFrameProperty = QTextFormat::UserProperty;
+
+  const QColor NoteColor("gray");
+  const QColor ErrorColor("#d9534f");
+
+  // Like the corners of the input's speech bubble.
+  constexpr qreal MessageRadius = 8;
+
+  /** \param fontSize In points; 0 for the default font. */
+  QString GetSpanHtml(const QString& text, const QColor& color, qreal fontSize)
+  {
+    const auto size = fontSize > 0
+      ? QString(" font-size: %1pt;").arg(fontSize)
+      : QString();
+
+    return QString("<span style=\"color: %1;%2\">%3</span>").arg(color.name(), size, text.toHtmlEscaped());
+  }
+
+  /** \param fontSize In points; 0 for the default font. */
+  QTextCharFormat GetStepFormat(const QColor& color, qreal fontSize)
+  {
+    QTextCharFormat format;
+    format.setForeground(color);
+
+    if (fontSize > 0)
+      format.setFontPointSize(fontSize);
+
+    return format;
+  }
+
+  /** The frame around a message of the user, whose outline paintEvent() draws. */
+  QTextFrameFormat GetMessageFrameFormat()
+  {
+    QTextFrameFormat format;
+    format.setProperty(MessageFrameProperty, true);
+    format.setPadding(MessagePadding);
+    format.setTopMargin(StepSpacing);
+    format.setBottomMargin(StepSpacing);
+    return format;
+  }
+}
+
+QmitkAgentConversationWidget::QmitkAgentConversationWidget(QWidget* parent)
+  : QTextBrowser(parent),
+    m_StreamBlock(-1),
+    m_FollowEnd(true),
+    m_NoteFontSize(0.0),
+    m_StepGroupOpen(false),
+    m_StepsShown(false),
+    m_NextImageId(1)
+{
+  this->setOpenLinks(false);
+
+  // In a style sheet, as the application sets its font size in one, which a
+  // font set on the widget would not override.
+  this->ensurePolished();
+  m_NoteFontSize = this->font().pointSizeF();
+
+  if (m_NoteFontSize > 0)
+    this->setStyleSheet(QString("QTextBrowser { font-size: %1pt; }").arg(m_NoteFontSize * TextScale));
+  else
+    m_NoteFontSize = 0.0;
+
+  connect(this, &QTextBrowser::anchorClicked, this, &QmitkAgentConversationWidget::OnLinkClicked);
+
+  connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+    m_FollowEnd = value == this->verticalScrollBar()->maximum();
+  });
+
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this->viewport(), qOverload<>(&QWidget::update));
+}
+
+QmitkAgentConversationWidget::~QmitkAgentConversationWidget() = default;
+
+void QmitkAgentConversationWidget::AppendUserMessage(const QString& text)
+{
+  // The user's own message brings the conversation back to its end.
+  m_FollowEnd = true;
+  m_StreamBlock = -1;
+  m_StepGroupOpen = false;
+
+  auto* document = this->document();
+  QTextCursor cursor(document);
+  cursor.movePosition(QTextCursor::End);
+
+  // A frame starts after the block at the cursor. Empty, as at the start and
+  // after an earlier frame, that block would show as an empty line above it.
+  const auto emptyBlock = cursor.block().length() == 1
+    ? cursor.blockNumber()
+    : -1;
+
+  cursor.insertFrame(GetMessageFrameFormat());
+  cursor.insertHtml(QString("<b>You:</b> %1").arg(text.toHtmlEscaped().replace('\n', "<br>")));
+
+  if (emptyBlock >= 0)
+  {
+    auto block = document->findBlockByNumber(emptyBlock);
+    block.setVisible(false);
+    document->markContentsDirty(block.position(), block.length());
+  }
+
+  this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::AppendMarkdown(const QString& markdown)
+{
+  auto cursor = this->AppendBlock();
+  cursor.insertMarkdown(markdown);
+  this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::AppendNote(const QString& text)
+{
+  this->AppendHtml(GetSpanHtml(text, NoteColor, m_NoteFontSize));
+}
+
+void QmitkAgentConversationWidget::AppendError(const QString& text)
+{
+  this->AppendHtml(GetSpanHtml(text, ErrorColor, m_NoteFontSize));
+}
+
+void QmitkAgentConversationWidget::BeginStreamedText()
+{
+  m_StreamBlock = this->AppendBlock().blockNumber();
+}
+
+void QmitkAgentConversationWidget::AppendStreamedText(const QString& text)
+{
+  if (m_StreamBlock < 0)
+    return;
+
+  QTextCursor cursor(this->document());
+  cursor.movePosition(QTextCursor::End);
+  cursor.insertText(text, QTextCharFormat());
+  this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::EndStreamedText(const QString& markdown)
+{
+  if (m_StreamBlock < 0)
+  {
+    this->AppendMarkdown(markdown);
+    return;
+  }
+
+  // The complete text replaces the streamed one, formatted now.
+  QTextCursor cursor(this->document()->findBlockByNumber(m_StreamBlock));
+  cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+  cursor.removeSelectedText();
+  cursor.insertMarkdown(markdown);
+  m_StreamBlock = -1;
+  this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::AppendStep(const QmitkAgentStep& step)
+{
+  auto cursor = this->AppendStepItem();
+
+  if (!step.Call.isEmpty())
+    cursor.insertText(step.Call, GetStepFormat(NoteColor, m_NoteFontSize));
+
+  if (!step.Result.isEmpty())
+  {
+    if (!step.Call.isEmpty())
+      cursor.insertText(QString(QChar::LineSeparator));
+
+    cursor.insertText(step.Result, GetStepFormat(step.Failed ? ErrorColor : NoteColor, m_NoteFontSize));
+  }
+
+  const auto thumbnails = this->CreateThumbnails(step.Images);
+
+  if (!thumbnails.isEmpty())
+  {
+    cursor = this->AppendStepImageBlock();
+
+    for (qsizetype i = 0; i < thumbnails.size(); ++i)
+    {
+      if (i > 0)
+        cursor.insertText(" ");
+
+      cursor.insertImage(thumbnails[i]);
+    }
+  }
+
+  this->FinishStep(step);
+}
+
+void QmitkAgentConversationWidget::SetStepsShown(bool shown)
+{
+  m_StepsShown = shown;
+
+  for (std::size_t i = 0; i < m_StepGroups.size(); ++i)
+    this->SetStepGroupExpanded(i, shown);
+}
+
+void QmitkAgentConversationWidget::Clear()
+{
+  this->clear();
+  m_Images.clear();
+  m_StreamBlock = -1;
+  m_StepGroups.clear();
+  m_StepGroupOpen = false;
+}
+
+void QmitkAgentConversationWidget::paintEvent(QPaintEvent* event)
+{
+  // Draws the frames around the user's messages with round corners, like the
+  // input, which the frames of rich text cannot have.
+  {
+    QPainter painter(this->viewport());
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.translate(-this->horizontalScrollBar()->value(), -this->verticalScrollBar()->value());
+
+    // Read at every paint, so that the frames follow a change of the theme.
+    painter.setPen(QPen(QmitkSpeechBubbleFrame::GetBorderColor(this->palette()), 1));
+    painter.setBrush(QmitkSpeechBubbleFrame::GetFillColor(this->palette()));
+
+    const auto* layout = this->document()->documentLayout();
+
+    for (auto* frame : this->document()->rootFrame()->childFrames())
+    {
+      const auto format = frame->frameFormat();
+
+      if (!format.boolProperty(MessageFrameProperty))
+        continue;
+
+      // The bounding rectangle includes the margins.
+      const auto rect = layout->frameBoundingRect(frame).adjusted(
+        format.leftMargin() + 0.5, format.topMargin() + 0.5, -format.rightMargin() - 0.5, -format.bottomMargin() - 0.5);
+
+      painter.drawRoundedRect(rect, MessageRadius, MessageRadius);
+    }
+  }
+
+  QTextBrowser::paintEvent(event);
+}
+
+QTextCursor QmitkAgentConversationWidget::AppendBlock()
+{
+  // The space after a group of steps, like the one before its summary.
+  QTextBlockFormat format;
+
+  if (m_StepGroupOpen)
+    format.setTopMargin(StepSpacing);
+
+  m_StreamBlock = -1;
+  m_StepGroupOpen = false;
+
+  QTextCursor cursor(this->document());
+  cursor.movePosition(QTextCursor::End);
+
+  // The last block is empty at the start, and after a frame like the one
+  // around a message of the user, which is always followed by a block.
+  if (cursor.block().length() > 1)
+  {
+    cursor.insertBlock(format, QTextCharFormat());
+  }
+  else
+  {
+    cursor.setBlockFormat(format);
+    cursor.setBlockCharFormat(QTextCharFormat());
+  }
+
+  return cursor;
+}
+
+QTextCursor QmitkAgentConversationWidget::AppendStepItem()
+{
+  if (!m_StepGroupOpen)
+  {
+    auto summary = this->AppendBlock();
+
+    QTextBlockFormat format;
+    format.setTopMargin(StepSpacing);
+    summary.setBlockFormat(format);
+
+    m_StepGroups.push_back({ summary.blockNumber(), summary.blockNumber(), nullptr, 0, 0, 0, 0, m_StepsShown });
+    m_StepGroupOpen = true;
+  }
+
+  auto& group = m_StepGroups.back();
+
+  QTextCursor cursor(this->document());
+  cursor.movePosition(QTextCursor::End);
+
+  QTextBlockFormat itemFormat;
+  itemFormat.setBottomMargin(StepItemSpacing);
+
+  // The bullet takes the block's character format.
+  cursor.insertBlock(itemFormat, GetStepFormat(NoteColor, m_NoteFontSize));
+
+  if (group.List == nullptr)
+  {
+    QTextListFormat format;
+    format.setStyle(QTextListFormat::ListDisc);
+    format.setIndent(1);
+    group.List = cursor.createList(format);
+  }
+  else
+  {
+    group.List->add(cursor.block());
+  }
+
+  return cursor;
+}
+
+QTextCursor QmitkAgentConversationWidget::AppendStepImageBlock()
+{
+  // Not part of the list, but indented as far as the text of its items.
+  QTextBlockFormat format;
+  format.setIndent(1);
+  format.setTopMargin(StepSpacing);
+  format.setBottomMargin(StepSpacing);
+
+  QTextCursor cursor(this->document());
+  cursor.movePosition(QTextCursor::End);
+  cursor.insertBlock(format, QTextCharFormat());
+  return cursor;
+}
+
+void QmitkAgentConversationWidget::FinishStep(const QmitkAgentStep& step)
+{
+  auto& group = m_StepGroups.back();
+  auto* document = this->document();
+
+  if (!group.Expanded)
+  {
+    const auto first = document->findBlockByNumber(group.LastBlock + 1);
+
+    for (auto block = first; block.isValid(); block = block.next())
+      block.setVisible(false);
+
+    document->markContentsDirty(first.position(), document->characterCount() - first.position());
+  }
+
+  group.LastBlock = document->lastBlock().blockNumber();
+  ++group.Steps;
+
+  if (step.Failed)
+  {
+    ++group.Failures;
+  }
+  else if (step.Memory == QmitkAgentStep::MemoryChange::NoteSaved)
+  {
+    ++group.SavedNotes;
+  }
+  else if (step.Memory == QmitkAgentStep::MemoryChange::NoteDeleted)
+  {
+    ++group.DeletedNotes;
+  }
+
+  this->UpdateStepSummary(m_StepGroups.size() - 1);
+  this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::UpdateStepSummary(std::size_t index)
+{
+  const auto& group = m_StepGroups[index];
+
+  auto action = QString("%1 %2")
+    .arg(group.Expanded ? "Hide" : "Show")
+    .arg(group.Steps == 1 ? QString("1 step") : QString("%1 steps").arg(group.Steps));
+
+  if (group.Failures > 0)
+    action += QString(", %1 failed").arg(group.Failures);
+
+  QTextCursor cursor(this->document()->findBlockByNumber(group.SummaryBlock));
+  cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+
+  QTextCharFormat format;
+  format.setAnchor(true);
+  format.setAnchorHref(QString("%1:%2").arg(StepsScheme).arg(index));
+  format.setForeground(NoteColor);
+  format.setFontUnderline(true);
+
+  if (m_NoteFontSize > 0)
+    format.setFontPointSize(m_NoteFontSize);
+
+  cursor.insertText(action, format);
+
+  // Most steps go through the same tools of the REST API, so naming them says
+  // little. Changes of the memory are worth a look, though.
+  QStringList memory;
+
+  if (group.SavedNotes > 0)
+    memory << (group.SavedNotes == 1 ? QString("saved a note") : QString("saved %1 notes").arg(group.SavedNotes));
+
+  if (group.DeletedNotes > 0)
+    memory << (group.DeletedNotes == 1 ? QString("deleted a note") : QString("deleted %1 notes").arg(group.DeletedNotes));
+
+  if (!memory.isEmpty())
+  {
+    format.setFontUnderline(false);
+    cursor.insertText(QString(" (%1)").arg(memory.join(", ")), format);
+  }
+}
+
+void QmitkAgentConversationWidget::SetStepGroupExpanded(std::size_t index, bool expanded)
+{
+  auto& group = m_StepGroups[index];
+  group.Expanded = expanded;
+
+  if (group.LastBlock > group.SummaryBlock)
+  {
+    auto* document = this->document();
+    const auto first = document->findBlockByNumber(group.SummaryBlock + 1);
+    const auto last = document->findBlockByNumber(group.LastBlock);
+
+    for (auto block = first; block.isValid() && block.blockNumber() <= group.LastBlock; block = block.next())
+      block.setVisible(expanded);
+
+    document->markContentsDirty(first.position(), last.position() + last.length() - first.position());
+  }
+
+  this->UpdateStepSummary(index);
+}
+
+void QmitkAgentConversationWidget::AppendHtml(const QString& html)
+{
+  auto cursor = this->AppendBlock();
+  cursor.insertHtml(html);
+  this->ScrollToEnd();
+}
+
+QList<QTextImageFormat> QmitkAgentConversationWidget::CreateThumbnails(const QList<QByteArray>& images)
+{
+  QList<QTextImageFormat> thumbnails;
+  const auto pixelRatio = this->devicePixelRatioF();
+
+  for (const auto& data : images)
+  {
+    QImage image;
+
+    if (!image.loadFromData(data))
+      continue;
+
+    const auto size = image.size().scaled(ThumbnailSize, Qt::KeepAspectRatio).boundedTo(image.size());
+    auto thumbnail = image.scaled(size * pixelRatio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    thumbnail.setDevicePixelRatio(pixelRatio);
+
+    const auto id = m_NextImageId++;
+    const auto url = QString("%1:%2").arg(ImageScheme).arg(id);
+
+    m_Images.insert(id, data);
+    this->document()->addResource(QTextDocument::ImageResource, QUrl(url), thumbnail);
+
+    QTextImageFormat format;
+    format.setName(url);
+    format.setWidth(size.width());
+    format.setHeight(size.height());
+    format.setAnchor(true);
+    format.setAnchorHref(url);
+    thumbnails << format;
+  }
+
+  return thumbnails;
+}
+
+void QmitkAgentConversationWidget::ShowImage(int id)
+{
+  QPixmap pixmap;
+
+  if (!pixmap.loadFromData(m_Images.value(id)))
+    return;
+
+  // Not modal, so that the agent can go on working and the user can compare.
+  auto* dialog = new QDialog(this);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setWindowTitle("Screenshot");
+
+  auto* image = new QLabel(dialog);
+  image->setPixmap(pixmap);
+
+  auto* scrollArea = new QScrollArea(dialog);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setWidget(image);
+
+  auto* layout = new QVBoxLayout(dialog);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(scrollArea);
+
+  const auto available = this->screen()->availableGeometry().size() * 0.9;
+  dialog->resize(pixmap.size().boundedTo(available));
+  dialog->show();
+}
+
+void QmitkAgentConversationWidget::OnLinkClicked(const QUrl& url)
+{
+  if (url.scheme() == ImageScheme)
+  {
+    this->ShowImage(url.path().toInt());
+  }
+  else if (url.scheme() == StepsScheme)
+  {
+    const auto index = url.path().toULongLong();
+
+    if (index < m_StepGroups.size())
+      this->SetStepGroupExpanded(index, !m_StepGroups[index].Expanded);
+  }
+  // Links in the agent's answers must not open local files or programs.
+  else if (url.scheme() == "https" || url.scheme() == "http")
+  {
+    QDesktopServices::openUrl(url);
+  }
+}
+
+void QmitkAgentConversationWidget::ScrollToEnd()
+{
+  if (m_FollowEnd)
+    this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
+}

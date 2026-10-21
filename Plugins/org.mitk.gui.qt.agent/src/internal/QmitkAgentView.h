@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <QmitkClaudeCodeProcess.h>
 
-#include <QByteArray>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QHash>
@@ -24,20 +23,15 @@ found in the LICENSE file.
 #include <QStringList>
 
 #include <memory>
-#include <vector>
 
+class QmitkAgentConversationWidget;
 class QmitkAgentMemory;
 class QCheckBox;
 class QComboBox;
 class QLabel;
 class QPlainTextEdit;
 class QPushButton;
-class QTextBrowser;
-class QTextCursor;
-class QTextImageFormat;
-class QTextList;
 class QTimer;
-class QUrl;
 
 namespace mitk
 {
@@ -150,7 +144,6 @@ private:
   void OnResult(const QJsonObject& message);
   void OnProcessFinished(int exitCode, const QString& errorOutput);
   void OnProcessError(const QString& description);
-  void OnLinkClicked(const QUrl& url);
 
   /**
    * \brief Let the user see the answer when the agent's turn ends.
@@ -163,67 +156,7 @@ private:
   void SetActivity(const QString& activity);
   void UpdateActivityLabel();
   void UpdateCostLabel();
-
-  /** \brief Stores the images of a tool result and returns their thumbnails, as links to them. */
-  QList<QTextImageFormat> CreateThumbnails(const QJsonValue& content);
-  void ShowImage(int id);
-
-  /**
-   * \brief A cursor in a new block at the end for a message.
-   *
-   * Ends the streamed text and the group of steps, if there are.
-   */
-  QTextCursor AppendBlock();
-
-  /**
-   * \brief A cursor in a new list item at the end for a step: a tool call with its result.
-   *
-   * The item joins the last group of steps, or starts a new one. Call
-   * FinishStep() once the step is complete.
-   */
-  QTextCursor AppendStepItem();
-
-  /** \brief A cursor in a new block below the item of the last step, for its images. */
-  QTextCursor AppendStepImageBlock();
-
-  /**
-   * \brief Hides what the step appended if the group is collapsed, and updates its summary.
-   *
-   * \param toolName The tool that was called.
-   */
-  void FinishStep(const QString& toolName, bool failed);
-
-  void UpdateStepSummary(std::size_t index);
-  void SetStepGroupExpanded(std::size_t index, bool expanded);
   void OnShowStepsToggled(bool show);
-
-  /** \brief Appends what the user wrote, in a frame that looks like the input. */
-  void AppendUserMessage(const QString& text);
-
-  void AppendHtml(const QString& html);
-  void AppendMarkdown(const QString& markdown);
-  void AppendNote(const QString& text);
-  void AppendError(const QString& text);
-  void ScrollToEnd();
-
-  /** \brief Consecutive tool calls and their results, shown as a list or as one summary line. */
-  struct StepGroup
-  {
-    int SummaryBlock;
-    int LastBlock;
-
-    /** \brief The list of the steps; null until the first step. */
-    QTextList* List;
-
-    int Steps;
-    int Failures;
-
-    /** \brief Changes of the agent's memory, which the summary shows, unlike other steps. */
-    int SavedNotes;
-    int DeletedNotes;
-
-    bool Expanded;
-  };
 
   QLabel* m_StatusLabel;
 
@@ -234,7 +167,7 @@ private:
   QCheckBox* m_ShowStepsCheckBox;
   QPushButton* m_MemoryButton;
   QPushButton* m_NewConversationButton;
-  QTextBrowser* m_Conversation;
+  QmitkAgentConversationWidget* m_Conversation;
   QLabel* m_ActivityLabel;
   QLabel* m_CostLabel;
   QPlainTextEdit* m_Input;
@@ -296,22 +229,6 @@ private:
   QString m_Activity;
 
   /**
-   * \brief The block where the text that the agent is writing starts, or -1.
-   *
-   * A block number, not a position: rewriting the summary of a group of
-   * steps further up moves the positions after it.
-   */
-  int m_StreamBlock;
-
-  /** \brief Whether the conversation scrolls along, which stops while the user reads further up. */
-  bool m_FollowEnd;
-
-  /** \brief The font size of notes and steps in points, smaller than the conversation's; 0 if unknown. */
-  qreal m_NoteFontSize;
-
-  std::vector<StepGroup> m_StepGroups;
-
-  /**
    * \brief The tool calls that wait for their results, by id.
    *
    * A step shows a call together with its result. Calls that the agent makes
@@ -319,17 +236,8 @@ private:
    */
   QHash<QString, QJsonObject> m_ToolCalls;
 
-  /** \brief Whether the next step joins the last group, which it does until a message follows. */
-  bool m_StepGroupOpen;
-
   /** \brief Claude Code reports the cost of the whole session, even across processes. */
   double m_ConversationCost;
-
-  /** \brief Images of the conversation, encoded, as a long conversation collects many screenshots. */
-  QHash<int, QByteArray> m_Images;
-
-  /** \brief Never reused, so that the conversation cannot show an image of an earlier one. */
-  int m_NextImageId;
 };
 
 #endif

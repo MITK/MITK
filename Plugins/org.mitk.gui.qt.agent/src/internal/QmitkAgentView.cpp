@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkAgentView.h"
 #include "QmitkAgentPluginActivator.h"
 
+#include <QmitkAgentConversationWidget.h>
 #include <QmitkAgentMemory.h>
 #include <QmitkAgentMemoryDialog.h>
 
@@ -39,37 +40,22 @@ found in the LICENSE file.
 
 #include <berryIWorkbenchPage.h>
 
-#include <QAbstractTextDocumentLayout>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
-#include <QDesktopServices>
-#include <QDialog>
 #include <QFile>
 #include <QFutureWatcher>
 #include <QHBoxLayout>
-#include <QImage>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPainter>
-#include <QPixmap>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QScreen>
-#include <QScrollArea>
-#include <QScrollBar>
 #include <QSignalBlocker>
 #include <QStandardPaths>
-#include <QTextBlock>
-#include <QTextBrowser>
-#include <QTextCursor>
-#include <QTextFrame>
-#include <QTextImageFormat>
-#include <QTextList>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtConcurrent>
@@ -127,120 +113,6 @@ namespace
 
     return QString("%1://%2:%3").arg(config.httpsEnabled ? "https" : "http").arg(host).arg(config.port);
   }
-  const QString ImageScheme = "agent-image";
-  const QString StepsScheme = "agent-steps";
-
-  // Gestures in render windows return a screenshot each, so thumbnails stay small.
-  const QSize ThumbnailSize(160, 100);
-
-  // Around groups of steps and around thumbnails. The same for both: a hidden
-  // block still passes its bottom margin on to the next visible one, so a
-  // larger thumbnail margin would widen the space after a collapsed group.
-  constexpr int StepSpacing = 6;
-
-  // Between the steps of a list, as a step runs over a line for its call and
-  // more for its result.
-  constexpr int StepItemSpacing = 3;
-
-  constexpr int MessagePadding = 6;
-
-  // Marks the frames around the user's messages, unlike those of tables.
-  constexpr int MessageFrameProperty = QTextFormat::UserProperty;
-
-  // The conversation and the input are set larger than the rest of the
-  // application, like the VoxTell prompts. Notes and steps keep its size.
-  constexpr qreal TextScale = 1.2;
-
-  const QColor NoteColor("gray");
-  const QColor ErrorColor("#d9534f");
-
-  // Like the corners of the input's speech bubble.
-  constexpr qreal MessageRadius = 8;
-
-  /** \param fontSize In points; 0 for the default font. */
-  QString GetSpanHtml(const QString& text, const QColor& color, qreal fontSize)
-  {
-    const auto size = fontSize > 0
-      ? QString(" font-size: %1pt;").arg(fontSize)
-      : QString();
-
-    return QString("<span style=\"color: %1;%2\">%3</span>").arg(color.name(), size, text.toHtmlEscaped());
-  }
-
-  QString GetNoteHtml(const QString& text, qreal fontSize)
-  {
-    return GetSpanHtml(text, NoteColor, fontSize);
-  }
-
-  QString GetErrorHtml(const QString& text, qreal fontSize)
-  {
-    return GetSpanHtml(text, ErrorColor, fontSize);
-  }
-
-  /** \param fontSize In points; 0 for the default font. */
-  QTextCharFormat GetStepFormat(const QColor& color, qreal fontSize)
-  {
-    QTextCharFormat format;
-    format.setForeground(color);
-
-    if (fontSize > 0)
-      format.setFontPointSize(fontSize);
-
-    return format;
-  }
-
-  /** The frame around a message of the user, whose outline ConversationBrowser draws. */
-  QTextFrameFormat GetMessageFrameFormat()
-  {
-    QTextFrameFormat format;
-    format.setProperty(MessageFrameProperty, true);
-    format.setPadding(MessagePadding);
-    format.setTopMargin(StepSpacing);
-    format.setBottomMargin(StepSpacing);
-    return format;
-  }
-
-  /**
-   * Draws the frames around the user's messages with round corners, like the
-   * input, which the frames of rich text cannot have.
-   */
-  class ConversationBrowser : public QTextBrowser
-  {
-  public:
-    using QTextBrowser::QTextBrowser;
-
-  protected:
-    void paintEvent(QPaintEvent* event) override
-    {
-      {
-        QPainter painter(this->viewport());
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.translate(-this->horizontalScrollBar()->value(), -this->verticalScrollBar()->value());
-
-        // Read at every paint, so that the frames follow a change of the theme.
-        painter.setPen(QPen(QmitkSpeechBubbleFrame::GetBorderColor(this->palette()), 1));
-        painter.setBrush(QmitkSpeechBubbleFrame::GetFillColor(this->palette()));
-
-        const auto* layout = this->document()->documentLayout();
-
-        for (auto* frame : this->document()->rootFrame()->childFrames())
-        {
-          const auto format = frame->frameFormat();
-
-          if (!format.boolProperty(MessageFrameProperty))
-            continue;
-
-          // The bounding rectangle includes the margins.
-          const auto rect = layout->frameBoundingRect(frame).adjusted(
-            format.leftMargin() + 0.5, format.topMargin() + 0.5, -format.rightMargin() - 0.5, -format.bottomMargin() - 0.5);
-
-          painter.drawRoundedRect(rect, MessageRadius, MessageRadius);
-        }
-      }
-
-      QTextBrowser::paintEvent(event);
-    }
-  };
 
   QString GetToolName(const QString& name)
   {
@@ -368,12 +240,7 @@ QmitkAgentView::QmitkAgentView()
     m_PendingTurns(0),
     m_Stopping(false),
     m_Killing(false),
-    m_StreamBlock(-1),
-    m_FollowEnd(true),
-    m_NoteFontSize(0.0),
-    m_StepGroupOpen(false),
-    m_ConversationCost(0.0),
-    m_NextImageId(1)
+    m_ConversationCost(0.0)
 {
 }
 
@@ -436,21 +303,11 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   header->addWidget(m_NewConversationButton);
   layout->addLayout(header);
 
-  m_Conversation = new ConversationBrowser(parent);
+  m_Conversation = new QmitkAgentConversationWidget(parent);
   m_Conversation->setObjectName("conversation");
-  m_Conversation->setOpenLinks(false);
   m_Conversation->setPlaceholderText("The conversation appears here.");
+  m_Conversation->SetStepsShown(m_ShowStepsCheckBox->isChecked());
   layout->addWidget(m_Conversation, 1);
-
-  // In a style sheet, as the application sets its font size in one, which a
-  // font set on the widget would not override.
-  m_Conversation->ensurePolished();
-  m_NoteFontSize = m_Conversation->font().pointSizeF();
-
-  if (m_NoteFontSize > 0)
-    m_Conversation->setStyleSheet(QString("QTextBrowser { font-size: %1pt; }").arg(m_NoteFontSize * TextScale));
-  else
-    m_NoteFontSize = 0.0;
 
   auto* activity = new QHBoxLayout;
   m_ActivityLabel = new QLabel(parent);
@@ -475,7 +332,7 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   QString inputStyleSheet = "QPlainTextEdit { background: transparent; }";
 
   if (const auto fontSize = m_Input->font().pointSizeF(); fontSize > 0)
-    inputStyleSheet += QString("QPlainTextEdit { font-size: %1pt; }").arg(fontSize * TextScale);
+    inputStyleSheet += QString("QPlainTextEdit { font-size: %1pt; }").arg(fontSize * QmitkAgentConversationWidget::TextScale);
 
   m_Input->setStyleSheet(inputStyleSheet);
   m_Input->setPlaceholderText("Describe what you want to do. Enter sends, Shift+Enter starts a new line.");
@@ -537,13 +394,6 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   connect(m_EffortBox, &QComboBox::currentIndexChanged, this, &QmitkAgentView::OnEffortSelected);
   connect(m_ActivityTimer, &QTimer::timeout, this, &QmitkAgentView::UpdateActivityLabel);
   connect(m_UnlockTimer, &QTimer::timeout, this, &QmitkAgentView::UpdateLock);
-  connect(m_Conversation, &QTextBrowser::anchorClicked, this, &QmitkAgentView::OnLinkClicked);
-
-  connect(m_Conversation->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-    m_FollowEnd = value == m_Conversation->verticalScrollBar()->maximum();
-  });
-
-  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, m_Conversation->viewport(), qOverload<>(&QWidget::update));
 
   m_Process = new QmitkClaudeCodeProcess(this);
   connect(m_Process, &QmitkClaudeCodeProcess::MessageReceived, this, &QmitkAgentView::OnMessageReceived);
@@ -623,7 +473,7 @@ void QmitkAgentView::OfferTools()
 
   if (m_RestServer == nullptr)
   {
-    this->AppendError("The agent cannot work in the Workbench: this build of MITK has no REST API, through which "
+    m_Conversation->AppendError("The agent cannot work in the Workbench: this build of MITK has no REST API, through which "
       "the agent operates it.");
     return;
   }
@@ -632,7 +482,7 @@ void QmitkAgentView::OfferTools()
   {
     if (!this->AcceptRunningServer())
     {
-      this->AppendNote("The agent does not work in the Workbench for now. To let the Agent view start a REST API "
+      m_Conversation->AppendNote("The agent does not work in the Workbench for now. To let the Agent view start a REST API "
         "server of its own, which only the agent can use, stop the running server in the REST API view and reopen "
         "the Agent view. Or require a token in Preferences > REST API.");
       return;
@@ -658,7 +508,7 @@ void QmitkAgentView::OfferTools()
     {
       const auto error = QString::fromStdString(m_RestServer->GetLastError().value_or("unknown error"));
 
-      this->AppendError(QString("The agent cannot work in the Workbench, as the REST API server it works through does "
+      m_Conversation->AppendError(QString("The agent cannot work in the Workbench, as the REST API server it works through does "
         "not start: %1. The log may tell more. You can also start the server yourself in the REST API view and reopen "
         "the Agent view.").arg(error));
       return;
@@ -690,7 +540,7 @@ void QmitkAgentView::OfferTools()
   catch (const mitk::Exception& e)
   {
     MITK_ERROR << e.GetDescription();
-    this->AppendError(QString("The Workbench tools are not available: %1").arg(e.GetDescription()));
+    m_Conversation->AppendError(QString("The Workbench tools are not available: %1").arg(e.GetDescription()));
     return;
   }
 
@@ -963,7 +813,7 @@ void QmitkAgentView::StartProcess()
 
   if (!config.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
-    this->AppendError(QString("Cannot write %1.").arg(configPath));
+    m_Conversation->AppendError(QString("Cannot write %1.").arg(configPath));
     return;
   }
 
@@ -974,7 +824,7 @@ void QmitkAgentView::StartProcess()
 
   if (!promptResource.open(QIODevice::ReadOnly))
   {
-    this->AppendError("The agent's instructions are missing from the plugin.");
+    m_Conversation->AppendError("The agent's instructions are missing from the plugin.");
     return;
   }
 
@@ -987,7 +837,7 @@ void QmitkAgentView::StartProcess()
 
   if (!prompt.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
-    this->AppendError(QString("Cannot write %1.").arg(promptPath));
+    m_Conversation->AppendError(QString("Cannot write %1.").arg(promptPath));
     return;
   }
 
@@ -1029,13 +879,12 @@ void QmitkAgentView::Send()
 
   if (!this->AreToolsOffered())
   {
-    this->AppendNote("The agent cannot work in the Workbench right now, see the messages above.");
+    m_Conversation->AppendNote("The agent cannot work in the Workbench right now, see the messages above.");
     return;
   }
 
   m_Input->clear();
-  m_FollowEnd = true;
-  this->AppendUserMessage(text);
+  m_Conversation->AppendUserMessage(text);
 
   if (!m_Process->IsRunning())
     this->StartProcess();
@@ -1082,11 +931,7 @@ void QmitkAgentView::StartNewConversation()
 
   m_SessionId.clear();
   m_PendingTurns = 0;
-  m_Conversation->clear();
-  m_Images.clear();
-  m_StreamBlock = -1;
-  m_StepGroups.clear();
-  m_StepGroupOpen = false;
+  m_Conversation->Clear();
   m_ToolCalls.clear();
   m_ConversationCost = 0.0;
   this->UpdateCostLabel();
@@ -1310,7 +1155,7 @@ void QmitkAgentView::OnSystemMessage(const QJsonObject& message)
     const auto object = server.toObject();
 
     if (object.value("name").toString() == McpServerName && object.value("status").toString() != "connected")
-      this->AppendError(QString("Claude Code could not connect to the Workbench tools (%1).").arg(object.value("status").toString()));
+      m_Conversation->AppendError(QString("Claude Code could not connect to the Workbench tools (%1).").arg(object.value("status").toString()));
   }
 
   // Built-in tools would give the agent the user's files and a shell.
@@ -1318,7 +1163,7 @@ void QmitkAgentView::OnSystemMessage(const QJsonObject& message)
   {
     if (!tool.toString().startsWith(ToolPrefix))
     {
-      this->AppendError(QString("Claude Code offers the tool \"%1\", which the Agent view does not allow. Stopping.").arg(tool.toString()));
+      m_Conversation->AppendError(QString("Claude Code offers the tool \"%1\", which the Agent view does not allow. Stopping.").arg(tool.toString()));
       m_Killing = true;
       m_Process->Kill();
       m_Killing = false;
@@ -1345,24 +1190,19 @@ void QmitkAgentView::OnStreamEvent(const QJsonObject& message)
     if (blockType == "text")
     {
       this->SetActivity("Writing");
-      m_StreamBlock = this->AppendBlock().blockNumber();
+      m_Conversation->BeginStreamedText();
     }
     else if (blockType == "tool_use")
     {
       this->SetActivity(QString("Using %1").arg(GetToolName(block.value("name").toString())));
     }
   }
-  else if (type == "content_block_delta" && m_StreamBlock >= 0)
+  else if (type == "content_block_delta")
   {
     const auto delta = event.value("delta").toObject();
 
-    if (delta.value("type").toString() != "text_delta")
-      return;
-
-    QTextCursor cursor(m_Conversation->document());
-    cursor.movePosition(QTextCursor::End);
-    cursor.insertText(delta.value("text").toString(), QTextCharFormat());
-    this->ScrollToEnd();
+    if (delta.value("type").toString() == "text_delta")
+      m_Conversation->AppendStreamedText(delta.value("text").toString());
   }
 }
 
@@ -1379,22 +1219,7 @@ void QmitkAgentView::OnAssistantMessage(const QJsonObject& message)
 
     if (type == "text")
     {
-      const auto text = object.value("text").toString();
-
-      if (m_StreamBlock >= 0)
-      {
-        // The complete text replaces the streamed one, formatted now.
-        QTextCursor cursor(m_Conversation->document()->findBlockByNumber(m_StreamBlock));
-        cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-        cursor.removeSelectedText();
-        cursor.insertMarkdown(text);
-        m_StreamBlock = -1;
-        this->ScrollToEnd();
-      }
-      else
-      {
-        this->AppendMarkdown(text);
-      }
+      m_Conversation->EndStreamedText(object.value("text").toString());
     }
     else if (type == "tool_use")
     {
@@ -1414,42 +1239,41 @@ void QmitkAgentView::OnToolResults(const QJsonObject& message)
 
     const auto call = m_ToolCalls.take(object.value("tool_use_id").toString());
     const auto name = GetToolName(call.value("name").toString());
-
     const auto content = object.value("content");
-    const auto text = ToolResultText(content);
-    const auto failed = object.value("is_error").toBool();
 
-    auto cursor = this->AppendStepItem();
+    QmitkAgentStep step;
+    step.Failed = object.value("is_error").toBool();
 
     if (!call.isEmpty())
-      cursor.insertText(Abbreviate(DescribeToolCall(name, call.value("input").toObject()), 200), GetStepFormat(NoteColor, m_NoteFontSize));
+      step.Call = Abbreviate(DescribeToolCall(name, call.value("input").toObject()), 200);
 
     // The result only where it says why a call failed. The transcript of
     // Claude Code keeps all of them.
-    if (failed || call.isEmpty())
+    if (step.Failed || call.isEmpty())
     {
-      if (!call.isEmpty())
-        cursor.insertText(QString(QChar::LineSeparator));
-
-      cursor.insertText(Abbreviate(failed ? DescribeFailure(text) : text, 300), GetStepFormat(failed ? ErrorColor : NoteColor, m_NoteFontSize));
+      const auto text = ToolResultText(content);
+      step.Result = Abbreviate(step.Failed ? DescribeFailure(text) : text, 300);
     }
 
-    const auto thumbnails = this->CreateThumbnails(content);
-
-    if (!thumbnails.isEmpty())
+    for (const auto& item : content.toArray())
     {
-      cursor = this->AppendStepImageBlock();
+      const auto image = item.toObject();
+      const auto source = image.value("source").toObject();
 
-      for (qsizetype i = 0; i < thumbnails.size(); ++i)
-      {
-        if (i > 0)
-          cursor.insertText(" ");
-
-        cursor.insertImage(thumbnails[i]);
-      }
+      if (image.value("type").toString() == "image" && source.value("type").toString() == "base64")
+        step.Images << QByteArray::fromBase64(source.value("data").toString().toLatin1());
     }
 
-    this->FinishStep(name, failed);
+    if (name == "remember")
+    {
+      step.Memory = QmitkAgentStep::MemoryChange::NoteSaved;
+    }
+    else if (name == "forget")
+    {
+      step.Memory = QmitkAgentStep::MemoryChange::NoteDeleted;
+    }
+
+    m_Conversation->AppendStep(step);
   }
 }
 
@@ -1481,11 +1305,11 @@ void QmitkAgentView::OnResult(const QJsonObject& message)
 
   if (subtype == "success")
   {
-    this->AppendNote(QString("Done in %1 s (API-equivalent cost $%2).").arg(seconds, 0, 'f', 1).arg(cost, 0, 'f', 2));
+    m_Conversation->AppendNote(QString("Done in %1 s (API-equivalent cost $%2).").arg(seconds, 0, 'f', 1).arg(cost, 0, 'f', 2));
   }
   else if (subtype == "error_during_execution")
   {
-    this->AppendNote("Stopped.");
+    m_Conversation->AppendNote("Stopped.");
   }
   else
   {
@@ -1494,7 +1318,7 @@ void QmitkAgentView::OnResult(const QJsonObject& message)
     for (const auto& error : message.value("errors").toArray())
       errors << error.toString();
 
-    this->AppendError(QString("The agent stopped (%1). %2").arg(subtype, errors.join(' ')));
+    m_Conversation->AppendError(QString("The agent stopped (%1). %2").arg(subtype, errors.join(' ')));
   }
 }
 
@@ -1516,12 +1340,12 @@ void QmitkAgentView::OnProcessFinished(int exitCode, const QString& errorOutput)
   if (!errorOutput.isEmpty())
     text += " " + Abbreviate(errorOutput, 500);
 
-  this->AppendError(text + " The next message continues the conversation.");
+  m_Conversation->AppendError(text + " The next message continues the conversation.");
 }
 
 void QmitkAgentView::OnProcessError(const QString& description)
 {
-  this->AppendError(description);
+  m_Conversation->AppendError(description);
 }
 
 void QmitkAgentView::CleanUpAfterTurn()
@@ -1555,337 +1379,8 @@ void QmitkAgentView::UpdateCostLabel()
   m_CostLabel->setText(QString("Conversation: $%1").arg(m_ConversationCost, 0, 'f', 2));
 }
 
-void QmitkAgentView::OnLinkClicked(const QUrl& url)
-{
-  if (url.scheme() == ImageScheme)
-  {
-    this->ShowImage(url.path().toInt());
-  }
-  else if (url.scheme() == StepsScheme)
-  {
-    const auto index = url.path().toULongLong();
-
-    if (index < m_StepGroups.size())
-      this->SetStepGroupExpanded(index, !m_StepGroups[index].Expanded);
-  }
-  // Links in the agent's answers must not open local files or programs.
-  else if (url.scheme() == "https" || url.scheme() == "http")
-  {
-    QDesktopServices::openUrl(url);
-  }
-}
-
-QList<QTextImageFormat> QmitkAgentView::CreateThumbnails(const QJsonValue& content)
-{
-  QList<QTextImageFormat> thumbnails;
-  const auto pixelRatio = m_Conversation->devicePixelRatioF();
-
-  for (const auto& item : content.toArray())
-  {
-    const auto object = item.toObject();
-    const auto source = object.value("source").toObject();
-
-    if (object.value("type").toString() != "image" || source.value("type").toString() != "base64")
-      continue;
-
-    const auto data = QByteArray::fromBase64(source.value("data").toString().toLatin1());
-    QImage image;
-
-    if (!image.loadFromData(data))
-      continue;
-
-    const auto size = image.size().scaled(ThumbnailSize, Qt::KeepAspectRatio).boundedTo(image.size());
-    auto thumbnail = image.scaled(size * pixelRatio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    thumbnail.setDevicePixelRatio(pixelRatio);
-
-    const auto id = m_NextImageId++;
-    const auto url = QString("%1:%2").arg(ImageScheme).arg(id);
-
-    m_Images.insert(id, data);
-    m_Conversation->document()->addResource(QTextDocument::ImageResource, QUrl(url), thumbnail);
-
-    QTextImageFormat format;
-    format.setName(url);
-    format.setWidth(size.width());
-    format.setHeight(size.height());
-    format.setAnchor(true);
-    format.setAnchorHref(url);
-    thumbnails << format;
-  }
-
-  return thumbnails;
-}
-
-void QmitkAgentView::ShowImage(int id)
-{
-  QPixmap pixmap;
-
-  if (!pixmap.loadFromData(m_Images.value(id)))
-    return;
-
-  // Not modal, so that the agent can go on working and the user can compare.
-  auto* dialog = new QDialog(m_Conversation);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
-  dialog->setWindowTitle("Screenshot");
-
-  auto* image = new QLabel(dialog);
-  image->setPixmap(pixmap);
-
-  auto* scrollArea = new QScrollArea(dialog);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidget(image);
-
-  auto* layout = new QVBoxLayout(dialog);
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->addWidget(scrollArea);
-
-  const auto available = m_Conversation->screen()->availableGeometry().size() * 0.9;
-  dialog->resize(pixmap.size().boundedTo(available));
-  dialog->show();
-}
-
-QTextCursor QmitkAgentView::AppendBlock()
-{
-  // The space after a group of steps, like the one before its summary.
-  QTextBlockFormat format;
-
-  if (m_StepGroupOpen)
-    format.setTopMargin(StepSpacing);
-
-  m_StreamBlock = -1;
-  m_StepGroupOpen = false;
-
-  QTextCursor cursor(m_Conversation->document());
-  cursor.movePosition(QTextCursor::End);
-
-  // The last block is empty at the start, and after a frame like the one
-  // around a message of the user, which is always followed by a block.
-  if (cursor.block().length() > 1)
-  {
-    cursor.insertBlock(format, QTextCharFormat());
-  }
-  else
-  {
-    cursor.setBlockFormat(format);
-    cursor.setBlockCharFormat(QTextCharFormat());
-  }
-
-  return cursor;
-}
-
-void QmitkAgentView::AppendUserMessage(const QString& text)
-{
-  m_StreamBlock = -1;
-  m_StepGroupOpen = false;
-
-  auto* document = m_Conversation->document();
-  QTextCursor cursor(document);
-  cursor.movePosition(QTextCursor::End);
-
-  // A frame starts after the block at the cursor. Empty, as at the start and
-  // after an earlier frame, that block would show as an empty line above it.
-  const auto emptyBlock = cursor.block().length() == 1
-    ? cursor.blockNumber()
-    : -1;
-
-  cursor.insertFrame(GetMessageFrameFormat());
-  cursor.insertHtml(QString("<b>You:</b> %1").arg(text.toHtmlEscaped().replace('\n', "<br>")));
-
-  if (emptyBlock >= 0)
-  {
-    auto block = document->findBlockByNumber(emptyBlock);
-    block.setVisible(false);
-    document->markContentsDirty(block.position(), block.length());
-  }
-
-  this->ScrollToEnd();
-}
-
-QTextCursor QmitkAgentView::AppendStepItem()
-{
-  if (!m_StepGroupOpen)
-  {
-    auto summary = this->AppendBlock();
-
-    QTextBlockFormat format;
-    format.setTopMargin(StepSpacing);
-    summary.setBlockFormat(format);
-
-    m_StepGroups.push_back({ summary.blockNumber(), summary.blockNumber(), nullptr, 0, 0, 0, 0, m_ShowStepsCheckBox->isChecked() });
-    m_StepGroupOpen = true;
-  }
-
-  auto& group = m_StepGroups.back();
-
-  QTextCursor cursor(m_Conversation->document());
-  cursor.movePosition(QTextCursor::End);
-
-  QTextBlockFormat itemFormat;
-  itemFormat.setBottomMargin(StepItemSpacing);
-
-  // The bullet takes the block's character format.
-  cursor.insertBlock(itemFormat, GetStepFormat(NoteColor, m_NoteFontSize));
-
-  if (group.List == nullptr)
-  {
-    QTextListFormat format;
-    format.setStyle(QTextListFormat::ListDisc);
-    format.setIndent(1);
-    group.List = cursor.createList(format);
-  }
-  else
-  {
-    group.List->add(cursor.block());
-  }
-
-  return cursor;
-}
-
-QTextCursor QmitkAgentView::AppendStepImageBlock()
-{
-  // Not part of the list, but indented as far as the text of its items.
-  QTextBlockFormat format;
-  format.setIndent(1);
-  format.setTopMargin(StepSpacing);
-  format.setBottomMargin(StepSpacing);
-
-  QTextCursor cursor(m_Conversation->document());
-  cursor.movePosition(QTextCursor::End);
-  cursor.insertBlock(format, QTextCharFormat());
-  return cursor;
-}
-
-void QmitkAgentView::FinishStep(const QString& toolName, bool failed)
-{
-  auto& group = m_StepGroups.back();
-  auto* document = m_Conversation->document();
-
-  if (!group.Expanded)
-  {
-    const auto first = document->findBlockByNumber(group.LastBlock + 1);
-
-    for (auto block = first; block.isValid(); block = block.next())
-      block.setVisible(false);
-
-    document->markContentsDirty(first.position(), document->characterCount() - first.position());
-  }
-
-  group.LastBlock = document->lastBlock().blockNumber();
-  ++group.Steps;
-
-  if (failed)
-  {
-    ++group.Failures;
-  }
-  else if (toolName == "remember")
-  {
-    ++group.SavedNotes;
-  }
-  else if (toolName == "forget")
-  {
-    ++group.DeletedNotes;
-  }
-
-  this->UpdateStepSummary(m_StepGroups.size() - 1);
-  this->ScrollToEnd();
-}
-
-void QmitkAgentView::UpdateStepSummary(std::size_t index)
-{
-  const auto& group = m_StepGroups[index];
-
-  auto action = QString("%1 %2")
-    .arg(group.Expanded ? "Hide" : "Show")
-    .arg(group.Steps == 1 ? QString("1 step") : QString("%1 steps").arg(group.Steps));
-
-  if (group.Failures > 0)
-    action += QString(", %1 failed").arg(group.Failures);
-
-  QTextCursor cursor(m_Conversation->document()->findBlockByNumber(group.SummaryBlock));
-  cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-
-  QTextCharFormat format;
-  format.setAnchor(true);
-  format.setAnchorHref(QString("%1:%2").arg(StepsScheme).arg(index));
-  format.setForeground(NoteColor);
-  format.setFontUnderline(true);
-
-  if (m_NoteFontSize > 0)
-    format.setFontPointSize(m_NoteFontSize);
-
-  cursor.insertText(action, format);
-
-  // Most steps go through the same tools of the REST API, so naming them says
-  // little. Changes of the memory are worth a look, though.
-  QStringList memory;
-
-  if (group.SavedNotes > 0)
-    memory << (group.SavedNotes == 1 ? QString("saved a note") : QString("saved %1 notes").arg(group.SavedNotes));
-
-  if (group.DeletedNotes > 0)
-    memory << (group.DeletedNotes == 1 ? QString("deleted a note") : QString("deleted %1 notes").arg(group.DeletedNotes));
-
-  if (!memory.isEmpty())
-  {
-    format.setFontUnderline(false);
-    cursor.insertText(QString(" (%1)").arg(memory.join(", ")), format);
-  }
-}
-
-void QmitkAgentView::SetStepGroupExpanded(std::size_t index, bool expanded)
-{
-  auto& group = m_StepGroups[index];
-  group.Expanded = expanded;
-
-  if (group.LastBlock > group.SummaryBlock)
-  {
-    auto* document = m_Conversation->document();
-    const auto first = document->findBlockByNumber(group.SummaryBlock + 1);
-    const auto last = document->findBlockByNumber(group.LastBlock);
-
-    for (auto block = first; block.isValid() && block.blockNumber() <= group.LastBlock; block = block.next())
-      block.setVisible(expanded);
-
-    document->markContentsDirty(first.position(), last.position() + last.length() - first.position());
-  }
-
-  this->UpdateStepSummary(index);
-}
-
 void QmitkAgentView::OnShowStepsToggled(bool show)
 {
   GetPreferences()->PutBool("showSteps", show);
-
-  for (std::size_t i = 0; i < m_StepGroups.size(); ++i)
-    this->SetStepGroupExpanded(i, show);
-}
-
-void QmitkAgentView::AppendHtml(const QString& html)
-{
-  auto cursor = this->AppendBlock();
-  cursor.insertHtml(html);
-  this->ScrollToEnd();
-}
-
-void QmitkAgentView::AppendMarkdown(const QString& markdown)
-{
-  auto cursor = this->AppendBlock();
-  cursor.insertMarkdown(markdown);
-  this->ScrollToEnd();
-}
-
-void QmitkAgentView::AppendNote(const QString& text)
-{
-  this->AppendHtml(GetNoteHtml(text, m_NoteFontSize));
-}
-
-void QmitkAgentView::AppendError(const QString& text)
-{
-  this->AppendHtml(GetErrorHtml(text, m_NoteFontSize));
-}
-
-void QmitkAgentView::ScrollToEnd()
-{
-  if (m_FollowEnd)
-    m_Conversation->verticalScrollBar()->setValue(m_Conversation->verticalScrollBar()->maximum());
+  m_Conversation->SetStepsShown(show);
 }

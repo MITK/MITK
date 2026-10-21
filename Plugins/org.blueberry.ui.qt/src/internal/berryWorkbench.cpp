@@ -1550,6 +1550,15 @@ IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(
   // manager
   //  }
   //});
+
+  // A new window has no saved state. Maximize the still hidden shell directly;
+  // Shell::SetMaximized() would show it before its page is open.
+  if (newWindow->GetWindowConfigurer()->GetInitialMaximized())
+  {
+    QWidget* control = newWindow->GetShell()->GetControl();
+    control->setWindowState(control->windowState() | Qt::WindowMaximized);
+  }
+
   windowManager.Add(newWindow);
 
   //final WorkbenchException [] exceptions = new WorkbenchException[1];

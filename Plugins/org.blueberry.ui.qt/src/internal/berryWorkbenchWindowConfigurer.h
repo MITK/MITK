@@ -202,6 +202,12 @@ public:
   void SetInitialSize(QPoint size) override;
 
   /**
+   * Returns whether a window opened without saved state starts maximized.
+   * By default true on screens up to Full HD; SetInitialSize() disables it.
+   */
+  bool GetInitialMaximized() const;
+
+  /**
    * Creates the default window contents.
    *
    * @param shell the shell
@@ -388,6 +394,11 @@ private:
    * The initial size to use for the shell.
    */
   QPoint initialSize;
+
+  /**
+   * Whether a window opened without saved state starts maximized.
+   */
+  bool initialMaximized;
 
   /**
    * Object for configuring this workbench window's action bars.

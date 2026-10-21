@@ -26,6 +26,7 @@ found in the LICENSE file.
 
 class QmitkAgentConversationWidget;
 class QmitkAgentMemory;
+class QmitkAgentToolServer;
 class QCheckBox;
 class QComboBox;
 class QLabel;
@@ -33,20 +34,12 @@ class QPlainTextEdit;
 class QPushButton;
 class QTimer;
 
-namespace mitk
-{
-  class McpEndpoint;
-  struct IRestServerService;
-}
-
 /**
  * \brief Chat with an agent that operates the Workbench.
  *
  * The agent is the user's own Claude Code installation, started headless
- * with the Workbench tools as its only tools. The view offers the tools
- * through an MCP endpoint of the REST API for as long as it exists, and
- * starts the REST server for that if it does not run. The agent's token
- * has no access to the file system.
+ * with the Workbench tools as its only tools, which the view offers for as
+ * long as it exists (see QmitkAgentToolServer).
  */
 class QmitkAgentView : public QmitkAbstractView
 {
@@ -74,19 +67,13 @@ protected:
 
 private:
   void OfferTools();
-  void WithdrawTools();
-  bool AreToolsOffered() const;
 
   /**
-   * \brief Whether the agent may use a REST server that runs already.
+   * \brief Whether the agent may use a REST server that runs already and lets others in as well.
    *
-   * Asks the user if the server lets others in as well, unless the user
-   * chose not to be asked again.
+   * Asks the user, unless the user chose not to be asked again.
    */
-  bool AcceptRunningServer();
-
-  /** \brief The tools remember and forget, which keep the agent's notes across conversations. */
-  void AddMemoryTools(mitk::McpEndpoint& endpoint);
+  bool AcceptRunningServer(const QStringList& risks);
 
   /** \brief How Claude Code is run, as far as the settings decide it. */
   QmitkClaudeCodeProcess::Options GetBaseOptions() const;
@@ -181,17 +168,10 @@ private:
   QTimer* m_UnlockTimer;
 
   std::unique_ptr<QmitkAgentMemory> m_Memory;
-  std::unique_ptr<mitk::McpEndpoint> m_Endpoint;
-  mitk::IRestServerService* m_RestServer;
-
-  /** \brief Whether the view started the REST server, and stops it again. */
-  bool m_StartedRestServer;
-
+  std::unique_ptr<QmitkAgentToolServer> m_ToolServer;
   QmitkClaudeCodeProcess* m_Process;
 
   QDir m_Directory;
-  QString m_Token;
-  QString m_McpUrl;
   QString m_Executable;
   QString m_SessionId;
   bool m_SignedIn;

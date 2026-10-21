@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkAgentConversationWidget.h>
 #include <QmitkAgentMemory.h>
 #include <QmitkAgentMemoryDialog.h>
+#include <QmitkAgentToolServer.h>
 
 #include <ctkPlugin.h>
 #include <ctkPluginContext.h>
@@ -24,15 +25,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
-#include <mitkIRestServerService.h>
 #include <mitkLog.h>
-#include <mitkMcpEndpoint.h>
-#include <mitkMcpRestApiTools.h>
-#include <mitkRestGuiThread.h>
-
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleRegistry.h>
 
 #include <QmitkIconTheme.h>
 #include <QmitkPartLock.h>
@@ -42,7 +35,6 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QCoreApplication>
 #include <QFile>
 #include <QFutureWatcher>
 #include <QHBoxLayout>
@@ -68,7 +60,6 @@ namespace
 {
   const QString McpServerName = "mitk";
   const QString ToolPrefix = "mcp__" + McpServerName + "__";
-  const std::string McpPath = "/mcp";
 
   // As in plugin.xml.
   const std::string PreferencePageId = "org.mitk.AgentPreferencePage";
@@ -95,23 +86,6 @@ namespace
         MITK_WARN << "Cannot start " << symbolicName.toStdString() << ": " << e.what();
       }
     }
-  }
-
-  /** The server's URL for a client on the same machine. */
-  QString GetLocalUrl(const mitk::RestServerConfig& config)
-  {
-    auto host = QString::fromStdString(config.host);
-
-    if (host == "::" || host == "0.0.0.0" || host == "localhost")
-    {
-      host = "127.0.0.1";
-    }
-    else if (host.contains(':'))
-    {
-      host = '[' + host + ']';
-    }
-
-    return QString("%1://%2:%3").arg(config.httpsEnabled ? "https" : "http").arg(host).arg(config.port);
   }
 
   QString GetToolName(const QString& name)
@@ -230,8 +204,6 @@ QmitkAgentView::QmitkAgentView()
     m_SendButton(nullptr),
     m_ActivityTimer(nullptr),
     m_UnlockTimer(nullptr),
-    m_RestServer(nullptr),
-    m_StartedRestServer(false),
     m_Process(nullptr),
     m_SignedIn(false),
     m_IgnoreApiKeyVariable(false),
@@ -252,11 +224,13 @@ QmitkAgentView::~QmitkAgentView()
     m_Process->Kill();
   }
 
-  // WithdrawTools() runs the event loop, in which the timer must not lock again.
+  // Withdrawing the tools runs the event loop, in which the timer must not lock again.
   if (m_UnlockTimer != nullptr)
     m_UnlockTimer->stop();
 
-  this->WithdrawTools();
+  if (m_ToolServer != nullptr)
+    m_ToolServer->Withdraw();
+
   QmitkPartLock::GetInstance()->Unlock();
 }
 
@@ -405,6 +379,7 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   m_Directory.cdUp();
 
   m_Memory = std::make_unique<QmitkAgentMemory>(m_Directory.filePath("memory.json"));
+  m_ToolServer = std::make_unique<QmitkAgentToolServer>(*m_Memory);
 
   const auto* preferences = GetPreferences();
   m_Model = QString::fromStdString(preferences->Get("model", ""));
@@ -467,54 +442,18 @@ void QmitkAgentView::OnPreferencesChanged(const mitk::IPreferences* preferences)
 
 void QmitkAgentView::OfferTools()
 {
-  auto* context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
-  const auto reference = context->GetServiceReference<mitk::IRestServerService>();
-  m_RestServer = reference ? context->GetService(reference) : nullptr;
-
-  if (m_RestServer == nullptr)
+  if (const auto risks = m_ToolServer->GetRunningServerRisks(); !risks.isEmpty() && !this->AcceptRunningServer(risks))
   {
-    m_Conversation->AppendError("The agent cannot work in the Workbench: this build of MITK has no REST API, through which "
-      "the agent operates it.");
+    m_Conversation->AppendNote("The agent does not work in the Workbench for now. To let the Agent view start a REST API "
+      "server of its own, which only the agent can use, stop the running server in the REST API view and reopen "
+      "the Agent view. Or require a token in Preferences > REST API.");
     return;
   }
 
-  if (m_RestServer->IsRunning())
+  if (const auto error = m_ToolServer->Offer(); !error.isEmpty())
   {
-    if (!this->AcceptRunningServer())
-    {
-      m_Conversation->AppendNote("The agent does not work in the Workbench for now. To let the Agent view start a REST API "
-        "server of its own, which only the agent can use, stop the running server in the REST API view and reopen "
-        "the Agent view. Or require a token in Preferences > REST API.");
-      return;
-    }
-  }
-  else
-  {
-    // A server for the agent only, whatever the REST API preferences say:
-    // only the agent's token gets in, as the main token is empty, no client
-    // may name files, and nothing outside this computer can reach it.
-    mitk::RestServerConfig config;
-    config.enabled = true;
-    config.host = "127.0.0.1";
-    config.port = 0;
-    config.clientAccessMode = mitk::ClientAccessMode::LocalhostOnly;
-    config.requireAuth = true;
-    config.apiToken.clear();
-    config.fileAccessMode = mitk::FileAccessMode::AllowedDirectories;
-    config.allowedFileDirectories.clear();
-    config.httpsEnabled = false;
-
-    if (!m_RestServer->Start(config, "Agent view"))
-    {
-      const auto error = QString::fromStdString(m_RestServer->GetLastError().value_or("unknown error"));
-
-      m_Conversation->AppendError(QString("The agent cannot work in the Workbench, as the REST API server it works through does "
-        "not start: %1. The log may tell more. You can also start the server yourself in the REST API view and reopen "
-        "the Agent view.").arg(error));
-      return;
-    }
-
-    m_StartedRestServer = true;
+    m_Conversation->AppendError(error);
+    return;
   }
 
   // These plugins add the endpoints of the Workbench, of segmentation, of
@@ -527,83 +466,13 @@ void QmitkAgentView::OfferTools()
   StartPlugin("org.mitk.gui.qt.segmentation");
   StartPlugin("org.mitk.gui.qt.measurementtoolbox");
   StartPlugin("org.mitk.gui.qt.reports");
-
-  m_Endpoint = std::make_unique<mitk::McpEndpoint>("MITK Workbench", "0.2");
-  mitk::AddRestApiTools(*m_Endpoint, m_RestServer);
-  this->AddMemoryTools(*m_Endpoint);
-
-  try
-  {
-    m_Token = QString::fromStdString(m_RestServer->CreateToken("Agent view", mitk::RestTokenRights()));
-    m_Endpoint->Offer(m_RestServer, McpPath);
-  }
-  catch (const mitk::Exception& e)
-  {
-    MITK_ERROR << e.GetDescription();
-    m_Conversation->AppendError(QString("The Workbench tools are not available: %1").arg(e.GetDescription()));
-    return;
-  }
-
-  m_McpUrl = GetLocalUrl(m_RestServer->GetRunningConfig().value()) + "/api/v1" + QString::fromStdString(McpPath);
 }
 
-void QmitkAgentView::WithdrawTools()
+bool QmitkAgentView::AcceptRunningServer(const QStringList& risks)
 {
-  m_McpUrl.clear();
-
-  if (m_Endpoint != nullptr)
-  {
-    m_Endpoint->Withdraw();
-
-    // Calls that run wait for the GUI thread, which is this one.
-    while (m_Endpoint->GetRunningCallCount() > 0)
-      QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
-
-    m_Endpoint.reset();
-  }
-
-  if (m_RestServer == nullptr)
-    return;
-
-  if (!m_Token.isEmpty())
-  {
-    m_RestServer->RemoveToken(m_Token.toStdString());
-    m_Token.clear();
-  }
-
-  if (m_StartedRestServer)
-  {
-    m_RestServer->Stop();
-    m_StartedRestServer = false;
-  }
-}
-
-bool QmitkAgentView::AreToolsOffered() const
-{
-  return !m_McpUrl.isEmpty();
-}
-
-bool QmitkAgentView::AcceptRunningServer()
-{
-  const auto config = m_RestServer->GetRunningConfig();
   auto* preferences = GetPreferences();
 
-  if (!config.has_value() || !preferences->GetBool("warnAboutOpenRestServer", true))
-    return true;
-
-  QStringList risks;
-  const bool remote = config->clientAccessMode != mitk::ClientAccessMode::LocalhostOnly;
-
-  if (!config->requireAuth)
-    risks << "Programs on this computer can use it without a token, and web pages in your browser can use parts of it.";
-
-  if (remote)
-    risks << "Other computers can reach it.";
-
-  if (config->fileAccessMode == mitk::FileAccessMode::Unrestricted && (!config->requireAuth || remote))
-    risks << "These clients can load any file you can read into the Workbench.";
-
-  if (risks.isEmpty())
+  if (!preferences->GetBool("warnAboutOpenRestServer", true))
     return true;
 
   QMessageBox box(QMessageBox::Warning, "Agent", QString(
@@ -627,55 +496,6 @@ bool QmitkAgentView::AcceptRunningServer()
     preferences->PutBool("warnAboutOpenRestServer", false);
 
   return accepted;
-}
-
-void QmitkAgentView::AddMemoryTools(mitk::McpEndpoint& endpoint)
-{
-  auto* memory = m_Memory.get();
-  const auto* server = m_RestServer;
-
-  mitk::McpTool remember;
-  remember.Name = "remember";
-  remember.Description =
-    "Save a note to your memory. You get your notes at the start of every later conversation. Save what you "
-    "learned about operating the Workbench, from the user or by trying, that will help you next time: how a "
-    "tool behaves, a step that is easy to get wrong, or what the user prefers. One fact per note, short and "
-    "general. Never save patient data, image contents, or findings. The user sees each note in the chat and "
-    "can edit or delete it.";
-  remember.InputSchema = {
-    { "type", "object" },
-    { "properties", { { "note", { { "type", "string" } } } } },
-    { "required", { "note" } }
-  };
-  remember.Handler = [memory, server](const nlohmann::json& arguments, const mitk::RestRequest&) {
-    const auto note = QString::fromStdString(arguments.at("note").get<std::string>());
-
-    return mitk::CallInGuiThread(*server, [memory, note]() {
-      const auto id = memory->Add(note);
-      return mitk::McpToolResult::FromText(QString("Saved as note %1.").arg(id).toStdString());
-    });
-  };
-  endpoint.AddTool(remember);
-
-  mitk::McpTool forget;
-  forget.Name = "forget";
-  forget.Description =
-    "Delete a note from your memory, for example one that turned out to be wrong or outdated. To correct a "
-    "note, delete it and save the corrected one.";
-  forget.InputSchema = {
-    { "type", "object" },
-    { "properties", { { "id", { { "type", "integer" }, { "description", "id of the note" } } } } },
-    { "required", { "id" } }
-  };
-  forget.Handler = [memory, server](const nlohmann::json& arguments, const mitk::RestRequest&) {
-    const auto id = arguments.at("id").get<int>();
-
-    return mitk::CallInGuiThread(*server, [memory, id]() {
-      memory->Remove(id);
-      return mitk::McpToolResult::FromText(QString("Deleted note %1.").arg(id).toStdString());
-    });
-  };
-  endpoint.AddTool(forget);
 }
 
 QmitkClaudeCodeProcess::Options QmitkAgentView::GetBaseOptions() const
@@ -799,13 +619,13 @@ void QmitkAgentView::OpenSettings()
 
 void QmitkAgentView::StartProcess()
 {
-  if (!this->AreToolsOffered())
+  if (!m_ToolServer->IsOffered())
     return;
 
   const QJsonObject server = {
     { "type", "http" },
-    { "url", m_McpUrl },
-    { "headers", QJsonObject{ { "Authorization", "Bearer " + m_Token } } }
+    { "url", m_ToolServer->GetUrl() },
+    { "headers", QJsonObject{ { "Authorization", "Bearer " + m_ToolServer->GetToken() } } }
   };
 
   const auto configPath = m_Directory.filePath("mcp.json");
@@ -877,7 +697,7 @@ void QmitkAgentView::Send()
   if (text.isEmpty() || m_Executable.isEmpty())
     return;
 
-  if (!this->AreToolsOffered())
+  if (!m_ToolServer->IsOffered())
   {
     m_Conversation->AppendNote("The agent cannot work in the Workbench right now, see the messages above.");
     return;
@@ -895,7 +715,7 @@ void QmitkAgentView::Send()
   if (m_Stopping)
   {
     m_Stopping = false;
-    m_Endpoint->AcceptCalls();
+    m_ToolServer->AcceptCalls();
   }
 
   m_Process->SendUserMessage(text);
@@ -916,7 +736,7 @@ void QmitkAgentView::Stop()
     return;
 
   m_Stopping = true;
-  m_Endpoint->RefuseCalls("The user stopped you, so this call did nothing. Wait for the user's next message.");
+  m_ToolServer->RefuseCalls("The user stopped you, so this call did nothing. Wait for the user's next message.");
   m_Process->Interrupt();
 
   m_Activity = "Stopping";
@@ -1011,7 +831,7 @@ bool QmitkAgentView::IsTurnRunning() const
 void QmitkAgentView::UpdateLock()
 {
   auto* lock = QmitkPartLock::GetInstance();
-  const bool callsRunning = m_Endpoint != nullptr && m_Endpoint->GetRunningCallCount() > 0;
+  const bool callsRunning = m_ToolServer != nullptr && m_ToolServer->GetRunningCallCount() > 0;
 
   if (!this->IsTurnRunning() && !callsRunning)
   {

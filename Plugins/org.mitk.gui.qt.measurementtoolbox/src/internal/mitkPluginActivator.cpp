@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #if MITK_HAS_RESTAPI
 #include "QmitkImageStatisticsRestRoutes.h"
+#include "QmitkPlanarFigureRestRoutes.h"
 
 #include <mitkIRestServerService.h>
 #include <mitkLog.h>
@@ -52,10 +53,13 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
     {
       for (const auto& route : CreateImageStatisticsRoutes(m_RestServer))
         m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+
+      for (const auto& route : CreatePlanarFigureRoutes(m_RestServer))
+        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
     }
     catch (const mitk::Exception& e)
     {
-      MITK_ERROR << "Cannot offer the image statistics' REST endpoints: " << e.GetDescription();
+      MITK_ERROR << "Cannot offer the measurement toolbox's REST endpoints: " << e.GetDescription();
     }
   }
 #endif

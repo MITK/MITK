@@ -9,7 +9,10 @@ set(INTERNAL_CPP_FILES
 )
 
 if(MITK_HAS_RESTAPI)
-  list(APPEND INTERNAL_CPP_FILES QmitkImageStatisticsRestRoutes.cpp)
+  list(APPEND INTERNAL_CPP_FILES
+    QmitkImageStatisticsRestRoutes.cpp
+    QmitkPlanarFigureRestRoutes.cpp
+  )
 endif()
 
 set(UI_FILES

@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <typeinfo>
 
 
 namespace
@@ -92,6 +93,49 @@ namespace
     }
 
     return nullptr;
+  }
+
+  /**
+   * @brief The property that a JSON value of a request sets on a node or its data.
+   *
+   * A simple value, like 3, takes the type of the property it changes: JSON does
+   * not tell 3 from 3.0, and clients in JavaScript cannot send 3.0 at all. A value
+   * with a type has to name the type of the property it changes, as property lists
+   * refuse to change the type of a property. A new property gets its type from the
+   * value.
+   *
+   * @throw std::exception if the value does not fit the property it changes.
+   */
+  mitk::BaseProperty::Pointer ConvertPropertyFromRequestJson(const nlohmann::json& value, const mitk::DataNode* node,
+    const std::string& propertyKey, const std::string& contextName, mitk::PropertyScope scope)
+  {
+    const auto existing = GetConstProperty(node, propertyKey, contextName, scope);
+
+    if (existing.IsNull())
+      return mitk::ConvertPropertyFromSelfContainedJson(value);
+
+    if (value.is_object() && value.contains("type"))
+    {
+      auto property = mitk::ConvertPropertyFromSelfContainedJson(value);
+
+      if (property.IsNotNull() && typeid(*property) != typeid(*existing))
+      {
+        mitkThrow() << "Property \"" << propertyKey << "\" is a " << existing->GetNameOfClass() << ", not a "
+          << property->GetNameOfClass() << ".";
+      }
+
+      return property;
+    }
+
+    auto property = existing->Clone();
+
+    if (!property->FromJSON(value))
+    {
+      mitkThrow() << "Property \"" << propertyKey << "\" of type " << existing->GetNameOfClass()
+        << " cannot take the value " << value.dump() << ".";
+    }
+
+    return property;
   }
 
   /**
@@ -675,7 +719,7 @@ namespace mitk
         {
           try
           {
-            auto prop = ConvertPropertyFromSelfContainedJson(value);
+            auto prop = ConvertPropertyFromRequestJson(value, node, key, "", PropertyScope::Node);
             if (prop.IsNotNull())
             {
               node->SetProperty(key, prop);
@@ -1056,11 +1100,10 @@ namespace mitk
         {
            propValue = value["value"];
         }
-        auto prop = ConvertPropertyFromSelfContainedJson(propValue);
+        const std::string contextName = params.context.has_value() ? params.context.value() : "";
+        auto prop = ConvertPropertyFromRequestJson(propValue, node, key, contextName, params.scope);
         if (prop.IsNotNull())
         {
-          const std::string contextName = params.context.has_value() ? params.context.value() : "";
-
           if (params.scope == PropertyScope::Data)
           {
             auto data = node->GetData();
@@ -1231,7 +1274,7 @@ namespace mitk
 
         try
         {
-          auto prop = ConvertPropertyFromSelfContainedJson(value);
+          auto prop = ConvertPropertyFromRequestJson(value, node, key, contextName, params.scope);
           if (prop.IsNotNull())
           {
             if (params.scope == PropertyScope::Data)

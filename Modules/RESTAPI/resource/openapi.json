@@ -3603,7 +3603,7 @@
         }
       },
       "PropertyValue": {
-        "description": "Property value. Simple types are returned as-is (boolean, number, string).\nComplex types are returned as `{type, value}` objects.\n",
+        "description": "Property value. Simple types are returned as-is (boolean, number, string).\nComplex types are returned as `{type, value}` objects.\n\nIn requests, a simple value takes the type of the property it changes, so `3` sets a FloatProperty to 3.0, and a `{type, value}` object has to name that type. A new property gets its type from the value: a whole number makes an IntProperty, any other number a FloatProperty, and other types need a `{type, value}` object.\n",
         "oneOf": [
           {
             "type": "boolean"

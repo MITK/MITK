@@ -92,11 +92,15 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(GetNodePropertiesNamesOnly);
   MITK_TEST(GetNodePropertyWithScopeAndValue);
   MITK_TEST(SetNodeProperty);
+  MITK_TEST(SetNodePropertyKeepsTypeOfSimpleValue);
+  MITK_TEST(SetNodePropertyRefusesOtherType);
+  MITK_TEST(SetNodePropertyRefusesUnfittingValue);
   MITK_TEST(DeleteNodeProperty);
   MITK_TEST(DeleteNodePropertyNotFound);
   MITK_TEST(DeleteNodePropertyWithScope);
   MITK_TEST(ReplaceNodeProperties);
   MITK_TEST(ReplaceNodePropertiesWithScope);
+  MITK_TEST(ReplaceNodePropertiesKeepsTypeOfSimpleValue);
   MITK_TEST(MutationRejectsAllScope);
   MITK_TEST(ComplexPropertySerializationRoundTrip);
   MITK_TEST(NameFilterWithExactMatch);
@@ -1299,6 +1303,53 @@ public:
     CPPUNIT_ASSERT(prop.has_value());
   }
 
+  void SetNodePropertyKeepsTypeOfSimpleValue()
+  {
+    // A whole number, as clients in JavaScript send 3.0
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
+
+    auto* property = dynamic_cast<mitk::FloatProperty*>(m_Root1->GetProperty("line.width"));
+    CPPUNIT_ASSERT(property != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, property->GetValue());
+  }
+
+  void SetNodePropertyRefusesOtherType()
+  {
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    const nlohmann::json value = { { "type", "IntProperty" }, { "value", 3 } };
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", value, params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    auto* property = dynamic_cast<mitk::FloatProperty*>(m_Root1->GetProperty("line.width"));
+    CPPUNIT_ASSERT(property != nullptr);
+    CPPUNIT_ASSERT_EQUAL(2.0f, property->GetValue());
+  }
+
+  void SetNodePropertyRefusesUnfittingValue()
+  {
+    m_Root1->SetBoolProperty("flag", true);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "flag", "yes", params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    bool flag = false;
+    CPPUNIT_ASSERT(m_Root1->GetBoolProperty("flag", flag));
+    CPPUNIT_ASSERT(flag);
+  }
+
   void DeleteNodeProperty()
   {
     mitk::PropertyQueryParams params;
@@ -1419,6 +1470,24 @@ public:
     nodeProps = m_Bridge->GetNodeProperties(nodeUid, params);
     CPPUNIT_ASSERT(nodeProps.has_value());
     CPPUNIT_ASSERT(nodeProps.value().contains("node_prop_new"));
+  }
+
+  void ReplaceNodePropertiesKeepsTypeOfSimpleValue()
+  {
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+
+    nlohmann::json newProps;
+    newProps["line.width"] = 3;
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
+
+    auto* property = dynamic_cast<mitk::FloatProperty*>(m_Root1->GetProperty("line.width"));
+    CPPUNIT_ASSERT(property != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, property->GetValue());
   }
 
   void DeleteNodePropertyWithScope()

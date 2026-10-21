@@ -1159,6 +1159,15 @@ Content-Type: application/json
 
 #### 8.2.4 Node Properties {#sec-824-node-properties}
 
+Requests give property values in the form GET returns them. A simple value
+(boolean, number, string) takes the type of the property it changes, so `3`
+sets a `FloatProperty` like `opacity` to 3.0: JSON does not tell `3` from
+`3.0`, and clients in JavaScript send `3` for both. A `{type, value}` object
+has to name the type of the property it changes, as a property keeps its
+type; a value of another type fails for that property. A new property gets
+its type from the value: a whole number makes an `IntProperty`, any other
+number a `FloatProperty`, and other types need a `{type, value}` object.
+
 ##### GET /api/v1/datastorage/nodes/{uid}/properties
 
 Get all properties of a node.

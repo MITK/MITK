@@ -18,7 +18,9 @@ found in the LICENSE file.
 #include <ctkPluginContext.h>
 #include <ctkPluginException.h>
 
+#include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkIRestServerService.h>
 #include <mitkLog.h>
 #include <mitkMcpEndpoint.h>
@@ -86,6 +88,9 @@ namespace
   const QString McpServerName = "mitk";
   const QString ToolPrefix = "mcp__" + McpServerName + "__";
   const std::string McpPath = "/mcp";
+
+  // As in plugin.xml.
+  const std::string PreferencePageId = "org.mitk.AgentPreferencePage";
 
   /** Start a plugin now that would otherwise start only when one of its classes is used. */
   void StartPlugin(const QString& symbolicName)
@@ -521,6 +526,9 @@ QmitkAgentView::QmitkAgentView()
     m_StartedRestServer(false),
     m_Process(nullptr),
     m_SignedIn(false),
+    m_IgnoreApiKeyVariable(false),
+    m_CheckPending(false),
+    m_AuthQueries(0),
     m_PendingTurns(0),
     m_Stopping(false),
     m_Killing(false),
@@ -549,14 +557,28 @@ QmitkAgentView::~QmitkAgentView()
   QmitkPartLock::GetInstance()->Unlock();
 }
 
+QString QmitkAgentView::GetWorkspaceDirectory()
+{
+  const QDir directory(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+  directory.mkpath("Agent/workspace");
+  return directory.filePath("Agent/workspace");
+}
+
 void QmitkAgentView::CreateQtPartControl(QWidget* parent)
 {
   auto* layout = new QVBoxLayout(parent);
 
-  m_StatusLabel = new QLabel("Looking for Claude Code...", parent);
+  m_StatusLabel = new QLabel(parent);
   m_StatusLabel->setObjectName("statusLabel");
   m_StatusLabel->setWordWrap(true);
+  m_StatusLabel->setTextFormat(Qt::RichText);
+  connect(m_StatusLabel, &QLabel::linkActivated, this, &QmitkAgentView::OpenSettings);
   layout->addWidget(m_StatusLabel);
+  this->SetStatus("Looking for Claude Code...");
+
+  connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]() {
+    this->SetStatus(m_Status, m_StatusLinkText);
+  });
 
   auto* header = new QHBoxLayout;
   m_ShowStepsCheckBox = new QCheckBox("Show steps", parent);
@@ -693,15 +715,19 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   connect(m_Process, &QmitkClaudeCodeProcess::Finished, this, &QmitkAgentView::OnProcessFinished);
   connect(m_Process, &QmitkClaudeCodeProcess::ErrorOccurred, this, &QmitkAgentView::OnProcessError);
 
-  m_Directory.setPath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-  m_Directory.mkpath("Agent/workspace");
-  m_Directory.cd("Agent");
+  m_Directory.setPath(GetWorkspaceDirectory());
+  m_Directory.cdUp();
 
   m_Memory = std::make_unique<QmitkAgentMemory>(m_Directory.filePath("memory.json"));
 
   const auto* preferences = GetPreferences();
   m_Model = QString::fromStdString(preferences->Get("model", ""));
   m_Effort = QString::fromStdString(preferences->Get("effort", ""));
+  m_ConfiguredExecutable = QString::fromStdString(preferences->Get("executable", ""));
+  m_IgnoreApiKeyVariable = preferences->GetBool("ignoreApiKeyVariable", false);
+
+  if (auto* activator = QmitkAgentPluginActivator::GetInstance(); activator != nullptr)
+    connect(activator, &QmitkAgentPluginActivator::ClaudeCodeSignedIn, this, &QmitkAgentView::CheckClaudeCodeAgain);
 
   this->UpdateCostLabel();
   this->UpdateControls();
@@ -734,6 +760,23 @@ bool QmitkAgentView::eventFilter(QObject* watched, QEvent* event)
   }
 
   return QmitkAbstractView::eventFilter(watched, event);
+}
+
+void QmitkAgentView::OnPreferencesChanged(const mitk::IPreferences* preferences)
+{
+  if (preferences == nullptr)
+    return;
+
+  // Also called for the choices that the view stores itself, like the model.
+  const auto executable = QString::fromStdString(preferences->Get("executable", ""));
+  const auto ignoreApiKeyVariable = preferences->GetBool("ignoreApiKeyVariable", false);
+
+  if (executable == m_ConfiguredExecutable && ignoreApiKeyVariable == m_IgnoreApiKeyVariable)
+    return;
+
+  m_ConfiguredExecutable = executable;
+  m_IgnoreApiKeyVariable = ignoreApiKeyVariable;
+  this->CheckClaudeCodeAgain();
 }
 
 void QmitkAgentView::OfferTools()
@@ -949,43 +992,69 @@ void QmitkAgentView::AddMemoryTools(mitk::McpEndpoint& endpoint)
   endpoint.AddTool(forget);
 }
 
+QmitkClaudeCodeProcess::Options QmitkAgentView::GetBaseOptions() const
+{
+  QmitkClaudeCodeProcess::Options options;
+  options.Executable = m_Executable;
+  options.WorkingDirectory = GetWorkspaceDirectory();
+  options.IgnoreApiKeyVariable = m_IgnoreApiKeyVariable;
+  return options;
+}
+
 void QmitkAgentView::QueryAuthStatus()
 {
-  m_Executable = QmitkClaudeCodeProcess::FindExecutable();
+  const auto query = ++m_AuthQueries;
+
+  m_Executable = m_ConfiguredExecutable.isEmpty()
+    ? QmitkClaudeCodeProcess::FindExecutable()
+    : m_ConfiguredExecutable;
+
+  m_StatusLabel->setToolTip(QString());
 
   if (m_Executable.isEmpty())
   {
-    m_StatusLabel->setText("Claude Code was not found.");
-    this->AppendNote("Install Claude Code, run \"claude\" once in a terminal, and sign in with /login. Then reopen this view.");
+    this->SetStatus("Claude Code was not found. Install it, or set where it is.", "Settings...");
     return;
   }
 
-  m_StatusLabel->setText("Checking how Claude Code signs in...");
+  if (!QmitkClaudeCodeProcess::IsUsableExecutable(m_Executable))
+  {
+    const auto text = QString("The agent cannot run %1 as Claude Code.").arg(QDir::toNativeSeparators(m_Executable));
+    this->SetStatus(text, "Settings...");
+    m_Executable.clear();
+    return;
+  }
+
+  this->SetStatus("Checking how Claude Code signs in...");
 
   auto* watcher = new QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>(this);
 
-  connect(watcher, &QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>::finished, this, [this, watcher]() {
+  connect(watcher, &QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>::finished, this, [this, watcher, query]() {
     const auto status = watcher->result();
     watcher->deleteLater();
 
+    // The settings changed meanwhile, and a newer query follows.
+    if (query != m_AuthQueries)
+      return;
+
     if (!status.Error.isEmpty())
     {
-      m_StatusLabel->setText(status.Error);
+      this->SetStatus(status.Error, "Settings...");
     }
     else if (!status.LoggedIn)
     {
-      m_StatusLabel->setText("Claude Code is not signed in.");
-      this->AppendNote("Run \"claude\" in a terminal and sign in with /login.");
+      this->SetStatus("Claude Code is not signed in.", "Sign in...");
     }
     else
     {
-      auto text = QString("Claude Code, signed in via %1").arg(status.Method);
-
-      if (!status.Subscription.isEmpty())
-        text += QString(" (%1)").arg(status.Subscription);
-
-      m_StatusLabel->setText(text);
+      this->SetStatus(QString("Claude Code, signed in %1.").arg(status.Describe()), "Settings...");
       m_SignedIn = true;
+
+      if (status.ApiKeySource == "ANTHROPIC_API_KEY")
+      {
+        m_StatusLabel->setToolTip("Claude Code prefers this key over a Claude subscription. To use a subscription instead, sign in "
+          "with it in the settings and choose to use it even if ANTHROPIC_API_KEY is set.");
+      }
 
       // Ahead of the first message, so that it gets a faster answer and the
       // models to choose from are known.
@@ -994,7 +1063,52 @@ void QmitkAgentView::QueryAuthStatus()
     }
   });
 
-  watcher->setFuture(QtConcurrent::run(&QmitkClaudeCodeProcess::QueryAuthStatus, m_Executable));
+  watcher->setFuture(QtConcurrent::run(&QmitkClaudeCodeProcess::QueryAuthStatus, this->GetBaseOptions()));
+}
+
+void QmitkAgentView::CheckClaudeCodeAgain()
+{
+  if (this->IsTurnRunning())
+  {
+    m_CheckPending = true;
+    return;
+  }
+
+  m_CheckPending = false;
+  m_SignedIn = false;
+
+  m_Killing = true;
+  m_Process->Kill();
+  m_Killing = false;
+
+  this->QueryAuthStatus();
+}
+
+void QmitkAgentView::SetStatus(const QString& text, const QString& linkText)
+{
+  m_Status = text;
+  m_StatusLinkText = linkText;
+
+  auto html = text.toHtmlEscaped();
+
+  // In the accent color of the theme, as the default link color is hard to
+  // read in the dark theme, and its style sheet overrides the palette.
+  if (!linkText.isEmpty())
+  {
+    html += QString(" <a href=\"settings\"><span style=\"color: %1;\">%2</span></a>")
+      .arg(QmitkIconTheme::GetAccentColor(), linkText.toHtmlEscaped());
+  }
+
+  m_StatusLabel->setText(html);
+}
+
+void QmitkAgentView::OpenSettings()
+{
+  mitk::CoreServices::GetPreferencesService()->OpenPreferencesDialog(PreferencePageId);
+
+  // Claude Code may have been installed meanwhile, which changes no setting.
+  if (!m_SignedIn)
+    this->CheckClaudeCodeAgain();
 }
 
 void QmitkAgentView::StartProcess()
@@ -1045,9 +1159,7 @@ void QmitkAgentView::StartProcess()
   prompt.write(m_Memory->Describe().toUtf8());
   prompt.close();
 
-  QmitkClaudeCodeProcess::Options options;
-  options.Executable = m_Executable;
-  options.WorkingDirectory = m_Directory.filePath("workspace");
+  auto options = this->GetBaseOptions();
   options.McpConfigFile = configPath;
   options.AllowedTools = { ToolPrefix + "*" };
   options.AppendSystemPromptFile = promptPath;
@@ -1144,8 +1256,14 @@ void QmitkAgentView::StartNewConversation()
   this->UpdateCostLabel();
   this->UpdateControls();
 
-  if (m_SignedIn)
+  if (m_CheckPending)
+  {
+    this->CheckClaudeCodeAgain();
+  }
+  else if (m_SignedIn)
+  {
     this->StartProcess();
+  }
 }
 
 void QmitkAgentView::ShowMemory()
@@ -1586,7 +1704,13 @@ void QmitkAgentView::OnResult(const QJsonObject& message)
   this->UpdateControls();
 
   if (!this->IsTurnRunning())
+  {
     this->CleanUpAfterTurn();
+
+    // Later, as the process is still reporting.
+    if (m_CheckPending)
+      QTimer::singleShot(0, this, &QmitkAgentView::CheckClaudeCodeAgain);
+  }
 
   const auto subtype = message.value("subtype").toString();
   const auto seconds = message.value("duration_ms").toDouble() / 1000.0;
@@ -1628,6 +1752,9 @@ void QmitkAgentView::OnProcessFinished(int exitCode, const QString& errorOutput)
     return;
 
   this->CleanUpAfterTurn();
+
+  if (m_CheckPending)
+    QTimer::singleShot(0, this, &QmitkAgentView::CheckClaudeCodeAgain);
 
   auto text = QString("Claude Code ended (exit code %1).").arg(exitCode);
 

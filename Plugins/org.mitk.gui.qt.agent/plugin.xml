@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.AgentPreferencePage"
+          name="Agent"
+          class="QmitkAgentPreferencePage">
+      <keywordreference id="org.mitk.AgentPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.AgentPreferencePageKeywords"
+             label="agent claude code sign in login account subscription api key anthropic console"/>
+  </extension>
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.agent"
           name="Agent"

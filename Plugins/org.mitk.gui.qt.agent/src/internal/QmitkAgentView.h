@@ -64,11 +64,19 @@ public:
   QmitkAgentView();
   ~QmitkAgentView() override;
 
+  /**
+   * \brief The empty directory in which Claude Code runs, created if missing.
+   *
+   * Claude Code reads project settings and CLAUDE.md files from there.
+   */
+  static QString GetWorkspaceDirectory();
+
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
 
 protected:
   bool eventFilter(QObject* watched, QEvent* event) override;
+  void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
 
 private:
   void OfferTools();
@@ -85,7 +93,24 @@ private:
 
   /** \brief The tools remember and forget, which keep the agent's notes across conversations. */
   void AddMemoryTools(mitk::McpEndpoint& endpoint);
+
+  /** \brief How Claude Code is run, as far as the settings decide it. */
+  QmitkClaudeCodeProcess::Options GetBaseOptions() const;
+
   void QueryAuthStatus();
+
+  /**
+   * \brief Finds and asks Claude Code again after its settings or sign-in changed.
+   *
+   * Restarts the process, which the conversation continues in. A running
+   * turn keeps its process, and the check follows when the turn ends.
+   */
+  void CheckClaudeCodeAgain();
+
+  /** \brief Shows the status of Claude Code, followed by a link to the settings unless \p linkText is empty. */
+  void SetStatus(const QString& text, const QString& linkText = QString());
+
+  void OpenSettings();
   void StartProcess();
   void RestartIdleProcess();
   void Send();
@@ -201,6 +226,11 @@ private:
   };
 
   QLabel* m_StatusLabel;
+
+  /** \brief What the status label shows, to show it again in the colors of another theme. */
+  QString m_Status;
+  QString m_StatusLinkText;
+
   QCheckBox* m_ShowStepsCheckBox;
   QPushButton* m_MemoryButton;
   QPushButton* m_NewConversationButton;
@@ -232,6 +262,16 @@ private:
   QString m_Executable;
   QString m_SessionId;
   bool m_SignedIn;
+
+  /** \brief The settings that Claude Code runs with; an empty executable is looked for. */
+  QString m_ConfiguredExecutable;
+  bool m_IgnoreApiKeyVariable;
+
+  /** \brief Whether CheckClaudeCodeAgain() waits for the running turn to end. */
+  bool m_CheckPending;
+
+  /** \brief Counts the queries of the sign-in, so that only the last one counts. */
+  int m_AuthQueries;
 
   /**
    * \brief The messages sent whose turns have not ended.

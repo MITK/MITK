@@ -25,22 +25,49 @@ namespace
 {
   constexpr qsizetype MaxErrorOutputSize = 8192;
 
-  bool IsUsableExecutable(const QString& path)
+  // Keeps the user's own settings, hooks and plugins away from the agent.
+  const QString SettingSources = "--setting-sources=project";
+}
+
+QString QmitkClaudeCodeProcess::AuthStatus::Describe() const
+{
+  if (Method == "claude.ai")
   {
-    if (path.isEmpty())
-      return false;
-
-    const QFileInfo info(path);
-
-#ifdef Q_OS_WIN
-    // A .cmd or .bat wrapper (an npm install) would run through cmd.exe,
-    // which reinterprets the arguments.
-    if (info.suffix().compare("exe", Qt::CaseInsensitive) != 0)
-      return false;
-#endif
-
-    return info.isFile() && info.isExecutable();
+    return Subscription.isEmpty()
+      ? QString("with a Claude subscription")
+      : QString("with a Claude subscription (%1)").arg(Subscription);
   }
+
+  if (Method == "api_key")
+  {
+    if (ApiKeySource == "ANTHROPIC_API_KEY")
+      return "with the API key in ANTHROPIC_API_KEY, billed per token";
+
+    // The key that "claude auth login --console" creates.
+    if (ApiKeySource == "/login managed key")
+      return "with an Anthropic Console account, billed per token";
+
+    return "with an API key, billed per token";
+  }
+
+  if (Method == "oauth_token")
+    return "with a token from the environment";
+
+  if (Method == "third_party")
+  {
+    if (ApiProvider == "bedrock")
+      return "through Amazon Bedrock";
+
+    if (ApiProvider == "vertex")
+      return "through Google Vertex AI";
+
+    if (ApiProvider == "foundry")
+      return "through Microsoft Foundry";
+
+    return QString("through %1").arg(ApiProvider);
+  }
+
+  return QString("via %1").arg(Method);
 }
 
 QmitkClaudeCodeProcess::QmitkClaudeCodeProcess(QObject* parent)
@@ -80,13 +107,29 @@ QString QmitkClaudeCodeProcess::FindExecutable()
   return IsUsableExecutable(installed) ? installed : QString();
 }
 
-QmitkClaudeCodeProcess::AuthStatus QmitkClaudeCodeProcess::QueryAuthStatus(const QString& executable)
+bool QmitkClaudeCodeProcess::IsUsableExecutable(const QString& path)
+{
+  if (path.isEmpty())
+    return false;
+
+  const QFileInfo info(path);
+
+#ifdef Q_OS_WIN
+  if (info.suffix().compare("exe", Qt::CaseInsensitive) != 0)
+    return false;
+#endif
+
+  return info.isFile() && info.isExecutable();
+}
+
+QmitkClaudeCodeProcess::AuthStatus QmitkClaudeCodeProcess::QueryAuthStatus(const Options& options)
 {
   AuthStatus status;
 
   QProcess process;
-  process.setProcessEnvironment(GetEnvironment());
-  process.start(executable, { "auth", "status" });
+  process.setWorkingDirectory(options.WorkingDirectory);
+  process.setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
+  process.start(options.Executable, { SettingSources, "auth", "status" });
 
   if (!process.waitForFinished(10000))
   {
@@ -107,18 +150,27 @@ QmitkClaudeCodeProcess::AuthStatus QmitkClaudeCodeProcess::QueryAuthStatus(const
   status.LoggedIn = object.value("loggedIn").toBool();
   status.Method = object.value("authMethod").toString();
   status.Subscription = object.value("subscriptionType").toString();
+  status.ApiKeySource = object.value("apiKeySource").toString();
+  status.ApiProvider = object.value("apiProvider").toString();
 
   return status;
 }
 
-QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment()
+QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(bool ignoreApiKeyVariable)
 {
   auto environment = QProcessEnvironment::systemEnvironment();
 
+  if (ignoreApiKeyVariable)
+    environment.remove("ANTHROPIC_API_KEY");
+
   for (const auto& key : environment.keys())
   {
+    // Git Bash, the token of "claude setup-token", and the provider.
+    const bool setByUser = key == "CLAUDE_CODE_GIT_BASH_PATH" || key == "CLAUDE_CODE_OAUTH_TOKEN" ||
+      key.startsWith("CLAUDE_CODE_USE_");
+
     const bool setByParentSession = key == "CLAUDECODE" || key == "CLAUDE_PID" || key == "CLAUDE_EFFORT" ||
-      (key.startsWith("CLAUDE_CODE_") && key != "CLAUDE_CODE_GIT_BASH_PATH" && !key.startsWith("CLAUDE_CODE_USE_"));
+      (key.startsWith("CLAUDE_CODE_") && !setByUser);
 
     if (setByParentSession)
       environment.remove(key);
@@ -153,7 +205,7 @@ void QmitkClaudeCodeProcess::Start(const Options& options)
     "--strict-mcp-config",
     "--mcp-config", options.McpConfigFile,
     "--permission-mode", "dontAsk",
-    "--setting-sources=project",
+    SettingSources,
     // Claude Code's own memory would ask the agent to write files with the
     // built-in tools, which are removed.
     "--settings", R"({"disableClaudeAiConnectors": true, "autoMemoryEnabled": false})"
@@ -181,7 +233,7 @@ void QmitkClaudeCodeProcess::Start(const Options& options)
   m_Process->setProgram(options.Executable);
   m_Process->setArguments(arguments);
   m_Process->setWorkingDirectory(options.WorkingDirectory);
-  m_Process->setProcessEnvironment(GetEnvironment());
+  m_Process->setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
   m_Process->start();
 
   if (!m_Process->waitForStarted(10000))

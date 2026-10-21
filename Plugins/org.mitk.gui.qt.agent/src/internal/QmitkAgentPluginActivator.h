@@ -28,8 +28,16 @@ public:
   /** \brief The context of the active plugin, or nullptr. */
   static ctkPluginContext* GetContext();
 
+  /** \brief The activator of the active plugin, which relays events between its parts, or nullptr. */
+  static QmitkAgentPluginActivator* GetInstance();
+
+signals:
+  /** \brief Claude Code signed in, maybe with another account than before. */
+  void ClaudeCodeSignedIn();
+
 private:
   static ctkPluginContext* s_Context;
+  static QmitkAgentPluginActivator* s_Instance;
 };
 
 #endif

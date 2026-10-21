@@ -1,0 +1,68 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitkAgentPreferencePage_h
+#define QmitkAgentPreferencePage_h
+
+#include "QmitkAgentSignInDialog.h"
+
+#include <berryIQtPreferencePage.h>
+
+class QmitkInfoCard;
+class QCheckBox;
+class QLineEdit;
+class QPushButton;
+
+/**
+ * \brief Settings of the agent: which Claude Code runs, how it signs in,
+ *        and whether a subscription takes precedence over an API key.
+ *
+ * The credentials stay with Claude Code. The Agent view applies the
+ * settings, and checks the sign-in again when Claude Code signed in here.
+ */
+class QmitkAgentPreferencePage : public QObject, public berry::IQtPreferencePage
+{
+  Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
+
+public:
+  void Init(berry::IWorkbench::Pointer workbench) override;
+
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
+
+  bool PerformOk() override;
+  void PerformCancel() override;
+  void Update() override;
+
+private:
+  /** \brief The executable that the settings on the page lead to; empty if none is found. */
+  QString GetExecutable() const;
+
+  /** \brief Shows how Claude Code signs in with the settings on the page, which may not be applied yet. */
+  void UpdateStatus();
+
+  void BrowseExecutable();
+  void SignIn(QmitkAgentSignInDialog::Account account);
+
+  QWidget* m_Control = nullptr;
+  QLineEdit* m_ExecutableEdit = nullptr;
+  QCheckBox* m_IgnoreApiKeyCheckBox = nullptr;
+  QmitkInfoCard* m_StatusCard = nullptr;
+  QPushButton* m_SubscriptionButton = nullptr;
+  QPushButton* m_ConsoleButton = nullptr;
+
+  /** \brief Counts the queries of the sign-in, so that only the last one shows. */
+  int m_StatusQueries = 0;
+};
+
+#endif

@@ -32,7 +32,9 @@ found in the LICENSE file.
  *
  * Authentication is entirely Claude Code's own: this class never sees
  * credentials. Which method Claude Code uses can be queried with
- * QueryAuthStatus().
+ * QueryAuthStatus(). Claude Code reads no user settings, so credentials
+ * or providers configured there do not apply, only those that "claude
+ * auth login" stores and environment variables.
  */
 class MITKAGENT_EXPORT QmitkClaudeCodeProcess : public QObject
 {
@@ -69,9 +71,17 @@ public:
 
     /** \brief A session to continue; empty for a new one. */
     QString ResumeSessionId;
+
+    /**
+     * \brief Whether Claude Code does not get the environment variable ANTHROPIC_API_KEY.
+     *
+     * Claude Code prefers the key over a signed-in subscription and bills
+     * per token.
+     */
+    bool IgnoreApiKeyVariable = false;
   };
 
-  struct AuthStatus
+  struct MITKAGENT_EXPORT AuthStatus
   {
     bool LoggedIn = false;
 
@@ -81,8 +91,17 @@ public:
     /** \brief The subscription, for example "team"; empty for API keys. */
     QString Subscription;
 
+    /** \brief Where an API key comes from, for example "ANTHROPIC_API_KEY"; empty without one. */
+    QString ApiKeySource;
+
+    /** \brief Who serves the models, for example "firstParty" or "bedrock". */
+    QString ApiProvider;
+
     /** \brief Why the status could not be read; empty on success. */
     QString Error;
+
+    /** \brief How Claude Code signs in and who pays, for example "with a Claude subscription (team)". */
+    QString Describe() const;
   };
 
   /** \brief A model that the account can use. */
@@ -106,8 +125,22 @@ public:
   /** \brief Find the claude executable on the PATH or in its default install location. */
   static QString FindExecutable();
 
-  /** \brief Ask Claude Code how it would authenticate. Blocks for up to a few seconds. */
-  static AuthStatus QueryAuthStatus(const QString& executable);
+  /**
+   * \brief Whether \p path is a claude executable that Start() can run.
+   *
+   * On Windows, only an .exe: the .cmd wrapper of an npm install would run
+   * through cmd.exe, which reinterprets the arguments.
+   */
+  static bool IsUsableExecutable(const QString& path);
+
+  /**
+   * \brief Ask Claude Code how it would authenticate if started with \p options.
+   *
+   * Reads the settings that Start() lets Claude Code read, from the same
+   * working directory, so that the answer holds for the process. Blocks for
+   * up to a few seconds.
+   */
+  static AuthStatus QueryAuthStatus(const Options& options);
 
   /**
    * \brief The environment Claude Code is started with.
@@ -116,7 +149,7 @@ public:
    * session sets, which would otherwise make the child behave as nested,
    * and with 127.0.0.1 exempt from any HTTP proxy.
    */
-  static QProcessEnvironment GetEnvironment();
+  static QProcessEnvironment GetEnvironment(bool ignoreApiKeyVariable = false);
 
   /** \brief Start Claude Code. Emits ErrorOccurred() if it cannot be started. */
   void Start(const Options& options);

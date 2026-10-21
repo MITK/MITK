@@ -177,6 +177,12 @@ QmitkVoxTellToolGUI::QmitkVoxTellToolGUI()
 
 QmitkVoxTellToolGUI::~QmitkVoxTellToolGUI()
 {
+  if (auto* tool = this->GetTool(); tool != nullptr)
+  {
+    tool->ModelLoadedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+
   if (m_Preferences != nullptr)
   {
     m_Preferences->OnPropertyChanged -=

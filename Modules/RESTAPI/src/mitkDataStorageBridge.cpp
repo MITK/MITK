@@ -118,7 +118,13 @@ namespace
     {
       auto property = mitk::ConvertPropertyFromSelfContainedJson(value);
 
-      if (property.IsNotNull() && typeid(*property) != typeid(*existing))
+      if (property.IsNull())
+        return property;
+
+      const auto& newProperty = *property;
+      const auto& existingProperty = *existing;
+
+      if (typeid(newProperty) != typeid(existingProperty))
       {
         mitkThrow() << "Property \"" << propertyKey << "\" is a " << existing->GetNameOfClass() << ", not a "
           << property->GetNameOfClass() << ".";

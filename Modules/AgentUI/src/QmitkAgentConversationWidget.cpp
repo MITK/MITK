@@ -373,6 +373,11 @@ QTextCursor QmitkAgentConversationWidget::AppendStepItem()
       .SummaryBlock = summaryBlock,
       .PreviewBlock = cursor.blockNumber(),
       .LastBlock = cursor.blockNumber(),
+      .List = nullptr,
+      .Steps = 0,
+      .Failures = 0,
+      .SavedNotes = 0,
+      .DeletedNotes = 0,
       .Expanded = m_StepsShown });
 
     m_StepGroupOpen = true;

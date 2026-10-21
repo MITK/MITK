@@ -56,21 +56,25 @@ found in the LICENSE file.
 #include <QPainter>
 #include <QPixmap>
 #include <QPlainTextEdit>
+#include <QPointer>
 #include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSignalBlocker>
 #include <QStandardPaths>
+#include <QStyledItemDelegate>
 #include <QTextBlock>
 #include <QTextBrowser>
 #include <QTextCursor>
+#include <QTextEdit>
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextList>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtConcurrent>
+#include <QtMath>
 
 #include <algorithm>
 
@@ -235,6 +239,104 @@ namespace
 
       QTextBrowser::paintEvent(event);
     }
+  };
+
+  /**
+   * Edits the text of an item in a box that wraps it like the list does and
+   * whose row grows with it. Enter confirms, as the text is one paragraph.
+   */
+  class ParagraphDelegate : public QStyledItemDelegate
+  {
+  public:
+    explicit ParagraphDelegate(QAbstractItemView* view)
+      : QStyledItemDelegate(view),
+        m_View(view),
+        m_EditorHeight(0)
+    {
+    }
+
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const override
+    {
+      auto* editor = new QTextEdit(parent);
+      editor->setAcceptRichText(false);
+      editor->setTabChangesFocus(true);
+      editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+      // The dark theme draws a box with a border, like a line edit.
+      editor->setFrameShape(QFrame::Box);
+
+      // Queued, as the document signals in the middle of its layout.
+      connect(editor->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, editor,
+        [this, editor, index = QPersistentModelIndex(index)](const QSizeF& size) {
+          // The view hides an editor before it destroys it.
+          if (editor->isHidden())
+            return;
+
+          m_EditedIndex = index;
+          m_EditorHeight = qCeil(size.height()) + 2 * editor->frameWidth();
+          m_View->doItemsLayout();
+          m_View->scrollTo(index);
+        },
+        Qt::QueuedConnection);
+
+      return editor;
+    }
+
+    void destroyEditor(QWidget* editor, const QModelIndex& index) const override
+    {
+      m_EditedIndex = QPersistentModelIndex();
+      QStyledItemDelegate::destroyEditor(editor, index);
+
+      // Back to the height of the text, once the view has closed the editor.
+      QMetaObject::invokeMethod(m_View, &QAbstractItemView::doItemsLayout, Qt::QueuedConnection);
+    }
+
+    void setEditorData(QWidget* editor, const QModelIndex& index) const override
+    {
+      auto* textEdit = static_cast<QTextEdit*>(editor);
+      textEdit->setPlainText(index.data(Qt::EditRole).toString());
+      textEdit->moveCursor(QTextCursor::End);
+    }
+
+    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
+    {
+      model->setData(index, static_cast<QTextEdit*>(editor)->toPlainText(), Qt::EditRole);
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+      return m_EditedIndex == index
+        ? QSize(option.rect.width(), m_EditorHeight)
+        : QStyledItemDelegate::sizeHint(option, index);
+    }
+
+  protected:
+    bool eventFilter(QObject* object, QEvent* event) override
+    {
+      if (event->type() == QEvent::KeyPress)
+      {
+        if (const auto key = static_cast<QKeyEvent*>(event)->key(); key == Qt::Key_Return || key == Qt::Key_Enter)
+        {
+          // Queued, like for a line edit. A message box from the commit takes
+          // the focus, upon which the view closes and destroys the editor.
+          QMetaObject::invokeMethod(object, [this, editor = QPointer<QWidget>(static_cast<QWidget*>(object))]() {
+            emit this->commitData(editor);
+
+            if (editor != nullptr)
+              emit this->closeEditor(editor, QAbstractItemDelegate::SubmitModelCache);
+          }, Qt::QueuedConnection);
+
+          return true;
+        }
+      }
+
+      return QStyledItemDelegate::eventFilter(object, event);
+    }
+
+  private:
+    QAbstractItemView* m_View;
+    mutable QPersistentModelIndex m_EditedIndex;
+    mutable int m_EditorHeight;
   };
 
   QString GetToolName(const QString& name)
@@ -994,7 +1096,14 @@ void QmitkAgentView::ShowMemory()
 
   auto* list = new QListWidget(&dialog);
   list->setWordWrap(true);
+  list->setSpacing(6);
   list->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  list->setItemDelegate(new ParagraphDelegate(list));
+
+  // In the size of the conversation, in a style sheet like there. The editor
+  // needs its own rule, as the application sets the size of every widget.
+  if (const auto fontSize = m_Conversation->font().pointSizeF(); fontSize > 0)
+    list->setStyleSheet(QString("QListWidget, QTextEdit { font-size: %1pt; }").arg(fontSize));
 
   for (const auto& note : m_Memory->GetNotes())
   {

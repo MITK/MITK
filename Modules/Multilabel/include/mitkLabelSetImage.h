@@ -243,6 +243,24 @@ namespace mitk
       OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
 
     /**
+     * \brief Splits the content of a label into its connected components.
+     *
+     * The label keeps its largest component. Every further component moves to a new instance of the
+     * label in the same group: a clone with the same name and color, but without center of mass and
+     * without DICOM tracking ID and UID, because these identify a single finding. Voxels connect via
+     * faces, edges and corners (26-neighborhood). No voxel is added or removed.
+     *
+     * \param labelValue The value of the label that should be split.
+     * \param t The time step whose content is split; the content of other time steps stays with the
+     * label. A segmentation with a single time step serves every time step.
+     * \return The value of the label followed by the values of the new instances, ordered by voxel
+     * count, largest first. Only the label value if it has at most one component at the time step.
+     * \pre labelValue must exist.
+     * \pre t must be a valid time step.
+     */
+    LabelValueVectorType SplitLabelIntoConnectedComponents(LabelValueType labelValue, TimeStepType t = 0);
+
+    /**
      * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one,
      * if also labels are added.
      * \param labels Labels that will be added to the new group if provided

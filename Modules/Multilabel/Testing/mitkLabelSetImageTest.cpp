@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkIOUtil.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
@@ -20,6 +21,7 @@ found in the LICENSE file.
 
 #include <mitkAutoCropImageFilter.h>
 
+#include <algorithm>
 #include <array>
 
 namespace CppUnit
@@ -84,6 +86,9 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestIsEmpty);
   MITK_TEST(TestIsEmpty_Static);
   MITK_TEST(TestMergeLabels);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents_SingleComponent);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents_Dynamic);
   MITK_TEST(TestCreateLabelMask);
   MITK_TEST(TestUpdateCenterOfMass);
   MITK_TEST(TestUpdateCenterOfMass_ReusedUntilGroupImageChanges);
@@ -937,6 +942,88 @@ public:
     PaintBox(segmentation->GetGroupImage(0), 0, { 1, 1, 1 }, { 1, 1, 1 }, 5);
 
     CPPUNIT_ASSERT_MESSAGE("Static segmentation was not checked for a later time step", !segmentation->IsEmpty(5, 3));
+  }
+
+  static std::size_t CountVoxels(const mitk::Image* groupImage, mitk::TimeStepType timeStep, mitk::Label::PixelType value)
+  {
+    mitk::ImageReadAccessor accessor(groupImage, groupImage->GetVolumeData(timeStep));
+    const auto* pixels = static_cast<const mitk::Label::PixelType*>(accessor.GetData());
+    const std::size_t numPixels = std::size_t(1) * groupImage->GetDimension(0) * groupImage->GetDimension(1) * groupImage->GetDimension(2);
+
+    return static_cast<std::size_t>(std::count(pixels, pixels + numPixels, value));
+  }
+
+  void TestSplitLabelIntoConnectedComponents()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+    const auto label = segmentation->GetLabel(5);
+    label->SetTrackingID("Nodule");
+    label->SetTrackingUID("1.2.3");
+
+    // In raster order the smallest component comes first and the largest last, so the result order comes from sorting.
+    PaintBox(groupImage, 0, { 90, 5, 0 }, { 90, 5, 0 }, 5);
+    PaintBox(groupImage, 0, { 60, 20, 10 }, { 69, 29, 19 }, 5);
+    PaintBox(groupImage, 0, { 10, 20, 25 }, { 19, 29, 44 }, 5);
+    PaintBox(groupImage, 0, { 70, 20, 10 }, { 75, 29, 19 }, 6); // Touches the medium component, but belongs to another label.
+
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(5);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(3), result.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The split label does not come first", mitk::Label::PixelType(5), result[0]);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 0, 5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong second instance", std::size_t(1000), CountVoxels(groupImage, 0, result[1]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong third instance", std::size_t(1), CountVoxels(groupImage, 0, result[2]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Another label was changed", std::size_t(600), CountVoxels(groupImage, 0, 6));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Instances were not added", 4u, segmentation->GetNumberOfLabels(0));
+    CPPUNIT_ASSERT_MESSAGE("The label lost its tracking ID", label->HasTrackingID() && label->HasTrackingUID());
+
+    for (std::size_t i = 1; i < result.size(); ++i)
+    {
+      const auto instance = segmentation->GetLabel(result[i]);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance is in another group", mitk::MultiLabelSegmentation::GroupIndexType(0), segmentation->GetGroupIndexOfLabel(result[i]));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance has another name", label->GetName(), instance->GetName());
+      CPPUNIT_ASSERT_MESSAGE("Instance has another color", label->GetColor() == instance->GetColor());
+      CPPUNIT_ASSERT_MESSAGE("Instance kept the tracking ID of the label", !instance->HasTrackingID() && !instance->HasTrackingUID());
+    }
+  }
+
+  void TestSplitLabelIntoConnectedComponents_SingleComponent()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    PaintBox(groupImage, 0, { 20, 30, 25 }, { 20, 30, 25 }, 5); // Touches the box at a corner only.
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A label connected at a corner was split",
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 5 }), segmentation->SplitLabelIntoConnectedComponents(5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An empty label was split",
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 6 }), segmentation->SplitLabelIntoConnectedComponents(6));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Labels were added", 2u, segmentation->GetNumberOfLabels(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label content changed", std::size_t(2001), CountVoxels(groupImage, 0, 5));
+    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(7), mitk::Exception);
+  }
+
+  void TestSplitLabelIntoConnectedComponents_Dynamic()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    for (mitk::TimeStepType timeStep = 0; timeStep < 2; ++timeStep)
+    {
+      PaintBox(groupImage, timeStep, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+      PaintBox(groupImage, timeStep, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+    }
+
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Time step 0 was split", std::size_t(3000), CountVoxels(groupImage, 0, 5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance has content at time step 0", std::size_t(0), CountVoxels(groupImage, 0, result[1]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 1, 5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong instance at time step 1", std::size_t(1000), CountVoxels(groupImage, 1, result[1]));
+    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(5, 2), mitk::Exception);
   }
 };
 

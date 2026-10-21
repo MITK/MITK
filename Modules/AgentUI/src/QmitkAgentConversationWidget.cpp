@@ -34,10 +34,14 @@ found in the LICENSE file.
 namespace
 {
   const QString ImageScheme = "agent-image";
+  const QString PreviewScheme = "agent-preview";
   const QString StepsScheme = "agent-steps";
 
   // Gestures in render windows return a screenshot each, so thumbnails stay small.
   const QSize ThumbnailSize(160, 100);
+
+  // Smaller still, as a preview gathers the images of all steps of a group.
+  const QSize PreviewSize(96, 60);
 
   // Around groups of steps and around thumbnails. The same for both: a hidden
   // block still passes its bottom margin on to the next visible one, so a
@@ -90,6 +94,20 @@ namespace
     format.setTopMargin(StepSpacing);
     format.setBottomMargin(StepSpacing);
     return format;
+  }
+
+  /** Inserts the thumbnails in a row that wraps, after those the block already has. */
+  void InsertThumbnails(QTextCursor& cursor, const QList<QTextImageFormat>& thumbnails)
+  {
+    for (const auto& thumbnail : thumbnails)
+    {
+      // In a format of its own, as the space would take that of the image
+      // before it and link to it.
+      if (!cursor.atBlockStart())
+        cursor.insertText(" ", QTextCharFormat());
+
+      cursor.insertImage(thumbnail);
+    }
   }
 }
 
@@ -220,19 +238,30 @@ void QmitkAgentConversationWidget::AppendStep(const QmitkAgentStep& step)
     cursor.insertText(step.Result, GetStepFormat(step.Failed ? ErrorColor : NoteColor, m_NoteFontSize));
   }
 
-  const auto thumbnails = this->CreateThumbnails(step.Images);
+  QList<QTextImageFormat> thumbnails;
+  QList<QTextImageFormat> previews;
+
+  for (const auto& data : step.Images)
+  {
+    QImage image;
+
+    if (!image.loadFromData(data))
+      continue;
+
+    const auto id = m_NextImageId++;
+    const auto link = QString("%1:%2").arg(ImageScheme).arg(id);
+    m_Images.insert(id, data);
+
+    thumbnails << this->CreateThumbnail(image, ThumbnailSize, link, link);
+    previews << this->CreateThumbnail(image, PreviewSize, QString("%1:%2").arg(PreviewScheme).arg(id), link);
+  }
 
   if (!thumbnails.isEmpty())
   {
     cursor = this->AppendStepImageBlock();
+    InsertThumbnails(cursor, thumbnails);
 
-    for (qsizetype i = 0; i < thumbnails.size(); ++i)
-    {
-      if (i > 0)
-        cursor.insertText(" ");
-
-      cursor.insertImage(thumbnails[i]);
-    }
+    this->AppendPreviews(previews);
   }
 
   this->FinishStep(step);
@@ -321,14 +350,26 @@ QTextCursor QmitkAgentConversationWidget::AppendStepItem()
 {
   if (!m_StepGroupOpen)
   {
-    auto summary = this->AppendBlock();
+    auto cursor = this->AppendBlock();
 
     QTextBlockFormat format;
     format.setTopMargin(StepSpacing);
-    summary.setBlockFormat(format);
+    cursor.setBlockFormat(format);
 
-    m_StepGroups.push_back({ summary.blockNumber(), summary.blockNumber(), nullptr, 0, 0, 0, 0, m_StepsShown });
+    const auto summaryBlock = cursor.blockNumber();
+
+    // The preview has no bottom margin: hidden while the steps show, it would
+    // pass it on to the first of them.
+    cursor.insertBlock(format, QTextCharFormat());
+
+    m_StepGroups.push_back({
+      .SummaryBlock = summaryBlock,
+      .PreviewBlock = cursor.blockNumber(),
+      .LastBlock = cursor.blockNumber(),
+      .Expanded = m_StepsShown });
+
     m_StepGroupOpen = true;
+    this->UpdatePreview(m_StepGroups.back());
   }
 
   auto& group = m_StepGroups.back();
@@ -453,10 +494,10 @@ void QmitkAgentConversationWidget::SetStepGroupExpanded(std::size_t index, bool 
   auto& group = m_StepGroups[index];
   group.Expanded = expanded;
 
-  if (group.LastBlock > group.SummaryBlock)
+  if (group.LastBlock > group.PreviewBlock)
   {
     auto* document = this->document();
-    const auto first = document->findBlockByNumber(group.SummaryBlock + 1);
+    const auto first = document->findBlockByNumber(group.PreviewBlock + 1);
     const auto last = document->findBlockByNumber(group.LastBlock);
 
     for (auto block = first; block.isValid() && block.blockNumber() <= group.LastBlock; block = block.next())
@@ -465,7 +506,29 @@ void QmitkAgentConversationWidget::SetStepGroupExpanded(std::size_t index, bool 
     document->markContentsDirty(first.position(), last.position() + last.length() - first.position());
   }
 
+  this->UpdatePreview(group);
   this->UpdateStepSummary(index);
+}
+
+void QmitkAgentConversationWidget::AppendPreviews(const QList<QTextImageFormat>& previews)
+{
+  const auto& group = m_StepGroups.back();
+
+  QTextCursor cursor(this->document()->findBlockByNumber(group.PreviewBlock));
+  cursor.movePosition(QTextCursor::EndOfBlock);
+  InsertThumbnails(cursor, previews);
+
+  this->UpdatePreview(group);
+}
+
+void QmitkAgentConversationWidget::UpdatePreview(const StepGroup& group)
+{
+  auto* document = this->document();
+  auto block = document->findBlockByNumber(group.PreviewBlock);
+
+  // Empty, it would show as an empty line.
+  block.setVisible(!group.Expanded && block.length() > 1);
+  document->markContentsDirty(block.position(), block.length());
 }
 
 void QmitkAgentConversationWidget::AppendHtml(const QString& html)
@@ -475,38 +538,23 @@ void QmitkAgentConversationWidget::AppendHtml(const QString& html)
   this->ScrollToEnd();
 }
 
-QList<QTextImageFormat> QmitkAgentConversationWidget::CreateThumbnails(const QList<QByteArray>& images)
+QTextImageFormat QmitkAgentConversationWidget::CreateThumbnail(const QImage& image, const QSize& size, const QString& name, const QString& link)
 {
-  QList<QTextImageFormat> thumbnails;
   const auto pixelRatio = this->devicePixelRatioF();
+  const auto thumbnailSize = image.size().scaled(size, Qt::KeepAspectRatio).boundedTo(image.size());
 
-  for (const auto& data : images)
-  {
-    QImage image;
+  auto thumbnail = image.scaled(thumbnailSize * pixelRatio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  thumbnail.setDevicePixelRatio(pixelRatio);
 
-    if (!image.loadFromData(data))
-      continue;
+  this->document()->addResource(QTextDocument::ImageResource, QUrl(name), thumbnail);
 
-    const auto size = image.size().scaled(ThumbnailSize, Qt::KeepAspectRatio).boundedTo(image.size());
-    auto thumbnail = image.scaled(size * pixelRatio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    thumbnail.setDevicePixelRatio(pixelRatio);
-
-    const auto id = m_NextImageId++;
-    const auto url = QString("%1:%2").arg(ImageScheme).arg(id);
-
-    m_Images.insert(id, data);
-    this->document()->addResource(QTextDocument::ImageResource, QUrl(url), thumbnail);
-
-    QTextImageFormat format;
-    format.setName(url);
-    format.setWidth(size.width());
-    format.setHeight(size.height());
-    format.setAnchor(true);
-    format.setAnchorHref(url);
-    thumbnails << format;
-  }
-
-  return thumbnails;
+  QTextImageFormat format;
+  format.setName(name);
+  format.setWidth(thumbnailSize.width());
+  format.setHeight(thumbnailSize.height());
+  format.setAnchor(true);
+  format.setAnchorHref(link);
+  return format;
 }
 
 void QmitkAgentConversationWidget::ShowImage(int id)

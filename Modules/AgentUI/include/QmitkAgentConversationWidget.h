@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <vector>
 
+class QImage;
 class QTextImageFormat;
 class QTextList;
 
@@ -33,8 +34,10 @@ class QTextList;
  *
  * The user's messages appear in frames that look like the input. The steps
  * of a turn form a group, which a summary line shows or hides. The images of
- * a step appear as thumbnails, which open the image when clicked. The text is
- * larger than the rest of the application, notes and steps keep its size.
+ * a step appear as thumbnails, which open the image when clicked. While the
+ * steps are hidden, smaller thumbnails of all their images show below the
+ * summary, as the steps arrive. The text is larger than the rest of the
+ * application, notes and steps keep its size.
  */
 class MITKAGENTUI_EXPORT QmitkAgentConversationWidget : public QTextBrowser
 {
@@ -76,6 +79,10 @@ private:
   struct StepGroup
   {
     int SummaryBlock;
+
+    /** \brief Below the summary, the thumbnails of the images of all steps, shown while the steps are hidden. */
+    int PreviewBlock;
+
     int LastBlock;
 
     /** \brief The list of the steps; null until the first step. */
@@ -110,10 +117,20 @@ private:
   void UpdateStepSummary(std::size_t index);
   void SetStepGroupExpanded(std::size_t index, bool expanded);
 
+  /** \brief Adds the thumbnails to the preview of the last group of steps. */
+  void AppendPreviews(const QList<QTextImageFormat>& previews);
+
+  /** \brief Shows the preview of the group if its steps are hidden and it has thumbnails, else hides it. */
+  void UpdatePreview(const StepGroup& group);
+
   void AppendHtml(const QString& html);
 
-  /** \brief Stores the images and returns their thumbnails, as links to them. */
-  QList<QTextImageFormat> CreateThumbnails(const QList<QByteArray>& images);
+  /**
+   * \brief Stores a thumbnail of the image in the document and returns it, as a link.
+   *
+   * \param name The name of the thumbnail in the document.
+   */
+  QTextImageFormat CreateThumbnail(const QImage& image, const QSize& size, const QString& name, const QString& link);
 
   void ShowImage(int id);
   void OnLinkClicked(const QUrl& url);

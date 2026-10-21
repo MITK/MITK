@@ -1175,6 +1175,65 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   };
   routes.push_back(removeLabel);
 
+  RestRoute splitLabel;
+  splitLabel.Method = "POST";
+  splitLabel.Path = "/segmentation/segmentations/:uid/labels/:value/split";
+  splitLabel.Summary = "Split a label into one instance per separate part";
+  splitLabel.Description =
+    "For a label that stands for several separate findings, like the lung nodules that TotalSegmentator or "
+    "VoxTell put into one label. The label keeps its largest part; every further part becomes a new instance, "
+    "a label with the same name, color and group but a value of its own. Voxels touching at a face, an edge or "
+    "a corner belong to the same part; no voxel is added or removed. Query parameter: timepoint_ms (optional), "
+    "the time point to split, the selected time point without it; other time steps stay with the label. "
+    "Undoable. Returns {data: [label]}, the label and its new instances, largest first, as GET .../labels gives "
+    "them; only the label if it has no separate parts.";
+  splitLabel.Handler = [server](const RestRequest& request) {
+    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      ShowView(request.Path);
+      auto* segmentation = GetSegmentation(node, request.Path);
+      const auto label = GetLabel(segmentation, request);
+      const auto selection = RestTimeSelection::FromRequest(request);
+
+      if (selection.All)
+        throw RestException(ErrorResponse::InvalidRequest("A label is split at one time point, timepoint_ms cannot be all.", request.Path));
+
+      const auto timeSteps = selection.GetTimeSteps(segmentation);
+
+      if (timeSteps.empty())
+      {
+        Throw("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "The segmentation has no data at " +
+          std::to_string(selection.TimePoint) + " ms.", 422, request.Path);
+      }
+
+      const auto name = label->GetName();
+      SegGroupModifyUndoRedoHelper undoRedo(segmentation, { segmentation->GetGroupIndexOfLabel(label->GetValue()) },
+        false, timeSteps.front(), false, false, true);
+      const auto values = segmentation->SplitLabelIntoConnectedComponents(label->GetValue(), timeSteps.front());
+
+      if (1 < values.size())
+        undoRedo.RegisterUndoRedoOperationEvent("Split label \"" + name + "\" into " + std::to_string(values.size()) + " instances");
+
+      RenderingManager::GetInstance()->RequestUpdateAll();
+
+      const auto labels = DescribeLabels(segmentation, selection);
+      auto instances = nlohmann::json::array();
+
+      for (const auto value : values)
+      {
+        const auto described = std::find_if(labels.begin(), labels.end(),
+          [value](const nlohmann::json& json) { return json.at("value") == value; });
+
+        if (described != labels.end())
+          instances.push_back(*described);
+      }
+
+      return instances;
+    }));
+  };
+  routes.push_back(splitLabel);
+
   RestRoute groups;
   groups.Method = "GET";
   groups.Path = "/segmentation/segmentations/:uid/groups";

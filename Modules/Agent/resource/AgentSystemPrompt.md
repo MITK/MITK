@@ -317,6 +317,24 @@ in this order:
   absent. In particular, a pathology task that finds nothing does not rule
   the pathology out; tell the user so.
 
+### Separate findings in one label
+
+TotalSegmentator and VoxTell put all findings of a kind, like the nodules
+of `lung_nodules`, into one label. When the user wants them counted,
+measured or reported one by one, split the label after the confirm: POST
+`/api/v1/segmentation/segmentations/{uid}/labels/{value}/split` keeps the
+largest part in the label and makes each further separate part a new
+instance, and answers with all of them, largest first, with voxels and
+milliliters. Instances share the name; address them by value.
+`/api/v1/statistics` measures each instance on its own.
+
+- Split only labels of separate findings, like nodules, lesions or
+  metastases. Do not split an organ that a tool returned in pieces: its
+  pieces are not findings.
+- Instances of a few voxels are often noise of the model rather than
+  findings. Mention them, and delete them only when the user agrees.
+- POST `/api/v1/workbench/undo` undoes the split.
+
 When you report, say what you segmented, how you checked it (which windows
 and slices), how confident you are, and what a human should look at.
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkAgentPreferencePage_h
 #define QmitkAgentPreferencePage_h
 
-#include "QmitkAgentSignInDialog.h"
+#include <QmitkAgentSignInDialog.h>
 
 #include <berryIQtPreferencePage.h>
 

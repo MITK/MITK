@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkAgentMemory_h
 #define QmitkAgentMemory_h
 
+#include <MitkAgentExports.h>
+
 #include <QString>
 
 #include <cstddef>
@@ -28,7 +30,7 @@ found in the LICENSE file.
  *
  * Not thread-safe; use it from the GUI thread only.
  */
-class QmitkAgentMemory
+class MITKAGENT_EXPORT QmitkAgentMemory
 {
 public:
   struct Note

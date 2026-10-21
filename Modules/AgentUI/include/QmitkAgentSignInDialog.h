@@ -13,12 +13,17 @@ found in the LICENSE file.
 #ifndef QmitkAgentSignInDialog_h
 #define QmitkAgentSignInDialog_h
 
+#include <MitkAgentUIExports.h>
+
 #include <QDialog>
 #include <QProcess>
 
-class QDialogButtonBox;
-class QLabel;
-class QLineEdit;
+#include <memory>
+
+namespace Ui
+{
+  class QmitkAgentSignInDialog;
+}
 
 /**
  * \brief Signs Claude Code in, like "claude auth login" in a terminal.
@@ -28,7 +33,7 @@ class QLineEdit;
  * the dialog. The dialog is accepted once Claude Code is signed in, and the
  * credentials stay with Claude Code.
  */
-class QmitkAgentSignInDialog : public QDialog
+class MITKAGENTUI_EXPORT QmitkAgentSignInDialog : public QDialog
 {
 public:
   enum class Account
@@ -49,13 +54,10 @@ private:
   void SubmitCode();
   void ShowError(const QString& error);
 
+  std::unique_ptr<Ui::QmitkAgentSignInDialog> m_Ui;
   QProcess* m_Process;
   QByteArray m_Output;
   QByteArray m_ErrorOutput;
-  QLabel* m_PageLabel;
-  QLineEdit* m_CodeEdit;
-  QLabel* m_ErrorLabel;
-  QDialogButtonBox* m_Buttons;
 };
 
 #endif

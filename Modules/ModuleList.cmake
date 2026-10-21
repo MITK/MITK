@@ -68,4 +68,5 @@ set(MITK_MODULES
   PythonSegmentationUI
   RESTAPI
   Agent
+  AgentUI
 )

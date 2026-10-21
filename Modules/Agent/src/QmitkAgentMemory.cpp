@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAgentMemory.h"
+#include <QmitkAgentMemory.h>
 
 #include <mitkLog.h>
 

@@ -2,10 +2,8 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  QmitkAgentMemory.cpp
   QmitkAgentPluginActivator.cpp
   QmitkAgentPreferencePage.cpp
-  QmitkAgentSignInDialog.cpp
   QmitkAgentView.cpp
 )
 

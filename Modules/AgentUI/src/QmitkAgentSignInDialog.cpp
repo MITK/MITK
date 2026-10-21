@@ -10,63 +10,29 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAgentSignInDialog.h"
+#include <QmitkAgentSignInDialog.h>
+#include <ui_QmitkAgentSignInDialog.h>
 
 #include <QmitkClaudeCodeProcess.h>
 
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QProcess>
 #include <QPushButton>
 #include <QRegularExpression>
-#include <QVBoxLayout>
 
 QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Account account, QWidget* parent)
   : QDialog(parent),
-    m_Process(new QProcess(this)),
-    m_PageLabel(new QLabel(this)),
-    m_CodeEdit(new QLineEdit(this)),
-    m_ErrorLabel(new QLabel(this)),
-    m_Buttons(new QDialogButtonBox(QDialogButtonBox::Cancel, this))
+    m_Ui(std::make_unique<Ui::QmitkAgentSignInDialog>()),
+    m_Process(new QProcess(this))
 {
+  m_Ui->setupUi(this);
+
   const bool subscription = account == Account::Subscription;
-
   this->setWindowTitle(subscription ? "Sign In with a Claude Subscription" : "Sign In with an Anthropic Console Account");
-  this->setMinimumWidth(480);
 
-  auto* description = new QLabel("Sign in on the page that Claude Code opens in your browser. "
-    "This dialog closes once Claude Code is signed in.", this);
-  description->setWordWrap(true);
+  m_Ui->pageLabel->hide();
+  m_Ui->errorLabel->hide();
 
-  m_PageLabel->setWordWrap(true);
-  m_PageLabel->setOpenExternalLinks(true);
-  m_PageLabel->hide();
-
-  auto* codeLabel = new QLabel("If the page shows a code, paste it here:", this);
-
-  // The default button, so that Enter in the code field continues instead of cancelling.
-  auto* continueButton = new QPushButton("Continue", this);
-  continueButton->setDefault(true);
-
-  auto* codeLayout = new QHBoxLayout;
-  codeLayout->addWidget(m_CodeEdit);
-  codeLayout->addWidget(continueButton);
-
-  m_ErrorLabel->setWordWrap(true);
-  m_ErrorLabel->hide();
-
-  auto* layout = new QVBoxLayout(this);
-  layout->addWidget(description);
-  layout->addWidget(m_PageLabel);
-  layout->addWidget(codeLabel);
-  layout->addLayout(codeLayout);
-  layout->addWidget(m_ErrorLabel);
-  layout->addWidget(m_Buttons);
-
-  connect(continueButton, &QPushButton::clicked, this, &QmitkAgentSignInDialog::SubmitCode);
-  connect(m_Buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+  connect(m_Ui->continueButton, &QPushButton::clicked, this, &QmitkAgentSignInDialog::SubmitCode);
+  connect(m_Ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
   connect(m_Process, &QProcess::readyReadStandardOutput, this, &QmitkAgentSignInDialog::OnOutput);
   connect(m_Process, &QProcess::finished, this, &QmitkAgentSignInDialog::OnFinished);
@@ -96,7 +62,7 @@ void QmitkAgentSignInDialog::OnOutput()
 {
   m_Output += m_Process->readAllStandardOutput();
 
-  if (!m_PageLabel->isHidden())
+  if (!m_Ui->pageLabel->isHidden())
     return;
 
   // The page in case the browser did not open. Where links are supported,
@@ -110,8 +76,8 @@ void QmitkAgentSignInDialog::OnOutput()
   if (!match.hasMatch() || match.capturedEnd() == output.size())
     return;
 
-  m_PageLabel->setText(QString("If no browser opened, <a href=\"%1\">open the sign-in page</a>.").arg(match.captured().toHtmlEscaped()));
-  m_PageLabel->show();
+  m_Ui->pageLabel->setText(QString("If no browser opened, <a href=\"%1\">open the sign-in page</a>.").arg(match.captured().toHtmlEscaped()));
+  m_Ui->pageLabel->show();
 }
 
 void QmitkAgentSignInDialog::OnFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -128,25 +94,25 @@ void QmitkAgentSignInDialog::OnFinished(int exitCode, QProcess::ExitStatus exitS
     ? QString("Claude Code ended before it was signed in (exit code %1).").arg(exitCode)
     : error);
 
-  m_CodeEdit->setEnabled(false);
-  m_Buttons->setStandardButtons(QDialogButtonBox::Close);
+  m_Ui->codeEdit->setEnabled(false);
+  m_Ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
 }
 
 void QmitkAgentSignInDialog::SubmitCode()
 {
-  const auto code = m_CodeEdit->text().trimmed();
+  const auto code = m_Ui->codeEdit->text().trimmed();
 
   if (code.isEmpty() || m_Process->state() != QProcess::Running)
     return;
 
   m_ErrorOutput.clear();
-  m_ErrorLabel->hide();
+  m_Ui->errorLabel->hide();
   m_Process->write(code.toUtf8() + '\n');
-  m_CodeEdit->clear();
+  m_Ui->codeEdit->clear();
 }
 
 void QmitkAgentSignInDialog::ShowError(const QString& error)
 {
-  m_ErrorLabel->setText(error);
-  m_ErrorLabel->show();
+  m_Ui->errorLabel->setText(error);
+  m_Ui->errorLabel->show();
 }

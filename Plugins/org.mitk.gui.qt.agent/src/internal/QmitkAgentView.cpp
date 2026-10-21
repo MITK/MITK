@@ -11,8 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkAgentView.h"
-#include "QmitkAgentMemory.h"
 #include "QmitkAgentPluginActivator.h"
+
+#include <QmitkAgentMemory.h>
+#include <QmitkAgentMemoryDialog.h>
 
 #include <ctkPlugin.h>
 #include <ctkPluginContext.h>
@@ -43,7 +45,6 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDialog>
-#include <QDialogButtonBox>
 #include <QFile>
 #include <QFutureWatcher>
 #include <QHBoxLayout>
@@ -52,32 +53,26 @@ found in the LICENSE file.
 #include <QJsonDocument>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <QPainterPath>
 #include <QPixmap>
 #include <QPlainTextEdit>
-#include <QPointer>
 #include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSignalBlocker>
 #include <QStandardPaths>
-#include <QStyledItemDelegate>
 #include <QTextBlock>
 #include <QTextBrowser>
 #include <QTextCursor>
-#include <QTextEdit>
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextList>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtConcurrent>
-#include <QtMath>
 
 #include <algorithm>
 
@@ -245,165 +240,6 @@ namespace
 
       QTextBrowser::paintEvent(event);
     }
-  };
-
-  /**
-   * Shows the text of each item as a paragraph in a frame with slightly
-   * rounded corners. Edits it in place, and the row grows with the text.
-   * Enter confirms, as the text is one paragraph.
-   */
-  class ParagraphDelegate : public QStyledItemDelegate
-  {
-  public:
-    explicit ParagraphDelegate(QListView* view)
-      : QStyledItemDelegate(view),
-        m_View(view),
-        m_EditorHeight(0)
-    {
-    }
-
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
-    {
-      const bool editing = m_EditedIndex == index;
-
-      QPainterPath frame;
-      frame.addRoundedRect(QRectF(option.rect).adjusted(0.5, 0.5, -0.5, -0.5), Radius, Radius);
-
-      painter->save();
-      painter->setRenderHint(QPainter::Antialiasing);
-      painter->fillPath(frame, QmitkSpeechBubbleFrame::GetFillColor(option.palette));
-
-      // The selection and hover of the theme, in the shape of the frame.
-      if (!editing)
-      {
-        painter->save();
-        painter->setClipPath(frame, Qt::IntersectClip);
-        m_View->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
-        painter->restore();
-      }
-
-      painter->setPen(editing
-        ? option.palette.color(QPalette::Highlight)
-        : QmitkSpeechBubbleFrame::GetBorderColor(option.palette));
-
-      painter->drawPath(frame);
-      painter->restore();
-
-      // The editor shows the text.
-      if (editing)
-        return;
-
-      // Without the states that the frame shows already.
-      auto textOption = option;
-      textOption.rect = option.rect.marginsRemoved(PaddingMargins);
-      textOption.state &= ~(QStyle::State_Selected | QStyle::State_MouseOver | QStyle::State_HasFocus);
-      QStyledItemDelegate::paint(painter, textOption, index);
-    }
-
-    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
-    {
-      // A width of 0 leaves the view to stretch the row to its width.
-      if (m_EditedIndex == index && m_EditorHeight > 0)
-        return QSize(0, m_EditorHeight + 2 * Padding);
-
-      // Wrapped at the width of the rows that the view paints. It lays them
-      // out at that width, but asks for their size at the width of its
-      // contents, which may be wider. The text then takes fewer lines there,
-      // and the view would paint it elided and leave a gap below.
-      auto textOption = option;
-      textOption.rect.setWidth(m_View->viewport()->width() - 2 * m_View->spacing());
-      textOption.rect = textOption.rect.marginsRemoved(PaddingMargins);
-      return QSize(0, QStyledItemDelegate::sizeHint(textOption, index).height() + 2 * Padding);
-    }
-
-    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const override
-    {
-      auto* editor = new QTextEdit(parent);
-      editor->setAcceptRichText(false);
-      editor->setTabChangesFocus(true);
-      editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-      editor->setFrameShape(QFrame::NoFrame);
-      editor->setStyleSheet("QTextEdit { background: transparent; }");
-      editor->document()->setDocumentMargin(0);
-
-      m_EditedIndex = index;
-      m_EditorHeight = 0;
-
-      // Queued, as the document signals in the middle of its layout.
-      connect(editor->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, editor,
-        [this, editor, index = QPersistentModelIndex(index)](const QSizeF& size) {
-          // The view hides an editor before it destroys it.
-          if (editor->isHidden())
-            return;
-
-          m_EditorHeight = qCeil(size.height()) + 2 * editor->frameWidth();
-          m_View->doItemsLayout();
-          m_View->scrollTo(index);
-        },
-        Qt::QueuedConnection);
-
-      return editor;
-    }
-
-    void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex&) const override
-    {
-      // Where the list shows the text, which the style indents by this margin.
-      const auto textMargin = m_View->style()->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1;
-      editor->setGeometry(option.rect.marginsRemoved(PaddingMargins).adjusted(textMargin, 0, -textMargin, 0));
-    }
-
-    void destroyEditor(QWidget* editor, const QModelIndex& index) const override
-    {
-      m_EditedIndex = QPersistentModelIndex();
-      QStyledItemDelegate::destroyEditor(editor, index);
-
-      // Back to the text, once the view has closed the editor.
-      QMetaObject::invokeMethod(m_View, &QAbstractItemView::doItemsLayout, Qt::QueuedConnection);
-    }
-
-    void setEditorData(QWidget* editor, const QModelIndex& index) const override
-    {
-      auto* textEdit = static_cast<QTextEdit*>(editor);
-      textEdit->setPlainText(index.data(Qt::EditRole).toString());
-      textEdit->moveCursor(QTextCursor::End);
-    }
-
-    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
-    {
-      model->setData(index, static_cast<QTextEdit*>(editor)->toPlainText(), Qt::EditRole);
-    }
-
-  protected:
-    bool eventFilter(QObject* object, QEvent* event) override
-    {
-      if (event->type() == QEvent::KeyPress)
-      {
-        if (const auto key = static_cast<QKeyEvent*>(event)->key(); key == Qt::Key_Return || key == Qt::Key_Enter)
-        {
-          // Queued, like for a line edit. A message box from the commit takes
-          // the focus, upon which the view closes and destroys the editor.
-          QMetaObject::invokeMethod(object, [this, editor = QPointer<QWidget>(static_cast<QWidget*>(object))]() {
-            emit this->commitData(editor);
-
-            if (editor != nullptr)
-              emit this->closeEditor(editor, QAbstractItemDelegate::SubmitModelCache);
-          }, Qt::QueuedConnection);
-
-          return true;
-        }
-      }
-
-      return QStyledItemDelegate::eventFilter(object, event);
-    }
-
-  private:
-    static constexpr int Padding = 6;
-    static constexpr QMargins PaddingMargins = QMargins(Padding, Padding, Padding, Padding);
-    static constexpr qreal Radius = 4;
-
-    QListView* m_View;
-    mutable QPersistentModelIndex m_EditedIndex;
-    mutable int m_EditorHeight;
   };
 
   QString GetToolName(const QString& name)
@@ -1268,92 +1104,11 @@ void QmitkAgentView::StartNewConversation()
 
 void QmitkAgentView::ShowMemory()
 {
-  QDialog dialog(m_Conversation);
-  dialog.setWindowTitle("Agent Memory");
-
-  auto* description = new QLabel("The agent gets these notes at the start of every conversation. Double-click a note to edit it.", &dialog);
-  description->setWordWrap(true);
-
-  auto* list = new QListWidget(&dialog);
-  list->setWordWrap(true);
-  list->setSpacing(6);
-  list->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  list->setItemDelegate(new ParagraphDelegate(list));
-
-  // In the size of the conversation, in a style sheet like there. The editor
-  // needs its own rule, as the application sets the size of every widget.
-  if (const auto fontSize = m_Conversation->font().pointSizeF(); fontSize > 0)
-    list->setStyleSheet(QString("QListWidget, QTextEdit { font-size: %1pt; }").arg(fontSize));
-
-  for (const auto& note : m_Memory->GetNotes())
-  {
-    auto* item = new QListWidgetItem(note.Text, list);
-    item->setData(Qt::UserRole, note.Id);
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
-  }
-
-  auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
-  auto* deleteButton = buttons->addButton("Delete", QDialogButtonBox::ActionRole);
-  deleteButton->setEnabled(false);
-
-  auto* layout = new QVBoxLayout(&dialog);
-  layout->addWidget(description);
-  layout->addWidget(list);
-  layout->addWidget(buttons);
-
-  bool changed = false;
-
-  connect(list, &QListWidget::itemSelectionChanged, &dialog, [list, deleteButton]() {
-    deleteButton->setEnabled(!list->selectedItems().isEmpty());
-  });
-
-  connect(list, &QListWidget::itemChanged, &dialog, [this, &dialog, &changed, list](QListWidgetItem* item) {
-    const auto id = item->data(Qt::UserRole).toInt();
-
-    try
-    {
-      m_Memory->SetText(id, item->text());
-      changed = true;
-    }
-    catch (const std::exception& e)
-    {
-      QMessageBox::warning(&dialog, "Agent Memory", QString::fromStdString(e.what()));
-    }
-
-    // Show the note as stored: normalized, or unchanged if it was rejected.
-    for (const auto& note : m_Memory->GetNotes())
-    {
-      if (note.Id == id)
-      {
-        const QSignalBlocker blocker(list);
-        item->setText(note.Text);
-      }
-    }
-  });
-
-  connect(deleteButton, &QPushButton::clicked, &dialog, [this, &dialog, &changed, list]() {
-    for (auto* item : list->selectedItems())
-    {
-      try
-      {
-        m_Memory->Remove(item->data(Qt::UserRole).toInt());
-        delete item;
-        changed = true;
-      }
-      catch (const std::exception& e)
-      {
-        QMessageBox::warning(&dialog, "Agent Memory", QString::fromStdString(e.what()));
-        return;
-      }
-    }
-  });
-
-  connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-
-  dialog.resize(560, 400);
+  // In the size of the conversation.
+  QmitkAgentMemoryDialog dialog(*m_Memory, std::max(0.0, m_Conversation->font().pointSizeF()), m_Conversation);
   dialog.exec();
 
-  if (changed)
+  if (dialog.HasChanged())
     this->RestartIdleProcess();
 }
 

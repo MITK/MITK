@@ -103,13 +103,15 @@ macro(mitk_create_executable)
         if(NOT EXEC_NAME)
           set(EXEC_NAME ${MODULE_TARGET})
         endif()
-        foreach(BUILD_TYPE debug release)
+        mitkFunctionGetWindowsBatchScriptBuildTypes(_batch_build_types)
+        foreach(BUILD_TYPE IN LISTS _batch_build_types)
           mitkFunctionCreateWindowsBatchScript(
               ${_batch_file_in} ${_batch_file_out_dir}/${MODULE_TARGET}_${BUILD_TYPE}.bat
               ${BUILD_TYPE}
              )
         endforeach()
       endif()
+      mitkFunctionCreateWindowsEnvScripts()
       mitkFunctionConfigureVisualStudioUserProjectFile(
           NAME ${MODULE_TARGET}
         )

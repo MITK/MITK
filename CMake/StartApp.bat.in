@@ -1,4 +1,2 @@
 @echo off
-PATH=@MITK_RUNTIME_PATH@;%PATH%
-rem %~dp0 keeps the script usable from any working directory.
-"%~dp0@VS_BUILD_TYPE@\@EXEC_NAME@.exe" %*
+"@MITK_ENV_SCRIPT@" "%~dp0@MITK_EXEC_SUBDIR@@EXEC_NAME@.exe" %*

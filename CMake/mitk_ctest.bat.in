@@ -1,0 +1,2 @@
+@echo off
+"@MITK_ENV_SCRIPT@" "@MITK_CTEST_COMMAND@" --test-dir "@MITK_CTEST_DIR@" -C @MITK_BUILD_CONFIG@ %*

@@ -219,14 +219,17 @@ endif()
 include(mitkFunctionCreateWindowsBatchScript)
 
 if(WIN32)
-  set(template_name "start${_APP_NAME}.bat.in")
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${template_name}")
-    foreach(BUILD_TYPE debug release)
-      mitkFunctionCreateWindowsBatchScript(${template_name}
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat
-        ${BUILD_TYPE})
-    endforeach()
+  set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${_APP_NAME}.bat.in")
+  if(NOT EXISTS "${_batch_file_in}")
+    set(_batch_file_in "${MITK_CMAKE_DIR}/StartApp.bat.in")
   endif()
+  set(EXEC_NAME ${_APP_NAME})
+  mitkFunctionGetWindowsBatchScriptBuildTypes(_batch_build_types)
+  foreach(BUILD_TYPE IN LISTS _batch_build_types)
+    mitkFunctionCreateWindowsBatchScript(${_batch_file_in}
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_APP_NAME}_${BUILD_TYPE}.bat
+      ${BUILD_TYPE})
+  endforeach()
   mitkFunctionConfigureVisualStudioUserProjectFile(
     NAME ${_APP_NAME}
   )

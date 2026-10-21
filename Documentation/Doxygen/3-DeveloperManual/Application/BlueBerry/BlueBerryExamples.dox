@@ -6,8 +6,8 @@ The following examples give an introduction to Blueberry.
 
 The source code of the examples can be found in mitk/Examples/Plugins/
 
-Run the examples by executing startBlueBerryExampleLauncher_release.bat
-(or startBlueBerryExampleLauncher_debug.bat depending on the configured build type).
+Run the examples by executing BlueBerryExampleLauncher_&lt;config&gt;.bat
+for the build configuration you built, e.g. BlueBerryExampleLauncher_release.bat.
 
 \imageMacro{BlueBerryExampleLauncherDialog.png,"",14.14}
 

@@ -318,7 +318,7 @@ normally, but no dump is written.
 
 To exercise real-crash capture from Visual Studio, launch without the
 debugger (Start Without Debugging / Ctrl+F5) or start the application
-from \c startMitkWorkbench_release.bat.
+from \c MitkWorkbench_release.bat.
 
 Linux and macOS reach the same outcome by a different route. There is no
 debugger-detection bypass there; Crashpad's handler is an ordinary signal

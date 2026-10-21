@@ -47,10 +47,13 @@ directly.
 \subsection MITKCmdAppsPageWhereBuild In a build tree
 
 In your own build of MITK the executables are located in the <tt>bin/</tt>
-directory of the MITK build tree (on Windows in <tt>bin/Release/</tt> or
-<tt>bin/Debug/</tt>). On Windows use the generated batch files
-<tt>bin/Mitk&lt;App&gt;_release.bat</tt> and <tt>bin/Mitk&lt;App&gt;_debug.bat</tt>,
-which set up the PATH and forward all arguments.
+directory of the MITK build tree (on Windows in a subdirectory per build
+configuration, e.g. <tt>bin/Release/</tt>). On Windows use the generated batch
+files <tt>bin/Mitk&lt;App&gt;_&lt;config&gt;.bat</tt>, one per build
+configuration (e.g. <tt>bin/MitkFileConverter_release.bat</tt>), which set up
+the PATH and forward all arguments. <tt>bin/mitk_env_&lt;config&gt;.bat</tt> runs
+any command with that PATH, or opens a command prompt with it when called
+without arguments.
 
 Which apps are built is controlled per module by a CMake option named
 <tt>BUILD_&lt;Module&gt;CmdApps</tt> (see the tables below). The build

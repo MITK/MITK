@@ -30,7 +30,10 @@ namespace mitk
    * never armed at the same time.
    *
    * Display interaction and the interactors of data that can merely be edited,
-   * like the control points of a finished planar figure, do not take part.
+   * like the control points of a finished planar figure, do not acquire the
+   * slot. Their interactors may yield to an armed tool by ignoring input while
+   * IsClaimed() is true; mitk::PlanarFigureInteractor does, so that a new
+   * figure can be started inside an existing one.
    *
    * Only to be used from the GUI thread.
    *
@@ -91,6 +94,9 @@ namespace mitk
      * \throw mitk::Exception if \p revoke is empty.
      */
     [[nodiscard]] static Claim Acquire(RevokeFunction revoke);
+
+    /** \brief True while any component holds the slot. */
+    static bool IsClaimed();
   };
 }
 

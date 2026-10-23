@@ -614,6 +614,9 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
     case Qt::Key_Delete:
       key = mitk::InteractionEvent::KeyDelete;
       break;
+    case Qt::Key_Backspace:
+      key = mitk::InteractionEvent::KeyBackspace;
+      break;
     case Qt::Key_Up:
       key = mitk::InteractionEvent::KeyArrowUp;
       break;

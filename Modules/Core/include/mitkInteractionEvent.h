@@ -103,6 +103,7 @@ namespace mitk
     static const std::string KeyEnter;      ///< "Enter" key constant.
     static const std::string KeyReturn;     ///< "Return" key constant.
     static const std::string KeyDelete;     ///< "Delete" key constant.
+    static const std::string KeyBackspace;  /**< "Backspace" key constant (the "delete" key of macOS keyboards). */
     static const std::string KeyArrowUp;    ///< "ArrowUp" key constant.
     static const std::string KeyArrowDown;  ///< "ArrowDown" key constant.
     static const std::string KeyArrowLeft;  ///< "ArrowLeft" key constant.

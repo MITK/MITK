@@ -578,6 +578,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   emit beginResetModel();
   m_InputObservers.clear();
   m_Statistics.clear();
+  m_OutdatedStatistics.clear();
   m_ImageNodes.clear();
   m_TimeStepResolvedImageNodes.clear();
   m_MaskNodes.clear();
@@ -684,33 +685,40 @@ void QmitkImageStatisticsTreeModel::RequestModelUpdate()
 void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
 {
   StatisticsContainerVector newStatistics;
+  std::set<const mitk::ImageStatisticsContainer*> newOutdatedStatistics;
 
   auto datamanager = m_DataStorage.Lock();
 
   if (datamanager.IsNotNull())
   {
+    // While an input changes, e.g. while a figure is dragged, the generator waits for the changes
+    // to settle before it adds a pending placeholder. Until then the newest statistics stand in
+    // for it, so the row stays.
+    const auto addStatistics = [&](const mitk::BaseData* image, const mitk::BaseData* mask) {
+      auto stats = mitk::ImageStatisticsContainerManager::GetImageStatistics(datamanager, image, mask, m_IgnoreZeroValueVoxel, m_HistogramNBins, true, false);
+
+      if (stats.IsNull())
+      {
+        stats = mitk::ImageStatisticsContainerManager::GetImageStatistics(datamanager, image, mask, m_IgnoreZeroValueVoxel, m_HistogramNBins, false, false);
+
+        if (stats.IsNotNull())
+          newOutdatedStatistics.insert(stats);
+      }
+
+      if (stats.IsNotNull())
+        newStatistics.emplace_back(stats);
+    };
+
     for (const auto &image : m_ImageNodes)
     {
       if (m_MaskNodes.empty())
       {
-        auto stats = mitk::ImageStatisticsContainerManager::GetImageStatistics(datamanager, image->GetData(), nullptr, m_IgnoreZeroValueVoxel, m_HistogramNBins, true, false);
-
-        if (stats.IsNotNull())
-        {
-          newStatistics.emplace_back(stats);
-        }
+        addStatistics(image->GetData(), nullptr);
       }
       else
       {
         for (const auto &mask : m_MaskNodes)
-        {
-          auto stats =
-            mitk::ImageStatisticsContainerManager::GetImageStatistics(datamanager, image->GetData(), mask->GetData(), m_IgnoreZeroValueVoxel, m_HistogramNBins, true, false);
-          if (stats.IsNotNull())
-          {
-            newStatistics.emplace_back(stats);
-          }
-        }
+          addStatistics(image->GetData(), mask->GetData());
       }
     }
     if (!newStatistics.empty())
@@ -720,12 +728,13 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
   }
 
   const auto expectedStatisticsCount = m_ImageNodes.size() * std::max<std::size_t>(1, m_MaskNodes.size());
-  const bool isComplete = newStatistics.size() == expectedStatisticsCount &&
+  const bool isComplete = newStatistics.size() == expectedStatisticsCount && newOutdatedStatistics.empty() &&
     std::none_of(newStatistics.cbegin(), newStatistics.cend(), [](const auto& statistics) { return statistics->IsWIP(); });
 
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
+    m_OutdatedStatistics = newOutdatedStatistics;
 
     if (isComplete || !m_InputStatisticNamesKnown)
       m_StatisticNames = GetOfferedStatisticNames(m_Statistics);
@@ -871,8 +880,9 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
   for (const auto &statistic : m_Statistics)
   {
-    bool isWIP = statistic->IsWIP();
-    const bool isFailed = statistic->IsFailed();
+    const bool isOutdated = 0 != m_OutdatedStatistics.count(statistic);
+    bool isWIP = isOutdated || statistic->IsWIP();
+    const bool isFailed = !isOutdated && statistic->IsFailed();
     const auto failureReason = QString::fromStdString(statistic->GetFailureReason());
     // get the connected image data node/mask data node
     auto imageRule = mitk::StatisticsToImageRelationRule::New();

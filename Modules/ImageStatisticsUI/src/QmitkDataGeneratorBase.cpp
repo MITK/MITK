@@ -20,13 +20,22 @@ found in the LICENSE file.
 
 #include <QThreadPool>
 
-QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent) : QObject(parent)
+QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent)
+  : QmitkDataGeneratorBase(parent)
 {
   this->SetDataStorage(storage);
 }
 
 QmitkDataGeneratorBase::QmitkDataGeneratorBase(QObject* parent): QObject(parent)
-{}
+{
+  m_RecheckTimer.setSingleShot(true);
+  m_RecheckTimer.setInterval(250);
+  connect(&m_RecheckTimer, &QTimer::timeout, this, [this]() {
+    // Auto update may have been switched off while the timer was pending.
+    if (m_AutoUpdate)
+      this->EnsureRecheckingAndGeneration();
+  });
+}
 
 QmitkDataGeneratorBase::~QmitkDataGeneratorBase()
 {
@@ -112,7 +121,10 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
 
   for (const auto &pos : results)
   {
-    resultnodes->push_back(this->PrepareResultForStorage(pos.first, pos.second, job));
+    auto resultNode = this->PrepareResultForStorage(pos.first, pos.second, job);
+
+    if (resultNode.IsNotNull())
+      resultnodes->push_back(resultNode);
   }
 
   {
@@ -129,10 +141,10 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
     }
   }
 
-  emit NewDataAvailable(resultnodes.GetPointer());
-
+  // Without a stored result, the change that discarded it has already started the delayed recheck.
   if (!resultnodes->empty())
   {
+    emit NewDataAvailable(resultnodes.GetPointer());
     this->EnsureRecheckingAndGeneration();
   }
 }
@@ -143,7 +155,9 @@ void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
   {
     if (this->ChangedNodeIsRelevant(node))
     {
-      this->EnsureRecheckingAndGeneration();
+      // Each change restarts the delay. Changes may arrive from worker threads,
+      // and a timer can only be started from its own thread.
+      QMetaObject::invokeMethod(&m_RecheckTimer, [this]() { m_RecheckTimer.start(); });
     }
   }
 }

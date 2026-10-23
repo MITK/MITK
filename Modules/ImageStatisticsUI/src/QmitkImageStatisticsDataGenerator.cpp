@@ -234,6 +234,10 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStora
 
   if (statsJob != nullptr)
   {
+    // The result is newer than any change made while the job ran, so it would pass as up to date.
+    if (statsJob->HaveInputsChanged())
+      return nullptr;
+
     auto resultNode = mitk::DataNode::New();
     resultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
     resultNode->SetVisibility(false);

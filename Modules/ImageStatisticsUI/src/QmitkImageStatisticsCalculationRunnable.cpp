@@ -28,6 +28,8 @@ found in the LICENSE file.
 
 #include <itkMacro.h>
 
+#include <algorithm>
+
 namespace
 {
   /** The error message is shown to users, e.g. as tooltip of the statistics table. The source
@@ -62,6 +64,20 @@ void QmitkImageStatisticsCalculationRunnable::Initialize(const mitk::Image* imag
     mitkThrow() << "Cannot initialize QmitkImageStatisticsCalculationRunnable. Mask data is not a supported type.";
   this->m_StatisticsImage = image;
   this->m_MaskData = mask;
+
+  const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(mask);
+  this->m_PlanarFigureMask = nullptr != planarFigure ? planarFigure->Clone().GetPointer() : nullptr;
+
+  this->m_InputTime = std::max(nullptr != image ? image->GetMTime() : 0, nullptr != mask ? mask->GetMTime() : 0);
+}
+
+bool QmitkImageStatisticsCalculationRunnable::HaveInputsChanged() const
+{
+  const auto isNewer = [this](const mitk::BaseData* data) {
+    return nullptr != data && data->GetMTime() > this->m_InputTime;
+  };
+
+  return isNewer(this->m_StatisticsImage) || isNewer(this->m_MaskData);
 }
 
 mitk::ImageStatisticsContainer* QmitkImageStatisticsCalculationRunnable::GetStatisticsData() const
@@ -129,7 +145,6 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   {
     auto multiLabelMask = dynamic_cast<const mitk::MultiLabelSegmentation*>(m_MaskData.GetPointer());
     auto binLabelMask = dynamic_cast<const mitk::Image*>(m_MaskData.GetPointer());
-    auto pfMask = dynamic_cast<const mitk::PlanarFigure*>(m_MaskData.GetPointer());
 
     if (nullptr != multiLabelMask)
     {
@@ -144,11 +159,11 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
       imgMaskGen->SetImageMask(binLabelMask);
       roiMaskGenerator = imgMaskGen;
     }
-    else if (nullptr != pfMask)
+    else if (m_PlanarFigureMask.IsNotNull())
     {
       auto pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
       pfMaskGen->SetInputImage(m_StatisticsImage);
-      pfMaskGen->SetPlanarFigure(pfMask->Clone());
+      pfMaskGen->SetPlanarFigure(m_PlanarFigureMask);
       roiMaskGenerator = pfMaskGen;
     }
   }

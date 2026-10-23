@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkBaseData.h>
 #include <mitkCoreServices.h>
+#include <mitkIPropertyMigration.h>
 #include <mitkIPropertyTransience.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkPropertyList.h>
@@ -53,6 +54,27 @@ namespace mitk::SceneReaderHelpers
 
     for (const auto &key : transientKeys)
       propertyList.DeleteProperty(key);
+  }
+
+  /**
+   * \brief Upgrade a freshly read property list: migrate legacy properties,
+   *        then remove transient properties.
+   *
+   * Applies to every property list a scene reader reads: the default and the
+   * render-window-specific lists of a node and the list of its BaseData.
+   * Migration comes first, since a migration may move a value out of a key
+   * that is transient by now. \p data may be null for a data-less node.
+   *
+   * \sa IPropertyMigration, StripTransientProperties
+   */
+  inline void SanitizeLoadedProperties(PropertyList &propertyList, const BaseData *data)
+  {
+    CoreServicePointer<IPropertyMigration> migration(CoreServices::GetPropertyMigration());
+
+    if (migration)
+      migration->Migrate(data, propertyList);
+
+    StripTransientProperties(propertyList, data);
   }
 
   /**

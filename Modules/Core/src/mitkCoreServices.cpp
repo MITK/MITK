@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkIPropertyDeserialization.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkIPropertyMigration.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkIPropertyRelations.h>
 #include <mitkIPropertyTransience.h>
@@ -119,6 +120,11 @@ namespace mitk
   IPropertyFilters *CoreServices::GetPropertyFilters(us::ModuleContext *context)
   {
     return GetCoreService<IPropertyFilters>(context);
+  }
+
+  IPropertyMigration *CoreServices::GetPropertyMigration(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyMigration>(context);
   }
 
   IPropertyPersistence *CoreServices::GetPropertyPersistence(us::ModuleContext *context)

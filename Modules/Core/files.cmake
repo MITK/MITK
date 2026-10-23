@@ -178,6 +178,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyDeserialization.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
+  DataManagement/mitkIPropertyMigration.cpp
   DataManagement/mitkIPropertyOwner.cpp
   DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkIPropertyProvider.cpp
@@ -231,6 +232,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyKeyPath.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
+  DataManagement/mitkPropertyMigration.cpp
   DataManagement/mitkPropertyNameHelper.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkPropertyPersistence.cpp

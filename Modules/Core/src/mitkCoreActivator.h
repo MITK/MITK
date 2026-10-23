@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkPropertyDeserialization.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
+#include <mitkPropertyMigration.h>
 #include <mitkPropertyPersistence.h>
 #include <mitkPropertyRelations.h>
 #include <mitkPropertyTransience.h>
@@ -106,6 +107,7 @@ private:
   std::unique_ptr<mitk::PropertyDeserialization> m_PropertyDeserialization;
   std::unique_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::unique_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::unique_ptr<mitk::PropertyMigration> m_PropertyMigration;
   std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
   std::unique_ptr<mitk::PropertyRelations> m_PropertyRelations;
   std::unique_ptr<mitk::PropertyTransience> m_PropertyTransience;

@@ -64,6 +64,7 @@ set(MODULE_TESTS
   mitkProgressTaskTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
+  mitkPropertyMigrationTest.cpp
   mitkPropertyPersistenceTest.cpp
   mitkPropertyPersistenceInfoTest.cpp
   mitkPropertyRelationRuleBaseTest.cpp

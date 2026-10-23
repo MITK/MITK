@@ -35,6 +35,7 @@ namespace mitk
   class IPropertyDeserialization;
   class IPropertyExtensions;
   class IPropertyFilters;
+  class IPropertyMigration;
   class IPropertyPersistence;
   class IPropertyRelations;
   class IPropertyTransience;
@@ -111,6 +112,13 @@ namespace mitk
      * @return A non-nullptr IPropertyFilters instance.
      */
     static IPropertyFilters *GetPropertyFilters(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+     * @brief Get an IPropertyMigration instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-nullptr IPropertyMigration instance.
+     */
+    static IPropertyMigration *GetPropertyMigration(us::ModuleContext *context = us::GetModuleContext());
 
     /**
     * @brief Get an IPropertyPersistence instance.

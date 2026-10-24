@@ -18,7 +18,7 @@ The first step to perform measurements is to select a reference image on top of 
 
 \imageMacro{QmitkMeasurementToolbox_MeasurementView.jpg,"Measurement View",7.60}
 
-After selecting an image, you can click on any of the geometrical symbols. The respective measurement will appear as soon as you click on the image location you want to measure.
+After selecting an image, you can click on any of the geometrical symbols. Lines, circles, ellipses, double ellipses and rectangles are placed by pressing the left mouse button and dragging, or by two clicks. The other measurements are placed point by point with left-clicks; a double-click or Enter finishes them, and Backspace or Delete removes the last point.
 
 A measurement that has not been placed yet can be canceled by pressing Esc, by clicking the active tool button again, or by switching to another tool.
 
@@ -33,7 +33,7 @@ Draws a line between two set points and returns the distance between these point
 
 <li> <b>Path:</b>
 
-Draws a line between several set points (two and more) and calculates the overall length, which is all lines length summed up. Add the final point by double left-click.
+Draws a line between several set points (two and more) and calculates the overall length, which is all lines length summed up.
 
 <li> <b>Angle:</b>
 
@@ -45,47 +45,47 @@ Draws two lines that may but do not have to intersect from four set points. The 
 
 <li> <b>Circle:</b>
 
-Draws a circle by setting two points, whereas the first set point is the center and the second the radius of the circle. The measured values are the radius and the included area.
+Draws a circle from its center to its rim. The center handle moves the circle, the handle on the rim changes its radius. The measured values are the radius, the diameter and the included area.
 
 <li> <b>Ellipse:</b>
 
-Draws an ellipse that can be modified by three points. The middle point can be used to move the whole measurement. The lower point modifies the ellipse axes. The right point can be used to modify the radius of the ellipse. The measured values are the major and minor axes and the area.
+Draws an ellipse from its center, starting as a circle. The center handle moves the ellipse. The handle at the end of the first axis turns the ellipse and changes the length of that axis, the handle at the end of the second axis changes only its length. The measured values are the major and minor axes and the area.
 
 <li> <b>Double Ellipse:</b>
 
-Draws two ellipses by adjusting four points. The middle point can be used to move the whole measurement. The left point is used to adjust the distance between the two ellipses. The lower point modifies the ellipse axes. The right point can be used to modify the radius of the ellipse. Can be used for measuring e.g. the wall thickness of a vessel. The measured values are the major and minor axes and the thickness.
+Draws a ring between two ellipses from its center, starting as a circular ring. The center handle moves the ring. The handle at the end of the first outer axis turns the ring and changes the length of that axis, the handle at the end of the second outer axis changes only its length, and the handle on the inner ellipse, opposite of the end of the first axis, changes the thickness of the ring. Can be used for measuring e.g. the wall thickness of a vessel. The measured values are the major and minor axes and the thickness.
 
 <li> <b>Rectangle:</b>
 
-Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left corner. The measured values are the circumference and the included area.
+Draws a rectangle from one corner to the opposite one. Dragging a corner keeps the opposite corner in place. The measured values are the circumference and the included area.
 
 <li> <b>Polygon:</b>
 
-Draws a closed polygon that can have an arbitrary number of points. New points are added by left mouse-click. To finish the drawing the user can double click on the last control point. The measured values are circumference and area.
+Draws a closed polygon that can have an arbitrary number of points. The measured values are the circumference and, if the polygon does not cross itself, the area.
 
 <li> <b>Bezier curve:</b>
 
-Draws a bezier curve by adding some control points with left mouse-click. To finish the drawing the user can double-click on the last control point. The measured value is the length of the bezier curve.
+Draws a bezier curve through its first and last control point. The measured value is the length of the bezier curve.
 
 <li> <b>Subdivision Polygon:</b>
 
-Draws a closed subdivision polygon by adding some control points with left mouse-click. To finish the drawing the user can double-click on the last control point. The measured value is the circumference of the polygon.
+Draws a smooth closed curve through its control points. The measured values are the circumference and, if the curve does not cross itself, the area.
 </ul>
 
 <h2>Fixed sizes of measurement figures</h2>
-The measurement view offers a fixed size for circle and double ellipses to preset a radius and a thickness. This is useful e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region.
+The measurement view offers a fixed size for circle and double ellipses to preset a radius and a thickness. This is useful e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. A figure of fixed size follows the mouse until a click drops it. Its shape stays locked afterwards, so it can only be moved.
 
 <h2>Modify measurements</h2>
 
-All measurements can be modified later on by moving the respective control points. Note that they can only be modified if the view is open.
+Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. Note that measurements can only be modified if the view is open.
 
 <h2>Multiple measurement figures</h2>
 
-When applying more than one measurement figure to the image the actual measurement figure is depicted in red and the displayed values belong to this measurement figure. All other measurement figures appear white. They can be selected by a left-mouse click on the respective node.
+The selected measurement figure is surrounded by a halo in its own color, and the displayed values belong to it. Click a measurement figure in a render window or its node in the data manager to select it. Where figures overlap, a click inside them selects the smaller one, and the handles of a figure take precedence over the outline of another.
 
 
 <h2>Save the measurement information</h2>
-The entire scene containing the image and the measurement figures can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can just save the measurement solely (with file extension '.pf') by right-click on the node in the data manager.
+The entire scene containing the image and the measurement figures can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can just save the measurement solely (with file extension '.pf.json') by right-click on the node in the data manager. Measurements saved by previous versions of MITK (with file extension '.pf') can still be opened.
 
 The content of the measurement widget can be copied to the clipboard with the corresponding button for further use in a table calculation program (e.g. Open Office Calc etc.).
 

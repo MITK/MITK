@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+  mitkSceneIOPlanarFigureTest.cpp
   mitkSceneIOTest2.cpp
   mitkSceneJsonReaderTest.cpp
   mitkSceneJsonReaderIntegrationTest.cpp

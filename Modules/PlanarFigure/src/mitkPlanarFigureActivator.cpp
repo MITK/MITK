@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkPlanarFigureVtkMapper2D.h>
 #include <mitkPlanarFigureVtkMapper3D.h>
 
+#include "mitkPlanarFigureLegacyProperties.h"
+
 #include <memory>
 #include <vector>
 
@@ -29,13 +31,16 @@ namespace mitk
   /**
    * \brief Module activator for the PlanarFigure module.
    *
-   * Registers the mapper providers for mitk::PlanarFigure.
+   * Registers the mapper providers for mitk::PlanarFigure and the migration
+   * of properties of previous versions.
    */
   class PlanarFigureModuleActivator : public us::ModuleActivator
   {
   public:
     void Load(us::ModuleContext *) override
     {
+      PlanarFigureLegacyProperties::Register();
+
       m_MapperProviders.push_back(
         std::make_unique<MapperProviderBase<PlanarFigureVtkMapper2D, PlanarFigure>>(BaseRenderer::Standard2D));
       m_MapperProviders.push_back(

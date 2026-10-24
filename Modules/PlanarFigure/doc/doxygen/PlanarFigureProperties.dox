@@ -1,45 +1,34 @@
 /**
 \page PlanarPropertiesPage The Planar Figure Properties
 
-The planar figures use several properties to create a more userfriendly handling:
-<ul>
- <li> planarfigure.default.helperline.color controls the colour of the helperline, if the figure is neither selected nor hovered over
- <li> planarfigure.default.helperline.opacity controls the opacity of the helperline, if the figure is neither selected nor hovered over
- <li> planarfigure.default.line.color controls the colour of the line, if the figure is neither selected nor hovered over
- <li> planarfigure.default.line.opacity controls the opacity of the line, if the figure is neither selected nor hovered over
- <li> planarfigure.default.marker.color controls the colour of the markers, if the figure is neither selected nor hovered over
- <li> planarfigure.default.marker.opacity controls the opacity of the markers, if the figure is neither selected nor hovered over
- <li> planarfigure.default.markerline.color controls the colour of the outline of the markers, if the figure is neither selected nor hovered over
- <li> planarfigure.default.markerline.opacity controls the opacity of the outline of the markers, if the figure is neither selected nor hovered over
- <li> planarfigure.default.outline.color controls the colour of the outline, if the figure is neither selected nor hovered over
- <li> planarfigure.default.outline.opacity controls the opacity of the outline, if the figure is neither selected nor hovered over
- <li> planarfigure.drawoutline controls whether to draw the outline
- <li> planarfigure.drawshadow controls whether to draw the shadow
- <li> planarfigure.helperline.width controls the width of the helperline
- <li> planarfigure.hover.helperline.color controls the colour of the helperline, if the figure is hovered over but not selected
- <li> planarfigure.hover.helperline.opacity controls the opacity of the helperline, if the figure is hovered over but not selected
- <li> planarfigure.hover.line.color controls the colour of the line, if the figure is hovered over but not selected
- <li> planarfigure.hover.line.opacity controls the opacity of the line, if the figure is hovered over but not selected
- <li> planarfigure.hover.marker.color controls the colour of the markers, if the figure is hovered over but not selected
- <li> planarfigure.hover.marker.opacity controls the opacity of the markers, if the figure is hovered over but not selected
- <li> planarfigure.hover.markerline.color controls the colour of the outline of the markers, if the figure is hovered over but not selected
- <li> planarfigure.hover.markerline.opacity controls the opacity of the outline of the markers, if the figure is hovered over but not selected
- <li> planarfigure.hover.outline.color controls the colour of the outline, if the figure is hovered over but not selected
- <li> planarfigure.hover.outline.opacity controls the opacity of the outline, if the figure is hovered over but not selected
- <li> planarfigure.ishovering is set to true if the figure is hovered over, controls if hover settings are used
- <li> planarfigure.line.width controls the width of the lines
- <li> planarfigure.outline.width controls the width of the outlines
- <li> planarfigure.selected.helperline.color controls the colour of the helperline, if the figure is selected
- <li> planarfigure.selected.helperline.opacity controls the opacity of the helperline, if the figure is selected
- <li> planarfigure.selected.line.color controls the colour of the line, if the figure is selected
- <li> planarfigure.selected.line.opacity controls the opacity of the line, if the figure is selected
- <li> planarfigure.selected.marker.color controls the colour of the markers, if the figure is selected
- <li> planarfigure.selected.marker.opacity controls the opacity of the markers, if the figure is selected
- <li> planarfigure.selected.markerline.color controls the colour of the outline of the markers, if the figure is selected
- <li> planarfigure.selected.markerline.opacity controls the opacity of the outline of the markers, if the figure is selected
- <li> planarfigure.selected.outline.color controls the colour of the outline, if the figure is selected
- <li> planarfigure.selected.outline.opacity controls the opacity of the outline, if the figure is selected
- <li> planarfigure.shadow.widthmodifier controls the width of the shadow
-</ul>
+The mappers of planar figures, mitk::PlanarFigureVtkMapper2D and
+mitk::PlanarFigureVtkMapper3D, read these properties of a data node. Each of
+them can also be set for a single render window.
 
+| Property | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| color | ColorProperty | white | Base color. It does not change with the state of the figure; hovering and selection add a halo around it. |
+| opacity | FloatProperty | 1 | Opacity of the figure. |
+| line width | FloatProperty | 2 | Width of the outline in logical pixels, independent of the zoom. |
+| planarfigure.drawname | BoolProperty | false | Shows the name of the node in a label next to the figure. |
+| planarfigure.drawquantities | BoolProperty | false | Shows the measurements in the label. |
+| font.size | IntProperty | 13 | Font size of the label in points. |
+| planarfigure.3drendering | BoolProperty | false | Shows the figure in 3D render windows. |
+| planarfigure.3drendering.fill | BoolProperty | false | Fills closed figures in 3D render windows. |
+| animated.pulse | BoolProperty | false | Lets the figure grow and shrink by up to 8 percent in 2D render windows. |
+| animated.pulse.frequency | FloatProperty | 0.5 | Pulses per second. |
+
+The 2D mapper also reads \c visible, \c selected, which adds a halo, and
+\c PlanarFigureInitializedWindow: a figure of locked shape that is being placed
+is shown only in the render windows where it is true, i.e. where the
+interactor moves it.
+
+Which handles are shown and how they are highlighted does not depend on
+properties. mitk::PlanarFigureInteractor reports it to the mapper for the
+render window under the mouse.
+
+Scenes of previous versions carry many more properties of the previous
+mapper and interactor. Loading such a scene moves \c planarfigure.line.width
+to \c line \c width and \c planarfigure.annotations.font.size to \c font.size,
+and removes the others.
 */

@@ -10,675 +10,264 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkPlanarFigureIO.h>
+#include "mitkPlanarFigureIO.h"
+#include "mitkPlanarFigureIOMimeTypes.h"
 
-#include <mitkCustomMimeType.h>
-#include <mitkIOMimeTypes.h>
-#include <mitkExceptionMacro.h>
-
-#include <mitkPlanarAngle.h>
-#include <mitkPlanarArrow.h>
-#include <mitkPlanarBezierCurve.h>
-#include <mitkPlanarCircle.h>
-#include <mitkPlanarCross.h>
+#include <mitkAffineTransform3D.h>
 #include <mitkPlanarDoubleEllipse.h>
 #include <mitkPlanarEllipse.h>
-#include <mitkPlanarFourPointAngle.h>
-#include <mitkPlanarLine.h>
-#include <mitkPlanarPath.h>
-#include <mitkPlanarPolygon.h>
-#include <mitkPlanarRectangle.h>
-#include <mitkPlanarSubdivisionPolygon.h>
 #include <mitkPlaneGeometry.h>
 
-#include <mitkBasePropertySerializer.h>
+#include <nlohmann/json.hpp>
 
-#include <mitkLocaleSwitch.h>
+#include <fstream>
+#include <iomanip>
 
-#include <tinyxml2.h>
-
-#include <algorithm>
-#include <map>
-#include <optional>
-
-namespace mitk
+namespace
 {
+  constexpr int Version = 1;
 
-  PlanarFigureIO::PlanarFigureIO()
-    : AbstractFileIO(PlanarFigure::GetStaticNameOfClass())
+  template <class TPair>
+  TPair ReadPair(const nlohmann::json &j, const std::string &what)
   {
-    std::string category = "MITK PlanarFigure File";
-    CustomMimeType customMimeType;
-    customMimeType.SetCategory(category);
-    customMimeType.AddExtension("pf");
-    this->AbstractFileIOWriter::SetMimeType(customMimeType);
-    this->AbstractFileIOWriter::SetDescription(category);
+    if (!j.is_array() || 2 != j.size())
+      mitkThrow() << what << " needs two coordinates.";
 
-    customMimeType.AddExtension("pf");
-    customMimeType.AddExtension("PF");
-    this->AbstractFileIOReader::SetMimeType(customMimeType);
-    this->AbstractFileIOReader::SetDescription(category);
-
-    AbstractFileWriter::SetRanking(10);
-    AbstractFileReader::SetRanking(10);
-    this->RegisterService();
+    TPair pair;
+    pair[0] = j[0].get<mitk::ScalarType>();
+    pair[1] = j[1].get<mitk::ScalarType>();
+    return pair;
   }
 
-  IFileIO::ConfidenceLevel PlanarFigureIO::GetWriterConfidenceLevel() const
+  nlohmann::ordered_json WritePlane(const mitk::PlaneGeometry *plane)
   {
-    if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
-      return Unsupported;
+    nlohmann::json transform;
+    mitk::ToJSON(transform, plane->GetIndexToWorldTransform());
 
-    const auto *input = static_cast<const PlanarFigure *>(this->GetInput());
-    if (input != nullptr)
-      return Supported;
-    else
-      return Unsupported;
+    const auto &bounds = plane->GetBounds();
+
+    nlohmann::ordered_json j;
+    j["Transform"] = transform;
+    j["Bounds"] = { bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5] };
+    j["ImageGeometry"] = plane->GetImageGeometry();
+
+    return j;
   }
 
-  void PlanarFigureIO::Write()
+  mitk::PlaneGeometry::Pointer ReadPlane(const nlohmann::json &j)
   {
-    this->ValidateOutputLocation();
+    auto transform = mitk::AffineTransform3D::New();
+    mitk::FromJSON(j.at("Transform"), transform);
 
-    mitk::LocaleSwitch localeSwitch("C");
+    const auto &jBounds = j.at("Bounds");
 
-    tinyxml2::XMLDocument document;
-    document.InsertEndChild(document.NewDeclaration());
+    if (!jBounds.is_array() || 6 != jBounds.size())
+      mitkThrow() << "The bounds of the plane need six values.";
 
-    auto *version = document.NewElement("Version");
-    version->SetAttribute("Writer", __FILE__);
-    version->SetAttribute("CVSRevision", "$Revision: 17055 $");
-    version->SetAttribute("FileVersion", 1);
-    document.InsertEndChild(version);
+    mitk::BaseGeometry::BoundsArrayType bounds;
 
-    auto pf = dynamic_cast<const PlanarFigure*>(this->GetInput());
-    if (pf == nullptr)
-    {
-      mitkThrow() << "Try to safe a BaseData instance as PlanarFigure. That is not a planar figure. This should not happen and is a violated precondition. Please check the program logic.";
-    }
+    for (unsigned int i = 0; i < 6; ++i)
+      bounds[i] = jBounds[i].get<mitk::ScalarType>();
 
-    auto *pfElement = document.NewElement("PlanarFigure");
-    pfElement->SetAttribute("type", pf->GetNameOfClass());
-    document.InsertEndChild(pfElement);
+    // PlaneGeometry asserts most of these instead of throwing.
+    if (0.0 != bounds[0] || 0.0 != bounds[2] || !(bounds[1] > 0.0) || !(bounds[3] > 0.0) || !(bounds[5] > bounds[4]))
+      mitkThrow() << "The bounds of the plane must start at 0 and have an extent.";
 
-    // Serialize property list of PlanarFigure
-    mitk::PropertyList::Pointer propertyList = pf->GetPropertyList();
-    mitk::PropertyList::PropertyMap::const_iterator it;
-    for (it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); ++it)
-    {
-      // Create serializer for this property
-      const mitk::BaseProperty* prop = it->second;
-      std::string serializerName = std::string(prop->GetNameOfClass()) + "Serializer";
-      std::list<itk::LightObject::Pointer> allSerializers =
-        itk::ObjectFactoryBase::CreateAllInstance(serializerName.c_str());
+    auto plane = mitk::PlaneGeometry::New();
+    plane->SetIndexToWorldTransform(transform);
+    plane->SetBounds(bounds);
+    plane->SetImageGeometry(j.at("ImageGeometry").get<bool>());
 
-      if (allSerializers.size() != 1)
-      {
-        // No or too many serializer(s) found, skip this property
-        continue;
-      }
-
-      auto* serializer =
-        dynamic_cast<mitk::BasePropertySerializer*>(allSerializers.begin()->GetPointer());
-      if (serializer == nullptr)
-      {
-        // Serializer not valid; skip this property
-      }
-
-      auto *keyElement = document.NewElement("property");
-      keyElement->SetAttribute("key", it->first.c_str());
-      keyElement->SetAttribute("type", prop->GetNameOfClass());
-
-      serializer->SetProperty(prop);
-      tinyxml2::XMLElement* valueElement = nullptr;
-      try
-      {
-        valueElement = serializer->Serialize(document);
-      }
-      catch (...)
-      {
-      }
-
-      if (valueElement == nullptr)
-      {
-        // Serialization failed; skip this property
-        continue;
-      }
-
-      // Add value to property element
-      keyElement->InsertEndChild(valueElement);
-
-      // Append serialized property to property list
-      pfElement->InsertEndChild(keyElement);
-    }
-
-    // Serialize control points of PlanarFigure
-    auto *controlPointsElement = document.NewElement("ControlPoints");
-    pfElement->InsertEndChild(controlPointsElement);
-    for (unsigned int i = 0; i < pf->GetNumberOfControlPoints(); i++)
-    {
-      auto *vElement = document.NewElement("Vertex");
-      vElement->SetAttribute("id", i);
-      vElement->SetAttribute("x", pf->GetControlPoint(i)[0]);
-      vElement->SetAttribute("y", pf->GetControlPoint(i)[1]);
-      controlPointsElement->InsertEndChild(vElement);
-    }
-    auto *geoElement = document.NewElement("Geometry");
-    const auto* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetPlaneGeometry());
-    if (planeGeo != nullptr)
-    {
-      // Write parameters of IndexToWorldTransform of the PlaneGeometry
-      typedef mitk::Geometry3D::TransformType TransformType;
-      const TransformType* affineGeometry = planeGeo->GetIndexToWorldTransform();
-      const TransformType::ParametersType& parameters = affineGeometry->GetParameters();
-      auto *vElement = document.NewElement("transformParam");
-      for (unsigned int i = 0; i < affineGeometry->GetNumberOfParameters(); ++i)
-      {
-        std::stringstream paramName;
-        paramName << "param" << i;
-        vElement->SetAttribute(paramName.str().c_str(), parameters.GetElement(i));
-      }
-      geoElement->InsertEndChild(vElement);
-
-      // Write bounds of the PlaneGeometry
-      typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
-      const BoundsArrayType& bounds = planeGeo->GetBounds();
-      vElement = document.NewElement("boundsParam");
-      for (unsigned int i = 0; i < 6; ++i)
-      {
-        std::stringstream boundName;
-        boundName << "bound" << i;
-        vElement->SetAttribute(boundName.str().c_str(), bounds.GetElement(i));
-      }
-      geoElement->InsertEndChild(vElement);
-
-      // Write spacing and origin of the PlaneGeometry
-      Vector3D spacing = planeGeo->GetSpacing();
-      Point3D origin = planeGeo->GetOrigin();
-      geoElement->InsertEndChild(this->CreateXMLVectorElement(document, "Spacing", spacing));
-      geoElement->InsertEndChild(this->CreateXMLVectorElement(document, "Origin", origin));
-
-      pfElement->InsertEndChild(geoElement);
-    }
-
-    if (this->GetOutputStream() != nullptr)
-    {
-      tinyxml2::XMLPrinter printer;
-      document.Print(&printer);
-      *(this->GetOutputStream()) << printer.CStr();
-    }
-    else
-    {
-      if (document.SaveFile(this->GetOutputLocation().c_str()) != tinyxml2::XML_SUCCESS)
-      {
-        MITK_ERROR << "Could not write planar figures to " << this->GetOutputLocation() << "\nTinyXML reports '" << document.ErrorStr()
-          << "'";
-        throw std::ios_base::failure("Error during writing of planar figure xml file.");
-      }
-    }
+    return plane;
   }
 
-  tinyxml2::XMLElement* mitk::PlanarFigureIO::CreateXMLVectorElement(tinyxml2::XMLDocument& doc, const char* name, itk::FixedArray<mitk::ScalarType, 3> v)
+  nlohmann::ordered_json WriteFigure(const mitk::PlanarFigure &figure)
   {
-    auto vElement = doc.NewElement(name);
-    vElement->SetAttribute("x", v.GetElement(0));
-    vElement->SetAttribute("y", v.GetElement(1));
-    vElement->SetAttribute("z", v.GetElement(2));
-    return vElement;
+    nlohmann::ordered_json j = {
+      { "FileFormat", mitk::PlanarFigureIOMimeTypes::FileFormat },
+      { "Version", Version },
+      { "Type", figure.GetTypeId() }
+    };
+
+    j["Plane"] = WritePlane(figure.GetPlaneGeometry());
+
+    auto controlPoints = nlohmann::json::array();
+
+    for (const auto &point : figure.GetControlPoints())
+      controlPoints.push_back({ point[0], point[1] });
+
+    j["ControlPoints"] = controlPoints;
+
+    nlohmann::ordered_json parameters;
+
+    if (const auto *doubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&figure); nullptr != doubleEllipse)
+    {
+      parameters["Thickness"] = doubleEllipse->GetThickness();
+    }
+    else if (const auto *ellipse = dynamic_cast<const mitk::PlanarEllipse *>(&figure); nullptr != ellipse)
+    {
+      if (const auto direction = ellipse->GetReferenceDirection(); direction.has_value())
+        parameters["ReferenceDirection"] = { (*direction)[0], (*direction)[1] };
+    }
+
+    if (!parameters.empty())
+      j["Parameters"] = parameters;
+
+    if (figure.IsShapeLocked())
+      j["ShapeLocked"] = true;
+
+    return j;
   }
 
-  IFileIO::ConfidenceLevel PlanarFigureIO::GetReaderConfidenceLevel() const
+  void ReadParameters(const nlohmann::json &j, mitk::PlanarFigure &figure)
   {
-    if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
-      return Unsupported;
+    if (!j.is_object())
+      mitkThrow() << "The parameters need to be an object.";
 
-    return Supported;
-    //Remark: The original reader code assumed that al pf files can be read.
-    //So no content checking was done. Thus was not implemented while refactoring
-    //to services yet. But I think it would make sense.
-  }
-
-  std::vector<BaseData::Pointer> PlanarFigureIO::DoRead()
-  {
-    mitk::LocaleSwitch localeSwitch("C");
-
-    std::vector<BaseData::Pointer> results;
-
-    tinyxml2::XMLDocument document;
-
-    if (this->GetInputStream() != nullptr)
+    for (const auto &parameter : j.items())
     {
-      std::string s(std::istreambuf_iterator<char>(*(this->GetInputStream())), {});
-      document.Parse(s.c_str());
-      //Remark: didn't use *(this->GetInputStream()) >> document;
-      //because our PlanarFigure files version 1 are illformed (multiple top level elements)
-      //and therefor tinyxml does not read them completely when streamed directly.
-      //only the first (version element) is read.
-    }
-    else
-    {
-      if (tinyxml2::XML_SUCCESS != document.LoadFile(this->GetInputLocation().c_str()))
-      {
-        MITK_ERROR << "Could not open/read/parse " << this->GetInputLocation() << ". TinyXML reports: '" << document.ErrorStr() << "'.";
-        return {};
-      }
-    }
+      const auto &name = parameter.key();
+      auto *doubleEllipse = dynamic_cast<mitk::PlanarDoubleEllipse *>(&figure);
+      auto *ellipse = dynamic_cast<mitk::PlanarEllipse *>(&figure);
 
-    int fileVersion = 1;
-    auto* versionObject = document.FirstChildElement("Version");
-    if (versionObject != nullptr)
-    {
-      if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != tinyxml2::XML_SUCCESS)
+      if ("Thickness" == name && nullptr != doubleEllipse)
       {
-        MITK_WARN << this->GetInputLocation() << " does not contain version information! Trying version 1 format." << std::endl;
+        doubleEllipse->SetThickness(parameter.value().get<double>());
       }
-    }
-    else
-    {
-      MITK_WARN << this->GetInputLocation() << " does not contain version information! Trying version 1 format." << std::endl;
-    }
-    if (fileVersion !=
-      1) // add file version selection and version specific file parsing here, if newer file versions are created
-    {
-      MITK_WARN << "File version > 1 is not supported by this reader.";
-      return {};
-    }
-
-    /* file version 1 reader code */
-    for (auto* pfElement = document.FirstChildElement("PlanarFigure"); pfElement != nullptr;
-      pfElement = pfElement->NextSiblingElement("PlanarFigure"))
-    {
-      const char* typeC = pfElement->Attribute("type");
-      std::string type = nullptr != typeC
-        ? typeC
-        : "";
-
-      mitk::PlanarFigure::Pointer planarFigure = nullptr;
-      if (type == "PlanarAngle")
+      else if ("ReferenceDirection" == name && nullptr != ellipse)
       {
-        planarFigure = mitk::PlanarAngle::New();
-      }
-      else if (type == "PlanarCircle")
-      {
-        planarFigure = mitk::PlanarCircle::New();
-      }
-      else if (type == "PlanarEllipse")
-      {
-        planarFigure = mitk::PlanarEllipse::New();
-      }
-      else if (type == "PlanarCross")
-      {
-        planarFigure = mitk::PlanarCross::New();
-      }
-      else if (type == "PlanarFourPointAngle")
-      {
-        planarFigure = mitk::PlanarFourPointAngle::New();
-      }
-      else if (type == "PlanarLine")
-      {
-        planarFigure = mitk::PlanarLine::New();
-      }
-      else if (type == "PlanarPolygon")
-      {
-        planarFigure = mitk::PlanarPolygon::New();
-      }
-      else if (type == "PlanarPath")
-      {
-        planarFigure = mitk::PlanarPath::New();
-      }
-      else if (type == "PlanarSubdivisionPolygon")
-      {
-        planarFigure = mitk::PlanarSubdivisionPolygon::New();
-      }
-      else if (type == "PlanarRectangle")
-      {
-        planarFigure = mitk::PlanarRectangle::New();
-      }
-      else if (type == "PlanarArrow")
-      {
-        planarFigure = mitk::PlanarArrow::New();
-      }
-      else if (type == "PlanarDoubleEllipse")
-      {
-        planarFigure = mitk::PlanarDoubleEllipse::New();
-      }
-      else if (type == "PlanarBezierCurve")
-      {
-        planarFigure = mitk::PlanarBezierCurve::New();
+        ellipse->SetReferenceDirection(ReadPair<mitk::Vector2D>(parameter.value(), "The reference direction"));
       }
       else
       {
-        // unknown type
-        MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
-        continue;
-      }
-
-      // Read properties of the planar figure
-      for (auto* propertyElement = pfElement->FirstChildElement("property"); propertyElement != nullptr;
-        propertyElement = propertyElement->NextSiblingElement("property"))
-      {
-        const char* keya = propertyElement->Attribute("key");
-        const std::string key(keya ? keya : "");
-
-        const char* typea = propertyElement->Attribute("type");
-        const std::string type(typea ? typea : "");
-
-        // hand propertyElement to specific reader
-        std::stringstream propertyDeserializerClassName;
-        propertyDeserializerClassName << type << "Serializer";
-
-        const std::list<itk::LightObject::Pointer> readers =
-          itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
-        if (readers.size() < 1)
-        {
-          MITK_ERROR << "No property reader found for " << type;
-        }
-        if (readers.size() > 1)
-        {
-          MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
-        }
-
-        for (auto iter = readers.cbegin(); iter != readers.cend(); ++iter)
-        {
-          if (auto* reader = dynamic_cast<BasePropertySerializer*>(iter->GetPointer()))
-          {
-            const BaseProperty::Pointer property = reader->Deserialize(propertyElement->FirstChildElement());
-            if (property.IsNotNull())
-            {
-              planarFigure->GetPropertyList()->ReplaceProperty(key, property);
-            }
-            else
-            {
-              MITK_ERROR << "There were errors while loading property '" << key << "' of type " << type
-                << ". Your data may be corrupted";
-            }
-            break;
-          }
-        }
-      }
-
-      // Paths used to be polygons that are not closed.
-      if (type == "PlanarPolygon")
-      {
-        bool isClosed = false;
-        planarFigure->GetPropertyList()->GetBoolProperty("closed", isClosed);
-
-        if (!isClosed)
-          planarFigure = mitk::PlanarPath::New();
-      }
-
-      // Crosses in single-line mode, or without their second line, were lines.
-      if (type == "PlanarCross")
-      {
-        bool isSingleLine = false;
-        planarFigure->GetPropertyList()->GetBoolProperty("SingleLineMode", isSingleLine);
-
-        int numberOfVertices = 0;
-
-        if (const auto* controlPoints = pfElement->FirstChildElement("ControlPoints"); controlPoints != nullptr)
-        {
-          for (auto* vertex = controlPoints->FirstChildElement("Vertex"); vertex != nullptr; vertex = vertex->NextSiblingElement("Vertex"))
-            ++numberOfVertices;
-        }
-
-        if (isSingleLine || numberOfVertices == 2)
-        {
-          MITK_WARN << "A PlanarCross with a single line is read as PlanarLine from " << this->GetInputLocation() << ".";
-          planarFigure = mitk::PlanarLine::New();
-        }
-      }
-
-      // If we load a planarFigure, it has definitely been placed correctly.
-      // If we do not set this property here, we cannot load old planarFigures
-      // without messing up the interaction (PF-Interactor needs this property.
-      planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
-
-      // Read geometry of containing plane
-      auto* geoElement = pfElement->FirstChildElement("Geometry");
-      if (geoElement != nullptr)
-      {
-        try
-        {
-          // Create plane geometry
-          mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
-
-          // Extract and set plane transform parameters
-          const DoubleList transformList =
-            this->GetDoubleAttributeListFromXMLNode(geoElement->FirstChildElement("transformParam"), "param", 12);
-
-          typedef mitk::BaseGeometry::TransformType TransformType;
-          TransformType::ParametersType parameters;
-          parameters.SetSize(12);
-
-          unsigned int i;
-          DoubleList::const_iterator it;
-          for (it = transformList.cbegin(), i = 0; it != transformList.cend(); ++it, ++i)
-          {
-            parameters.SetElement(i, *it);
-          }
-
-          typedef mitk::BaseGeometry::TransformType TransformType;
-          TransformType::Pointer affineGeometry = TransformType::New();
-          affineGeometry->SetParameters(parameters);
-          planeGeo->SetIndexToWorldTransform(affineGeometry);
-
-          // Extract and set plane bounds
-          const DoubleList boundsList =
-            this->GetDoubleAttributeListFromXMLNode(geoElement->FirstChildElement("boundsParam"), "bound", 6);
-
-          typedef mitk::BaseGeometry::BoundsArrayType BoundsArrayType;
-
-          BoundsArrayType bounds;
-          for (it = boundsList.cbegin(), i = 0; it != boundsList.cend(); ++it, ++i)
-          {
-            bounds[i] = *it;
-          }
-
-          planeGeo->SetBounds(bounds);
-
-          // Extract and set spacing and origin
-          const Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
-          planeGeo->SetSpacing(spacing);
-
-          const Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
-          planeGeo->SetOrigin(origin);
-          planarFigure->SetPlaneGeometry(planeGeo);
-        }
-        catch (...)
-        {
-        }
-      }
-      std::map<int, Point2D> vertices;
-
-      auto* cpElement = pfElement->FirstChildElement("ControlPoints");
-      if (cpElement != nullptr)
-        for (auto* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr;
-          vertElement = vertElement->NextSiblingElement("Vertex"))
-      {
-        int id = 0;
-        mitk::Point2D::ValueType x = 0.0;
-        mitk::Point2D::ValueType y = 0.0;
-        if (vertElement->QueryIntAttribute("id", &id) != tinyxml2::XML_SUCCESS)
-          return{}; // TODO: can we do a better error handling?
-        if (vertElement->QueryDoubleAttribute("x", &x) != tinyxml2::XML_SUCCESS)
-          return{}; // TODO: can we do a better error handling?
-        if (vertElement->QueryDoubleAttribute("y", &y) != tinyxml2::XML_SUCCESS)
-          return{}; // TODO: can we do a better error handling?
-        Point2D p;
-        p.SetElement(0, x);
-        p.SetElement(1, y);
-        vertices[id] = p;
-      }
-
-      // Rectangles used to store all four corners. Their placement started
-      // at corner 1 and ended at corner 3.
-      if (type == "PlanarRectangle" && vertices.size() == 4)
-        vertices = { { 0, vertices[1] }, { 1, vertices[3] } };
-
-      // Ellipses used to store a fourth point whose direction Fiberfox uses
-      // to twist fiber bundles. Loading replayed the constraints of that
-      // time: the first axis turned perpendicular to the second one, and the
-      // fourth point moved to the larger radius, clamped to the plane.
-      if (type == "PlanarEllipse" && vertices.size() == 4)
-      {
-        const auto center = vertices[0];
-        const auto firstRadius = center.EuclideanDistanceTo(vertices[1]);
-        const auto secondAxis = vertices[2] - center;
-        const auto secondRadius = secondAxis.GetNorm();
-
-        if (secondRadius > 0.0)
-        {
-          Vector2D firstAxis;
-          firstAxis[0] = secondAxis[1];
-          firstAxis[1] = -secondAxis[0];
-          vertices[1] = center + firstAxis * (firstRadius / secondRadius);
-        }
-
-        auto twist = vertices[3] - center;
-
-        if (twist.GetNorm() > 0.0)
-        {
-          twist.Normalize();
-          Point2D twistPoint = center + twist * std::max(firstRadius, secondRadius);
-
-          if (const auto* plane = planarFigure->GetPlaneGeometry(); plane != nullptr)
-          {
-            const auto& bounds = plane->GetBounds();
-            Point2D index;
-            plane->WorldToIndex(twistPoint, index);
-            index[0] = std::clamp(index[0], bounds[0], bounds[1]);
-            index[1] = std::clamp(index[1], bounds[2], bounds[3]);
-            plane->IndexToWorld(index, twistPoint);
-          }
-
-          twist = twistPoint - center;
-
-          if (twist.GetNorm() > 0.0)
-            static_cast<PlanarEllipse*>(planarFigure.GetPointer())->SetReferenceDirection(twist);
-        }
-
-        vertices.erase(3);
-      }
-
-      // Circles and double ellipses of fixed size stored only their center.
-      if ((type == "PlanarCircle" || type == "PlanarDoubleEllipse") && vertices.size() == 1)
-      {
-        MITK_WARN << "The size of a fixed-size " << type << " was not stored. It is read with a radius of 0 from "
-                  << this->GetInputLocation() << ".";
-      }
-
-      // Double ellipses used to store the end of the first inner axis as a
-      // fourth point, opposite of the first outer axis. Loading replayed the
-      // constraints of that time: the second axis turned perpendicular to the
-      // first one and became no longer than it.
-      std::optional<double> thickness;
-
-      if (type == "PlanarDoubleEllipse" && vertices.size() == 4)
-      {
-        const auto center = vertices[0];
-        const auto firstAxis = vertices[1] - center;
-        const auto firstRadius = firstAxis.GetNorm();
-        const auto secondRadius = std::min(center.EuclideanDistanceTo(vertices[2]), firstRadius);
-
-        if (firstRadius > 0.0)
-        {
-          Vector2D secondAxis;
-          secondAxis[0] = firstAxis[1];
-          secondAxis[1] = -firstAxis[0];
-          vertices[2] = center + secondAxis * (secondRadius / firstRadius);
-        }
-
-        thickness = std::clamp(firstRadius - center.EuclideanDistanceTo(vertices[3]), 0.0, secondRadius);
-        vertices.erase(3);
-      }
-
-      bool first = true;
-      for (const auto& [id, p] : vertices)
-      {
-        if (first == true) // needed to set m_FigurePlaced to true
-        {
-          planarFigure->PlaceFigure(p);
-          first = false;
-        }
-        planarFigure->SetControlPoint(id, p, true);
-      }
-
-      if (thickness.has_value())
-        static_cast<PlanarDoubleEllipse*>(planarFigure.GetPointer())->SetThickness(*thickness);
-
-      // Calculate feature quantities of this PlanarFigure
-      planarFigure->EvaluateFeatures();
-
-      // Make sure that no control point is currently selected
-      planarFigure->DeselectControlPoint();
-
-      if (planarFigure.IsNotNull())
-      {
-        results.emplace_back(planarFigure);
+        mitkThrow() << "A planar figure of type \"" << figure.GetTypeId() << "\" has no parameter \"" << name << "\".";
       }
     }
-
-    return results;
   }
 
-  mitk::PlanarFigureIO::DoubleList mitk::PlanarFigureIO::GetDoubleAttributeListFromXMLNode(
-    const tinyxml2::XMLElement* e, const char* attributeNameBase, unsigned int count)
+  mitk::PlanarFigure::Pointer ReadFigure(const nlohmann::json &j)
   {
-    DoubleList list;
+    if (!j.is_object() || mitk::PlanarFigureIOMimeTypes::FileFormat != j.value("FileFormat", ""))
+      mitkThrow() << "Not a planar figure file.";
 
-    if (e == nullptr)
-      throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
+    if (!j.at("Version").is_number_integer())
+      mitkThrow() << "The version of the planar figure file must be an integer.";
 
-    for (unsigned int i = 0; i < count; ++i)
-    {
-      mitk::ScalarType p(-1.0);
-      std::stringstream attributeName;
-      attributeName << attributeNameBase << i;
+    const auto version = j.at("Version").get<int>();
 
-      if (e->QueryDoubleAttribute(attributeName.str().c_str(), &p) != tinyxml2::XML_SUCCESS)
-        throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-      list.push_back(p);
-    }
+    if (version > Version)
+      mitkThrow() << "The planar figure file has version " << version << ", which is newer than the supported version " << Version << ".";
 
-    return list;
+    if (version < 1)
+      mitkThrow() << "The planar figure file has the invalid version " << version << ".";
+
+    auto figure = mitk::CreatePlanarFigure(j.at("Type").get<std::string>());
+    figure->SetPlaneGeometry(ReadPlane(j.at("Plane")));
+
+    const auto &jControlPoints = j.at("ControlPoints");
+
+    if (!jControlPoints.is_array())
+      mitkThrow() << "The control points need to be an array.";
+
+    std::vector<mitk::Point2D> controlPoints;
+
+    for (const auto &jControlPoint : jControlPoints)
+      controlPoints.push_back(ReadPair<mitk::Point2D>(jControlPoint, "A control point"));
+
+    figure->SetControlPoints(controlPoints);
+
+    if (j.contains("Parameters"))
+      ReadParameters(j["Parameters"], *figure);
+
+    if (j.contains("ShapeLocked"))
+      figure->SetShapeLocked(j["ShapeLocked"].get<bool>());
+
+    return figure;
   }
+}
 
-  mitk::Point3D mitk::PlanarFigureIO::GetPointFromXMLNode(const tinyxml2::XMLElement* e)
+mitk::PlanarFigureIO::PlanarFigureIO()
+  : AbstractFileIO(PlanarFigure::GetStaticNameOfClass(), PlanarFigureIOMimeTypes::PLANARFIGURE_MIMETYPE(), "MITK Planar Figure")
+{
+  this->RegisterService();
+}
+
+mitk::IFileIO::ConfidenceLevel mitk::PlanarFigureIO::GetWriterConfidenceLevel() const
+{
+  if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
+    return Unsupported;
+
+  return nullptr != dynamic_cast<const PlanarFigure *>(this->GetInput())
+    ? Supported
+    : Unsupported;
+}
+
+std::vector<mitk::BaseData::Pointer> mitk::PlanarFigureIO::DoRead()
+{
+  auto *stream = this->GetInputStream();
+  std::ifstream fileStream;
+
+  if (nullptr == stream)
   {
-    if (e == nullptr)
-      throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
-    mitk::Point3D point;
-    mitk::ScalarType p(-1.0);
-    if (e->QueryDoubleAttribute("x", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    point.SetElement(0, p);
-    if (e->QueryDoubleAttribute("y", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    point.SetElement(1, p);
-    if (e->QueryDoubleAttribute("z", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    point.SetElement(2, p);
-    return point;
+    const auto filename = this->GetInputLocation();
+    fileStream.open(filename);
+
+    if (!fileStream.is_open())
+      mitkThrow() << "Could not open file \"" << filename << "\" for reading.";
+
+    stream = &fileStream;
   }
 
-  mitk::Vector3D mitk::PlanarFigureIO::GetVectorFromXMLNode(const tinyxml2::XMLElement* e)
+  PlanarFigure::Pointer figure;
+
+  try
   {
-    if (e == nullptr)
-      throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
-    mitk::Vector3D vector;
-    mitk::ScalarType p(-1.0);
-    if (e->QueryDoubleAttribute("x", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    vector.SetElement(0, p);
-    if (e->QueryDoubleAttribute("y", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    vector.SetElement(1, p);
-    if (e->QueryDoubleAttribute("z", &p) != tinyxml2::XML_SUCCESS)
-      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
-    vector.SetElement(2, p);
-    return vector;
+    figure = ReadFigure(nlohmann::json::parse(*stream));
+  }
+  catch (const nlohmann::json::exception &e)
+  {
+    mitkThrow() << "Invalid planar figure file: " << e.what();
   }
 
-  PlanarFigureIO *PlanarFigureIO::IOClone() const { return new PlanarFigureIO(*this); }
+  // The interactor of the previous API takes figures without it for being placed.
+  figure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
+  figure->EvaluateFeatures();
 
-} // namespace
+  return { figure.GetPointer() };
+}
+
+void mitk::PlanarFigureIO::Write()
+{
+  const auto *figure = dynamic_cast<const PlanarFigure *>(this->GetInput());
+
+  if (nullptr == figure)
+    mitkThrow() << "Invalid input for writing.";
+
+  if (!figure->IsComplete())
+    mitkThrow() << "A planar figure cannot be written while it is being placed.";
+
+  auto *stream = this->GetOutputStream();
+  std::ofstream fileStream;
+
+  if (nullptr == stream)
+  {
+    const auto filename = this->GetOutputLocation();
+
+    if (filename.empty())
+      mitkThrow() << "Neither an output stream nor an output filename was specified.";
+
+    fileStream.open(filename);
+
+    if (!fileStream.is_open())
+      mitkThrow() << "Could not open file \"" << filename << "\" for writing.";
+
+    stream = &fileStream;
+  }
+
+  *stream << std::setw(2) << WriteFigure(*figure) << std::endl;
+}
+
+mitk::PlanarFigureIO *mitk::PlanarFigureIO::IOClone() const
+{
+  return new PlanarFigureIO(*this);
+}

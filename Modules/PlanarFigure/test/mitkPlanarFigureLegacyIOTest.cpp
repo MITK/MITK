@@ -10,7 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkCoreServices.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
+#include <mitkPlanarDoubleEllipse.h>
 #include <mitkPlanarEllipse.h>
 #include <mitkPlaneGeometry.h>
 
@@ -18,6 +23,9 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <array>
+#include <cmath>
+#include <numbers>
+#include <sstream>
 
 namespace
 {
@@ -188,6 +196,64 @@ namespace
 
     return measurements;
   }
+
+  const std::string AxialGeometry =
+    R"(<Geometry>)"
+    R"(<transformParam param0="1" param1="0" param2="0" param3="0" param4="1" param5="0" param6="0" param7="0" param8="1" param9="0" param10="0" param11="0" />)"
+    R"(<boundsParam bound0="0" bound1="100" bound2="0" bound3="100" bound4="0" bound5="1" />)"
+    R"(<Spacing x="1" y="1" z="1" />)"
+    R"(<Origin x="0" y="0" z="0" />)"
+    R"(</Geometry>)";
+
+  std::string Vertices(const std::vector<std::array<double, 2>> &points)
+  {
+    std::ostringstream vertices;
+
+    for (std::size_t i = 0; i < points.size(); ++i)
+      vertices << R"(<Vertex id=")" << i << R"(" x=")" << points[i][0] << R"(" y=")" << points[i][1] << R"(" />)";
+
+    return vertices.str();
+  }
+
+  std::string BoolProperty(const std::string &key, bool value)
+  {
+    return R"(<property key=")" + key + R"(" type="BoolProperty"><bool value=")" + (value ? "true" : "false") + R"(" /></property>)";
+  }
+
+  std::string Figure(const std::string &type, const std::string &content)
+  {
+    return R"(<PlanarFigure type=")" + type + R"(">)" + content + "</PlanarFigure>";
+  }
+
+  std::string File(const std::string &figures, const std::string &version = R"(<Version FileVersion="1" />)")
+  {
+    return R"(<?xml version="1.0" ?>)" + version + figures;
+  }
+
+  std::string ControlPoints(const std::vector<std::array<double, 2>> &points)
+  {
+    return "<ControlPoints>" + Vertices(points) + "</ControlPoints>";
+  }
+
+  std::vector<mitk::BaseData::Pointer> ReadLegacy(const std::string &content)
+  {
+    mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+    mitk::FileReaderRegistry registry;
+    auto readers = registry.GetReaders(mimeTypeProvider->GetMimeTypeForName(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".planarfigure.legacy"));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), readers.size());
+
+    std::istringstream stream(content);
+    readers.front()->SetInput("", &stream);
+    return readers.front()->Read();
+  }
+
+  mitk::PlanarFigure::Pointer ReadLegacyFigure(const std::string &type, const std::string &content)
+  {
+    const auto data = ReadLegacy(File(Figure(type, content + AxialGeometry)));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), data.size());
+
+    return dynamic_cast<mitk::PlanarFigure *>(data.front().GetPointer());
+  }
 }
 
 class mitkPlanarFigureLegacyIOTestSuite : public mitk::TestFixture
@@ -195,10 +261,135 @@ class mitkPlanarFigureLegacyIOTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkPlanarFigureLegacyIOTestSuite);
 
   MITK_TEST(ReadsEveryLegacyFileOfTestData);
+  MITK_TEST(FixedSizeFigures_HaveRadiusZero);
+  MITK_TEST(SingleLineCrosses_AreLines);
+  MITK_TEST(Cross_KeepsBothLines);
+  MITK_TEST(Cross_RoundedCoordinates_Load);
+  MITK_TEST(Cross_ReplaysOldConstraints);
+  MITK_TEST(Arrow_IsRead);
+  MITK_TEST(SeveralFigures_AreRead);
+  MITK_TEST(InvalidFiles_Throw);
 
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void FixedSizeFigures_HaveRadiusZero()
+  {
+    const auto circle = ReadLegacyFigure("PlanarCircle", ControlPoints({ { 10, 20 } }));
+    CPPUNIT_ASSERT_EQUAL(std::string("circle"), circle->GetTypeId());
+    CPPUNIT_ASSERT_EQUAL(0.0, *circle->GetMeasurement(mitk::PlanarFigure::MeasurementType::Radius));
+
+    const auto doubleEllipse = ReadLegacyFigure("PlanarDoubleEllipse", ControlPoints({ { 10, 20 } }));
+    CPPUNIT_ASSERT_EQUAL(std::string("double_ellipse"), doubleEllipse->GetTypeId());
+    CPPUNIT_ASSERT_EQUAL(3u, doubleEllipse->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(0.0, static_cast<const mitk::PlanarDoubleEllipse *>(doubleEllipse.GetPointer())->GetThickness());
+  }
+
+  void SingleLineCrosses_AreLines()
+  {
+    const auto singleLine = ReadLegacyFigure("PlanarCross", BoolProperty("SingleLineMode", true) + ControlPoints({ { 10, 20 }, { 50, 20 } }));
+    CPPUNIT_ASSERT_EQUAL(std::string("line"), singleLine->GetTypeId());
+
+    const auto withoutSecondLine = ReadLegacyFigure("PlanarCross", ControlPoints({ { 10, 20 }, { 50, 20 } }));
+    CPPUNIT_ASSERT_EQUAL(std::string("line"), withoutSecondLine->GetTypeId());
+    CPPUNIT_ASSERT_EQUAL(40.0, *withoutSecondLine->GetMeasurement(mitk::PlanarFigure::MeasurementType::Length));
+  }
+
+  void Cross_KeepsBothLines()
+  {
+    const auto cross = ReadLegacyFigure("PlanarCross",
+      BoolProperty("SingleLineMode", false) + ControlPoints({ { 10, 20 }, { 50, 20 }, { 30, 30 }, { 30, 15 } }));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("cross"), cross->GetTypeId());
+    CPPUNIT_ASSERT_EQUAL(40.0, *cross->GetMeasurement(mitk::PlanarFigure::MeasurementType::LongAxis));
+    CPPUNIT_ASSERT_EQUAL(15.0, *cross->GetMeasurement(mitk::PlanarFigure::MeasurementType::ShortAxis));
+  }
+
+  void Cross_RoundedCoordinates_Load()
+  {
+    // Files written before late 2013 stored six significant digits, like Vertices() does.
+    const auto angle = 23.7 * std::numbers::pi / 180.0;
+    const std::array<double, 2> direction = { std::cos(angle), std::sin(angle) };
+    const std::array<double, 2> normal = { -direction[1], direction[0] };
+
+    const auto at = [&](double along, double across) {
+      return std::array<double, 2>{ 51.37 + direction[0] * along + normal[0] * across, 48.91 + direction[1] * along + normal[1] * across };
+    };
+
+    const auto cross = ReadLegacyFigure("PlanarCross", ControlPoints({ at(-20, 0), at(20, 0), at(3, 7), at(3, -5) }));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("cross"), cross->GetTypeId());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(40.0, *cross->GetMeasurement(mitk::PlanarFigure::MeasurementType::LongAxis), 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(12.0, *cross->GetMeasurement(mitk::PlanarFigure::MeasurementType::ShortAxis), 1e-3);
+  }
+
+  void Cross_ReplaysOldConstraints()
+  {
+    const auto assertControlPoint = [](const mitk::PlanarFigure *figure, std::size_t index, double x, double y) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(x, figure->GetControlPoint(index)[0], Epsilon);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(y, figure->GetControlPoint(index)[1], Epsilon);
+    };
+
+    // The crossing is clipped to the end of the first line.
+    const auto clipped = ReadLegacyFigure("PlanarCross", ControlPoints({ { 10, 20 }, { 50, 20 }, { 60, 30 }, { 55, 15 } }));
+    assertControlPoint(clipped, 2, 50, 30);
+    assertControlPoint(clipped, 3, 50, 15);
+
+    // A second point on the side of the first one moves onto the first line.
+    const auto tShaped = ReadLegacyFigure("PlanarCross", ControlPoints({ { 10, 20 }, { 50, 20 }, { 30, 30 }, { 32, 25 } }));
+    assertControlPoint(tShaped, 2, 30, 30);
+    assertControlPoint(tShaped, 3, 30, 20);
+  }
+
+  void Arrow_IsRead()
+  {
+    const auto arrow = ReadLegacyFigure("PlanarArrow", ControlPoints({ { 10, 20 }, { 50, 50 } }));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("arrow"), arrow->GetTypeId());
+    CPPUNIT_ASSERT_EQUAL(50.0, *arrow->GetMeasurement(mitk::PlanarFigure::MeasurementType::Length));
+  }
+
+  void SeveralFigures_AreRead()
+  {
+    const auto data = ReadLegacy(File(
+      Figure("PlanarLine", ControlPoints({ { 10, 20 }, { 50, 20 } }) + AxialGeometry) +
+      Figure("PlanarCircle", ControlPoints({ { 10, 20 }, { 15, 20 } }) + AxialGeometry)));
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), data.size());
+  }
+
+  void InvalidFiles_Throw()
+  {
+    const auto line = ControlPoints({ { 10, 20 }, { 50, 20 } }) + AxialGeometry;
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Version 2",
+      ReadLegacy(File(Figure("PlanarLine", line), R"(<Version FileVersion="2" />)")), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No version", ReadLegacy(File(Figure("PlanarLine", line), "")), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Unknown type", ReadLegacy(File(Figure("PlanarSquare", line))), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No figure", ReadLegacy(File("")), mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("No geometry",
+      ReadLegacy(File(Figure("PlanarLine", ControlPoints({ { 10, 20 }, { 50, 20 } })))), mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Incomplete geometry",
+      ReadLegacy(File(Figure("PlanarLine", ControlPoints({ { 10, 20 }, { 50, 20 } }) +
+        R"(<Geometry><boundsParam bound0="0" bound1="100" bound2="0" bound3="100" bound4="0" bound5="1" /></Geometry>)"))),
+      mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Vertex without y",
+      ReadLegacy(File(Figure("PlanarLine",
+        R"(<ControlPoints><Vertex id="0" x="10" y="20" /><Vertex id="1" x="50" /></ControlPoints>)" + AxialGeometry))),
+      mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Gap in the ids",
+      ReadLegacy(File(Figure("PlanarLine",
+        R"(<ControlPoints><Vertex id="0" x="10" y="20" /><Vertex id="2" x="50" y="20" /></ControlPoints>)" + AxialGeometry))),
+      mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Too few control points",
+      ReadLegacy(File(Figure("PlanarLine", ControlPoints({ { 10, 20 } }) + AxialGeometry))), mitk::Exception);
+  }
+
   void ReadsEveryLegacyFileOfTestData()
   {
     for (const auto& expected : LegacyFigures)
@@ -210,6 +401,9 @@ public:
       CPPUNIT_ASSERT_MESSAGE(expected.File, figure != nullptr);
       CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.ClassName, std::string(figure->GetNameOfClass()));
       CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.Closed, figure->IsClosed());
+
+      // Properties of the file only steer the conversion.
+      CPPUNIT_ASSERT_MESSAGE(expected.File, nullptr == figure->GetPropertyList()->GetProperty("subdivision"));
 
       const auto expectedWorldControlPoints = GetExpectedWorldControlPoints(expected);
       CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expectedWorldControlPoints.size(), static_cast<std::size_t>(figure->GetNumberOfControlPoints()));

@@ -1,8 +1,9 @@
 set(CPP_FILES
+  mitkLegacyPlanarFigureReader.cpp
   mitkPlanarFigureIOActivator.cpp
   mitkPlanarFigureIO.cpp
+  mitkPlanarFigureIOMimeTypes.cpp
   mitkPlanarFigurePropertySerializers.cpp
   mitkPlanarFigureSerializer.cpp
   mitkPlanarFigureSubclassesSerializer.cpp
 )
-

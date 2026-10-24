@@ -39,6 +39,14 @@ namespace mitk
     /** \brief Two open outlines, one per line. */
     std::vector<Contour> GetContours() const override;
 
+    /**
+     * \brief The measured angle as an arc where the extended lines meet, and
+     *        the extensions of the lines that do not reach that point.
+     *
+     * Parallel lines have none.
+     */
+    std::vector<Decoration> GetDecorations() const override;
+
     /** \brief Angle between the directions of both lines. */
     std::vector<Measurement> GetMeasurements() const override;
 

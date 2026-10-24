@@ -30,7 +30,7 @@ namespace mitk
    * Node properties:
    *   - \c planarfigure.3drendering (BoolProperty): whether the figure is shown in 3D, false by default
    *   - \c planarfigure.3drendering.fill (BoolProperty): whether closed contours are filled, false by default
-   *   - \c color, \c opacity and \c line \c width as in 2D render windows
+   *   - \c color, \c opacity, \c line \c width, \c animated.pulse and \c animated.pulse.frequency as in 2D render windows
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
   {
@@ -60,7 +60,9 @@ namespace mitk
 
       vtkSmartPointer<vtkActor> m_Actor;
       itk::ModifiedTimeType m_FigureTime = 0;
+      itk::ModifiedTimeType m_PlaneTime = 0;
       bool m_IsFilled = false;
+      Point3D m_PulseCenter;
     };
 
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;

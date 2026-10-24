@@ -19,7 +19,9 @@ found in the LICENSE file.
 
 #include <vtkActor.h>
 #include <vtkCellArray.h>
+#include <vtkLinearTransform.h>
 #include <vtkMapper.h>
+#include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
 #include <vtkTriangle.h>
 
@@ -30,6 +32,7 @@ class mitkPlanarFigureVtkMapper3DTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkPlanarFigureVtkMapper3DTestSuite);
   MITK_TEST(Figure_IsHiddenByDefault);
   MITK_TEST(Fill_LeavesHoleOpen);
+  MITK_TEST(Pulse_ScalesFigureAroundItsCenter);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -43,7 +46,7 @@ class mitkPlanarFigureVtkMapper3DTestSuite : public mitk::TestFixture
     return point;
   }
 
-  vtkPolyData *GetRenderedPolyData()
+  vtkActor *GetRenderedActor()
   {
     m_RenderingTestHelper.Render();
 
@@ -54,7 +57,12 @@ class mitkPlanarFigureVtkMapper3DTestSuite : public mitk::TestFixture
     auto *actor = dynamic_cast<vtkActor *>(mapper->GetVtkProp(renderer));
     CPPUNIT_ASSERT(nullptr != actor);
 
-    return vtkPolyData::SafeDownCast(actor->GetMapper()->GetInput());
+    return actor;
+  }
+
+  vtkPolyData *GetRenderedPolyData()
+  {
+    return vtkPolyData::SafeDownCast(this->GetRenderedActor()->GetMapper()->GetInput());
   }
 
 public:
@@ -121,6 +129,31 @@ public:
     // The sampled ellipses are polygons inscribed in the exact ones.
     const auto ringArea = std::numbers::pi * (20.0 * 10.0 - 16.0 * 6.0);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(ringArea, area, 0.01 * ringArea);
+  }
+
+  // The animation time follows a steady clock, so the scale is anywhere within the pulse.
+  void Pulse_ScalesFigureAroundItsCenter()
+  {
+    m_Node->SetBoolProperty("planarfigure.3drendering", true);
+    m_Node->SetBoolProperty("animated.pulse", true);
+
+    auto *transform = this->GetRenderedActor()->GetUserTransform();
+    CPPUNIT_ASSERT_MESSAGE("The figure pulses", nullptr != transform);
+
+    const auto scale = transform->GetMatrix()->GetElement(0, 0);
+    CPPUNIT_ASSERT_MESSAGE("Scale of the pulse", scale >= 1.0 && scale <= 1.08);
+
+    mitk::Point3D center;
+    static_cast<mitk::PlanarFigure *>(m_Node->GetData())->GetPlaneGeometry()->Map(P(50, 50), center);
+
+    double transformedCenter[3];
+    transform->TransformPoint(center.GetDataPointer(), transformedCenter);
+
+    for (int i = 0; i < 3; ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(center[i], transformedCenter[i], 1e-9);
+
+    m_Node->SetBoolProperty("animated.pulse", false);
+    CPPUNIT_ASSERT_MESSAGE("The figure rests", nullptr == this->GetRenderedActor()->GetUserTransform());
   }
 };
 

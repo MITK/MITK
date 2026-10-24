@@ -60,12 +60,8 @@ namespace
 
     // Only lists of previous versions have this property, so the defaults they
     // wrote for properties that are still in use are dropped here, where they
-    // cannot be mistaken for a choice made in a current scene.
-    bool drawName = false;
-
-    if (properties.GetBoolProperty("planarfigure.drawname", drawName) && drawName)
-      properties.DeleteProperty("planarfigure.drawname");
-
+    // cannot be mistaken for a choice made in a current scene. Their labels
+    // were on by default, as they are now.
     float opacity = 1.0f;
 
     if (properties.GetFloatProperty("opacity", opacity) && 0.8f == opacity)

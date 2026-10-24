@@ -16,8 +16,11 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 #include <mitkBaseRenderer.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyDeserialization.h>
 #include <mitkMapperProviderBase.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
 #include <mitkPlanarFigureVtkMapper2D.h>
 #include <mitkPlanarFigureVtkMapper3D.h>
 
@@ -31,8 +34,8 @@ namespace mitk
   /**
    * \brief Module activator for the PlanarFigure module.
    *
-   * Registers the mapper providers for mitk::PlanarFigure and the migration
-   * of properties of previous versions.
+   * Registers the mapper providers for mitk::PlanarFigure, its property types
+   * and the migration of properties of previous versions.
    */
   class PlanarFigureModuleActivator : public us::ModuleActivator
   {
@@ -40,6 +43,9 @@ namespace mitk
     void Load(us::ModuleContext *) override
     {
       PlanarFigureLegacyProperties::Register();
+
+      CoreServicePointer<IPropertyDeserialization> deserialization(CoreServices::GetPropertyDeserialization());
+      deserialization->RegisterProperty<PlanarFigureVisibilityProperty>();
 
       m_MapperProviders.push_back(
         std::make_unique<MapperProviderBase<PlanarFigureVtkMapper2D, PlanarFigure>>(BaseRenderer::Standard2D));

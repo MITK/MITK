@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLevelWindowProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkSurface.h>
 #include <mitkTestingMacros.h>
@@ -89,6 +90,7 @@ int mitkViewportRenderingTest(int argc, char *argv[])
     (*iterFigures)->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0)); // red
     (*iterFigures)->SetProperty("planarfigure.drawname", mitk::BoolProperty::New(false));
     (*iterFigures)->SetProperty("planarfigure.drawquantities", mitk::BoolProperty::New(true));
+    (*iterFigures)->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Always));
   }
 
   ObjectsSet::ConstPointer surfaces =

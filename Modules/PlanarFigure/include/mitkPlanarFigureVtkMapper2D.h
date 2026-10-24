@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkType.h>
 
+#include <array>
 #include <optional>
 
 class vtkActor2D;
@@ -43,11 +44,16 @@ namespace mitk
    *   - \c color (ColorProperty): base color of the figure
    *   - \c opacity (FloatProperty): opacity of the figure
    *   - \c line \c width (FloatProperty): width of the outline in logical pixels
-   *   - \c planarfigure.drawname (BoolProperty): label with the node name
-   *   - \c planarfigure.drawquantities (BoolProperty): label with the measurements
+   *   - \c planarfigure.drawname (BoolProperty): label with the node name, true by default
+   *   - \c planarfigure.drawquantities (BoolProperty): label with the measurements, true by default
+   *   - \c planarfigure.label (PlanarFigureVisibilityProperty): when the label is shown, on hover by default;
+   *     never for helper objects and hidden objects
+   *   - \c planarfigure.drawcontrastoutline (BoolProperty): black or white outline that keeps strokes visible on any image, true by default
+   *   - \c planarfigure.helperlines (PlanarFigureVisibilityProperty): when helper lines like the arc of an angle are shown;
+   *     always by default, on hover like the handles for the control polygon of Bezier curves
    *   - \c font.size (IntProperty): font size of the label in points
    *   - \c animated.pulse (BoolProperty): while true, the figure grows and shrinks by up to 8 percent
-   *   - \c animated.pulse.frequency (FloatProperty): pulses per second, 0.5 by default
+   *   - \c animated.pulse.frequency (FloatProperty): pulses per second, 2 by default
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigureVtkMapper2D : public VtkMapper
   {
@@ -78,12 +84,18 @@ namespace mitk
     struct BuildKey
     {
       itk::ModifiedTimeType FigureTime = 0;
+      const void *FigurePlane = nullptr;
+      itk::ModifiedTimeType FigurePlaneTime = 0;
       itk::ModifiedTimeType NodeTime = 0;
       itk::ModifiedTimeType PropertiesTime = 0;
       itk::ModifiedTimeType RendererPropertiesTime = 0;
       const void *RendererPlane = nullptr;
       itk::ModifiedTimeType RendererPlaneTime = 0;
-      vtkMTimeType CameraTime = 0;
+      // Values, not the modification time, which every render changes by adjusting the camera to the plane.
+      std::array<double, 3> CameraPosition = {};
+      std::array<double, 3> CameraFocalPoint = {};
+      std::array<double, 3> CameraViewUp = {};
+      double CameraParallelScale = 0.0;
       int ViewportWidth = 0;
       int ViewportHeight = 0;
       int DPI = 0;

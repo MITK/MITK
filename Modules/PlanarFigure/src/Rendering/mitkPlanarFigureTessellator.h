@@ -57,14 +57,24 @@ namespace mitk
      */
     void AddStroke(const std::vector<Point2D> &points, bool closed, double width, const Color &color, double feather = 1.0);
 
-    /** \brief Adds a stroke interrupted by gaps, measured along the polyline. */
-    void AddDashedStroke(const std::vector<Point2D> &points, bool closed, double width, const Color &color, double dash, double gap);
+    /**
+     * \brief Adds a stroke interrupted by gaps, measured along the polyline.
+     *
+     * Only the dashes that can touch the clip rectangle are added, so the cost
+     * depends on the visible length, not on the length of the polyline. The
+     * pattern stays anchored to the start of the polyline.
+     */
+    void AddDashedStroke(const std::vector<Point2D> &points, bool closed, double width, const Color &color, double dash, double gap,
+      const Point2D &clipLowerLeft, const Point2D &clipUpperRight);
 
     /** \brief Adds a filled disc. */
     void AddDisc(const Point2D &center, double radius, const Color &color);
 
     /** \brief Adds a ring between two radii. */
     void AddRing(const Point2D &center, double innerRadius, double outerRadius, const Color &color);
+
+    /** \brief Adds a filled rectangle with rounded corners, at least half a pixel round. */
+    void AddRoundedRectangle(const Point2D &lowerLeft, const Point2D &upperRight, double cornerRadius, const Color &color);
 
     /** \brief The poly data the shapes are written into. */
     vtkPolyData *GetPolyData() const;

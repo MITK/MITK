@@ -17,8 +17,10 @@ found in the LICENSE file.
 
 #include <mitkBaseRenderer.h>
 #include <mitkColorProperty.h>
+#include <mitkPlanarBezierCurve.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureInteractor.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
@@ -32,6 +34,7 @@ found in the LICENSE file.
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <numbers>
@@ -54,7 +57,7 @@ namespace
     constexpr double OutlineAlpha = 0.4;
     constexpr double HelperWidth = 1.0;
     constexpr double HelperAlpha = 0.85;
-    constexpr double HelperOutlineWidth = 1.0;
+    constexpr double HelperOutlineWidth = HelperWidth + OutlineExtraWidth;
     constexpr double HelperOutlineAlpha = 0.45;
     constexpr double DashLength = 4.0;
     constexpr double GapLength = 3.0;
@@ -68,13 +71,19 @@ namespace
     constexpr double CenterHandleWidth = 2.0;
     constexpr double InsertionPreviewAlpha = 0.7;
     constexpr double LabelOffset = 8.0;
+    constexpr double LabelHorizontalPadding = 6.0;
+    constexpr double LabelTopPadding = 6.0;
+    constexpr double LabelBottomPadding = 3.0; // Below the baseline, the descent of the font adds to it.
+    constexpr double LabelCornerRadius = 4.0;
     constexpr double LabelPlateAlpha = 0.55;
-    constexpr double PulseAmplitude = 0.08;
+    constexpr double LabelLineSpacing = 1.35; // Relative to the height of a line; VTK uses 1.1.
   }
 
-  constexpr const char *PulseProperty = "animated.pulse";
-  constexpr const char *PulseFrequencyProperty = "animated.pulse.frequency";
-  constexpr float DefaultPulseFrequency = 0.5f;
+  using mitk::PlanarFigureViewHelpers::DefaultColor;
+  using mitk::PlanarFigureViewHelpers::DefaultPulseFrequency;
+  using mitk::PlanarFigureViewHelpers::PulseAmplitude;
+  using mitk::PlanarFigureViewHelpers::PulseFrequencyProperty;
+  using mitk::PlanarFigureViewHelpers::PulseProperty;
 
   struct DisplayPolyline
   {
@@ -161,25 +170,69 @@ namespace
       : mitk::PlanarFigureInteractor::Feedback{};
   }
 
-  std::string GetMeasurementText(const mitk::PlanarFigure *figure)
+  mitk::PlanarFigureVisibilityProperty::Visibility GetVisibility(const mitk::DataNode *node, const std::string &key,
+    const mitk::BaseRenderer *renderer, mitk::PlanarFigureVisibilityProperty::Visibility fallback)
   {
-    std::ostringstream text;
-    text << std::fixed << std::setprecision(2);
+    const auto *property = dynamic_cast<const mitk::PlanarFigureVisibilityProperty *>(node->GetProperty(key.c_str(), renderer));
+    return nullptr != property ? property->GetVisibility() : fallback;
+  }
 
-    bool first = true;
+  // The control polygon of a Bezier curve helps to edit it, so it comes and goes with the handles,
+  // while the arc of an angle shows what is measured.
+  mitk::PlanarFigureVisibilityProperty::Visibility GetDefaultHelperLines(const mitk::BaseData *data)
+  {
+    return nullptr != dynamic_cast<const mitk::PlanarBezierCurve *>(data)
+      ? mitk::PlanarFigureVisibilityProperty::Visibility::OnHover
+      : mitk::PlanarFigureVisibilityProperty::Visibility::Always;
+  }
+
+  bool IsShown(mitk::PlanarFigureVisibilityProperty::Visibility visibility, bool isHovered, bool isSelected, bool isBeingPlaced)
+  {
+    using Visibility = mitk::PlanarFigureVisibilityProperty::Visibility;
+
+    switch (visibility)
+    {
+      case Visibility::Always:
+        return true;
+      case Visibility::OnHover:
+        return isHovered || isBeingPlaced;
+      case Visibility::WhenSelected:
+        return isSelected || isBeingPlaced;
+      case Visibility::OnHoverOrWhenSelected:
+        return isHovered || isSelected || isBeingPlaced;
+      case Visibility::OnHoverWhileSelected:
+        return (isHovered && isSelected) || isBeingPlaced;
+      case Visibility::Never:
+        return false;
+    }
+
+    return true;
+  }
+
+  // The unit symbols are plain ASCII, the label typesets them in UTF-8.
+  std::vector<std::string> GetMeasurementLines(const mitk::PlanarFigure *figure)
+  {
+    std::vector<std::string> lines;
 
     for (const auto &measurement : figure->GetMeasurements())
     {
-      if (!first)
-        text << ", ";
+      const auto unit = mitk::PlanarFigure::GetUnitSymbol(measurement.Type);
 
-      text << mitk::PlanarFigure::GetDisplayName(measurement.Type) << ' ' << measurement.Value << ' '
-           << mitk::PlanarFigure::GetUnitSymbol(measurement.Type);
+      std::ostringstream line;
+      line.imbue(std::locale::classic());
+      line << std::fixed << std::setprecision(2) << mitk::PlanarFigure::GetDisplayName(measurement.Type) << ": " << measurement.Value;
 
-      first = false;
+      if ("mm2" == unit)
+        line << " mm\xC2\xB2";
+      else if ("deg" == unit)
+        line << "\xC2\xB0";
+      else
+        line << ' ' << unit;
+
+      lines.push_back(line.str());
     }
 
-    return text.str();
+    return lines;
   }
 }
 
@@ -215,11 +268,15 @@ void mitk::PlanarFigureVtkMapper2D::SetDefaultProperties(DataNode *node, BaseRen
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 
-  node->AddProperty("color", ColorProperty::New(1.0f, 1.0f, 1.0f), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(DefaultColor), renderer, overwrite);
   node->AddProperty("opacity", FloatProperty::New(1.0f), renderer, overwrite);
   node->AddProperty("line width", FloatProperty::New(2.0f), renderer, overwrite);
-  node->AddProperty("planarfigure.drawname", BoolProperty::New(false), renderer, overwrite);
-  node->AddProperty("planarfigure.drawquantities", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("planarfigure.drawname", BoolProperty::New(true), renderer, overwrite);
+  node->AddProperty("planarfigure.drawquantities", BoolProperty::New(true), renderer, overwrite);
+  node->AddProperty("planarfigure.label", PlanarFigureVisibilityProperty::New(PlanarFigureVisibilityProperty::Visibility::OnHover), renderer, overwrite);
+  node->AddProperty("planarfigure.drawcontrastoutline", BoolProperty::New(true), renderer, overwrite);
+
+  node->AddProperty("planarfigure.helperlines", PlanarFigureVisibilityProperty::New(GetDefaultHelperLines(node->GetData())), renderer, overwrite);
   node->AddProperty("font.size", IntProperty::New(13), renderer, overwrite);
   node->AddProperty(PulseProperty, BoolProperty::New(false), renderer, overwrite);
   node->AddProperty(PulseFrequencyProperty, FloatProperty::New(DefaultPulseFrequency), renderer, overwrite);
@@ -245,15 +302,24 @@ mitk::PlanarFigureVtkMapper2D::BuildKey mitk::PlanarFigureVtkMapper2D::GetBuildK
 
   const auto *figure = dynamic_cast<const PlanarFigure *>(node->GetData());
 
+  // The modification time of the figure leaves out its plane.
+  const auto *figurePlane = figure != nullptr ? figure->GetPlaneGeometry() : nullptr;
+
   BuildKey key;
   key.FigureTime = figure != nullptr ? figure->GetMTime() : 0;
+  key.FigurePlane = figurePlane;
+  key.FigurePlaneTime = figurePlane != nullptr ? figurePlane->GetMTime() : 0;
   key.Feedback = GetFeedback(node, renderer);
   key.NodeTime = node->GetMTime();
   key.PropertiesTime = node->GetPropertyList()->GetMTime();
   key.RendererPropertiesTime = node->GetPropertyList(renderer)->GetMTime();
   key.RendererPlane = rendererPlane;
   key.RendererPlaneTime = rendererPlane != nullptr ? rendererPlane->GetMTime() : 0;
-  key.CameraTime = renderer->GetVtkRenderer()->GetActiveCamera()->GetMTime();
+  auto *camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  std::copy_n(camera->GetPosition(), 3, key.CameraPosition.begin());
+  std::copy_n(camera->GetFocalPoint(), 3, key.CameraFocalPoint.begin());
+  std::copy_n(camera->GetViewUp(), 3, key.CameraViewUp.begin());
+  key.CameraParallelScale = camera->GetParallelScale();
   key.ViewportWidth = viewportSize[0];
   key.ViewportHeight = viewportSize[1];
   key.DPI = renderer->GetRenderWindow()->GetDPI();
@@ -298,7 +364,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
     return;
   }
 
-  float rgb[3] = { 1.0f, 1.0f, 1.0f };
+  float rgb[3] = { DefaultColor[0], DefaultColor[1], DefaultColor[2] };
   node->GetColor(rgb, renderer);
 
   float opacity = 1.0f;
@@ -330,14 +396,22 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   std::vector<DisplayPolyline> helpers;
   std::vector<DisplayPolyline> dashedHelpers;
 
+  // Arrow heads are part of the figure, the other decorations are helper lines.
+  const auto helperLines = GetVisibility(node, "planarfigure.helperlines", renderer, GetDefaultHelperLines(figure));
+  const auto showHelperLines = IsShown(helperLines, isHovered, isSelected, figure->IsBeingPlaced());
+
   for (const auto &decoration : figure->GetDecorations())
   {
     if (const auto *controlPolygon = std::get_if<PlanarFigure::HelperPolyline>(&decoration); controlPolygon != nullptr)
     {
-      dashedHelpers.push_back({ ToDisplay(controlPolygon->Points, figurePlane, renderer), false });
+      if (showHelperLines)
+        dashedHelpers.push_back({ ToDisplay(controlPolygon->Points, figurePlane, renderer), false });
     }
     else if (const auto *arc = std::get_if<PlanarFigure::AngleArc>(&decoration); arc != nullptr)
     {
+      if (!showHelperLines)
+        continue;
+
       const auto points = GetArc(ToDisplay(arc->Vertex, figurePlane, renderer), ToDisplay(arc->End1, figurePlane, renderer),
         ToDisplay(arc->End2, figurePlane, renderer), Style::AngleArcRadius * scale);
 
@@ -369,8 +443,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
     float frequency = DefaultPulseFrequency;
     node->GetFloatProperty(PulseFrequencyProperty, frequency, renderer);
 
-    const auto phase = 2.0 * std::numbers::pi * frequency * localStorage->m_BuildKey->AnimationTime;
-    pulseScale = 1.0 + Style::PulseAmplitude * (1.0 - std::cos(phase)) / 2.0;
+    pulseScale = PlanarFigureViewHelpers::GetPulseScale(localStorage->m_BuildKey->AnimationTime, frequency);
 
     std::size_t numberOfPoints = 0;
 
@@ -390,13 +463,20 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       pulseCenter[1] /= numberOfPoints;
     }
 
-    for (auto *polylines : { &contours, &outlines, &helpers, &dashedHelpers })
+    for (auto *polylines : { &contours, &helpers, &dashedHelpers })
     {
       for (auto &polyline : *polylines)
       {
         for (auto &point : polyline.Points)
           point = pulseCenter + (point - pulseCenter) * pulseScale;
       }
+    }
+
+    // The label stays where the outline reaches at most, so it neither moves nor gets covered.
+    for (auto &outline : outlines)
+    {
+      for (auto &point : outline.Points)
+        point = pulseCenter + (point - pulseCenter) * (1.0 + PulseAmplitude);
     }
   }
 
@@ -419,16 +499,35 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
     }
   }
 
-  for (const auto *helperGroup : { &helpers, &dashedHelpers })
-  {
-    for (const auto &helper : *helperGroup)
-      tessellator.AddStroke(helper.Points, false, Style::HelperOutlineWidth * scale, WithAlpha(contrast, Style::HelperOutlineAlpha * opacity));
-  }
+  Point2D viewportLowerLeft;
+  viewportLowerLeft.Fill(0.0);
 
-  for (const auto &contour : contours)
+  Point2D viewportUpperRight;
+  viewportUpperRight[0] = renderer->GetViewportSize()[0];
+  viewportUpperRight[1] = renderer->GetViewportSize()[1];
+
+  bool drawContrastOutline = true;
+  node->GetBoolProperty("planarfigure.drawcontrastoutline", drawContrastOutline, renderer);
+
+  if (drawContrastOutline)
   {
-    tessellator.AddStroke(contour.Points, contour.Closed, lineWidth + Style::OutlineExtraWidth * scale,
-      WithAlpha(contrast, Style::OutlineAlpha * opacity));
+    const auto helperOutlineColor = WithAlpha(contrast, Style::HelperOutlineAlpha * opacity);
+
+    for (const auto &helper : helpers)
+      tessellator.AddStroke(helper.Points, false, Style::HelperOutlineWidth * scale, helperOutlineColor);
+
+    // A solid outline would fill the gaps, so every dash gets its own.
+    for (const auto &helper : dashedHelpers)
+    {
+      tessellator.AddDashedStroke(helper.Points, false, Style::HelperOutlineWidth * scale, helperOutlineColor,
+        Style::DashLength * scale, Style::GapLength * scale, viewportLowerLeft, viewportUpperRight);
+    }
+
+    for (const auto &contour : contours)
+    {
+      tessellator.AddStroke(contour.Points, contour.Closed, lineWidth + Style::OutlineExtraWidth * scale,
+        WithAlpha(contrast, Style::OutlineAlpha * opacity));
+    }
   }
 
   for (const auto &helper : helpers)
@@ -437,7 +536,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   for (const auto &helper : dashedHelpers)
   {
     tessellator.AddDashedStroke(helper.Points, false, Style::HelperWidth * scale, WithAlpha(base, Style::HelperAlpha * opacity),
-      Style::DashLength * scale, Style::GapLength * scale);
+      Style::DashLength * scale, Style::GapLength * scale, viewportLowerLeft, viewportUpperRight);
   }
 
   for (const auto &contour : contours)
@@ -505,22 +604,31 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       addHollowHandle(toView(*feedback.InsertionPreview), Style::HandleRadius * scale, Style::InsertionPreviewAlpha);
   }
 
-  localStorage->m_Mapper->SetInputData(tessellator.GetPolyData());
+  // Helper and hidden objects serve other tools, like the box prompts of nnInteractive, and carry no label.
+  bool isHelperObject = false;
+  node->GetBoolProperty("helper object", isHelperObject, renderer);
 
-  bool drawName = false;
+  bool isHiddenObject = false;
+  node->GetBoolProperty("hidden object", isHiddenObject, renderer);
+
+  const auto label = GetVisibility(node, "planarfigure.label", renderer, PlanarFigureVisibilityProperty::Visibility::OnHover);
+  const auto showLabel = !isHelperObject && !isHiddenObject && IsShown(label, isHovered, isSelected, figure->IsBeingPlaced());
+
+  bool drawName = true;
   node->GetBoolProperty("planarfigure.drawname", drawName, renderer);
 
-  bool drawQuantities = false;
+  bool drawQuantities = true;
   node->GetBoolProperty("planarfigure.drawquantities", drawQuantities, renderer);
 
-  auto text = drawName ? node->GetName() : std::string();
+  auto text = showLabel && drawName ? node->GetName() : std::string();
 
-  if (drawQuantities)
+  if (showLabel && drawQuantities)
   {
-    const auto measurements = GetMeasurementText(figure);
+    // Below a name, the measurements are indented.
+    const std::string indentation = text.empty() ? "" : "  ";
 
-    if (!measurements.empty())
-      text += (text.empty() ? "" : "\n") + measurements;
+    for (const auto &line : GetMeasurementLines(figure))
+      text += (text.empty() ? "" : "\n") + indentation + line;
   }
 
   auto *textActor = localStorage->m_TextActor.GetPointer();
@@ -550,43 +658,64 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
 
       auto *textProperty = textActor->GetTextProperty();
       textProperty->SetFontSize(fontSize);
-      textProperty->SetColor(rgb[0], rgb[1], rgb[2]);
+      textProperty->SetLineSpacing(Style::LabelLineSpacing);
+      textProperty->SetColor(1.0, 1.0, 1.0);
       textProperty->SetOpacity(opacity);
-      textProperty->SetBackgroundColor(contrastValue, contrastValue, contrastValue);
-      textProperty->SetBackgroundOpacity(Style::LabelPlateAlpha * opacity);
+      textProperty->SetBackgroundOpacity(0.0);
       textProperty->SetVerticalJustificationToCentered();
       textProperty->SetJustificationToLeft();
       textProperty->ShadowOff();
 
       textActor->SetInput(text.c_str());
 
-      double boundingBox[4];
+      // Relative to the position of the text, with the last pixel included.
+      double boundingBox[4] = { 0.0, 0.0, 0.0, 0.0 };
       textActor->GetBoundingBox(renderer->GetVtkRenderer(), boundingBox);
+
+      const auto horizontalPadding = Style::LabelHorizontalPadding * scale;
+      const auto plateWidth = boundingBox[1] + 1.0 - boundingBox[0] + 2.0 * horizontalPadding;
 
       // Right of the figure, else left of it, else as far right as the viewport allows.
       const auto offset = Style::LabelOffset * scale;
-      const auto textWidth = boundingBox[1] - boundingBox[0];
       const auto viewportWidth = static_cast<double>(renderer->GetViewportSize()[0]);
       const auto right = (*rightmost)[0] + offset;
       const auto left = (*leftmost)[0] - offset;
 
-      if (right + textWidth <= viewportWidth)
+      auto plateLeft = right;
+      auto anchorHeight = (*rightmost)[1];
+
+      if (right + plateWidth > viewportWidth)
       {
-        textActor->SetPosition(right, (*rightmost)[1]);
-      }
-      else if (left - textWidth >= 0.0)
-      {
-        textProperty->SetJustificationToRight();
-        textActor->SetPosition(left, (*leftmost)[1]);
-      }
-      else
-      {
-        textActor->SetPosition(std::max(0.0, viewportWidth - textWidth), (*rightmost)[1]);
+        if (left - plateWidth >= 0.0)
+        {
+          plateLeft = left - plateWidth;
+          anchorHeight = (*leftmost)[1];
+        }
+        else
+        {
+          plateLeft = std::max(0.0, viewportWidth - plateWidth);
+        }
       }
 
+      // VTK draws text at whole pixels, so the plate is placed around the rounded position.
+      const auto x = std::round(plateLeft + horizontalPadding - boundingBox[0]);
+      const auto y = std::round(anchorHeight);
+      textActor->SetPosition(x, y);
       textActor->SetVisibility(true);
+
+      Point2D lowerLeft;
+      lowerLeft[0] = x + boundingBox[0] - horizontalPadding;
+      lowerLeft[1] = y + boundingBox[2] - Style::LabelBottomPadding * scale;
+
+      Point2D upperRight;
+      upperRight[0] = x + boundingBox[1] + 1.0 + horizontalPadding;
+      upperRight[1] = y + boundingBox[3] + 1.0 + Style::LabelTopPadding * scale;
+
+      // The text actor is drawn after the figure, so the plate is added last to lie right beneath the text.
+      tessellator.AddRoundedRectangle(lowerLeft, upperRight, Style::LabelCornerRadius * scale, { 0.0, 0.0, 0.0, Style::LabelPlateAlpha * opacity });
     }
   }
 
+  localStorage->m_Mapper->SetInputData(tessellator.GetPolyData());
   localStorage->m_PropAssembly->SetVisibility(true);
 }

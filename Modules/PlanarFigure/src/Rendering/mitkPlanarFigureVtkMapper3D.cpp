@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigure.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 
 #include <vtkActor.h>
 #include <vtkCellArray.h>
@@ -25,6 +26,8 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkShaderProperty.h>
+#include <vtkTransform.h>
 
 #include <algorithm>
 
@@ -109,6 +112,42 @@ namespace
 
     return polyData;
   }
+
+  // The center of the outlines in world coordinates, around which the figure pulses as in 2D.
+  mitk::Point3D GetPulseCenter(const mitk::PlanarFigure *figure)
+  {
+    const auto contours = figure->GetContours();
+    const auto hasOutline = std::any_of(contours.begin(), contours.end(), [](const mitk::PlanarFigure::Contour &contour) {
+      return mitk::PlanarFigure::ContourRole::Outline == contour.Role;
+    });
+
+    mitk::Point2D center;
+    center.Fill(0.0);
+    std::size_t numberOfPoints = 0;
+
+    for (const auto &contour : contours)
+    {
+      if (hasOutline && mitk::PlanarFigure::ContourRole::Outline != contour.Role)
+        continue;
+
+      for (const auto &point : contour.Points)
+      {
+        center[0] += point[0];
+        center[1] += point[1];
+        ++numberOfPoints;
+      }
+    }
+
+    if (numberOfPoints > 0)
+    {
+      center[0] /= numberOfPoints;
+      center[1] /= numberOfPoints;
+    }
+
+    mitk::Point3D worldCenter;
+    figure->GetPlaneGeometry()->Map(center, worldCenter);
+    return worldCenter;
+  }
 }
 
 mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
@@ -116,6 +155,20 @@ mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
 {
   m_Actor->SetMapper(vtkSmartPointer<vtkPolyDataMapper>::New());
   m_Actor->SetVisibility(false);
+
+  // A figure lies in the plane of an image slice, which it would fight for depth. Like a polygon
+  // offset, it is moved a little towards the camera, more where the plane is seen at a flat angle.
+  // VTK applies its own polygon offset only if it is switched on for all mappers. The constant part
+  // is a few steps of a 24 bit depth buffer: VTK puts the near plane close to the camera, where a
+  // larger constant amounts to millimeters and lets figures show through other slices.
+  auto *shaderProperty = m_Actor->GetShaderProperty();
+  shaderProperty->AddFragmentShaderReplacement("//VTK::UniformFlow::Impl", true,
+    "float depthSlope = length(vec2(dFdx(gl_FragCoord.z), dFdy(gl_FragCoord.z)));\n"
+    "  //VTK::UniformFlow::Impl\n",
+    false);
+  shaderProperty->AddFragmentShaderReplacement("//VTK::Depth::Impl", true,
+    "gl_FragDepth = gl_FragCoord.z - 2.0 * depthSlope - 4.0 / 16777215.0;\n",
+    false);
 }
 
 mitk::PlanarFigureVtkMapper3D::LocalStorage::~LocalStorage()
@@ -165,16 +218,46 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
   bool isFilled = false;
   node->GetBoolProperty("planarfigure.3drendering.fill", isFilled, renderer);
 
-  if (figure->GetMTime() != localStorage->m_FigureTime || isFilled != localStorage->m_IsFilled)
+  // The modification time of the figure leaves out its plane.
+  const auto planeTime = figure->GetPlaneGeometry()->GetMTime();
+
+  if (figure->GetMTime() != localStorage->m_FigureTime || planeTime != localStorage->m_PlaneTime || isFilled != localStorage->m_IsFilled)
   {
     localStorage->m_FigureTime = figure->GetMTime();
+    localStorage->m_PlaneTime = planeTime;
     localStorage->m_IsFilled = isFilled;
 
     auto *mapper = static_cast<vtkPolyDataMapper *>(localStorage->m_Actor->GetMapper());
     mapper->SetInputData(CreatePolyData(figure, isFilled));
+    localStorage->m_PulseCenter = GetPulseCenter(figure);
   }
 
-  float color[3] = { 1.0f, 1.0f, 1.0f };
+  bool pulse = false;
+  node->GetBoolProperty(PlanarFigureViewHelpers::PulseProperty, pulse, renderer);
+
+  vtkSmartPointer<vtkTransform> pulseTransform;
+
+  if (pulse)
+  {
+    auto *renderingManager = RenderingManager::GetInstance();
+    renderingManager->RequestAnimationFrame(renderer->GetRenderWindow());
+
+    float frequency = PlanarFigureViewHelpers::DefaultPulseFrequency;
+    node->GetFloatProperty(PlanarFigureViewHelpers::PulseFrequencyProperty, frequency, renderer);
+
+    const auto scale = PlanarFigureViewHelpers::GetPulseScale(renderingManager->GetAnimationTime(), frequency);
+    const auto &center = localStorage->m_PulseCenter;
+
+    pulseTransform = vtkSmartPointer<vtkTransform>::New();
+    pulseTransform->Translate(center[0], center[1], center[2]);
+    pulseTransform->Scale(scale, scale, scale);
+    pulseTransform->Translate(-center[0], -center[1], -center[2]);
+  }
+
+  localStorage->m_Actor->SetUserTransform(pulseTransform);
+
+  const auto *defaultColor = PlanarFigureViewHelpers::DefaultColor;
+  float color[3] = { defaultColor[0], defaultColor[1], defaultColor[2] };
   node->GetColor(color, renderer);
 
   float opacity = 1.0f;

@@ -7,16 +7,19 @@ them can also be set for a single render window.
 
 | Property | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| color | ColorProperty | white | Base color. It does not change with the state of the figure; hovering and selection add a halo around it. |
+| color | ColorProperty | orange (#ffaa00) | Base color. It does not change with the state of the figure; hovering and selection add a halo around it. |
 | opacity | FloatProperty | 1 | Opacity of the figure. |
 | line width | FloatProperty | 2 | Width of the outline in logical pixels, independent of the zoom. |
-| planarfigure.drawname | BoolProperty | false | Shows the name of the node in a label next to the figure. |
-| planarfigure.drawquantities | BoolProperty | false | Shows the measurements in the label. |
+| planarfigure.drawname | BoolProperty | true | Shows the name of the node in a label next to the figure. |
+| planarfigure.drawquantities | BoolProperty | true | Shows the measurements in the label, one per line. |
+| planarfigure.label | PlanarFigureVisibilityProperty | On hover | When the label is shown, with the same values as planarfigure.helperlines. Figures that are helper objects or hidden objects never show a label. |
+| planarfigure.drawcontrastoutline | BoolProperty | true | Draws a black outline behind light figures and a white one behind dark figures, so they stay visible on any image. |
+| planarfigure.helperlines | PlanarFigureVisibilityProperty | Always, On hover for Bezier curves | When helper lines are shown: the arc of an angle, the arc and the extended lines of a four-point angle, the control polygon of a Bezier curve. Besides "Always" and "Never", they can be shown on hover, when selected, on hover or when selected, or on hover while selected; these also show them while the figure is placed. |
 | font.size | IntProperty | 13 | Font size of the label in points. |
 | planarfigure.3drendering | BoolProperty | false | Shows the figure in 3D render windows. |
 | planarfigure.3drendering.fill | BoolProperty | false | Fills closed figures in 3D render windows. |
-| animated.pulse | BoolProperty | false | Lets the figure grow and shrink by up to 8 percent in 2D render windows. |
-| animated.pulse.frequency | FloatProperty | 0.5 | Pulses per second. |
+| animated.pulse | BoolProperty | false | Lets the figure grow and shrink by up to 8 percent. Its label stays in place. |
+| animated.pulse.frequency | FloatProperty | 2 | Pulses per second. |
 
 The 2D mapper also reads \c visible, \c selected, which adds a halo, and
 \c PlanarFigureInitializedWindow: a figure of locked shape that is being placed
@@ -29,6 +32,9 @@ render window under the mouse.
 
 Scenes of previous versions carry many more properties of the previous
 mapper and interactor. Loading such a scene moves \c planarfigure.line.width
-to \c line \c width and \c planarfigure.annotations.font.size to \c font.size,
-and removes the others.
+to \c line \c width, \c planarfigure.annotations.font.size to \c font.size and
+\c planarfigure.default.line.color to \c color, and removes the others. Values
+that were the previous defaults (line width 2, font size 12, opacity 0.8) are
+dropped, so these figures get the current defaults, as they do for properties
+added since.
 */

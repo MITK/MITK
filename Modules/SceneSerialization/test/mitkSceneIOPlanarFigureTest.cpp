@@ -13,9 +13,15 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <mitkColorProperty.h>
+#include <mitkCoreServices.h>
 #include <mitkDataNode.h>
 #include <mitkIOUtil.h>
+#include <mitkIPropertyMigration.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
+#include <mitkPlanarLine.h>
+#include <mitkPropertyList.h>
 #include <mitkSceneIO.h>
 
 #include <itksys/SystemTools.hxx>
@@ -28,7 +34,8 @@ namespace
   bool IsLegacyKey(const std::string &key)
   {
     static const std::set<std::string> currentKeys = {
-      "planarfigure.drawname", "planarfigure.drawquantities", "planarfigure.3drendering", "planarfigure.3drendering.fill"
+      "planarfigure.drawname", "planarfigure.drawquantities", "planarfigure.label", "planarfigure.helperlines",
+      "planarfigure.drawcontrastoutline", "planarfigure.3drendering", "planarfigure.3drendering.fill"
     };
 
     static const std::set<std::string> legacyDataKeys = {
@@ -71,6 +78,8 @@ class mitkSceneIOPlanarFigureTestSuite : public mitk::TestFixture
   MITK_TEST(LoadLegacyScene_ConvertsFigures);
   MITK_TEST(LoadLegacyScene_RemovesLegacyProperties);
   MITK_TEST(LoadLegacyScene_MigratesStyle);
+  MITK_TEST(LoadLegacyScene_AddsCurrentDefaults);
+  MITK_TEST(MigrateDefaultLineColor_BecomesColor);
   MITK_TEST(LoadLegacyScene_KeepsSegmentationProperties);
   MITK_TEST(SaveAndLoad_KeepsFigures);
   MITK_TEST(SaveAndLoad_KeepsValuesOfPreviousDefaults);
@@ -155,17 +164,57 @@ public:
     // The defaults of previous versions give way to the current ones.
     const auto *line = this->GetFigureNode("Line1");
 
-    lineWidth = 2.0f;
-    line->GetFloatProperty("line width", lineWidth);
+    lineWidth = 0.0f;
+    CPPUNIT_ASSERT(line->GetFloatProperty("line width", lineWidth));
     CPPUNIT_ASSERT_EQUAL(2.0f, lineWidth);
-
-    bool drawName = false;
-    line->GetBoolProperty("planarfigure.drawname", drawName);
-    CPPUNIT_ASSERT_MESSAGE("No name label", !drawName);
 
     float opacity = 1.0f;
     line->GetOpacity(opacity, nullptr);
     CPPUNIT_ASSERT_EQUAL(1.0f, opacity);
+
+    // Name labels were on by default, as they are now, so a switched off one stays off.
+    bool drawName = false;
+    CPPUNIT_ASSERT(line->GetBoolProperty("planarfigure.drawname", drawName) && drawName);
+    CPPUNIT_ASSERT(this->GetFigureNode("Rectangle1")->GetBoolProperty("planarfigure.drawname", drawName) && !drawName);
+  }
+
+  void LoadLegacyScene_AddsCurrentDefaults()
+  {
+    // Properties added since previous versions exist, so they can be changed.
+    using Visibility = mitk::PlanarFigureVisibilityProperty::Visibility;
+
+    const auto getVisibility = [this](const std::string &name, const std::string &key) {
+      const auto *property = dynamic_cast<const mitk::PlanarFigureVisibilityProperty *>(this->GetFigureNode(name)->GetProperty(key.c_str()));
+      CPPUNIT_ASSERT_MESSAGE(name + ": " + key, nullptr != property);
+      return property->GetVisibility();
+    };
+
+    CPPUNIT_ASSERT(Visibility::OnHover == getVisibility("BezierCurve1", "planarfigure.helperlines"));
+    CPPUNIT_ASSERT(Visibility::Always == getVisibility("Line1", "planarfigure.helperlines"));
+    CPPUNIT_ASSERT(Visibility::OnHover == getVisibility("Line1", "planarfigure.label"));
+
+    int fontSize = 0;
+    CPPUNIT_ASSERT(this->GetFigureNode("Line1")->GetIntProperty("font.size", fontSize));
+    CPPUNIT_ASSERT_EQUAL(13, fontSize);
+  }
+
+  void MigrateDefaultLineColor_BecomesColor()
+  {
+    // Previous versions drew a figure in this color instead of its color, which they kept white.
+    auto properties = mitk::PropertyList::New();
+    properties->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
+    properties->SetProperty("planarfigure.default.line.color", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f));
+
+    mitk::CoreServicePointer<mitk::IPropertyMigration> migration(mitk::CoreServices::GetPropertyMigration());
+    migration->Migrate(mitk::PlanarLine::New(), *properties);
+
+    CPPUNIT_ASSERT(nullptr == properties->GetProperty("planarfigure.default.line.color"));
+
+    const auto *color = dynamic_cast<const mitk::ColorProperty *>(properties->GetProperty("color"));
+    CPPUNIT_ASSERT(nullptr != color);
+    CPPUNIT_ASSERT_EQUAL(1.0f, color->GetColor()[0]);
+    CPPUNIT_ASSERT_EQUAL(0.0f, color->GetColor()[1]);
+    CPPUNIT_ASSERT_EQUAL(0.0f, color->GetColor()[2]);
   }
 
   void LoadLegacyScene_KeepsSegmentationProperties()
@@ -210,9 +259,8 @@ public:
 
   void SaveAndLoad_KeepsValuesOfPreviousDefaults()
   {
-    // In a current scene, these are choices rather than defaults of a previous version.
+    // In a current scene, this is a choice rather than a default of a previous version.
     auto *line = this->GetFigureNode("Line1");
-    line->SetBoolProperty("planarfigure.drawname", true);
     line->SetOpacity(0.8f);
 
     const auto filename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
@@ -220,9 +268,6 @@ public:
 
     const auto restoredStorage = mitk::SceneIO::New()->LoadScene(filename);
     const auto *restoredLine = restoredStorage->GetNamedNode("Line1");
-
-    bool drawName = false;
-    CPPUNIT_ASSERT(restoredLine->GetBoolProperty("planarfigure.drawname", drawName) && drawName);
 
     float opacity = 1.0f;
     CPPUNIT_ASSERT(restoredLine->GetOpacity(opacity, nullptr));

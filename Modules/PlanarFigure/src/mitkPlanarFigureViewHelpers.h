@@ -29,6 +29,23 @@ namespace mitk::PlanarFigureViewHelpers
   /** \brief Radius of the handles of figures, in logical pixels. */
   constexpr double HandleRadius = 4.0;
 
+  /** \brief Color of figures without a color property, #ffaa00. */
+  constexpr float DefaultColor[3] = { 1.0f, 170.0f / 255.0f, 0.0f };
+
+  /** \brief Lets a figure grow and shrink in 2D and 3D render windows. */
+  constexpr const char *PulseProperty = "animated.pulse";
+
+  /** \brief Pulses per second. */
+  constexpr const char *PulseFrequencyProperty = "animated.pulse.frequency";
+
+  constexpr float DefaultPulseFrequency = 2.0f;
+
+  /** \brief How much larger a pulsing figure gets at most, relative to its size at rest. */
+  constexpr double PulseAmplitude = 0.08;
+
+  /** \brief Scale of a pulsing figure at an animation time, from 1 at rest to 1 + PulseAmplitude. */
+  double GetPulseScale(double time, double frequency);
+
   /**
    * \brief Whether a render window shows the plane of a figure.
    *

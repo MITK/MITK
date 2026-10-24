@@ -10,11 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkCameraController.h>
 #include <mitkIOUtil.h>
 #include <mitkMouseMoveEvent.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureInteractor.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
 #include <mitkPlaneGeometry.h>
+#include <mitkVtkMapper.h>
 #include <mitkProperties.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkTestFixture.h>
@@ -22,7 +25,13 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
+#include <vtkActor2D.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkPropAssembly.h>
+#include <vtkPropCollection.h>
 #include <vtkRenderWindow.h>
+#include <vtkTextActor.h>
 
 namespace
 {
@@ -37,11 +46,16 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(RenderEveryType);
   MITK_TEST(RenderLineWidths);
   MITK_TEST(RenderDarkTranslucentFigures);
+  MITK_TEST(RenderWithoutContrastOutline);
   MITK_TEST(RenderLabels);
+  MITK_TEST(Label_FollowsItsProperty);
   MITK_TEST(RenderHighDpi);
   MITK_TEST(RenderStates);
   MITK_TEST(RenderInsertionPreview);
   MITK_TEST(RenderRemovalPreview);
+  MITK_TEST(HelperLines_FollowTheirProperty);
+  MITK_TEST(MovedPlane_IsDrawnAgain);
+  MITK_TEST(UnchangedFigure_IsNotDrawnAgain);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -111,12 +125,34 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
     return nodes;
   }
 
+  /** Adds a figure without a label, which tests of states and previews do not need. */
   mitk::DataNode::Pointer AddFigure(const std::string &typeId, std::size_t cell)
   {
     auto node = mitk::DataNode::New();
     node->SetData(this->CreateFigure(typeId, cell));
+    node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Never));
     m_RenderingTestHelper.GetDataStorage()->Add(node);
     return node;
+  }
+
+  /** Whether a figure is drawn at all. */
+  bool RenderAndIsShown(mitk::DataNode *node)
+  {
+    m_RenderingTestHelper.Render();
+
+    auto *mapper = dynamic_cast<mitk::VtkMapper *>(node->GetMapper(mitk::BaseRenderer::Standard2D));
+    return mapper->GetVtkProp(this->GetRenderer())->GetVisibility();
+  }
+
+  /** Whether the label of a figure is drawn. */
+  bool RenderAndIsLabelShown(mitk::DataNode *node)
+  {
+    m_RenderingTestHelper.Render();
+
+    auto *mapper = dynamic_cast<mitk::VtkMapper *>(node->GetMapper(mitk::BaseRenderer::Standard2D));
+    auto *assembly = vtkPropAssembly::SafeDownCast(mapper->GetVtkProp(this->GetRenderer()));
+    auto *textActor = vtkTextActor::SafeDownCast(assembly->GetParts()->GetItemAsObject(1));
+    return nullptr != textActor && textActor->GetVisibility();
   }
 
   static mitk::PlanarFigureInteractor::Pointer AddInteractor(mitk::DataNode *node)
@@ -207,20 +243,64 @@ public:
     this->CompareWithReference("DarkTranslucent");
   }
 
+  void RenderWithoutContrastOutline()
+  {
+    for (auto &node : this->AddEveryType())
+      node->SetBoolProperty("planarfigure.drawcontrastoutline", false);
+
+    this->CompareWithReference("NoContrastOutline");
+  }
+
   void RenderLabels()
   {
     // The label of the polygon at the right border flips to its left side.
-    for (const auto &[typeId, cell] : std::vector<std::pair<std::string, std::size_t>>{ { "line", 0 }, { "circle", 9 }, { "polygon", 7 } })
+    for (const auto &[typeId, cell] : std::vector<std::pair<std::string, std::size_t>>{ { "line", 0 }, { "circle", 9 }, { "polygon", 7 }, { "angle", 14 } })
     {
       auto node = mitk::DataNode::New();
       node->SetName(typeId);
       node->SetData(this->CreateFigure(typeId, cell));
-      node->SetBoolProperty("planarfigure.drawname", true);
-      node->SetBoolProperty("planarfigure.drawquantities", true);
+      node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Always));
       m_RenderingTestHelper.GetDataStorage()->Add(node);
     }
 
     this->CompareWithReference("Labels");
+  }
+
+  void Label_FollowsItsProperty()
+  {
+    using Visibility = mitk::PlanarFigureVisibilityProperty::Visibility;
+
+    auto node = mitk::DataNode::New();
+    node->SetName("circle");
+    node->SetData(this->CreateFigure("circle", 5));
+    m_RenderingTestHelper.GetDataStorage()->Add(node);
+
+    bool drawName = false;
+    bool drawQuantities = false;
+    CPPUNIT_ASSERT_MESSAGE("The name is in the label by default", node->GetBoolProperty("planarfigure.drawname", drawName) && drawName);
+    CPPUNIT_ASSERT_MESSAGE("The measurements are in the label by default", node->GetBoolProperty("planarfigure.drawquantities", drawQuantities) && drawQuantities);
+
+    const auto *byDefault = dynamic_cast<mitk::PlanarFigureVisibilityProperty *>(node->GetProperty("planarfigure.label"));
+    CPPUNIT_ASSERT_MESSAGE("The label is shown on hover by default", nullptr != byDefault && Visibility::OnHover == byDefault->GetVisibility());
+
+    CPPUNIT_ASSERT_MESSAGE("The label is hidden at rest", !this->RenderAndIsLabelShown(node));
+
+    AddInteractor(node);
+    this->MoveTo(P(5, 0.85, 0.5));
+    CPPUNIT_ASSERT_MESSAGE("The label is shown on hover", this->RenderAndIsLabelShown(node));
+
+    node->SetBoolProperty("helper object", true);
+    CPPUNIT_ASSERT_MESSAGE("A helper object has no label", !this->RenderAndIsLabelShown(node));
+
+    node->SetBoolProperty("helper object", false);
+    node->SetBoolProperty("hidden object", true);
+    CPPUNIT_ASSERT_MESSAGE("A hidden object has no label", !this->RenderAndIsLabelShown(node));
+
+    node->SetBoolProperty("hidden object", false);
+    CPPUNIT_ASSERT_MESSAGE("The label is shown on hover again", this->RenderAndIsLabelShown(node));
+
+    node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(Visibility::Never));
+    CPPUNIT_ASSERT_MESSAGE("The label is hidden if never shown", !this->RenderAndIsLabelShown(node));
   }
 
   void RenderHighDpi()
@@ -262,6 +342,82 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A removal is previewed", interactor->GetFeedback(this->GetRenderer()).IsRemovalPreview);
 
     this->CompareWithReference("RemovalPreview");
+  }
+
+  void HelperLines_FollowTheirProperty()
+  {
+    using Visibility = mitk::PlanarFigureVisibilityProperty::Visibility;
+
+    const auto curve = this->AddFigure("bezier_curve", 5);
+    const auto angle = this->AddFigure("angle", 6);
+
+    const auto *byDefault = dynamic_cast<mitk::PlanarFigureVisibilityProperty *>(curve->GetProperty("planarfigure.helperlines"));
+    CPPUNIT_ASSERT_MESSAGE("The control polygon follows the handles by default", nullptr != byDefault && Visibility::OnHover == byDefault->GetVisibility());
+
+    const auto curveAtRest = this->RenderAndCountPoints(curve);
+
+    curve->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::Always));
+    CPPUNIT_ASSERT_MESSAGE("The control polygon is shown always", this->RenderAndCountPoints(curve) > curveAtRest);
+
+    // Selection adds a halo as well, so the selected curve is compared with and without its control polygon.
+    curve->SetSelected(true);
+    curve->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::WhenSelected));
+    const auto selectedCurve = this->RenderAndCountPoints(curve);
+
+    curve->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::Never));
+    CPPUNIT_ASSERT_MESSAGE("The control polygon is shown when selected", this->RenderAndCountPoints(curve) < selectedCurve);
+
+    // Handles are drawn on hover as well, so the hovered curve is compared with and without its control polygon.
+    curve->SetSelected(false);
+    curve->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::OnHover));
+    AddInteractor(curve);
+    this->MoveTo(P(5, 0.1, 0.8));
+    const auto hoveredCurve = this->RenderAndCountPoints(curve);
+
+    curve->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::Never));
+    CPPUNIT_ASSERT_MESSAGE("The control polygon is shown on hover", this->RenderAndCountPoints(curve) < hoveredCurve);
+
+    const auto angleWithArc = this->RenderAndCountPoints(angle);
+    angle->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::Never));
+    CPPUNIT_ASSERT_MESSAGE("The arc of an angle is shown by default", this->RenderAndCountPoints(angle) < angleWithArc);
+  }
+
+  void MovedPlane_IsDrawnAgain()
+  {
+    const auto node = this->AddFigure("circle", 5);
+    CPPUNIT_ASSERT_MESSAGE("The figure is shown on its slice", this->RenderAndIsShown(node));
+
+    // Moved in place by a whole slice, which leaves the modification time of the figure as it is.
+    auto *plane = node->GetData()->GetGeometry();
+    plane->SetOrigin(plane->GetOrigin() + plane->GetAxisVector(2));
+    CPPUNIT_ASSERT_MESSAGE("The figure is hidden off its slice", !this->RenderAndIsShown(node));
+  }
+
+  void UnchangedFigure_IsNotDrawnAgain()
+  {
+    const auto node = this->AddFigure("circle", 5);
+    const auto drawTime = this->RenderAndGetDrawing(node)->GetMTime();
+    CPPUNIT_ASSERT_MESSAGE("An unchanged figure is not drawn again", drawTime == this->RenderAndGetDrawing(node)->GetMTime());
+
+    this->GetRenderer()->GetCameraController()->Zoom(2.0, P(5, 0.5, 0.5));
+    CPPUNIT_ASSERT_MESSAGE("A zoomed figure is drawn again", drawTime != this->RenderAndGetDrawing(node)->GetMTime());
+  }
+
+  /** The geometry drawn for a figure. */
+  vtkPolyData *RenderAndGetDrawing(mitk::DataNode *node)
+  {
+    m_RenderingTestHelper.Render();
+
+    auto *mapper = dynamic_cast<mitk::VtkMapper *>(node->GetMapper(mitk::BaseRenderer::Standard2D));
+    auto *assembly = vtkPropAssembly::SafeDownCast(mapper->GetVtkProp(this->GetRenderer()));
+    auto *actor = vtkActor2D::SafeDownCast(assembly->GetParts()->GetItemAsObject(0));
+    return vtkPolyDataMapper2D::SafeDownCast(actor->GetMapper())->GetInput();
+  }
+
+  /** The number of points of the geometry drawn for a figure. */
+  vtkIdType RenderAndCountPoints(mitk::DataNode *node)
+  {
+    return this->RenderAndGetDrawing(node)->GetNumberOfPoints();
   }
 };
 

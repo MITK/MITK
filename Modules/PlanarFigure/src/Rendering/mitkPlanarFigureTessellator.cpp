@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPlanarFigureTessellator.h"
 
+#include <vtkBox.h>
 #include <vtkPointData.h>
 
 #include <algorithm>
@@ -238,14 +239,22 @@ void mitk::PlanarFigureTessellator::AddStroke(
   }
 }
 
-void mitk::PlanarFigureTessellator::AddDashedStroke(
-  const std::vector<Point2D> &points, bool closed, double width, const Color &color, double dash, double gap)
+void mitk::PlanarFigureTessellator::AddDashedStroke(const std::vector<Point2D> &points, bool closed, double width,
+  const Color &color, double dash, double gap, const Point2D &clipLowerLeft, const Point2D &clipUpperRight)
 {
   if (dash <= 0.0 || gap <= 0.0)
   {
     this->AddStroke(points, closed, width, color);
     return;
   }
+
+  // A dash reaches less than half its width plus two feathers beyond its center
+  // line, so dashes outside this margin around the clip rectangle cannot touch it.
+  constexpr double feather = 1.0;
+  const auto margin = width / 2.0 + 2.0 * feather;
+
+  const double bounds[6] = { clipLowerLeft[0] - margin, clipUpperRight[0] + margin,
+    clipLowerLeft[1] - margin, clipUpperRight[1] + margin, 0.0, 0.0 };
 
   auto vertices = points;
 
@@ -256,50 +265,109 @@ void mitk::PlanarFigureTessellator::AddDashedStroke(
   bool isDash = true;
   double phase = 0.0;
 
+  const auto endPiece = [&]() {
+    if (piece.size() > 1)
+      this->AddStroke(piece, false, width, color, feather);
+
+    piece.clear();
+  };
+
+  // Moves the pattern along the clipped parts, so it stays anchored to the start of the polyline.
+  const auto advance = [&](double length) {
+    const auto position = std::fmod((isDash ? phase : dash + phase) + length, dash + gap);
+    isDash = position < dash;
+    phase = isDash ? position : position - dash;
+  };
+
   for (std::size_t i = 0; i + 1 < vertices.size(); ++i)
   {
-    const auto &start = vertices[i];
-    const auto segment = vertices[i + 1] - start;
-    const auto length = segment.GetNorm();
+    const auto &segmentStart = vertices[i];
+    const auto segment = vertices[i + 1] - segmentStart;
+    const auto segmentLength = segment.GetNorm();
 
-    if (length <= Epsilon)
+    if (!std::isfinite(segmentLength))
+    {
+      endPiece();
+      continue;
+    }
+
+    if (segmentLength <= Epsilon)
       continue;
 
-    const auto direction = segment / length;
-    double position = 0.0;
+    // The clipped ends are clamped into the box, which keeps the visible part short
+    // also where huge coordinates leave no precision for the clipping.
+    const double from[3] = { segmentStart[0], segmentStart[1], 0.0 };
+    const double to[3] = { vertices[i + 1][0], vertices[i + 1][1], 0.0 };
+    double lower = 0.0;
+    double upper = 1.0;
+    double clippedFrom[3];
+    double clippedTo[3];
+    int fromPlane = -1;
+    int toPlane = -1;
 
-    while (position < length)
+    if (0 == vtkBox::IntersectWithLine(bounds, from, to, lower, upper, clippedFrom, clippedTo, fromPlane, toPlane) || lower >= upper)
     {
-      const auto stateLength = isDash ? dash : gap;
-      const auto step = std::min(stateLength - phase, length - position);
+      endPiece();
+      advance(segmentLength);
+      continue;
+    }
 
-      if (isDash)
+    if (lower > 0.0)
+    {
+      endPiece();
+      advance(lower * segmentLength);
+    }
+
+    Point2D start;
+    start[0] = clippedFrom[0];
+    start[1] = clippedFrom[1];
+
+    Vector2D visible;
+    visible[0] = clippedTo[0] - clippedFrom[0];
+    visible[1] = clippedTo[1] - clippedFrom[1];
+
+    const auto length = visible.GetNorm();
+
+    if (length > Epsilon)
+    {
+      const auto direction = visible / length;
+      double position = 0.0;
+
+      while (position < length)
       {
-        if (piece.empty())
-          piece.push_back(start + direction * position);
+        const auto stateLength = isDash ? dash : gap;
+        const auto step = std::min(stateLength - phase, length - position);
 
-        piece.push_back(start + direction * (position + step));
-      }
-
-      position += step;
-      phase += step;
-
-      if (phase >= stateLength - Epsilon)
-      {
         if (isDash)
         {
-          this->AddStroke(piece, false, width, color);
-          piece.clear();
+          if (piece.empty())
+            piece.push_back(start + direction * position);
+
+          piece.push_back(start + direction * (position + step));
         }
 
-        isDash = !isDash;
-        phase = 0.0;
+        position += step;
+        phase += step;
+
+        if (phase >= stateLength - Epsilon)
+        {
+          if (isDash)
+            endPiece();
+
+          isDash = !isDash;
+          phase = 0.0;
+        }
       }
+    }
+
+    if (upper < 1.0)
+    {
+      endPiece();
+      advance((1.0 - upper) * segmentLength);
     }
   }
 
-  if (isDash && piece.size() > 1)
-    this->AddStroke(piece, false, width, color);
+  endPiece();
 }
 
 void mitk::PlanarFigureTessellator::AddCircularBands(
@@ -364,6 +432,68 @@ void mitk::PlanarFigureTessellator::AddDisc(const Point2D &center, double radius
     this->AddCircularBands(center, { 0.0, innerRadius, radius + 0.5 }, { alpha, alpha, 0.0 }, color);
   else
     this->AddCircularBands(center, { 0.0, radius + 0.5 }, { alpha, 0.0 }, color);
+}
+
+void mitk::PlanarFigureTessellator::AddRoundedRectangle(
+  const Point2D &lowerLeft, const Point2D &upperRight, double cornerRadius, const Color &color)
+{
+  const auto width = upperRight[0] - lowerLeft[0];
+  const auto height = upperRight[1] - lowerLeft[1];
+
+  if (width < 1.0 || height < 1.0 || color[3] <= 0.0)
+    return;
+
+  // The outline is inset and outset by half a pixel for the feather, which needs a radius of at least that.
+  const auto radius = std::clamp(cornerRadius, 0.5, std::min(width, height) / 2.0);
+  const auto segmentsPerCorner = std::max(4, static_cast<int>(std::ceil(radius)));
+
+  // Counterclockwise, starting with the lower right corner, which turns from -90 to 0 degrees.
+  std::array<Point2D, 4> cornerCenters;
+  cornerCenters[0][0] = upperRight[0] - radius;
+  cornerCenters[0][1] = lowerLeft[1] + radius;
+  cornerCenters[1][0] = upperRight[0] - radius;
+  cornerCenters[1][1] = upperRight[1] - radius;
+  cornerCenters[2][0] = lowerLeft[0] + radius;
+  cornerCenters[2][1] = upperRight[1] - radius;
+  cornerCenters[3][0] = lowerLeft[0] + radius;
+  cornerCenters[3][1] = lowerLeft[1] + radius;
+
+  const auto addOutline = [&](double offset, double alpha) {
+    std::vector<vtkIdType> ids;
+
+    for (int corner = 0; corner < 4; ++corner)
+    {
+      for (int j = 0; j <= segmentsPerCorner; ++j)
+      {
+        const auto angle = (corner - 1 + static_cast<double>(j) / segmentsPerCorner) * std::numbers::pi / 2.0;
+
+        Vector2D direction;
+        direction[0] = std::cos(angle);
+        direction[1] = std::sin(angle);
+
+        ids.push_back(this->AddVertex(cornerCenters[corner] + direction * (radius + offset), color, alpha));
+      }
+    }
+
+    return ids;
+  };
+
+  const auto inner = addOutline(-0.5, color[3]);
+  const auto outer = addOutline(0.5, 0.0);
+
+  Point2D center;
+  center[0] = (lowerLeft[0] + upperRight[0]) / 2.0;
+  center[1] = (lowerLeft[1] + upperRight[1]) / 2.0;
+
+  const auto centerId = this->AddVertex(center, color, color[3]);
+  const auto numberOfVertices = inner.size();
+
+  for (std::size_t i = 0; i < numberOfVertices; ++i)
+  {
+    const auto next = (i + 1) % numberOfVertices;
+    this->AddTriangle(centerId, inner[i], inner[next]);
+    this->AddQuad(inner[i], outer[i], outer[next], inner[next]);
+  }
 }
 
 void mitk::PlanarFigureTessellator::AddRing(const Point2D &center, double innerRadius, double outerRadius, const Color &color)

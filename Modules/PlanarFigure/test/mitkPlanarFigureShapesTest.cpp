@@ -84,6 +84,7 @@ class mitkPlanarFigureShapesTestSuite : public mitk::TestFixture
   MITK_TEST(Arrow);
   MITK_TEST(Angle);
   MITK_TEST(FourPointAngle);
+  MITK_TEST(FourPointAngle_ShowsAngleWhereLinesMeet);
   MITK_TEST(Cross);
   MITK_TEST(Circle);
   MITK_TEST(Ellipse_MajorAxisIsTheLongerOne);
@@ -227,6 +228,49 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), angle->GetContours().size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(45.0, GetMeasurement(angle, MeasurementType::Angle), Epsilon);
+  }
+
+  void FourPointAngle_ShowsAngleWhereLinesMeet()
+  {
+    using HelperPolyline = mitk::PlanarFigure::HelperPolyline;
+    using AngleArc = mitk::PlanarFigure::AngleArc;
+
+    // The extended lines meet at (0, 10), before both of them.
+    auto angle = Place<mitk::PlanarFourPointAngle>(mitk::PlanarFourPointAngle::New(),
+      { P(10, 10), P(20, 10), P(10, 20), P(20, 30) });
+    auto decorations = angle->GetDecorations();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), decorations.size());
+
+    const auto *firstExtension = std::get_if<HelperPolyline>(&decorations[0]);
+    CPPUNIT_ASSERT(nullptr != firstExtension && firstExtension->Points.size() == 2);
+    CPPUNIT_ASSERT(mitk::Equal(P(0, 10), firstExtension->Points[0], Epsilon) && mitk::Equal(P(10, 10), firstExtension->Points[1], Epsilon));
+
+    const auto *secondExtension = std::get_if<HelperPolyline>(&decorations[1]);
+    CPPUNIT_ASSERT(nullptr != secondExtension && mitk::Equal(P(10, 20), secondExtension->Points[1], Epsilon));
+
+    const auto *arc = std::get_if<AngleArc>(&decorations[2]);
+    CPPUNIT_ASSERT(nullptr != arc);
+    CPPUNIT_ASSERT(mitk::Equal(P(0, 10), arc->Vertex, Epsilon));
+    CPPUNIT_ASSERT(mitk::Equal(P(10, 10), arc->End1, Epsilon));
+    CPPUNIT_ASSERT(mitk::Equal(P(10, 20), arc->End2, Epsilon));
+
+    // Reversed lines measure the same angle, which is still shown on the side of the lines.
+    angle->SetControlPoints({ P(20, 10), P(10, 10), P(20, 30), P(10, 20) });
+    decorations = angle->GetDecorations();
+    arc = std::get_if<AngleArc>(&decorations.back());
+    CPPUNIT_ASSERT(nullptr != arc);
+    CPPUNIT_ASSERT(mitk::Equal(P(10, 10), arc->End1, Epsilon));
+    CPPUNIT_ASSERT(mitk::Equal(P(10, 20), arc->End2, Epsilon));
+
+    // Crossing lines need no extensions.
+    angle->SetControlPoints({ P(0, 0), P(10, 10), P(0, 10), P(10, 0) });
+    decorations = angle->GetDecorations();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), decorations.size());
+    CPPUNIT_ASSERT(mitk::Equal(P(5, 5), std::get<AngleArc>(decorations[0]).Vertex, Epsilon));
+
+    angle->SetControlPoints({ P(0, 0), P(10, 0), P(0, 5), P(10, 5) });
+    CPPUNIT_ASSERT_MESSAGE("Parallel lines do not meet", angle->GetDecorations().empty());
   }
 
   void Cross()

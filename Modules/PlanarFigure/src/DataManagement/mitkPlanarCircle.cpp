@@ -11,82 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarCircle.h>
-#include <mitkProperties.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
 
 #include <numbers>
-
-mitk::PlanarCircle::PlanarCircle()
-  : FEATURE_ID_RADIUS(this->AddFeature("Radius", "mm")),
-    FEATURE_ID_DIAMETER(this->AddFeature("Diameter", "mm")),
-    FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))
-{
-  this->ResetNumberOfControlPoints(2);
-  this->SetNumberOfPolyLines(1);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
-}
-
-mitk::PlanarCircle::PlanarCircle(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_RADIUS(other.FEATURE_ID_RADIUS),
-    FEATURE_ID_DIAMETER(other.FEATURE_ID_DIAMETER),
-    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
-{
-}
-
-bool mitk::PlanarCircle::SetControlPoint(unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/)
-{
-  if (index == 0)
-  {
-    const Point2D &centerPoint = GetControlPoint(0);
-    Point2D boundaryPoint = GetControlPoint(1);
-    boundaryPoint += point - centerPoint;
-
-    PlanarFigure::SetControlPoint(1, boundaryPoint);
-    PlanarFigure::SetControlPoint(0, point);
-    return true;
-  }
-  else if (index == 1)
-  {
-    PlanarFigure::SetControlPoint(index, point);
-    return true;
-  }
-
-  return false;
-}
-
-bool mitk::PlanarCircle::SetCurrentControlPoint(const Point2D &point)
-{
-  if (m_SelectedControlPoint < 0)
-    m_SelectedControlPoint = 1;
-
-  return this->SetControlPoint(m_SelectedControlPoint, point, false);
-}
-
-void mitk::PlanarCircle::GeneratePolyLine()
-{
-  this->ClearPolyLines();
-
-  for (const auto &contour : this->GetContours())
-  {
-    for (const auto &point : contour.Points)
-      this->AppendPointToPolyLine(0, point);
-  }
-}
-
-void mitk::PlanarCircle::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarCircle::EvaluateFeaturesInternal()
-{
-  const auto radius = this->GetWorldControlPoint(0).EuclideanDistanceTo(this->GetWorldControlPoint(1));
-
-  this->SetQuantity(FEATURE_ID_RADIUS, radius);
-  this->SetQuantity(FEATURE_ID_DIAMETER, 2 * radius);
-  this->SetQuantity(FEATURE_ID_AREA, vnl_math::pi * radius * radius);
-}
 
 std::string mitk::PlanarCircle::GetTypeId() const
 {
@@ -154,7 +82,7 @@ void mitk::PlanarCircle::MoveHandle(std::size_t index, const Point2D &position)
     this->ReplaceControlPoint(index, position);
 }
 
-bool mitk::PlanarCircle::Equals(const PlanarFigure &other) const
+bool mitk::PlanarCircle::IsClosed() const
 {
-  return nullptr != dynamic_cast<const PlanarCircle *>(&other) && Superclass::Equals(other);
+  return true;
 }

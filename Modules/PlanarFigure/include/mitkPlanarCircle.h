@@ -52,33 +52,20 @@ namespace mitk
 
     void MoveHandle(std::size_t index, const Point2D &position) override;
 
-    /** \brief Moves the circle by its center and resizes it by its rim point. */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
-
-    /** \brief Moves the rim point if no control point is selected. */
-    bool SetCurrentControlPoint(const Point2D &point) override;
+    /** \brief Returns true. */
+    bool IsClosed() const override;
 
     /** \brief Returns 2. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 2; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 2; }
 
     /** \brief Returns 2. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
-
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 2; }
 
   protected:
-    PlanarCircle();
-    PlanarCircle(const Self &other);
+    PlanarCircle() = default;
+    PlanarCircle(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    void GeneratePolyLine() override;
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-    void EvaluateFeaturesInternal() override;
-
-    const unsigned int FEATURE_ID_RADIUS;
-    const unsigned int FEATURE_ID_DIAMETER;
-    const unsigned int FEATURE_ID_AREA;
   };
 }
 

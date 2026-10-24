@@ -364,10 +364,6 @@ namespace
     if (thickness.has_value())
       static_cast<mitk::PlanarDoubleEllipse *>(figure.GetPointer())->SetThickness(*thickness);
 
-    // The interactor of the previous API takes figures without it for being placed.
-    figure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
-    figure->EvaluateFeatures();
-
     return figure;
   }
 }

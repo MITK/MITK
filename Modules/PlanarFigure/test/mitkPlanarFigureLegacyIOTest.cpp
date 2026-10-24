@@ -281,7 +281,7 @@ public:
 
     const auto doubleEllipse = ReadLegacyFigure("PlanarDoubleEllipse", ControlPoints({ { 10, 20 } }));
     CPPUNIT_ASSERT_EQUAL(std::string("double_ellipse"), doubleEllipse->GetTypeId());
-    CPPUNIT_ASSERT_EQUAL(3u, doubleEllipse->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), doubleEllipse->GetNumberOfControlPoints());
     CPPUNIT_ASSERT_EQUAL(0.0, static_cast<const mitk::PlanarDoubleEllipse *>(doubleEllipse.GetPointer())->GetThickness());
   }
 
@@ -426,24 +426,6 @@ public:
 
         for (unsigned int j = 0; j < 2; ++j)
           CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expectedDirection[j], (*direction)[j], Epsilon);
-      }
-
-      figure->EvaluateFeatures();
-
-      std::vector<std::pair<std::string, double>> measurements;
-
-      for (unsigned int i = 0; i < figure->GetNumberOfFeatures(); ++i)
-      {
-        if (figure->IsFeatureActive(i))
-          measurements.emplace_back(figure->GetFeatureName(i), figure->GetQuantity(i));
-      }
-
-      CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.Measurements.size(), measurements.size());
-
-      for (std::size_t i = 0; i < measurements.size(); ++i)
-      {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.Measurements[i].first, measurements[i].first);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expected.Measurements[i].second, measurements[i].second, Epsilon);
       }
 
       const auto expectedMeasurements = GetExpectedMeasurements(expected);

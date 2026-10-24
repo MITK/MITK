@@ -11,31 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarDoubleEllipse.h>
-#include <mitkProperties.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
 
 #include <algorithm>
 #include <cmath>
-
-mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
-  : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
-    FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
-    FEATURE_ID_THICKNESS(Superclass::AddFeature("Thickness", "mm"))
-{
-  this->ResetNumberOfControlPoints(3);
-  this->SetNumberOfPolyLines(2);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
-}
-
-mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
-    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
-    FEATURE_ID_THICKNESS(other.FEATURE_ID_THICKNESS),
-    m_Thickness(other.m_Thickness)
-{
-}
 
 std::optional<std::pair<double, double>> mitk::PlanarDoubleEllipse::GetOuterRadii() const
 {
@@ -54,54 +34,6 @@ void mitk::PlanarDoubleEllipse::CheckControlPoints(const std::vector<Point2D> &p
     mitkThrow() << "The axes of a double ellipse must be perpendicular.";
 }
 
-void mitk::PlanarDoubleEllipse::EvaluateFeaturesInternal()
-{
-  const auto radii = this->GetOuterRadii();
-
-  if (!radii.has_value())
-    return;
-
-  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * radii->first);
-  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * radii->second);
-  this->SetQuantity(FEATURE_ID_THICKNESS, this->GetThickness());
-}
-
-void mitk::PlanarDoubleEllipse::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarDoubleEllipse::GeneratePolyLine()
-{
-  this->ClearPolyLines();
-
-  for (const auto &contour : this->GetContours())
-  {
-    const unsigned int polyLine = ContourRole::Hole == contour.Role ? 1 : 0;
-
-    for (const auto &point : contour.Points)
-      this->AppendPointToPolyLine(polyLine, point);
-  }
-}
-
-bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
-{
-  const auto numberOfControlPoints = this->GetNumberOfControlPoints();
-
-  if (numberOfControlPoints < this->GetMinimumNumberOfControlPoints() || index >= numberOfControlPoints)
-    return Superclass::SetControlPoint(index, point, createIfDoesNotExist);
-
-  if (this->IsBeingPlaced() && 1 == index)
-  {
-    this->SetFromSpan(this->GetControlPoint(0), point);
-  }
-  else
-  {
-    this->MoveHandle(index, point);
-  }
-
-  return true;
-}
-
 double mitk::PlanarDoubleEllipse::GetThickness() const
 {
   const auto radii = this->GetOuterRadii();
@@ -113,7 +45,10 @@ double mitk::PlanarDoubleEllipse::GetThickness() const
 
 void mitk::PlanarDoubleEllipse::SetThickness(double thickness)
 {
-  if (!(thickness >= 0.0))
+  if (!std::isfinite(thickness))
+    mitkThrow() << "The thickness of a double ellipse must be finite.";
+
+  if (thickness < 0.0)
     mitkThrow() << "The thickness of a double ellipse must not be negative.";
 
   if (const auto radii = this->GetOuterRadii(); radii.has_value())
@@ -128,7 +63,7 @@ void mitk::PlanarDoubleEllipse::SetThickness(double thickness)
   }
 
   m_Thickness = thickness;
-  this->ShapeChanged();
+  this->Modified();
 }
 
 std::string mitk::PlanarDoubleEllipse::GetTypeId() const
@@ -246,9 +181,9 @@ void mitk::PlanarDoubleEllipse::MoveHandle(std::size_t index, const Point2D &pos
 
     case 2:
     {
-      // The second axis cannot be shorter than the ring is thick, nor longer than the first axis.
+      // The second axis cannot be shorter than the ring is thick.
       const auto offset = (position - center) * normal;
-      const auto radius = std::clamp(std::abs(offset), thickness, firstRadius);
+      const auto radius = std::max(std::abs(offset), thickness);
       points[2] = center + normal * (offset < 0.0 ? -radius : radius);
       break;
     }
@@ -266,15 +201,22 @@ void mitk::PlanarDoubleEllipse::MoveHandle(std::size_t index, const Point2D &pos
   this->AssignControlPoints(points);
 }
 
-bool mitk::PlanarDoubleEllipse::Equals(const mitk::PlanarFigure &other) const
+bool mitk::PlanarDoubleEllipse::IsClosed() const
 {
-  const auto *otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&other);
+  return true;
+}
 
-  if (nullptr == otherDoubleEllipse)
+bool mitk::PlanarDoubleEllipse::EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const
+{
+  const auto otherThickness = static_cast<const PlanarDoubleEllipse &>(other).GetThickness();
+
+  if (!Equal(this->GetThickness(), otherThickness, eps, verbose))
+  {
+    if (verbose)
+      MITK_INFO << "[Equal( PlanarDoubleEllipse )] Thicknesses differ.";
+
     return false;
+  }
 
-  if (std::abs(m_Thickness - otherDoubleEllipse->m_Thickness) > mitk::eps)
-    return false;
-
-  return Superclass::Equals(other);
+  return true;
 }

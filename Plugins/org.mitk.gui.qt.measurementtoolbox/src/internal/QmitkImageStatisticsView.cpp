@@ -64,7 +64,7 @@ namespace {
       return true;
 
     const auto numControlPoints = planarFigure->GetNumberOfControlPoints();
-    for (unsigned int i = 0; i < numControlPoints; ++i)
+    for (std::size_t i = 0; i < numControlPoints; ++i)
     {
       if (!imageGeometry->IsInside(planarFigure->GetWorldControlPoint(i)))
         return false;

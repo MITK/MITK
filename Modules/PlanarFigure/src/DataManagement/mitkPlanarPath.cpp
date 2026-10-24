@@ -14,19 +14,6 @@ found in the LICENSE file.
 
 #include "mitkPlanarFigureGeometryHelpers.h"
 
-mitk::PlanarPath::PlanarPath()
-  : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
-{
-  this->ResetNumberOfControlPoints(2);
-  this->SetNumberOfPolyLines(1);
-}
-
-mitk::PlanarPath::PlanarPath(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH)
-{
-}
-
 std::string mitk::PlanarPath::GetTypeId() const
 {
   return "path";
@@ -62,25 +49,7 @@ bool mitk::PlanarPath::CanInsertControlPoints() const
   return true;
 }
 
-void mitk::PlanarPath::GeneratePolyLine()
+bool mitk::PlanarPath::IsClosed() const
 {
-  this->ClearPolyLines();
-
-  for (const auto &point : this->GetControlPoints())
-    this->AppendPointToPolyLine(0, point);
-}
-
-void mitk::PlanarPath::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarPath::EvaluateFeaturesInternal()
-{
-  this->SetQuantity(FEATURE_ID_LENGTH,
-    PlanarFigureGeometryHelpers::GetLength(this->GetPlaneGeometry(), this->GetControlPoints(), false));
-}
-
-bool mitk::PlanarPath::Equals(const mitk::PlanarFigure &other) const
-{
-  return nullptr != dynamic_cast<const PlanarPath *>(&other) && Superclass::Equals(other);
+  return false;
 }

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlanarDoubleEllipse_h
 #define mitkPlanarDoubleEllipse_h
 
-#include <MitkPlanarFigureExports.h>
 #include <mitkPlanarFigure.h>
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
@@ -58,42 +58,32 @@ namespace mitk
     /** \brief Moves a handle while the axes stay perpendicular and the ring keeps a valid thickness. */
     void MoveHandle(std::size_t index, const Point2D &position) override;
 
-    /** \brief Places the ring while it is being placed and moves handles otherwise. */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
+    /** \brief Returns true. */
+    bool IsClosed() const override;
 
     /** \brief Returns 3. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 3; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 3; }
 
     /** \brief Returns 3. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 3; }
 
     /** \brief Distance between the outer and the inner ellipse along both axes, never more than the outer radii. */
     double GetThickness() const;
 
-    /** \brief Sets the thickness; throws if it is negative or exceeds a radius of the outer ellipse. */
+    /** \brief Sets the thickness; throws if it is not finite, negative or exceeds a radius of the outer ellipse. */
     void SetThickness(double thickness);
 
-    bool Equals(const mitk::PlanarFigure &other) const override;
-
-    /** \brief Feature identifier for the length of the first outer axis. */
-    const unsigned int FEATURE_ID_MAJOR_AXIS;
-    /** \brief Feature identifier for the length of the second outer axis. */
-    const unsigned int FEATURE_ID_MINOR_AXIS;
-    /** \brief Feature identifier for the ring thickness. */
-    const unsigned int FEATURE_ID_THICKNESS;
-
   protected:
-    PlanarDoubleEllipse();
-    PlanarDoubleEllipse(const Self &other);
+    PlanarDoubleEllipse() = default;
+    PlanarDoubleEllipse(const Self &other) = default;
 
     mitkCloneMacro(Self);
 
     /** \brief Additionally requires perpendicular axes. */
     void CheckControlPoints(const std::vector<Point2D> &points) const override;
 
-    void EvaluateFeaturesInternal() override;
-    void GenerateHelperPolyLine(double, unsigned int) override;
-    void GeneratePolyLine() override;
+    /** \brief Compares the thicknesses. */
+    bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const override;
 
   private:
     /** \brief Both outer radii in plane coordinates, or nothing if the outer ellipse is not defined yet. */

@@ -11,25 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarSubdivisionPolygon.h>
-#include <mitkProperties.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
-
-mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon()
-  : FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
-    FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))
-{
-  this->ResetNumberOfControlPoints(2);
-  this->SetNumberOfPolyLines(1);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
-}
-
-mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
-    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
-{
-}
 
 std::string mitk::PlanarSubdivisionPolygon::GetTypeId() const
 {
@@ -91,36 +74,7 @@ mitk::PlanarFigure::PlacementKind mitk::PlanarSubdivisionPolygon::GetPlacementKi
   return PlacementKind::Sequence;
 }
 
-void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
+bool mitk::PlanarSubdivisionPolygon::IsClosed() const
 {
-  this->ClearPolyLines();
-
-  for (const auto &contour : this->GetContours())
-  {
-    for (const auto &point : contour.Points)
-      this->AppendPointToPolyLine(0, point);
-  }
-}
-
-void mitk::PlanarSubdivisionPolygon::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarSubdivisionPolygon::EvaluateFeaturesInternal()
-{
-  const auto circumference = this->GetMeasurement(MeasurementType::Circumference);
-  const auto area = this->GetMeasurement(MeasurementType::Area);
-
-  this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference.value_or(0.0));
-  this->SetQuantity(FEATURE_ID_AREA, area.value_or(0.0));
-
-  if (area.has_value())
-    this->ActivateFeature(FEATURE_ID_AREA);
-  else
-    this->DeactivateFeature(FEATURE_ID_AREA);
-}
-
-bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure &other) const
-{
-  return nullptr != dynamic_cast<const PlanarSubdivisionPolygon *>(&other) && Superclass::Equals(other);
+  return true;
 }

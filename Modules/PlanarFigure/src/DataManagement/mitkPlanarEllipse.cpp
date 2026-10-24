@@ -11,48 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarEllipse.h>
-#include <mitkProperties.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numbers>
-
-mitk::PlanarEllipse::PlanarEllipse()
-  : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
-    FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
-    FEATURE_ID_AREA(Superclass::AddFeature("Area", "mm2"))
-{
-  this->ResetNumberOfControlPoints(3);
-  this->SetNumberOfPolyLines(1);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
-}
-
-mitk::PlanarEllipse::PlanarEllipse(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
-    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
-    FEATURE_ID_AREA(other.FEATURE_ID_AREA),
-    m_ReferenceDirection(other.m_ReferenceDirection)
-{
-}
-
-bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
-{
-  if (this->GetNumberOfControlPoints() < 3 || index > 2)
-    return Superclass::SetControlPoint(index, point, createIfDoesNotExist);
-
-  if (this->IsBeingPlaced() && 1 == index)
-  {
-    this->SetFromSpan(this->GetControlPoint(0), point);
-  }
-  else
-  {
-    this->MoveHandle(index, point);
-  }
-
-  return true;
-}
 
 void mitk::PlanarEllipse::CheckControlPoints(const std::vector<Point2D> &points) const
 {
@@ -60,33 +24,6 @@ void mitk::PlanarEllipse::CheckControlPoints(const std::vector<Point2D> &points)
 
   if (points.size() == 3 && !PlanarFigureGeometryHelpers::ArePerpendicular(points[1] - points[0], points[2] - points[0]))
     mitkThrow() << "The axes of an ellipse must be perpendicular.";
-}
-
-void mitk::PlanarEllipse::GeneratePolyLine()
-{
-  this->ClearPolyLines();
-
-  for (const auto &contour : this->GetContours())
-  {
-    for (const auto &point : contour.Points)
-      this->AppendPointToPolyLine(0, point);
-  }
-}
-
-void mitk::PlanarEllipse::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarEllipse::EvaluateFeaturesInternal()
-{
-  const Point2D centerPoint = this->GetControlPoint(0);
-
-  const auto longAxisLength = centerPoint.EuclideanDistanceTo(this->GetControlPoint(1));
-  const auto shortAxisLength = centerPoint.EuclideanDistanceTo(this->GetControlPoint(2));
-
-  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * longAxisLength);
-  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * shortAxisLength);
-  this->SetQuantity(FEATURE_ID_AREA, longAxisLength * shortAxisLength * itk::Math::pi);
 }
 
 std::string mitk::PlanarEllipse::GetTypeId() const
@@ -196,6 +133,9 @@ std::optional<mitk::Vector2D> mitk::PlanarEllipse::GetReferenceDirection() const
 
 void mitk::PlanarEllipse::SetReferenceDirection(const std::optional<Vector2D> &direction)
 {
+  if (direction.has_value() && !(std::isfinite((*direction)[0]) && std::isfinite((*direction)[1])))
+    mitkThrow() << "The reference direction of an ellipse must be finite.";
+
   if (direction.has_value() && direction->GetNorm() <= 0.0)
     mitkThrow() << "The reference direction of an ellipse must not be a zero vector.";
 
@@ -207,18 +147,23 @@ void mitk::PlanarEllipse::SetReferenceDirection(const std::optional<Vector2D> &d
   this->Modified();
 }
 
-bool mitk::PlanarEllipse::Equals(const mitk::PlanarFigure &other) const
+bool mitk::PlanarEllipse::IsClosed() const
 {
-  const auto *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
+  return true;
+}
 
-  if (nullptr == otherEllipse)
+bool mitk::PlanarEllipse::EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const
+{
+  const auto &otherDirection = static_cast<const PlanarEllipse &>(other).m_ReferenceDirection;
+
+  if (m_ReferenceDirection.has_value() != otherDirection.has_value() ||
+      (m_ReferenceDirection.has_value() && !Equal(*m_ReferenceDirection, *otherDirection, eps, verbose)))
+  {
+    if (verbose)
+      MITK_INFO << "[Equal( PlanarEllipse )] Reference directions differ.";
+
     return false;
+  }
 
-  if (m_ReferenceDirection.has_value() != otherEllipse->m_ReferenceDirection.has_value())
-    return false;
-
-  if (m_ReferenceDirection.has_value() && (*m_ReferenceDirection - *otherEllipse->m_ReferenceDirection).GetNorm() > mitk::eps)
-    return false;
-
-  return Superclass::Equals(other);
+  return true;
 }

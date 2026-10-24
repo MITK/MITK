@@ -11,60 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarFourPointAngle.h>
-#include <mitkPlaneGeometry.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
-
-mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
-{
-  // Four point angle has two control points
-  this->ResetNumberOfControlPoints(2);
-  this->SetNumberOfPolyLines(2);
-}
-
-mitk::PlanarFourPointAngle::PlanarFourPointAngle(const Self& other)
-  : PlanarFigure(other),
-    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
-{
-}
-
-void mitk::PlanarFourPointAngle::GeneratePolyLine()
-{
-  this->ClearPolyLines();
-
-  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
-    this->AppendPointToPolyLine(i / 2, this->GetControlPoint(i));
-}
-
-void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
-{
-  // Generate helper-poly-line for an four point angle
-  // Need to discuss a sensible implementation
-}
-
-void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
-{
-  if (this->GetNumberOfControlPoints() < 4)
-  {
-    // Angle not yet complete.
-    return;
-  }
-
-  // Calculate angle between lines
-  const Point2D &p0 = this->GetControlPoint(0);
-  const Point2D &p1 = this->GetControlPoint(1);
-  const Point2D &p2 = this->GetControlPoint(2);
-  const Point2D &p3 = this->GetControlPoint(3);
-
-  Vector2D v0 = p1 - p0;
-  Vector2D v1 = p3 - p2;
-
-  v0.Normalize();
-  v1.Normalize();
-  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
-
-  this->SetQuantity(FEATURE_ID_ANGLE, angle);
-}
 
 std::string mitk::PlanarFourPointAngle::GetTypeId() const
 {
@@ -73,10 +21,11 @@ std::string mitk::PlanarFourPointAngle::GetTypeId() const
 
 std::vector<mitk::PlanarFigure::Contour> mitk::PlanarFourPointAngle::GetContours() const
 {
+  const auto points = this->GetControlPoints();
   std::vector<Contour> contours;
 
-  for (unsigned int i = 0; i + 1 < this->GetNumberOfControlPoints(); i += 2)
-    contours.push_back({ ContourRole::Outline, false, { this->GetControlPoint(i), this->GetControlPoint(i + 1) } });
+  for (std::size_t i = 0; i + 1 < points.size(); i += 2)
+    contours.push_back({ ContourRole::Outline, false, { points[i], points[i + 1] } });
 
   return contours;
 }
@@ -97,20 +46,7 @@ mitk::PlanarFigure::PlacementKind mitk::PlanarFourPointAngle::GetPlacementKind()
   return PlacementKind::Sequence;
 }
 
-void mitk::PlanarFourPointAngle::PrintSelf(std::ostream &os, itk::Indent indent) const
+bool mitk::PlanarFourPointAngle::IsClosed() const
 {
-  Superclass::PrintSelf(os, indent);
-}
-
-bool mitk::PlanarFourPointAngle::Equals(const mitk::PlanarFigure &other) const
-{
-  const auto *otherFourPtAngle = dynamic_cast<const mitk::PlanarFourPointAngle *>(&other);
-  if (otherFourPtAngle)
-  {
-    return Superclass::Equals(other);
-  }
-  else
-  {
-    return false;
-  }
+  return false;
 }

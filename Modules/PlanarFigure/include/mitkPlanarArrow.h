@@ -18,33 +18,25 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PlaneGeometry;
-
   /**
-   * \brief Implementation of PlanarFigure representing an arrow with two control points.
+   * \brief Implementation of PlanarFigure representing an arrow.
    *
-   * Draws a directed line segment from the first control point to the second,
-   * with an arrowhead rendered at the second control point. The arrowhead size
-   * is determined relative to the display size and can be adjusted via
-   * SetArrowTipScaleFactor().
+   * Control point 0 is the tip, which carries the arrow head, and control
+   * point 1 the tail.
    *
-   * Provides one feature: the arrow length (FEATURE_ID_LENGTH).
-   *
-   * \sa PlanarFigure, PlanarLine, PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarLine
    */
   class MITKPLANARFIGURE_EXPORT PlanarArrow : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarArrow, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
     /** \brief Returns "arrow". */
     std::string GetTypeId() const override;
 
-    /** \brief An open outline from the tip (control point 0) to the tail. */
+    /** \brief An open outline from the tip to the tail. */
     std::vector<Contour> GetContours() const override;
 
     /** \brief The arrow head at the tip. */
@@ -58,57 +50,21 @@ namespace mitk
 
     void SetFromSpan(const Point2D &start, const Point2D &end) override;
 
-      /** \brief Returns 2 -- an arrow requires exactly two control points. */
-      unsigned int GetMinimumNumberOfControlPoints() const override
-    {
-      return 2;
-    }
+    /** \brief Returns false. */
+    bool IsClosed() const override;
 
-    /** \brief Returns 2 -- an arrow requires exactly two control points. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
+    /** \brief Returns 2. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 2; }
 
-    /**
-     * \brief Sets the scale factor for the arrowhead size.
-     *
-     * Controls the size of the arrow tip relative to the display.
-     *
-     * \param[in] scale The scale factor for the arrowhead.
-     */
-    void SetArrowTipScaleFactor(float scale);
-
-    /**
-     * \brief Compares this PlanarArrow with another PlanarFigure for equality.
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    /** \brief Returns 2. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 2; }
 
   protected:
-    PlanarArrow();
-    PlanarArrow(const Self& other);
+    PlanarArrow() = default;
+    PlanarArrow(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    /** \brief Generates the poly-line representation of the planar figure. */
-    void GeneratePolyLine() override;
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    void EvaluateFeaturesInternal() override;
-
-    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-
-    // Feature identifiers
-    const unsigned int FEATURE_ID_LENGTH;
-
-    // ScaleFactor defining size of helper-lines in relation to display size
-    float m_ArrowTipScaleFactor;
-
-  private:
   };
-
-} // namespace mitk
+}
 
 #endif

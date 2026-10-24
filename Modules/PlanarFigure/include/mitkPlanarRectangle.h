@@ -30,9 +30,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarRectangle, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
     /** \brief Returns "rectangle". */
@@ -60,26 +58,20 @@ namespace mitk
 
     void SetFromSpan(const Point2D &start, const Point2D &end) override;
 
-    /** \brief Returns 2. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 2; }
+    /** \brief Returns true. */
+    bool IsClosed() const override;
 
     /** \brief Returns 2. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 2; }
 
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    /** \brief Returns 2. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 2; }
 
   protected:
-    PlanarRectangle();
-    PlanarRectangle(const Self &other);
+    PlanarRectangle() = default;
+    PlanarRectangle(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    void GeneratePolyLine() override;
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-    void EvaluateFeaturesInternal() override;
-
-    const unsigned int FEATURE_ID_CIRCUMFERENCE;
-    const unsigned int FEATURE_ID_AREA;
   };
 }
 

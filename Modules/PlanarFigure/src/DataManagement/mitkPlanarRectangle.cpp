@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarRectangle.h>
-#include <mitkProperties.h>
 
 #include "mitkPlanarFigureGeometryHelpers.h"
 
@@ -27,22 +26,6 @@ namespace
 
     return { first, second, opposite, fourth };
   }
-}
-
-mitk::PlanarRectangle::PlanarRectangle()
-  : FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
-    FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))
-{
-  this->ResetNumberOfControlPoints(2);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
-  this->SetNumberOfPolyLines(1);
-}
-
-mitk::PlanarRectangle::PlanarRectangle(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
-    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
-{
 }
 
 std::string mitk::PlanarRectangle::GetTypeId() const
@@ -128,28 +111,7 @@ void mitk::PlanarRectangle::SetFromSpan(const Point2D &start, const Point2D &end
   this->AssignControlPoints({ start, end });
 }
 
-void mitk::PlanarRectangle::GeneratePolyLine()
+bool mitk::PlanarRectangle::IsClosed() const
 {
-  this->ClearPolyLines();
-
-  for (const auto &contour : this->GetContours())
-  {
-    for (const auto &corner : contour.Points)
-      this->AppendPointToPolyLine(0, corner);
-  }
-}
-
-void mitk::PlanarRectangle::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarRectangle::EvaluateFeaturesInternal()
-{
-  this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, this->GetMeasurement(MeasurementType::Circumference).value_or(0.0));
-  this->SetQuantity(FEATURE_ID_AREA, this->GetMeasurement(MeasurementType::Area).value_or(0.0));
-}
-
-bool mitk::PlanarRectangle::Equals(const mitk::PlanarFigure &other) const
-{
-  return nullptr != dynamic_cast<const PlanarRectangle *>(&other) && Superclass::Equals(other);
+  return true;
 }

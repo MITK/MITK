@@ -66,6 +66,8 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(LeaveWhileNotHovering_IsNotConsumed);
   MITK_TEST(PresetCircle_IsPlacedWhereClicked);
   MITK_TEST(DragLine_MovesIt);
+  MITK_TEST(DragSelectedLine_KeepsSelection);
+  MITK_TEST(ReleaseDragWithCtrlShift_EndsDrag);
   MITK_TEST(DragLineBeyondImage_StopsAtItsEdge);
   MITK_TEST(DragLinePointBeyondImage_StopsAtItsEdge);
   MITK_TEST(DragCircleInside_MovesIt);
@@ -76,6 +78,10 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(PlaceLineInsideCircleWhileClaimed_LeavesCircle);
   MITK_TEST(HoverNestedCircles_HoversSmallerInside);
   MITK_TEST(DragNestedCircles_MovesSmallerInside);
+  MITK_TEST(HoverNestedCircles_IgnoresHiddenInner);
+  MITK_TEST(LeaveNestedCircles_CtrlRevivesNoHover);
+  MITK_TEST(HoverLineEndOnOtherStroke_HoversHandle);
+  MITK_TEST(CtrlInOtherWindow_KeepsFeedbackUnderMouse);
   MITK_TEST(HoverHiddenFigure_DoesNothing);
   MITK_TEST(CtrlHoverPolygonEdge_PreviewsInsertion);
   MITK_TEST(CtrlClickPolygonEdge_InsertsDraggedPoint);
@@ -84,6 +90,8 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(PressAndReleaseCtrl_TogglesPreview);
   MITK_TEST(CtrlHoverLine_PreviewsNothing);
   MITK_TEST(HoverPolygon_ShowsCursorOfPress);
+  MITK_TEST(DragDoubleEllipseInnerHandle_ThinsRing);
+  MITK_TEST(PlacePolygonWithKeys_RemovesAndFinishes);
   // BUG 19304
   // MITK_TEST(PlanarSubdivisionInteractionCreate);
 
@@ -161,11 +169,8 @@ public:
     // Load reference PlanarFigure
     auto reference = mitk::IOUtil::Load<mitk::PlanarFigure>(GetTestDataFilePath(referenceFigurePath));
 
-    // The comparison includes the features of the previous API, which the interactor no longer evaluates.
-    figure->EvaluateFeatures();
-
-    // Compare figures
-    MITK_ASSERT_EQUAL(figure, reference, "Compare figure with reference");
+    // Some references were computed by the previous implementation, whose arithmetic differs in the last digits.
+    CPPUNIT_ASSERT_MESSAGE("Compare figure with reference", mitk::Equal(*figure, *reference, 1e-6, true));
   }
 
   void AngleInteractionCreate()
@@ -350,18 +355,17 @@ public:
     this->PressAt(clickPosition);
     this->ReleaseAt(clickPosition);
 
-    // Moving does not reshape the preset; the next click ends its placement.
-    const auto finishPosition = GetPositionFarFromLine();
-    this->MoveTo(finishPosition);
-    this->PressAt(finishPosition);
-    this->ReleaseAt(finishPosition);
-
-    CPPUNIT_ASSERT_MESSAGE("The preset is placed", circle->IsComplete());
+    CPPUNIT_ASSERT_MESSAGE("The preset is placed by one click", circle->IsComplete());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, *circle->GetMeasurement(mitk::PlanarFigure::MeasurementType::Radius), mitk::eps);
 
     const auto centerPosition = this->GetControlPointPosition(0);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(clickPosition[0], centerPosition[0], 0.5);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(clickPosition[1], centerPosition[1], 0.5);
+
+    // Its shape stays locked: dragging the rim does not change the radius.
+    const auto rimPosition = this->GetControlPointPosition(1);
+    this->DragFromTo(rimPosition, rimPosition + MakeOffset(30, 0));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, *circle->GetMeasurement(mitk::PlanarFigure::MeasurementType::Radius), 1e-9);
   }
 
   void DragLine_MovesIt()
@@ -380,6 +384,50 @@ public:
 
     AssertDisplayPositionsEqual(first + offset, this->GetControlPointPosition(0));
     AssertDisplayPositionsEqual(second + offset, this->GetControlPointPosition(1));
+  }
+
+  void DragSelectedLine_KeepsSelection()
+  {
+    this->PlaybackLineAndMoveAway();
+
+    const EventCounter selections(m_FigureNode->GetData(), mitk::SelectPlanarFigureEvent());
+
+    // Selecting a selected figure again would collapse a selection of several nodes.
+    m_FigureNode->SetSelected(true);
+    const auto midpoint = this->GetLineMidpointPosition();
+    this->DragFromTo(midpoint, midpoint + MakeOffset(20, 10));
+    CPPUNIT_ASSERT_EQUAL(0u, selections.GetCount());
+
+    m_FigureNode->SetSelected(false);
+    const auto movedMidpoint = this->GetLineMidpointPosition();
+    this->MoveTo(movedMidpoint);
+    this->PressAt(movedMidpoint);
+    this->ReleaseAt(movedMidpoint);
+    CPPUNIT_ASSERT_EQUAL(1u, selections.GetCount());
+  }
+
+  void ReleaseDragWithCtrlShift_EndsDrag()
+  {
+    this->PlaybackLineAndMoveAway();
+
+    const EventCounter endInteractions(m_FigureNode->GetData(), mitk::EndInteractionPlanarFigureEvent());
+
+    const auto first = this->GetControlPointPosition(0);
+    const auto midpoint = this->GetLineMidpointPosition();
+    const auto offset = MakeOffset(20, 10);
+
+    this->MoveTo(midpoint);
+    this->PressAt(midpoint);
+    this->DragTo(midpoint + offset);
+    this->ReleaseAt(midpoint + offset, mitk::InteractionEvent::ShiftKey | mitk::InteractionEvent::ControlKey);
+
+    AssertDisplayPositionsEqual(first + offset, this->GetControlPointPosition(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The release ends the drag", 1u, endInteractions.GetCount());
+
+    // A drag that did not end would take no hover.
+    this->MoveTo(GetPositionFarFromLine());
+    this->MoveTo(this->GetLineMidpointPosition());
+    CPPUNIT_ASSERT_MESSAGE("Hovering over the line after the drag", this->IsHovering());
   }
 
   void DragLineBeyondImage_StopsAtItsEdge()
@@ -518,6 +566,76 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The inner circle is no longer hovered", !innerInteractor->GetFeedback(renderer).IsHovered);
   }
 
+  void HoverNestedCircles_IgnoresHiddenInner()
+  {
+    this->SetUpCircle(GetWindowCenter(), 80.0);
+
+    const auto inner = mitk::PlanarCircle::New();
+    this->PlaceCircle(inner, GetWindowCenter(), 30.0);
+    this->AddFigure(inner)->GetDataNode()->SetVisibility(false);
+
+    this->MoveTo(GetWindowCenter() + MakeOffset(15, 0));
+    CPPUNIT_ASSERT_MESSAGE("A hidden inner circle does not take the hover from the outer one", this->IsHovering());
+  }
+
+  void LeaveNestedCircles_CtrlRevivesNoHover()
+  {
+    // The outer circle gets the events first.
+    this->SetUpCircle(GetWindowCenter(), 80.0);
+
+    const auto inner = mitk::PlanarCircle::New();
+    this->PlaceCircle(inner, GetWindowCenter(), 30.0);
+    const auto innerInteractor = this->AddFigure(inner);
+    const auto *renderer = this->GetLineRenderer();
+
+    // The inner circle sees none of the moves that leave it.
+    this->MoveTo(GetWindowCenter() + MakeOffset(15, 0));
+    this->MoveTo(GetWindowCenter() + MakeOffset(55, 0));
+    this->MoveTo(GetWindowCenter() + MakeOffset(120, 0));
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the outer circle is still hovered", !this->IsHovering());
+
+    this->PressControl();
+    CPPUNIT_ASSERT_MESSAGE("The inner circle is not hovered again", !innerInteractor->GetFeedback(renderer).IsHovered);
+    this->ReleaseControl();
+  }
+
+  void HoverLineEndOnOtherStroke_HoversHandle()
+  {
+    // The polygon gets the events first.
+    this->SetUpPolygon(GetSquare());
+
+    // A line that ends on the upper edge of the polygon.
+    const auto lineEnd = MakePosition(150, 100);
+    const auto *plane = this->GetLineRenderer()->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+    const auto line = mitk::PlanarLine::New();
+    line->SetPlaneGeometry(plane);
+    line->SetControlPoints({ this->ToPlane(lineEnd, plane), this->ToPlane(MakePosition(150, 60), plane) });
+    const auto lineInteractor = this->AddFigure(line);
+
+    this->MoveTo(lineEnd);
+
+    const auto lineFeedback = lineInteractor->GetFeedback(this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The end of the line is hovered", lineFeedback.IsHovered && lineFeedback.HoveredHandle == std::optional<std::size_t>(0));
+    CPPUNIT_ASSERT_MESSAGE("The polygon is not hovered", !this->IsHovering());
+  }
+
+  void CtrlInOtherWindow_KeepsFeedbackUnderMouse()
+  {
+    this->PlaybackLineAndMoveAway();
+
+    this->MoveTo(this->GetLineMidpointPosition());
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the line is not hovered", this->IsHovering());
+
+    // Ctrl also reaches the window with the keyboard focus, here one without the mouse.
+    auto *focusedWindow = m_InteractionTestHelper->GetRenderWindowByName("stdmulti.widget2");
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the recording has no second 2D window", nullptr != focusedWindow);
+    Send(mitk::InteractionKeyEvent::New(focusedWindow->GetRenderer(), mitk::InteractionEvent::KeyControl, mitk::InteractionEvent::NoKey));
+
+    CPPUNIT_ASSERT_MESSAGE("The line stays hovered where the mouse is", this->IsHovering());
+    this->ReleaseControl();
+  }
+
   void DragNestedCircles_MovesSmallerInside()
   {
     // The outer circle gets the events first.
@@ -570,7 +688,7 @@ public:
     this->DragTo(target);
     this->ReleaseAt(target);
 
-    CPPUNIT_ASSERT_EQUAL(5u, polygon->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(5), polygon->GetNumberOfControlPoints());
     AssertDisplayPositionsEqual(target, this->GetControlPointPosition(1));
   }
 
@@ -586,7 +704,7 @@ public:
     this->PressAt(corner, mitk::InteractionEvent::ControlKey);
     this->ReleaseAt(corner);
 
-    CPPUNIT_ASSERT_EQUAL(3u, polygon->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), polygon->GetNumberOfControlPoints());
   }
 
   void CtrlClickTrianglePoint_KeepsIt()
@@ -603,7 +721,7 @@ public:
     this->PressAt(corner, mitk::InteractionEvent::ControlKey);
     this->ReleaseAt(corner);
 
-    CPPUNIT_ASSERT_EQUAL(3u, polygon->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), polygon->GetNumberOfControlPoints());
   }
 
   void PressAndReleaseCtrl_TogglesPreview()
@@ -644,6 +762,54 @@ public:
 
     this->MoveTo(this->GetLineMidpointPosition(), mitk::InteractionEvent::ControlKey);
     CPPUNIT_ASSERT_MESSAGE("Lines take no points", this->IsHovering() && !this->GetFeedback().InsertionPreview.has_value());
+  }
+
+  void DragDoubleEllipseInnerHandle_ThinsRing()
+  {
+    auto ring = mitk::PlanarDoubleEllipse::New();
+    this->SetUpNewFigure(ring, "InteractionTestData/Interactions/Line.xml");
+    this->InitializeViews();
+
+    const auto *plane = this->GetLineRenderer()->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    ring->SetPlaneGeometry(plane);
+    ring->SetFromSpan(this->ToPlane(GetWindowCenter(), plane), this->ToPlane(GetWindowCenter() + MakeOffset(80, 0), plane));
+    const auto thickness = ring->GetThickness();
+
+    // The inner handle lies 40 pixels left of the center, opposite of the end of the first axis.
+    mitk::Point3D innerHandle;
+    plane->Map(ring->GetHandles()[3].Position, innerHandle);
+    mitk::Point2D innerHandlePosition;
+    this->GetLineRenderer()->WorldToDisplay(innerHandle, innerHandlePosition);
+
+    this->DragFromTo(innerHandlePosition, innerHandlePosition - MakeOffset(20, 0));
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5 * thickness, ring->GetThickness(), 0.02 * thickness);
+    AssertDisplayPositionsEqual(GetWindowCenter() + MakeOffset(80, 0), this->GetControlPointPosition(1));
+  }
+
+  void PlacePolygonWithKeys_RemovesAndFinishes()
+  {
+    auto polygon = mitk::PlanarPolygon::New();
+    this->SetUpNewFigure(polygon, "InteractionTestData/Interactions/Line.xml");
+    this->InitializeViews();
+
+    const auto square = GetSquare();
+
+    for (const auto &corner : square)
+    {
+      this->MoveTo(corner);
+      this->PressAt(corner);
+      this->ReleaseAt(corner);
+    }
+
+    Send(mitk::InteractionKeyEvent::New(this->GetLineRenderer(), mitk::InteractionEvent::KeyBackspace, mitk::InteractionEvent::NoKey));
+    Send(mitk::InteractionKeyEvent::New(this->GetLineRenderer(), mitk::InteractionEvent::KeyEnter, mitk::InteractionEvent::NoKey));
+
+    CPPUNIT_ASSERT_MESSAGE("Enter finishes the placement", polygon->IsComplete());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Backspace removes the last point", std::size_t(3), polygon->GetNumberOfControlPoints());
+
+    for (unsigned int i = 0; i < 3; ++i)
+      AssertDisplayPositionsEqual(square[i], this->GetControlPointPosition(i));
   }
 
   // this is only for the OpenGL check
@@ -855,14 +1021,37 @@ public:
                                       mitk::InteractionEvent::LeftMouseButton));
     }
 
-    void ReleaseAt(const mitk::Point2D &position) const
+    void ReleaseAt(const mitk::Point2D &position, mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey) const
     {
       Send(mitk::MouseReleaseEvent::New(this->GetLineRenderer(),
                                         position,
                                         mitk::InteractionEvent::NoButton,
-                                        mitk::InteractionEvent::NoKey,
+                                        modifiers,
                                         mitk::InteractionEvent::LeftMouseButton));
     }
+
+    /** Counts the events of a kind that the figure sends while the counter lives. */
+    class EventCounter
+    {
+    public:
+      EventCounter(itk::Object *figure, const itk::EventObject &event)
+        : m_Figure(figure),
+          m_Tag(figure->AddObserver(event, [this](const itk::EventObject &) { ++m_Count; }))
+      {
+      }
+
+      EventCounter(const EventCounter &) = delete;
+      EventCounter &operator=(const EventCounter &) = delete;
+
+      ~EventCounter() { m_Figure->RemoveObserver(m_Tag); }
+
+      unsigned int GetCount() const { return m_Count; }
+
+    private:
+      itk::Object *m_Figure;
+      unsigned int m_Count = 0;
+      unsigned long m_Tag;
+    };
 
     /** Returns whether an interactor consumed the event. */
     bool LeaveWindow() const

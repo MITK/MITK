@@ -16,40 +16,6 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-mitk::PlanarCross::PlanarCross()
-  : FEATURE_ID_LONGESTDIAMETER(this->AddFeature("Longest Axis", "mm")),
-    FEATURE_ID_SHORTAXISDIAMETER(this->AddFeature("Short Axis", "mm"))
-{
-  this->ResetNumberOfControlPoints(4);
-  this->SetNumberOfPolyLines(2);
-}
-
-mitk::PlanarCross::PlanarCross(const Self &other)
-  : PlanarFigure(other),
-    FEATURE_ID_LONGESTDIAMETER(other.FEATURE_ID_LONGESTDIAMETER),
-    FEATURE_ID_SHORTAXISDIAMETER(other.FEATURE_ID_SHORTAXISDIAMETER)
-{
-}
-
-bool mitk::PlanarCross::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
-{
-  const auto numberOfControlPoints = this->GetNumberOfControlPoints();
-
-  if (numberOfControlPoints < 4 || index >= numberOfControlPoints)
-    return Superclass::SetControlPoint(index, point, createIfDoesNotExist);
-
-  if (this->IsBeingPlaced() && 1 == index)
-  {
-    this->SetFromSpan(this->GetControlPoint(0), point);
-  }
-  else
-  {
-    this->MoveHandle(index, point);
-  }
-
-  return true;
-}
-
 void mitk::PlanarCross::CheckControlPoints(const std::vector<Point2D> &points) const
 {
   Superclass::CheckControlPoints(points);
@@ -78,29 +44,6 @@ void mitk::PlanarCross::CheckControlPoints(const std::vector<Point2D> &points) c
   {
     mitkThrow() << "The second line of a cross must cross the first one.";
   }
-}
-
-void mitk::PlanarCross::GeneratePolyLine()
-{
-  this->ClearPolyLines();
-
-  const auto contours = this->GetContours();
-
-  for (std::size_t i = 0; i < contours.size(); ++i)
-  {
-    for (const auto &point : contours[i].Points)
-      this->AppendPointToPolyLine(static_cast<unsigned int>(i), point);
-  }
-}
-
-void mitk::PlanarCross::GenerateHelperPolyLine(double, unsigned int)
-{
-}
-
-void mitk::PlanarCross::EvaluateFeaturesInternal()
-{
-  this->SetQuantity(FEATURE_ID_LONGESTDIAMETER, this->GetMeasurement(MeasurementType::LongAxis).value_or(0.0));
-  this->SetQuantity(FEATURE_ID_SHORTAXISDIAMETER, this->GetMeasurement(MeasurementType::ShortAxis).value_or(0.0));
 }
 
 std::string mitk::PlanarCross::GetTypeId() const
@@ -202,7 +145,7 @@ void mitk::PlanarCross::MoveHandle(std::size_t index, const Point2D &position)
   this->AssignControlPoints(points);
 }
 
-bool mitk::PlanarCross::Equals(const mitk::PlanarFigure &other) const
+bool mitk::PlanarCross::IsClosed() const
 {
-  return nullptr != dynamic_cast<const PlanarCross *>(&other) && Superclass::Equals(other);
+  return false;
 }

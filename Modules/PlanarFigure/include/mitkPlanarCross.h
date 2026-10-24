@@ -32,9 +32,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarCross, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
     /** \brief Returns "cross". */
@@ -55,32 +53,23 @@ namespace mitk
     /** \brief Moves an end point while the second line stays perpendicular to the first one and crosses it. */
     void MoveHandle(std::size_t index, const Point2D &position) override;
 
-    /** \brief Places the cross while it is being placed and moves handles otherwise. */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
+    /** \brief Returns false. */
+    bool IsClosed() const override;
 
     /** \brief Returns 4. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 4; }
 
     /** \brief Returns 4. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
-
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 4; }
 
   protected:
-    PlanarCross();
-    PlanarCross(const Self &other);
+    PlanarCross() = default;
+    PlanarCross(const Self &other) = default;
 
     mitkCloneMacro(Self);
 
     /** \brief Additionally requires a second line that is perpendicular to the first one and crosses it. */
     void CheckControlPoints(const std::vector<Point2D> &points) const override;
-
-    void GeneratePolyLine() override;
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-    void EvaluateFeaturesInternal() override;
-
-    const unsigned int FEATURE_ID_LONGESTDIAMETER;
-    const unsigned int FEATURE_ID_SHORTAXISDIAMETER;
   };
 }
 

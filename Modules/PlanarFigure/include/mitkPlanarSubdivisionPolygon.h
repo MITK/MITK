@@ -31,9 +31,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarSubdivisionPolygon, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
     /** \brief Every round doubles the number of curve points. */
@@ -54,26 +52,20 @@ namespace mitk
     /** \brief Placed point by point. */
     PlacementKind GetPlacementKind() const override;
 
+    /** \brief Returns true. */
+    bool IsClosed() const override;
+
     /** \brief Returns 3. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 3; }
 
     /** \brief Returns 1000. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 1000; }
-
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 1000; }
 
   protected:
-    PlanarSubdivisionPolygon();
-    PlanarSubdivisionPolygon(const Self &other);
+    PlanarSubdivisionPolygon() = default;
+    PlanarSubdivisionPolygon(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    void GeneratePolyLine() override;
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-    void EvaluateFeaturesInternal() override;
-
-    const unsigned int FEATURE_ID_CIRCUMFERENCE;
-    const unsigned int FEATURE_ID_AREA;
   };
 }
 

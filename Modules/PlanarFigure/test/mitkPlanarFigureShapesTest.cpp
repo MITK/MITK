@@ -29,6 +29,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <cmath>
+#include <limits>
 #include <numbers>
 
 namespace
@@ -53,21 +55,11 @@ namespace
     return plane;
   }
 
-  // Places a figure like the interactor does, so that the figure constraints apply.
   template <class TFigure>
   typename TFigure::Pointer Place(typename TFigure::Pointer figure, const std::vector<mitk::Point2D> &points)
   {
     figure->SetPlaneGeometry(CreatePlane());
-    figure->PlaceFigure(points.front());
-
-    for (unsigned int i = 1; i < points.size(); ++i)
-    {
-      if (i < figure->GetNumberOfControlPoints())
-        figure->SetControlPoint(i, points[i]);
-      else
-        figure->AddControlPoint(points[i]);
-    }
-
+    figure->SetControlPoints(points);
     return figure;
   }
 
@@ -101,6 +93,7 @@ class mitkPlanarFigureShapesTestSuite : public mitk::TestFixture
   MITK_TEST(Polygon_SelfIntersecting_HasNoArea);
   MITK_TEST(Path);
   MITK_TEST(SubdivisionPolygon_OpenWhileBeingPlaced);
+  MITK_TEST(SubdivisionPolygon_PassesThroughControlPoints);
   MITK_TEST(BezierCurve);
   MITK_TEST(PlacementKinds);
   MITK_TEST(CanInsertControlPoints);
@@ -113,6 +106,7 @@ class mitkPlanarFigureShapesTestSuite : public mitk::TestFixture
   MITK_TEST(Cross_ShortAxisFollowsLongAxis);
   MITK_TEST(Cross_StartsWithDefaultShortAxis);
   MITK_TEST(Cross_LinesKeepCrossing);
+  MITK_TEST(CollapsedAxes_PassTheirCheck);
   MITK_TEST(Invariants_AreChecked);
 
   CPPUNIT_TEST_SUITE_END();
@@ -142,11 +136,14 @@ public:
     auto figure = mitk::PlanarLine::New();
     CPPUNIT_ASSERT_THROW(figure->SetPlaneGeometry(nullptr), mitk::Exception);
 
+#ifdef NDEBUG
+    // PlaneGeometry asserts on such bounds in Debug builds.
     auto flatPlane = CreatePlane();
     mitk::BaseGeometry::BoundsArrayType bounds = flatPlane->GetBounds();
     bounds[1] = bounds[0];
     flatPlane->SetBounds(bounds);
     CPPUNIT_ASSERT_THROW(figure->SetPlaneGeometry(flatPlane), mitk::Exception);
+#endif
   }
 
   void SetPlaneGeometry_KeepsCopy()
@@ -168,13 +165,17 @@ public:
     auto line = mitk::PlanarLine::New();
     line->SetPlaneGeometry(CreatePlane());
     line->BeginPlacement();
-    line->PlaceFigure(P(10, 10));
+    line->SetFromSpan(P(10, 10), P(10, 10));
     CPPUNIT_ASSERT_MESSAGE("Being placed", !line->IsComplete());
 
     line->EndPlacement();
     CPPUNIT_ASSERT(line->IsComplete());
 
-    auto angle = Place<mitk::PlanarAngle>(mitk::PlanarAngle::New(), { P(10, 10), P(20, 20) });
+    auto angle = mitk::PlanarAngle::New();
+    angle->SetPlaneGeometry(CreatePlane());
+    angle->BeginPlacement();
+    angle->SetControlPoints({ P(10, 10), P(20, 20) });
+    CPPUNIT_ASSERT_THROW(angle->EndPlacement(), mitk::Exception);
     CPPUNIT_ASSERT_MESSAGE("Below the minimum number of control points", !angle->IsComplete());
   }
 
@@ -274,7 +275,7 @@ public:
     doubleEllipse->MoveHandle(2, P(50, 60));
     doubleEllipse->SetThickness(5.0);
 
-    CPPUNIT_ASSERT_EQUAL(3u, doubleEllipse->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), doubleEllipse->GetNumberOfControlPoints());
 
     const auto contours = doubleEllipse->GetContours();
 
@@ -291,6 +292,10 @@ public:
     CPPUNIT_ASSERT_THROW(doubleEllipse->SetThickness(-1.0), mitk::Exception);
     CPPUNIT_ASSERT_THROW(doubleEllipse->SetThickness(11.0), mitk::Exception);
 
+    // Without radii there is no maximum to clamp to.
+    auto withoutRadii = mitk::PlanarDoubleEllipse::New();
+    CPPUNIT_ASSERT_THROW(withoutRadii->SetThickness(std::numeric_limits<double>::infinity()), mitk::Exception);
+
     // A thickness of a whole radius leaves no hole.
     doubleEllipse->SetThickness(10.0);
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), doubleEllipse->GetContours().size());
@@ -300,10 +305,9 @@ public:
   {
     auto rectangle = mitk::PlanarRectangle::New();
     rectangle->SetPlaneGeometry(CreatePlane());
-    rectangle->PlaceFigure(P(10, 10));
-    rectangle->SetCurrentControlPoint(P(14, 13));
+    rectangle->SetFromSpan(P(10, 10), P(14, 13));
 
-    CPPUNIT_ASSERT_EQUAL(2u, rectangle->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), rectangle->GetNumberOfControlPoints());
 
     const auto contours = rectangle->GetContours();
 
@@ -358,17 +362,31 @@ public:
     auto contours = polygon->GetContours();
     CPPUNIT_ASSERT(contours[0].Closed);
     CPPUNIT_ASSERT_EQUAL(numberOfCurvePoints, contours[0].Points.size());
-    CPPUNIT_ASSERT_EQUAL(numberOfCurvePoints, polygon->GetPolyLine(0).size());
     CPPUNIT_ASSERT(polygon->GetMeasurement(MeasurementType::Area).has_value());
 
     polygon->BeginPlacement();
     contours = polygon->GetContours();
     CPPUNIT_ASSERT(!contours[0].Closed);
     CPPUNIT_ASSERT(contours[0].Points.back() == P(10, 30));
-    CPPUNIT_ASSERT_EQUAL(contours[0].Points.size(), polygon->GetPolyLine(0).size());
+  }
 
-    polygon->EndPlacement();
-    CPPUNIT_ASSERT_EQUAL(numberOfCurvePoints, polygon->GetPolyLine(0).size());
+  void SubdivisionPolygon_PassesThroughControlPoints()
+  {
+    const std::vector<mitk::Point2D> controlPoints = { P(25, 25), P(75, 25), P(75, 75), P(25, 75) };
+    const auto polygon = Place<mitk::PlanarSubdivisionPolygon>(mitk::PlanarSubdivisionPolygon::New(), controlPoints);
+    const auto curve = polygon->GetContours()[0].Points;
+
+    // Every control point starts a run of 2^rounds curve points.
+    const auto run = std::size_t(1) << mitk::PlanarSubdivisionPolygon::SubdivisionRounds;
+    CPPUNIT_ASSERT_EQUAL(4 * run, curve.size());
+
+    for (std::size_t i = 0; i < controlPoints.size(); ++i)
+      CPPUNIT_ASSERT(curve[i * run] == controlPoints[i]);
+
+    // Points between them, as computed by the previous implementation
+    CPPUNIT_ASSERT(mitk::Equal(curve[10], P(39.624, 19.3268), 1e-3, true));
+    CPPUNIT_ASSERT(mitk::Equal(curve[47], P(81.25, 48.243), 1e-3, true));
+    CPPUNIT_ASSERT(mitk::Equal(curve[67], P(71.2887, 77.5248), 1e-3, true));
   }
 
   void BezierCurve()
@@ -379,7 +397,7 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), contours.size());
     CPPUNIT_ASSERT(!contours[0].Closed);
-    CPPUNIT_ASSERT_EQUAL(std::size_t(curve->GetNumberOfSegments() + 1), contours[0].Points.size());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(mitk::PlanarBezierCurve::NumberOfSegments + 1), contours[0].Points.size());
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), decorations.size());
     CPPUNIT_ASSERT(std::holds_alternative<mitk::PlanarFigure::HelperPolyline>(decorations[0]));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, GetMeasurement(curve, MeasurementType::Length), 1e-6);
@@ -468,8 +486,7 @@ public:
     auto ellipse = mitk::PlanarEllipse::New();
     ellipse->SetPlaneGeometry(CreatePlane());
     ellipse->BeginPlacement();
-    ellipse->PlaceFigure(P(50, 50));
-    ellipse->SetCurrentControlPoint(P(60, 50));
+    ellipse->SetFromSpan(P(50, 50), P(60, 50));
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, GetMeasurement(ellipse, MeasurementType::MajorAxis), Epsilon);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, GetMeasurement(ellipse, MeasurementType::MinorAxis), Epsilon);
@@ -497,6 +514,12 @@ public:
 
     direction.Fill(0.0);
     CPPUNIT_ASSERT_THROW(ellipse->SetReferenceDirection(direction), mitk::Exception);
+
+    direction[0] = std::numeric_limits<double>::quiet_NaN();
+    CPPUNIT_ASSERT_THROW(ellipse->SetReferenceDirection(direction), mitk::Exception);
+
+    direction[0] = std::numeric_limits<double>::infinity();
+    CPPUNIT_ASSERT_THROW(ellipse->SetReferenceDirection(direction), mitk::Exception);
   }
 
   void DoubleEllipse_ThicknessStaysValid()
@@ -522,6 +545,10 @@ public:
     // Shortening the first axis thins the ring.
     ring->MoveHandle(1, P(60, 50));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, ring->GetThickness(), Epsilon);
+
+    // The second axis may then stay longer than the first, so its handle does not jump.
+    ring->MoveHandle(2, P(50, 69.1));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(38.2, GetMeasurement(ring, MeasurementType::MajorAxis), Epsilon);
   }
 
   void Rectangle_StaysAligned()
@@ -587,6 +614,32 @@ public:
     CPPUNIT_ASSERT(cross->GetControlPoint(2) == P(30, 20));
   }
 
+  void CollapsedAxes_PassTheirCheck()
+  {
+    // A collapsed axis is left with a length of rounding noise in any direction,
+    // which the reader takes through SetControlPoints().
+    for (int i = 0; i < 360; ++i)
+    {
+      const auto angle = 0.1 + 0.0137 * i;
+      const auto start = P(0.3, 0.7);
+      const auto end = P(start[0] + 70.0 * std::cos(angle), start[1] + 70.0 * std::sin(angle));
+      const auto middle = start + (end - start) * 0.5;
+
+      auto ellipse = mitk::PlanarEllipse::New();
+      ellipse->SetPlaneGeometry(CreatePlane());
+      ellipse->SetFromSpan(start, end);
+      ellipse->MoveHandle(2, end);
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE("Ellipse", mitk::PlanarEllipse::New()->SetControlPoints(ellipse->GetControlPoints()));
+
+      auto cross = mitk::PlanarCross::New();
+      cross->SetPlaneGeometry(CreatePlane());
+      cross->SetFromSpan(start, end);
+      cross->MoveHandle(2, middle);
+      cross->MoveHandle(3, middle);
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE("Cross", mitk::PlanarCross::New()->SetControlPoints(cross->GetControlPoints()));
+    }
+  }
+
   void Invariants_AreChecked()
   {
     auto ellipse = mitk::PlanarEllipse::New();
@@ -614,10 +667,9 @@ public:
     auto cross = mitk::PlanarCross::New();
     cross->SetPlaneGeometry(CreatePlane());
     cross->BeginPlacement();
-    cross->PlaceFigure(P(10, 20));
-    cross->SetCurrentControlPoint(P(50, 20));
+    cross->SetFromSpan(P(10, 20), P(50, 20));
 
-    CPPUNIT_ASSERT_EQUAL(4u, cross->GetNumberOfControlPoints());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), cross->GetNumberOfControlPoints());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(40.0, GetMeasurement(cross, MeasurementType::LongAxis), Epsilon);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, GetMeasurement(cross, MeasurementType::ShortAxis), Epsilon);
   }

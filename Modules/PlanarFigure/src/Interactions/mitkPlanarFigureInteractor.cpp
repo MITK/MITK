@@ -707,7 +707,7 @@ bool mitk::PlanarFigureInteractor::IsValidPoint(const InteractionEvent *interact
   const auto newPoint = PlanarFigureViewHelpers::ToDisplay(ClampToPlane(plane, *position), plane, renderer);
   const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer);
 
-  for (unsigned int i = 0; i + 1 < numberOfControlPoints; ++i)
+  for (std::size_t i = 0; i + 1 < numberOfControlPoints; ++i)
   {
     const auto placedPoint = PlanarFigureViewHelpers::ToDisplay(figure->GetControlPoint(i), plane, renderer);
 
@@ -845,7 +845,7 @@ void mitk::PlanarFigureInteractor::RemovePoint(StateMachineAction *, Interaction
     return;
 
   SelectUnlessSelected(this->GetDataNode(), figure);
-  figure->RemoveControlPoint(static_cast<unsigned int>(*hit.Handle));
+  figure->RemoveControlPoint(*hit.Handle);
 
   this->SetFeedback(GetHoverFeedback(interactionEvent, std::nullopt), GetRenderWindow(interactionEvent));
   RenderingManager::GetInstance()->RequestUpdateAll();

@@ -22,7 +22,6 @@ set(CPP_FILES
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
   Interactions/mitkPlanarFigureInteractor.cpp
-  Rendering/mitkPlanarFigureMapper2D.cpp
   Rendering/mitkPlanarFigureTessellator.cpp
   Rendering/mitkPlanarFigureVtkMapper2D.cpp
   Rendering/mitkPlanarFigureVtkMapper3D.cpp

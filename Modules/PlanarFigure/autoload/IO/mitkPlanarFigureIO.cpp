@@ -229,10 +229,6 @@ std::vector<mitk::BaseData::Pointer> mitk::PlanarFigureIO::DoRead()
     mitkThrow() << "Invalid planar figure file: " << e.what();
   }
 
-  // The interactor of the previous API takes figures without it for being placed.
-  figure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
-  figure->EvaluateFeatures();
-
   return { figure.GetPointer() };
 }
 

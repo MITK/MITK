@@ -1,13 +1,10 @@
 set(MODULE_TESTS
-  mitkPlanarPolygonTest.cpp
-  mitkPlanarSubdivisionPolygonTest.cpp
   mitkPlanarFigureIOTest.cpp
   mitkPlanarFigureLegacyIOTest.cpp
   mitkPlanarFigureSceneSerializerTest.cpp
   mitkPlanarFigureShapesTest.cpp
   mitkPlanarFigureTest.cpp
   mitkPlanarFigurePropertySerializerTest.cpp
-  mitkPlanarArrowTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

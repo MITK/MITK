@@ -994,10 +994,7 @@ void QmitkMeasurementView::OnDrawPolygonTriggered(bool checked)
   if (!this->BeginDrawAction(d->m_DrawPolygon, checked))
     return;
 
-  auto planarFigure = mitk::PlanarPolygon::New();
-  planarFigure->ClosedOn();
-
-  this->AddFigureToDataStorage(planarFigure, "Polygon", d->m_PolygonCounter);
+  this->AddFigureToDataStorage(mitk::PlanarPolygon::New(), "Polygon", d->m_PolygonCounter);
 
   d->m_HintLabel->show();
 }

@@ -53,47 +53,39 @@ namespace mitk
     /** \brief Moves a handle while both axes stay perpendicular. */
     void MoveHandle(std::size_t index, const Point2D &position) override;
 
-    /** \brief Places the ellipse while it is being placed and moves handles otherwise. */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
+    /** \brief Returns true. */
+    bool IsClosed() const override;
 
     /** \brief Returns 3. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 3; }
 
     /** \brief Returns 3. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 3; }
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 3; }
 
     /**
      * \brief Optional unit direction in the plane that does not affect the shape.
      *
      * Fiberfox fiducials use it to twist fiber bundles. It has no handle and
-     * keeps its direction when the ellipse is edited.
+     * keeps its direction when the ellipse is edited. Without one, consumers
+     * use (1, 0), as fiducials of previous versions did when their fourth
+     * point was never moved.
      */
     std::optional<Vector2D> GetReferenceDirection() const;
 
-    /** \brief Sets the reference direction, normalized; throws on a zero vector. */
+    /** \brief Sets the reference direction, normalized; throws on a zero or non-finite vector. */
     void SetReferenceDirection(const std::optional<Vector2D> &direction);
 
-    bool Equals(const mitk::PlanarFigure &other) const override;
-
-    /** \brief Feature identifier for the length of the first axis. */
-    const unsigned int FEATURE_ID_MAJOR_AXIS;
-    /** \brief Feature identifier for the length of the second axis. */
-    const unsigned int FEATURE_ID_MINOR_AXIS;
-    /** \brief Feature identifier for the ellipse area. */
-    const unsigned int FEATURE_ID_AREA;
-
   protected:
-    PlanarEllipse();
-    PlanarEllipse(const Self &other);
+    PlanarEllipse() = default;
+    PlanarEllipse(const Self &other) = default;
 
     mitkCloneMacro(Self);
 
     /** \brief Additionally requires perpendicular axes. */
     void CheckControlPoints(const std::vector<Point2D> &points) const override;
 
-    void GeneratePolyLine() override;
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-    void EvaluateFeaturesInternal() override;
+    /** \brief Compares the reference directions. */
+    bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const override;
 
   private:
     std::optional<Vector2D> m_ReferenceDirection;

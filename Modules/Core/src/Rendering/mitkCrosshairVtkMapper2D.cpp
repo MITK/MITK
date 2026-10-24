@@ -98,7 +98,7 @@ void mitk::CrosshairVtkMapper2D::SetDefaultProperties(DataNode* node,
 {
   CoreServicePointer<IPropertyAliases> aliases(CoreServices::GetPropertyAliases());
   node->AddProperty("Line width", FloatProperty::New(1), renderer, overwrite);
-  aliases->AddAlias("line width", "Crosshair.Line Width", "");
+  aliases->AddAlias("Line width", "Crosshair.Line Width", "CrosshairData");
   node->AddProperty("Crosshair.Gap Size", IntProperty::New(32), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

@@ -40,6 +40,21 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Returns "bezier_curve". */
+    std::string GetTypeId() const override;
+
+    /** \brief The sampled curve as an open outline. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief The control polygon, once there are more than two control points. */
+    std::vector<Decoration> GetDecorations() const override;
+
+    /** \brief Length of the curve. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed point by point. */
+    PlacementKind GetPlacementKind() const override;
+
       /**
        * \brief Returns the number of line segments used to approximate the curve.
        * \return The current number of segments.

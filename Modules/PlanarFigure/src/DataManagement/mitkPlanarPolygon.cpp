@@ -14,6 +14,8 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 // stl related includes
 #include <algorithm>
 
@@ -26,7 +28,6 @@ mitk::PlanarPolygon::PlanarPolygon()
 
   // Polygon is closed by default
   this->SetProperty("closed", mitk::BoolProperty::New(true));
-  this->SetProperty("subdivision", mitk::BoolProperty::New(false));
 }
 
 mitk::PlanarPolygon::PlanarPolygon(const Self& other)
@@ -152,6 +153,58 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     SetQuantity(FEATURE_ID_AREA, 0);
     this->DeactivateFeature(FEATURE_ID_AREA);
   }
+}
+
+std::string mitk::PlanarPolygon::GetTypeId() const
+{
+  return this->IsClosed() ? "polygon" : "path";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarPolygon::GetContours() const
+{
+  Contour contour{ ContourRole::Outline, false, {} };
+
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    contour.Points.push_back(this->GetControlPoint(i));
+
+  if (contour.Points.size() < 2)
+    return {};
+
+  contour.Closed = this->IsClosed() && contour.Points.size() > 2;
+
+  return { contour };
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarPolygon::GetMeasurements() const
+{
+  const auto contours = this->GetContours();
+
+  if (contours.empty())
+    return {};
+
+  const auto *plane = this->GetPlaneGeometry();
+  const auto &points = contours.front().Points;
+
+  if (!this->IsClosed())
+    return { { MeasurementType::Length, PlanarFigureGeometryHelpers::GetLength(plane, points, false) } };
+
+  std::vector<Measurement> measurements{
+    { MeasurementType::Circumference, PlanarFigureGeometryHelpers::GetLength(plane, points, true) } };
+
+  if (points.size() > 2 && !PlanarFigureGeometryHelpers::IsSelfIntersecting(points))
+    measurements.push_back({ MeasurementType::Area, PlanarFigureGeometryHelpers::GetArea(plane, points) });
+
+  return measurements;
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarPolygon::GetPlacementKind() const
+{
+  return PlacementKind::Sequence;
+}
+
+bool mitk::PlanarPolygon::CanInsertControlPoints() const
+{
+  return true;
 }
 
 void mitk::PlanarPolygon::PrintSelf(std::ostream &os, itk::Indent indent) const

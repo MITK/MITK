@@ -11,278 +11,70 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarEllipse.h>
-#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 #include <algorithm>
+#include <numbers>
 
 mitk::PlanarEllipse::PlanarEllipse()
   : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
     FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
-    FEATURE_ID_AREA(Superclass::AddFeature("Area", "mm2")),
-    m_MinRadius(0),
-    m_MaxRadius(100),
-    m_MinMaxRadiusContraintsActive(false),
-    m_TreatAsCircle(true)
+    FEATURE_ID_AREA(Superclass::AddFeature("Area", "mm2"))
 {
-  // Ellipse has three control points
-  this->ResetNumberOfControlPoints(4);
-  this->SetNumberOfPolyLines(2);
+  this->ResetNumberOfControlPoints(3);
+  this->SetNumberOfPolyLines(1);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
 
-mitk::PlanarEllipse::PlanarEllipse(const Self& other)
+mitk::PlanarEllipse::PlanarEllipse(const Self &other)
   : PlanarFigure(other),
     FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
     FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
     FEATURE_ID_AREA(other.FEATURE_ID_AREA),
-    m_MinRadius(other.m_MinRadius),
-    m_MaxRadius(other.m_MaxRadius),
-    m_MinMaxRadiusContraintsActive(other.m_MinMaxRadiusContraintsActive),
-    m_TreatAsCircle(other.m_TreatAsCircle)
+    m_ReferenceDirection(other.m_ReferenceDirection)
 {
 }
 
 bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
 {
-  if (index == 0) // moving center point and control points accordingly
+  if (this->GetNumberOfControlPoints() < 3 || index > 2)
+    return Superclass::SetControlPoint(index, point, createIfDoesNotExist);
+
+  if (this->IsBeingPlaced() && 1 == index)
   {
-    const Point2D &centerPoint = GetControlPoint(0);
-    Point2D boundaryPoint1 = GetControlPoint(1);
-    Point2D boundaryPoint2 = GetControlPoint(2);
-    Point2D boundaryPoint3 = GetControlPoint(3);
-    const vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
-
-    boundaryPoint1[0] += vec[0];
-    boundaryPoint1[1] += vec[1];
-    boundaryPoint2[0] += vec[0];
-    boundaryPoint2[1] += vec[1];
-    boundaryPoint3[0] += vec[0];
-    boundaryPoint3[1] += vec[1];
-    PlanarFigure::SetControlPoint(0, point, createIfDoesNotExist);
-    PlanarFigure::SetControlPoint(1, boundaryPoint1, createIfDoesNotExist);
-    PlanarFigure::SetControlPoint(2, boundaryPoint2, createIfDoesNotExist);
-    PlanarFigure::SetControlPoint(3, boundaryPoint3, createIfDoesNotExist);
-    return true;
+    this->SetFromSpan(this->GetControlPoint(0), point);
   }
-  else if (index < 3)
+  else
   {
-    PlanarFigure::SetControlPoint(index, point, createIfDoesNotExist);
-    int otherIndex = index + 1;
-    if (otherIndex > 2)
-      otherIndex = 1;
-
-    const Point2D centerPoint = GetControlPoint(0);
-    Point2D otherPoint = GetControlPoint(otherIndex);
-    Point2D point3 = GetControlPoint(3);
-
-    const Vector2D vec1 = point - centerPoint;
-    Vector2D vec2;
-
-    if (index == 1 && m_TreatAsCircle)
-    {
-      const float x = vec1[0];
-      vec2[0] = vec1[1];
-      vec2[1] = x;
-
-      if (index == 1)
-        vec2[0] *= -1;
-      else
-        vec2[1] *= -1;
-
-      otherPoint = centerPoint + vec2;
-      PlanarFigure::SetControlPoint(otherIndex, otherPoint, createIfDoesNotExist);
-      const float r = centerPoint.EuclideanDistanceTo(otherPoint);
-
-      // adjust additional third control point
-      const Point2D p3 = this->GetControlPoint(3);
-      Vector2D vec3;
-      vec3[0] = p3[0] - centerPoint[0];
-      vec3[1] = p3[1] - centerPoint[1];
-      if (vec3[0] != 0 || vec3[1] != 0)
-      {
-        vec3.Normalize();
-        vec3 *= r;
-      }
-      else
-      {
-        vec3[0] = r;
-        vec3[1] = 0;
-      }
-      point3 = centerPoint + vec3;
-      PlanarFigure::SetControlPoint(3, point3, createIfDoesNotExist);
-    }
-    else if (vec1.GetNorm() > 0)
-    {
-      const float r = centerPoint.EuclideanDistanceTo(otherPoint);
-      const float x = vec1[0];
-      vec2[0] = vec1[1];
-      vec2[1] = x;
-
-      if (index == 1)
-        vec2[0] *= -1;
-      else
-        vec2[1] *= -1;
-
-      vec2.Normalize();
-      vec2 *= r;
-
-      if (vec2.GetNorm() > 0)
-      {
-        otherPoint = centerPoint + vec2;
-        PlanarFigure::SetControlPoint(otherIndex, otherPoint, createIfDoesNotExist);
-      }
-
-      // adjust third control point
-      Vector2D vec3 = point3 - centerPoint;
-      vec3.Normalize();
-      const double r1 = centerPoint.EuclideanDistanceTo(GetControlPoint(1));
-      const double r2 = centerPoint.EuclideanDistanceTo(GetControlPoint(2));
-      const Point2D newPoint = centerPoint + vec3 * std::max(r1, r2);
-      PlanarFigure::SetControlPoint(3, newPoint, createIfDoesNotExist);
-
-      m_TreatAsCircle = false;
-    }
-    return true;
+    this->MoveHandle(index, point);
   }
-  else if (index == 3)
-  {
-    const Point2D centerPoint = GetControlPoint(0);
-    Vector2D vec3 = point - centerPoint;
-    vec3.Normalize();
-    const double r1 = centerPoint.EuclideanDistanceTo(GetControlPoint(1));
-    const double r2 = centerPoint.EuclideanDistanceTo(GetControlPoint(2));
-    const Point2D newPoint = centerPoint + vec3 * std::max(r1, r2);
-    PlanarFigure::SetControlPoint(index, newPoint, createIfDoesNotExist);
-    m_TreatAsCircle = false;
-    return true;
-  }
-  return false;
+
+  return true;
 }
 
-void mitk::PlanarEllipse::PlaceFigure(const mitk::Point2D &point)
+void mitk::PlanarEllipse::CheckControlPoints(const std::vector<Point2D> &points) const
 {
-  PlanarFigure::PlaceFigure(point);
-  m_SelectedControlPoint = 1;
-}
+  Superclass::CheckControlPoints(points);
 
-mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
-{
-  if (this->GetPlaneGeometry() == nullptr)
-  {
-    return point;
-  }
-
-  Point2D indexPoint;
-  this->GetPlaneGeometry()->WorldToIndex(point, indexPoint);
-
-  BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
-  if (indexPoint[0] < bounds[0])
-  {
-    indexPoint[0] = bounds[0];
-  }
-  if (indexPoint[0] > bounds[1])
-  {
-    indexPoint[0] = bounds[1];
-  }
-  if (indexPoint[1] < bounds[2])
-  {
-    indexPoint[1] = bounds[2];
-  }
-  if (indexPoint[1] > bounds[3])
-  {
-    indexPoint[1] = bounds[3];
-  }
-
-  Point2D constrainedPoint;
-  this->GetPlaneGeometry()->IndexToWorld(indexPoint, constrainedPoint);
-
-  if (m_MinMaxRadiusContraintsActive)
-  {
-    if (index != 0)
-    {
-      const Point2D &centerPoint = this->GetControlPoint(0);
-      const double euclideanDinstanceFromCenterToPoint1 = centerPoint.EuclideanDistanceTo(point);
-
-      Vector2D vectorProjectedPoint = point - centerPoint;
-      vectorProjectedPoint.Normalize();
-
-      if (euclideanDinstanceFromCenterToPoint1 > m_MaxRadius)
-      {
-        vectorProjectedPoint *= m_MaxRadius;
-        constrainedPoint = centerPoint;
-        constrainedPoint += vectorProjectedPoint;
-      }
-      else if (euclideanDinstanceFromCenterToPoint1 < m_MinRadius)
-      {
-        vectorProjectedPoint *= m_MinRadius;
-        constrainedPoint = centerPoint;
-        constrainedPoint += vectorProjectedPoint;
-      }
-    }
-  }
-
-  return constrainedPoint;
+  if (points.size() == 3 && !PlanarFigureGeometryHelpers::ArePerpendicular(points[1] - points[0], points[2] - points[0]))
+    mitkThrow() << "The axes of an ellipse must be perpendicular.";
 }
 
 void mitk::PlanarEllipse::GeneratePolyLine()
 {
-  // clear the PolyLine-Contrainer, it will be reconstructed soon enough...
   this->ClearPolyLines();
 
-  const Point2D &centerPoint = GetControlPoint(0);
-  const Point2D &boundaryPoint1 = GetControlPoint(1);
-  const Point2D &boundaryPoint2 = GetControlPoint(2);
-
-  Vector2D dir = boundaryPoint1 - centerPoint;
-  dir.Normalize();
-  vnl_matrix_fixed<float, 2, 2> rot;
-
-  // differentiate between clockwise and counterclockwise rotation
-  int start = 0;
-  int end = 64;
-  if (dir[1] < 0)
+  for (const auto &contour : this->GetContours())
   {
-    dir[0] = -dir[0];
-    start = -32;
-    end = 32;
+    for (const auto &point : contour.Points)
+      this->AppendPointToPolyLine(0, point);
   }
-  // construct rotation matrix to align ellipse with control point vector
-  rot[0][0] = dir[0];
-  rot[1][1] = rot[0][0];
-  rot[1][0] = sin(acos(rot[0][0]));
-  rot[0][1] = -rot[1][0];
-
-  const double radius1 = centerPoint.EuclideanDistanceTo(boundaryPoint1);
-  const double radius2 = centerPoint.EuclideanDistanceTo(boundaryPoint2);
-
-  // Generate poly-line with 64 segments
-  for (int t = start; t < end; ++t)
-  {
-    const double alpha = (double)t * vnl_math::pi / 32.0;
-
-    // construct the new polyline point ...
-    vnl_vector_fixed<float, 2> vec;
-    vec[0] = radius1 * cos(alpha);
-    vec[1] = radius2 * sin(alpha);
-    vec = rot * vec;
-
-    Point2D polyLinePoint;
-    polyLinePoint[0] = centerPoint[0] + vec[0];
-    polyLinePoint[1] = centerPoint[1] + vec[1];
-
-    // ... and append it to the PolyLine.
-    // No extending supported here, so we can set the index of the PolyLineElement to '0'
-    this->AppendPointToPolyLine(0, polyLinePoint);
-  }
-
-  this->AppendPointToPolyLine(1, centerPoint);
-  this->AppendPointToPolyLine(1, this->GetControlPoint(3));
 }
 
-void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
+void mitk::PlanarEllipse::GenerateHelperPolyLine(double, unsigned int)
 {
-  // A circle does not require a helper object
 }
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
@@ -297,23 +89,136 @@ void mitk::PlanarEllipse::EvaluateFeaturesInternal()
   this->SetQuantity(FEATURE_ID_AREA, longAxisLength * shortAxisLength * itk::Math::pi);
 }
 
-void mitk::PlanarEllipse::PrintSelf(std::ostream &os, itk::Indent indent) const
+std::string mitk::PlanarEllipse::GetTypeId() const
 {
-  Superclass::PrintSelf(os, indent);
+  return "ellipse";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarEllipse::GetContours() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
+
+  const auto center = this->GetControlPoint(0);
+  const auto firstAxisEnd = this->GetControlPoint(1);
+  const auto firstRadius = center.EuclideanDistanceTo(firstAxisEnd);
+  const auto secondRadius = center.EuclideanDistanceTo(this->GetControlPoint(2));
+
+  return { { ContourRole::Outline, true,
+    PlanarFigureGeometryHelpers::SampleEllipse(center, firstAxisEnd - center, firstRadius, secondRadius) } };
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarEllipse::GetMeasurements() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
+
+  const auto *plane = this->GetPlaneGeometry();
+  const auto center = this->GetControlPoint(0);
+  const auto firstRadius = PlanarFigureGeometryHelpers::GetDistance(plane, center, this->GetControlPoint(1));
+  const auto secondRadius = PlanarFigureGeometryHelpers::GetDistance(plane, center, this->GetControlPoint(2));
+
+  return {
+    { MeasurementType::MajorAxis, 2.0 * std::max(firstRadius, secondRadius) },
+    { MeasurementType::MinorAxis, 2.0 * std::min(firstRadius, secondRadius) },
+    { MeasurementType::Area, std::numbers::pi * firstRadius * secondRadius }
+  };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarEllipse::GetPlacementKind() const
+{
+  return PlacementKind::Span;
+}
+
+void mitk::PlanarEllipse::SetFromSpan(const Point2D &start, const Point2D &end)
+{
+  const auto radius = start.EuclideanDistanceTo(end);
+  const auto direction = PlanarFigureGeometryHelpers::GetDirection(start, end);
+
+  this->AssignControlPoints({ start, end, start + PlanarFigureGeometryHelpers::GetPerpendicular(direction) * radius });
+}
+
+std::vector<mitk::PlanarFigure::Handle> mitk::PlanarEllipse::GetHandles() const
+{
+  const auto points = this->GetControlPoints();
+
+  if (points.size() < 3)
+    return Superclass::GetHandles();
+
+  return { { HandleRole::Center, points[0] }, { HandleRole::Extent, points[1] }, { HandleRole::Extent, points[2] } };
+}
+
+void mitk::PlanarEllipse::MoveHandle(std::size_t index, const Point2D &position)
+{
+  auto points = this->GetControlPoints();
+
+  if (index > 2 || index >= points.size())
+    mitkThrow() << "Handle index " << index << " is out of range.";
+
+  const auto center = points[0];
+
+  if (0 == index)
+  {
+    this->Translate(position - center);
+    return;
+  }
+
+  if (points.size() < 3)
+  {
+    this->ReplaceControlPoint(index, position);
+    return;
+  }
+
+  if (1 == index)
+  {
+    // The second axis turns with the first one and keeps its side and length.
+    const auto previousNormal = PlanarFigureGeometryHelpers::GetPerpendicular(PlanarFigureGeometryHelpers::GetDirection(center, points[1]));
+    const auto side = (points[2] - center) * previousNormal < 0.0 ? -1.0 : 1.0;
+    const auto secondRadius = center.EuclideanDistanceTo(points[2]);
+    const auto normal = PlanarFigureGeometryHelpers::GetPerpendicular(PlanarFigureGeometryHelpers::GetDirection(center, position));
+
+    points[1] = position;
+    points[2] = center + normal * (side * secondRadius);
+  }
+  else
+  {
+    const auto normal = PlanarFigureGeometryHelpers::GetPerpendicular(PlanarFigureGeometryHelpers::GetDirection(center, points[1]));
+    points[2] = center + normal * ((position - center) * normal);
+  }
+
+  this->AssignControlPoints(points);
+}
+
+std::optional<mitk::Vector2D> mitk::PlanarEllipse::GetReferenceDirection() const
+{
+  return m_ReferenceDirection;
+}
+
+void mitk::PlanarEllipse::SetReferenceDirection(const std::optional<Vector2D> &direction)
+{
+  if (direction.has_value() && direction->GetNorm() <= 0.0)
+    mitkThrow() << "The reference direction of an ellipse must not be a zero vector.";
+
+  m_ReferenceDirection = direction;
+
+  if (m_ReferenceDirection.has_value())
+    m_ReferenceDirection->Normalize();
+
+  this->Modified();
 }
 
 bool mitk::PlanarEllipse::Equals(const mitk::PlanarFigure &other) const
 {
   const auto *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
-  if (otherEllipse)
-  {
-    if (this->m_TreatAsCircle != otherEllipse->m_TreatAsCircle)
-      return false;
 
-    return Superclass::Equals(other);
-  }
-  else
-  {
+  if (nullptr == otherEllipse)
     return false;
-  }
+
+  if (m_ReferenceDirection.has_value() != otherEllipse->m_ReferenceDirection.has_value())
+    return false;
+
+  if (m_ReferenceDirection.has_value() && (*m_ReferenceDirection - *otherEllipse->m_ReferenceDirection).GetNorm() > mitk::eps)
+    return false;
+
+  return Superclass::Equals(other);
 }

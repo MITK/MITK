@@ -11,7 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkIOUtil.h>
-#include <mitkPlanarFigure.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlaneGeometry.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -23,7 +24,8 @@ namespace
   /* Every planar figure file of MITK-Data as read by the XML reader of file
    * format version 1 before the redesign of planar figures: world control
    * points after the reader replayed the figure constraints, and the active
-   * measurements in feature order.
+   * measurements in feature order. Polygons that are not closed are read as
+   * paths since.
    */
   struct LegacyFigure
   {
@@ -104,7 +106,7 @@ namespace
     {"InteractionTestData/ReferenceData/Line.pf", "PlanarLine", false,
       {{72.5374639769, 86.1858789625, 72}, {185.413544669, 171.027377522, 72}},
       {{"Length", 141.205840779}}},
-    {"InteractionTestData/ReferenceData/Path.pf", "PlanarPolygon", false,
+    {"InteractionTestData/ReferenceData/Path.pf", "PlanarPath", false,
       {{137.594637224, 189.6829653, 72}, {102.061514196, 202.604100946, 72}, {47.1466876972, 174.339116719, 72}, {43.9164037855, 171.108832808, 72}, {30.1876971609, 128.307570978, 72}, {42.3012618297, 75.0078864353, 72}, {47.9542586751, 67.7397476341, 72}, {87.5252365931, 45.9353312303, 72}, {103.676656151, 44.3201892744, 72}, {149.708201893, 44.3201892744, 72}, {167.474763407, 48.358044164, 72}, {205.430599369, 66.9321766562, 72}, {215.121451104, 77.4305993691, 72}, {229.657728707, 134.768138801, 72}, {226.427444795, 146.074132492, 72}, {191.701892744, 183.222397476, 72}, {184.433753943, 184.837539432, 72}, {148.900630915, 188.875394322, 72}, {154.55362776, 151.727129338, 72}},
       {{"Length", 597.708097081}}},
     {"InteractionTestData/ReferenceData/Planar4PointAngle.pf", "PlanarFourPointAngle", false,
@@ -125,7 +127,7 @@ namespace
     {"RenderingTestData/PlanarFigures/Line1.pf", "PlanarLine", false,
       {{307.589, 153.901, 0}, {307.589, 206.64, 0}},
       {{"Length", 52.739}}},
-    {"RenderingTestData/PlanarFigures/Path1.pf", "PlanarPolygon", false,
+    {"RenderingTestData/PlanarFigures/Path1.pf", "PlanarPath", false,
       {{102.796, 306.639, 0}, {102.453, 256.64, 0}, {156.22, 256.64, 0}, {156.22, 306.639, 0}, {205.192, 306.639, 0}},
       {{"Length", 202.7381765}}},
     {"RenderingTestData/PlanarFigures/Polygon1.pf", "PlanarPolygon", true,
@@ -138,6 +140,54 @@ namespace
 
   // The golden values carry 12 significant digits.
   constexpr double Epsilon = 1e-6;
+
+  /* Rectangles keep two opposite corners since: corners 1 and 3, where the
+   * placement started and ended. Ellipses and double ellipses keep the
+   * center and the ends of both outer axes; the fourth point only gives the
+   * reference direction or the thickness.
+   */
+  std::vector<std::array<double, 3>> GetExpectedWorldControlPoints(const LegacyFigure &figure)
+  {
+    if (figure.ClassName == "PlanarRectangle")
+      return { figure.WorldControlPoints[1], figure.WorldControlPoints[3] };
+
+    if (figure.ClassName == "PlanarEllipse" || figure.ClassName == "PlanarDoubleEllipse")
+      return { figure.WorldControlPoints[0], figure.WorldControlPoints[1], figure.WorldControlPoints[2] };
+
+    return figure.WorldControlPoints;
+  }
+
+  mitk::Point2D MapToPlane(const mitk::PlanarFigure *figure, const std::array<double, 3> &worldPoint)
+  {
+    mitk::Point3D point;
+    point[0] = worldPoint[0];
+    point[1] = worldPoint[1];
+    point[2] = worldPoint[2];
+
+    mitk::Point2D planePoint;
+    figure->GetPlaneGeometry()->Map(point, planePoint);
+    return planePoint;
+  }
+
+  /* The measurements of the current API equal the features above, except
+   * that the major axis of an ellipse is the longer one. The features named
+   * the axis of control point 1 the major axis, whatever its length.
+   */
+  std::vector<std::pair<std::string, double>> GetExpectedMeasurements(const LegacyFigure &figure)
+  {
+    auto measurements = figure.Measurements;
+
+    if (figure.ClassName == "PlanarEllipse" || figure.ClassName == "PlanarDoubleEllipse")
+    {
+      auto &majorAxis = measurements[0].second;
+      auto &minorAxis = measurements[1].second;
+
+      if (majorAxis < minorAxis)
+        std::swap(majorAxis, minorAxis);
+    }
+
+    return measurements;
+  }
 }
 
 class mitkPlanarFigureLegacyIOTestSuite : public mitk::TestFixture
@@ -161,14 +211,27 @@ public:
       CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.ClassName, std::string(figure->GetNameOfClass()));
       CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.Closed, figure->IsClosed());
 
-      CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.WorldControlPoints.size(), static_cast<std::size_t>(figure->GetNumberOfControlPoints()));
+      const auto expectedWorldControlPoints = GetExpectedWorldControlPoints(expected);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expectedWorldControlPoints.size(), static_cast<std::size_t>(figure->GetNumberOfControlPoints()));
 
-      for (unsigned int i = 0; i < expected.WorldControlPoints.size(); ++i)
+      for (unsigned int i = 0; i < expectedWorldControlPoints.size(); ++i)
       {
         const auto point = figure->GetWorldControlPoint(i);
 
         for (unsigned int j = 0; j < 3; ++j)
-          CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expected.WorldControlPoints[i][j], point[j], Epsilon);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expectedWorldControlPoints[i][j], point[j], Epsilon);
+      }
+
+      if (expected.ClassName == "PlanarEllipse")
+      {
+        const auto direction = static_cast<const mitk::PlanarEllipse *>(figure)->GetReferenceDirection();
+        CPPUNIT_ASSERT_MESSAGE(expected.File, direction.has_value());
+
+        auto expectedDirection = MapToPlane(figure, expected.WorldControlPoints[3]) - MapToPlane(figure, expected.WorldControlPoints[0]);
+        expectedDirection.Normalize();
+
+        for (unsigned int j = 0; j < 2; ++j)
+          CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expectedDirection[j], (*direction)[j], Epsilon);
       }
 
       figure->EvaluateFeatures();
@@ -187,6 +250,18 @@ public:
       {
         CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expected.Measurements[i].first, measurements[i].first);
         CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expected.Measurements[i].second, measurements[i].second, Epsilon);
+      }
+
+      const auto expectedMeasurements = GetExpectedMeasurements(expected);
+      const auto currentMeasurements = figure->GetMeasurements();
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expectedMeasurements.size(), currentMeasurements.size());
+
+      for (std::size_t i = 0; i < currentMeasurements.size(); ++i)
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(expected.File, expectedMeasurements[i].first,
+          mitk::PlanarFigure::GetDisplayName(currentMeasurements[i].Type));
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(expected.File, expectedMeasurements[i].second, currentMeasurements[i].Value, Epsilon);
       }
     }
   }

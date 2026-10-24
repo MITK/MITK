@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkPlanarBezierCurve.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarFigure.h>
-#include <mitkPlanarPolygon.h>
 
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
@@ -154,8 +153,21 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
   GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", !hidecontrolpointsduringinteraction);
   // interactionEvent->GetSender()->GetDataStorage()->BlockNodeModifiedEvents( false );
 
-  // Move current control point to this point
-  planarFigure->SetCurrentControlPoint(point2D);
+  // Placement moves control points, editing moves handles. A figure of locked
+  // shape keeps its place until the placement ends and moves by its center only.
+  const auto selectedHandle = planarFigure->GetSelectedControlPoint();
+  const auto handles = planarFigure->GetHandles();
+
+  if (planarFigure->IsBeingPlaced())
+  {
+    if (!planarFigure->IsShapeLocked())
+      planarFigure->SetCurrentControlPoint(point2D);
+  }
+  else if (selectedHandle >= 0 && static_cast<std::size_t>(selectedHandle) < handles.size())
+  {
+    if (!planarFigure->IsShapeLocked() || PlanarFigure::HandleRole::Center == handles[selectedHandle].Role)
+      planarFigure->MoveHandle(selectedHandle, point2D);
+  }
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();
@@ -174,7 +186,8 @@ void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, Interact
     return;
   }
 
-  planarFigure->Modified();
+  // Ended first, so that removing the floating point keeps the minimum number of control points.
+  planarFigure->EndPlacement();
   planarFigure->DeselectControlPoint();
   planarFigure->RemoveLastControlPoint();
   planarFigure->SetProperty("initiallyplaced", mitk::BoolProperty::New(true));
@@ -409,13 +422,13 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction *, InteractionEve
   int nextIndex = -1;
 
   // We only need to check which position to insert the control point
-  // when interacting with a PlanarPolygon. For all other types
-  // new control points will always be appended
+  // when interacting with a figure whose vertices are its control points.
+  // For all other types new control points will always be appended
 
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
-  if (dynamic_cast<mitk::PlanarPolygon *>(planarFigure) && isFigureFinished)
+  if (planarFigure->CanInsertControlPoints() && isFigureFinished)
   {
     nextIndex =
       this->IsPositionOverFigure(positionEvent, planarFigure, planarFigureGeometry, projectionPlane, projectedPoint);
@@ -484,8 +497,17 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
     return;
   }
 
-  // Place PlanarFigure at this point
-  planarFigure->PlaceFigure(point2D);
+  // Place PlanarFigure at this point. A preset of locked shape is moved there.
+  planarFigure->BeginPlacement();
+
+  if (planarFigure->IsShapeLocked() && planarFigure->GetNumberOfControlPoints() > 0)
+  {
+    planarFigure->Translate(point2D - planarFigure->GetControlPoint(0));
+  }
+  else
+  {
+    planarFigure->PlaceFigure(point2D);
+  }
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();
@@ -992,15 +1014,15 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(const InteractionPositi
 
   const mitk::Point2D displayPosition = positionEvent->GetPointerPositionOnScreen();
 
-  // Iterate over all control points of planar figure, and check if
+  // Iterate over all handles of planar figure, and check if
   // any one is close to the current display position
   mitk::Point2D displayControlPoint;
 
-  const int numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
-  for (int i = 0; i < numberOfControlPoints; i++)
+  const auto handles = planarFigure->GetHandles();
+  for (int i = 0; i < static_cast<int>(handles.size()); i++)
   {
     if (this->TransformObjectToDisplay(
-          planarFigure->GetControlPoint(i), displayControlPoint, planarFigureGeometry, rendererGeometry, renderer))
+          handles[i].Position, displayControlPoint, planarFigureGeometry, rendererGeometry, renderer))
     {
       // TODO: variable size of markers
       if (displayPosition.SquaredEuclideanDistanceTo(displayControlPoint) < 20.0)

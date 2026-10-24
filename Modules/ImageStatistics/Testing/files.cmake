@@ -9,6 +9,7 @@ set(MODULE_TESTS
   mitkImageStatisticsContainerTest.cpp
   mitkImageStatisticsContainerManagerTest.cpp
   mitkMinMaxLabelImageFilterWithIndexTest.cpp
+  mitkPlanarFigureMaskGeneratorTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

@@ -174,9 +174,9 @@ public:
   {
   }
 
-  void operator()(const PlanarFigure::PolyLineElement& polyLineElement)
+  void operator()(const Point2D& point)
   {
-    m_PlanarFigureGeometry->Map(polyLineElement, m_WorldPoint);
+    m_PlanarFigureGeometry->Map(point, m_WorldPoint);
     m_ImageGeometry->WorldToIndex(m_WorldPoint, m_ContinuousIndexPoint);
     m_Vertex.CastFrom(m_ContinuousIndexPoint);
     m_Path->AddVertex(m_Vertex);
@@ -192,12 +192,20 @@ private:
   itk::PolyLineParametricPath<3>::ContinuousIndexType m_Vertex;
 };
 
-static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(BaseGeometry* imageGeometry, PlanarFigure* planarFigure)
+static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(const BaseGeometry* imageGeometry, const PlanarFigure* planarFigure)
 {
-  itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
-  const auto& polyLine = planarFigure->GetPolyLine(0);
+  if (nullptr == planarFigure)
+    mitkThrow() << "Cannot compute an intensity profile without a planar figure.";
 
-  std::for_each(polyLine.begin(), polyLine.end(),
+  const auto contours = planarFigure->GetContours();
+
+  if (contours.empty())
+    mitkThrow() << "Cannot compute an intensity profile along a planar figure without an outline.";
+
+  itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
+  const auto& outline = contours.front().Points;
+
+  std::for_each(outline.begin(), outline.end(),
     AddPolyLineElementToPath(planarFigure->GetPlaneGeometry(), imageGeometry, path));
 
   return path;
@@ -224,14 +232,14 @@ static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPoints(BaseGeometry
   return path;
 }
 
-IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure)
+IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, const PlanarFigure* planarFigure)
 {
   return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarFigure));
 }
 
-IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
+IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, const PlanarFigure* planarFigure, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
 {
-  return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarLine.GetPointer()), numSamples, interpolator);
+  return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarFigure), numSamples, interpolator);
 }
 
 IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)

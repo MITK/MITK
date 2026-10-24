@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkPlanarAngle.h>
 #include <mitkPlaneGeometry.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 mitk::PlanarAngle::PlanarAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
   // Start with two control points
@@ -154,6 +156,49 @@ void mitk::PlanarAngle::EvaluateFeaturesInternal()
   double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
+}
+
+std::string mitk::PlanarAngle::GetTypeId() const
+{
+  return "angle";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarAngle::GetContours() const
+{
+  Contour contour{ ContourRole::Outline, false, {} };
+
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    contour.Points.push_back(this->GetControlPoint(i));
+
+  if (contour.Points.size() < 2)
+    return {};
+
+  return { contour };
+}
+
+std::vector<mitk::PlanarFigure::Decoration> mitk::PlanarAngle::GetDecorations() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
+
+  return { AngleArc{ this->GetControlPoint(1), this->GetControlPoint(0), this->GetControlPoint(2) } };
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarAngle::GetMeasurements() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
+
+  const auto &vertex = this->GetControlPoint(1);
+  const auto angle = PlanarFigureGeometryHelpers::GetAngle(
+    this->GetPlaneGeometry(), this->GetControlPoint(0), vertex, this->GetControlPoint(2), vertex);
+
+  return { { MeasurementType::Angle, angle } };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarAngle::GetPlacementKind() const
+{
+  return PlacementKind::Sequence;
 }
 
 void mitk::PlanarAngle::PrintSelf(std::ostream &os, itk::Indent indent) const

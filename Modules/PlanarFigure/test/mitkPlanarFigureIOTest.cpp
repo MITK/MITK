@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkPlanarCross.h>
 #include <mitkPlanarFourPointAngle.h>
 #include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkPlanarSubdivisionPolygon.h>
@@ -79,12 +80,9 @@ public:
 
     // Create PlanarCross
     mitk::PlanarCross::Pointer planarCross = mitk::PlanarCross::New();
-    planarCross->SetSingleLineMode(false);
     planarCross->SetPlaneGeometry(planeGeometry);
-    planarCross->PlaceFigure(p0);
-    planarCross->SetCurrentControlPoint(p1);
-    planarCross->AddControlPoint(p2);
-    planarCross->AddControlPoint(p3);
+    planarCross->SetFromSpan(p0, p1);
+    planarCross->MoveHandle(2, p2);
     planarCross->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
     planarFigures.emplace("planarCross",planarCross.GetPointer());
 
@@ -108,7 +106,6 @@ public:
 
     // Create PlanarPolygon
     mitk::PlanarPolygon::Pointer planarPolygon = mitk::PlanarPolygon::New();
-    planarPolygon->SetClosed(false);
     planarPolygon->SetPlaneGeometry(planeGeometry);
     planarPolygon->PlaceFigure(p0);
     planarPolygon->SetCurrentControlPoint(p1);
@@ -117,9 +114,18 @@ public:
     planarPolygon->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
     planarFigures.emplace("planarPolygon",planarPolygon.GetPointer());
 
+    // Create PlanarPath
+    mitk::PlanarPath::Pointer planarPath = mitk::PlanarPath::New();
+    planarPath->SetPlaneGeometry(planeGeometry);
+    planarPath->PlaceFigure(p0);
+    planarPath->SetCurrentControlPoint(p1);
+    planarPath->AddControlPoint(p2);
+    planarPath->AddControlPoint(p3);
+    planarPath->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
+    planarFigures.emplace("planarPath",planarPath.GetPointer());
+
     // Create PlanarSubdivisionPolygon
     mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygon = mitk::PlanarSubdivisionPolygon::New();
-    planarSubdivisionPolygon->SetClosed(false);
     planarSubdivisionPolygon->SetPlaneGeometry(planeGeometry);
     planarSubdivisionPolygon->PlaceFigure(p0);
     planarSubdivisionPolygon->SetCurrentControlPoint(p1);
@@ -171,12 +177,9 @@ public:
     // Now all PlanarFigures are create using the precise Geometry
     // Create PlanarCross
     mitk::PlanarCross::Pointer nochncross = mitk::PlanarCross::New();
-    nochncross->SetSingleLineMode(false);
     nochncross->SetPlaneGeometry(preciseGeometry);
-    nochncross->PlaceFigure(p0precise);
-    nochncross->SetCurrentControlPoint(p1precise);
-    nochncross->AddControlPoint(p2precise);
-    nochncross->AddControlPoint(p3precise);
+    nochncross->SetFromSpan(p0precise, p1precise);
+    nochncross->MoveHandle(2, p2precise);
     nochncross->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
     planarFigures.emplace("nochncross", nochncross.GetPointer());
 
@@ -217,7 +220,6 @@ public:
 
     // Create PlanarPolygon
     mitk::PlanarPolygon::Pointer planarPolygonPrecise = mitk::PlanarPolygon::New();
-    planarPolygonPrecise->SetClosed(false);
     planarPolygonPrecise->SetPlaneGeometry(preciseGeometry);
     planarPolygonPrecise->PlaceFigure(p0precise);
     planarPolygonPrecise->SetCurrentControlPoint(p1precise);
@@ -226,9 +228,18 @@ public:
     planarPolygonPrecise->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
     planarFigures.emplace("planarPolygonPrecise",planarPolygonPrecise.GetPointer());
 
+    // Create PlanarPath
+    mitk::PlanarPath::Pointer planarPathPrecise = mitk::PlanarPath::New();
+    planarPathPrecise->SetPlaneGeometry(preciseGeometry);
+    planarPathPrecise->PlaceFigure(p0precise);
+    planarPathPrecise->SetCurrentControlPoint(p1precise);
+    planarPathPrecise->AddControlPoint(p2precise);
+    planarPathPrecise->AddControlPoint(p3precise);
+    planarPathPrecise->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
+    planarFigures.emplace("planarPathPrecise",planarPathPrecise.GetPointer());
+
     // Create PlanarSubdivisionPolygon
     mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygonPrecise = mitk::PlanarSubdivisionPolygon::New();
-    planarSubdivisionPolygonPrecise->SetClosed(false);
     planarSubdivisionPolygonPrecise->SetPlaneGeometry(preciseGeometry);
     planarSubdivisionPolygonPrecise->PlaceFigure(p0precise);
     planarSubdivisionPolygonPrecise->SetCurrentControlPoint(p1precise);

@@ -41,6 +41,23 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+    /** \brief Returns "arrow". */
+    std::string GetTypeId() const override;
+
+    /** \brief An open outline from the tip (control point 0) to the tail. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief The arrow head at the tip. */
+    std::vector<Decoration> GetDecorations() const override;
+
+    /** \brief Length. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed by a span from the tip to the tail. */
+    PlacementKind GetPlacementKind() const override;
+
+    void SetFromSpan(const Point2D &start, const Point2D &end) override;
+
       /** \brief Returns 2 -- an arrow requires exactly two control points. */
       unsigned int GetMinimumNumberOfControlPoints() const override
     {

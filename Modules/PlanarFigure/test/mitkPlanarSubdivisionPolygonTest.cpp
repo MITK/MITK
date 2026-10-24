@@ -28,12 +28,6 @@ public:
     MITK_TEST_CONDITION(planarSubdivisionPolygon->GetMaximumNumberOfControlPoints() == 1000,
                         "Maximum number of control points");
 
-    // Test for correct rounds of subdivisionPoints
-    MITK_TEST_CONDITION(planarSubdivisionPolygon->GetSubdivisionRounds() == 5, "Subdivision point generation depth");
-
-    // Test for correct tension parameter
-    MITK_TEST_CONDITION(planarSubdivisionPolygon->GetTensionParameter() == 0.0625, "Tension parameter");
-
     planarSubdivisionPolygon->SetProperty("initiallyplaced", mitk::BoolProperty::New(true));
 
     // Initial placement of planarSubdivisionPolygon

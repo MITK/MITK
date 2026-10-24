@@ -27,15 +27,14 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkException.h>
 #include <mitkExclusiveInteraction.h>
-#include <mitkIPropertyFilters.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkITKEventObserverGuard.h>
-#include <mitkPropertyFilter.h>
 #include <mitkRenderingManager.h>
 #include <mitkRenderWindowPartHelper.h>
 #include <mitkVtkLayerController.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarEllipse.h>
+#include <mitkPlanarPath.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarRectangle.h>
@@ -67,6 +66,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleInitialization.h>
 
+#include <algorithm>
 #include <optional>
 
 US_INITIALIZE_MODULE
@@ -85,6 +85,20 @@ namespace
     }
 
     return nullptr;
+  }
+
+  /** Gives a figure placed by a span the size of the given radius and locks its shape, so that it is placed with a click. */
+  void MakePreset(mitk::PlanarFigure* figure, double radius)
+  {
+    mitk::Point2D center;
+    center.Fill(0.0);
+
+    auto rim = center;
+    rim[0] = radius;
+
+    figure->BeginPlacement();
+    figure->SetFromSpan(center, rim);
+    figure->SetShapeLocked(true);
   }
 }
 
@@ -569,8 +583,6 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 {
   auto nonConstNode = const_cast<mitk::DataNode*>(node);
   auto it = d->m_DataNodeToPlanarFigureData.find(nonConstNode);
-  auto isFigureFinished = false;
-  auto isPlaced = false;
 
   if (it != d->m_DataNodeToPlanarFigureData.end())
   {
@@ -582,9 +594,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     data.m_Figure->RemoveObserver(data.m_EndInteractionObserverTag);
     data.m_Figure->RemoveObserver(data.m_DuringInteractionObserverTag);
 
-    isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced", isPlaced);
-
-    if (!isFigureFinished) // if the property does not yet exist or is false, drop the datanode
+    if (!data.m_Figure->IsComplete())
       this->PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
 
     d->m_DataNodeToPlanarFigureData.erase( it );
@@ -597,13 +607,11 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 
   for (unsigned int x = 0; x < nodes->size(); ++x)
   {
-    mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(nodes->at(x)->GetData());
+    const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(nodes->at(x)->GetData());
 
-    if (planarFigure.IsNotNull())
+    if (nullptr != planarFigure)
     {
-      isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
-
-      if (!isFigureFinished) // if the property does not yet exist or is false, drop the datanode
+      if (!planarFigure->IsComplete()) // an unfinished figure goes with its parent
       {
         this->GetDataStorage()->Remove(nodes->at(x));
 
@@ -893,19 +901,7 @@ void QmitkMeasurementView::OnDrawPathTriggered(bool checked)
   if (!this->BeginDrawAction(d->m_DrawPath, checked))
     return;
 
-  mitk::CoreServicePointer<mitk::IPropertyFilters> propertyFilters(mitk::CoreServices::GetPropertyFilters());
-
-  mitk::PropertyFilter filter;
-  filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
-
-  propertyFilters->AddFilter(filter, "PlanarPolygon");
-
-  mitk::PlanarPolygon::Pointer planarFigure = mitk::PlanarPolygon::New();
-  planarFigure->ClosedOff();
-
-  auto node = this->AddFigureToDataStorage(planarFigure, "Path", d->m_PathCounter);
-
-  node->SetProperty("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
+  auto node = this->AddFigureToDataStorage(mitk::PlanarPath::New(), "Path", d->m_PathCounter);
   node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
 
   d->m_HintLabel->show();
@@ -932,7 +928,10 @@ void QmitkMeasurementView::OnDrawCircleTriggered(bool checked)
   if (!this->BeginDrawAction(d->m_DrawCircle, checked))
     return;
 
-  auto circle = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarCircle::New(d->m_Radius->value()) : mitk::PlanarCircle::New();
+  auto circle = mitk::PlanarCircle::New();
+
+  if (d->m_FixedParameterBox->isChecked())
+    MakePreset(circle, d->m_Radius->value());
 
   this->AddFigureToDataStorage(circle, "Circle", d->m_CircleCounter);
 }
@@ -950,7 +949,15 @@ void QmitkMeasurementView::OnDrawDoubleEllipseTriggered(bool checked)
   if (!this->BeginDrawAction(d->m_DrawDoubleEllipse, checked))
     return;
 
-  auto ellipse = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarDoubleEllipse::New(d->m_Radius->value(),d->m_Thickness->value()) : mitk::PlanarDoubleEllipse::New();
+  auto ellipse = mitk::PlanarDoubleEllipse::New();
+
+  if (d->m_FixedParameterBox->isChecked())
+  {
+    const auto radius = d->m_Radius->value();
+
+    MakePreset(ellipse, radius);
+    ellipse->SetThickness(std::min(d->m_Thickness->value(), radius));
+  }
 
   this->AddFigureToDataStorage(ellipse, "DoubleEllipse", d->m_DoubleEllipseCounter);
 }
@@ -1062,49 +1069,32 @@ void QmitkMeasurementView::UpdateMeasurementText()
   d->m_SelectedPlanarFiguresText->clear();
 
   QString infoText;
-  QString plainInfoText;
   int j = 1;
-
-  mitk::PlanarFigure::Pointer planarFigure;
-  mitk::DataNode::Pointer node;
 
   for (int i = 0; i < d->m_CurrentSelection.size(); ++i, ++j)
   {
-    plainInfoText.clear();
-    node = d->m_CurrentSelection[i];
-    planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+    const auto& node = d->m_CurrentSelection[i];
+    const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
 
-    if (planarFigure.IsNull())
+    if (nullptr == planarFigure)
       continue;
 
     if (j > 1)
       infoText.append("<br />");
 
     infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(node->GetName())));
-    plainInfoText.append(QString("%1").arg(QString::fromStdString(node->GetName())));
 
-    double featureQuantity = 0.0;
+    QStringList measurementTexts;
 
-    for (unsigned int k = 0; k < planarFigure->GetNumberOfFeatures(); ++k)
+    for (const auto& measurement : planarFigure->GetMeasurements())
     {
-      if (!planarFigure->IsFeatureActive(k))
-        continue;
-
-      featureQuantity = planarFigure->GetQuantity(k);
-
-      infoText.append(QString("<i>%1</i>: %2 %3")
-        .arg(QString(planarFigure->GetFeatureName(k)))
-        .arg(featureQuantity, 0, 'f', 2)
-        .arg(QString(planarFigure->GetFeatureUnit(k))));
-
-      plainInfoText.append(QString("\n%1: %2 %3")
-        .arg(QString(planarFigure->GetFeatureName(k)))
-        .arg(featureQuantity, 0, 'f', 2)
-        .arg(QString(planarFigure->GetFeatureUnit(k))));
-
-      if (k + 1 != planarFigure->GetNumberOfFeatures())
-        infoText.append("<br />");
+      measurementTexts.append(QString("<i>%1</i>: %2 %3")
+        .arg(QString::fromStdString(mitk::PlanarFigure::GetDisplayName(measurement.Type)))
+        .arg(measurement.Value, 0, 'f', 2)
+        .arg(QString::fromStdString(mitk::PlanarFigure::GetUnitSymbol(measurement.Type))));
     }
+
+    infoText.append(measurementTexts.join("<br />"));
 
     if (j != d->m_CurrentSelection.size())
       infoText.append("<br />");

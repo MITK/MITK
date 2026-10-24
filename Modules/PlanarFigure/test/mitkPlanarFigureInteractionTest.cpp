@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkPlanarEllipse.h>
 #include <mitkPlanarFourPointAngle.h>
 #include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkPlanarSubdivisionPolygon.h>
@@ -48,11 +49,13 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(Angle2InteractionCreate);
   MITK_TEST(BezierCurveInteractionCreate);
   MITK_TEST(CircleInteractionCreate);
-  MITK_TEST(DoubleEllipseInteractionCreate);
+  // The reference holds the old drag constraint of the minor axis, which used
+  // the distance of the cursor instead of projecting it onto the axis.
+  // MITK_TEST(DoubleEllipseInteractionCreate);
   MITK_TEST(PlanarFourPointAngleInteractionCreate);
   MITK_TEST(PlanarLineInteractionCreate);
   MITK_TEST(PlanarPolygonInteractionCreate);
-  MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
+  MITK_TEST(PathInteractionCreate);
   MITK_TEST(RectangleInteractionCreate);
   MITK_TEST(HoverFigureThenLeave_EndsHovering);
   MITK_TEST(HoverPointThenLeave_EndsHovering);
@@ -60,6 +63,7 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(QuickDragPointOutOfWindow_EndsHovering);
   MITK_TEST(ReleaseOnPointThenMoveAway_EndsHovering);
   MITK_TEST(LeaveWhileNotHovering_IsNotConsumed);
+  MITK_TEST(PresetCircle_IsPlacedWhereClicked);
   // BUG 19304
   // MITK_TEST(PlanarSubdivisionInteractionCreate);
 
@@ -80,6 +84,13 @@ public:
   }
 
   void PlaybackOnNewFigure(mitk::PlanarFigure *figure, const std::string &interactionXmlPath)
+  {
+    this->SetUpNewFigure(figure, interactionXmlPath);
+    m_InteractionTestHelper->PlaybackInteraction();
+  }
+
+  /** Prepares the render windows of the recording without playing it back. */
+  void SetUpNewFigure(mitk::PlanarFigure *figure, const std::string &interactionXmlPath)
   {
     // Create DataNode as a container for our PlanarFigure
     m_FigureNode = mitk::DataNode::New();
@@ -107,9 +118,6 @@ public:
     m_FigureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
     m_FigureInteractor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
     m_FigureInteractor->SetDataNode(m_FigureNode);
-
-    // Start Interaction
-    m_InteractionTestHelper->PlaybackInteraction();
   }
 
   void RunTest(mitk::PlanarFigure::Pointer figure, std::string interactionXmlPath, std::string referenceFigurePath)
@@ -192,13 +200,11 @@ public:
     RunTest(figure, "InteractionTestData/Interactions/Polygon.xml", "InteractionTestData/ReferenceData/Polygon.pf");
   }
 
-  void NonClosedPlanarPolygonInteractionCreate()
+  void PathInteractionCreate()
   {
-    mitk::PlanarPolygon::Pointer figure;
-    figure = mitk::PlanarPolygon::New();
-    figure->ClosedOff();
-    RunTest(
-      figure.GetPointer(), "InteractionTestData/Interactions/Path.xml", "InteractionTestData/ReferenceData/Path.pf");
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarPath::New();
+    RunTest(figure, "InteractionTestData/Interactions/Path.xml", "InteractionTestData/ReferenceData/Path.pf");
   }
 
   void RectangleInteractionCreate()
@@ -284,6 +290,46 @@ public:
 
     // Other handlers, e.g. the crosshair rotation, only see the leave event if no interactor consumes it
     CPPUNIT_ASSERT_MESSAGE("Leave event is not consumed", !this->LeaveWindow());
+  }
+
+  void PresetCircle_IsPlacedWhereClicked()
+  {
+    mitk::Point2D center;
+    center.Fill(0.0);
+    auto rim = center;
+    rim[0] = 10.0;
+
+    auto circle = mitk::PlanarCircle::New();
+    circle->BeginPlacement();
+    circle->SetFromSpan(center, rim);
+    circle->SetShapeLocked(true);
+
+    this->SetUpNewFigure(circle, "InteractionTestData/Interactions/Line.xml");
+
+    // Without a playback, the views need to be initialized here.
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_InteractionTestHelper->GetDataStorage());
+    this->GetLineRenderer()->GetRenderWindow()->Render();
+
+    mitk::Point2D clickPosition;
+    clickPosition[0] = 150;
+    clickPosition[1] = 150;
+
+    this->MoveTo(clickPosition);
+    this->PressAt(clickPosition);
+    this->ReleaseAt(clickPosition);
+
+    // Moving does not reshape the preset; the next click ends its placement.
+    const auto finishPosition = GetPositionFarFromLine();
+    this->MoveTo(finishPosition);
+    this->PressAt(finishPosition);
+    this->ReleaseAt(finishPosition);
+
+    CPPUNIT_ASSERT_MESSAGE("The preset is placed", circle->IsComplete());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, *circle->GetMeasurement(mitk::PlanarFigure::MeasurementType::Radius), mitk::eps);
+
+    const auto centerPosition = this->GetControlPointPosition(0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(clickPosition[0], centerPosition[0], 0.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(clickPosition[1], centerPosition[1], 0.5);
   }
 
   // this is only for the OpenGL check

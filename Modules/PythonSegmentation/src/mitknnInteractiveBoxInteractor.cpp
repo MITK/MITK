@@ -112,7 +112,7 @@ namespace mitk::nnInteractive
 
       // Remove the box from data storage if it was never completed, as it is
       // not yet managed by the list of boxes.
-      if (m_NextBoxNode->GetData()->GetProperty("initiallyplaced").IsNull())
+      if (!static_cast<const PlanarFigure*>(m_NextBoxNode->GetData())->IsComplete())
         m_Owner->GetDataStorage()->Remove(m_NextBoxNode);
 
       // Unsubscribe from the EndPlacementPlanarFigureEvent.

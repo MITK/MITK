@@ -37,6 +37,20 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+    /** \brief Returns "line". */
+    std::string GetTypeId() const override;
+
+    /** \brief An open outline between both end points. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief Length. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed by a span from start to end. */
+    PlacementKind GetPlacementKind() const override;
+
+    void SetFromSpan(const Point2D &start, const Point2D &end) override;
+
       /** \brief Returns 2 -- a line requires exactly two control points. */
       unsigned int GetMinimumNumberOfControlPoints() const override
     {

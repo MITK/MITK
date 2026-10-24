@@ -38,9 +38,25 @@ namespace mitk
 
     itkFactorylessNewMacro(Self);
 
-    itkCloneMacro(Self) public :
-      /** \brief Feature identifier for the angle measurement (in degrees). */
-      const unsigned int FEATURE_ID_ANGLE;
+    itkCloneMacro(Self);
+
+    /** \brief Feature identifier for the angle measurement (in degrees). */
+    const unsigned int FEATURE_ID_ANGLE;
+
+    /** \brief Returns "angle". */
+    std::string GetTypeId() const override;
+
+    /** \brief An open outline along both arms; control point 1 is the vertex. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief The arc at the vertex. */
+    std::vector<Decoration> GetDecorations() const override;
+
+    /** \brief Angle between the arms. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed point by point: first arm end, vertex, second arm end. */
+    PlacementKind GetPlacementKind() const override;
 
     /** \brief Returns 3 -- an angle requires exactly three control points. */
     unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }

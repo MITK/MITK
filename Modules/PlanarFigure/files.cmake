@@ -11,9 +11,11 @@ set(CPP_FILES
   DataManagement/mitkPlanarEllipse.cpp
   DataManagement/mitkPlanarCross.cpp
   DataManagement/mitkPlanarFigure.cpp
+  DataManagement/mitkPlanarFigureGeometryHelpers.cpp
   DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarArrow.cpp
+  DataManagement/mitkPlanarPath.cpp
   DataManagement/mitkPlanarPolygon.cpp
   DataManagement/mitkPlanarSubdivisionPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp

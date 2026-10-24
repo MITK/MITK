@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkPlanarEllipse.h>
 #include <mitkPlanarFourPointAngle.h>
 #include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkPlanarSubdivisionPolygon.h>
@@ -35,6 +36,10 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 
 #include <tinyxml2.h>
+
+#include <algorithm>
+#include <map>
+#include <optional>
 
 namespace mitk
 {
@@ -317,6 +322,10 @@ namespace mitk
       {
         planarFigure = mitk::PlanarPolygon::New();
       }
+      else if (type == "PlanarPath")
+      {
+        planarFigure = mitk::PlanarPath::New();
+      }
       else if (type == "PlanarSubdivisionPolygon")
       {
         planarFigure = mitk::PlanarSubdivisionPolygon::New();
@@ -388,20 +397,41 @@ namespace mitk
         }
       }
 
+      // Paths used to be polygons that are not closed.
+      if (type == "PlanarPolygon")
+      {
+        bool isClosed = false;
+        planarFigure->GetPropertyList()->GetBoolProperty("closed", isClosed);
+
+        if (!isClosed)
+          planarFigure = mitk::PlanarPath::New();
+      }
+
+      // Crosses in single-line mode, or without their second line, were lines.
+      if (type == "PlanarCross")
+      {
+        bool isSingleLine = false;
+        planarFigure->GetPropertyList()->GetBoolProperty("SingleLineMode", isSingleLine);
+
+        int numberOfVertices = 0;
+
+        if (const auto* controlPoints = pfElement->FirstChildElement("ControlPoints"); controlPoints != nullptr)
+        {
+          for (auto* vertex = controlPoints->FirstChildElement("Vertex"); vertex != nullptr; vertex = vertex->NextSiblingElement("Vertex"))
+            ++numberOfVertices;
+        }
+
+        if (isSingleLine || numberOfVertices == 2)
+        {
+          MITK_WARN << "A PlanarCross with a single line is read as PlanarLine from " << this->GetInputLocation() << ".";
+          planarFigure = mitk::PlanarLine::New();
+        }
+      }
+
       // If we load a planarFigure, it has definitely been placed correctly.
       // If we do not set this property here, we cannot load old planarFigures
       // without messing up the interaction (PF-Interactor needs this property.
       planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
-
-      // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
-      // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature
-      auto* planarPolygon = dynamic_cast<PlanarPolygon*>(planarFigure.GetPointer());
-      if (planarPolygon != nullptr)
-      {
-        bool isClosed = false;
-        planarFigure->GetPropertyList()->GetBoolProperty("closed", isClosed);
-        planarPolygon->SetClosed(isClosed);
-      }
 
       // Read geometry of containing plane
       auto* geoElement = pfElement->FirstChildElement("Geometry");
@@ -458,8 +488,9 @@ namespace mitk
         {
         }
       }
+      std::map<int, Point2D> vertices;
+
       auto* cpElement = pfElement->FirstChildElement("ControlPoints");
-      bool first = true;
       if (cpElement != nullptr)
         for (auto* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr;
           vertElement = vertElement->NextSiblingElement("Vertex"))
@@ -476,6 +507,94 @@ namespace mitk
         Point2D p;
         p.SetElement(0, x);
         p.SetElement(1, y);
+        vertices[id] = p;
+      }
+
+      // Rectangles used to store all four corners. Their placement started
+      // at corner 1 and ended at corner 3.
+      if (type == "PlanarRectangle" && vertices.size() == 4)
+        vertices = { { 0, vertices[1] }, { 1, vertices[3] } };
+
+      // Ellipses used to store a fourth point whose direction Fiberfox uses
+      // to twist fiber bundles. Loading replayed the constraints of that
+      // time: the first axis turned perpendicular to the second one, and the
+      // fourth point moved to the larger radius, clamped to the plane.
+      if (type == "PlanarEllipse" && vertices.size() == 4)
+      {
+        const auto center = vertices[0];
+        const auto firstRadius = center.EuclideanDistanceTo(vertices[1]);
+        const auto secondAxis = vertices[2] - center;
+        const auto secondRadius = secondAxis.GetNorm();
+
+        if (secondRadius > 0.0)
+        {
+          Vector2D firstAxis;
+          firstAxis[0] = secondAxis[1];
+          firstAxis[1] = -secondAxis[0];
+          vertices[1] = center + firstAxis * (firstRadius / secondRadius);
+        }
+
+        auto twist = vertices[3] - center;
+
+        if (twist.GetNorm() > 0.0)
+        {
+          twist.Normalize();
+          Point2D twistPoint = center + twist * std::max(firstRadius, secondRadius);
+
+          if (const auto* plane = planarFigure->GetPlaneGeometry(); plane != nullptr)
+          {
+            const auto& bounds = plane->GetBounds();
+            Point2D index;
+            plane->WorldToIndex(twistPoint, index);
+            index[0] = std::clamp(index[0], bounds[0], bounds[1]);
+            index[1] = std::clamp(index[1], bounds[2], bounds[3]);
+            plane->IndexToWorld(index, twistPoint);
+          }
+
+          twist = twistPoint - center;
+
+          if (twist.GetNorm() > 0.0)
+            static_cast<PlanarEllipse*>(planarFigure.GetPointer())->SetReferenceDirection(twist);
+        }
+
+        vertices.erase(3);
+      }
+
+      // Circles and double ellipses of fixed size stored only their center.
+      if ((type == "PlanarCircle" || type == "PlanarDoubleEllipse") && vertices.size() == 1)
+      {
+        MITK_WARN << "The size of a fixed-size " << type << " was not stored. It is read with a radius of 0 from "
+                  << this->GetInputLocation() << ".";
+      }
+
+      // Double ellipses used to store the end of the first inner axis as a
+      // fourth point, opposite of the first outer axis. Loading replayed the
+      // constraints of that time: the second axis turned perpendicular to the
+      // first one and became no longer than it.
+      std::optional<double> thickness;
+
+      if (type == "PlanarDoubleEllipse" && vertices.size() == 4)
+      {
+        const auto center = vertices[0];
+        const auto firstAxis = vertices[1] - center;
+        const auto firstRadius = firstAxis.GetNorm();
+        const auto secondRadius = std::min(center.EuclideanDistanceTo(vertices[2]), firstRadius);
+
+        if (firstRadius > 0.0)
+        {
+          Vector2D secondAxis;
+          secondAxis[0] = firstAxis[1];
+          secondAxis[1] = -firstAxis[0];
+          vertices[2] = center + secondAxis * (secondRadius / firstRadius);
+        }
+
+        thickness = std::clamp(firstRadius - center.EuclideanDistanceTo(vertices[3]), 0.0, secondRadius);
+        vertices.erase(3);
+      }
+
+      bool first = true;
+      for (const auto& [id, p] : vertices)
+      {
         if (first == true) // needed to set m_FigurePlaced to true
         {
           planarFigure->PlaceFigure(p);
@@ -483,6 +602,9 @@ namespace mitk
         }
         planarFigure->SetControlPoint(id, p, true);
       }
+
+      if (thickness.has_value())
+        static_cast<PlanarDoubleEllipse*>(planarFigure.GetPointer())->SetThickness(*thickness);
 
       // Calculate feature quantities of this PlanarFigure
       planarFigure->EvaluateFeatures();

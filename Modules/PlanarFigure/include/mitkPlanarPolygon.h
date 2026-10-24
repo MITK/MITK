@@ -43,6 +43,21 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+    /** \brief Returns "polygon" if closed, "path" otherwise. */
+    std::string GetTypeId() const override;
+
+    /** \brief An outline through the control points, closed unless the polygon is open. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief Circumference and, if the polygon does not cross itself, area; the length if open. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed point by point. */
+    PlacementKind GetPlacementKind() const override;
+
+    /** \brief Returns true; every vertex is a control point. */
+    bool CanInsertControlPoints() const override;
+
       /**
        * \brief Sets whether the polygon is closed between the first and last control point.
        * \param[in] closed If true, the polygon is closed; otherwise open.

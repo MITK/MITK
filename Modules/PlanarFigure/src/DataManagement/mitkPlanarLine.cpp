@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkPlanarLine.h>
 #include <mitkPlaneGeometry.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
   // Line has two control points
@@ -48,6 +50,38 @@ void mitk::PlanarLine::EvaluateFeaturesInternal()
   double length = p0.EuclideanDistanceTo(p1);
 
   this->SetQuantity(FEATURE_ID_LENGTH, length);
+}
+
+std::string mitk::PlanarLine::GetTypeId() const
+{
+  return "line";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarLine::GetContours() const
+{
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
+
+  return { { ContourRole::Outline, false, { this->GetControlPoint(0), this->GetControlPoint(1) } } };
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarLine::GetMeasurements() const
+{
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
+
+  const auto length = PlanarFigureGeometryHelpers::GetDistance(this->GetPlaneGeometry(), this->GetControlPoint(0), this->GetControlPoint(1));
+  return { { MeasurementType::Length, length } };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarLine::GetPlacementKind() const
+{
+  return PlacementKind::Span;
+}
+
+void mitk::PlanarLine::SetFromSpan(const Point2D &start, const Point2D &end)
+{
+  this->AssignControlPoints({ start, end });
 }
 
 void mitk::PlanarLine::PrintSelf(std::ostream &os, itk::Indent indent) const

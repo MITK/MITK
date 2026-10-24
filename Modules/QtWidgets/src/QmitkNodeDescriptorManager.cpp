@@ -83,8 +83,7 @@ void QmitkNodeDescriptorManager::Initialize()
   auto isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");
   AddDescriptor(new QmitkNodeDescriptor("PlanarPolygon", ":/Qmitk/PlanarPolygon_48.png", isPlanarPolygon, this));
 
-  auto isNotClosedPolygon = mitk::NodePredicateProperty::New("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
-  auto isPlanarPath = mitk::NodePredicateAnd::New(isNotClosedPolygon, isPlanarPolygon);
+  auto isPlanarPath = mitk::NodePredicateDataType::New("PlanarPath");
   AddDescriptor(new QmitkNodeDescriptor("PlanarPath", ":/Qmitk/PlanarPath_48.png", isPlanarPath, this));
 
   auto isPlanarDoubleEllipse = mitk::NodePredicateDataType::New("PlanarDoubleEllipse");

@@ -660,9 +660,9 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
   PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
 
   const auto selectedControlPointsIdx = (unsigned int)planarFigure->GetSelectedControlPoint();
-  const unsigned int numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
-  // Draw markers at control points (selected control point will be colored)
-  for (unsigned int i = 0; i < numberOfControlPoints; ++i)
+  const auto handles = planarFigure->GetHandles();
+  // Draw markers at handles (selected handle will be colored)
+  for (unsigned int i = 0; i < handles.size(); ++i)
   {
     // Only if planar figure is marked as editable: display markers (control points) in a
     // different style if mouse is over them or they are selected
@@ -688,7 +688,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
       // draw outlines for markers as well
       // linewidth for the contour is only half, as full width looks
       // much too thick!
-      this->DrawMarker(planarFigure->GetControlPoint(i),
+      this->DrawMarker(handles[i].Position,
                        m_OutlineColor[lineDisplayMode],
                        m_MarkerlineOpacity[pointDisplayMode],
                        m_OutlineColor[lineDisplayMode],
@@ -700,7 +700,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
                        renderer, context2D);
     }
 
-    this->DrawMarker(planarFigure->GetControlPoint(i),
+    this->DrawMarker(handles[i].Position,
                      m_MarkerlineColor[pointDisplayMode],
                      m_MarkerlineOpacity[pointDisplayMode],
                      m_MarkerColor[pointDisplayMode],

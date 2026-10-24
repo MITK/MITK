@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkPlanarBezierCurve.h>
 #include <mitkProperties.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 #include <limits>
 
 mitk::PlanarBezierCurve::PlanarBezierCurve()
@@ -142,6 +144,52 @@ unsigned int mitk::PlanarBezierCurve::GetMinimumNumberOfControlPoints() const
 bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index) const
 {
   return index == 0 && m_ControlPoints.size() > 2;
+}
+
+std::string mitk::PlanarBezierCurve::GetTypeId() const
+{
+  return "bezier_curve";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarBezierCurve::GetContours() const
+{
+  std::vector<Point2D> controlPoints;
+
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    controlPoints.push_back(this->GetControlPoint(i));
+
+  if (controlPoints.size() < 2)
+    return {};
+
+  return { { ContourRole::Outline, false, PlanarFigureGeometryHelpers::SampleBezier(controlPoints, m_NumberOfSegments) } };
+}
+
+std::vector<mitk::PlanarFigure::Decoration> mitk::PlanarBezierCurve::GetDecorations() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
+
+  HelperPolyline controlPolygon;
+
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    controlPolygon.Points.push_back(this->GetControlPoint(i));
+
+  return { controlPolygon };
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarBezierCurve::GetMeasurements() const
+{
+  const auto contours = this->GetContours();
+
+  if (contours.empty())
+    return {};
+
+  return { { MeasurementType::Length, PlanarFigureGeometryHelpers::GetLength(this->GetPlaneGeometry(), contours.front().Points, false) } };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarBezierCurve::GetPlacementKind() const
+{
+  return PlacementKind::Sequence;
 }
 
 bool mitk::PlanarBezierCurve::Equals(const PlanarFigure &other) const

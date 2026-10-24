@@ -1360,7 +1360,7 @@ nlohmann::json mitk::nnInteractiveTool::Impl::GetBoxParams(const PlanarFigure* b
 
   std::array<itk::Index<3>, 2> indices;
   geometry->WorldToIndex(box->GetWorldControlPoint(0), indices[0]);
-  geometry->WorldToIndex(box->GetWorldControlPoint(2), indices[1]);
+  geometry->WorldToIndex(box->GetWorldControlPoint(1), indices[1]);
 
   auto bbox = nlohmann::json::array();
 

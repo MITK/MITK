@@ -804,10 +804,8 @@ int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsign
   mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
   mitk::Point2D p1;
   planeGeometry->Map(planeGeometry->GetCenter(), p1);
-  contourMarker->SetPlaneGeometry(planeGeometry->Clone());
-  contourMarker->PlaceFigure(p1);
-  contourMarker->SetCurrentControlPoint(p1);
-  contourMarker->SetProperty("initiallyplaced", mitk::BoolProperty::New(true));
+  contourMarker->SetPlaneGeometry(planeGeometry);
+  contourMarker->SetFromSpan(p1, p1);
 
   std::stringstream markerStream;
   auto workingNode = this->GetWorkingDataNode();

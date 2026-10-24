@@ -18,6 +18,10 @@ found in the LICENSE file.
 #include <MitkPlanarFigureExports.h>
 
 #include <deque>
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace mitk
 {
@@ -64,13 +68,189 @@ namespace mitk
     /** \brief Type for a polyline (vector of 2D points). */
     typedef std::vector<PolyLineElement> PolyLineType;
 
-    /** \brief Sets the 2D geometry on which this figure will be placed.
+    /** \brief Kind of a measurement of a planar figure. Its unit follows from the kind. */
+    enum class MeasurementType
+    {
+      Length,
+      Circumference,
+      Area,
+      Angle,
+      Radius,
+      Diameter,
+      MajorAxis,
+      MinorAxis,
+      Thickness,
+      LongAxis,
+      ShortAxis
+    };
+
+    /** \brief A measured value in the unit of its type, see GetUnitSymbol(). */
+    struct Measurement
+    {
+      MeasurementType Type;
+      double Value;
+    };
+
+    /** \brief Role of a contour within its figure. */
+    enum class ContourRole
+    {
+      Outline,
+      Hole
+    };
+
+    /** \brief A polyline of a figure in 2D plane coordinates (mm). */
+    struct Contour
+    {
+      ContourRole Role;
+      bool Closed;
+      std::vector<Point2D> Points;
+    };
+
+    /** \brief Construction line that is not part of the shape, e.g. the control polygon of a Bezier curve. */
+    struct HelperPolyline
+    {
+      std::vector<Point2D> Points;
+    };
+
+    /** \brief Marks the angle at a vertex between two arms. Its radius is up to the display. */
+    struct AngleArc
+    {
+      Point2D Vertex;
+      Point2D End1;
+      Point2D End2;
+    };
+
+    /** \brief Head of an arrow at its tip. Its size is up to the display. */
+    struct ArrowHead
+    {
+      Point2D Tip;
+      Point2D Tail;
+    };
+
+    /** \brief Visual aid of a figure that is not part of its measured shape. */
+    using Decoration = std::variant<HelperPolyline, AngleArc, ArrowHead>;
+
+    /** \brief Name of a measurement type for display, e.g. "Major Axis". */
+    static std::string GetDisplayName(MeasurementType type);
+
+    /** \brief Unit of a measurement type: "mm", "mm2" or "deg". */
+    static std::string GetUnitSymbol(MeasurementType type);
+
+    /** \brief Stable identifier of the figure type for file formats and interfaces, e.g. "four_point_angle". */
+    virtual std::string GetTypeId() const = 0;
+
+    /** \brief Whether the figure has been placed completely and has at least the minimum number of control points. */
+    bool IsComplete() const;
+
+    /** \brief The contours of the figure, computed from its control points. */
+    virtual std::vector<Contour> GetContours() const = 0;
+
+    /** \brief The decorations of the figure, computed from its control points. None by default. */
+    virtual std::vector<Decoration> GetDecorations() const;
+
+    /** \brief The measurements of the figure, computed from its control points in world coordinates. */
+    virtual std::vector<Measurement> GetMeasurements() const = 0;
+
+    /** \brief A single measurement, if the figure has one of this type. */
+    std::optional<double> GetMeasurement(MeasurementType type) const;
+
+    /** \brief Meaning of a handle for editing. */
+    enum class HandleRole
+    {
+      Vertex, /**< A point of the shape. */
+      Center, /**< The center of the shape; moving it moves the whole figure. */
+      Extent  /**< Defines the size of the shape in one direction. */
+    };
+
+    /** \brief A point at which the figure is edited, in 2D plane coordinates (mm). */
+    struct Handle
+    {
+      HandleRole Role;
+      Point2D Position;
+    };
+
+    /** \brief How a figure is placed. */
+    enum class PlacementKind
+    {
+      Span,    /**< Defined by two points, e.g. by pressing and dragging, see SetFromSpan(). */
+      Sequence /**< Defined by placing its control points one after another. */
+    };
+
+    /** \brief The control points in 2D plane coordinates (mm). */
+    std::vector<Point2D> GetControlPoints() const;
+
+    /**
+     * \brief Replaces all control points.
      *
-     * In most cases, this is a Geometry already owned by another object, e.g.
-     * describing the slice of the image on which measurements will be
-     * performed.
+     * \throw mitk::Exception if the number of points is outside of the range of
+     *        the figure type (while being placed, only the maximum applies), or
+     *        if the points violate a constraint of the figure type.
      */
-    virtual void SetPlaneGeometry(mitk::PlaneGeometry *geometry);
+    void SetControlPoints(const std::vector<Point2D> &points);
+
+    /** \brief Whether control points can be inserted into and removed from a placed figure. */
+    virtual bool CanInsertControlPoints() const;
+
+    /**
+     * \brief Inserts a control point before the given index, or appends it at the end.
+     *
+     * Allowed for figures that can insert control points, and for appending
+     * while a figure is being placed.
+     *
+     * \throw mitk::Exception if inserting is not allowed, the index is out of
+     *        range or the figure has the maximum number of control points.
+     */
+    void InsertControlPoint(std::size_t index, const Point2D &point);
+
+    /** \brief The handles of the figure. By default, every control point is a vertex handle. */
+    virtual std::vector<Handle> GetHandles() const;
+
+    /**
+     * \brief Moves a handle and keeps the figure consistent, e.g. the axes of
+     *        an ellipse perpendicular or the center of a circle in the center.
+     *
+     * Positions are not restricted to the bounds of the plane.
+     *
+     * \throw mitk::Exception if the index is out of range.
+     */
+    virtual void MoveHandle(std::size_t index, const Point2D &position);
+
+    /** \brief Moves all control points by an offset. */
+    void Translate(const Vector2D &offset);
+
+    /** \brief How the figure is placed. */
+    virtual PlacementKind GetPlacementKind() const = 0;
+
+    /**
+     * \brief Defines the whole figure by two points, as placing it by pressing and dragging does.
+     *
+     * \throw mitk::Exception for figures that are not placed by a span.
+     */
+    virtual void SetFromSpan(const Point2D &start, const Point2D &end);
+
+    /** \brief Marks the figure as being placed, e.g. by an interactor. */
+    void BeginPlacement();
+
+    /** \brief Marks the placement of the figure as finished. */
+    void EndPlacement();
+
+    /** \brief Whether the figure is being placed. */
+    bool IsBeingPlaced() const;
+
+    /** \brief Sets whether the shape of the figure is locked, so that editing may only move it. */
+    void SetShapeLocked(bool locked);
+
+    /** \brief Whether the shape of the figure is locked, so that editing may only move it. */
+    bool IsShapeLocked() const;
+
+    /** \brief Sets the plane the figure lies on.
+     *
+     * The figure keeps a copy of the plane, which defines the coordinate frame
+     * of the control points.
+     *
+     * \throw mitk::Exception if the plane is null, curved or has no extent.
+     */
+    void SetPlaneGeometry(const PlaneGeometry *geometry);
 
     /** \brief Returns (previously set) 2D geometry of this figure. */
     virtual const PlaneGeometry *GetPlaneGeometry() const;
@@ -352,6 +532,22 @@ namespace mitk
 
     PlanarFigure(const Self &other);
 
+    /**
+     * \brief Checks control points before SetControlPoints() takes them.
+     *
+     * The default checks the number of points. Figure types with constraints
+     * between their points extend it.
+     *
+     * \throw mitk::Exception if the points are not valid for the figure type.
+     */
+    virtual void CheckControlPoints(const std::vector<Point2D> &points) const;
+
+    /** \brief Takes control points without any check, for figure types that build them. */
+    void AssignControlPoints(const std::vector<Point2D> &points);
+
+    /** \brief Sets one control point without any constraint, for figure types that move handles. */
+    void ReplaceControlPoint(std::size_t index, const Point2D &point);
+
     /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
      * of a planar figure object and returns integer ID for the feature element.
      * Should be called in sub-class constructors. */
@@ -407,6 +603,9 @@ namespace mitk
     /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
     void ClearHelperPolyLines();
 
+    /** \brief Marks the derived data of the previous API outdated after a change of the shape. */
+    void ShapeChanged();
+
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     ControlPointListType m_ControlPoints;
@@ -448,6 +647,9 @@ namespace mitk
     bool m_HelperLinesUpToDate;
     bool m_FeaturesUpToDate;
 
+    bool m_IsBeingPlaced = false;
+    bool m_IsShapeLocked = false;
+
     // Vector of features available for this geometric figure
     typedef std::vector<Feature> FeatureVectorType;
     FeatureVectorType m_Features;
@@ -474,6 +676,14 @@ namespace mitk
                                      const mitk::PlanarFigure &rightHandSide,
                                      ScalarType eps,
                                      bool verbose);
+
+  /**
+   * \brief Creates an empty planar figure of a type.
+   *
+   * \param[in] typeId Type identifier, see PlanarFigure::GetTypeId().
+   * \throw mitk::Exception for an unknown type identifier.
+   */
+  MITKPLANARFIGURE_EXPORT PlanarFigure::Pointer CreatePlanarFigure(const std::string &typeId);
 
 } // namespace mitk
 

@@ -11,6 +11,22 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarFigure.h>
+
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkExceptionMacro.h>
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarArrow.h>
+#include <mitkPlanarBezierCurve.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarCross.h>
+#include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -50,6 +66,8 @@ mitk::PlanarFigure::PlanarFigure(const Self &other)
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
     m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
+    m_IsBeingPlaced(other.m_IsBeingPlaced),
+    m_IsShapeLocked(other.m_IsShapeLocked),
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)
@@ -61,10 +79,258 @@ mitk::PlanarFigure::PlanarFigure(const Self &other)
   }
 }
 
-void mitk::PlanarFigure::SetPlaneGeometry(mitk::PlaneGeometry *geometry)
+void mitk::PlanarFigure::SetPlaneGeometry(const PlaneGeometry *geometry)
 {
-  this->SetGeometry(geometry);
+  if (nullptr == geometry)
+    mitkThrow() << "A planar figure needs a plane.";
 
+  if (nullptr != dynamic_cast<const AbstractTransformGeometry *>(geometry))
+    mitkThrow() << "A planar figure cannot lie on a curved plane.";
+
+  if (geometry->GetExtent(0) <= 0.0 || geometry->GetExtent(1) <= 0.0)
+    mitkThrow() << "The plane of a planar figure needs an extent.";
+
+  this->SetGeometry(geometry->Clone());
+}
+
+std::string mitk::PlanarFigure::GetDisplayName(MeasurementType type)
+{
+  switch (type)
+  {
+    case MeasurementType::Length:
+      return "Length";
+    case MeasurementType::Circumference:
+      return "Circumference";
+    case MeasurementType::Area:
+      return "Area";
+    case MeasurementType::Angle:
+      return "Angle";
+    case MeasurementType::Radius:
+      return "Radius";
+    case MeasurementType::Diameter:
+      return "Diameter";
+    case MeasurementType::MajorAxis:
+      return "Major Axis";
+    case MeasurementType::MinorAxis:
+      return "Minor Axis";
+    case MeasurementType::Thickness:
+      return "Thickness";
+    case MeasurementType::LongAxis:
+      return "Longest Axis";
+    case MeasurementType::ShortAxis:
+      return "Short Axis";
+  }
+
+  mitkThrow() << "Unknown measurement type.";
+}
+
+std::string mitk::PlanarFigure::GetUnitSymbol(MeasurementType type)
+{
+  switch (type)
+  {
+    case MeasurementType::Area:
+      return "mm2";
+    case MeasurementType::Angle:
+      return "deg";
+    default:
+      return "mm";
+  }
+}
+
+bool mitk::PlanarFigure::IsComplete() const
+{
+  return !m_IsBeingPlaced && this->GetNumberOfControlPoints() >= this->GetMinimumNumberOfControlPoints();
+}
+
+std::vector<mitk::Point2D> mitk::PlanarFigure::GetControlPoints() const
+{
+  return std::vector<Point2D>(m_ControlPoints.begin(), m_ControlPoints.begin() + this->GetNumberOfControlPoints());
+}
+
+void mitk::PlanarFigure::SetControlPoints(const std::vector<Point2D> &points)
+{
+  this->CheckControlPoints(points);
+  this->AssignControlPoints(points);
+}
+
+void mitk::PlanarFigure::CheckControlPoints(const std::vector<Point2D> &points) const
+{
+  if (points.size() > this->GetMaximumNumberOfControlPoints())
+    mitkThrow() << this->GetNameOfClass() << " takes at most " << this->GetMaximumNumberOfControlPoints() << " control points.";
+
+  if (!m_IsBeingPlaced && points.size() < this->GetMinimumNumberOfControlPoints())
+    mitkThrow() << this->GetNameOfClass() << " needs at least " << this->GetMinimumNumberOfControlPoints() << " control points.";
+}
+
+void mitk::PlanarFigure::AssignControlPoints(const std::vector<Point2D> &points)
+{
+  m_ControlPoints.assign(points.begin(), points.end());
+  m_NumberOfControlPoints = static_cast<unsigned int>(points.size());
+  m_FigurePlaced = !points.empty();
+  this->ShapeChanged();
+}
+
+void mitk::PlanarFigure::ReplaceControlPoint(std::size_t index, const Point2D &point)
+{
+  if (index >= m_NumberOfControlPoints)
+    mitkThrow() << "Control point index " << index << " is out of range.";
+
+  m_ControlPoints[index] = point;
+  this->ShapeChanged();
+}
+
+void mitk::PlanarFigure::ShapeChanged()
+{
+  m_PolyLineUpToDate = false;
+  m_HelperLinesUpToDate = false;
+  m_FeaturesUpToDate = false;
+
+  this->Modified();
+}
+
+bool mitk::PlanarFigure::CanInsertControlPoints() const
+{
+  return false;
+}
+
+void mitk::PlanarFigure::InsertControlPoint(std::size_t index, const Point2D &point)
+{
+  const auto numberOfControlPoints = this->GetNumberOfControlPoints();
+
+  if (!this->CanInsertControlPoints() && !(m_IsBeingPlaced && index == numberOfControlPoints))
+    mitkThrow() << this->GetNameOfClass() << " cannot insert control points.";
+
+  if (index > numberOfControlPoints)
+    mitkThrow() << "Control point index " << index << " is out of range.";
+
+  if (numberOfControlPoints >= this->GetMaximumNumberOfControlPoints())
+    mitkThrow() << this->GetNameOfClass() << " takes at most " << this->GetMaximumNumberOfControlPoints() << " control points.";
+
+  m_ControlPoints.resize(numberOfControlPoints);
+  m_ControlPoints.insert(m_ControlPoints.begin() + index, point);
+  m_NumberOfControlPoints = numberOfControlPoints + 1;
+  m_FigurePlaced = true;
+  this->ShapeChanged();
+}
+
+std::vector<mitk::PlanarFigure::Handle> mitk::PlanarFigure::GetHandles() const
+{
+  std::vector<Handle> handles;
+
+  for (const auto &point : this->GetControlPoints())
+    handles.push_back({ HandleRole::Vertex, point });
+
+  return handles;
+}
+
+void mitk::PlanarFigure::MoveHandle(std::size_t index, const Point2D &position)
+{
+  this->ReplaceControlPoint(index, position);
+}
+
+void mitk::PlanarFigure::Translate(const Vector2D &offset)
+{
+  for (unsigned int i = 0; i < m_NumberOfControlPoints; ++i)
+    m_ControlPoints[i] += offset;
+
+  this->ShapeChanged();
+}
+
+void mitk::PlanarFigure::SetFromSpan(const Point2D &, const Point2D &)
+{
+  mitkThrow() << this->GetNameOfClass() << " is not placed by a span.";
+}
+
+// The contours of some types differ while the figure is placed.
+void mitk::PlanarFigure::BeginPlacement()
+{
+  m_IsBeingPlaced = true;
+  this->ShapeChanged();
+}
+
+void mitk::PlanarFigure::EndPlacement()
+{
+  m_IsBeingPlaced = false;
+  this->ShapeChanged();
+}
+
+bool mitk::PlanarFigure::IsBeingPlaced() const
+{
+  return m_IsBeingPlaced;
+}
+
+void mitk::PlanarFigure::SetShapeLocked(bool locked)
+{
+  if (locked == m_IsShapeLocked)
+    return;
+
+  m_IsShapeLocked = locked;
+  this->Modified();
+}
+
+bool mitk::PlanarFigure::IsShapeLocked() const
+{
+  return m_IsShapeLocked;
+}
+
+std::vector<mitk::PlanarFigure::Decoration> mitk::PlanarFigure::GetDecorations() const
+{
+  return {};
+}
+
+std::optional<double> mitk::PlanarFigure::GetMeasurement(MeasurementType type) const
+{
+  for (const auto &measurement : this->GetMeasurements())
+  {
+    if (measurement.Type == type)
+      return measurement.Value;
+  }
+
+  return std::nullopt;
+}
+
+mitk::PlanarFigure::Pointer mitk::CreatePlanarFigure(const std::string &typeId)
+{
+  if (typeId == "line")
+    return PlanarLine::New().GetPointer();
+
+  if (typeId == "arrow")
+    return PlanarArrow::New().GetPointer();
+
+  if (typeId == "angle")
+    return PlanarAngle::New().GetPointer();
+
+  if (typeId == "four_point_angle")
+    return PlanarFourPointAngle::New().GetPointer();
+
+  if (typeId == "cross")
+    return PlanarCross::New().GetPointer();
+
+  if (typeId == "circle")
+    return PlanarCircle::New().GetPointer();
+
+  if (typeId == "ellipse")
+    return PlanarEllipse::New().GetPointer();
+
+  if (typeId == "double_ellipse")
+    return PlanarDoubleEllipse::New().GetPointer();
+
+  if (typeId == "rectangle")
+    return PlanarRectangle::New().GetPointer();
+
+  if (typeId == "polygon")
+    return PlanarPolygon::New().GetPointer();
+
+  if (typeId == "path")
+    return PlanarPath::New().GetPointer();
+
+  if (typeId == "subdivision_polygon")
+    return PlanarSubdivisionPolygon::New().GetPointer();
+
+  if (typeId == "bezier_curve")
+    return PlanarBezierCurve::New().GetPointer();
+
+  mitkThrow() << "Unknown planar figure type \"" << typeId << "\".";
 }
 
 const mitk::PlaneGeometry *mitk::PlanarFigure::GetPlaneGeometry() const
@@ -84,13 +350,15 @@ bool mitk::PlanarFigure::IsClosed() const
 
 void mitk::PlanarFigure::PlaceFigure(const mitk::Point2D &point)
 {
-  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+  // The number of control points to start with, preset by the figure type.
+  for (unsigned int i = 0; i < m_NumberOfControlPoints; ++i)
   {
     m_ControlPoints.push_back(this->ApplyControlPointConstraints(i, point));
   }
 
   m_FigurePlaced = true;
   m_SelectedControlPoint = 1;
+  this->ShapeChanged();
 }
 
 bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D &point, int position)
@@ -128,13 +396,9 @@ bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D &point, int positio
       }
     }
 
-    // polylines & helperpolylines need to be repainted
-    m_PolyLineUpToDate = false;
-    m_HelperLinesUpToDate = false;
-    m_FeaturesUpToDate = false;
-
     // one control point more
     ++m_NumberOfControlPoints;
+    this->ShapeChanged();
     return true;
   }
   else
@@ -170,11 +434,7 @@ bool mitk::PlanarFigure::SetControlPoint(unsigned int index, const Point2D &poin
   }
 
   if (controlPointSetCorrectly)
-  {
-    m_PolyLineUpToDate = false;
-    m_HelperLinesUpToDate = false;
-    m_FeaturesUpToDate = false;
-  }
+    this->ShapeChanged();
 
   return controlPointSetCorrectly;
 }
@@ -191,7 +451,8 @@ bool mitk::PlanarFigure::SetCurrentControlPoint(const Point2D &point)
 
 unsigned int mitk::PlanarFigure::GetNumberOfControlPoints() const
 {
-  return m_NumberOfControlPoints;
+  // Before a figure is placed, m_NumberOfControlPoints holds the number to start with.
+  return std::min(m_NumberOfControlPoints, static_cast<unsigned int>(m_ControlPoints.size()));
 }
 
 bool mitk::PlanarFigure::SelectControlPoint(unsigned int index)
@@ -598,7 +859,8 @@ void mitk::PlanarFigure::RemoveControlPoint(unsigned int index)
   if (index >= m_ControlPoints.size())
     return;
 
-  if ((m_ControlPoints.size() - 1) < this->GetMinimumNumberOfControlPoints())
+  // While being placed, a figure may have fewer than the minimum number of control points.
+  if (!m_IsBeingPlaced && (m_ControlPoints.size() - 1) < this->GetMinimumNumberOfControlPoints())
     return;
 
   ControlPointListType::iterator iter;
@@ -606,11 +868,8 @@ void mitk::PlanarFigure::RemoveControlPoint(unsigned int index)
 
   m_ControlPoints.erase(iter);
 
-  m_PolyLineUpToDate = false;
-  m_HelperLinesUpToDate = false;
-  m_FeaturesUpToDate = false;
-
   --m_NumberOfControlPoints;
+  this->ShapeChanged();
 }
 
 void mitk::PlanarFigure::RemoveLastControlPoint()

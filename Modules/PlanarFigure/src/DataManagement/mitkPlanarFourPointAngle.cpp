@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <mitkPlanarFourPointAngle.h>
 #include <mitkPlaneGeometry.h>
 
+#include "mitkPlanarFigureGeometryHelpers.h"
+
 mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
   // Four point angle has two control points
@@ -62,6 +64,37 @@ void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
   double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
+}
+
+std::string mitk::PlanarFourPointAngle::GetTypeId() const
+{
+  return "four_point_angle";
+}
+
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarFourPointAngle::GetContours() const
+{
+  std::vector<Contour> contours;
+
+  for (unsigned int i = 0; i + 1 < this->GetNumberOfControlPoints(); i += 2)
+    contours.push_back({ ContourRole::Outline, false, { this->GetControlPoint(i), this->GetControlPoint(i + 1) } });
+
+  return contours;
+}
+
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarFourPointAngle::GetMeasurements() const
+{
+  if (this->GetNumberOfControlPoints() < 4)
+    return {};
+
+  const auto angle = PlanarFigureGeometryHelpers::GetAngle(this->GetPlaneGeometry(),
+    this->GetControlPoint(0), this->GetControlPoint(1), this->GetControlPoint(2), this->GetControlPoint(3));
+
+  return { { MeasurementType::Angle, angle } };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarFourPointAngle::GetPlacementKind() const
+{
+  return PlacementKind::Sequence;
 }
 
 void mitk::PlanarFourPointAngle::PrintSelf(std::ostream &os, itk::Indent indent) const

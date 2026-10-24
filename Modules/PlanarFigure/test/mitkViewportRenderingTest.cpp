@@ -86,8 +86,7 @@ int mitkViewportRenderingTest(int argc, char *argv[])
     renderingHelper.GetDataStorage()->GetSubset(mitk::TNodePredicateDataType<mitk::PlanarFigure>::New());
   for (auto iterFigures = figures->begin(); iterFigures != figures->end(); ++iterFigures)
   {
-    (*iterFigures)->SetProperty("planarfigure.default.line.color", mitk::ColorProperty::New(1.0, 0.0, 0.0)); // red
-    (*iterFigures)->SetProperty("planarfigure.drawcontrolpoints", mitk::BoolProperty::New(false));
+    (*iterFigures)->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0)); // red
     (*iterFigures)->SetProperty("planarfigure.drawname", mitk::BoolProperty::New(false));
     (*iterFigures)->SetProperty("planarfigure.drawquantities", mitk::BoolProperty::New(true));
   }

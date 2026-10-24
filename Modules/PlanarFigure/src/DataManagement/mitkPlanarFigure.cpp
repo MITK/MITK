@@ -142,6 +142,11 @@ bool mitk::PlanarFigure::IsComplete() const
   return !m_IsBeingPlaced && this->GetNumberOfControlPoints() >= this->GetMinimumNumberOfControlPoints();
 }
 
+bool mitk::PlanarFigure::IsEmptyTimeStep(unsigned int) const
+{
+  return 0 == this->GetNumberOfControlPoints();
+}
+
 std::vector<mitk::Point2D> mitk::PlanarFigure::GetControlPoints() const
 {
   return std::vector<Point2D>(m_ControlPoints.begin(), m_ControlPoints.begin() + this->GetNumberOfControlPoints());

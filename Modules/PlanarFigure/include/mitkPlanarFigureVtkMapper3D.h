@@ -14,59 +14,56 @@ found in the LICENSE file.
 #define mitkPlanarFigureVtkMapper3D_h
 
 #include <MitkPlanarFigureExports.h>
+#include <mitkLocalStorageHandler.h>
 #include <mitkVtkMapper.h>
+
 #include <vtkSmartPointer.h>
 
 namespace mitk
 {
   /**
-   * \brief VTK-based mapper for rendering planar figures in 3D render windows.
+   * \brief Draws planar figures in 3D render windows.
    *
-   * Renders the polyline representation of a PlanarFigure as a 3D VTK actor.
+   * The contours of the figure are drawn as lines in its plane. Closed
+   * contours can be filled; holes stay open.
    *
-   * \sa PlanarFigure
-   * \sa PlanarFigureMapper2D
-   * \ingroup MitkPlanarFigureModule
+   * Node properties:
+   *   - \c planarfigure.3drendering (BoolProperty): whether the figure is shown in 3D, false by default
+   *   - \c planarfigure.3drendering.fill (BoolProperty): whether closed contours are filled, false by default
+   *   - \c color, \c opacity and \c line \c width as in 2D render windows
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
   {
-    class LocalStorage
-    {
-    public:
-      LocalStorage();
-      ~LocalStorage();
-
-      vtkSmartPointer<vtkActor> m_Actor;
-      unsigned long m_LastMTime;
-
-    private:
-      LocalStorage(const LocalStorage &);
-      LocalStorage &operator=(const LocalStorage &);
-    };
-
   public:
-    static void SetDefaultProperties(DataNode *, BaseRenderer * = nullptr, bool = false);
-
     mitkClassMacro(PlanarFigureVtkMapper3D, VtkMapper);
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
 
-      void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
-    void ApplyPlanarFigureProperties(BaseRenderer *renderer, vtkActor *actor);
+    static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
+
     vtkProp *GetVtkProp(BaseRenderer *renderer) override;
-    void UpdateVtkTransform(BaseRenderer *) override;
 
-  private:
+    /** \brief Does nothing; the contours are drawn in world coordinates. */
+    void UpdateVtkTransform(BaseRenderer *renderer) override;
+
+  protected:
     PlanarFigureVtkMapper3D();
     ~PlanarFigureVtkMapper3D() override;
 
-    PlanarFigureVtkMapper3D(const Self &);
-    Self &operator=(const Self &);
-
     void GenerateDataForRenderer(BaseRenderer *renderer) override;
 
+  private:
+    class LocalStorage : public Mapper::BaseLocalStorage
+    {
+    public:
+      LocalStorage();
+      ~LocalStorage() override;
+
+      vtkSmartPointer<vtkActor> m_Actor;
+      itk::ModifiedTimeType m_FigureTime = 0;
+      bool m_IsFilled = false;
+    };
+
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
-    bool m_FillPf;
   };
 }
 

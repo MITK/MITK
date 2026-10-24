@@ -822,10 +822,6 @@ int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsign
   rotatedContourNode->SetBoolProperty("PlanarFigureInitializedWindow", true, m_LastEventSender);
   rotatedContourNode->SetProperty("includeInBoundingBox", BoolProperty::New(false));
   rotatedContourNode->SetProperty("helper object", mitk::BoolProperty::New(!m_ShowMarkerNodes));
-  rotatedContourNode->SetProperty("planarfigure.drawcontrolpoints", BoolProperty::New(false));
-  rotatedContourNode->SetProperty("planarfigure.drawname", BoolProperty::New(false));
-  rotatedContourNode->SetProperty("planarfigure.drawoutline", BoolProperty::New(false));
-  rotatedContourNode->SetProperty("planarfigure.drawshadow", BoolProperty::New(false));
 
   if (planeGeometry)
   {

@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkPlanarFigureActivator.cpp
+  mitkPlanarFigureViewHelpers.cpp
   Algorithms/mitkExtrudePlanarFigureFilter.cpp
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureSource.cpp
@@ -22,6 +23,8 @@ set(CPP_FILES
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
   Interactions/mitkPlanarFigureInteractor.cpp
   Rendering/mitkPlanarFigureMapper2D.cpp
+  Rendering/mitkPlanarFigureTessellator.cpp
+  Rendering/mitkPlanarFigureVtkMapper2D.cpp
   Rendering/mitkPlanarFigureVtkMapper3D.cpp
 )
 

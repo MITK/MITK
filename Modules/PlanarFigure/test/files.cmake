@@ -13,6 +13,9 @@ set(MODULE_TESTS
 
 set(MODULE_RENDERING_TESTS
   mitkPlanarFigureInteractionTest.cpp
+  mitkPlanarFigureVtkMapper2DAnimationTest.cpp
+  mitkPlanarFigureVtkMapper2DTest.cpp
+  mitkPlanarFigureVtkMapper3DTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

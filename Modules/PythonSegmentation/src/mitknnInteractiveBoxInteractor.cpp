@@ -61,19 +61,13 @@ namespace mitk::nnInteractive
       const auto promptType = m_Owner->GetCurrentPromptType();
 
       // Style the box using data node properties, taking into account the
-      // current prompt type.
+      // current prompt type. The box being drawn is vibrant, completed boxes
+      // are muted.
       auto node = DataNode::New();
       node->SetName(this->CreateNextBoxNodeName());
       node->SetData(box);
-      node->SetColor(GetColor(promptType, ColorIntensity::Muted));
-      node->SetColor(GetColor(promptType, ColorIntensity::Vibrant), nullptr, "planarfigure.selected.line.color");
-      node->SetSelected(true);
-      node->SetFloatProperty("planarfigure.line.width", 3.0f);
-      node->SetBoolProperty("planarfigure.drawname", false);
-      node->SetBoolProperty("planarfigure.drawshadow", false);
-      node->SetBoolProperty("planarfigure.drawcontrolpoints", false);
-      node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
-      node->SetBoolProperty("planarfigure.fill", true);
+      node->SetColor(GetColor(promptType, ColorIntensity::Vibrant));
+      node->SetFloatProperty("line width", 3.0f);
       node->SetBoolProperty("helper object", true);
       HideNodeIn3DRenderWindows(node);
 
@@ -159,7 +153,7 @@ namespace mitk::nnInteractive
       // Add the newly placed box to the list of completed boxes.
       auto latestBoxNode = m_NextBoxNode;
       latestBoxNode->SetName(this->CreateBoxNodeName());
-      latestBoxNode->SetSelected(false);
+      latestBoxNode->SetColor(GetColor(m_Owner->GetCurrentPromptType(), ColorIntensity::Muted));
       this->BoxNodes[m_Owner->GetCurrentPromptType()].push_back(latestBoxNode);
 
       // Notify the nnInteractiveTool that an interaction has occurred.

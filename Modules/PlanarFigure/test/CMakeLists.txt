@@ -10,7 +10,7 @@ if(TARGET ${TESTDRIVER})
   #
   # The test postfix encodes the aspect ratio (Square, Landscape, Portrait) of the
   # render window (r), the viewport (v) and the input image (w).
-  # The expected result is mitkViewportRenderingTest_${testPostfix}.png
+  # The expected result is mitkViewportRenderingTest_${testPostfix}_AntiAliasedFigures.png
   #
   function(viewportTest
     testPostfix  # postfix to uniquely identify the test case
@@ -33,7 +33,7 @@ if(TARGET ${TESTDRIVER})
         ${MITK_DATA_DIR}/RenderingTestData/PlanarFigures/FourPointAngle1.pf
         ${MITK_DATA_DIR}/RenderingTestData/PlanarFigures/Rectangle1.pf
         ${MITK_DATA_DIR}/binary.stl
-        -V ${MITK_DATA_DIR}/RenderingTestData/viewport/mitkViewportRenderingTest_${testPostfix}.png #corresponding reference screenshot
+        -V ${MITK_DATA_DIR}/RenderingTestData/viewport/mitkViewportRenderingTest_${testPostfix}_AntiAliasedFigures.png #corresponding reference screenshot
         )
   endfunction()
 

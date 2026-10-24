@@ -142,6 +142,9 @@ namespace mitk
     /** \brief Whether the figure has been placed completely and has at least the minimum number of control points. */
     bool IsComplete() const;
 
+    /** \brief A figure without control points is empty; its plane does not count for bounding boxes, for example. */
+    bool IsEmptyTimeStep(unsigned int timeStep) const override;
+
     /** \brief The contours of the figure, computed from its control points. */
     virtual std::vector<Contour> GetContours() const = 0;
 

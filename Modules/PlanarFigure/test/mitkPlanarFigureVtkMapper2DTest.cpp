@@ -11,12 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkIOUtil.h>
+#include <mitkMouseMoveEvent.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureInteractor.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+
+#include <usModuleRegistry.h>
 
 #include <vtkRenderWindow.h>
 
@@ -35,6 +39,9 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(RenderDarkTranslucentFigures);
   MITK_TEST(RenderLabels);
   MITK_TEST(RenderHighDpi);
+  MITK_TEST(RenderStates);
+  MITK_TEST(RenderInsertionPreview);
+  MITK_TEST(RenderRemovalPreview);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -102,6 +109,44 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
     }
 
     return nodes;
+  }
+
+  mitk::DataNode::Pointer AddFigure(const std::string &typeId, std::size_t cell)
+  {
+    auto node = mitk::DataNode::New();
+    node->SetData(this->CreateFigure(typeId, cell));
+    m_RenderingTestHelper.GetDataStorage()->Add(node);
+    return node;
+  }
+
+  static mitk::PlanarFigureInteractor::Pointer AddInteractor(mitk::DataNode *node)
+  {
+    auto interactor = mitk::PlanarFigureInteractor::New();
+    auto *planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
+    interactor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
+    interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
+    interactor->SetDataNode(node);
+    return interactor;
+  }
+
+  mitk::BaseRenderer *GetRenderer()
+  {
+    return mitk::BaseRenderer::GetInstance(m_RenderingTestHelper.GetVtkRenderWindow());
+  }
+
+  /** Moves the mouse over a point of the plane, through the dispatcher like a real mouse. */
+  void MoveTo(const mitk::Point2D &point, mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey)
+  {
+    auto *renderer = this->GetRenderer();
+
+    mitk::Point3D worldPoint;
+    m_Plane->Map(point, worldPoint);
+
+    mitk::Point2D displayPoint;
+    renderer->WorldToDisplay(worldPoint, displayPoint);
+
+    auto event = mitk::MouseMoveEvent::New(renderer, displayPoint, mitk::InteractionEvent::NoButton, modifiers);
+    renderer->GetDispatcher()->ProcessEvent(event);
   }
 
   void CompareWithReference(const std::string &name)
@@ -183,6 +228,40 @@ public:
     m_RenderingTestHelper.GetVtkRenderWindow()->SetDPI(144);
     this->AddEveryType();
     this->CompareWithReference("HighDpi");
+  }
+
+  void RenderStates()
+  {
+    this->AddFigure("polygon", 4);
+    this->AddFigure("polygon", 5)->SetSelected(true);
+
+    const auto hoveredInteractor = AddInteractor(this->AddFigure("circle", 6));
+    this->MoveTo(P(6, 0.65, 0.5));
+    CPPUNIT_ASSERT_MESSAGE("The circle is hovered", hoveredInteractor->GetFeedback(this->GetRenderer()).IsHovered);
+
+    this->CompareWithReference("States");
+  }
+
+  void RenderInsertionPreview()
+  {
+    const auto node = this->AddFigure("polygon", 5);
+    node->SetSelected(true);
+
+    // Midway along the first edge
+    const auto interactor = AddInteractor(node);
+    this->MoveTo(P(5, 0.5, 0.25), mitk::InteractionEvent::ControlKey);
+    CPPUNIT_ASSERT_MESSAGE("An insertion is previewed", interactor->GetFeedback(this->GetRenderer()).InsertionPreview.has_value());
+
+    this->CompareWithReference("InsertionPreview");
+  }
+
+  void RenderRemovalPreview()
+  {
+    const auto interactor = AddInteractor(this->AddFigure("polygon", 5));
+    this->MoveTo(P(5, 0.85, 0.3), mitk::InteractionEvent::ControlKey);
+    CPPUNIT_ASSERT_MESSAGE("A removal is previewed", interactor->GetFeedback(this->GetRenderer()).IsRemovalPreview);
+
+    this->CompareWithReference("RemovalPreview");
   }
 };
 

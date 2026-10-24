@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkPlanarFigureVtkMapper2D_h
 
 #include <mitkLocalStorageHandler.h>
+#include <mitkPlanarFigureInteractor.h>
 #include <mitkVtkMapper.h>
 #include <MitkPlanarFigureExports.h>
 
@@ -86,7 +87,7 @@ namespace mitk
       int ViewportWidth = 0;
       int ViewportHeight = 0;
       int DPI = 0;
-      int HoveredHandle = -1;
+      PlanarFigureInteractor::Feedback Feedback;
       double AnimationTime = 0.0;
 
       bool operator==(const BuildKey &) const = default;

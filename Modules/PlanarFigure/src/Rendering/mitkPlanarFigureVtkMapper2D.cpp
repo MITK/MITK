@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkColorProperty.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureInteractor.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
@@ -60,11 +61,12 @@ namespace
     constexpr double AngleArcRadius = 24.0;
     constexpr double ArrowHeadLength = 12.0;
     constexpr double ArrowHeadHalfAngle = std::numbers::pi / 6.0;
-    constexpr double HandleRadius = 4.0;
+    constexpr double HandleRadius = mitk::PlanarFigureViewHelpers::HandleRadius;
     constexpr double HoveredHandleRadius = 5.5;
     constexpr double HandleOutlineWidth = 1.5;
     constexpr double HandleOutlineAlpha = 0.8;
     constexpr double CenterHandleWidth = 2.0;
+    constexpr double InsertionPreviewAlpha = 0.7;
     constexpr double LabelOffset = 8.0;
     constexpr double LabelPlateAlpha = 0.55;
     constexpr double PulseAmplitude = 0.08;
@@ -148,6 +150,15 @@ namespace
     };
 
     return { rotate(Style::ArrowHeadHalfAngle), tip, rotate(-Style::ArrowHeadHalfAngle) };
+  }
+
+  mitk::PlanarFigureInteractor::Feedback GetFeedback(const mitk::DataNode *node, const mitk::BaseRenderer *renderer)
+  {
+    const auto *interactor = dynamic_cast<const mitk::PlanarFigureInteractor *>(node->GetDataInteractor().GetPointer());
+
+    return nullptr != interactor
+      ? interactor->GetFeedback(renderer)
+      : mitk::PlanarFigureInteractor::Feedback{};
   }
 
   std::string GetMeasurementText(const mitk::PlanarFigure *figure)
@@ -236,7 +247,7 @@ mitk::PlanarFigureVtkMapper2D::BuildKey mitk::PlanarFigureVtkMapper2D::GetBuildK
 
   BuildKey key;
   key.FigureTime = figure != nullptr ? figure->GetMTime() : 0;
-  key.HoveredHandle = figure != nullptr ? figure->GetSelectedControlPoint() : -1;
+  key.Feedback = GetFeedback(node, renderer);
   key.NodeTime = node->GetMTime();
   key.PropertiesTime = node->GetPropertyList()->GetMTime();
   key.RendererPropertiesTime = node->GetPropertyList(renderer)->GetMTime();
@@ -275,7 +286,12 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   const auto *figurePlane = figure != nullptr ? figure->GetPlaneGeometry() : nullptr;
   const auto *rendererPlane = renderer->GetCurrentWorldPlaneGeometry();
 
-  if (figurePlane == nullptr || rendererPlane == nullptr || 0 == figure->GetNumberOfControlPoints() ||
+  // A figure of locked shape that is being placed is shown only in the window that moves it.
+  bool isPlacedHere = false;
+  node->GetBoolProperty("PlanarFigureInitializedWindow", isPlacedHere, renderer);
+  const auto isStampElsewhere = figure != nullptr && figure->IsBeingPlaced() && figure->IsShapeLocked() && !isPlacedHere;
+
+  if (figurePlane == nullptr || rendererPlane == nullptr || 0 == figure->GetNumberOfControlPoints() || isStampElsewhere ||
       !node->IsVisible(renderer) || !PlanarFigureViewHelpers::IsOnPlane(figurePlane, rendererPlane))
   {
     localStorage->m_PropAssembly->SetVisibility(false);
@@ -294,8 +310,8 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer);
   const auto lineWidth = logicalLineWidth * scale;
 
-  bool isHovered = false;
-  node->GetBoolProperty("planarfigure.ishovering", isHovered);
+  const auto feedback = GetFeedback(node, renderer);
+  const auto isHovered = feedback.IsHovered;
 
   bool isSelected = false;
   node->GetBoolProperty("selected", isSelected, renderer);
@@ -437,7 +453,18 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
     if (isPlacedPointByPoint && !handles.empty())
       handles.pop_back();
 
-    const auto hoveredHandle = isHovered ? figure->GetSelectedControlPoint() : -1;
+    const auto outlineWidth = Style::HandleOutlineWidth * scale;
+
+    const auto toView = [&](const Point2D &point) {
+      return pulseCenter + (ToDisplay(point, figurePlane, renderer) - pulseCenter) * pulseScale;
+    };
+
+    // Hollow handles mark the center, and where a Ctrl+click would insert or remove a point.
+    const auto addHollowHandle = [&](const Point2D &position, double radius, double alpha) {
+      const auto innerRadius = radius - Style::CenterHandleWidth * scale;
+      tessellator.AddRing(position, innerRadius - outlineWidth, radius + outlineWidth, WithAlpha(contrast, Style::HandleOutlineAlpha * alpha * opacity));
+      tessellator.AddRing(position, innerRadius, radius, WithAlpha(base, alpha * opacity));
+    };
 
     for (std::size_t i = 0; i < handles.size(); ++i)
     {
@@ -446,15 +473,26 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       if (figure->IsShapeLocked() && !isCenter)
         continue;
 
-      const auto position = pulseCenter + (ToDisplay(handles[i].Position, figurePlane, renderer) - pulseCenter) * pulseScale;
-      const auto radius = (static_cast<int>(i) == hoveredHandle ? Style::HoveredHandleRadius : Style::HandleRadius) * scale;
-      const auto outlineWidth = Style::HandleOutlineWidth * scale;
+      const auto position = toView(handles[i].Position);
+      const auto isHoveredHandle = feedback.HoveredHandle == i;
+      const auto radius = (isHoveredHandle ? Style::HoveredHandleRadius : Style::HandleRadius) * scale;
 
-      if (isCenter)
+      if (isHoveredHandle && feedback.IsRemovalPreview)
       {
-        const auto innerRadius = radius - Style::CenterHandleWidth * scale;
-        tessellator.AddRing(position, innerRadius - outlineWidth, radius + outlineWidth, WithAlpha(contrast, Style::HandleOutlineAlpha * opacity));
-        tessellator.AddRing(position, innerRadius, radius, base);
+        addHollowHandle(position, radius, 1.0);
+
+        Vector2D arm;
+        arm.Fill(radius * std::numbers::sqrt2 / 2.0);
+        Vector2D otherArm = arm;
+        otherArm[1] = -arm[1];
+
+        const auto crossColor = WithAlpha(contrast, Style::HandleOutlineAlpha * opacity);
+        tessellator.AddStroke({ position - arm, position + arm }, false, outlineWidth, crossColor);
+        tessellator.AddStroke({ position - otherArm, position + otherArm }, false, outlineWidth, crossColor);
+      }
+      else if (isCenter)
+      {
+        addHollowHandle(position, radius, 1.0);
       }
       else
       {
@@ -462,6 +500,9 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
         tessellator.AddDisc(position, radius, base);
       }
     }
+
+    if (feedback.InsertionPreview.has_value())
+      addHollowHandle(toView(*feedback.InsertionPreview), Style::HandleRadius * scale, Style::InsertionPreviewAlpha);
   }
 
   localStorage->m_Mapper->SetInputData(tessellator.GetPolyData());

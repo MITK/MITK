@@ -901,8 +901,7 @@ void QmitkMeasurementView::OnDrawPathTriggered(bool checked)
   if (!this->BeginDrawAction(d->m_DrawPath, checked))
     return;
 
-  auto node = this->AddFigureToDataStorage(mitk::PlanarPath::New(), "Path", d->m_PathCounter);
-  node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
+  this->AddFigureToDataStorage(mitk::PlanarPath::New(), "Path", d->m_PathCounter);
 
   d->m_HintLabel->show();
 }
@@ -998,9 +997,7 @@ void QmitkMeasurementView::OnDrawPolygonTriggered(bool checked)
   auto planarFigure = mitk::PlanarPolygon::New();
   planarFigure->ClosedOn();
 
-  auto node = this->AddFigureToDataStorage(planarFigure, "Polygon", d->m_PolygonCounter);
-
-  node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
+  this->AddFigureToDataStorage(planarFigure, "Polygon", d->m_PolygonCounter);
 
   d->m_HintLabel->show();
 }
@@ -1034,10 +1031,10 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   d->m_CancelPlacementShortcut->setEnabled(true);
   d->m_DrawLabel->show();
 
-  // The planar figure interactor ignores points added to a figure that is not
-  // selected, so the placement ends once something else takes the selection,
-  // e.g. the Data Manager when another node gets selected. The cancellation is
-  // deferred to not remove the figure while its deselection is still processed.
+  // A figure being placed is canceled once something else takes the selection,
+  // e.g. the Data Manager when another node gets selected, so no unfinished
+  // figure stays behind. The cancellation is deferred to not remove the figure
+  // while its deselection is still processed.
   d->m_PlacementSelectionObserver.Reset(newNode, itk::ModifiedEvent(), [this](const itk::EventObject&) {
     if (d->m_UninitializedNode.IsNull() || d->m_UninitializedNode->IsSelected())
       return;

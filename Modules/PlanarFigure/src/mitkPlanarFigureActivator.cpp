@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 #include <mitkBaseRenderer.h>
-#include <mitkCoreServices.h>
-#include <mitkIPropertyTransience.h>
 #include <mitkMapperProviderBase.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureVtkMapper2D.h>
@@ -31,19 +29,13 @@ namespace mitk
   /**
    * \brief Module activator for the PlanarFigure module.
    *
-   * Registers the mapper providers for mitk::PlanarFigure and
-   * planar-figure-specific transient properties, i.e. runtime/UI
-   * state that must not be persisted to scene files. The generic node
-   * "selected" flag is registered centrally by the Core module.
+   * Registers the mapper providers for mitk::PlanarFigure.
    */
   class PlanarFigureModuleActivator : public us::ModuleActivator
   {
   public:
     void Load(us::ModuleContext *) override
     {
-      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
-      transience->AddTransient<PlanarFigure>("planarfigure.ishovering");
-
       m_MapperProviders.push_back(
         std::make_unique<MapperProviderBase<PlanarFigureVtkMapper2D, PlanarFigure>>(BaseRenderer::Standard2D));
       m_MapperProviders.push_back(

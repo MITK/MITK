@@ -26,6 +26,9 @@ namespace mitk
 /** \brief How planar figures relate to the render windows that show them. */
 namespace mitk::PlanarFigureViewHelpers
 {
+  /** \brief Radius of the handles of figures, in logical pixels. */
+  constexpr double HandleRadius = 4.0;
+
   /**
    * \brief Whether a render window shows the plane of a figure.
    *

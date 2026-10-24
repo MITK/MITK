@@ -8,7 +8,6 @@ set(MODULE_TESTS
   mitkPlanarFigureTest.cpp
   mitkPlanarFigurePropertySerializerTest.cpp
   mitkPlanarArrowTest.cpp
-  mitkPlanarFigureTransienceTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

@@ -67,6 +67,11 @@ namespace
     if (properties.GetFloatProperty("opacity", opacity) && 0.8f == opacity)
       properties.DeleteProperty("opacity");
 
+    const auto *color = dynamic_cast<const mitk::ColorProperty *>(properties.GetProperty("color"));
+
+    if (nullptr != color && mitk::Color(1.0f) == color->GetColor())
+      properties.DeleteProperty("color");
+
     AddMissingDefaults(data, properties);
   }
 

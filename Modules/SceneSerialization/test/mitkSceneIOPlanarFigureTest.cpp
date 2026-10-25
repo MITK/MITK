@@ -172,6 +172,23 @@ public:
     line->GetOpacity(opacity, nullptr);
     CPPUNIT_ASSERT_EQUAL(1.0f, opacity);
 
+    // Figures were white by default, so a white one gets the current default and a colored one keeps its color.
+    auto currentNode = mitk::DataNode::New();
+    currentNode->SetData(mitk::PlanarLine::New());
+
+    const auto getColor = [](const mitk::DataNode *node) {
+      float rgb[3] = { 0.0f, 0.0f, 0.0f };
+      CPPUNIT_ASSERT_MESSAGE(node->GetName(), node->GetColor(rgb));
+      return mitk::Color(rgb);
+    };
+
+    const auto currentColor = getColor(currentNode);
+    CPPUNIT_ASSERT(mitk::Color(1.0f) != currentColor);
+    CPPUNIT_ASSERT(currentColor == getColor(this->GetFigureNode("Circle1")));
+
+    const float red[3] = { 1.0f, 0.0f, 0.0f };
+    CPPUNIT_ASSERT(mitk::Color(red) == getColor(line));
+
     // Name labels were on by default, as they are now, so a switched off one stays off.
     bool drawName = false;
     CPPUNIT_ASSERT(line->GetBoolProperty("planarfigure.drawname", drawName) && drawName);
@@ -262,6 +279,7 @@ public:
     // In a current scene, this is a choice rather than a default of a previous version.
     auto *line = this->GetFigureNode("Line1");
     line->SetOpacity(0.8f);
+    line->SetColor(1.0f, 1.0f, 1.0f);
 
     const auto filename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
     CPPUNIT_ASSERT(mitk::SceneIO::New()->SaveScene(m_Storage->GetAll(), m_Storage, filename));
@@ -272,6 +290,10 @@ public:
     float opacity = 1.0f;
     CPPUNIT_ASSERT(restoredLine->GetOpacity(opacity, nullptr));
     CPPUNIT_ASSERT_EQUAL(0.8f, opacity);
+
+    float rgb[3] = { 0.0f, 0.0f, 0.0f };
+    CPPUNIT_ASSERT(restoredLine->GetColor(rgb));
+    CPPUNIT_ASSERT(mitk::Color(1.0f) == mitk::Color(rgb));
   }
 };
 

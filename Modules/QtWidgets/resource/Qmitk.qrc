@@ -44,17 +44,19 @@
     <file>mxn-clean-off.svg</file>
     <file>mxn-clean-on.svg</file>
     <file>mxn-navigator.svg</file>
-    <file>PlanarAngle_48.png</file>
-    <file>PlanarBezierCurve_48.png</file>
-    <file>PlanarCircle_48.png</file>
-    <file>PlanarDoubleEllipse_48.png</file>
-    <file>PlanarEllipse_48.png</file>
-    <file>PlanarFourPointAngle_48.png</file>
-    <file>PlanarLine_48.png</file>
-    <file>PlanarPath_48.png</file>
-    <file>PlanarPolygon_48.png</file>
-    <file>PlanarRectangle_48.png</file>
-    <file>PlanarSubdivisionPolygon_48.png</file>
+    <file>PlanarAngle.svg</file>
+    <file>PlanarArrow.svg</file>
+    <file>PlanarBezierCurve.svg</file>
+    <file>PlanarCircle.svg</file>
+    <file>PlanarCross.svg</file>
+    <file>PlanarDoubleEllipse.svg</file>
+    <file>PlanarEllipse.svg</file>
+    <file>PlanarFourPointAngle.svg</file>
+    <file>PlanarLine.svg</file>
+    <file>PlanarPath.svg</file>
+    <file>PlanarPolygon.svg</file>
+    <file>PlanarRectangle.svg</file>
+    <file>PlanarSubdivisionPolygon.svg</file>
     <file>PointSet_48.png</file>
     <file>reset.svg</file>
     <file>ROIIcon.svg</file>

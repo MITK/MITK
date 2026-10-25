@@ -10,6 +10,7 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkMeasurementViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -19,18 +20,9 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/angle.png
-  resources/arrow.png
-  resources/circle.png
-  resources/four-point-angle.png
   resources/lena.xpm
-  resources/line.png
   resources/measurement.svg
-  resources/path.png
-  resources/polygon.png
-  resources/rectangle.png
   resources/stats.png
-  resources/text.png
   resources/bar-chart.svg
   resources/bar-chart2.svg
   plugin.xml

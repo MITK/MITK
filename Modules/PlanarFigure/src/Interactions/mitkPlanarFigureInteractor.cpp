@@ -341,6 +341,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("is_on_flat_plane", IsOnFlatPlane);
   CONNECT_CONDITION("is_placed_by_span", IsPlacedBySpan);
   CONNECT_CONDITION("is_stamp", IsStamp);
+  CONNECT_CONDITION("is_inside_slice", IsInsideSlice);
   CONNECT_CONDITION("is_complete", IsComplete);
   CONNECT_CONDITION("is_hit", IsHit);
   CONNECT_CONDITION("is_beyond_drag_threshold", IsBeyondDragThreshold);
@@ -364,6 +365,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("remove_last_point", RemoveLastPoint);
   CONNECT_FUNCTION("end_placement", EndPlacement);
   CONNECT_FUNCTION("move_stamp", MoveStamp);
+  CONNECT_FUNCTION("hide_stamp", HideStamp);
 }
 
 void mitk::PlanarFigureInteractor::ConfigurationChanged()
@@ -668,6 +670,24 @@ bool mitk::PlanarFigureInteractor::IsStamp(const InteractionEvent *)
 {
   const auto *figure = this->GetFigure();
   return nullptr != figure && figure->IsBeingPlaced() && figure->IsShapeLocked() && figure->GetNumberOfControlPoints() > 0;
+}
+
+bool mitk::PlanarFigureInteractor::IsInsideSlice(const InteractionEvent *interactionEvent)
+{
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+
+  if (nullptr == positionEvent)
+    return false;
+
+  const auto *plane = GetSlicePlane(interactionEvent->GetSender());
+
+  if (nullptr == plane)
+    return false;
+
+  Point2D position;
+  plane->Map(positionEvent->GetPositionInWorld(), position);
+
+  return ClampToPlane(plane, position) == position;
 }
 
 bool mitk::PlanarFigureInteractor::IsComplete(const InteractionEvent *)
@@ -1001,6 +1021,13 @@ void mitk::PlanarFigureInteractor::MoveStamp(StateMachineAction *, InteractionEv
   if (nullptr == figure || !this->IsOnFlatPlane(interactionEvent))
     return;
 
+  // A stamp is placed where the mouse is, so it is not offered beside the image.
+  if (!this->IsInsideSlice(interactionEvent))
+  {
+    this->ShowStampIn(nullptr);
+    return;
+  }
+
   // The shape is kept in plane coordinates, so it moves to the slice under the mouse unchanged.
   figure->SetPlaneGeometry(GetSlicePlane(renderer));
 
@@ -1010,7 +1037,29 @@ void mitk::PlanarFigureInteractor::MoveStamp(StateMachineAction *, InteractionEv
     return;
 
   figure->Translate(ClampOffsetToPlane(figure->GetPlaneGeometry(), GetPositionsBoundToPlane(*figure), *position - figure->GetControlPoint(0)));
-  this->GetDataNode()->SetBoolProperty("PlanarFigureInitializedWindow", true, renderer);
 
-  RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+  this->ShowStampIn(renderer);
+}
+
+void mitk::PlanarFigureInteractor::HideStamp(StateMachineAction *, InteractionEvent *)
+{
+  this->ShowStampIn(nullptr);
+}
+
+void mitk::PlanarFigureInteractor::ShowStampIn(const BaseRenderer *renderer)
+{
+  // Only the window that moves the stamp shows it, so the mark of that window follows the mouse.
+  auto *node = this->GetDataNode();
+
+  for (const auto &rendererName : node->GetPropertyListNames())
+  {
+    if (nullptr == renderer || rendererName != renderer->GetName())
+      node->GetPropertyList(rendererName)->DeleteProperty("PlanarFigureInitializedWindow");
+  }
+
+  if (nullptr != renderer)
+    node->SetBoolProperty("PlanarFigureInitializedWindow", true, renderer);
+
+  // The windows the stamp left still show it until they are rendered again.
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }

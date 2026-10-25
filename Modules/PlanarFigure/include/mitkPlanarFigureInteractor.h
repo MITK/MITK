@@ -61,7 +61,7 @@ namespace mitk
    * by a span; one point per click for the others, finished by a double
    * click or Enter, where Backspace or Delete removes the last point. A
    * figure whose shape is locked follows the mouse until it is dropped by a
-   * click.
+   * click; beside the image it is hidden, and a click does not drop it.
    *
    * Placed figures show their handles while hovered. Dragging a handle moves
    * it, dragging the stroke or the inside moves the whole figure. Pressing a
@@ -178,6 +178,7 @@ namespace mitk
     bool IsOnFlatPlane(const InteractionEvent *interactionEvent);
     bool IsPlacedBySpan(const InteractionEvent *interactionEvent);
     bool IsStamp(const InteractionEvent *interactionEvent);
+    bool IsInsideSlice(const InteractionEvent *interactionEvent);
     bool IsComplete(const InteractionEvent *interactionEvent);
     bool IsHit(const InteractionEvent *interactionEvent);
     bool IsBeyondDragThreshold(const InteractionEvent *interactionEvent);
@@ -201,6 +202,10 @@ namespace mitk
     void RemoveLastPoint(StateMachineAction *, InteractionEvent *interactionEvent);
     void EndPlacement(StateMachineAction *, InteractionEvent *interactionEvent);
     void MoveStamp(StateMachineAction *, InteractionEvent *interactionEvent);
+    void HideStamp(StateMachineAction *, InteractionEvent *interactionEvent);
+
+    /** \brief Shows the stamp in the given window only, or nowhere for nullptr. */
+    void ShowStampIn(const BaseRenderer *renderer);
 
     // In logical pixels, also for configurations that leave them out or give invalid values.
     static constexpr double DefaultHitTolerance = 4.0;

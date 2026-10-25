@@ -6,8 +6,18 @@
     </transition>
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="AwaitRelease">
       <condition name="is_stamp" />
+      <condition name="is_inside_slice" />
       <action name="move_stamp" />
       <action name="end_placement" />
+    </transition>
+    <!-- Beside the image, a press places no stamp, and the armed stamp keeps it from other interaction. -->
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Idle">
+      <condition name="is_stamp" />
+    </transition>
+    <!-- The stamp follows the mouse, so it leaves with it. -->
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="Idle">
+      <condition name="is_stamp" />
+      <action name="hide_stamp" />
     </transition>
 
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Hovering">

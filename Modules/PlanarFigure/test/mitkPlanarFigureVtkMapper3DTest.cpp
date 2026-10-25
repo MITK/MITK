@@ -31,6 +31,7 @@ class mitkPlanarFigureVtkMapper3DTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPlanarFigureVtkMapper3DTestSuite);
   MITK_TEST(Figure_IsHiddenByDefault);
+  MITK_TEST(Stamp_IsHidden);
   MITK_TEST(Fill_LeavesHoleOpen);
   MITK_TEST(Pulse_ScalesFigureAroundItsCenter);
   CPPUNIT_TEST_SUITE_END();
@@ -99,6 +100,19 @@ public:
 
     m_Node->SetBoolProperty("planarfigure.3drendering", true);
     CPPUNIT_ASSERT_MESSAGE("Shown in 3D", m_RenderingTestHelper.RendersAnything());
+  }
+
+  void Stamp_IsHidden()
+  {
+    m_Node->SetBoolProperty("planarfigure.3drendering", true);
+
+    auto *figure = dynamic_cast<mitk::PlanarFigure *>(m_Node->GetData());
+    figure->BeginPlacement();
+    figure->SetShapeLocked(true);
+    CPPUNIT_ASSERT_MESSAGE("A preset that follows the mouse is hidden", !m_RenderingTestHelper.RendersAnything());
+
+    figure->EndPlacement();
+    CPPUNIT_ASSERT_MESSAGE("A placed preset is shown", m_RenderingTestHelper.RendersAnything());
   }
 
   void Fill_LeavesHoleOpen()

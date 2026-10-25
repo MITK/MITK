@@ -209,7 +209,10 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
   bool isShownIn3D = false;
   node->GetBoolProperty("planarfigure.3drendering", isShownIn3D, renderer);
 
-  if (figure == nullptr || !isShownIn3D || !node->IsVisible(renderer))
+  // A figure of locked shape that is being placed is a preview under the mouse in a 2D window.
+  const auto isStamp = figure != nullptr && figure->IsBeingPlaced() && figure->IsShapeLocked();
+
+  if (figure == nullptr || isStamp || !isShownIn3D || !node->IsVisible(renderer))
   {
     localStorage->m_Actor->SetVisibility(false);
     return;

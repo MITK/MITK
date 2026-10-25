@@ -25,7 +25,9 @@ namespace mitk
    * \brief Draws planar figures in 3D render windows.
    *
    * The contours of the figure are drawn as lines in its plane. Closed
-   * contours can be filled; holes stay open.
+   * contours can be filled; holes stay open. A figure of locked shape that
+   * is still being placed follows the mouse in 2D render windows and is not
+   * drawn.
    *
    * Node properties:
    *   - \c planarfigure.3drendering (BoolProperty): whether the figure is shown in 3D, false by default

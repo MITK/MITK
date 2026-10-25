@@ -65,6 +65,9 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(ReleaseOnPointThenMoveAway_EndsHovering);
   MITK_TEST(LeaveWhileNotHovering_IsNotConsumed);
   MITK_TEST(PresetCircle_IsPlacedWhereClicked);
+  MITK_TEST(PresetCircleMovedToOtherWindow_IsShownOnlyThere);
+  MITK_TEST(PresetCircleLeavingWindow_IsHidden);
+  MITK_TEST(PresetCircleBesideImage_IsHiddenAndNotPlaced);
   MITK_TEST(DragLine_MovesIt);
   MITK_TEST(DragSelectedLine_KeepsSelection);
   MITK_TEST(ReleaseDragWithCtrlShift_EndsDrag);
@@ -366,6 +369,101 @@ public:
     const auto rimPosition = this->GetControlPointPosition(1);
     this->DragFromTo(rimPosition, rimPosition + MakeOffset(30, 0));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, *circle->GetMeasurement(mitk::PlanarFigure::MeasurementType::Radius), 1e-9);
+  }
+
+  void PresetCircleMovedToOtherWindow_IsShownOnlyThere()
+  {
+    mitk::Point2D center;
+    center.Fill(0.0);
+    auto rim = center;
+    rim[0] = 10.0;
+
+    auto circle = mitk::PlanarCircle::New();
+    circle->BeginPlacement();
+    circle->SetFromSpan(center, rim);
+    circle->SetShapeLocked(true);
+
+    this->SetUpNewFigure(circle, "InteractionTestData/Interactions/Line.xml");
+    this->InitializeViews();
+
+    auto *otherWindow = m_InteractionTestHelper->GetRenderWindowByName("stdmulti.widget2");
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the recording has no second 2D window", nullptr != otherWindow);
+
+    this->MoveTo(GetWindowCenter());
+    Send(mitk::MouseMoveEvent::New(otherWindow->GetRenderer(), GetWindowCenter(), mitk::InteractionEvent::NoButton, mitk::InteractionEvent::NoKey));
+
+    bool isShownInOtherWindow = false;
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShownInOtherWindow, otherWindow->GetRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The window under the mouse shows the preset", isShownInOtherWindow);
+
+    bool isShownInFirstWindow = false;
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShownInFirstWindow, this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The window the mouse left no longer shows the preset", !isShownInFirstWindow);
+  }
+
+  void PresetCircleLeavingWindow_IsHidden()
+  {
+    mitk::Point2D center;
+    center.Fill(0.0);
+    auto rim = center;
+    rim[0] = 10.0;
+
+    auto circle = mitk::PlanarCircle::New();
+    circle->BeginPlacement();
+    circle->SetFromSpan(center, rim);
+    circle->SetShapeLocked(true);
+
+    this->SetUpNewFigure(circle, "InteractionTestData/Interactions/Line.xml");
+    this->InitializeViews();
+
+    this->MoveTo(GetWindowCenter());
+    this->LeaveWindow();
+
+    bool isShown = false;
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShown, this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The preset leaves the window with the mouse", !isShown);
+
+    this->MoveTo(GetWindowCenter());
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShown, this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The preset comes back with the mouse", isShown);
+  }
+
+  void PresetCircleBesideImage_IsHiddenAndNotPlaced()
+  {
+    mitk::Point2D center;
+    center.Fill(0.0);
+    auto rim = center;
+    rim[0] = 10.0;
+
+    auto circle = mitk::PlanarCircle::New();
+    circle->BeginPlacement();
+    circle->SetFromSpan(center, rim);
+    circle->SetShapeLocked(true);
+
+    this->SetUpNewFigure(circle, "InteractionTestData/Interactions/Line.xml");
+    this->InitializeViews();
+
+    this->MoveTo(GetWindowCenter());
+
+    bool isShown = false;
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShown, this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the preset is not shown on the image", isShown);
+
+    const auto besideImage = GetPositionLeftOfImage(GetWindowCenter()[1]);
+    this->MoveTo(besideImage);
+
+    isShown = false;
+    m_FigureNode->GetBoolProperty("PlanarFigureInitializedWindow", isShown, this->GetLineRenderer());
+    CPPUNIT_ASSERT_MESSAGE("The preset is hidden beside the image", !isShown);
+
+    this->PressAt(besideImage);
+    this->ReleaseAt(besideImage);
+    CPPUNIT_ASSERT_MESSAGE("A click beside the image places nothing", !circle->IsComplete());
+
+    this->MoveTo(GetWindowCenter());
+    this->PressAt(GetWindowCenter());
+    this->ReleaseAt(GetWindowCenter());
+    CPPUNIT_ASSERT_MESSAGE("A click on the image places the preset", circle->IsComplete());
   }
 
   void DragLine_MovesIt()

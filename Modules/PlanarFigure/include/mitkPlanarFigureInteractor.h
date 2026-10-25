@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <vtkWeakPointer.h>
 
 #include <optional>
+#include <string>
 
 namespace mitk
 {
@@ -234,6 +235,9 @@ namespace mitk
 
     /** \brief Where the span of the figure being placed starts, in plane coordinates. */
     Point2D m_SpanStart;
+
+    /** \brief The name of the renderer that shows the stamp, or empty while it is hidden. */
+    std::string m_StampRendererName;
   };
 }
 

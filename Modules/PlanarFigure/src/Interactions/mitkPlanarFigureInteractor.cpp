@@ -1050,16 +1050,26 @@ void mitk::PlanarFigureInteractor::ShowStampIn(const BaseRenderer *renderer)
 {
   // Only the window that moves the stamp shows it, so the mark of that window follows the mouse.
   auto *node = this->GetDataNode();
+  const std::string rendererName = nullptr != renderer ? renderer->GetName() : std::string();
 
-  for (const auto &rendererName : node->GetPropertyListNames())
+  if (rendererName != m_StampRendererName)
   {
-    if (nullptr == renderer || rendererName != renderer->GetName())
-      node->GetPropertyList(rendererName)->DeleteProperty("PlanarFigureInitializedWindow");
+    for (const auto &name : node->GetPropertyListNames())
+    {
+      if (name != rendererName)
+        node->GetPropertyList(name)->DeleteProperty("PlanarFigureInitializedWindow");
+    }
+
+    // The window the stamp left still shows it until it is rendered again.
+    if (const auto *previousRenderer = BaseRenderer::GetByName(m_StampRendererName); nullptr != previousRenderer)
+      RenderingManager::GetInstance()->RequestUpdate(previousRenderer->GetRenderWindow());
+
+    m_StampRendererName = rendererName;
   }
 
   if (nullptr != renderer)
+  {
     node->SetBoolProperty("PlanarFigureInitializedWindow", true, renderer);
-
-  // The windows the stamp left still show it until they are rendered again.
-  RenderingManager::GetInstance()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+  }
 }

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QClipboard>
 #include <QColorDialog>
 #include <QHeaderView>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QShortcut>
 #include <QTimer>
@@ -67,6 +68,7 @@ found in the LICENSE file.
 #include <cmath>
 #include <optional>
 #include <set>
+#include <utility>
 
 namespace
 {
@@ -166,11 +168,16 @@ namespace
   /** Gives a figure placed by a span the size of the given radius and locks its shape, so that it is placed with a click. */
   void MakePreset(mitk::PlanarFigure* figure, double radius)
   {
+    // A preset that already follows the mouse is resized where it is.
     mitk::Point2D center;
-    center.Fill(0.0);
+
+    if (figure->GetNumberOfControlPoints() > 0)
+      center = figure->GetControlPoint(0);
+    else
+      center.Fill(0.0);
 
     auto rim = center;
-    rim[0] = radius;
+    rim[0] += radius;
 
     figure->BeginPlacement();
     figure->SetFromSpan(center, rim);
@@ -211,7 +218,8 @@ namespace
       hint = QStringLiteral("Click to add points. Double-click to add a last one and finish, or press Enter to finish.");
     }
 
-    if (numberOfPlacedPoints > 0)
+    // The first point stays until the placement is canceled.
+    if (numberOfPlacedPoints > 1)
       hint += QStringLiteral(" Backspace removes the last point.");
 
     return hint + QStringLiteral(" Press Esc to cancel.");
@@ -274,6 +282,9 @@ struct QmitkMeasurementViewData
   mitk::ITKEventObserverGuard m_PlacementProgressObserver;
 
   bool m_IsMeasurementTreeUpdateScheduled = false;
+
+  /** Set by a node change, e.g. a new color, until the next update of the tree. */
+  bool m_HaveMeasurementTreeIconsChanged = false;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -313,6 +324,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   header->setStretchLastSection(false);
   header->setSectionResizeMode(0, QHeaderView::Stretch);
   header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  d->m_Controls->measurementsTree->viewport()->installEventFilter(this);
 
   d->m_Controls->tools->setEnabled(false);
   d->m_Controls->thicknessSpinBox->setMaximum(d->m_Controls->radiusSpinBox->value());
@@ -392,13 +404,18 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_AlignmentOverlay, &QmitkButtonOverlayWidget::Clicked, this, &QmitkMeasurementView::OnAlignViewsClicked);
   connect(d->m_Controls->copyButton, &QPushButton::clicked, this, &QmitkMeasurementView::OnCopyToClipboard);
   connect(d->m_Controls->measurementsTree, &QTreeWidget::itemSelectionChanged, this, &QmitkMeasurementView::OnMeasurementTreeSelectionChanged);
-  connect(d->m_Controls->measurementsTree, &QTreeWidget::currentItemChanged, this, &QmitkMeasurementView::OnMeasurementTreeItemActivated);
-  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemClicked, this, &QmitkMeasurementView::OnMeasurementTreeItemActivated);
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemPressed, this, &QmitkMeasurementView::OnMeasurementTreeItemActivated);
+
+  // A press changes the current item as well and is handled above, so this is for the keyboard only.
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* item) {
+    if (Qt::NoButton == QApplication::mouseButtons())
+      this->OnMeasurementTreeItemActivated(item);
+  });
 
   connect(d->m_Controls->radiusSpinBox, &QDoubleSpinBox::valueChanged, d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::setMaximum);
-  connect(d->m_Controls->fixedSizeGroupBox, &QGroupBox::toggled, this, &QmitkMeasurementView::OnFixedSizeChanged);
-  connect(d->m_Controls->radiusSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeChanged);
-  connect(d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeChanged);
+  connect(d->m_Controls->fixedSizeGroupBox, &QGroupBox::toggled, this, &QmitkMeasurementView::OnFixedSizeToggled);
+  connect(d->m_Controls->radiusSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeValueChanged);
+  connect(d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeValueChanged);
 
   connect(d->m_Controls->colorButton, &QToolButton::clicked, this, &QmitkMeasurementView::OnColorButtonClicked);
   connect(d->m_Controls->lineWidthSlider, &QSlider::valueChanged, this, [this]() {
@@ -777,7 +794,10 @@ void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
   // A figure may have been renamed, recolored or changed by other means than interaction.
   if (d->m_Figures.count(node) != 0)
+  {
+    d->m_HaveMeasurementTreeIconsChanged = true;
     this->ScheduleMeasurementTreeUpdate();
+  }
 }
 
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
@@ -900,11 +920,24 @@ void QmitkMeasurementView::OnToolClicked(int toolIndex)
   }
 }
 
-void QmitkMeasurementView::OnFixedSizeChanged()
+void QmitkMeasurementView::OnFixedSizeToggled()
 {
-  // The size is applied when the placement starts, so start over with the new one.
+  // A preset and a figure drawn by hand are placed differently, so start over.
   if (d->m_PendingTool.has_value() && FixedSize::None != Tools[*d->m_PendingTool].Size)
     this->StartPlacement(*d->m_PendingTool);
+}
+
+void QmitkMeasurementView::OnFixedSizeValueChanged()
+{
+  // Resized in place: a restart would hide the options and take the focus from the spin box.
+  if (d->m_PendingNode.IsNull() || !d->m_PendingTool.has_value() || !this->IsPlacedWithFixedSize(*d->m_PendingTool))
+    return;
+
+  if (auto* figure = dynamic_cast<mitk::PlanarFigure*>(d->m_PendingNode->GetData()); nullptr != figure)
+  {
+    this->ApplyFixedSize(figure, *d->m_PendingTool);
+    this->RequestRenderWindowUpdate();
+  }
 }
 
 void QmitkMeasurementView::StartPlacement(int toolIndex)
@@ -1033,15 +1066,7 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
   newNode->SetData(figure);
   this->ApplyAppearance(newNode);
 
-  if (d->m_SelectedImageNode.IsNotNull())
-  {
-    dataStorage->Add(newNode, d->m_SelectedImageNode);
-  }
-  else
-  {
-    dataStorage->Add(newNode);
-  }
-
+  dataStorage->Add(newNode, d->m_SelectedImageNode);
   this->SelectNode(newNode);
 
   d->m_PendingNode = newNode;
@@ -1066,12 +1091,10 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
   // There is only one such geometry per renderer and the Segmentation view claims
   // it for as long as one of its tools is active, so borrow it for the placement
   // and hand it back afterwards instead of clearing it.
-  const auto* referenceData = d->m_SelectedImageNode.IsNotNull() ? d->m_SelectedImageNode->GetData() : nullptr;
-
-  if (nullptr != d->m_RenderWindowPart && nullptr != referenceData)
+  if (nullptr != d->m_RenderWindowPart)
   {
     d->m_RestoreInteractionReferenceGeometry = GetInteractionReferenceGeometry(d->m_RenderWindowPart);
-    this->SetInteractionReferenceGeometry(referenceData->GetTimeGeometry());
+    this->SetInteractionReferenceGeometry(d->m_SelectedImageNode->GetData()->GetTimeGeometry());
   }
 }
 
@@ -1119,22 +1142,29 @@ void QmitkMeasurementView::UpdateMeasurementTree()
   const auto figures = this->GetMeasuredFigures();
   const auto numberOfFigures = static_cast<int>(figures.size());
 
+  // Icons cannot be compared, so setting them repaints the rows even while only values change.
+  const bool updateIcons = std::exchange(d->m_HaveMeasurementTreeIconsChanged, false);
+
   for (int i = 0; i < numberOfFigures; ++i)
   {
     auto* node = figures[i];
 
     QTreeWidgetItem* item = nullptr;
+    bool isExpanded = true;
 
     for (int j = i; j < tree->topLevelItemCount(); ++j)
     {
       if (GetNode(tree->topLevelItem(j)) == node)
       {
+        isExpanded = tree->topLevelItem(j)->isExpanded();
         item = j == i ? tree->topLevelItem(j) : tree->takeTopLevelItem(j);
         break;
       }
     }
 
-    if (nullptr == item)
+    const bool isNew = nullptr == item;
+
+    if (isNew)
     {
       item = new QTreeWidgetItem;
       item->setData(0, Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(node)));
@@ -1143,13 +1173,16 @@ void QmitkMeasurementView::UpdateMeasurementTree()
     if (tree->indexOfTopLevelItem(item) != i)
     {
       tree->insertTopLevelItem(i, item);
-      item->setExpanded(true);
+      item->setExpanded(isExpanded);
     }
 
     SetText(item, 0, QString::fromStdString(node->GetName()));
 
-    if (auto* descriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node); nullptr != descriptor)
-      item->setIcon(0, descriptor->GetIcon(node));
+    if (isNew || updateIcons)
+    {
+      if (auto* descriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node); nullptr != descriptor)
+        item->setIcon(0, descriptor->GetIcon(node));
+    }
 
     const auto measurements = static_cast<const mitk::PlanarFigure*>(node->GetData())->GetMeasurements();
     const auto numberOfMeasurements = static_cast<int>(measurements.size());
@@ -1158,7 +1191,13 @@ void QmitkMeasurementView::UpdateMeasurementTree()
       delete item->takeChild(item->childCount() - 1);
 
     while (item->childCount() < numberOfMeasurements)
-      (new QTreeWidgetItem(item))->setTextAlignment(1, Qt::AlignRight | Qt::AlignVCenter);
+    {
+      // A selection ranges over the figure rows only; otherwise a drag would select the
+      // value rows in between, which the selection of the figures then clears again.
+      auto* child = new QTreeWidgetItem(item);
+      child->setFlags(child->flags() & ~Qt::ItemIsSelectable);
+      child->setTextAlignment(1, Qt::AlignRight | Qt::AlignVCenter);
+    }
 
     for (int j = 0; j < numberOfMeasurements; ++j)
     {
@@ -1220,15 +1259,45 @@ void QmitkMeasurementView::OnMeasurementTreeSelectionChanged()
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkMeasurementView::OnMeasurementTreeItemActivated()
+void QmitkMeasurementView::OnMeasurementTreeItemActivated(const QTreeWidgetItem* item)
 {
-  const auto* item = d->m_Controls->measurementsTree->currentItem();
-
   if (nullptr == item)
     return;
 
+  // A value row stands for its figure.
+  if (nullptr != item->parent())
+    item = item->parent();
+
   if (auto it = d->m_Figures.find(GetNode(item)); it != d->m_Figures.end())
     this->ShowFigure(it->second.Node);
+}
+
+bool QmitkMeasurementView::eventFilter(QObject* watched, QEvent* event)
+{
+  auto* tree = d->m_Controls->measurementsTree;
+
+  if (nullptr != tree && watched == tree->viewport() &&
+      (QEvent::MouseButtonPress == event->type() || QEvent::MouseButtonDblClick == event->type()))
+  {
+    const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+    const auto* item = tree->itemAt(mouseEvent->position().toPoint());
+    auto* figureItem = nullptr != item ? item->parent() : nullptr;
+
+    // Pressing a value row would clear the selection, since the row is not selectable.
+    // Shift is left to Qt: its range reaches the figure rows up to the value row anyway.
+    if (nullptr != figureItem && Qt::LeftButton == mouseEvent->button() && !mouseEvent->modifiers().testFlag(Qt::ShiftModifier))
+    {
+      const auto command = mouseEvent->modifiers().testFlag(Qt::ControlModifier)
+        ? QItemSelectionModel::Toggle
+        : QItemSelectionModel::ClearAndSelect;
+
+      tree->setCurrentItem(figureItem, 0, command | QItemSelectionModel::Rows);
+      this->OnMeasurementTreeItemActivated(figureItem);
+      return true;
+    }
+  }
+
+  return QmitkAbstractView::eventFilter(watched, event);
 }
 
 void QmitkMeasurementView::ShowFigure(const mitk::DataNode* node)

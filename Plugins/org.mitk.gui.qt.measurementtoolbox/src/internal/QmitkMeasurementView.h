@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <memory>
 #include <vector>
 
+class QTreeWidgetItem;
 struct QmitkMeasurementViewData;
 
 namespace mitk
@@ -47,6 +48,9 @@ public:
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override {}
 
+  /** Lets a press on a value row of the measurement tree act on its figure row. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   void NodeAdded(const mitk::DataNode* node) override;
@@ -63,7 +67,8 @@ private:
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnAlignViewsClicked();
   void OnToolClicked(int toolIndex);
-  void OnFixedSizeChanged();
+  void OnFixedSizeToggled();
+  void OnFixedSizeValueChanged();
   void OnColorButtonClicked();
   void OnAppearanceChanged();
   void OnApplyAppearanceClicked();
@@ -106,7 +111,7 @@ private:
   void UpdateMeasurementTreeSelection();
 
   void OnMeasurementTreeSelectionChanged();
-  void OnMeasurementTreeItemActivated();
+  void OnMeasurementTreeItemActivated(const QTreeWidgetItem* item);
 
   /** Moves the views to the figure, and turns the closest view into its plane if no view shows it. */
   void ShowFigure(const mitk::DataNode* node);

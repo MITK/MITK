@@ -5,90 +5,93 @@
 
 <h1>Overview</h1>
 
-The Measurement view allows you to measure distances, angles, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement view is repeatedly usable with the same or different measurement figures that are related to the chosen image and can be saved together with it for future use. 
+The Measurement view allows you to measure distances, angles, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement figures belong to the chosen image and can be saved together with it for future use.
 
-
-\imageMacro{QmitkMeasurementToolbox_BasicScreenEdited.jpg,"Image with measurements",16.00}
-
+\imageMacroEx{QmitkMeasurementToolbox_BasicScreenEdited.jpg,"A line\, an angle and a circle on an image slice",10,377px}
 
 <h1>Usage</h1>
 
-The first step to perform measurements is to select a reference image on top of the view. All resulting measurements will be assigned as child nodes of the image in the data manager. The standard working plane is 'Axial' but the other standard view planes ('Sagittal' and 'Coronal') are also valid for measurements. 
+The first step to perform measurements is to select a reference image on top of the view. All measurement figures are added as child nodes of the image in the Data Manager. Measurements can be drawn in any 2D render window: axial, sagittal, coronal, or a rotated slice.
 
+\imageMacroEx{QmitkMeasurementToolbox_MeasurementView.png,"The Measurement view with the tools\, the appearance of new figures and the list of measurements",8,328px}
 
-\imageMacro{QmitkMeasurementToolbox_MeasurementView.jpg,"Measurement View",7.60}
+<h2>Drawing measurements</h2>
 
-After selecting an image, you can click on any of the geometrical symbols. Lines, circles, ellipses, double ellipses and rectangles are placed by pressing the left mouse button and dragging, or by two clicks. The other measurements are placed point by point with left-clicks; a double-click or Enter finishes them, and Backspace or Delete removes the last point.
+The tools are grouped into <i>Distances</i>, <i>Angles</i> and <i>Areas</i>. Click a tool, then draw the measurement in a render window. Each click on a tool places one measurement; afterwards the tool is released and the new measurement can be edited right away. While you draw, a hint below the tools tells you what to do next.
 
-A measurement that has not been placed yet can be canceled by pressing Esc, by clicking the active tool button again, or by switching to another tool.
+<ul>
+<li> Lines, arrows, crosses, circles, ellipses, rings and rectangles are placed by pressing the left mouse button and dragging, or by two clicks.
+<li> The other measurements are placed point by point with left-clicks. A double-click or Enter finishes them, and Backspace or Delete removes the last point.
+</ul>
+
+A measurement that has not been placed yet can be canceled by pressing Esc, by clicking the active tool again, or by switching to another tool.
+
+New measurements are named after their type, e.g. <i>Circle</i>, <i>Circle 2</i> and so on.
+
+<h2>Aligned render windows</h2>
 
 Measurements are placed on the slices of the reference image, so the render windows have to be aligned to it. Whenever they are not, the drawing tools are covered by a notice; click <i>Align views</i> to align the views to the reference image. This is the case when the view is opened while the views show something else, and when the views are initialized to other data afterwards, for example via <i>Fit views to selection</i> in the Data Manager. Switching to another reference image aligns the views to it right away. A measurement that is currently being placed is canceled in all of these cases. In displays with independent render windows, every render window that is not aligned to the reference image shows its own <i>Align view to image</i> notice while a measurement is being placed.
 
-The view offers a variety of measurement options that are introduced in the following:
+<h2>Measurement types</h2>
 
+<b>Distances</b>
 <ul>
-<li> <b>Line:</b>
-
-Draws a line between two set points and returns the distance between these points.
-
-<li> <b>Path:</b>
-
-Draws a line between several set points (two and more) and calculates the overall length, which is all lines length summed up.
-
-<li> <b>Angle:</b>
-
-Draws two lines from three set points connected in the second set point and return the inner angle at the second point.
-
-<li> <b>Four Point / Double Angle:</b>
-
-Draws two lines that may but do not have to intersect from four set points. The returned angle is the one depicted in the icon.
-
-<li> <b>Circle:</b>
-
-Draws a circle from its center to its rim. The center handle moves the circle, the handle on the rim changes its radius. The measured values are the radius, the diameter and the included area.
-
-<li> <b>Ellipse:</b>
-
-Draws an ellipse from its center, starting as a circle. The center handle moves the ellipse. The handle at the end of the first axis turns the ellipse and changes the length of that axis, the handle at the end of the second axis changes only its length. The measured values are the major and minor axes and the area.
-
-<li> <b>Double Ellipse:</b>
-
-Draws a ring between two ellipses from its center, starting as a circular ring. The center handle moves the ring. The handle at the end of the first outer axis turns the ring and changes the length of that axis, the handle at the end of the second outer axis changes only its length, and the handle on the inner ellipse, opposite of the end of the first axis, changes the thickness of the ring. Can be used for measuring e.g. the wall thickness of a vessel. The measured values are the major and minor axes and the thickness.
-
-<li> <b>Rectangle:</b>
-
-Draws a rectangle from one corner to the opposite one. Dragging a corner keeps the opposite corner in place. The measured values are the circumference and the included area.
-
-<li> <b>Polygon:</b>
-
-Draws a closed polygon that can have an arbitrary number of points. The measured values are the circumference and, if the polygon does not cross itself, the area.
-
-<li> <b>Bezier curve:</b>
-
-Draws a bezier curve through its first and last control point. The measured value is the length of the bezier curve.
-
-<li> <b>Subdivision Polygon:</b>
-
-Draws a smooth closed curve through its control points. The measured values are the circumference and, if the curve does not cross itself, the area.
+<li> <b>Line:</b> A line between two points. The measured value is its length.
+<li> <b>Cross:</b> Two perpendicular lines for bidimensional measurements, e.g. of lesions. The first line is drawn like a line; the second one starts at half its length through its middle. Dragging an end keeps the lines perpendicular. The measured values are the long and the short axis.
+<li> <b>Path:</b> Lines through two or more points. The measured value is the length of all lines summed up.
+<li> <b>Bezier Curve:</b> A curve through its first and last control point, shaped by the ones in between. The measured value is its length.
+<li> <b>Arrow:</b> A line with an arrow head, drawn from the tip to the tail, e.g. to point at a finding. The measured value is its length.
 </ul>
 
-<h2>Fixed sizes of measurement figures</h2>
-The measurement view offers a fixed size for circle and double ellipses to preset a radius and a thickness. This is useful e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. A figure of fixed size follows the mouse until a click drops it. Its shape stays locked afterwards, so it can only be moved.
+<b>Angles</b>
+<ul>
+<li> <b>Angle:</b> Two lines from three points, connected in the second point. The measured value is the inner angle at the second point.
+<li> <b>Four-Point Angle:</b> Two lines from four points that may but do not have to intersect. The measured value is the angle between the lines.
+</ul>
+
+<b>Areas</b>
+<ul>
+<li> <b>Rectangle:</b> Drawn from one corner to the opposite one. Dragging a corner keeps the opposite corner in place. The measured values are the circumference and the area.
+<li> <b>Circle:</b> Drawn from its center to its rim. The center handle moves the circle, the handle on the rim changes its radius. The measured values are the radius, the diameter and the area.
+<li> <b>Ellipse:</b> Drawn from its center, starting as a circle. The center handle moves the ellipse. The handle at the end of the first axis turns the ellipse and changes the length of that axis, the handle at the end of the second axis changes only its length. The measured values are the major and minor axes and the area.
+<li> <b>Ring:</b> A ring between two ellipses, drawn from its center and starting as a circular ring. The center handle moves the ring. The handle at the end of the first outer axis turns the ring and changes the length of that axis, the handle at the end of the second outer axis changes only its length, and the handle on the inner ellipse, opposite of the end of the first axis, changes the thickness of the ring. Can be used for measuring e.g. the wall thickness of a vessel. The measured values are the major and minor axes and the thickness.
+<li> <b>Polygon:</b> A closed polygon with an arbitrary number of points. The measured values are the circumference and, if the polygon does not cross itself, the area.
+<li> <b>Subdivision Polygon:</b> A smooth closed curve through its control points. The measured values are the circumference and, if the curve does not cross itself, the area.
+</ul>
+
+<h2>Fixed size</h2>
+
+Circles and rings can be placed with a fixed size, e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. While the circle or ring tool is active, check <i>Fixed size</i> below the tools and set the radius, and for rings the thickness. The measurement then follows the mouse over the image and is dropped by a click; beside the image it is hidden. The tool stays active, so you can place several measurements of the same size in a row; press Esc or click the tool again to stop. Their shape stays locked, so they can only be moved.
+
+<h2>Appearance of new measurements</h2>
+
+The <i>Appearance of new figures</i> group defines how new measurements are shown. The values are kept for the next session.
+
+<ul>
+<li> <b>Color:</b> The color of the measurement.
+<li> <b>Contrast outline:</b> A black or white outline that keeps the measurement visible on any image.
+<li> <b>Show in 3D:</b> Shows the measurement in the 3D render window, too.
+<li> <b>Line width:</b> The width of the outline in screen pixels, independent of the zoom.
+<li> <b>Label:</b> When the label of the measurement is shown, e.g. on hover, and whether it contains the name, the measured values, or both.
+</ul>
+
+<i>Apply to selected figures</i> gives the selected measurements this appearance. Each measurement can also be changed individually in the Properties view.
 
 <h2>Modify measurements</h2>
 
-Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. Note that measurements can only be modified if the view is open.
+Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open.
 
-<h2>Multiple measurement figures</h2>
+<h2>List of measurements</h2>
 
-The selected measurement figure is surrounded by a halo in its own color, and the displayed values belong to it. Click a measurement figure in a render window or its node in the data manager to select it. Where figures overlap, a click inside them selects the smaller one, and the handles of a figure take precedence over the outline of another.
+The list at the bottom of the view shows the measured values of all measurements of the reference image. Selecting a measurement in the list selects it in the render windows and in the Data Manager and moves the views to it; selecting it elsewhere selects it in the list. Where measurements overlap in a render window, a click inside them selects the smaller one, and the handles of a measurement take precedence over the outline of another. The selected measurement is surrounded by a halo in its own color.
 
+<i>Copy as CSV</i> copies the values of the selected measurements, or of all measurements if none is selected, to the clipboard as comma-separated values with the columns figure, measurement, value and unit, e.g. for a spreadsheet application.
 
 <h2>Save the measurement information</h2>
-The entire scene containing the image and the measurement figures can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can just save the measurement solely (with file extension '.pf.json') by right-click on the node in the data manager. Measurements saved by previous versions of MITK (with file extension '.pf') can still be opened.
 
-The content of the measurement widget can be copied to the clipboard with the corresponding button for further use in a table calculation program (e.g. Open Office Calc etc.).
+The entire scene containing the image and the measurements can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can save a single measurement (with file extension '.pf.json') by right-clicking its node in the Data Manager. Measurements saved by previous versions of MITK (with file extension '.pf') can still be opened.
 
-<h2>Remove measurement figures or image</h2>
-If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously removing all the dependent measurement figures that belong to the image tree in the data manager. To remove, just select the wanted items in the data manager list by right-clicking on the respective node or, if several items wanted to be removed, right-click on all wanted by simultaneously holding the ctrl-button pressed.
+<h2>Remove measurements or the image</h2>
+
+Measurements and the image can be removed individually or together in the Data Manager. The image cannot be removed without also removing the measurements that belong to it. To remove items, right-click on a node in the Data Manager, or select several nodes while holding Ctrl and right-click on one of them.
 */

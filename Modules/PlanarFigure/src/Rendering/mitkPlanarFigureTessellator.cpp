@@ -248,10 +248,11 @@ void mitk::PlanarFigureTessellator::AddDashedStroke(const std::vector<Point2D> &
     return;
   }
 
-  // A dash reaches less than half its width plus two feathers beyond its center
-  // line, so dashes outside this margin around the clip rectangle cannot touch it.
+  // A dash reaches at most the miter limit times its feathered half width beyond
+  // its center line, plus a feather at its caps, so dashes outside this margin
+  // around the clip rectangle cannot touch it.
   constexpr double feather = 1.0;
-  const auto margin = width / 2.0 + 2.0 * feather;
+  const auto margin = MiterLimit * (width + feather) / 2.0 + feather;
 
   const double bounds[6] = { clipLowerLeft[0] - margin, clipUpperRight[0] + margin,
     clipLowerLeft[1] - margin, clipUpperRight[1] + margin, 0.0, 0.0 };

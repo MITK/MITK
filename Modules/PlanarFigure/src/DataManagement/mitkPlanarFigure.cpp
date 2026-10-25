@@ -31,6 +31,9 @@ found in the LICENSE file.
 #include <mitkProportionalTimeGeometry.h>
 
 #include <cmath>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 #include <typeinfo>
 
 namespace
@@ -141,6 +144,28 @@ std::string mitk::PlanarFigure::GetUnitSymbol(MeasurementType type)
     default:
       return "mm";
   }
+}
+
+std::string mitk::PlanarFigure::FormatValue(const Measurement &measurement)
+{
+  std::ostringstream stream;
+  stream.imbue(std::locale::classic());
+  stream << std::fixed << std::setprecision(2) << measurement.Value;
+
+  switch (measurement.Type)
+  {
+    case MeasurementType::Area:
+      stream << " mm\xC2\xB2";
+      break;
+    case MeasurementType::Angle:
+      stream << "\xC2\xB0";
+      break;
+    default:
+      stream << ' ' << GetUnitSymbol(measurement.Type);
+      break;
+  }
+
+  return stream.str();
 }
 
 std::vector<mitk::Point2D> mitk::PlanarFigure::GetControlPoints() const

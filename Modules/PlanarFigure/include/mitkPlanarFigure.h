@@ -136,6 +136,9 @@ namespace mitk
     /** \brief Unit of a measurement type: "mm", "mm2" or "deg". */
     static std::string GetUnitSymbol(MeasurementType type);
 
+    /** \brief Value and typeset unit for display, e.g. "12.34 mm²" or "45.00°", in UTF-8. */
+    static std::string FormatValue(const Measurement &measurement);
+
     /** \brief Stable identifier of the figure type for file formats and interfaces, e.g. "four_point_angle". */
     virtual std::string GetTypeId() const = 0;
 

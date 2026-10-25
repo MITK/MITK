@@ -81,6 +81,7 @@ class mitkPlanarFigureTestSuite : public mitk::TestFixture
   MITK_TEST(Clone_CopiesStateIndependently);
   MITK_TEST(Equal_ComparesWhatDefinesTheFigure);
   MITK_TEST(SetTimeGeometry_WithoutPlane_Throws);
+  MITK_TEST(FormatValue_TypesetsUnit);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -306,6 +307,15 @@ public:
     timeGeometry->Initialize(mitk::Geometry3D::New(), 1);
 
     CPPUNIT_ASSERT_THROW(line->SetTimeGeometry(timeGeometry), mitk::Exception);
+  }
+
+  void FormatValue_TypesetsUnit()
+  {
+    using Type = mitk::PlanarFigure::MeasurementType;
+
+    CPPUNIT_ASSERT_EQUAL(std::string("12.50 mm"), mitk::PlanarFigure::FormatValue({ Type::Length, 12.5 }));
+    CPPUNIT_ASSERT_EQUAL(std::string("7.25 mm\xC2\xB2"), mitk::PlanarFigure::FormatValue({ Type::Area, 7.25 }));
+    CPPUNIT_ASSERT_EQUAL(std::string("45.00\xC2\xB0"), mitk::PlanarFigure::FormatValue({ Type::Angle, 45.0 }));
   }
 };
 

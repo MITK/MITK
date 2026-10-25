@@ -1082,10 +1082,9 @@ void QmitkMeasurementView::UpdateMeasurementText()
 
     for (const auto& measurement : planarFigure->GetMeasurements())
     {
-      measurementTexts.append(QString("<i>%1</i>: %2 %3")
+      measurementTexts.append(QString("<i>%1</i>: %2")
         .arg(QString::fromStdString(mitk::PlanarFigure::GetDisplayName(measurement.Type)))
-        .arg(measurement.Value, 0, 'f', 2)
-        .arg(QString::fromStdString(mitk::PlanarFigure::GetUnitSymbol(measurement.Type))));
+        .arg(QString::fromStdString(mitk::PlanarFigure::FormatValue(measurement))));
     }
 
     infoText.append(measurementTexts.join("<br />"));

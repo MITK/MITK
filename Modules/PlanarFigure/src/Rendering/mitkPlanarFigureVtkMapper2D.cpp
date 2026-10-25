@@ -36,9 +36,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cmath>
-#include <iomanip>
 #include <numbers>
-#include <sstream>
 
 namespace
 {
@@ -209,28 +207,12 @@ namespace
     return true;
   }
 
-  // The unit symbols are plain ASCII, the label typesets them in UTF-8.
   std::vector<std::string> GetMeasurementLines(const mitk::PlanarFigure *figure)
   {
     std::vector<std::string> lines;
 
     for (const auto &measurement : figure->GetMeasurements())
-    {
-      const auto unit = mitk::PlanarFigure::GetUnitSymbol(measurement.Type);
-
-      std::ostringstream line;
-      line.imbue(std::locale::classic());
-      line << std::fixed << std::setprecision(2) << mitk::PlanarFigure::GetDisplayName(measurement.Type) << ": " << measurement.Value;
-
-      if ("mm2" == unit)
-        line << " mm\xC2\xB2";
-      else if ("deg" == unit)
-        line << "\xC2\xB0";
-      else
-        line << ' ' << unit;
-
-      lines.push_back(line.str());
-    }
+      lines.push_back(mitk::PlanarFigure::GetDisplayName(measurement.Type) + ": " + mitk::PlanarFigure::FormatValue(measurement));
 
     return lines;
   }

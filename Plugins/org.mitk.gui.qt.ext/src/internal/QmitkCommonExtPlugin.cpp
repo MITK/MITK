@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkRecentData.h>
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkBaseApplication.h>
 
@@ -230,9 +231,10 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   }
   else
   {
-    loadDataFromDisk(fileArgs, false);
     if (newInstanceScene)
     {
+      loadDataFromDisk(fileArgs, false);
+
       foreach(QString sceneFile, sceneArgs)
       {
         startNewInstance(args, QStringList(sceneFile));
@@ -240,7 +242,9 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
     }
     else
     {
-      loadDataFromDisk(sceneArgs, false);
+      // Scenes first, so that closing the current project keeps the other files.
+      mitk::WorkbenchUtil::LoadFiles(sceneArgs, window);
+      loadDataFromDisk(fileArgs, false);
     }
   }
 

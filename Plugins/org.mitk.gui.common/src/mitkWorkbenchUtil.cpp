@@ -183,18 +183,18 @@ namespace mitk {
   }; // end struct WorkbenchUtilPrivate
 
   //! [UtilLoadFiles]
-  void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window, bool openEditor)
+  QStringList WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window, bool openEditor)
   //! [UtilLoadFiles]
   {
     if (fileNames.empty())
     {
-      return;
+      return {};
     }
 
     mitk::DataStorageReference dsRef = WorkbenchUtilPrivate::GetActiveDataStorageReference();
     if (!dsRef.IsValid())
     {
-      return;
+      return {};
     }
     mitk::DataStorage::Pointer dataStorage = dsRef.GetStorage();
 
@@ -202,7 +202,7 @@ namespace mitk {
 
     if (choice == WorkbenchUtilPrivate::CurrentProjectChoice::Cancel)
     {
-      return;
+      return {};
     }
 
     // Taken before loading, so that the loaded files are not closed with the current project.
@@ -241,7 +241,7 @@ namespace mitk {
           "be loaded multiple times</b>.</p>"
           "<p>Hint: To load all DICOM series in a folder, simply select the folder. MITK will handle the rest for you.</p>"
           "<p>Do you want to continue?</p>", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel))
-          return;
+          return {};
       }
     }
 
@@ -259,7 +259,7 @@ namespace mitk {
     catch (const mitk::Exception& e)
     {
       MITK_INFO << e;
-      return;
+      return {};
     }
     const bool dsmodified = !data->empty();
 
@@ -338,6 +338,8 @@ namespace mitk {
           msg.arg(e.message()));
       }
     }
+
+    return loadedFileNames;
   }
 
   bool WorkbenchUtil::IsSceneFile(const QString& fileName)

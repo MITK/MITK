@@ -33,8 +33,9 @@ class QPushButton;
  *
  * Clicking an entry loads it like File > Open, i.e., into the data that is
  * already loaded. Entries whose files no longer exist are shown but cannot be
- * opened. Whether they exist is checked in the background, since unreachable
- * network paths can take long to answer.
+ * opened. Instead, they can be removed from the list or located elsewhere.
+ * Whether they exist is checked in the background, since unreachable network
+ * paths can take long to answer.
  */
 class QmitkWelcomeRecentDataPage : public QWidget
 {
@@ -63,11 +64,13 @@ private:
   void UpdateLists();
   void UpdateAvailability(const RecentList& recentList);
   void CheckAvailability();
+  void Locate(const QString& path);
 
   void OnItemClicked(const QListWidgetItem* item);
   void OnContextMenuRequested(QListWidget* list, const QPoint& pos);
   void OnRecentDataChanged();
   void OnAvailabilityChecked();
+  void OnLocateFolderFound();
 
   berry::IWorkbenchWindow::WeakPtr m_Window;
   QmitkWelcomePalette m_Palette;
@@ -76,6 +79,9 @@ private:
   QSet<QString> m_MissingPaths;
   QFutureWatcher<QSet<QString>> m_AvailabilityCheck;
   bool m_IsAvailabilityCheckPending;
+  bool m_IsLocating;
+  QString m_PathToLocate;
+  QFutureWatcher<QString> m_LocateFolderSearch;
 };
 
 #endif

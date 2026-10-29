@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr int MAX_ENTRIES = 7;
+  constexpr int MAX_ENTRIES = 10;
 
   // The default file systems of Windows and macOS ignore case, so differently
   // cased spellings of a path name the same file there.

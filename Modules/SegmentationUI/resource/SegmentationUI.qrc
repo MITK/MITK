@@ -22,7 +22,6 @@
     <file>icon_label_delete_instance.svg</file>
     <file>icon_group_add.svg</file>
     <file>icon_group_delete.svg</file>
-    <file>icon_find.svg</file>
 	<file>lasso_mode_add.svg</file>
 	<file>lasso_mode_subtract.svg</file>
   </qresource>

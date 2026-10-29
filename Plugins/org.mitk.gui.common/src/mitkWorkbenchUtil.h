@@ -59,6 +59,12 @@ namespace mitk {
      * If the window already has an editor open on the active datastorage then that editor
      * is activated; otherwise the default editor for the "mitk" extension is activated.
      *
+     * If the files include a scene and the data storage already contains data other than
+     * helper objects, the user is asked whether to close the current project first, to add
+     * the scene to it, or to cancel loading. The current project is closed only after the files
+     * have been loaded, so it is kept if nothing could be loaded. Use mitk::IOUtil to load files
+     * without user interaction.
+     *
      * @param fileNames
      *            A list of file names with absolute path.
      * @param wnd

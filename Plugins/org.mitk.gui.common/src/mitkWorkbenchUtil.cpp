@@ -32,12 +32,17 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkUndoController.h>
 
 #include <QmitkIOUtil.h>
 
 #include <QMessageBox>
+#include <QPushButton>
 #include <QApplication>
 #include <QDateTime>
+
+#include <algorithm>
+#include <optional>
 
 #include "internal/org_mitk_gui_common_Activator.h"
 
@@ -105,6 +110,72 @@ namespace mitk {
       return dsService->GetActiveDataStorageReference();
     }
 
+    static bool IsSceneFile(const QString& fileName)
+    {
+      return fileName.endsWith(".mitk", Qt::CaseInsensitive) || fileName.endsWith(".mitkscene.json", Qt::CaseInsensitive);
+    }
+
+    /**
+     * Asks whether to close the current project before scenes are loaded into a data storage
+     * that already contains data other than helper objects.
+     *
+     * @return The nodes of the current project if the user chose to close it, \c nullptr if the
+     *         files are added to it, or \c std::nullopt if the user canceled loading.
+     */
+    static std::optional<DataStorage::SetOfObjects::ConstPointer> AskToCloseCurrentProject(const QStringList& fileNames, const mitk::DataStorage& dataStorage)
+    {
+      if (!std::ranges::any_of(fileNames, IsSceneFile))
+        return nullptr;
+
+      auto isNoHelperObject = NodePredicateNot::New(NodePredicateProperty::New("helper object", BoolProperty::New(true)));
+      auto projectNodes = dataStorage.GetSubset(isNoHelperObject);
+
+      if (projectNodes->empty())
+        return nullptr;
+
+      QMessageBox messageBox(QApplication::activeWindow());
+      messageBox.setIcon(QMessageBox::Question);
+      messageBox.setWindowTitle("Open Project");
+      messageBox.setText("Close the current project before opening another?");
+      messageBox.setInformativeText("Unsaved changes will be lost if you close it.");
+      auto* closeButton = messageBox.addButton("Close Current Project", QMessageBox::DestructiveRole);
+      auto* addButton = messageBox.addButton("Add to Current Project", QMessageBox::AcceptRole);
+      messageBox.addButton(QMessageBox::Cancel);
+      messageBox.setDefaultButton(addButton);
+      messageBox.exec();
+
+      if (messageBox.clickedButton() == closeButton)
+        return projectNodes;
+
+      if (messageBox.clickedButton() == addButton)
+        return nullptr;
+
+      return std::nullopt;
+    }
+
+    /**
+     * Removes the given nodes and all nodes derived from them, such as their helper objects.
+     */
+    static void RemoveNodesAndDerivations(mitk::DataStorage& dataStorage, const DataStorage::SetOfObjects& nodes)
+    {
+      auto nodesToRemove = DataStorage::SetOfObjects::New();
+
+      const auto addOnce = [&nodesToRemove](const DataNode::Pointer& node) {
+        if (std::ranges::find(*nodesToRemove, node) == nodesToRemove->end())
+          nodesToRemove->push_back(node);
+      };
+
+      for (const auto& node : nodes)
+      {
+        addOnce(node);
+
+        for (const auto& derivation : *dataStorage.GetDerivations(node, nullptr, false))
+          addOnce(derivation);
+      }
+
+      dataStorage.Remove(nodesToRemove);
+    }
+
   }; // end struct WorkbenchUtilPrivate
 
   //! [UtilLoadFiles]
@@ -122,6 +193,13 @@ namespace mitk {
       return;
     }
     mitk::DataStorage::Pointer dataStorage = dsRef.GetStorage();
+
+    auto projectToClose = WorkbenchUtilPrivate::AskToCloseCurrentProject(fileNames, *dataStorage);
+
+    if (!projectToClose)
+    {
+      return;
+    }
 
     // Turn off ASSERT
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
@@ -174,11 +252,31 @@ namespace mitk {
     const bool dsmodified = !data->empty();
 
     QStringList loadedFileNames;
+    bool sceneLoaded = false;
 
     for (int i = 0; i < fileNames.size(); ++i)
     {
       if (!loadInfos[i].m_Output.empty())
+      {
         loadedFileNames.append(fileNames[i]);
+        sceneLoaded = sceneLoaded || WorkbenchUtilPrivate::IsSceneFile(fileNames[i]);
+      }
+    }
+
+    // Other files may have loaded although the scene failed, so dsmodified is not enough.
+    if (sceneLoaded && projectToClose->IsNotNull())
+    {
+      WorkbenchUtilPrivate::RemoveNodesAndDerivations(*dataStorage, **projectToClose);
+
+      // Explicitly trigger undo model again. It is also done in the data storage itself, but
+      // as long as projectToClose exists, it has no effect, as the smart pointer keeps the
+      // removed nodes alive.
+      projectToClose.reset();
+
+      if (auto undoModel = mitk::UndoController::GetCurrentUndoModel(); nullptr != undoModel)
+      {
+        undoModel->RemoveInvalidOperations();
+      }
     }
 
     RecentData::Add(loadedFileNames);

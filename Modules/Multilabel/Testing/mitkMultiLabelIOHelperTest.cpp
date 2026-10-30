@@ -49,6 +49,9 @@ class mitkMultiLabelIOHelperTestSuite : public mitk::TestFixture
   MITK_TEST(TestLoadLegacyXMLPreset);
   MITK_TEST(TestLoadJSONPreset);
   MITK_TEST(TestLabelJSONTrackingRoundTrip);
+  MITK_TEST(TestDeserializeLabelColorAsColorProperty);
+  MITK_TEST(TestDeserializeLabelColorAsIntegers);
+  MITK_TEST(TestDeserializeLabelIndexlessCodeNames);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -279,6 +282,51 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Non-empty tracking_uid must round-trip into HasTrackingUID()",
                            realLoaded->HasTrackingUID());
     CPPUNIT_ASSERT_EQUAL(std::string("real-uid"), realLoaded->GetTrackingUID());
+  }
+
+  // Version 1 of the native format wrote colours as self-contained ColorProperty JSON.
+  void TestDeserializeLabelColorAsColorProperty()
+  {
+    const auto label = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(nlohmann::json::parse(
+      R"({"value": 3, "name": "A", "color": {"type": "ColorProperty", "value": [0.25, 0.5, 0.75]}})"));
+
+    CPPUNIT_ASSERT_EQUAL(0.25f, label->GetColor().GetRed());
+    CPPUNIT_ASSERT_EQUAL(0.5f, label->GetColor().GetGreen());
+    CPPUNIT_ASSERT_EQUAL(0.75f, label->GetColor().GetBlue());
+  }
+
+  // Hand-written label definitions may give colours as integers in 0..255.
+  void TestDeserializeLabelColorAsIntegers()
+  {
+    const auto label = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(nlohmann::json::parse(
+      R"({"value": 3, "name": "A", "color": [51, 102, 255]})"));
+
+    CPPUNIT_ASSERT_EQUAL(51 / 255.f, label->GetColor().GetRed());
+    CPPUNIT_ASSERT_EQUAL(102 / 255.f, label->GetColor().GetGreen());
+    CPPUNIT_ASSERT_EQUAL(1.f, label->GetColor().GetBlue());
+  }
+
+  // Hand-written label definitions may omit the index when there is only one region or structure.
+  void TestDeserializeLabelIndexlessCodeNames()
+  {
+    const auto stringValue = [](const std::string& value) {
+      return nlohmann::json{ { "type", "StringProperty" }, { "value", value } };
+    };
+
+    nlohmann::json json = { { "value", 3 }, { "name", "A" } };
+    json["anatomic_region.value"] = stringValue("R1");
+    json["anatomic_region.scheme"] = stringValue("SCT");
+    json["anatomic_region.meaning"] = stringValue("Region");
+    json["primary_anatomic_structure.value"] = stringValue("P1");
+    json["primary_anatomic_structure.scheme"] = stringValue("SCT");
+    json["primary_anatomic_structure.meaning"] = stringValue("Structure");
+
+    const auto label = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(json);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), label->GetAnatomicRegionCount());
+    CPPUNIT_ASSERT(mitk::DICOMCodeSequenceWithModifiers("R1", "SCT", "Region") == label->GetAnatomicRegion(0));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), label->GetPrimaryAnatomicStructureCount());
+    CPPUNIT_ASSERT(mitk::DICOMCodeSequenceWithModifiers("P1", "SCT", "Structure") == label->GetPrimaryAnatomicStructure(0));
   }
 };
 

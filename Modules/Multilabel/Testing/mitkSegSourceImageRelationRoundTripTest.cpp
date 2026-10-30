@@ -150,7 +150,7 @@ namespace
 
     // Purpose-of-Reference Code Sequence Code Meaning is written by
     // SourceImageRelationRule::Connect_datalayer at the canonical
-    // uppercase DICOM hex form so both IO paths (stack JSON and .mitk
+    // uppercase DICOM hex form so both IO paths (stack JSON and native NRRD
     // persistence template) agree on the property key after round-trip.
     const std::string purposeKey =
       "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
@@ -222,9 +222,9 @@ public:
     mitk::IOUtil::Save(seg, path);
 
     const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_MESSAGE(".mitk reader yields exactly one BaseData", loaded.size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Native NRRD reader yields exactly one BaseData", loaded.size() == 1);
     auto* loadedSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
-    CPPUNIT_ASSERT_MESSAGE(".mitk reader yields a MultiLabelSegmentation", loadedSeg != nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Native NRRD reader yields a MultiLabelSegmentation", loadedSeg != nullptr);
 
     AssertRelationPreserved(loadedSeg, seriesUID, instanceUIDs, "1.2.840.10008.5.1.4.1.1.2");
   }

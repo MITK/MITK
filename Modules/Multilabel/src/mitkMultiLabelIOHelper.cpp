@@ -440,7 +440,7 @@ std::string mitk::MultiLabelIOHelper::GetStringByKey(const itk::MetaDataDictiona
       return metaString;
     }
   }
-  return metaString;
+  return "";
 }
 
 mitk::MultiLabelIOHelper::LabelGroupMetaData::LabelGroupMetaData() : properties(PropertyList::New())

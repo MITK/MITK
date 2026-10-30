@@ -19,6 +19,9 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkPropertyPersistenceInfo.h>
 #include <mitkIPropertyPersistence.h>
+#include <mitkSegIOTestFixtures.h>
+
+#include <filesystem>
 
 std::string pathToImage;
 
@@ -29,9 +32,11 @@ class mitkLegacyLabelSetImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestRead3DLabelSetImage_Adapt);
   MITK_TEST(TestRead3DLabelSetImage_Split);
   MITK_TEST(TestRead3DplusTLabelSetImage);
+  MITK_TEST(TestReadMissingLabelDefinitionFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  std::string m_TempDir;
   mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet1;
   mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2;
   mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2_adapted;
@@ -51,6 +56,8 @@ public:
 
   void setUp() override
   {
+    m_TempDir = mitk::IOUtil::CreateTemporaryDirectory("mitkLegacyLabelSetImageIOTest_XXXXXX");
+
     auto label = GenerateLabel(1, "Label 1", 0.745098054f, 0.f, 0.196078435f,0);
     auto label2 = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0, 0);
     m_labelSet1 = { label, label2 };
@@ -71,7 +78,35 @@ public:
     m_labelSet1.clear();
     m_labelSet2.clear();
     m_labelSet2_adapted.clear();
+
+    std::error_code ec;
+    std::filesystem::remove_all(m_TempDir, ec);
   }
+
+  /** A copy of a valid legacy file (one layer, labels 0 to 2 with values 0 to 2) to corrupt. */
+  std::string CopyValidLegacyFile() const
+  {
+    const auto path = (std::filesystem::path(m_TempDir) / "legacy.nrrd").string();
+    std::filesystem::copy_file(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd"), path);
+    return path;
+  }
+
+  /** The reader itself must throw mitk::Exception mentioning text; IOUtil must report the failure too. */
+  static void AssertReadFails(const std::string& path, const std::string& text)
+  {
+    try
+    {
+      mitk::test::ReadWithReader(path, "MITK LabelSetImage (legacy)");
+      CPPUNIT_FAIL("Reading " + path + " did not fail");
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The reader's exception should mention \"" + text + "\"; got: " + e.GetDescription(),
+                             std::string(e.GetDescription()).find(text) != std::string::npos);
+    }
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(path), mitk::Exception);
+  }
+
   
   void TestRead3DLabelSetImage_Default()
   {
@@ -138,6 +173,15 @@ public:
   void TestRead3DplusTLabelSetImage()
   {
 
+  }
+
+  void TestReadMissingLabelDefinitionFails()
+  {
+    const auto path = CopyValidLegacyFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::RemoveNrrdHeaderKey(lines, "org.mitk.label_000_00002");
+    });
+    AssertReadFails(path, "label_000_00002");
   }
 
 };

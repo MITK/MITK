@@ -166,7 +166,12 @@ namespace mitk
     auto output = ConvertImageToLabelSetImage(rawimage);
 
     //get label groups definitions
-    auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
+    const auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
+    if (jsonStr.empty())
+    {
+      mitkThrow() << "The NRRD header lacks the label group information (" << MULTILABEL_SEGMENTATION_LABELS_INFO_KEY << ").";
+    }
+
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
     auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 

@@ -107,7 +107,7 @@ namespace mitk
 
         auto* labelElem = doc.FirstChildElement("Label");
         if (labelElem == nullptr)
-          mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage legacy IO";
+          mitkThrow() << "Cannot read the definition of label '" << keybuffer << "' from the NRRD header of the legacy segmentation.";
 
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 

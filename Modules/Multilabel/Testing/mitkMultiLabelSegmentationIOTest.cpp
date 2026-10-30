@@ -49,6 +49,7 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadVersion2With4D);
   MITK_TEST(TestReadVersionAbove4Fails);
   MITK_TEST(TestReadGroupCountMismatchFails);
+  MITK_TEST(TestReadWithoutLabelGroupsFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -443,6 +444,15 @@ public:
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":[]},{"labels":[]},{"labels":[]}])");
     });
     AssertReadFails(path, "does not match");
+  }
+
+  void TestReadWithoutLabelGroupsFails()
+  {
+    const auto path = SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::RemoveNrrdHeaderKey(lines, LabelGroupsKey());
+    });
+    AssertReadFails(path, LabelGroupsKey());
   }
 };
 

@@ -49,7 +49,9 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadVersion2With4D);
   MITK_TEST(TestReadVersionAbove4Fails);
   MITK_TEST(TestReadGroupCountMismatchFails);
+  MITK_TEST(TestReadMalformedLabelGroupsFails);
   MITK_TEST(TestReadWithoutLabelGroupsFails);
+  MITK_TEST(TestReadLabelCustomPropertyOfWrongTypeFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -446,6 +448,15 @@ public:
     AssertReadFails(path, "does not match");
   }
 
+  void TestReadMalformedLabelGroupsFails()
+  {
+    const auto path = SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":)");
+    });
+    AssertReadFails(path, LabelGroupsKey());
+  }
+
   void TestReadWithoutLabelGroupsFails()
   {
     const auto path = SaveValidFile();
@@ -453,6 +464,16 @@ public:
       mitk::test::RemoveNrrdHeaderKey(lines, LabelGroupsKey());
     });
     AssertReadFails(path, LabelGroupsKey());
+  }
+
+  void TestReadLabelCustomPropertyOfWrongTypeFails()
+  {
+    const auto path = SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(),
+        R"([{"labels":[{"value":7,"name":"Liver","mitk.test.label.custom":{"type":5,"value":70}}]},{"labels":[]}])");
+    });
+    AssertReadFails(path, "mitk.test.label.custom");
   }
 };
 

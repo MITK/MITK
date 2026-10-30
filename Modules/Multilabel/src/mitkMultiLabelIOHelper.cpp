@@ -808,6 +808,10 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
         MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
         mitkReThrow(e) << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
       }
+      catch (const nlohmann::json::exception& e)
+      {
+        mitkThrow() << "Unable to read custom label property from JSON. Failed key: " << internalKey << "; invalid value: " << jValue.dump() << "; reason: " << e.what();
+      }
     }
   }
 

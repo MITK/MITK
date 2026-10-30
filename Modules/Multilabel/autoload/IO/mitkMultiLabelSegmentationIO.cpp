@@ -172,8 +172,15 @@ namespace mitk
       mitkThrow() << "The NRRD header lacks the label group information (" << MULTILABEL_SEGMENTATION_LABELS_INFO_KEY << ").";
     }
 
-    nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
+    std::vector<MultiLabelIOHelper::LabelGroupMetaData> labelGroups;
+    try
+    {
+      labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(nlohmann::json::parse(jsonStr));
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+      mitkThrow() << "The label group information (" << MULTILABEL_SEGMENTATION_LABELS_INFO_KEY << ") in the NRRD header is invalid: " << e.what();
+    }
 
     if (labelGroups.empty() && output->GetNumberOfGroups()==1)
     {

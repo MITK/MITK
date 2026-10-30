@@ -13,6 +13,7 @@ set(MODULE_TESTS
     mitkMultiLabelSegmentationStackWriterTest.cpp
     mitkMultiLabelSurfaceExtractionSchedulerTest.cpp
     mitkMultiLabelSurfaceNetsExtractorTest.cpp
+    mitkSegIOTestComparatorTest.cpp
     mitkSegSourceImageRelationRoundTripTest.cpp
     mitkSegSourceImageRelationRuleTest.cpp
     mitkTransferLabelTest.cpp

@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkFileReaderSelector.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLog.h>
+#include <mitkLogBackendBase.h>
 #include <mitkProperties.h>
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkSegTestSourceImageFactory.h>
@@ -353,6 +355,67 @@ namespace mitk
       CPPUNIT_ASSERT_MESSAGE("NRRD header has no key " + key, finding != lines.end());
       lines.erase(finding);
     }
+
+    /**
+     * Returns "label <value>: <key>" for every label property under DICOM.0062.0002., the
+     * keys that MITK versions before 2025.12 stamped on every label.
+     */
+    inline std::vector<std::string> FindOutdatedLabelProperties(const MultiLabelSegmentation& segmentation)
+    {
+      const std::string prefix = "DICOM.0062.0002.";
+      std::vector<std::string> result;
+      for (const auto value : segmentation.GetAllLabelValues())
+      {
+        for (const auto& key : segmentation.GetLabel(value)->GetPropertyKeys())
+        {
+          if (key.compare(0, prefix.size(), prefix) == 0)
+            result.push_back("label " + std::to_string(value) + ": " + key);
+        }
+      }
+      return result;
+    }
+
+    /**
+     * Records, while it lives, the warnings whose text contains a fragment. Filtering by a
+     * fragment such as a property key keeps a case from counting the unrelated warnings a
+     * read also emits, without pinning the rest of the wording.
+     */
+    class WarningRecorder : public LogBackendBase
+    {
+    public:
+      explicit WarningRecorder(const std::string& fragment) : m_Fragment(fragment)
+      {
+        RegisterBackend(this);
+      }
+
+      ~WarningRecorder() override
+      {
+        UnregisterBackend(this);
+      }
+
+      WarningRecorder(const WarningRecorder&) = delete;
+      WarningRecorder& operator=(const WarningRecorder&) = delete;
+
+      void ProcessMessage(const LogMessage& message) override
+      {
+        if (LogLevel::Warn == message.Level && std::string::npos != message.Message.find(m_Fragment))
+          m_Warnings.push_back(message.Message);
+      }
+
+      OutputType GetOutputType() const override
+      {
+        return OutputType::Other;
+      }
+
+      const std::vector<std::string>& GetWarnings() const
+      {
+        return m_Warnings;
+      }
+
+    private:
+      std::string m_Fragment;
+      std::vector<std::string> m_Warnings;
+    };
   }
 }
 

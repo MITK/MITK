@@ -231,7 +231,9 @@ namespace
     bool segInitialized = false;
 
     //get pixel content
-    auto groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"]);
+    std::vector<Label::PixelType> labelsWithOutdatedProperties;
+    auto groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"],
+      &labelsWithOutdatedProperties);
 
     for (const auto& groupInfo : groupInfos)
     {
@@ -321,6 +323,8 @@ namespace
         uidManipulator.SetUID(uid);
       }
     }
+
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), labelsWithOutdatedProperties.size());
 
     result.push_back(segmentation.GetPointer());
     return result;

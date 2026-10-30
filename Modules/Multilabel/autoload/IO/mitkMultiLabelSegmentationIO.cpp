@@ -178,9 +178,11 @@ namespace mitk
     }
 
     std::vector<MultiLabelIOHelper::LabelGroupMetaData> labelGroups;
+    std::vector<Label::PixelType> labelsWithOutdatedProperties;
     try
     {
-      labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(nlohmann::json::parse(jsonStr));
+      labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(nlohmann::json::parse(jsonStr),
+        &labelsWithOutdatedProperties);
     }
     catch (const nlohmann::json::exception& e)
     {
@@ -249,6 +251,8 @@ namespace mitk
     // path regardless of the seg's origin. No-op when the seg is already
     // post-rework.
     DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesToRelation(output);
+
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), labelsWithOutdatedProperties.size());
 
     result.push_back(output.GetPointer());
 

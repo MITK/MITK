@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkIOUtil.h>
 
+#include <tinyxml2.h>
+
 #include <sstream>
 
 namespace CppUnit
@@ -51,6 +53,9 @@ class mitkMultiLabelIOHelperTestSuite : public mitk::TestFixture
   MITK_TEST(TestLabelJSONTrackingRoundTrip);
   MITK_TEST(TestDeserializeLabelColorAsColorProperty);
   MITK_TEST(TestDeserializeLabelColorAsIntegers);
+  MITK_TEST(TestDeserializeLabelDiscardsOutdatedKeys);
+  MITK_TEST(TestDeserializeGroupsReportsLabelsWithOutdatedKeys);
+  MITK_TEST(TestLoadLabelFromXMLDiscardsOutdatedKeys);
   MITK_TEST(TestDeserializeLabelIndexlessCodeNames);
 
   CPPUNIT_TEST_SUITE_END();
@@ -304,6 +309,99 @@ public:
     CPPUNIT_ASSERT_EQUAL(51 / 255.f, label->GetColor().GetRed());
     CPPUNIT_ASSERT_EQUAL(102 / 255.f, label->GetColor().GetGreen());
     CPPUNIT_ASSERT_EQUAL(1.f, label->GetColor().GetBlue());
+  }
+
+  /**
+   * One key of each family that MITK versions before 2025.12 stamped on every label: segment
+   * number, label and algorithm type, and the region, category, type and type-modifier codes.
+   * They are spelled out because the constants that produced them no longer exist.
+   */
+  static const std::vector<std::string>& OutdatedKeys()
+  {
+    static const std::vector<std::string> keys = {
+      "DICOM.0062.0002.0062.0004",
+      "DICOM.0062.0002.0062.0005",
+      "DICOM.0062.0002.0062.0008",
+      "DICOM.0062.0002.0008.2218.0008.0100",
+      "DICOM.0062.0002.0062.0003.0008.0102",
+      "DICOM.0062.0002.0062.000F.0008.0104",
+      "DICOM.0062.0002.0062.000F.0062.0011.0008.0100"
+    };
+    return keys;
+  }
+
+  /** The value as those versions wrote it. */
+  static nlohmann::json OutdatedValue(const std::string& value)
+  {
+    return nlohmann::json::parse(
+      R"({"type": "TemporoSpatialStringProperty", "value": {"values": [{"t": 0, "value": ")" + value + R"(", "z": 0}]}})");
+  }
+
+  static void AssertNoOutdatedKeys(const mitk::Label* label)
+  {
+    for (const auto& key : label->GetPropertyKeys())
+      CPPUNIT_ASSERT_MESSAGE("Outdated key survived: " + key, key.rfind("DICOM.0062.0002.", 0) != 0);
+  }
+
+  void TestDeserializeLabelDiscardsOutdatedKeys()
+  {
+    nlohmann::json json = { { "value", 3 }, { "name", "Liver" } };
+    for (const auto& key : OutdatedKeys())
+      json[key] = OutdatedValue("SEMIAUTOMATIC");
+
+    bool hadOutdatedProperties = false;
+    const auto label = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(json, &hadOutdatedProperties);
+
+    AssertNoOutdatedKeys(label);
+    CPPUNIT_ASSERT(hadOutdatedProperties);
+    CPPUNIT_ASSERT_EQUAL(mitk::Label::PixelType(3), label->GetValue());
+    CPPUNIT_ASSERT_EQUAL(std::string("Liver"), label->GetName());
+    CPPUNIT_ASSERT(mitk::Label::AlgorithmType::Undefined == label->GetAlgorithmType());
+
+    hadOutdatedProperties = true;
+    mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(nlohmann::json{ { "value", 4 }, { "name", "B" } },
+                                                       &hadOutdatedProperties);
+    CPPUNIT_ASSERT(!hadOutdatedProperties);
+  }
+
+  void TestDeserializeGroupsReportsLabelsWithOutdatedKeys()
+  {
+    auto outdatedLabel = [](int value) {
+      nlohmann::json label = { { "value", value }, { "name", "L" + std::to_string(value) } };
+      label[OutdatedKeys().front()] = OutdatedValue(std::to_string(value));
+      return label;
+    };
+    nlohmann::json groups = nlohmann::json::array();
+    groups.push_back({ { "labels", { { { "value", 1 }, { "name", "L1" } }, outdatedLabel(2) } } });
+    groups.push_back({ { "labels", { outdatedLabel(5) } } });
+
+    std::vector<mitk::Label::PixelType> labelsWithOutdatedProperties = { 99 };
+    const auto result = mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(groups,
+                                                                                      &labelsWithOutdatedProperties);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), result.size());
+    for (const auto& group : result)
+      for (const auto& label : group.labels)
+        AssertNoOutdatedKeys(label);
+    CPPUNIT_ASSERT(std::vector<mitk::Label::PixelType>({ 2, 5 }) == labelsWithOutdatedProperties);
+  }
+
+  void TestLoadLabelFromXMLDiscardsOutdatedKeys()
+  {
+    tinyxml2::XMLDocument document;
+    document.Parse(R"(<Label>)"
+                   R"(<property key="value" type="UShortProperty"><unsigned value="3" /></property>)"
+                   R"(<property key="DICOM.0062.0002.0062.0008" type="TemporoSpatialStringProperty">)"
+                   R"(<temporo_spatial_string>{"values":[{"z":0, "t":0, "value":"SEMIAUTOMATIC"}]}</temporo_spatial_string>)"
+                   R"(</property></Label>)");
+
+    bool hadOutdatedProperties = false;
+    const auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(document.FirstChildElement("Label"),
+                                                                          &hadOutdatedProperties);
+
+    AssertNoOutdatedKeys(label);
+    CPPUNIT_ASSERT(hadOutdatedProperties);
+    CPPUNIT_ASSERT_EQUAL(mitk::Label::PixelType(3), label->GetValue());
   }
 
   // Hand-written label definitions may omit the index when there is only one region or structure.

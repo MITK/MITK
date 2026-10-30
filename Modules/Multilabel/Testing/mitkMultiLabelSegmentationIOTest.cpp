@@ -47,6 +47,7 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestCustomPropertyWithoutPersistenceInfoIsDropped);
   MITK_TEST(TestReadVersion1);
   MITK_TEST(TestReadVersion2With4D);
+  MITK_TEST(TestReadOutdatedLabelPropertiesAreDiscarded);
   MITK_TEST(TestReadVersionAbove4Fails);
   MITK_TEST(TestReadGroupCountMismatchFails);
   MITK_TEST(TestReadMalformedLabelGroupsFails);
@@ -429,6 +430,33 @@ public:
       CPPUNIT_ASSERT_EQUAL(timePoints[step], timeGeometry->GetMinimumTimePoint(step));
       CPPUNIT_ASSERT_EQUAL(timePoints[step + 1], timeGeometry->GetMaximumTimePoint(step));
     }
+  }
+
+  void TestReadOutdatedLabelPropertiesAreDiscarded()
+  {
+    // Every label of this version 2 file carries the segment number, label and algorithm type
+    // that MITK stamped under DICOM.0062.0002. before 2025.12.
+    const auto path = GetTestDataFilePath("Multilabel/MultilabelSegmentation3DplusT.nrrd");
+    mitk::MultiLabelSegmentation::Pointer segmentation;
+    std::vector<std::string> readWarnings;
+    {
+      mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+      segmentation = LoadSingleSegmentation(path);
+      readWarnings = warnings.GetWarnings();
+    }
+    const auto outdated = mitk::test::FindOutdatedLabelProperties(*segmentation);
+    CPPUNIT_ASSERT_MESSAGE("Outdated label properties survived the read:" + mitk::test::JoinDifferences(outdated),
+                           outdated.empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per file", std::size_t(1), readWarnings.size());
+    CPPUNIT_ASSERT_MESSAGE("The warning names the file: " + readWarnings.front(),
+                           readWarnings.front().find("MultilabelSegmentation3DplusT.nrrd") != std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE("The warning counts the labels: " + readWarnings.front(),
+                           readWarnings.front().find("labels affected: 8") != std::string::npos);
+
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    const auto reloaded = SaveAndReload(segmentation);
+    CPPUNIT_ASSERT_MESSAGE("Saving again removes the cause of the warning", warnings.GetWarnings().empty());
+    CPPUNIT_ASSERT(mitk::test::FindOutdatedLabelProperties(*reloaded).empty());
   }
 
   void TestReadVersionAbove4Fails()

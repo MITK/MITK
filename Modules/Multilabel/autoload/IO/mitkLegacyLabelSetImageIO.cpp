@@ -80,7 +80,8 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<mitk::MultiLabelSegmentation::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
+  std::vector<mitk::MultiLabelSegmentation::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary,
+    std::size_t& numberOfLabelsWithOutdatedProperties)
   {
     std::vector<mitk::MultiLabelSegmentation::LabelVectorType> result;
 
@@ -109,11 +110,14 @@ namespace mitk
         if (labelElem == nullptr)
           mitkThrow() << "Cannot read the definition of label '" << keybuffer << "' from the NRRD header of the legacy segmentation.";
 
-        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
+        bool hadOutdatedProperties = false;
+        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem, &hadOutdatedProperties);
 
         if (label->GetValue() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {
           labelSet.push_back(label);
+          if (hadOutdatedProperties)
+            ++numberOfLabelsWithOutdatedProperties;
         }
         else
         {
@@ -142,7 +146,8 @@ namespace mitk
       groupImages = SplitVectorImage(rawimage);
     }
 
-    auto labelsets = ExtractLabelSetsFromMetaData(dictionary);
+    std::size_t numberOfLabelsWithOutdatedProperties = 0;
+    auto labelsets = ExtractLabelSetsFromMetaData(dictionary, numberOfLabelsWithOutdatedProperties);
 
     if (labelsets.size() != groupImages.size())
     {
@@ -244,6 +249,8 @@ namespace mitk
       }
       result.push_back(output.GetPointer());
     }
+
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), numberOfLabelsWithOutdatedProperties);
 
     MITK_INFO << "...finished!";
     return result;

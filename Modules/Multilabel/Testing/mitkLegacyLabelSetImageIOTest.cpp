@@ -36,6 +36,9 @@ class mitkLegacyLabelSetImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadLabelValueWithoutValueFails);
   MITK_TEST(TestReadMalformedLabelValueFails);
   MITK_TEST(TestReadLabelValueOfWrongTypeFails);
+  MITK_TEST(TestReadOutdatedLabelPropertiesAreDiscarded);
+  MITK_TEST(TestReadStampedLegacyFileWarnsOnce);
+  MITK_TEST(TestReadStampOnUnlabeledDefinitionDoesNotWarn);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -225,6 +228,53 @@ public:
     const auto path = CopyValidLegacyFile();
     EditLabelDefinition(path, R"(type="UShortProperty"><unsigned value="1" />)", R"(type="StringProperty"><string value="1" />)");
     AssertReadFails(path, "wrong property type");
+  }
+
+  void TestReadOutdatedLabelPropertiesAreDiscarded()
+  {
+    // The algorithm type as MITK stamped it on every label before 2025.12.
+    const auto path = CopyValidLegacyFile();
+    EditLabelDefinition(path, "</Label>",
+      R"(<property key="DICOM.0062.0002.0062.0008" type="TemporoSpatialStringProperty">)"
+      R"(<temporo_spatial_string>{"values":[{"z":0, "t":0, "value":"SEMIAUTOMATIC"}]}</temporo_spatial_string>)"
+      R"(</property></Label>)");
+
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), loaded.size());
+    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
+    CPPUNIT_ASSERT(nullptr != segmentation);
+
+    CPPUNIT_ASSERT_MESSAGE("Outdated label properties survived the read",
+                           mitk::test::FindOutdatedLabelProperties(*segmentation).empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per file", std::size_t(1), warnings.GetWarnings().size());
+    CPPUNIT_ASSERT_MESSAGE("The warning names the file: " + warnings.GetWarnings().front(),
+                           warnings.GetWarnings().front().find("legacy.nrrd") != std::string::npos);
+  }
+
+  void TestReadStampedLegacyFileWarnsOnce()
+  {
+    // Every label of both layers carries the stamps; the values repeat across the layers.
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    const auto loaded = mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3DplusT.nrrd"));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), loaded.size());
+    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
+    CPPUNIT_ASSERT(nullptr != segmentation);
+
+    CPPUNIT_ASSERT_MESSAGE("Outdated label properties survived the read",
+                           mitk::test::FindOutdatedLabelProperties(*segmentation).empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per file", std::size_t(1), warnings.GetWarnings().size());
+    CPPUNIT_ASSERT_MESSAGE("The warning counts the labels: " + warnings.GetWarnings().front(),
+                           warnings.GetWarnings().front().find("labels affected: 5") != std::string::npos);
+  }
+
+  void TestReadStampOnUnlabeledDefinitionDoesNotWarn()
+  {
+    // Only the definition for unlabeled pixels carries the stamps, and the reader drops that
+    // definition, so no saved file could carry them on.
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3D.nrrd"));
+    CPPUNIT_ASSERT(warnings.GetWarnings().empty());
   }
 
 };

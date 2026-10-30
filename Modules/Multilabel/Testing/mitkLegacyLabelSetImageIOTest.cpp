@@ -33,6 +33,9 @@ class mitkLegacyLabelSetImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestRead3DLabelSetImage_Split);
   MITK_TEST(TestRead3DplusTLabelSetImage);
   MITK_TEST(TestReadMissingLabelDefinitionFails);
+  MITK_TEST(TestReadLabelValueWithoutValueFails);
+  MITK_TEST(TestReadMalformedLabelValueFails);
+  MITK_TEST(TestReadLabelValueOfWrongTypeFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -89,6 +92,25 @@ public:
     const auto path = (std::filesystem::path(m_TempDir) / "legacy.nrrd").string();
     std::filesystem::copy_file(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd"), path);
     return path;
+  }
+
+  /** Replaces text in the XML definition of label 1 of layer 0. */
+  static void EditLabelDefinition(const std::string& path, const std::string& oldText, const std::string& newText)
+  {
+    mitk::test::EditNrrdHeader(path, [&oldText, &newText](std::vector<std::string>& lines) {
+      const std::string prefix = "org.mitk.label_000_00001:=";
+      for (auto& line : lines)
+      {
+        if (line.compare(0, prefix.size(), prefix) == 0)
+        {
+          const auto position = line.find(oldText);
+          CPPUNIT_ASSERT_MESSAGE("Label definition lacks " + oldText, position != std::string::npos);
+          line.replace(position, oldText.size(), newText);
+          return;
+        }
+      }
+      CPPUNIT_FAIL("Fixture lacks the definition of label 1");
+    });
   }
 
   /** The reader itself must throw mitk::Exception mentioning text; IOUtil must report the failure too. */
@@ -182,6 +204,27 @@ public:
       mitk::test::RemoveNrrdHeaderKey(lines, "org.mitk.label_000_00002");
     });
     AssertReadFails(path, "label_000_00002");
+  }
+
+  void TestReadLabelValueWithoutValueFails()
+  {
+    const auto path = CopyValidLegacyFile();
+    EditLabelDefinition(path, R"(<unsigned value="1" />)", "<unsigned />");
+    AssertReadFails(path, "'value'");
+  }
+
+  void TestReadMalformedLabelValueFails()
+  {
+    const auto path = CopyValidLegacyFile();
+    EditLabelDefinition(path, R"(<unsigned value="1" />)", R"(<unsigned value="one" />)");
+    AssertReadFails(path, "'value'");
+  }
+
+  void TestReadLabelValueOfWrongTypeFails()
+  {
+    const auto path = CopyValidLegacyFile();
+    EditLabelDefinition(path, R"(type="UShortProperty"><unsigned value="1" />)", R"(type="StringProperty"><string value="1" />)");
+    AssertReadFails(path, "wrong property type");
   }
 
 };

@@ -74,6 +74,7 @@ namespace mitk
      * \brief Creates a mitk::Label from an XML element
      * \param labelElem the xml element from which a mitk::Label will be created
      * \return the created mitk::Label
+     * \throw mitk::Exception if a property of the label cannot be deserialized
      */
     static itk::SmartPointer<mitk::Label> LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem);
 

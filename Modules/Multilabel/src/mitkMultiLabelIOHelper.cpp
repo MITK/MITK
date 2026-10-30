@@ -296,13 +296,14 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(const ti
   // reread
   auto *propElem = labelElem->FirstChildElement("property");
 
-  std::string name;
-  mitk::BaseProperty::Pointer prop;
-
   mitk::Label::Pointer label = mitk::Label::New();
   while (propElem)
   {
-    MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem);
+    std::string name;
+    mitk::BaseProperty::Pointer prop;
+    if (!MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem))
+      mitkThrow() << "Cannot load the label property '" << name << "' from XML: its value cannot be deserialized.";
+
     if (name == "value")
     {
       auto castedProp = dynamic_cast<mitk::UShortProperty*>(prop.GetPointer());

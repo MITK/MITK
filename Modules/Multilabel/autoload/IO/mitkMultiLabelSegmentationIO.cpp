@@ -69,6 +69,11 @@ namespace mitk
 
     auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
+    if (0 == input->GetNumberOfGroups())
+    {
+      mitkThrow() << "Cannot write the segmentation: it has no groups.";
+    }
+
     mitk::LocaleSwitch localeSwitch("C");
 
     mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);

@@ -52,6 +52,7 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadMalformedLabelGroupsFails);
   MITK_TEST(TestReadWithoutLabelGroupsFails);
   MITK_TEST(TestReadLabelCustomPropertyOfWrongTypeFails);
+  MITK_TEST(TestWriteWithoutGroupsFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -474,6 +475,24 @@ public:
         R"([{"labels":[{"value":7,"name":"Liver","mitk.test.label.custom":{"type":5,"value":70}}]},{"labels":[]}])");
     });
     AssertReadFails(path, "mitk.test.label.custom");
+  }
+
+  void TestWriteWithoutGroupsFails()
+  {
+    auto segmentation = mitk::test::BuildRichSegmentation({ false, false, false, false });
+    while (segmentation->GetNumberOfGroups() > 0)
+      segmentation->RemoveGroup(0);
+
+    try
+    {
+      mitk::IOUtil::Save(segmentation, TempPath("no-groups.nrrd"));
+      CPPUNIT_FAIL("Saving a segmentation without groups did not fail");
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("The error should say that there are no groups; got: ") + e.GetDescription(),
+                             std::string(e.GetDescription()).find("no groups") != std::string::npos);
+    }
   }
 };
 

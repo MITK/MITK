@@ -121,6 +121,8 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Barcode_PassiveStripStillOpensTheLayoutEditor);
   MITK_TEST(Barcode_ClickableStripReportsInBothRenderModes);
   MITK_TEST(Barcode_NotApplicableSlotIsInert);
+  MITK_TEST(Barcode_HoveredSlotRaisedOthersFade);
+  MITK_TEST(Barcode_PassiveStripHoverIsAWashBehindTheContent);
   MITK_TEST(PaintPath_PlateDoesNotCrash);
   MITK_TEST(Peek_FadeOutKeepsThePlateGeometry);
   CPPUNIT_TEST_SUITE_END();
@@ -466,9 +468,8 @@ public:
   {
     // A box sits flush against the target's edge whenever the strip fills the
     // height of its chrome. A frame stroked along that edge puts half its width
-    // outside the canvas, which loses the top line - and loses it worst when the
-    // frame is lit, because a lit frame is drawn part-transparent. Stroked half a
-    // pixel inside, the top line survives and matches the bottom one.
+    // outside the canvas, which loses the top line. Stroked half a pixel inside,
+    // the top line survives and matches the bottom one.
     constexpr int slotCount = 8;
     QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
     for (int axis = 0; axis < slotCount; ++axis)
@@ -487,9 +488,8 @@ public:
       canvas.fill(Qt::black);
       {
         QPainter painter(&canvas);
-        // hovered: every frame lit, which is the state the top line vanished in
         QmitkMxNSyncBarcodeWidget::PaintInto(painter, QRect(QPoint(0, 0), logical), axisSlots,
-                                             true, QColor(Qt::gray), -1);
+                                             false, QColor(Qt::gray), -1);
       }
 
       const auto layout =
@@ -1257,6 +1257,146 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A click on an applicable slot is reported once",
                                  1, static_cast<int>(clicked.size()));
     CPPUNIT_ASSERT_EQUAL(applicable, clicked[0]);
+  }
+
+  // ---------- The barcode's highlight ----------
+
+  /** The strip as PaintInto draws it on black, with a gray gap colour. */
+  static QImage PaintStrip(const QSize& size, const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots,
+                           bool hovered, int hoveredSlot)
+  {
+    QImage canvas(size, QImage::Format_ARGB32_Premultiplied);
+    canvas.fill(Qt::black);
+    QPainter painter(&canvas);
+    QmitkMxNSyncBarcodeWidget::PaintInto(painter, QRect(QPoint(0, 0), size), axisSlots, hovered,
+                                         QColor(100, 100, 100), hoveredSlot);
+    return canvas;
+  }
+
+  /** Where the strip draws slot 'index': a glyph box, or a 7 px colour slot. */
+  static QRect StripSlotRect(const QSize& size, int slotCount, int index)
+  {
+    const auto layout = QmitkMxNSyncBarcodeWidget::ComputeLayout(size.width(), size.height(), slotCount);
+    if (layout.mode == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs)
+    {
+      const int top = 1 + std::max(0, (size.height() - 2 - layout.box) / 2);
+      return QRect(1 + index * (layout.box + 2), top, layout.box, layout.box);
+    }
+    return QRect(index * 8, (size.height() - 16) / 2, 7, 16);
+  }
+
+  static qint64 Ink(const QImage& image, const QRect& rect)
+  {
+    qint64 ink = 0;
+    for (int y = rect.top(); y <= rect.bottom(); ++y)
+    {
+      for (int x = rect.left(); x <= rect.right(); ++x)
+      {
+        const QRgb pixel = image.pixel(x, y);
+        ink += qRed(pixel) + qGreen(pixel) + qBlue(pixel);
+      }
+    }
+    return ink;
+  }
+
+  static int MaxGreen(const QImage& image, const QRect& rect)
+  {
+    int green = 0;
+    for (int y = rect.top(); y <= rect.bottom(); ++y)
+    {
+      for (int x = rect.left(); x <= rect.right(); ++x)
+      {
+        green = std::max(green, qGreen(image.pixel(x, y)));
+      }
+    }
+    return green;
+  }
+
+  void Barcode_HoveredSlotRaisedOthersFade()
+  {
+    // Pure red slots: any green in a linked slot is the old white lit frame.
+    constexpr int hovered = 2;
+    constexpr int unlinked = 5;
+    auto axisSlots = EightSlots();
+    for (auto& slot : axisSlots)
+    {
+      slot.color = QColor(255, 0, 0);
+    }
+    axisSlots[unlinked].color = QColor();
+    const int slotCount = static_cast<int>(axisSlots.size());
+
+    for (const QSize size : { QSize(240, 24), QSize(63, 16) })
+    {
+      const bool glyphs = QmitkMxNSyncBarcodeWidget::ComputeLayout(size.width(), size.height(), slotCount).mode
+                          == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs;
+      const std::string mode = glyphs ? " (glyphs)" : " (colour slots)";
+      const QImage resting = PaintStrip(size, axisSlots, false, -1);
+      const QImage pointed = PaintStrip(size, axisSlots, false, hovered);
+
+      const QRect hoveredRect = StripSlotRect(size, slotCount, hovered);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A hovered linked slot keeps its resting look" + mode,
+                                   Ink(resting, hoveredRect), Ink(pointed, hoveredRect));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("in its own colour, nothing white" + mode, 0, MaxGreen(pointed, hoveredRect));
+
+      for (int slot = 0; slot < slotCount; ++slot)
+      {
+        if (slot == hovered)
+        {
+          continue;
+        }
+        const QRect rect = StripSlotRect(size, slotCount, slot);
+        const double ratio = static_cast<double>(Ink(pointed, rect)) / static_cast<double>(Ink(resting, rect));
+        CPPUNIT_ASSERT_MESSAGE("Slot " + std::to_string(slot) + " fades to 35 % of its resting look" + mode,
+                               ratio > 0.28 && ratio < 0.42);
+      }
+
+      if (glyphs)
+      {
+        const QImage pointedAtGap = PaintStrip(size, axisSlots, false, unlinked);
+        const QRect gapRect = StripSlotRect(size, slotCount, unlinked);
+        CPPUNIT_ASSERT_MESSAGE("A hovered unlinked slot is raised",
+                               Ink(pointedAtGap, gapRect) > 3 * Ink(resting, gapRect) / 2);
+        CPPUNIT_ASSERT_MESSAGE("in the gap colour, not in white", MaxGreen(pointedAtGap, gapRect) <= 100);
+      }
+    }
+  }
+
+  void Barcode_PassiveStripHoverIsAWashBehindTheContent()
+  {
+    auto axisSlots = EightSlots();
+    for (auto& slot : axisSlots)
+    {
+      slot.color = QColor(255, 0, 0);
+    }
+    const int slotCount = static_cast<int>(axisSlots.size());
+
+    for (const QSize size : { QSize(240, 24), QSize(63, 16) })
+    {
+      const bool glyphs = QmitkMxNSyncBarcodeWidget::ComputeLayout(size.width(), size.height(), slotCount).mode
+                          == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs;
+      const std::string mode = glyphs ? " (glyphs)" : " (colour slots)";
+      const QImage resting = PaintStrip(size, axisSlots, false, -1);
+      const QImage washed = PaintStrip(size, axisSlots, true, -1);
+
+      const QRect first = StripSlotRect(size, slotCount, 0);
+      const QPoint between(first.right() + 1, first.center().y());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("At rest the gap between two slots is empty" + mode, 0,
+                                   qGray(resting.pixel(between)));
+      const int wash = qGray(washed.pixel(between));
+      CPPUNIT_ASSERT_MESSAGE("Hovered, the button wash lies behind the slots" + mode, wash >= 20 && wash <= 32);
+
+      const QPoint past(StripSlotRect(size, slotCount, slotCount - 1).right() + 4, first.center().y());
+      if (past.x() < size.width())
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("but not past them" + mode, 0, qGray(washed.pixel(past)));
+      }
+
+      for (int slot = 0; slot < slotCount; ++slot)
+      {
+        CPPUNIT_ASSERT_MESSAGE("The slots keep their own colour, nothing turns white" + mode,
+                               MaxGreen(washed, StripSlotRect(size, slotCount, slot)) <= 40);
+      }
+    }
   }
 
   void Glyph_LargeRenderIsNotAnUpscaledResource()

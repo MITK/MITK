@@ -45,6 +45,13 @@ class QPainter;
  *
  * The whole strip doubles as a button: it emits Clicked so the owner can open
  * the layout editor. 'SetClickable' withdraws that button.
+ *
+ * Highlighting never recolours a slot, since a white frame or a brightened
+ * hue disappears on light group colours (the reserved group's light gray
+ * among them). A strip that is one button as a whole shows, under the
+ * pointer, the hover wash of the tool buttons beside it behind its slots; a
+ * strip whose axes are buttons keeps the pointed-at slot as it is and fades
+ * the others to QmitkMxNHighlightFade.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 {
@@ -118,9 +125,10 @@ public:
   /**
    * \brief Paint the given slots into 'target' as the strip does: the glyph row
    *        or the collapsed color bar, chosen by ComputeLayout for that rect's
-   *        size. 'gapColor' fills the unsynced hairline; 'hovered' brightens the
-   *        glyph frames to white. Static so the rendering can be checked on a
-   *        QImage at any device pixel ratio.
+   *        size. 'gapColor' fills the unsynced hairline; 'hovered' lays the
+   *        button hover wash behind the drawn slots; 'hoveredSlot', when not
+   *        -1, fades every other slot. Static so the rendering can be checked
+   *        on a QImage at any device pixel ratio.
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
@@ -209,9 +217,9 @@ protected:
   void resizeEvent(QResizeEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
 
-  /** \brief Tracks hover over the glyph area (lights the strip to advertise it
-   *         is clickable) and the pointing cursor; the strip may be wider than
-   *         its glyphs, so the empty part stays inert. */
+  /** \brief Tracks hover over the glyph area (the hover wash advertises that
+   *         it is clickable) and the pointing cursor; the strip may be wider
+   *         than its glyphs, so the empty part stays inert. */
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;

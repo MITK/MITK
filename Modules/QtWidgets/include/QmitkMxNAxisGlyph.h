@@ -47,6 +47,16 @@ enum class QmitkMxNAxisGlyph
 };
 
 /**
+ * \brief The opacity, relative to its resting one, at which a synchronization
+ *        surface draws its other elements while some of them are highlighted.
+ *
+ * Fading the rest works for every group colour, where brightening or framing
+ * the highlighted elements in white fails on light hues. A group's own linked
+ * and unlinked looks keep their order when both fade.
+ */
+inline constexpr qreal QmitkMxNHighlightFade = 0.35;
+
+/**
  * \brief Render an axis glyph, recolored to 'color', as a 'sizePx' square
  *        pixmap (device pixels) carrying 'devicePixelRatio'.
  *

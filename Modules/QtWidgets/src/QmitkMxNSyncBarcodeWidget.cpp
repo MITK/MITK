@@ -234,12 +234,30 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
   const BarcodeLayout layout = ComputeLayout(target.width(), target.height(), n);
   const QRect content = ContentRectIn(target, layout, n);
 
+  // The passive strip is one button as a whole, so it shows the hover of the
+  // tool buttons beside it in the same chrome.
+  if (hovered)
+  {
+    const bool hadAntialiasing = painter.testRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(255, 255, 255, 26));
+    painter.drawRoundedRect(QRectF(content), 3.0, 3.0);
+    painter.setBrush(Qt::NoBrush);
+    painter.setRenderHint(QPainter::Antialiasing, hadAntialiasing);
+  }
+
+  // While one axis is pointed at, the others fade instead of the pointed-at one
+  // brightening, which a light group hue would not show.
+  const auto fade = [hoveredSlot](int slot)
+  {
+    return hoveredSlot >= 0 && slot != hoveredSlot ? QmitkMxNHighlightFade : qreal(1.0);
+  };
+
   if (layout.mode == BarcodeLayout::Mode::Glyphs)
   {
     // A framed glyph per axis (the seam idiom): a 1 px box in the axis color
-    // with the glyph inside. A lit frame brightens to white: 'hovered' lights the
-    // whole strip (the passive per-cell strip is one button), 'hoveredSlot'
-    // lights a single axis (the editor targets axes individually).
+    // with the glyph inside.
     const int inner = std::max(1, layout.box - 2 * IconInset);
     const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
 
@@ -248,9 +266,9 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     // inside the box rather than along it. A pen centred on the boundary puts
     // half its width outside the canvas, which costs the top line the moment
     // the grid grows to the full height, and costs it most when the frame is
-    // lit and so drawn part-transparent. Antialiasing keeps that half-pixel
-    // stroke crisp and the corner mark smooth; it is restored afterwards
-    // because the painter belongs to the caller.
+    // drawn part-transparent. Antialiasing keeps that half-pixel stroke crisp
+    // and the corner mark smooth; it is restored afterwards because the
+    // painter belongs to the caller.
     const bool hadAntialiasing = painter.testRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -258,15 +276,15 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     {
       const AxisSlot& s = axisSlots[slot];
       const bool synced = s.color.isValid() && s.applicable;
-      const bool lit = hovered || slot == hoveredSlot;
+      const bool pointedAt = slot == hoveredSlot;
+      const qreal slotFade = fade(slot);
       const QColor color = synced ? s.color : gapColor;
       const QRect boxRect = GlyphBoxRectIn(content, layout, slot);
 
-      const QColor frameColor = lit ? QColor(255, 255, 255, 210) : color;
-      painter.setOpacity(synced || lit ? 1.0 : 0.5);
+      painter.setOpacity(slotFade * (synced || pointedAt ? 1.0 : 0.5));
       // A dashed frame marks the heterogeneous group state (some members linked,
       // not all); solid means all members, gap means none.
-      QPen framePen(frameColor, 1);
+      QPen framePen(color, 1);
       if (s.partial)
       {
         framePen.setStyle(Qt::DashLine);
@@ -275,7 +293,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       painter.setBrush(Qt::NoBrush);
       painter.drawRect(QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5));
 
-      painter.setOpacity(synced ? 1.0 : (lit ? 0.8 : 0.4));
+      painter.setOpacity(slotFade * (synced ? 1.0 : (pointedAt ? 0.8 : 0.4)));
       const QPixmap glyph = QmitkMxNRenderAxisGlyph(s.glyph, color, qRound(inner * dpr), dpr);
       if (!glyph.isNull())
       {
@@ -285,8 +303,8 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       if (!s.applicable)
       {
         // Struck through, so "does not apply here" reads apart from "not linked".
-        painter.setOpacity(lit ? 1.0 : 0.7);
-        painter.setPen(QPen(frameColor, 1));
+        painter.setOpacity(slotFade * (pointedAt ? 1.0 : 0.7));
+        painter.setPen(QPen(color, 1));
         const QRectF frameRect = QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5);
         painter.drawLine(frameRect.bottomLeft(), frameRect.topRight());
       }
@@ -296,7 +314,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       // stays recognisable with one corner covered.
       if (s.hasOffset && synced)
       {
-        painter.setOpacity(1.0);
+        painter.setOpacity(slotFade);
         const QRectF frameRect = QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5);
         const qreal mark = std::max(4, layout.box / 3);
         QPainterPath corner;
@@ -305,7 +323,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
         corner.lineTo(frameRect.right(), frameRect.top() + mark);
         corner.closeSubpath();
         painter.setPen(Qt::NoPen);
-        painter.setBrush(frameColor);
+        painter.setBrush(color);
         painter.drawPath(corner);
         painter.setBrush(Qt::NoBrush);
       }
@@ -321,6 +339,7 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
     const QRect slotRect(content.left() + slot * (ColorSlotWidth + SlotGap), content.top(),
                          ColorSlotWidth, BarcodeHeight);
     const AxisSlot& s = axisSlots[slot];
+    painter.setOpacity(fade(slot));
     if (!s.applicable)
     {
       // Not applicable: a diagonal stroke instead of the gap's baseline.
@@ -344,19 +363,8 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
       painter.setPen(QPen(gapColor, 1));
       painter.drawLine(slotRect.left(), slotRect.bottom(), slotRect.right(), slotRect.bottom());
     }
-
-    // Lit slot: a white outline mirrors the Glyphs-mode frame brightening so the
-    // editor's single-axis highlight still reads once a strip is too small for
-    // glyphs and collapses to color slots. Keyed on the per-axis hoveredSlot
-    // only (not whole-strip 'hovered'), so the passive per-cell strip - which
-    // never sets a hovered slot - is unaffected.
-    if (slot == hoveredSlot)
-    {
-      painter.setPen(QPen(QColor(255, 255, 255, 210), 1));
-      painter.setBrush(Qt::NoBrush);
-      painter.drawRect(slotRect.adjusted(0, 0, -1, -1));
-    }
   }
+  painter.setOpacity(1.0);
 }
 
 void QmitkMxNSyncBarcodeWidget::resizeEvent(QResizeEvent* event)

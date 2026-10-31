@@ -203,21 +203,30 @@ namespace
    * elided from the middle so auto-named groups stay apart by their trailing
    * digit, and the offset pinned right where it is never the part that elides.
    * Selection is drawn as a frame rather than a fill, so it never hides the hue
-   * it sits on. Paint only - the matrix is a read surface, edited from its
-   * action bar.
+   * it sits on. While a synchronization is highlighted, every chip outside it
+   * fades: brightening the chips inside it would not show on a light hue.
+   * Paint only - the matrix is a read surface, edited from its action bar.
    */
   class MatrixChipDelegate : public QStyledItemDelegate
   {
   public:
-    using QStyledItemDelegate::QStyledItemDelegate;
+    /** 'highlightActive' tells whether any chip carries the highlight role. */
+    MatrixChipDelegate(std::function<bool()> highlightActive, QObject* parent)
+      : QStyledItemDelegate(parent), m_HighlightActive(std::move(highlightActive))
+    {
+    }
 
     void paint(QPainter* painter, const QStyleOptionViewItem& option,
                const QModelIndex& index) const override
     {
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing, true);
+      if (m_HighlightActive() && !index.data(ChipHighlightRole).toBool())
+      {
+        painter->setOpacity(QmitkMxNHighlightFade);
+      }
 
-      auto hue = index.data(ChipHueRole).value<QColor>();
+      const auto hue = index.data(ChipHueRole).value<QColor>();
       if (index.data(ChipNotApplicableRole).toBool())
       {
         // The axis has no meaning for this window: a struck-through outline
@@ -232,13 +241,6 @@ namespace
       }
       else if (hue.isValid())
       {
-        // A chip sharing the hovered synchronization brightens. A frame would be
-        // invisible here - the chip is already filled in the group hue - and the
-        // selection frame already owns the highlight color.
-        if (index.data(ChipHighlightRole).toBool())
-        {
-          hue = hue.lighter(145);
-        }
         const QRect chip = option.rect.adjusted(2, 2, -2, -2);
         painter->setPen(Qt::NoPen);
         painter->setBrush(hue);
@@ -262,6 +264,7 @@ namespace
 
       if (option.state & QStyle::State_Selected)
       {
+        painter->setOpacity(1.0);
         QPen pen(option.palette.color(QPalette::Highlight));
         pen.setWidth(2);
         painter->setPen(pen);
@@ -278,6 +281,9 @@ namespace
       size.setHeight(size.height() + 6);
       return size;
     }
+
+  private:
+    std::function<bool()> m_HighlightActive;
   };
 
   /**
@@ -688,7 +694,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   m_Matrix->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_Matrix->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_Matrix->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Matrix->setItemDelegate(new MatrixChipDelegate(m_Matrix));
+  m_Matrix->setItemDelegate(
+    new MatrixChipDelegate([this]() { return !m_MatrixHighlighted.empty(); }, m_Matrix));
   m_Matrix->setContextMenuPolicy(Qt::CustomContextMenu);
   // Clickable headers take the whole line, which is what turns "link every
   // window on one dimension to this group" and "unlink this window entirely"
@@ -1812,7 +1819,9 @@ void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds
   }
 
   // Touch only what changes: hover moves arrive per mouse move, and repainting
-  // the whole grid for each would be work the eye never sees.
+  // the whole grid for each would be work the eye never sees. Only a highlight
+  // starting or ending changes every chip, since all the others fade.
+  const bool wasActive = !m_MatrixHighlighted.empty();
   for (const auto& [row, column] : m_MatrixHighlighted)
   {
     if (auto* item = m_Matrix->item(row, column))
@@ -1822,23 +1831,27 @@ void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds
   }
   m_MatrixHighlighted.clear();
 
-  if (column < 0 || column >= m_Matrix->columnCount())
+  if (column >= 0 && column < m_Matrix->columnCount())
   {
-    return;
-  }
-  for (int row = 0; row < m_Matrix->rowCount(); ++row)
-  {
-    const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
-                      ? m_MatrixCellIds[static_cast<std::size_t>(row)]
-                      : QString();
-    if (windowIds.contains(id))
+    for (int row = 0; row < m_Matrix->rowCount(); ++row)
     {
-      if (auto* item = m_Matrix->item(row, column))
+      const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
+                        ? m_MatrixCellIds[static_cast<std::size_t>(row)]
+                        : QString();
+      if (windowIds.contains(id))
       {
-        item->setData(ChipHighlightRole, true);
-        m_MatrixHighlighted.emplace_back(row, column);
+        if (auto* item = m_Matrix->item(row, column))
+        {
+          item->setData(ChipHighlightRole, true);
+          m_MatrixHighlighted.emplace_back(row, column);
+        }
       }
     }
+  }
+
+  if (wasActive != !m_MatrixHighlighted.empty())
+  {
+    m_Matrix->viewport()->update();
   }
 }
 

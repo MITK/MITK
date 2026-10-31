@@ -43,17 +43,20 @@ found in the LICENSE file.
 #include <QDropEvent>
 #include <QElapsedTimer>
 #include <QHeaderView>
+#include <QImage>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPointer>
 #include <QPointF>
 #include <QPushButton>
 #include <QScrollBar>
 #include <QSpinBox>
+#include <QStyleOptionViewItem>
 #include <QTableWidget>
 #include <QTabWidget>
 #include <QTimer>
@@ -160,6 +163,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(Matrix_BatchNotifiesOnceForTheWholeGesture);
   MITK_TEST(SyncHighlight_MatrixMarksTheSharedCells);
   MITK_TEST(SyncHighlight_MatrixMarkingClearsWithTheMap);
+  MITK_TEST(Matrix_HighlightFadesTheOtherChips);
   MITK_TEST(Offset_CellBarcodeMarksAndWordsTheOffset);
   MITK_TEST(Offset_GroupBarcodeMarksWithoutNumbering);
   MITK_TEST(Offset_WordingIsTheSameOnEverySurface);
@@ -2087,6 +2091,62 @@ public:
     Pump();
     CPPUNIT_ASSERT_MESSAGE("A rebuild leaves no stale marking",
                            !m_Widget->AdvancedMatrixCell(CellId(0), QmitkMxNSyncAxis::Slice).highlighted);
+  }
+
+  /** The chip at ('row', 'axis') as the matrix's delegate paints it, unselected, on black. */
+  QImage PaintChip(int row, QmitkMxNSyncAxis axis) const
+  {
+    auto* matrix = Matrix();
+    QStyleOptionViewItem option;
+    option.initFrom(matrix);
+    option.rect = QRect(0, 0, 90, 24);
+    option.state &= ~QStyle::State_Selected;
+
+    QImage canvas(option.rect.size(), QImage::Format_ARGB32_Premultiplied);
+    canvas.fill(Qt::black);
+    QPainter painter(&canvas);
+    matrix->itemDelegate()->paint(&painter, option,
+                                  matrix->model()->index(row, QmitkMxNSyncAxisToSlot(axis)));
+    return canvas;
+  }
+
+  static qint64 ImageInk(const QImage& image)
+  {
+    qint64 ink = 0;
+    for (int y = 0; y < image.height(); ++y)
+    {
+      for (int x = 0; x < image.width(); ++x)
+      {
+        const QRgb pixel = image.pixel(x, y);
+        ink += qRed(pixel) + qGreen(pixel) + qBlue(pixel);
+      }
+    }
+    return ink;
+  }
+
+  void Matrix_HighlightFadesTheOtherChips()
+  {
+    this->RaiseAdvancedFace();
+    const auto id = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(2) }, id);
+    Pump();
+
+    // Row 0's slice chip shares the synchronization the highlight names; row
+    // 1's windowing chip (the default group) does not.
+    const QImage sharingAtRest = PaintChip(0, QmitkMxNSyncAxis::Slice);
+    const QImage otherAtRest = PaintChip(1, QmitkMxNSyncAxis::Windowing);
+    CPPUNIT_ASSERT_MESSAGE("Both chips are drawn", ImageInk(sharingAtRest) > 0 && ImageInk(otherAtRest) > 0);
+
+    m_Widget->HighlightGroupAxis(QString::fromStdString(id), QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT_MESSAGE("A chip sharing the synchronization keeps its look",
+                           sharingAtRest == PaintChip(0, QmitkMxNSyncAxis::Slice));
+    const double ratio = static_cast<double>(ImageInk(PaintChip(1, QmitkMxNSyncAxis::Windowing)))
+                         / static_cast<double>(ImageInk(otherAtRest));
+    CPPUNIT_ASSERT_MESSAGE("Every other chip fades to 35 % of its look", ratio > 0.28 && ratio < 0.42);
+
+    m_Widget->ClearSyncHighlight();
+    CPPUNIT_ASSERT_MESSAGE("Clearing the highlight restores the other chips",
+                           otherAtRest == PaintChip(1, QmitkMxNSyncAxis::Windowing));
   }
 
   void Offset_CellBarcodeMarksAndWordsTheOffset()

@@ -56,7 +56,7 @@ found in the LICENSE file.
  *     keeps its lenient treatment of unknown link keys while a "3.0"
  *     document has a closed `links` object (unknown keys, unknown
  *     modifiers, and misplaced or mistyped offsets throw).
- *   - All eight link dimensions parse in string and object form and
+ *   - Every link key parses in string and object form and
  *     round-trip through SerializeLayout / ApplyLayout, including the
  *     slice / zoom / pan offsets.
  *   - Strict mode requires every referenced group declared, across all

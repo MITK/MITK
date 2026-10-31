@@ -628,9 +628,10 @@ public:
   * \brief Whether the axis has a meaning for the cell in its current render
   *        mode.
   *
-  *   A 3D cell synchronizes pan, zoom, orientation and data selection; it
-  *   has no slice, and without image planes in 3D no level/window or lookup
-  *   table. Links on an axis that is not applicable are kept but inactive:
+  *   A 3D cell synchronizes pan, zoom, orientation and data selection, and
+  *   follows the application's time like every cell; it has no slice, and
+  *   without image planes in 3D no level/window or lookup table. Links on an
+  *   axis that is not applicable are kept but inactive:
   *   they neither relay, nor anchor, nor converge, and they take effect
   *   again once the cell returns to 2D.
   *
@@ -725,19 +726,20 @@ public:
   QColor GetSyncGroupColor(const std::string& group) const;
 
   /**
-  * \brief The window-perspective sync-barcode slots for one cell: eight axes in
-  *        fixed order (the seven 'QmitkMxNSyncDimension' axes, then data
-  *        selection), each carrying the group hue when the cell is linked on
-  *        that axis and an invalid color (a gap) otherwise, plus the axis glyph
-  *        and a per-slot tooltip.
+  * \brief The window-perspective sync-barcode slots for one cell: the nine
+  *        axes of QmitkMxNAllSyncAxes in slot order, each carrying the group
+  *        hue when the cell is linked on that axis and an invalid color (a gap)
+  *        otherwise, plus the axis glyph and a per-slot tooltip.
   *
   *   Binary per axis - a cell is linked or not; the heterogeneous group state
   *   is a group-perspective concern, not a cell's. Every cell always carries a
   *   selection group (the default group), and a fresh cell also links Windowing
   *   and LUT to the default group, so a cell at rest paints three slots in its
-  *   hue (Windowing, LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
-  *   the sync peek plates so both surfaces tell the same story. Returns
-  *   eight gap slots for an unknown cell.
+  *   hue (Windowing, LUT, selection), not gaps. Time is always the reserved
+  *   group 'global', in the light gray that group takes on furniture that is
+  *   dark in every style. Shared by the per-cell utility-strip barcode and the
+  *   sync peek plates so both surfaces tell the same story. For an unknown cell
+  *   every slot but Time is a gap.
   */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
 
@@ -793,22 +795,17 @@ public:
   struct PeekGeometry
   {
     int glyphBox = 0;  // 0 when no visible cell can host a plate
-    QmitkMxNPeekRows rows = QmitkMxNPeekRows::One;
   };
 
   /**
-  * \brief The plate geometry of this layout. For each glyph arrangement, the
-  *        box is the smallest desirable one across the visible cells that can
-  *        host a plate in it, clamped to the legible range. The arrangement
-  *        that gives more cells a plate wins, then the one with the larger
-  *        box, then the single row. A zero box, when no cell can host a plate
-  *        either way, is how the peek stays down in a layout of slivers.
+  * \brief The plate geometry of this layout: the smallest desirable glyph box
+  *        across the visible cells that can host a plate, clamped to the
+  *        legible range. A zero box, when no cell can host a plate, is how the
+  *        peek stays down in a layout of slivers.
   *
   *   A cell too small for a plate shows none rather than dragging every other
   *   window down to its size: the comparison survives a missing member better
-  *   than it survives eight different geometries. But a missing plate is a
-  *   window arrange mode cannot select, so fitting more plates beats a larger
-  *   one.
+  *   than it survives differently sized plates.
   */
   PeekGeometry ResolvePeekGeometry() const;
 
@@ -845,13 +842,16 @@ public:
   *        'group' on 'axis'. Empty for an unknown group, an axis the group
   *        links for no cell, or a transient mid-layout-change state. A kept
   *        link on an axis that does not apply to the cell (see
-  *        IsAxisApplicable) synchronizes nothing and is not counted.
+  *        IsAxisApplicable) synchronizes nothing and is not counted. On Time,
+  *        the reserved group 'global' holds every live window, in pre-order,
+  *        and every other group none.
   */
   QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
 
   /**
-  * \brief The group 'windowId' is on for 'axis' - the per-dimension link, or
-  *        the selection connector for the selection axis; empty when the cell
+  * \brief The group 'windowId' is on for 'axis' - the per-dimension link, the
+  *        selection connector for the selection axis, or the reserved group
+  *        'global' on Time; empty for an unknown window and when the cell
   *        synchronizes nothing there, including a kept link on an axis that
   *        does not apply to the cell (see IsAxisApplicable).
   */
@@ -860,7 +860,7 @@ public:
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
   {
-    None,     // the cell has no group on any of the eight axes (not normally reachable)
+    None,     // the cell has no group on any axis (not normally reachable)
     Mono,     // every axis the cell is tied on names one group
     Complex   // the cell's tied axes span more than one group
   };
@@ -889,6 +889,12 @@ public:
   *   "navigation wins" tiebreak. A group color that throws mid-layout-change
   *   downgrades the result to 'None' for that pass. Consumed by
   *   'RefreshFrameColors'.
+  *
+  *   The reserved group 'global' does not count: once every window follows
+  *   the application's value on an axis, counting it would turn every frame
+  *   'Complex'. Time, on which every window is in 'global', is no input here;
+  *   an axis that lets 'global' join a dimension link or the selection has
+  *   to skip it.
   */
   CellGroupIdentity ResolveCellGroupIdentity(const QString& windowId) const;
 

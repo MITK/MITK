@@ -109,6 +109,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Reinit_AfterLoad_RestoresDirection);
   MITK_TEST(Reinit_TwoEditors_EachKeepsItsDirection);
   MITK_TEST(Applicability_PerRenderMode);
+  MITK_TEST(Time_AppliesTo2DAnd3D);
   MITK_TEST(Zoom_ThreeDAnchor_ConvergesTwoDToItsHalfHeight);
   MITK_TEST(Zoom_SwitchToThreeD_KeepsGroupZoom);
   MITK_TEST(Gate_PanGroup_ThreeDNeverAnchors);
@@ -917,11 +918,25 @@ public:
     {
       const auto axis = *QmitkMxNSyncAxisFromSlot(slot);
       const bool expected = QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis
-                            || QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
+                            || QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis
+                            || QmitkMxNSyncAxis::Time == axis;
       CPPUNIT_ASSERT_EQUAL_MESSAGE("slot " + std::to_string(slot), expected,
                                    m_Editor->IsAxisApplicable(CellId(0), axis));
     }
     CPPUNIT_ASSERT_THROW(m_Editor->IsAxisApplicable("mxn__nowhere", QmitkMxNSyncAxis::Pan), mitk::Exception);
+  }
+
+  void Time_AppliesTo2DAnd3D()
+  {
+    // Every window follows the application's time, whatever it renders.
+    CPPUNIT_ASSERT(m_Editor->IsAxisApplicable(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_EQUAL(std::string("global"), m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time));
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    CPPUNIT_ASSERT(m_Editor->IsAxisApplicable(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_EQUAL(std::string("global"), m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_MESSAGE("A 3D window shares Time with the others",
+                           m_Editor->CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time)
+                             .contains(CellId(0)));
   }
 
   static double HalfHeight(mitk::BaseRenderer* renderer)

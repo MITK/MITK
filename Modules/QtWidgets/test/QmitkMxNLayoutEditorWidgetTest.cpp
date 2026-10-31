@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QmitkInfoCard.h>
 #include <QmitkMxNArrangeMode.h>
+#include <QmitkMxNCellOverlay.h>
 #include <QmitkMxNDynamicLayoutDialog.h>
 #include <QmitkMxNGroupJoinMode.h>
 #include <QmitkMxNLayoutEditorWidget.h>
@@ -37,6 +38,8 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QColor>
+#include <QColorDialog>
+#include <QComboBox>
 #include <QCoreApplication>
 #include <QDialog>
 #include <QDoubleSpinBox>
@@ -44,6 +47,7 @@ found in the LICENSE file.
 #include <QElapsedTimer>
 #include <QHeaderView>
 #include <QImage>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
@@ -66,6 +70,7 @@ found in the LICENSE file.
 #include <array>
 #include <memory>
 #include <string>
+#include <typeinfo>
 #include <variant>
 #include <vector>
 
@@ -197,6 +202,20 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(ThreeD_GroupBarcodeMarksPanOffsetOnlyForConvergingMembers);
   MITK_TEST(ThreeD_ActionBarHidesPanOffsetForThreeDSelection);
 
+  MITK_TEST(SetCellAxisGroup_Time_ThrowsAndKeepsSelection);
+  MITK_TEST(ClearCellAxis_Time_ThrowsAndKeepsSelection);
+  MITK_TEST(UserCard_TimeSlotIsInert);
+  MITK_TEST(EmptyUserCard_TimeTakesNoIntent);
+  MITK_TEST(GlobalCard_IsFirstAndReserved);
+  MITK_TEST(GlobalCard_IsNoDragSourceOrDropTarget);
+  MITK_TEST(GlobalCard_RefusesAssign);
+  MITK_TEST(GlobalCard_FollowsAStyleSwitch);
+  MITK_TEST(PlateMenuAndMatrixPicker_OmitGlobal);
+  MITK_TEST(Matrix_NineColumnsInFamilyOrder);
+  MITK_TEST(Matrix_TimeChipIsGlobalAndNotSelectable);
+  MITK_TEST(RenameToGlobal_ShowsTheReasonInTheNotice);
+  MITK_TEST(ReservedColor_ShowsTheReasonInTheNotice);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -245,7 +264,7 @@ public:
     QCoreApplication::processEvents();
   }
 
-  /** The barcode axis index of a sync dimension (selection is the last axis). */
+  /** The barcode slot of a sync dimension. */
   static int AxisIndexOf(QmitkMxNSyncDimension dimension)
   {
     return QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxisOf(dimension));
@@ -448,20 +467,10 @@ public:
     m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Pan, id);
     m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, id);
 
-    const auto slotIndex = [](QmitkMxNSyncDimension dimension)
-    {
-      for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
-      {
-        if (QmitkMxNAllSyncDimensions[i] == dimension)
-        {
-          return static_cast<int>(i);
-        }
-      }
-      return -1;
-    };
+    const auto slotIndex = [](QmitkMxNSyncDimension dimension) { return AxisIndexOf(dimension); };
 
     const auto axisSlots = m_Widget->BuildGroupBarcodeSlots(id);
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount,
                          static_cast<int>(axisSlots.size()));
 
     const auto& sliceSlot = axisSlots[slotIndex(QmitkMxNSyncDimension::Slice)];
@@ -494,16 +503,7 @@ public:
     auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
     CPPUNIT_ASSERT(nullptr != barcode);
 
-    int windowingSlot = -1;
-    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
-    {
-      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Windowing)
-      {
-        windowingSlot = static_cast<int>(i);
-        break;
-      }
-    }
-    CPPUNIT_ASSERT(windowingSlot >= 0);
+    const int windowingSlot = AxisIndexOf(QmitkMxNSyncDimension::Windowing);
 
     const QColor navHue = m_Editor->GetSyncGroupColor("nav");
     CPPUNIT_ASSERT_MESSAGE("The two groups must be told apart by hue",
@@ -633,7 +633,8 @@ public:
     m_Widget->AssignCellsToGroup(QStringList{ CellId(1) }, "beta");
     Pump();
 
-    QStringList expected;
+    // The reserved group's card leads; the user's groups follow in engine order.
+    QStringList expected{ QStringLiteral("global") };
     for (const auto& info : m_Editor->GetSyncGroupInfos())
     {
       expected << QString::fromStdString(info.id);
@@ -657,7 +658,7 @@ public:
 
     // The barcode reflects exactly those two axes as linked (a valid hue).
     const auto barcodeSlots = m_Widget->BuildGroupBarcodeSlots(group);
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount,
                          static_cast<int>(barcodeSlots.size()));
     for (int i = 0; i < barcodeSlots.size(); ++i)
     {
@@ -756,7 +757,7 @@ public:
                            m_Editor->GetCellSelectionGroup(CellId(0)) != "G");
   }
 
-  // --- Selection as the 8th axis, "main" default, Replace join -----------------
+  // --- Selection as an axis, "main" default, Replace join ----------------------
 
   void NewCell_DefaultLinksWindowingAndLutToMain()
   {
@@ -784,7 +785,7 @@ public:
   void NewCell_FrameIsMonoMain()
   {
     // The fresh cell reads a solid "main" frame: it links Windowing, LUT, and
-    // selection to "main", so the eight-axis resolve is Mono("main").
+    // selection to "main", so the frame resolves to Mono("main").
     const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
     CPPUNIT_ASSERT_MESSAGE("A fresh cell's frame is Mono",
                            QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
@@ -794,7 +795,7 @@ public:
 
   void Frame_SelectionDivergesFromNav_IsComplex()
   {
-    // Selection is the 8th frame axis: a cell whose navigation/intensity axes all
+    // Selection is a frame axis too: a cell whose navigation/intensity axes all
     // name one group but whose selection stays on "main" is an honest split ->
     // Complex (gray). With selection excluded it would misread as Mono.
     for (const auto dimension : QmitkMxNAllSyncDimensions)
@@ -810,7 +811,7 @@ public:
 
   void Frame_WhollyOneGroup_IsMono()
   {
-    // A cell wholly on one group across all eight axes reads Mono.
+    // A cell wholly on one group across all its axes reads Mono.
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
       m_Editor->ClearSyncLink(CellId(0), dimension);
@@ -819,7 +820,7 @@ public:
     m_Editor->SetCellSelectionGroup(CellId(0), "X");
 
     const auto identity = m_Editor->ResolveCellGroupIdentity(CellId(0));
-    CPPUNIT_ASSERT_MESSAGE("All eight axes on X -> Mono(X)",
+    CPPUNIT_ASSERT_MESSAGE("All axes on X -> Mono(X)",
                            QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
     CPPUNIT_ASSERT_MESSAGE("Mono hue is X's color",
                            identity.hue == m_Editor->GetSyncGroupColor("X"));
@@ -846,7 +847,7 @@ public:
 
   void Membership_SelectionTieCountsAsMember()
   {
-    // Membership counts the selection tie (the 8th axis): a cell tied to a group
+    // Membership counts the selection tie: a cell tied to a group
     // only through data selection is a member, so a group axis toggle reaches it.
     // Driven through the public ApplyDimensionToGroup, whose members come from
     // GroupMembers.
@@ -943,14 +944,8 @@ public:
     CPPUNIT_ASSERT(nullptr != barcode);
 
     const auto axisSlots = barcode->Slots();
-    int windowingSlot = -1;
-    int lutSlot = -1;
-    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
-    {
-      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Windowing) { windowingSlot = static_cast<int>(i); }
-      if (QmitkMxNAllSyncDimensions[i] == QmitkMxNSyncDimension::Lut) { lutSlot = static_cast<int>(i); }
-    }
-    CPPUNIT_ASSERT(windowingSlot >= 0 && lutSlot >= 0);
+    const int windowingSlot = AxisIndexOf(QmitkMxNSyncDimension::Windowing);
+    const int lutSlot = AxisIndexOf(QmitkMxNSyncDimension::Lut);
     CPPUNIT_ASSERT_MESSAGE("A fresh cell's Windowing barcode slot is filled (main hue), no manual refresh",
                            axisSlots[windowingSlot].color.isValid());
     CPPUNIT_ASSERT_MESSAGE("A fresh cell's LUT barcode slot is filled (main hue), no manual refresh",
@@ -1636,7 +1631,7 @@ public:
 
   void Matrix_SelectionAxisClearReturnsToDefault()
   {
-    // Data selection has no unlinked state, so clearing the last axis returns
+    // Data selection has no unlinked state, so clearing its axis returns
     // the cell to the default group rather than leaving it in none.
     const auto id = m_Widget->CreateGroup();
 
@@ -2197,7 +2192,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("but the group perspective names no number",
                            axisSlots[sliceAxis].offsetText.isEmpty());
 
-    const int selectionAxis = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+    const int selectionAxis = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Selection);
     CPPUNIT_ASSERT_MESSAGE("Data selection never takes the mark",
                            !axisSlots[selectionAxis].hasOffset);
   }
@@ -2535,7 +2530,7 @@ public:
   static bool AppliesIn3D(QmitkMxNSyncAxis axis)
   {
     return QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis || QmitkMxNSyncAxis::Orientation == axis
-           || QmitkMxNSyncAxis::Selection == axis;
+           || QmitkMxNSyncAxis::Selection == axis || QmitkMxNSyncAxis::Time == axis;
   }
 
   void ThreeD_CellBarcodeMarksTwoDOnlyAxes()
@@ -2953,6 +2948,357 @@ public:
     }
     CPPUNIT_ASSERT_MESSAGE("The preset's windows exist after the apply",
                            nullptr != custom.GetRenderWindowWidget(QString::fromStdString(ids.front())));
+  }
+
+  // ---------- Time ----------
+
+  void SetCellAxisGroup_Time_ThrowsAndKeepsSelection()
+  {
+    const auto group = m_Widget->CreateGroup();
+    const auto selectionBefore = m_Editor->GetCellSelectionGroup(CellId(0));
+
+    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, group), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Time has no other group, and selection is not Time",
+                                 selectionBefore, m_Editor->GetCellSelectionGroup(CellId(0)));
+  }
+
+  void ClearCellAxis_Time_ThrowsAndKeepsSelection()
+  {
+    const auto group = m_Widget->CreateGroup();
+    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Selection, group);
+    CPPUNIT_ASSERT_EQUAL(group, m_Editor->GetCellSelectionGroup(CellId(0)));
+
+    CPPUNIT_ASSERT_THROW(m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Time), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Clearing Time leaves the selection group alone",
+                                 group, m_Editor->GetCellSelectionGroup(CellId(0)));
+  }
+
+  void UserCard_TimeSlotIsInert()
+  {
+    const auto group = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, group);
+    Pump();
+    std::vector<std::string> selectionBefore;
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      selectionBefore.push_back(m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+
+    const auto timeSlot = m_Widget->BuildGroupBarcodeSlots(group)[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)];
+    CPPUNIT_ASSERT_MESSAGE("A user card strikes Time through", !timeSlot.applicable);
+
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Time);
+    Pump();
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Toggling Time changes no window's selection",
+                                   selectionBefore[cell], m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+  }
+
+  void EmptyUserCard_TimeTakesNoIntent()
+  {
+    // An empty group records the axes its first windows get. Time is no such
+    // axis, so toggling it must leave the group without a recorded intent and
+    // the first window joins the way it would have without the toggle.
+    const auto group = m_Widget->CreateGroup();
+    m_Widget->ToggleGroupAxis(group, QmitkMxNSyncAxis::Time);
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
+    Pump();
+
+    for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("The window takes the navigation default on ")
+                               + QmitkMxNSyncDimensionToLinkKey(dimension),
+                             IsLinked(0, dimension, group));
+    }
+  }
+
+  // ---------- The reserved group's card ----------
+
+  void GlobalCard_IsFirstAndReserved()
+  {
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The reserved group's card leads", std::string("global"),
+                                 CardOrder().value(0).toStdString());
+    auto* card = CardFor("global");
+    CPPUNIT_ASSERT(nullptr != card);
+
+    QStringList texts;
+    for (const auto* label : card->findChildren<QLabel*>())
+    {
+      texts << label->text();
+    }
+    CPPUNIT_ASSERT_MESSAGE("Its name is the reserved display name", texts.contains(QStringLiteral("Global")));
+    CPPUNIT_ASSERT_MESSAGE("Its members are every window", texts.contains(QStringLiteral("3 window(s)")));
+
+    auto* badge = card->findChild<QWidget*>(QStringLiteral("mxnReservedBadge"));
+    CPPUNIT_ASSERT_MESSAGE("A badge stands where the menu would be", nullptr != badge);
+    CPPUNIT_ASSERT_MESSAGE("saying it is reserved", texts.contains(QStringLiteral("reserved")));
+    CPPUNIT_ASSERT_EQUAL(std::string("Reserved group: follows the application's value. It can't be renamed, "
+                                     "recoloured or deleted."),
+                         badge->toolTip().toStdString());
+    for (const auto* button : card->findChildren<QToolButton*>())
+    {
+      CPPUNIT_ASSERT_MESSAGE("The card offers no menu", nullptr == button->menu());
+    }
+
+    const auto axisSlots = m_Widget->BuildGroupBarcodeSlots("global");
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+    for (const auto axis : QmitkMxNAllSyncAxes)
+    {
+      const auto& slot = axisSlots[QmitkMxNSyncAxisToSlot(axis)];
+      if (QmitkMxNSyncAxis::Time == axis)
+      {
+        CPPUNIT_ASSERT_MESSAGE("Time is lit for every window", slot.applicable && !slot.partial);
+        CPPUNIT_ASSERT(m_Editor->GetSyncGroupColor("global") == slot.color);
+      }
+      else
+      {
+        CPPUNIT_ASSERT_MESSAGE("Every other axis is struck through", !slot.applicable);
+      }
+    }
+
+    // Its axes are not the user's to toggle.
+    std::vector<std::string> selectionBefore;
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      selectionBefore.push_back(m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+    for (const auto axis : QmitkMxNAllSyncAxes)
+    {
+      m_Widget->ToggleGroupAxis("global", axis);
+    }
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      CPPUNIT_ASSERT_EQUAL(selectionBefore[cell], m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+  }
+
+  void GlobalCard_IsNoDragSourceOrDropTarget()
+  {
+    Pump();
+    const auto id = m_Widget->CreateGroup();
+    Pump();
+    auto* reserved = CardFor("global");
+    auto* user = CardFor(id);
+    CPPUNIT_ASSERT(nullptr != reserved && nullptr != user);
+    CPPUNIT_ASSERT_MESSAGE("A user card takes window drops", user->acceptDrops());
+    CPPUNIT_ASSERT_MESSAGE("The reserved card takes none", !reserved->acceptDrops());
+    // The user cards are a QFrame subclass that starts a group drag; the
+    // reserved card is a plain frame, which starts none.
+    CPPUNIT_ASSERT_MESSAGE("The reserved card is no drag source", typeid(*reserved) == typeid(QFrame));
+    CPPUNIT_ASSERT_MESSAGE("unlike a user card", typeid(*user) != typeid(QFrame));
+  }
+
+  void GlobalCard_FollowsAStyleSwitch()
+  {
+    // The reserved group takes the style's text colour, so a switch between
+    // the Dark and the Light style recolours its card and its matrix chips.
+    this->RaiseAdvancedFace();
+    const QColor text(QStringLiteral("#123456"));
+    auto palette = m_Editor->palette();
+    palette.setColor(QPalette::WindowText, text);
+    m_Editor->setPalette(palette);
+    m_Widget->setPalette(palette);
+    Pump();
+
+    bool barRecoloured = false;
+    for (const auto* frame : CardFor("global")->findChildren<QFrame*>())
+    {
+      barRecoloured = barRecoloured || frame->styleSheet().contains(text.name());
+    }
+    CPPUNIT_ASSERT_MESSAGE("The card's bar takes the new text colour", barRecoloured);
+
+    // The chip's fill, right of its label.
+    const QImage chip = PaintChip(0, QmitkMxNSyncAxis::Time);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Time chips take it too", text.name().toStdString(),
+                                 QColor(chip.pixel(chip.width() - 6, chip.height() - 6)).name().toStdString());
+  }
+
+  void GlobalCard_RefusesAssign()
+  {
+    const auto other = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, other);
+    Pump();
+
+    const auto snapshot = [this]()
+    {
+      std::vector<std::string> state;
+      for (std::size_t cell = 0; cell < 3; ++cell)
+      {
+        state.push_back(m_Editor->GetCellSelectionGroup(CellId(cell)));
+        for (const auto dimension : QmitkMxNAllSyncDimensions)
+        {
+          const auto link = m_Editor->GetSyncLink(CellId(cell), dimension);
+          state.push_back(link.has_value() ? link->group : std::string("-"));
+        }
+      }
+      return state;
+    };
+    const auto before = snapshot();
+    for (const auto mode : { QmitkMxNGroupJoinMode::Replace, QmitkMxNGroupJoinMode::MergeOverwriteCollisions,
+                             QmitkMxNGroupJoinMode::FillEmpty })
+    {
+      m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, "global", mode);
+      Pump();
+      CPPUNIT_ASSERT_MESSAGE("Assigning to the reserved group changes no link", before == snapshot());
+    }
+  }
+
+  void PlateMenuAndMatrixPicker_OmitGlobal()
+  {
+    const auto group = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, group);
+    Pump();
+
+    auto* overlay = m_Editor->GetRenderWindowWidget(CellId(0))->findChild<QmitkMxNCellOverlay*>();
+    CPPUNIT_ASSERT(nullptr != overlay);
+    QMenu menu;
+    overlay->PopulatePlateMenu(&menu);
+    int submenus = 0;
+    for (const auto* action : menu.actions())
+    {
+      if (nullptr == action->menu())
+      {
+        continue;
+      }
+      ++submenus;
+      for (const auto* entry : action->menu()->actions())
+      {
+        CPPUNIT_ASSERT_MESSAGE(action->text().toStdString() + " does not offer the reserved group",
+                               QStringLiteral("Global") != entry->text());
+      }
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Add to group and Remove from group", 2, submenus);
+
+    this->RaiseAdvancedFace();
+    SelectMatrixCells({ { 0, AxisIndexOf(QmitkMxNSyncDimension::Slice) } });
+    auto* picker = m_Widget->findChild<QComboBox*>(QStringLiteral("mxnMatrixGroupPicker"));
+    CPPUNIT_ASSERT(nullptr != picker);
+    CPPUNIT_ASSERT_MESSAGE("The picker offers the user's groups", picker->findData(QString::fromStdString(group)) >= 0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("but not the reserved one", -1, picker->findData(QStringLiteral("global")));
+  }
+
+  void Matrix_NineColumnsInFamilyOrder()
+  {
+    this->RaiseAdvancedFace();
+    auto* matrix = Matrix();
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, matrix->columnCount());
+    const QStringList expected{ "Orientation", "Pan", "Zoom", "Slice", "Time", "Crosshair",
+                                "Data selection", "Windowing", "LUT" };
+    QStringList headers;
+    for (int column = 0; column < matrix->columnCount(); ++column)
+    {
+      headers << matrix->horizontalHeaderItem(column)->toolTip();
+    }
+    CPPUNIT_ASSERT_EQUAL(expected.join(QLatin1Char(',')).toStdString(), headers.join(QLatin1Char(',')).toStdString());
+  }
+
+  void Matrix_TimeChipIsGlobalAndNotSelectable()
+  {
+    this->RaiseAdvancedFace();
+    const int timeColumn = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time);
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      const auto chip = m_Widget->AdvancedMatrixCell(CellId(cell), QmitkMxNSyncAxis::Time);
+      CPPUNIT_ASSERT_EQUAL(std::string("global"), chip.group);
+      CPPUNIT_ASSERT_EQUAL(std::string("Locked: every window follows the application's time"),
+                           chip.toolTip.toStdString());
+      const auto* item = Matrix()->item(static_cast<int>(cell), timeColumn);
+      CPPUNIT_ASSERT_EQUAL(std::string("Global"), item->text().toStdString());
+      CPPUNIT_ASSERT_MESSAGE("A Time chip cannot be selected", !(item->flags() & Qt::ItemIsSelectable));
+    }
+
+    SelectMatrixCells({ { 0, timeColumn }, { 1, timeColumn } });
+    CPPUNIT_ASSERT_MESSAGE("so the action bar never edits Time",
+                           Matrix()->selectionModel()->selectedIndexes().isEmpty());
+  }
+
+  // ---------- Refused edits ----------
+
+  /** The menu of 'group''s card, populated as it is when it opens. */
+  QMenu* CardMenu(const std::string& group) const
+  {
+    auto* card = CardFor(group);
+    CPPUNIT_ASSERT(nullptr != card);
+    for (auto* button : card->findChildren<QToolButton*>())
+    {
+      if (nullptr != button->menu())
+      {
+        emit button->menu()->aboutToShow();
+        return button->menu();
+      }
+    }
+    CPPUNIT_FAIL("The card has a menu");
+    return nullptr;
+  }
+
+  static QAction* ActionNamed(QMenu* menu, const QString& text)
+  {
+    for (auto* action : menu->actions())
+    {
+      if (action->text() == text)
+      {
+        return action;
+      }
+    }
+    CPPUNIT_FAIL("The menu offers " + text.toStdString());
+    return nullptr;
+  }
+
+  void RenameToGlobal_ShowsTheReasonInTheNotice()
+  {
+    const auto group = m_Widget->CreateGroup();
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("precondition: no notice", !this->ConflictNoticeShown());
+
+    // The dialog runs its own loop; the poll answers it.
+    QTimer poll;
+    poll.setInterval(5);
+    QObject::connect(&poll, &QTimer::timeout, []()
+    {
+      if (auto* dialog = qobject_cast<QInputDialog*>(QApplication::activeModalWidget()))
+      {
+        dialog->setTextValue(QStringLiteral(" global "));
+        dialog->accept();
+      }
+    });
+    poll.start();
+    ActionNamed(CardMenu(group), QStringLiteral("Rename..."))->trigger();
+    poll.stop();
+
+    CPPUNIT_ASSERT_MESSAGE("The reason is shown, not only logged", this->ConflictNoticeShown());
+    CPPUNIT_ASSERT_MESSAGE("It names the reserved name: " + this->ConflictNotice()->GetMessage().toStdString(),
+                           this->ConflictNotice()->GetMessage().contains(QStringLiteral("reserved")));
+    CPPUNIT_ASSERT_EQUAL(group, m_Editor->GetSyncGroupDisplayName(group));
+  }
+
+  void ReservedColor_ShowsTheReasonInTheNotice()
+  {
+    const auto group = m_Widget->CreateGroup();
+    Pump();
+    const auto before = m_Editor->GetSyncGroupColor(group);
+
+    QTimer poll;
+    poll.setInterval(5);
+    QObject::connect(&poll, &QTimer::timeout, []()
+    {
+      if (auto* dialog = qobject_cast<QColorDialog*>(QApplication::activeModalWidget()))
+      {
+        dialog->setCurrentColor(QColor(QStringLiteral("#f1f1f1")));
+        dialog->accept();
+      }
+    });
+    poll.start();
+    ActionNamed(CardMenu(group), QStringLiteral("Change color..."))->trigger();
+    poll.stop();
+
+    CPPUNIT_ASSERT_MESSAGE("The reason is shown, not only logged", this->ConflictNoticeShown());
+    CPPUNIT_ASSERT_MESSAGE("It names the reserved colour: " + this->ConflictNotice()->GetMessage().toStdString(),
+                           this->ConflictNotice()->GetMessage().contains(QStringLiteral("reserved")));
+    CPPUNIT_ASSERT(before == m_Editor->GetSyncGroupColor(group));
   }
 };
 

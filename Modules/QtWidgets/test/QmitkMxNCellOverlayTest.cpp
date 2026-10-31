@@ -547,7 +547,7 @@ public:
 
   void FrameIdentity_SelectionParticipates()
   {
-    // Selection is the 8th frame axis. A cell whose only group tie is a deliberate
+    // Selection is a frame axis too. A cell whose only group tie is a deliberate
     // data-selection group (the appearance defaults cleared) reads Mono of that
     // group - selection drives the frame like any other axis.
     for (const auto dimension : QmitkMxNAllSyncDimensions)
@@ -576,16 +576,11 @@ public:
       auto* barcode = utility->findChild<QmitkMxNSyncBarcodeWidget*>();
       CPPUNIT_ASSERT(nullptr != barcode);
       const auto axisSlots = barcode->Slots();
-      // One slot per dimension in dimension order, then the data selection.
-      CPPUNIT_ASSERT(axisSlots.size() > static_cast<int>(QmitkMxNAllSyncDimensions.size()));
-      for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+      CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+      for (const auto axis : { QmitkMxNSyncAxis::Windowing, QmitkMxNSyncAxis::Lut })
       {
-        const auto dimension = QmitkMxNAllSyncDimensions[i];
-        if (QmitkMxNSyncDimension::Windowing == dimension || QmitkMxNSyncDimension::Lut == dimension)
-        {
-          CPPUNIT_ASSERT_MESSAGE("The barcode shows the appearance link: " + where,
-                                 axisSlots[static_cast<int>(i)].color == mainHue);
-        }
+        CPPUNIT_ASSERT_MESSAGE("The barcode shows the appearance link: " + where,
+                               axisSlots[QmitkMxNSyncAxisToSlot(axis)].color == mainHue);
       }
       CPPUNIT_ASSERT_MESSAGE("The frame carries the group hue: " + where,
                              cell->styleSheet().contains(mainHue.name(QColor::HexRgb)));
@@ -905,7 +900,7 @@ public:
       ] }
     })json"));
     // Wide enough that the strip's controls leave room around the centre.
-    m_Editor->resize(1400, 480);
+    m_Editor->resize(1600, 480);
     m_Editor->show();
     QmitkTestPopupProbe::Pump(200);
 

@@ -111,9 +111,11 @@ public:
 
   /** \brief Emphasise 'axis' on every plate and bump the frames of 'windowIds'
    *         in 'hue'; the list may be empty (emphasis alone). 'source' becomes the
-   *         highlight's owner. */
+   *         highlight's owner. 'namingWindowId' is the window the pointed-at
+   *         element belongs to, whose plate names the axis; empty when it
+   *         belongs to no window (a group card). */
   void SetHighlight(HighlightSource source, std::optional<QmitkMxNSyncAxis> axis,
-                    const QStringList& windowIds, const QColor& hue);
+                    const QStringList& windowIds, const QColor& hue, const QString& namingWindowId = QString());
 
   /** \brief Clear the highlight if 'source' owns it; otherwise nothing. */
   void ClearHighlight(HighlightSource source);
@@ -121,6 +123,8 @@ public:
   std::optional<QmitkMxNSyncAxis> GetHighlightAxis() const;
   QStringList GetHighlightedWindowIds() const;
   QColor GetHighlightHue() const;
+  /** rief The window whose plate names the highlighted axis; empty when none does. */
+  QString GetHighlightNamingWindowId() const;
 
 Q_SIGNALS:
 
@@ -153,6 +157,7 @@ private:
   std::optional<QmitkMxNSyncAxis> m_HighlightAxis;
   QStringList m_HighlightedWindowIds;
   QColor m_HighlightHue;
+  QString m_HighlightNamingWindowId;
 };
 
 #endif

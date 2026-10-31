@@ -15,24 +15,22 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
+#include <QmitkMxNSyncDimension.h>
+
+#include <QColor>
 #include <QtGlobal>
 
-class QColor;
-class QFont;
-class QPainter;
 class QPixmap;
-class QPointF;
-class QString;
 
 /**
  * \brief The synchronization axes that carry a compact viewport glyph: the
- *        seven per-dimension axes plus data selection.
+ *        seven per-dimension axes plus data selection and time.
  *
  * This is a presentation enum, deliberately separate from
  * QmitkMxNSyncDimension (a load-bearing data enum that sizes the per-cell link
  * store): surfaces that only draw axis glyphs depend on this, not on the data
- * model, and selection - which has no QmitkMxNSyncDimension value - takes its
- * place here as an equal axis.
+ * model, and selection and time - which have no QmitkMxNSyncDimension value -
+ * take their place here as equal axes.
  */
 enum class QmitkMxNAxisGlyph
 {
@@ -43,8 +41,52 @@ enum class QmitkMxNAxisGlyph
   Orientation,
   Windowing,
   Lut,
-  Selection
+  Selection,
+  Time
 };
+
+/** \brief The glyph that presents a synchronization axis on every surface. */
+inline constexpr QmitkMxNAxisGlyph QmitkMxNSyncAxisGlyph(QmitkMxNSyncAxis axis)
+{
+  switch (axis)
+  {
+    case QmitkMxNSyncAxis::Orientation: return QmitkMxNAxisGlyph::Orientation;
+    case QmitkMxNSyncAxis::Pan:         return QmitkMxNAxisGlyph::Pan;
+    case QmitkMxNSyncAxis::Zoom:        return QmitkMxNAxisGlyph::Zoom;
+    case QmitkMxNSyncAxis::Slice:       return QmitkMxNAxisGlyph::Slice;
+    case QmitkMxNSyncAxis::Time:        return QmitkMxNAxisGlyph::Time;
+    case QmitkMxNSyncAxis::Crosshair:   return QmitkMxNAxisGlyph::Crosshair;
+    case QmitkMxNSyncAxis::Selection:   return QmitkMxNAxisGlyph::Selection;
+    case QmitkMxNSyncAxis::Windowing:   return QmitkMxNAxisGlyph::Windowing;
+    case QmitkMxNSyncAxis::Lut:         return QmitkMxNAxisGlyph::Lut;
+  }
+  return QmitkMxNAxisGlyph::Pan;
+}
+
+/**
+ * \brief The axis's display name, untranslated: callers pass it through tr(),
+ *        so every surface names an axis alike.
+ */
+inline const char* QmitkMxNSyncAxisLabel(QmitkMxNSyncAxis axis)
+{
+  switch (axis)
+  {
+    case QmitkMxNSyncAxis::Orientation: return "Orientation";
+    case QmitkMxNSyncAxis::Pan:         return "Pan";
+    case QmitkMxNSyncAxis::Zoom:        return "Zoom";
+    case QmitkMxNSyncAxis::Slice:       return "Slice";
+    case QmitkMxNSyncAxis::Time:        return "Time";
+    case QmitkMxNSyncAxis::Crosshair:   return "Crosshair";
+    case QmitkMxNSyncAxis::Selection:   return "Data selection";
+    case QmitkMxNSyncAxis::Windowing:   return "Windowing";
+    case QmitkMxNSyncAxis::Lut:         return "LUT";
+  }
+  return "";
+}
+
+/** \brief Readable text ink on a fill in 'hue', for every surface that fills
+ *         with a group's colour. */
+MITKQTWIDGETS_EXPORT QColor QmitkMxNInkFor(const QColor& hue);
 
 /**
  * \brief The opacity, relative to its resting one, at which a synchronization
@@ -88,16 +130,5 @@ MITKQTWIDGETS_EXPORT QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph gl
 /** \brief The device pixels a sticker of 'sizePx' extends past its glyph on
  *         each side. */
 MITKQTWIDGETS_EXPORT int QmitkMxNAxisGlyphStickerMargin(int sizePx);
-
-/**
- * \brief Paint 'text' in 'color' from 'baseline' with the sticker's two rings,
- *        so a value lifted over its neighbours stays legible and reads as part
- *        of the sticker glyph it belongs to.
- */
-MITKQTWIDGETS_EXPORT void QmitkMxNPaintStickerText(QPainter& painter,
-                                                   const QPointF& baseline,
-                                                   const QFont& font,
-                                                   const QString& text,
-                                                   const QColor& color);
 
 #endif

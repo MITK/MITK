@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <QImage>
 #include <QImageReader>
 #include <QPainter>
-#include <QPainterPath>
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QRegularExpression>
@@ -40,6 +39,7 @@ namespace
       case QmitkMxNAxisGlyph::Windowing:   return QStringLiteral(":/Qmitk/mxn-axis-windowing.svg");
       case QmitkMxNAxisGlyph::Lut:         return QStringLiteral(":/Qmitk/mxn-axis-lut.svg");
       case QmitkMxNAxisGlyph::Selection:   return QStringLiteral(":/Qmitk/mxn-axis-selection.svg");
+      case QmitkMxNAxisGlyph::Time:        return QStringLiteral(":/Qmitk/mxn-axis-time.svg");
     }
     return QString();
   }
@@ -155,6 +155,12 @@ namespace
   }
 }
 
+QColor QmitkMxNInkFor(const QColor& hue)
+{
+  const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
+  return luminance > 140.0 ? QColor(0x1a, 0x1a, 0x1a) : QColor(Qt::white);
+}
+
 QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx,
                                 qreal devicePixelRatio)
 {
@@ -236,26 +242,4 @@ QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph, const QColor& co
   pixmap.setDevicePixelRatio(devicePixelRatio);
   QPixmapCache::insert(key, pixmap);
   return pixmap;
-}
-
-void QmitkMxNPaintStickerText(QPainter& painter, const QPointF& baseline, const QFont& font,
-                              const QString& text, const QColor& color)
-{
-  QPainterPath path;
-  path.addText(baseline, font, text);
-
-  // Each ring is one logical pixel wide. A stroke is centred on the outline, so
-  // it must be twice as wide as what it should show outside the text; the fill
-  // drawn last covers the inner half.
-  constexpr qreal ring = 1.0;
-  painter.save();
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(StickerOuterInk, 2 * (ring + ring), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-  painter.drawPath(path);
-  painter.setPen(QPen(StickerInnerInk, 2 * ring, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-  painter.drawPath(path);
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(color);
-  painter.drawPath(path);
-  painter.restore();
 }

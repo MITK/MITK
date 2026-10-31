@@ -105,6 +105,12 @@ public:
    */
   bool eventFilter(QObject* watched, QEvent* event) override;
 
+protected:
+  /** \brief Refreshes the cards and the matrix on a style or palette change: the
+   *         reserved group is drawn in the style's text colour. */
+  void changeEvent(QEvent* event) override;
+
+public:
   /**
    * \brief The data storage the dynamic layout dialog chooses its data from.
    *        Without it, "Dynamic layout..." opens no dialog.
@@ -242,12 +248,16 @@ public:
 
   /**
    * \brief The group-perspective barcode slots for a group's header: one per
-   *        axis (the seven dimensions then data selection). Each axis is
-   *        tri-state over the group's member cells - a solid hue when all
-   *        members link this group on that axis, a gap when none do, and the
-   *        partial (dashed) state when only some do (reachable via per-cell
-   *        edits or the advanced matrix). Distinct from the multiwidget's
-   *        per-cell, binary BuildBarcodeSlots.
+   *        axis, in slot order. Each axis is tri-state over the group's member
+   *        cells - a solid hue when all members link this group on that axis, a
+   *        gap when none do, and the partial (dashed) state when only some do
+   *        (reachable via per-cell edits or the advanced matrix). Distinct from
+   *        the multiwidget's per-cell, binary BuildBarcodeSlots.
+   *
+   *   Time is struck through on a user group's card: only the reserved group
+   *   'global' holds windows on it. That group's card has Time lit for every
+   *   window and strikes through every axis not in
+   *   QmitkMxNLinkKeysAcceptingGlobal.
    */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildGroupBarcodeSlots(const std::string& group) const;
 
@@ -272,9 +282,12 @@ public:
    *        mark them in the matrix and hand them to the arrange mode, which
    *        bumps their frames in the display; ClearSyncHighlight removes the highlight.
    *        Driven by a group card's glyph hover and a matrix chip's hover.
-   *        Public so the resolution is testable headlessly.
+   *        'namingWindowId' is the window the hovered element belongs to - a
+   *        matrix chip's row - whose plate names the axis; a card's glyph
+   *        belongs to no window and names the axis itself. Public so the
+   *        resolution is testable headlessly.
    */
-  void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis);
+  void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis, const QString& namingWindowId = QString());
   void ClearSyncHighlight();
 
 public Q_SLOTS:
@@ -442,6 +455,12 @@ private:
   void ReconcileGroupCards(const std::vector<std::string>& currentIds,
                            const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos);
   QWidget* BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info);
+  /** \brief The card of the reserved group 'global', first in the list: no
+   *         menu, no drag and drop, and its axes are not toggled from it. */
+  QWidget* BuildGlobalCard();
+  /** \brief Show in the notice card why a rename or recolour was refused for
+   *         the reserved name or colour. */
+  void ShowRefusedGroupEdit(const QString& reason);
   /** \brief Lay out the matrix's headers and its empty items for the current
    *         window set. RefreshMatrixCells fills the chips. */
   void RebuildMatrix(const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
@@ -555,14 +574,13 @@ private:
   std::vector<QString> m_MatrixCellIds;
   std::vector<std::string> m_MatrixGroupIds;
 
-  // Per-group, empty-group-only intent buffer: which of the eight axes (the
-  // seven QmitkMxNAllSyncDimensions, then data selection) the user toggled on
-  // while the group had no members. Applied to the first windows assigned.
-  // Editor-held (not card-bound) so the const BuildGroupBarcodeSlots can render
-  // from it and it survives the card reconcile. Erased once the group has a
-  // member by any route, when the group leaves the set or is deleted, and on a
-  // SetMultiWidget swap.
-  using AxisIntent = std::array<bool, QmitkMxNAllSyncDimensions.size() + 1>;
+  // Per-group, empty-group-only intent buffer, indexed by slot: which axes the
+  // user toggled on while the group had no members. Applied to the first
+  // windows assigned. Editor-held (not card-bound) so the const
+  // BuildGroupBarcodeSlots can render from it and it survives the card
+  // reconcile. Erased once the group has a member by any route, when the group
+  // leaves the set or is deleted, and on a SetMultiWidget swap.
+  using AxisIntent = std::array<bool, QmitkMxNSyncAxisCount>;
   std::map<std::string, AxisIntent> m_EmptyGroupAxisCache;
 
   bool m_RebuildPending = false;

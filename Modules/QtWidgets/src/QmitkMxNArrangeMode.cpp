@@ -202,10 +202,11 @@ void QmitkMxNArrangeMode::RequestRemove(const QString& group, const QString& win
 }
 
 void QmitkMxNArrangeMode::SetHighlight(HighlightSource source, std::optional<QmitkMxNSyncAxis> axis,
-                                       const QStringList& windowIds, const QColor& hue)
+                                       const QStringList& windowIds, const QColor& hue,
+                                       const QString& namingWindowId)
 {
-  if (m_HighlightSource == source && m_HighlightAxis == axis
-      && m_HighlightedWindowIds == windowIds && m_HighlightHue == hue)
+  if (m_HighlightSource == source && m_HighlightAxis == axis && m_HighlightedWindowIds == windowIds
+      && m_HighlightHue == hue && m_HighlightNamingWindowId == namingWindowId)
   {
     return;
   }
@@ -213,6 +214,7 @@ void QmitkMxNArrangeMode::SetHighlight(HighlightSource source, std::optional<Qmi
   m_HighlightAxis = axis;
   m_HighlightedWindowIds = windowIds;
   m_HighlightHue = hue;
+  m_HighlightNamingWindowId = namingWindowId;
   emit HighlightChanged();
 }
 
@@ -226,6 +228,7 @@ void QmitkMxNArrangeMode::ClearHighlight(HighlightSource source)
   m_HighlightAxis.reset();
   m_HighlightedWindowIds.clear();
   m_HighlightHue = QColor();
+  m_HighlightNamingWindowId.clear();
   emit HighlightChanged();
 }
 
@@ -242,6 +245,11 @@ QStringList QmitkMxNArrangeMode::GetHighlightedWindowIds() const
 QColor QmitkMxNArrangeMode::GetHighlightHue() const
 {
   return m_HighlightHue;
+}
+
+QString QmitkMxNArrangeMode::GetHighlightNamingWindowId() const
+{
+  return m_HighlightNamingWindowId;
 }
 
 void QmitkMxNArrangeMode::SetSelection(const QStringList& windowIds)

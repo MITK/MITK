@@ -5166,9 +5166,10 @@ bool QmitkMxNMultiWidget::IsAxisApplicableTo(const mitk::BaseRenderer* renderer,
     return true;
   }
   // A 3D camera has no slice and shows no crosshair, and without image planes
-  // in 3D there is no level/window or lookup table to show.
+  // in 3D there is no level/window or lookup table to show. It does show a
+  // time step.
   return QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis || QmitkMxNSyncAxis::Orientation == axis
-         || QmitkMxNSyncAxis::Selection == axis;
+         || QmitkMxNSyncAxis::Selection == axis || QmitkMxNSyncAxis::Time == axis;
 }
 
 bool QmitkMxNMultiWidget::IsDimensionApplicable(const QString& windowId, QmitkMxNSyncDimension dimension) const
@@ -6334,51 +6335,34 @@ QmitkMxNMultiWidget::PeekGeometry QmitkMxNMultiWidget::ResolvePeekGeometry() con
   // stand for all of them.
   const int textLineHeight = QmitkMxNCellOverlay::PeekTextLineHeight(this->font());
 
-  struct Candidate
+  int box = 0;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
-    PeekGeometry geometry;
-    int hosts = 0;
-  };
-  const auto evaluate = [this, textLineHeight](QmitkMxNPeekRows rows)
-  {
-    Candidate candidate;
-    candidate.geometry.rows = rows;
-    int box = 0;
-    for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+    // A maximized layout keeps the hidden cells registered; sizing from a
+    // hidden sliver would shrink the one plate the user can see.
+    if (!renderWindowWidget->isVisible())
     {
-      // A maximized layout keeps the hidden cells registered; sizing from a
-      // hidden sliver would shrink the one plate the user can see.
-      if (!renderWindowWidget->isVisible())
-      {
-        continue;
-      }
-
-      const QSize cellSize = PeekCellSize(renderWindowWidget.get());
-      const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight, rows);
-      if (maxBox <= 0)
-      {
-        continue;
-      }
-
-      ++candidate.hosts;
-      const int shortEdge = std::min(cellSize.width(), cellSize.height());
-      const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
-      box = box == 0 ? desired : std::min(box, desired);
+      continue;
     }
 
-    // Clamping up to the floor is safe: every cell counted admits at least that
-    // much, so no eligible cell is asked for more than it can host.
-    candidate.geometry.glyphBox = box == 0
-      ? 0
-      : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
-    return candidate;
-  };
+    const QSize cellSize = PeekCellSize(renderWindowWidget.get());
+    const int maxBox = QmitkMxNCellOverlay::MaxPeekGlyphBox(cellSize, textLineHeight);
+    if (maxBox <= 0)
+    {
+      continue;
+    }
 
-  const Candidate one = evaluate(QmitkMxNPeekRows::One);
-  const Candidate two = evaluate(QmitkMxNPeekRows::Two);
-  const bool twoWins = two.hosts > one.hosts
-                       || (two.hosts == one.hosts && two.geometry.glyphBox > one.geometry.glyphBox);
-  return twoWins ? two.geometry : one.geometry;
+    const int shortEdge = std::min(cellSize.width(), cellSize.height());
+    const int desired = std::min(qRound(PeekDesiredShortEdgeFraction * shortEdge), maxBox);
+    box = box == 0 ? desired : std::min(box, desired);
+  }
+
+  // Clamping up to the floor is safe: every cell counted admits at least that
+  // much, so no eligible cell is asked for more than it can host.
+  PeekGeometry geometry;
+  geometry.glyphBox =
+    box == 0 ? 0 : std::clamp(box, QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax);
+  return geometry;
 }
 
 void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis)
@@ -6410,7 +6394,7 @@ void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAx
       }
     }
     m_ArrangeMode->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Strip, m_SyncPeekAxis,
-                                partners, hue);
+                                partners, hue, m_SyncPeekHoverCell);
   }
   else
   {
@@ -6445,6 +6429,9 @@ void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
   const bool arranging = nullptr != m_ArrangeMode && m_ArrangeMode->IsActive();
   const bool up = arranging || m_SyncPeekVisible;
   const auto axis = arranging ? m_ArrangeMode->GetHighlightAxis() : m_SyncPeekAxis;
+  // The plate of the window the pointed-at element belongs to names the axis.
+  const QString namingWindowId = arranging ? m_ArrangeMode->GetHighlightNamingWindowId()
+                                           : (axis.has_value() ? m_SyncPeekHoverCell : QString());
 
   const PeekGeometry geometry = up ? this->ResolvePeekGeometry() : PeekGeometry();
   const int box = geometry.glyphBox;
@@ -6460,7 +6447,7 @@ void QmitkMxNMultiWidget::RefreshSyncPeekPlates()
     // reaches every cell, or one hidden while the peek was up would come back
     // still showing it.
     const bool hosts = box > 0 && renderWindowWidget->isVisible();
-    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0, geometry.rows);
+    cellOverlay->SetSyncPeek(hosts, axis, hosts ? box : 0, namingWindowId);
   }
 }
 
@@ -6541,6 +6528,21 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
 {
   QStringList result;
   const auto groupId = group.toStdString();
+
+  // Every window follows the application's time, which is all 'global' stands
+  // for on Time; no other group holds a window on it.
+  if (QmitkMxNSyncAxis::Time == axis)
+  {
+    if (QmitkMxNGlobalGroupId == groupId)
+    {
+      for (const auto& descriptor : this->ListWindowDescriptors())
+      {
+        result.append(descriptor.id);
+      }
+    }
+    return result;
+  }
+
   const auto dimension = QmitkMxNSyncAxisDimension(axis);
   try
   {
@@ -6550,14 +6552,14 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
       {
         continue;
       }
-      if (!dimension.has_value())
+      if (QmitkMxNSyncAxis::Selection == axis)
       {
         for (const auto& windowId : info.selectionMembers)
         {
           result.append(windowId);
         }
       }
-      else
+      else if (dimension.has_value())
       {
         // 'members' is keyed only for dimensions some cell links, so a missing
         // key is the common "nobody links this axis" case, not an error.
@@ -6585,17 +6587,22 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
 
 std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis) const
 {
+  if (QmitkMxNSyncAxis::Time == axis)
+  {
+    return nullptr != this->GetRenderWindowWidget(windowId) ? QmitkMxNGlobalGroupId : std::string();
+  }
   // Selection is single-valued per cell and lives on the connector, not in the
   // per-dimension links.
-  if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
+  if (QmitkMxNSyncAxis::Selection == axis)
   {
     return this->GetCellSelectionGroup(windowId);
   }
-  else if (!this->IsDimensionApplicable(windowId, *dimension))
+  const auto dimension = QmitkMxNSyncAxisDimension(axis);
+  if (!dimension.has_value() || !this->IsDimensionApplicable(windowId, *dimension))
   {
     return std::string();
   }
-  else if (const auto link = this->GetSyncLink(windowId, *dimension))
+  if (const auto link = this->GetSyncLink(windowId, *dimension))
   {
     return link->group;
   }
@@ -6637,28 +6644,74 @@ QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
 QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
 {
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> axisSlots;
-  axisSlots.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+  axisSlots.reserve(QmitkMxNSyncAxisCount);
 
-  // The seven per-dimension axes: a slot carries the group hue when linked and
-  // is an unsynced gap otherwise, plus the axis glyph the barcode draws when
-  // wide enough.
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  // The selection axis is single-valued per cell: every cell carries exactly one
+  // selection group, including the default group every cell starts in. The slot
+  // shows that group's hue - consistently with the group card and the render
+  // frame - so the default group is not treated as a special "no sync" case.
+  const auto selectionSlot = [this, &windowId](QmitkMxNSyncAxis axis, const QString& label)
   {
-    QString label;
-    QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;
-    switch (dimension)
-    {
-      case QmitkMxNSyncDimension::Pan:         label = tr("Pan"); glyph = QmitkMxNAxisGlyph::Pan; break;
-      case QmitkMxNSyncDimension::Zoom:        label = tr("Zoom"); glyph = QmitkMxNAxisGlyph::Zoom; break;
-      case QmitkMxNSyncDimension::Slice:       label = tr("Slice"); glyph = QmitkMxNAxisGlyph::Slice; break;
-      case QmitkMxNSyncDimension::Crosshair:   label = tr("Crosshair"); glyph = QmitkMxNAxisGlyph::Crosshair; break;
-      case QmitkMxNSyncDimension::Orientation: label = tr("Orientation"); glyph = QmitkMxNAxisGlyph::Orientation; break;
-      case QmitkMxNSyncDimension::Windowing:   label = tr("Windowing"); glyph = QmitkMxNAxisGlyph::Windowing; break;
-      case QmitkMxNSyncDimension::Lut:         label = tr("LUT"); glyph = QmitkMxNAxisGlyph::Lut; break;
-    }
-
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-    slot.glyph = glyph;
+    slot.glyph = QmitkMxNSyncAxisGlyph(axis);
+    slot.label = label;
+    const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
+    auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
+    if (nullptr != utilityWidget)
+    {
+      const auto index = utilityWidget->GetSyncGroup();
+      if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
+      {
+        try
+        {
+          slot.color = this->GetSyncGroupColor(recorded->second);
+          slot.tooltip = tr("%1 - group %2").arg(
+            label, QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
+        }
+        catch (const mitk::Exception&)
+        {
+        }
+      }
+    }
+    if (!slot.color.isValid())
+    {
+      slot.tooltip = tr("%1 - not linked").arg(label);
+    }
+    return slot;
+  };
+
+  for (const auto axis : QmitkMxNAllSyncAxes)
+  {
+    const QString label = tr(QmitkMxNSyncAxisLabel(axis));
+    if (QmitkMxNSyncAxis::Time == axis)
+    {
+      // Every window follows the application's time through 'global', drawn in
+      // the colour it takes on furniture that is dark in every style.
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+      slot.glyph = QmitkMxNSyncAxisGlyph(axis);
+      slot.label = label;
+      slot.color = QColor(GLOBAL_GROUP_OVERLAY_COLOR);
+      slot.tooltip = tr("%1 - group %2").arg(label, QString::fromStdString(GLOBAL_GROUP_DISPLAY_NAME));
+      axisSlots.append(slot);
+      continue;
+    }
+    if (QmitkMxNSyncAxis::Selection == axis)
+    {
+      axisSlots.append(selectionSlot(axis, label));
+      continue;
+    }
+    const auto maybeDimension = QmitkMxNSyncAxisDimension(axis);
+    if (!maybeDimension.has_value())
+    {
+      continue;
+    }
+    const auto dimension = *maybeDimension;
+
+    // A per-dimension axis: the slot carries the group hue when linked and is an
+    // unsynced gap otherwise, plus the axis glyph the barcode draws when wide
+    // enough.
+    QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+    slot.glyph = QmitkMxNSyncAxisGlyph(axis);
     slot.label = label;
     if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
     {
@@ -6705,37 +6758,6 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
     }
     axisSlots.append(slot);
   }
-
-  // The selection axis is single-valued per cell: every cell carries exactly one
-  // selection group, including the default group every cell starts in. The slot
-  // shows that group's hue - consistently with the group card and the render
-  // frame - so the default group is not treated as a special "no sync" case.
-  QmitkMxNSyncBarcodeWidget::AxisSlot selectionSlot;
-  selectionSlot.glyph = QmitkMxNAxisGlyph::Selection;
-  selectionSlot.label = tr("Data selection");
-  const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
-  auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
-  if (nullptr != utilityWidget)
-  {
-    const auto index = utilityWidget->GetSyncGroup();
-    if (const auto recorded = m_GroupNameByIndex.find(index); recorded != m_GroupNameByIndex.end())
-    {
-      try
-      {
-        selectionSlot.color = this->GetSyncGroupColor(recorded->second);
-        selectionSlot.tooltip = tr("Data selection - group %1").arg(
-          QString::fromStdString(this->GetSyncGroupDisplayName(recorded->second)));
-      }
-      catch (const mitk::Exception&)
-      {
-      }
-    }
-  }
-  if (!selectionSlot.color.isValid())
-  {
-    selectionSlot.tooltip = tr("Data selection - not linked");
-  }
-  axisSlots.append(selectionSlot);
 
   return axisSlots;
 }
@@ -6830,8 +6852,8 @@ QmitkMxNMultiWidget::ResolveCellGroupIdentity(const QString& windowId) const
     }
   }
 
-  // Data selection is the 8th axis and counts toward frame identity uniformly.
-  // A solid hue means the cell is wholly one group across all eight axes; a cell
+  // Data selection counts toward frame identity like the dimensions. A solid
+  // hue means the cell is wholly one group across those axes; a cell
   // whose axes (selection included) name more than one group is an honest split
   // and reads gray. Every cell always has a selection group (default group,
   // engine index 1), so a fresh cell is at least Mono(default group) and

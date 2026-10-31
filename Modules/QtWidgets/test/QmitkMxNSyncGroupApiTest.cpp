@@ -83,6 +83,12 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(GetSyncGroupColor_GlobalFollowsTheStyleSheet);
   MITK_TEST(GlobalTakesNoPaletteSlot);
   MITK_TEST(ResolveCellGroupIdentity_FreshWindowStaysMono);
+  MITK_TEST(SyncAxes_AreInFamilyOrder);
+  MITK_TEST(SyncAxisDimension_TimeAndSelectionHaveNone);
+  MITK_TEST(BuildBarcodeSlots_NineSlotsInFamilyOrder_TimeIsGlobal);
+  MITK_TEST(BuildBarcodeSlots_GlobalUsesTheOverlayColorInEveryStyle);
+  MITK_TEST(CellsSharingAxis_TimeIsGlobalOnly);
+  MITK_TEST(ResolveCellAxisGroup_TimeNeverTouchesSelection);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -610,6 +616,126 @@ public:
     const auto identity = widget.ResolveCellGroupIdentity(FirstWindow(widget));
     CPPUNIT_ASSERT(QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
     CPPUNIT_ASSERT(widget.GetSyncGroupColor(widget.GetDefaultSyncGroupName()) == identity.hue);
+  }
+
+  // ---------- The axes and Time ----------
+
+  void SyncAxes_AreInFamilyOrder()
+  {
+    using Axis = QmitkMxNSyncAxis;
+    const std::vector<Axis> expected{ Axis::Orientation, Axis::Pan,       Axis::Zoom,
+                                      Axis::Slice,       Axis::Time,      Axis::Crosshair,
+                                      Axis::Selection,   Axis::Windowing, Axis::Lut };
+    CPPUNIT_ASSERT_EQUAL(9, QmitkMxNSyncAxisCount);
+    for (int slot = 0; slot < QmitkMxNSyncAxisCount; ++slot)
+    {
+      const auto axis = expected[static_cast<std::size_t>(slot)];
+      CPPUNIT_ASSERT_MESSAGE("slot " + std::to_string(slot), axis == QmitkMxNAllSyncAxes[static_cast<std::size_t>(slot)]);
+      CPPUNIT_ASSERT_EQUAL(slot, QmitkMxNSyncAxisToSlot(axis));
+      CPPUNIT_ASSERT(axis == *QmitkMxNSyncAxisFromSlot(slot));
+    }
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisFromSlot(QmitkMxNSyncAxisCount).has_value());
+  }
+
+  void SyncAxisDimension_TimeAndSelectionHaveNone()
+  {
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis::Time).has_value());
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis::Selection).has_value());
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto axis = QmitkMxNSyncAxisOf(dimension);
+      CPPUNIT_ASSERT(dimension == *QmitkMxNSyncAxisDimension(axis));
+      CPPUNIT_ASSERT_EQUAL(std::string(QmitkMxNSyncDimensionToLinkKey(dimension)),
+                           std::string(QmitkMxNSyncAxisToLinkKey(axis)));
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("time"), std::string(QmitkMxNSyncAxisToLinkKey(QmitkMxNSyncAxis::Time)));
+    CPPUNIT_ASSERT_EQUAL(std::string("selection"),
+                         std::string(QmitkMxNSyncAxisToLinkKey(QmitkMxNSyncAxis::Selection)));
+  }
+
+  void BuildBarcodeSlots_NineSlotsInFamilyOrder_TimeIsGlobal()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+    for (const auto axis : QmitkMxNAllSyncAxes)
+    {
+      CPPUNIT_ASSERT(QmitkMxNSyncAxisGlyph(axis) == axisSlots[QmitkMxNSyncAxisToSlot(axis)].glyph);
+    }
+
+    const auto& time = axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)];
+    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"), time.color.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Time"), time.label.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Time - group Global"), time.tooltip.toStdString());
+    CPPUNIT_ASSERT(!time.hasOffset && time.offsetText.isEmpty());
+    CPPUNIT_ASSERT(time.applicable);
+  }
+
+  void BuildBarcodeSlots_GlobalUsesTheOverlayColorInEveryStyle()
+  {
+    // The strip and the plates are dark in every style, so they keep the light
+    // gray while the style's own text colour is black.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    auto palette = widget.palette();
+    palette.setColor(QPalette::WindowText, QColor(Qt::black));
+    widget.setPalette(palette);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("#000000"), widget.GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"),
+                         axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)].color.name().toStdString());
+  }
+
+  void CellsSharingAxis_TimeIsGlobalOnly()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(2, 2);
+
+    QStringList every;
+    for (const auto& descriptor : widget.ListWindowDescriptors())
+    {
+      every.append(descriptor.id);
+    }
+    CPPUNIT_ASSERT_EQUAL(4, static_cast<int>(every.size()));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every window, in pre-order, shares Time through 'global'",
+                                 every.join(QLatin1Char(',')).toStdString(),
+                                 widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time)
+                                   .join(QLatin1Char(',')).toStdString());
+    CPPUNIT_ASSERT_MESSAGE("A user group shares no Time",
+                           widget.CellsSharingAxis(QString::fromStdString(widget.GetDefaultSyncGroupName()),
+                                                   QmitkMxNSyncAxis::Time).isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("'global' takes no other axis yet",
+                           widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Selection).isEmpty());
+  }
+
+  void ResolveCellAxisGroup_TimeNeverTouchesSelection()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(1, 2);
+    const auto descriptors = widget.ListWindowDescriptors();
+    widget.SetCellSelectionGroup(descriptors.front().id, "tumor");
+
+    for (const auto& descriptor : descriptors)
+    {
+      const auto selectionBefore = widget.GetCellSelectionGroup(descriptor.id);
+      CPPUNIT_ASSERT_EQUAL(std::string("global"),
+                           widget.ResolveCellAxisGroup(descriptor.id, QmitkMxNSyncAxis::Time));
+      CPPUNIT_ASSERT_EQUAL(selectionBefore, widget.GetCellSelectionGroup(descriptor.id));
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("tumor"),
+                         widget.ResolveCellAxisGroup(descriptors.front().id, QmitkMxNSyncAxis::Selection));
+    CPPUNIT_ASSERT_MESSAGE("An unknown window has no Time group",
+                           widget.ResolveCellAxisGroup(QStringLiteral("mxn__nosuch"), QmitkMxNSyncAxis::Time).empty());
   }
 };
 

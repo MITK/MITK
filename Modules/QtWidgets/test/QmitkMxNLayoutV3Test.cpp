@@ -61,6 +61,10 @@ found in the LICENSE file.
  *     slice / zoom / pan offsets.
  *   - Strict mode requires every referenced group declared, across all
  *     dimensions; lazy mode does not.
+ *   - Every "3.0" window carries `"time": "global"`, which the writer always
+ *     writes; the reserved group 'global' is no target elsewhere and no
+ *     `groups` key, in "2.0" documents either, and the cosmetics it keeps to
+ *     itself are ignored on load.
  *   - A "3.0" window is closed as well; `render_mode` and `free` are
  *     validated, also across the windows of an orientation group.
  *   - The v3 documents shipped in the tree load.
@@ -77,12 +81,27 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3Doc_UnknownModifier_Throws);
   MITK_TEST(V3Doc_MistypedOffset_Throws);
   MITK_TEST(V3Doc_SelectionObjectForm_OK);
+  MITK_TEST(V3Doc_TimeGlobal_StringAndObjectForm_OK);
+  MITK_TEST(V3Doc_MissingTime_Throws);
+  MITK_TEST(V3Doc_TimeOtherGroup_Throws);
+  MITK_TEST(V3Doc_TimeOffset_Throws);
+  MITK_TEST(V3_StrictMode_GlobalNeedsNoGroupsEntry);
+  MITK_TEST(V2Doc_TimeKey_StillIgnored);
+  MITK_TEST(Serialize_WritesTimeGlobalForEveryWindow);
+  MITK_TEST(Serialize_NeverWritesGroupsGlobal);
+  MITK_TEST(V3Doc_GlobalOnOtherLink_Throws);
+  MITK_TEST(V3Doc_GroupsDeclaresGlobal_Throws);
+  MITK_TEST(V2Doc_SelectionGlobal_Throws);
+  MITK_TEST(V2Doc_GroupsDeclaresGlobal_Throws);
+  MITK_TEST(ReservedId_CaseVariants_Throw);
   MITK_TEST(V3_RoundTrip_AllDimensionsAndOffsets);
   MITK_TEST(V3_StrictMode_NavGroupUndeclared_Throws);
   MITK_TEST(V3_LazyMode_NavLinks_OK);
   MITK_TEST(GroupCosmetics_RoundTripVerbatim);
   MITK_TEST(GroupCosmetics_AbsentStaysAbsent);
   MITK_TEST(GroupCosmetics_MalformedColorIgnored);
+  MITK_TEST(GroupCosmetics_ColorInReservedBandIgnored);
+  MITK_TEST(GroupCosmetics_ReservedDisplayNameIgnored);
   MITK_TEST(GroupCosmetics_UnknownEntryKeyTolerated);
   MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
   MITK_TEST(EmptyGroup_SurvivesSaveAndLoad);
@@ -172,7 +191,7 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "selection": "main" } }
+            "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");
@@ -181,6 +200,38 @@ public:
   static nlohmann::json& WindowLinks(nlohmann::json& doc, std::size_t childIndex = 0)
   {
     return doc["root"]["children"][childIndex]["links"];
+  }
+
+  /** Applying 'doc' fails with exactly 'message', and the editor keeps its cells. */
+  void AssertLoadFails(const nlohmann::json& doc, const std::string& message)
+  {
+    auto editor = MakeEditor();
+    const auto cellsBefore = editor->GetNumberOfRenderWindowWidgets();
+    try
+    {
+      editor->ApplyLayout(doc);
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_ASSERT_EQUAL(message, std::string(e.GetDescription()));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A refused document leaves the layout alone",
+                                   cellsBefore, editor->GetNumberOfRenderWindowWidgets());
+      return;
+    }
+    CPPUNIT_FAIL("The load must fail with: " + message);
+  }
+
+  /** The `links` objects of the windows below 'node', in pre-order. */
+  static void CollectWindowLinks(const nlohmann::json& node, std::vector<nlohmann::json>& links)
+  {
+    if ("window" == node.value("type", std::string()))
+    {
+      links.push_back(node.at("links"));
+    }
+    for (const auto& child : node.value("children", nlohmann::json::array()))
+    {
+      CollectWindowLinks(child, links);
+    }
   }
 
   void V2Doc_UnknownLinkKey_Tolerated()
@@ -268,6 +319,201 @@ public:
       serialized.at("root").at("children").at(0).at("links").at("selection").get<std::string>());
   }
 
+  void V3Doc_TimeGlobal_StringAndObjectForm_OK()
+  {
+    for (const auto& time : { nlohmann::json("global"), nlohmann::json{ { "target", "global" } } })
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["time"] = time;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+      CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+    }
+  }
+
+  void V3Doc_MissingTime_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc).erase("time");
+    AssertLoadFails(doc, "Layout window 'mxn__w0' is missing the required 'links.time'. Every window follows the "
+                         "application's time, written as \"time\": \"global\".");
+  }
+
+  void V3Doc_TimeOtherGroup_Throws()
+  {
+    const std::pair<nlohmann::json, std::string> targets[] = {
+      { "main", "main" },
+      { nlohmann::json{ { "target", "nav" } }, "nav" },
+      { "Global", "Global" },  // the reserved id is spelled exactly in a document
+    };
+    for (const auto& [time, group] : targets)
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["time"] = time;
+      AssertLoadFails(doc, "Layout window 'mxn__w0': 'links.time' targets group '" + group
+                             + "', but time supports only the reserved group 'global'.");
+    }
+  }
+
+  void V3Doc_TimeOffset_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc)["time"] = nlohmann::json{ { "target", "global" }, { "offset", 1 } };
+    AssertLoadFails(doc, "Layout window 'mxn__w0': 'links.time' does not accept an 'offset' modifier.");
+  }
+
+  void V3_StrictMode_GlobalNeedsNoGroupsEntry()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } } };
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  void V2Doc_TimeKey_StillIgnored()
+  {
+    // A 2.0 document ignores every link key but selection; time is no exception.
+    for (const auto& time : { nlohmann::json("global"), nlohmann::json("main"), nlohmann::json(5) })
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = "2.0";
+      WindowLinks(doc)["time"] = time;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+      CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+    }
+  }
+
+  void Serialize_WritesTimeGlobalForEveryWindow()
+  {
+    // A 2.0 document carries no time; whatever was loaded, the writer adds it.
+    for (const auto* version : { "2.0", "3.0" })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "root": {
+          "type": "split", "orientation": "horizontal",
+          "children": [
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial",
+              "links": { "selection": "main", "time": "global" } },
+            { "type": "split", "orientation": "vertical",
+              "children": [
+                { "type": "window", "id": "mxn__w1", "view_direction": "sagittal",
+                  "links": { "selection": "main", "time": "global" } },
+                { "type": "window", "id": "mxn__w2", "view_direction": "coronal",
+                  "links": { "selection": "other", "time": { "target": "global" } } }
+              ] }
+          ]
+        }
+      })json");
+      doc["version"] = version;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      std::vector<nlohmann::json> links;
+      CollectWindowLinks(editor->SerializeLayout().at("root"), links);
+      CPPUNIT_ASSERT_EQUAL(std::size_t{ 3 }, links.size());
+      for (const auto& windowLinks : links)
+      {
+        CPPUNIT_ASSERT_MESSAGE(std::string("time is written as the string form after a ") + version + " load",
+                               windowLinks.contains("time") && nlohmann::json("global") == windowLinks.at("time"));
+      }
+    }
+  }
+
+  void Serialize_NeverWritesGroupsGlobal()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc)["slice"] = "nav";
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+
+    const auto groups = editor->SerializeLayout().at("groups");
+    CPPUNIT_ASSERT_MESSAGE("The reserved group takes no entry", !groups.contains("global"));
+    CPPUNIT_ASSERT_MESSAGE("The other referenced groups stay declared", groups.contains("main") && groups.contains("nav"));
+  }
+
+  static std::string GlobalOnLinkMessage(const std::string& key)
+  {
+    return "Layout window 'mxn__w0': 'links." + key
+           + "' targets the reserved group 'global'. 'global' is accepted only on: 'links.time'.";
+  }
+
+  void V3Doc_GlobalOnOtherLink_Throws()
+  {
+    for (const auto* key : { "selection", "pan", "zoom", "slice", "crosshair", "orientation", "windowing", "lut" })
+    {
+      for (const auto& target : { nlohmann::json("global"), nlohmann::json{ { "target", "global" } } })
+      {
+        auto doc = SingleWindowDoc();
+        WindowLinks(doc)[key] = target;
+        AssertLoadFails(doc, GlobalOnLinkMessage(key));
+      }
+    }
+  }
+
+  static constexpr const char* GroupsDeclaresGlobalMessage =
+    "Layout 'groups' declares the reserved group 'global'. It always exists and takes no entry.";
+
+  void V3Doc_GroupsDeclaresGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "global", nlohmann::json::object() } };
+    AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+  }
+
+  static constexpr const char* SelectionGlobalV2Message =
+    "Layout window 'mxn__w0': 'links.selection' targets the reserved group 'global'. Rename the group; 'global' "
+    "is reserved.";
+
+  void V2Doc_SelectionGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["version"] = "2.0";
+    WindowLinks(doc)["selection"] = "global";
+    AssertLoadFails(doc, SelectionGlobalV2Message);
+  }
+
+  void V2Doc_GroupsDeclaresGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["version"] = "2.0";
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "global", { { "select_all", true } } } };
+    AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+  }
+
+  void ReservedId_CaseVariants_Throw()
+  {
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["selection"] = "Global";
+      AssertLoadFails(doc, GlobalOnLinkMessage("selection"));
+    }
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["slice"] = nlohmann::json{ { "target", "gLoBaL" }, { "offset", 1 } };
+      AssertLoadFails(doc, GlobalOnLinkMessage("slice"));
+    }
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = "2.0";
+      WindowLinks(doc)["selection"] = "GLOBAL";
+      AssertLoadFails(doc, SelectionGlobalV2Message);
+    }
+    for (const auto* version : { "2.0", "3.0" })
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = version;
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "Global", nlohmann::json::object() } };
+      AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+    }
+  }
+
   void V3_RoundTrip_AllDimensionsAndOffsets()
   {
     const auto fixture = nlohmann::json::parse(R"json({
@@ -282,11 +528,11 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "selection": "main", "pan": "nav", "zoom": "nav", "slice": "nav",
+            "links": { "selection": "main", "time": "global", "pan": "nav", "zoom": "nav", "slice": "nav",
                        "crosshair": "nav", "orientation": "planes",
                        "windowing": "wl", "lut": "wl" } },
           { "type": "window", "id": "mxn__w1", "view_direction": "axial",
-            "links": { "selection": "main",
+            "links": { "selection": "main", "time": "global",
                        "pan":   { "target": "nav", "offset": [12.5, -3.0] },
                        "zoom":  { "target": "nav", "offset": 2.0 },
                        "slice": { "target": "nav", "offset": -1 },
@@ -408,6 +654,43 @@ public:
     const auto roundTrip = editor->SerializeLayout();
     CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("color"));
     CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("name"));
+  }
+
+  void GroupCosmetics_ColorInReservedBandIgnored()
+  {
+    // Near the reserved group's light gray and near black, the colour the
+    // reserved group takes in the Light style.
+    for (const auto* color : { "#F1F1F1", "#ffffff", "#d0d0d0", "#000000", "#202020" })
+    {
+      auto doc = SingleWindowDoc();
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true }, { "color", color } } } };
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      const std::string what = std::string(" (") + color + ")";
+      CPPUNIT_ASSERT_MESSAGE("The default hue applies" + what, QColor(color) != editor->GetSyncGroupColor("main"));
+      CPPUNIT_ASSERT_MESSAGE("Nothing is written back" + what,
+                             !editor->SerializeLayout().at("groups").at("main").contains("color"));
+    }
+  }
+
+  void GroupCosmetics_ReservedDisplayNameIgnored()
+  {
+    for (const auto* name : { "Global", "global", " GLOBAL " })
+    {
+      auto doc = SingleWindowDoc();
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true }, { "name", name } } } };
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      const std::string what = std::string(" ('") + name + "')";
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The id is shown instead" + what, std::string("main"),
+                                   editor->GetSyncGroupDisplayName("main"));
+      CPPUNIT_ASSERT_MESSAGE("Nothing is written back" + what,
+                             !editor->SerializeLayout().at("groups").at("main").contains("name"));
+    }
   }
 
   void GroupCosmetics_UnknownEntryKeyTolerated()
@@ -645,7 +928,7 @@ public:
         windows.push_back({ { "type", "window" },
                             { "id", "mxn__r" + std::to_string(r) + "c" + std::to_string(c) },
                             { "view_direction", "axial" },
-                            { "links", { { "selection", "main" } } } });
+                            { "links", { { "selection", "main" }, { "time", "global" } } } });
       }
       rowNodes.push_back({ { "type", "split" }, { "orientation", "horizontal" }, { "children", windows } });
     }
@@ -682,8 +965,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");
@@ -744,9 +1027,9 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial", "render_mode": "3d",
-            "links": { "selection": "main", "orientation": "planes" } },
+            "links": { "selection": "main", "time": "global", "orientation": "planes" } },
           { "type": "window", "id": "mxn__w1", "view_direction": "axial", "render_mode": "3d",
-            "links": { "selection": "main", "orientation": "planes" } }
+            "links": { "selection": "main", "time": "global", "orientation": "planes" } }
         ]
       }
     })json");
@@ -870,9 +1153,9 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__axial", "view_direction": "axial", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__sagittal", "view_direction": "sagittal", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__coronal", "view_direction": "coronal", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__axial", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__sagittal", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__coronal", "view_direction": "coronal", "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();
@@ -998,8 +1281,8 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();
@@ -1126,8 +1409,10 @@ public:
       auto doc = nlohmann::json::parse(R"json({
         "version": "3.0",
         "root": { "type": "split", "orientation": "horizontal", "children": [
-          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial",
+            "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial",
+            "links": { "selection": "main", "time": "global" } }
         ] }
       })json");
       if (zoomGroup)
@@ -1189,10 +1474,10 @@ public:
       auto doc = nlohmann::json::parse(R"json({
         "version": "3.0",
         "root": { "type": "split", "orientation": "horizontal", "children": [
-          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
           { "type": "split", "orientation": "vertical", "children": [
-            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main" } },
-            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main" } }
+            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" } },
+            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main", "time": "global" } }
           ] }
         ] }
       })json");
@@ -1222,9 +1507,9 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
         { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
-          "links": { "selection": "main" } }
+          "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();

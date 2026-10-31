@@ -89,6 +89,18 @@ public:
 };
 
 /**
+* \brief Thrown when a call would create, join, remove or restyle the reserved
+*        group 'global' (QmitkMxNGlobalGroupId) on an axis that does not accept
+*        it, or would give a user group the reserved display name "Global" or a
+*        colour that cannot be told apart from the reserved group's.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNReservedGroupException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNReservedGroupException, mitk::Exception);
+};
+
+/**
 * \brief Thrown by the 'QmitkMxNMultiWidget' constructor when another MxN widget
 *        with the same name is alive: render-window IDs derive from the name,
 *        so the two would share cell IDs and per-cell renderer properties.
@@ -291,6 +303,8 @@ public:
   *                previously recorded name in place and skip the name
   *                preconditions below.
   *
+  * \pre  'name' is not the reserved id QmitkMxNGlobalGroupId in any spelling,
+  *       also on an idempotent call   (otherwise QmitkMxNReservedGroupException)
   * \pre  index >= 1                       (otherwise mitk::Exception)
   * \pre  A non-empty 'name' matches the layout format's group-name pattern
   *       '^[A-Za-z0-9_.-]+$'               (otherwise mitk::Exception)
@@ -315,6 +329,10 @@ public:
   *   call is a no-op for it.
   *   A no-op as well for an id that names no group. Emits SyncLinksChanged
   *   once.
+  *
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling: that group always exists, so
+  *         a caller that removes it has a bug.
   */
   void RemoveSynchronizationGroup(const std::string& id);
 
@@ -350,6 +368,10 @@ public:
   *   allocated on first use (mapping the string id to a free engine index) and
   *   reclaimed once its last member leaves - unless it came from a layout
   *   document or the default seed, which persist. No-op for an unknown cell.
+  *
+  * \throws QmitkMxNReservedGroupException when 'group' is the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling and selection is not among
+  *         QmitkMxNLinkKeysAcceptingGlobal.
   */
   void SetCellSelectionGroup(const QString& windowId, const std::string& group);
 
@@ -429,6 +451,9 @@ public:
   *
   * \throws mitk::Exception on an unknown window, a malformed group name, or
   *         an offset that the dimension does not accept.
+  * \throws QmitkMxNReservedGroupException when 'group' is the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling and the dimension's link key
+  *         is not among QmitkMxNLinkKeysAcceptingGlobal.
   * \throws QmitkMxNOrientationConflictException when a 2D cell would join an
   *         `Orientation` group whose direction is 'Free'.
   */
@@ -691,6 +716,10 @@ public:
   *   identical for every cell. The palette wraps when more groups exist than
   *   palette entries.
   *
+  *   The reserved group QmitkMxNGlobalGroupId takes no palette entry: its
+  *   colour is the text colour of the current Workbench style, as this
+  *   widget's palette reports it (QPalette::WindowText).
+  *
   * \throws mitk::Exception on a group that was never registered.
   */
   QColor GetSyncGroupColor(const std::string& group) const;
@@ -881,13 +910,17 @@ public:
   * \brief The editor's current groups: every registered selection group plus
   *        every group a live cell links on any dimension, in stable
   *        first-registration order. Member lists are in cell pre-order.
+  *
+  *   These are the user's groups; the reserved group QmitkMxNGlobalGroupId,
+  *   which always exists, is not among them.
   */
   std::vector<SyncGroupInfo> GetSyncGroupInfos() const;
 
   /**
   * \brief The group's display name (`groups.<id>.name`), falling back to the
   *        id when none is set. The id itself never changes in-app; the
-  *        display name carries all human-facing identity.
+  *        display name carries all human-facing identity. The reserved group
+  *        QmitkMxNGlobalGroupId is always "Global".
   */
   std::string GetSyncGroupDisplayName(const std::string& id) const;
 
@@ -916,6 +949,10 @@ public:
   *
   * \throws mitk::Exception on a group that does not exist (neither
   *         registered nor linked by a live cell).
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling, and for the reserved group's
+  *         display name "Global", compared case-insensitively after trimming,
+  *         so that no second group reads "Global".
   */
   void SetSyncGroupDisplayName(const std::string& id, const std::string& displayName);
 
@@ -925,6 +962,10 @@ public:
   *
   * \throws mitk::Exception on a group that does not exist (neither
   *         registered nor linked by a live cell) or an invalid color.
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling, and for a color that could
+  *         not be told apart from the colours the reserved group takes: a
+  *         CIE76 distance below 15 to #f1f1f1 or to black, in either style.
   */
   void SetSyncGroupColor(const std::string& id, const QColor& color);
 
@@ -1212,13 +1253,20 @@ public:
   *   positional reuse). On failure during construction, rolls back to a
   *   single default cell and rethrows.
   *
-  *   See 'mxn-layout-v3.schema.json' for the accepted document shape. A
-  *   v2.0 document is the compatible subset: missing `links` keys default to
-  *   unsynced per-cell singletons, and unknown link keys stay tolerated
-  *   (silently ignored) so existing v2 files load unchanged. For a v3.0
-  *   document the `links` object is closed: an unknown link key, an unknown
-  *   modifier, or an `offset` on a dimension that does not accept it (or of
-  *   the wrong type) is rejected.
+  *   See 'mxn-layout-v3.schema.json' for the accepted document shape. In a
+  *   v2.0 document missing `links` keys default to unsynced per-cell
+  *   singletons, and unknown link keys stay tolerated (silently ignored), so
+  *   existing v2 files load unchanged unless they name a group 'global'. For a
+  *   v3.0 document the `links` object is closed: an unknown link key, an
+  *   unknown modifier, or an `offset` on a dimension that does not accept it
+  *   (or of the wrong type) is rejected, and every window must carry
+  *   `"time": "global"`.
+  *
+  *   The reserved group QmitkMxNGlobalGroupId always exists and takes no
+  *   `groups` entry; a link may target it only under a key of
+  *   QmitkMxNLinkKeysAcceptingGlobal. A group colour or display name that the
+  *   reserved group keeps to itself is ignored with a warning, like a
+  *   malformed one.
   *
   *   Id contract: every window's `id` MUST already be in the canonical
   *   fully-qualified form `<multiWidgetName>__<bareSegment>` matching this
@@ -1249,8 +1297,10 @@ public:
   *         shape violation; id not starting with `<multiWidgetName>__`;
   *         duplicate window ids; unknown view_direction; missing group
   *         reference in strict mode; v3 links-closure violation (unknown
-  *         link key / modifier, misplaced or mistyped offset);
-  *         nlohmann parse / type errors (rewrapped from
+  *         link key / modifier, misplaced or mistyped offset); a v3 window
+  *         without `links.time` or with a time target other than 'global';
+  *         the reserved group 'global' as a link target where it is not
+  *         accepted, or as a `groups` key; nlohmann parse / type errors (rewrapped from
   *         'nlohmann::json::exception' subtypes).
   */
   void ApplyLayout(const nlohmann::json& doc);

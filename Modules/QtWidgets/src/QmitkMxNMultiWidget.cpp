@@ -269,6 +269,67 @@ namespace
     "#D08FB8"   // orchid
   };
 
+  // The Dark style's text colour: the reserved group's colour on furniture
+  // that is dark in every style. On furniture that follows the style it takes
+  // that style's text colour instead (see GetSyncGroupColor).
+  constexpr const char* GLOBAL_GROUP_OVERLAY_COLOR = "#f1f1f1";
+
+  constexpr const char* GLOBAL_GROUP_DISPLAY_NAME = "Global";
+
+  // Whether 'text' names the reserved group: its id in any spelling, or its
+  // display name, which differs from the id only in case. Surrounding
+  // whitespace is ignored, as a typed display name is trimmed.
+  bool NamesReservedGroup(const std::string& text)
+  {
+    return 0 == QString::fromStdString(text).trimmed().compare(QLatin1String(QmitkMxNGlobalGroupId),
+                                                               Qt::CaseInsensitive);
+  }
+
+  // CIELAB (D65) coordinates of an sRGB colour.
+  std::array<double, 3> ToLab(const QColor& color)
+  {
+    const auto linear = [](double c) { return c <= 0.04045 ? c / 12.92 : std::pow((c + 0.055) / 1.055, 2.4); };
+    const double r = linear(color.redF());
+    const double g = linear(color.greenF());
+    const double b = linear(color.blueF());
+    const double x = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047;
+    const double y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b;
+    const double z = (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) / 1.08883;
+    const auto f = [](double t) { return t > 216.0 / 24389.0 ? std::cbrt(t) : (24389.0 / 27.0 * t + 16.0) / 116.0; };
+    return { 116.0 * f(y) - 16.0, 500.0 * (f(x) - f(y)), 200.0 * (f(y) - f(z)) };
+  }
+
+  // A group colour this close (CIE76) to a colour the reserved group takes -
+  // the Dark style's text colour, or black, the Light style's on Windows -
+  // could not be told apart from it. The band does not follow the current
+  // style, so that a layout loads the same in either.
+  bool IsInReservedColorBand(const QColor& color)
+  {
+    constexpr double ReservedBandDistance = 15.0;
+    const auto lab = ToLab(color);
+    for (const auto* reserved : { GLOBAL_GROUP_OVERLAY_COLOR, "#000000" })
+    {
+      const auto other = ToLab(QColor(reserved));
+      if (std::hypot(lab[0] - other[0], lab[1] - other[1], lab[2] - other[2]) < ReservedBandDistance)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  [[noreturn]] void ThrowReservedLinkTarget(const std::string& windowId, const std::string& key)
+  {
+    std::string acceptingKeys;
+    for (const auto acceptingKey : QmitkMxNLinkKeysAcceptingGlobal)
+    {
+      acceptingKeys += (acceptingKeys.empty() ? "'links." : ", 'links.") + std::string(acceptingKey) + "'";
+    }
+    mitkThrow() << "Layout window '" << windowId << "': 'links." << key << "' targets the reserved group '"
+                << QmitkMxNGlobalGroupId << "'. '" << QmitkMxNGlobalGroupId
+                << "' is accepted only on: " << acceptingKeys << ".";
+  }
+
   std::size_t DimensionIndex(QmitkMxNSyncDimension dimension)
   {
     return static_cast<std::size_t>(dimension);
@@ -372,7 +433,7 @@ namespace
   // Validates one v3 link value and extracts (group, offset). Enforces the
   // closed modifier set: `target` everywhere; `offset` only on slice / zoom /
   // pan, each with its dimension-typed shape. `dimension` is empty for
-  // `selection`, which accepts no modifiers at all.
+  // `selection` and `time`, which accept no modifiers at all.
   std::pair<std::string, QmitkMxNMultiWidget::SyncOffset> ParseV3LinkValue(
     const std::string& windowId,
     const std::string& key,
@@ -413,7 +474,7 @@ namespace
       if (!dimension.has_value())
       {
         mitkThrow() << "Layout window '" << windowId
-                    << "': 'links.selection' does not accept an 'offset' modifier.";
+                    << "': 'links." << key << "' does not accept an 'offset' modifier.";
       }
       switch (*dimension)
       {
@@ -466,7 +527,7 @@ namespace
   // unknown window key is silently ignored - so existing v2 files load
   // unchanged, including files with a typo'd key. Only the v3 additions
   // `render_mode` and `free` are rejected in a "2.0" document, since ignoring
-  // them would load a 3D window as 2D.
+  // them would load a 3D window as 2D, and the reserved group 'global'.
   void PrewalkValidate(const nlohmann::json& node, bool isV3, PrewalkResult& result)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
@@ -598,6 +659,10 @@ namespace
       if (isV3)
       {
         selectionGroup = ParseV3LinkValue(id, "selection", std::nullopt, links["selection"]).first;
+        if (NamesReservedGroup(selectionGroup) && !QmitkMxNLinkKeyAcceptsGlobal("selection"))
+        {
+          ThrowReservedLinkTarget(id, "selection");
+        }
       }
       else
       {
@@ -608,11 +673,20 @@ namespace
         }
         selectionGroup = links["selection"].get<std::string>();
         ValidateGroupNamePattern(id, selectionGroup);
+        // Loading it as an ordinary group now would change the file's meaning
+        // once 'global' follows the application's selection.
+        if (NamesReservedGroup(selectionGroup))
+        {
+          mitkThrow() << "Layout window '" << id << "': 'links.selection' targets the reserved group '"
+                      << QmitkMxNGlobalGroupId << "'. Rename the group; '" << QmitkMxNGlobalGroupId
+                      << "' is reserved.";
+        }
       }
       result.selectionGroups.insert(selectionGroup);
       result.seedingOrder.emplace_back(id, selectionGroup);
 
       std::vector<NavLinkSpec> navSpecs;
+      bool hasTimeLink = false;
       for (auto it = links.begin(); it != links.end(); ++it)
       {
         if (it.key() == "selection")
@@ -623,6 +697,19 @@ namespace
         {
           continue;
         }
+        // Every window follows the application's time, so 'global' is the only
+        // time target, and nothing is stored for it.
+        if (it.key() == "time")
+        {
+          const auto group = ParseV3LinkValue(id, it.key(), std::nullopt, it.value()).first;
+          if (group != QmitkMxNGlobalGroupId)
+          {
+            mitkThrow() << "Layout window '" << id << "': 'links.time' targets group '" << group
+                        << "', but time supports only the reserved group '" << QmitkMxNGlobalGroupId << "'.";
+          }
+          hasTimeLink = true;
+          continue;
+        }
         const auto dimension = QmitkMxNSyncDimensionFromLinkKey(it.key());
         if (!dimension.has_value())
         {
@@ -630,12 +717,24 @@ namespace
                       << it.key() << "'.";
         }
         auto [group, offset] = ParseV3LinkValue(id, it.key(), dimension, it.value());
+        if (NamesReservedGroup(group) && !QmitkMxNLinkKeyAcceptsGlobal(it.key()))
+        {
+          ThrowReservedLinkTarget(id, it.key());
+        }
         result.navGroups.insert(group);
         if (QmitkMxNSyncDimension::Orientation == *dimension)
         {
           windowView.orientationGroup = group;
         }
         navSpecs.push_back({ *dimension, std::move(group), offset });
+      }
+      // Required while 'global' is the only time group, so that a document
+      // written now keeps its meaning once a missing link means "independent"
+      // on time as it does on every other axis.
+      if (isV3 && !hasTimeLink)
+      {
+        mitkThrow() << "Layout window '" << id << "' is missing the required 'links.time'. Every window follows "
+                    << "the application's time, written as \"time\": \"" << QmitkMxNGlobalGroupId << "\".";
       }
       if (!navSpecs.empty())
       {
@@ -2589,7 +2688,8 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
         childJson["render_mode"] = RenderModeToString(descriptor.renderMode);
       }
 
-      nlohmann::json linksJson{ { "selection", descriptor.selectionGroup.toStdString() } };
+      nlohmann::json linksJson{ { "selection", descriptor.selectionGroup.toStdString() },
+                                { "time", QmitkMxNGlobalGroupId } };
       const auto linksIt = m_CellSyncLinks.find(descriptor.id);
       if (linksIt != m_CellSyncLinks.end())
       {
@@ -3597,39 +3697,56 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
                       << GROUP_NAME_PATTERN.pattern().toStdString()
                       << "' (URL-segment-safe).";
         }
+        if (NamesReservedGroup(it.key()))
+        {
+          mitkThrow() << "Layout 'groups' declares the reserved group '" << QmitkMxNGlobalGroupId
+                      << "'. It always exists and takes no entry.";
+        }
         if (!it.value().is_object())
         {
           mitkThrow() << "Layout 'groups." << it.key() << "' entry must be a JSON object.";
         }
         // Cosmetic per-group fields. Purely presentational, so malformed
         // values are ignored with a warning - a color must never make a
-        // layout unloadable.
+        // layout unloadable. The same holds for the cosmetics the reserved
+        // group keeps to itself.
         const auto& entry = it.value();
         if (entry.contains("color"))
         {
           const auto& color = entry.at("color");
-          if (color.is_string()
-              && GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
-          {
-            groupColors[it.key()] = color.get<std::string>();
-          }
-          else
+          if (!color.is_string()
+              || !GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
           {
             MITK_WARN << "Ignoring malformed 'groups." << it.key()
                       << ".color' (expected '#RRGGBB'); using the default hue.";
+          }
+          else if (IsInReservedColorBand(QColor(QString::fromStdString(color.get<std::string>()))))
+          {
+            MITK_WARN << "Ignoring 'groups." << it.key() << ".color' " << color.get<std::string>()
+                      << ": too close to the colours of the reserved group '" << QmitkMxNGlobalGroupId
+                      << "'; using the default hue.";
+          }
+          else
+          {
+            groupColors[it.key()] = color.get<std::string>();
           }
         }
         if (entry.contains("name"))
         {
           const auto& displayName = entry.at("name");
-          if (displayName.is_string() && !displayName.get<std::string>().empty())
-          {
-            groupDisplayNames[it.key()] = displayName.get<std::string>();
-          }
-          else
+          if (!displayName.is_string() || displayName.get<std::string>().empty())
           {
             MITK_WARN << "Ignoring malformed 'groups." << it.key()
                       << ".name' (expected a non-empty string); using the group id.";
+          }
+          else if (NamesReservedGroup(displayName.get<std::string>()))
+          {
+            MITK_WARN << "Ignoring 'groups." << it.key() << ".name' '" << displayName.get<std::string>()
+                      << "': it is the reserved group's display name; using the group id.";
+          }
+          else
+          {
+            groupDisplayNames[it.key()] = displayName.get<std::string>();
           }
         }
       }
@@ -3894,6 +4011,12 @@ QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const
 
 void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name)
 {
+  if (NamesReservedGroup(name))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "AddSynchronizationGroup: group id '" << name << "' is reserved; the group '" << QmitkMxNGlobalGroupId
+      << "' always exists.";
+  }
   if (index < 1)
   {
     mitkThrow() << "Invalid synchronization group index '" << index
@@ -3978,6 +4101,13 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
 
 void QmitkMxNMultiWidget::RemoveSynchronizationGroup(const std::string& id)
 {
+  if (NamesReservedGroup(id))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "RemoveSynchronizationGroup: group id '" << id << "' is reserved; the group '" << QmitkMxNGlobalGroupId
+      << "' cannot be removed.";
+  }
+
   // Resolve the id to its engine index, if it is a registered group.
   GroupSyncIndexType registeredIndex = 0;
   for (const auto& [index, name] : m_GroupNameByIndex)
@@ -4143,6 +4273,12 @@ void QmitkMxNMultiWidget::ReclaimSelectionGroupIfEmpty(GroupSyncIndexType index)
 
 void QmitkMxNMultiWidget::SetCellSelectionGroup(const QString& windowId, const std::string& group)
 {
+  if (NamesReservedGroup(group) && !QmitkMxNLinkKeyAcceptsGlobal("selection"))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetCellSelectionGroup: group id '" << group << "' is reserved; '" << QmitkMxNGlobalGroupId
+      << "' is not accepted on 'links.selection'.";
+  }
   const auto cell = this->GetRenderWindowWidget(windowId);
   if (nullptr == cell || nullptr == cell->GetUtilityWidget())
   {
@@ -4218,6 +4354,12 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
     mitkThrow() << "SetSyncLink: group name '" << group
                 << "' does not match the required pattern '"
                 << GROUP_NAME_PATTERN.pattern().toStdString() << "' (URL-segment-safe).";
+  }
+  if (NamesReservedGroup(group) && !QmitkMxNLinkKeyAcceptsGlobal(QmitkMxNSyncDimensionToLinkKey(dimension)))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetSyncLink: group id '" << group << "' is reserved; '" << QmitkMxNGlobalGroupId
+      << "' is not accepted on 'links." << QmitkMxNSyncDimensionToLinkKey(dimension) << "'.";
   }
 
   if (QmitkMxNSyncDimension::Orientation == dimension && !this->IsOrientationLinkAllowed(windowId, group))
@@ -6639,6 +6781,13 @@ void QmitkMxNMultiWidget::RefreshSyncBarcodes()
 
 QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const
 {
+  if (QmitkMxNGlobalGroupId == group)
+  {
+    // A style sheet's text colour reaches the palette only on polish.
+    this->ensurePolished();
+    return this->palette().color(QPalette::WindowText);
+  }
+
   // A layout-designer-set color wins over the default hue and is honored
   // verbatim (not themed), so a designed layout looks the same in dark and
   // light styles.
@@ -6808,6 +6957,10 @@ std::vector<QmitkMxNMultiWidget::SyncGroupInfo> QmitkMxNMultiWidget::GetSyncGrou
 
 std::string QmitkMxNMultiWidget::GetSyncGroupDisplayName(const std::string& id) const
 {
+  if (QmitkMxNGlobalGroupId == id)
+  {
+    return GLOBAL_GROUP_DISPLAY_NAME;
+  }
   const auto it = m_GroupDisplayNames.find(id);
   return (it != m_GroupDisplayNames.end() && !it->second.empty()) ? it->second : id;
 }
@@ -6839,9 +6992,21 @@ std::string QmitkMxNMultiWidget::GetDefaultSyncGroupName() const
 
 void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const std::string& displayName)
 {
+  if (NamesReservedGroup(id))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetSyncGroupDisplayName: group id '" << id << "' is reserved; the group '" << QmitkMxNGlobalGroupId
+      << "' cannot be renamed.";
+  }
   if (!this->SyncGroupExists(id))
   {
     mitkThrow() << "SetSyncGroupDisplayName: unknown group '" << id << "'.";
+  }
+  if (NamesReservedGroup(displayName))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetSyncGroupDisplayName: the display name '" << displayName << "' is reserved for the group '"
+      << QmitkMxNGlobalGroupId << "'.";
   }
 
   if (displayName.empty())
@@ -6866,6 +7031,12 @@ void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const s
 
 void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor& color)
 {
+  if (NamesReservedGroup(id))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetSyncGroupColor: group id '" << id << "' is reserved; the group '" << QmitkMxNGlobalGroupId
+      << "' cannot be recoloured.";
+  }
   if (!this->SyncGroupExists(id))
   {
     mitkThrow() << "SetSyncGroupColor: unknown group '" << id << "'.";
@@ -6873,6 +7044,12 @@ void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor&
   if (!color.isValid())
   {
     mitkThrow() << "SetSyncGroupColor: invalid color for group '" << id << "'.";
+  }
+  if (IsInReservedColorBand(color))
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "SetSyncGroupColor: color " << color.name(QColor::HexRgb).toStdString()
+      << " is reserved; it is too close to the colours of the group '" << QmitkMxNGlobalGroupId << "'.";
   }
 
   m_GroupColors[id] = color.name(QColor::HexRgb).toStdString();

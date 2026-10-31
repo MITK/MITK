@@ -2278,11 +2278,11 @@ Returns the current MxN layout as a version 3.0 document, of the same shape as a
     "orientation": "horizontal",
     "children": [
       { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",
-        "links": { "selection": "main", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
+        "links": { "selection": "main", "time": "global", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
       { "type": "window", "id": "mxn__widget1", "view_direction": "axial",
-        "links": { "selection": "main", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
+        "links": { "selection": "main", "time": "global", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
       { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",
-        "links": { "selection": "main", "windowing": "main", "lut": "main" }, "size": 210 }
+        "links": { "selection": "main", "time": "global", "windowing": "main", "lut": "main" }, "size": 210 }
     ]
   }
 }

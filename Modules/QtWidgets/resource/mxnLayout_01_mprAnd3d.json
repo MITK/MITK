@@ -21,6 +21,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "windowing": "main",
               "lut": "main"
@@ -33,6 +34,7 @@
             "view_direction": "sagittal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "windowing": "main",
               "lut": "main"
@@ -51,6 +53,7 @@
             "view_direction": "coronal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "windowing": "main",
               "lut": "main"
@@ -63,7 +66,8 @@
             "view_direction": "coronal",
             "render_mode": "3d",
             "links": {
-              "selection": "main"
+              "selection": "main",
+              "time": "global"
             }
           }
         ]

@@ -295,11 +295,11 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__slice", "view_direction": "sagittal",
-            "links": { "selection": "main" } },
+            "links": { "selection": "main", "time": "global" } },
           { "type": "window", "id": "mxn__volume", "view_direction": "sagittal", "render_mode": "3d",
-            "links": { "selection": "main" } },
+            "links": { "selection": "main", "time": "global" } },
           { "type": "window", "id": "mxn__overview", "view_direction": "free", "render_mode": "3d",
-            "links": { "selection": "main" } }
+            "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");

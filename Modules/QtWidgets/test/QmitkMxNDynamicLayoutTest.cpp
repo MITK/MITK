@@ -1366,7 +1366,7 @@ public:
       "version": "3.0",
       "groups": { "main": { "select_all": true } },
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
       ] }
     })json");
   }

@@ -17,6 +17,7 @@
         "view_direction": "axial",
         "links": {
           "selection": "main",
+          "time": "global",
           "zoom": "main",
           "windowing": "main",
           "lut": "main"
@@ -30,6 +31,7 @@
         "render_mode": "3d",
         "links": {
           "selection": "main",
+          "time": "global",
           "zoom": "main"
         }
       }

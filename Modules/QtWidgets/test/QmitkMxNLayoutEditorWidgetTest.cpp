@@ -1104,7 +1104,7 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "windowing": "left", "lut": "left", "selection": "left" } }
+            "links": { "windowing": "left", "lut": "left", "selection": "left", "time": "global" } }
         ]
       }
     })json");

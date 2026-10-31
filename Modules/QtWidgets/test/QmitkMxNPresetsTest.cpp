@@ -327,6 +327,39 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Exactly the preset's groups, with their display names" + where, preset.groups == groups);
   }
 
+  /** The `links` objects of the windows below 'node', in pre-order. */
+  static void CollectWindowLinks(const nlohmann::json& node, std::vector<nlohmann::json>& links)
+  {
+    if ("window" == node.value("type", std::string()))
+    {
+      links.push_back(node.at("links"));
+    }
+    for (const auto& child : node.value("children", nlohmann::json::array()))
+    {
+      CollectWindowLinks(child, links);
+    }
+  }
+
+  /** Saving the applied preset writes its file's links and groups back unchanged. */
+  static void CheckSavedAsShipped(const QmitkMxNMultiWidget& editor, const QmitkMxNPresets::Preset& shipped)
+  {
+    const std::string where = " (" + shipped.name.toStdString() + ")";
+    const auto saved = editor.SerializeLayout();
+
+    std::vector<nlohmann::json> savedLinks;
+    std::vector<nlohmann::json> shippedLinks;
+    CollectWindowLinks(saved.at("root"), savedLinks);
+    CollectWindowLinks(shipped.document.at("root"), shippedLinks);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The window count" + where, shippedLinks.size(), savedLinks.size());
+    for (std::size_t i = 0; i < shippedLinks.size(); ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The links of window " + std::to_string(i) + where, shippedLinks[i].dump(),
+                                   savedLinks[i].dump());
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The groups" + where, shipped.document.at("groups").dump(),
+                                 saved.at("groups").dump());
+  }
+
   // --- The menu --------------------------------------------------------------
 
   void Menu_ListsThePresetsInOrder()
@@ -470,10 +503,14 @@ public:
 
   void Presets_MatchTheirSpecification_OnTheDefaultNamedEditor()
   {
-    for (const auto& preset : Specification())
+    const auto specification = Specification();
+    const auto& shipped = QmitkMxNPresets::All();
+    CPPUNIT_ASSERT_EQUAL(specification.size(), shipped.size());
+    for (std::size_t i = 0; i < specification.size(); ++i)
     {
-      ApplyPreset(*m_LayoutEditor, *m_Editor, preset.menuName);
-      CheckPreset(*m_Editor, preset);
+      ApplyPreset(*m_LayoutEditor, *m_Editor, specification[i].menuName);
+      CheckPreset(*m_Editor, specification[i]);
+      CheckSavedAsShipped(*m_Editor, shipped[i]);
     }
   }
 

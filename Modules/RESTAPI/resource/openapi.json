@@ -3015,11 +3015,11 @@
                     "orientation": "horizontal",
                     "children": [
                       { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",
-                        "links": { "selection": "main", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
+                        "links": { "selection": "main", "time": "global", "slice": "nav", "windowing": "main", "lut": "main" }, "size": 210 },
                       { "type": "window", "id": "mxn__widget1", "view_direction": "axial",
-                        "links": { "selection": "main", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
+                        "links": { "selection": "main", "time": "global", "slice": { "target": "nav", "offset": 1 }, "windowing": "main", "lut": "main" }, "size": 210 },
                       { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",
-                        "links": { "selection": "main", "windowing": "main", "lut": "main" }, "size": 210 }
+                        "links": { "selection": "main", "time": "global", "windowing": "main", "lut": "main" }, "size": 210 }
                     ]
                   }
                 }
@@ -3867,7 +3867,7 @@
       },
       "MxNLinks": {
         "type": "object",
-        "description": "The cell's data-selection link from the layout document. Carries only the `selection` key; the per-dimension synchronization links (pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET /rendering/editors/mxn/layout`).",
+        "description": "The cell's data-selection link from the layout document. Carries only the `selection` key; the other links (time, pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET /rendering/editors/mxn/layout`), where `time` always targets the reserved group `global` that stands for the application's time. No user group is named `global`.",
         "required": ["selection"],
         "properties": {
           "selection": {

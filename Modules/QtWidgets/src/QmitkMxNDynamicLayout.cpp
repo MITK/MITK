@@ -206,6 +206,7 @@ namespace
 
     Json Window(const char* direction, Json links, const QString& name = QString(), bool threeD = false)
     {
+      links["time"] = QmitkMxNGlobalGroupId;
       Json window = { { "type", "window" },
                       { "id", this->NextId().toStdString() },
                       { "view_direction", direction },

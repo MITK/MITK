@@ -13,10 +13,12 @@ found in the LICENSE file.
 #ifndef QmitkMxNSyncDimension_h
 #define QmitkMxNSyncDimension_h
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <optional>
 #include <string>
+#include <string_view>
 
 /**
  * \brief Synchronization dimensions a cell of the MxN editor can link
@@ -76,6 +78,33 @@ inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(con
     }
   }
   return std::nullopt;
+}
+
+/**
+ * \brief The id of the reserved group whose members follow the application's
+ *        value (its time, for example) instead of a value of their own.
+ *
+ * The group always exists, takes no entry in a layout's `groups` dict, and is
+ * reserved in every spelling: no user group may be named "Global" or "GLOBAL".
+ */
+inline constexpr const char* QmitkMxNGlobalGroupId = "global";
+
+/**
+ * \brief The `links` keys whose links may target the reserved group 'global'.
+ *
+ * The one table the loader, the engine API and the layout editor consult, so
+ * that enabling 'global' on another axis means adding its key here and giving
+ * the axis the semantics of following the application's value. Keyed by link
+ * key, the vocabulary the loader works in; the engine maps a dimension with
+ * QmitkMxNSyncDimensionToLinkKey.
+ */
+inline constexpr std::array<std::string_view, 1> QmitkMxNLinkKeysAcceptingGlobal{ "time" };
+
+/** \brief Whether links under 'linkKey' may target the reserved group 'global'. */
+inline bool QmitkMxNLinkKeyAcceptsGlobal(std::string_view linkKey)
+{
+  return std::find(QmitkMxNLinkKeysAcceptingGlobal.begin(), QmitkMxNLinkKeysAcceptingGlobal.end(), linkKey)
+         != QmitkMxNLinkKeysAcceptingGlobal.end();
 }
 
 /**

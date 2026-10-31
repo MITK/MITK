@@ -661,7 +661,7 @@ public:
     m_Editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__w0", "view_direction": "original", "links": { "selection": "main" } } ] }
+        { "type": "window", "id": "mxn__w0", "view_direction": "original", "links": { "selection": "main", "time": "global" } } ] }
     })json"));
     auto* overlay = m_Editor->GetRenderWindowWidget("mxn__w0")->findChild<QmitkMxNCellOverlay*>();
     CPPUNIT_ASSERT(nullptr != overlay);
@@ -900,8 +900,8 @@ public:
       "groups": { "main": { "select_all": true } },
       "root": { "type": "split", "orientation": "horizontal", "children": [
         { "type": "window", "id": "mxn__widget0", "name": "Working plane", "view_direction": "axial",
-          "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } }
+          "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     // Wide enough that the strip's controls leave room around the centre.

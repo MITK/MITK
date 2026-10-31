@@ -21,6 +21,13 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QApplication>
+#include <QColor>
+#include <QPalette>
+
+#include <string>
+#include <vector>
+
 /**
  * Tests the canonical sync-group lifecycle API on QmitkMxNMultiWidget:
  *   - AddSynchronizationGroup throws on invalid index / null storage
@@ -28,6 +35,9 @@ found in the LICENSE file.
  *   - SetSynchronizationGroup auto-creates, moves between groups, and is
  *     edge-idempotent on the same group
  *   - NextFreeSyncGroupIndex picks gaps
+ *   - The reserved group 'global' cannot be created, joined, removed,
+ *     renamed or recoloured; its display name and a band of colours around
+ *     the colours it takes are reserved as well
  *
  * The test surfaces the protected 'GetSyncGroupConnector' / 'GetSyncGroupCount'
  * accessors via a thin subclass to inspect connector identity and registered
@@ -60,6 +70,19 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Set_IsIdempotentOnSameGroup);
   MITK_TEST(NextFreeSyncGroupIndex_PicksLowestUnused);
   MITK_TEST(SetSelectedPosition_UnknownWindowIsIgnored);
+  MITK_TEST(Reserved_AddSynchronizationGroup_Throws);
+  MITK_TEST(Reserved_SetSyncLink_ThrowsOnEveryDimension);
+  MITK_TEST(Reserved_SetCellSelectionGroup_Throws);
+  MITK_TEST(Reserved_RemoveSynchronizationGroup_Throws);
+  MITK_TEST(Reserved_SetSyncGroupDisplayNameOfGlobal_Throws);
+  MITK_TEST(Reserved_SetSyncGroupColorOfGlobal_Throws);
+  MITK_TEST(Reserved_DisplayNameGlobal_Throws);
+  MITK_TEST(ReservedBand_RefusesNearWhiteAndNearBlack);
+  MITK_TEST(GetSyncGroupInfos_DoesNotListGlobal);
+  MITK_TEST(GetSyncGroupColorAndName_GlobalIsReserved);
+  MITK_TEST(GetSyncGroupColor_GlobalFollowsTheStyleSheet);
+  MITK_TEST(GlobalTakesNoPaletteSlot);
+  MITK_TEST(ResolveCellGroupIdentity_FreshWindowStaysMono);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -363,6 +386,230 @@ public:
     position.Fill(0.0);
     CPPUNIT_ASSERT_NO_THROW(widget.SetSelectedPosition(position, QStringLiteral("mxn__nosuchwindow")));
     CPPUNIT_ASSERT_EQUAL(1u, widget.GetNumberOfRenderWindowWidgets());
+  }
+
+  // ---------- The reserved group 'global' ----------
+
+  /** The id of the reserved group, in the spellings that all name it. */
+  static std::vector<std::string> GlobalSpellings()
+  {
+    return { "global", "Global", "GLOBAL", "gLoBaL" };
+  }
+
+  static QString FirstWindow(const QmitkMxNMultiWidget& widget)
+  {
+    return widget.ListWindowDescriptors().front().id;
+  }
+
+  void Reserved_AddSynchronizationGroup_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.AddSynchronizationGroup(1);
+    AddedRecorder rec(widget);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.AddSynchronizationGroup(2, id), QmitkMxNReservedGroupException);
+      // Naming it is a caller's bug also where the call would be idempotent.
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.AddSynchronizationGroup(1, id), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 1 }, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL(0, rec.count);
+  }
+
+  void Reserved_SetSyncLink_ThrowsOnEveryDimension()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto windowId = FirstWindow(widget);
+
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto before = widget.GetSyncLink(windowId, dimension);
+      for (const auto& id : GlobalSpellings())
+      {
+        CPPUNIT_ASSERT_THROW_MESSAGE(std::string(QmitkMxNSyncDimensionToLinkKey(dimension)) + " " + id,
+                                     widget.SetSyncLink(windowId, dimension, id), QmitkMxNReservedGroupException);
+      }
+      const auto after = widget.GetSyncLink(windowId, dimension);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The link on ") + QmitkMxNSyncDimensionToLinkKey(dimension) + " stays",
+                             before.has_value() == after.has_value()
+                               && (!before.has_value() || before->group == after->group));
+    }
+  }
+
+  void Reserved_SetCellSelectionGroup_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto windowId = FirstWindow(widget);
+    const auto before = widget.GetCellSelectionGroup(windowId);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetCellSelectionGroup(windowId, id), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(before, widget.GetCellSelectionGroup(windowId));
+  }
+
+  void Reserved_RemoveSynchronizationGroup_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.RemoveSynchronizationGroup(id), QmitkMxNReservedGroupException);
+    }
+  }
+
+  void Reserved_SetSyncGroupDisplayNameOfGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetSyncGroupDisplayName(id, "Everything"),
+                                   QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("Global"), widget.GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+  }
+
+  void Reserved_SetSyncGroupColorOfGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto before = widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetSyncGroupColor(id, QColor("#E1707A")),
+                                   QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT(before == widget.GetSyncGroupColor(QmitkMxNGlobalGroupId));
+  }
+
+  void Reserved_DisplayNameGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+    widget.SetSyncGroupDisplayName(group, "Tumor");
+
+    for (const auto* name : { "Global", "global", " global ", "GLOBAL\t" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(name, widget.SetSyncGroupDisplayName(group, name), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor"), widget.GetSyncGroupDisplayName(group));
+
+    // Only the name itself is reserved.
+    widget.SetSyncGroupDisplayName(group, "Global view");
+    CPPUNIT_ASSERT_EQUAL(std::string("Global view"), widget.GetSyncGroupDisplayName(group));
+  }
+
+  void ReservedBand_RefusesNearWhiteAndNearBlack()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+    widget.SetSyncGroupColor(group, QColor("#ff0000"));
+
+    // Below a CIE76 distance of 15 to #f1f1f1 or to black.
+    for (const auto* color : { "#f1f1f1", "#ffffff", "#d0d0d0", "#fff0f0", "#000000", "#202020" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The colour stays after refusing ") + color,
+                             QColor("#ff0000") == widget.GetSyncGroupColor(group));
+    }
+
+    // Just outside the band, and every default hue.
+    for (const auto* color : { "#c0c0c0", "#303030", "#E1707A", "#6FA8DC", "#93C47D", "#F0B26B", "#B08FD9",
+                               "#76C7C0", "#C9C97A", "#D08FB8" })
+    {
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
+      CPPUNIT_ASSERT_MESSAGE(color, QColor(color) == widget.GetSyncGroupColor(group));
+    }
+  }
+
+  void GetSyncGroupInfos_DoesNotListGlobal()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto infos = widget.GetSyncGroupInfos();
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 1 }, infos.size());
+    CPPUNIT_ASSERT_EQUAL(widget.GetDefaultSyncGroupName(), infos.front().id);
+  }
+
+  void GetSyncGroupColorAndName_GlobalIsReserved()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Global"), widget.GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+
+    for (const auto* text : { "#000000", "#f1f1f1", "#123456" })
+    {
+      auto palette = widget.palette();
+      palette.setColor(QPalette::WindowText, QColor(text));
+      widget.setPalette(palette);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The reserved group takes the style's text colour ") + text,
+                             QColor(text) == widget.GetSyncGroupColor(QmitkMxNGlobalGroupId));
+    }
+  }
+
+  void GetSyncGroupColor_GlobalFollowsTheStyleSheet()
+  {
+    // The Dark style sets the text colour in a style sheet, which reaches a
+    // widget's palette only once the widget is polished.
+    struct StyleSheetGuard
+    {
+      ~StyleSheetGuard() { qApp->setStyleSheet(QString()); }
+    } guard;
+    qApp->setStyleSheet(QStringLiteral("QWidget { background-color: #2d2d30; color: #f1f1f1; }"));
+
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"),
+                         widget.GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
+  }
+
+  void GlobalTakesNoPaletteSlot()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    widget.AddSynchronizationGroup(widget.NextFreeSyncGroupIndex());
+
+    const auto infos = widget.GetSyncGroupInfos();
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 2 }, infos.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("#e1707a"), infos[0].color.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("#6fa8dc"), infos[1].color.name().toStdString());
+  }
+
+  void ResolveCellGroupIdentity_FreshWindowStaysMono()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto identity = widget.ResolveCellGroupIdentity(FirstWindow(widget));
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT(widget.GetSyncGroupColor(widget.GetDefaultSyncGroupName()) == identity.hue);
   }
 };
 

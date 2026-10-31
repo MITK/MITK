@@ -219,8 +219,8 @@ public:
 
     const auto roundTrip = editor->SerializeLayout();
 
-    // A loaded v2.0 document re-serializes as v3.0 (v2 is a strict subset;
-    // the content below stays identical).
+    // A loaded v2.0 document re-serializes as v3.0; the content below stays
+    // identical but for the time link every 3.0 window carries.
     CPPUNIT_ASSERT_EQUAL(std::string("3.0"),          roundTrip.at("version").get<std::string>());
     CPPUNIT_ASSERT_EQUAL(fixture.at("groups"),        roundTrip.at("groups"));
     // Compare the root subtree without splitter sizes (Qt may redistribute).
@@ -235,7 +235,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.at("type"),           r.at("type"));
       CPPUNIT_ASSERT_EQUAL(f.at("id"),             r.at("id"));
       CPPUNIT_ASSERT_EQUAL(f.at("view_direction"), r.at("view_direction"));
-      CPPUNIT_ASSERT_EQUAL(f.at("links"),          r.at("links"));
+      auto expectedLinks = f.at("links");
+      expectedLinks["time"] = "global";
+      CPPUNIT_ASSERT_EQUAL(expectedLinks,          r.at("links"));
       // Lower-bound check on emitted sizes - guards against a future regression
       // that emits zero or negative splitter sizes.
       CPPUNIT_ASSERT_MESSAGE("Round-trip child size must be > 0",

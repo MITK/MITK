@@ -2166,7 +2166,7 @@ Returns the MxN editor's cells in pre-order traversal of the current layout. Eac
 | `name` | string | *Optional.* Human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf. Free-form, not unique. Omitted when the cell has no display name set. |
 | `kind` | string | `"2d"` (the only value today; `"3d"` reserved for forward-compat) |
 | `view_direction` | string | One of `"axial"`, `"sagittal"`, `"coronal"`, `"original"`. Persisted state from the layout document — *authoring intent*, not live orientation. Read live orientation from `/camera` if needed. |
-| `links` | object | The cell's data-selection link from the layout document. Carries only the `selection` key; the per-dimension synchronization links (pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET .../layout`). |
+| `links` | object | The cell's data-selection link from the layout document. Carries only the `selection` key; the other links (time, pan, zoom, slice, crosshair, orientation, windowing, LUT) are in the layout document (`GET .../layout`), where `time` always targets the reserved group `global` that stands for the application's time. No user group is named `global`. |
 
 Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under crosshair rotation) and intentionally not asserted by `view_direction`.
 

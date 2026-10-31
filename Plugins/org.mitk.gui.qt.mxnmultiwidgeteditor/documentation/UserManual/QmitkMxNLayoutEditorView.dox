@@ -223,9 +223,9 @@
 	\ref org_mitk_editors_mxnmultiwidget_Utility) - and keeps it up. Closing the view,
 	hiding it behind another view, clicking any window's sync barcode, or clicking the
 	close button on a plate ends arrange mode and takes the plates away. Each plate
-	shows the window's eight synchronization axes in the fixed order pan, zoom, slice,
-	crosshair, orientation, windowing, LUT and data selection, tinted with the hue of
-	the group the window is linked to, and the window's name.
+	shows the window's nine synchronization axes in three rows, one family each - orientation,
+	pan and zoom; slice, time and crosshair; data selection, windowing and LUT - tinted with
+	the hue of the group the window is linked to, and the window's name on top.
 
 	\imageMacroEx{QmitkMxN_ArrangeMode.png, "Arrange mode: the plates while the view is open with two windows selected and the pointer on the zoom axis", 16, 800px}
 
@@ -233,14 +233,19 @@
 	scrolling, the crosshair, zoom and pan work everywhere else in the window exactly as
 	before, so a synchronization can be tried out the moment it is made.
 
-	Pointing at a glyph on a plate enlarges that axis on every plate, names it above the
-	row, and draws the frame of every window that shares this window's synchronization on
-	that axis bold in the group's hue - which windows belong together is visible at a
-	glance. The thin frames keep showing each window's group as always; only the bold ones
-	answer the axis you point at. Pointing at a glyph on a group card, a chip in the
-	<b>Advanced</b> matrix or a window's sync barcode does the same; the bold frames always
-	answer the last thing pointed at. A group card dragged over a window marks that
-	window's frame as the drop target.
+	Pointing at a glyph on a plate enlarges that axis on every plate and draws the frame of
+	every window that shares this window's synchronization on that axis bold in the group's
+	hue - which windows belong together is visible at a glance. The thin frames keep showing
+	each window's group as always; only the bold ones answer the axis you point at. Pointing
+	at a glyph on a group card, a chip in the <b>Advanced</b> matrix or a window's sync
+	barcode does the same; the bold frames always answer the last thing pointed at. A group
+	card dragged over a window marks that window's frame as the drop target.
+
+	The axis you point at is named in the top line of one plate only: the plate of the
+	window the pointed-at glyph or chip belongs to - the plate itself, the window whose
+	barcode it is, or the window of the matrix row - followed by that window's offset on it,
+	if any. Every other plate keeps its window's name. A group card's glyph belongs to no
+	window, so no plate names its axis; the card does in its tooltip.
 
 \subsection org_mitk_views_mxnlayouteditor_Selection Selecting windows
 	Selection follows the file-explorer model: a click on a plate selects that window,
@@ -309,18 +314,23 @@
 		<li> The header bar is drawn in the group's hue - the color that identifies the group
 			on every synchronization surface - and carries the group's display name and how
 			many windows it has.
-		<li> The axis strip below shows which of the eight axes the group synchronizes.
+		<li> The axis strip below shows which of the nine axes the group synchronizes.
 			Clicking an axis links or unlinks it for every window in the group; an axis
 			drawn dashed is linked for only some of them, and one with a filled upper
 			corner has at least one member sitting at an offset - the card speaks for
 			several windows, so it marks that a shift exists without saying whose. For
 			a group that has no windows yet, clicking an axis only prepares which
-			dimensions the first windows assigned to it will get.
+			dimensions the first windows assigned to it will get. Time is struck through:
+			every window follows the application's time through the group Global, and no
+			other group can take it. Pointing at an axis fades the strip's other axes and
+			names the axis in a tooltip.
 	</ul>
 	The "..." button in the header opens the less frequent actions:
 	<ul>
 		<li> "Rename..." and "Change color..." set the display name and the hue. Both are
-			saved with the layout.
+			saved with the layout. The name "Global" and colors too close to its light gray
+			or to black belong to the reserved group Global; the editor refuses them and says
+			why in a notice.
 		<li> "Add selected windows" and "Remove selected windows" act on the windows
 			selected on the plates.
 		<li> "Link navigation" links the pan, zoom, slice and crosshair bundle for every
@@ -335,15 +345,24 @@
 			because it is where every window's data selection falls back to.
 	</ul>
 
+	The first card is always <b>Global</b>, the reserved group whose windows follow the
+	application's value instead of a value of their own. Its bar is drawn in the text
+	colour of the Workbench style, and a lock marked "reserved" stands where the "..." button
+	would be: it cannot be renamed, recolored or deleted. For now it holds every window on
+	Time - its strip shows Time lit and every other axis struck through - and windows can
+	neither be added to nor removed from it, by drag and drop or by any menu.
+
 \section org_mitk_views_mxnlayouteditor_Advanced The advanced matrix
 	The <b>Advanced</b> tab is the power-user face: every window as a row, every
 	dimension as a column. Each cell shows the group the window links on that dimension
 	as a chip in the group's color, carrying the group's name and, where one was
-	authored, the offset. An empty cell is a window that is not synchronized on that
+	authored, the offset. The columns follow the axes' family order, the same as on the
+	barcodes and the plates. An empty cell is a window that is not synchronized on that
 	dimension. The data-selection column is never empty, because a window's selection
-	always belongs to some group. A column widens to keep its chips whole, so names
-	are only ever shortened by a width you set yourself - widen the view rather than
-	read an abbreviation.
+	always belongs to some group. The Time column holds a locked "Global" chip for every
+	window: every window follows the application's time, so those chips cannot be selected
+	or edited. A column widens to keep its chips whole, so names are only ever shortened
+	by a width you set yourself - widen the view rather than read an abbreviation.
 
 	A dashed "n/a" cell is a dimension that has no meaning for the window: a 3D view
 	has no slice, crosshair, level/window or colormap to synchronize. Such a cell cannot
@@ -369,9 +388,10 @@
 
 	Selecting windows on their plates selects their rows here, and selecting cells here
 	selects those windows on the plates. Hovering a chip marks every window sharing that
-	synchronization, here and in the display at once. Clicking an axis header takes that
-	whole column, clicking a window header that whole row, so linking every window on
-	one dimension, or unlinking one window entirely, is two gestures.
+	synchronization, here and in the display at once; here, every other chip fades.
+	Clicking an axis header takes that whole column, clicking a window header that whole
+	row, so linking every window on one dimension, or unlinking one window entirely, is
+	two gestures.
 
 	<ul>
 		<li> <b>Group</b> assigns every selected cell. The list holds the groups that

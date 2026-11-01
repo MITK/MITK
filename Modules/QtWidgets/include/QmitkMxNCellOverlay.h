@@ -317,9 +317,9 @@ public:
 
   /**
   * \brief The height of one peek text line for a widget whose font is
-  *        'baseFont'. The plate's lines are set in the peripheral readout font,
-  *        which the multi widget cannot measure on its own: it passes its own
-  *        font, the one every cell inherits.
+  *        'baseFont'. The plate's line is set one step above the peripheral
+  *        readout font, which the multi widget cannot measure on its own: it
+  *        passes its own font, the one every cell inherits.
   */
   static int PeekTextLineHeight(const QFont& baseFont);
 

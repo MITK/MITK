@@ -444,8 +444,8 @@ public:
 
   void PeekPlate_SizeAtTheMinimumBox()
   {
-    // A 16 px line, the readout font at 100 %: 2 * 12 + the grid wide and
-    // 8 + line + 4 + the grid + 8 tall.
+    // At a 16 px line: 2 * 12 + the grid wide and 8 + line + 4 + the grid + 8
+    // tall.
     const auto layout =
       QmitkMxNCellOverlay::ComputePeekPlate(QSize(900, 700), QmitkMxNCellOverlay::PeekGlyphBoxMin, -1, 16);
     CPPUNIT_ASSERT_EQUAL(116, layout.plate.width());

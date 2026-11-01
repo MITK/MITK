@@ -230,6 +230,15 @@ namespace
     return font;
   }
 
+  /** \brief The peek plate's line, one step above the readouts: it is not read
+   *         from the periphery but where the pointer is, over the image. */
+  QFont PeekLineFont(const QFont& base)
+  {
+    QFont font = ReadoutFont(base);
+    font.setPointSize(font.pointSize() + 1);
+    return font;
+  }
+
   QString FormatValue(double value)
   {
     return QString::number(std::llround(value));
@@ -755,7 +764,7 @@ void QmitkMxNCellOverlay::SetRevealProgress(qreal progress)
 
 int QmitkMxNCellOverlay::PeekTextLineHeight(const QFont& baseFont)
 {
-  return QFontMetrics(ReadoutFont(baseFont)).height();
+  return QFontMetrics(PeekLineFont(baseFont)).height();
 }
 
 int QmitkMxNCellOverlay::MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight)
@@ -1981,7 +1990,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   // arrange mode it stays clear of the button corner, symmetrically so it
   // remains centred over the grid.
   painter.setOpacity(m_PeekProgress);
-  const QFont lineFont = ReadoutFont(this->font());
+  const QFont lineFont = PeekLineFont(this->font());
   painter.setFont(lineFont);
   const QFontMetrics metrics(lineFont);
   const int reserve =

@@ -115,7 +115,15 @@ namespace
   constexpr int PeekLineGap = 4;          // the top line to the glyph grid
   constexpr int PeekPlateRadius = 7;
   const QColor PeekRibbonEdge(0x0b, 0x0d, 0x0f);  // the sticker's dark ring
+  constexpr double PeekRibbonFontPx = 9.0;  // at the smallest box
+  // A larger tab crowds the grid for no gain: the plate's line spells the
+  // offset out where the pointer is.
+  constexpr double PeekRibbonMaxFontPx = 11.0;
+  // The axis glyphs are drawn inside 4.5..19.5 of their 24 unit grid.
+  constexpr double PeekGlyphArtInset = 4.5 / 24.0;
   constexpr double PeekPumpScale = 1.75;  // the pointed-at glyph's side, in boxes
+  // The pointed-at glyph's ribbon grows with it, but far less than the glyph.
+  constexpr double PeekRibbonPumpScale = 1.25;
   // The plate is content-sized, never a scrim: it may claim this much of the
   // cell and no more, which is also what decides whether a cell hosts one.
   constexpr double PeekPlateWidthFraction = 0.86;
@@ -177,17 +185,20 @@ namespace
                  PeekGridTop(textLineHeight) + PeekGridSide(box) + PeekPlatePadY);
   }
 
-  /** \brief An offset ribbon's scale: the ribbon is drawn for the smallest glyph
-   *         box and grows with the resting box, never with the pumped one. */
-  double PeekRibbonScale(int glyphBox)
+  /** \brief The scale of the ribbon on 'glyph': drawn for the smallest glyph
+   *         box, it grows with the resting box up to its largest text, and by
+   *         PeekRibbonPumpScale on an enlarged glyph. */
+  double PeekRibbonScale(const QRect& glyph, int glyphBox)
   {
-    return static_cast<double>(glyphBox) / QmitkMxNCellOverlay::PeekGlyphBoxMin;
+    const double resting = std::min(static_cast<double>(glyphBox) / QmitkMxNCellOverlay::PeekGlyphBoxMin,
+                                    PeekRibbonMaxFontPx / PeekRibbonFontPx);
+    return glyph.width() > glyphBox ? PeekRibbonPumpScale * resting : resting;
   }
 
-  QFont PeekRibbonFont(const QFont& base, int glyphBox)
+  QFont PeekRibbonFont(const QFont& base, double scale)
   {
     QFont font(base);
-    font.setPixelSize(std::max(1, qRound(9.0 * PeekRibbonScale(glyphBox))));
+    font.setPixelSize(std::max(1, qRound(PeekRibbonFontPx * scale)));
     font.setWeight(QFont::DemiBold);
     return font;
   }
@@ -811,15 +822,20 @@ QmitkMxNCellOverlay::ComputePeekPlate(const QSize& cellSize, int glyphBox, int p
 QRect QmitkMxNCellOverlay::PeekRibbonRect(const QRect& glyph, int glyphBox, const QString& text,
                                           const QFont& baseFont)
 {
-  const double scale = PeekRibbonScale(glyphBox);
-  const QFont font = PeekRibbonFont(baseFont, glyphBox);
+  const double scale = PeekRibbonScale(glyph, glyphBox);
+  const QFont font = PeekRibbonFont(baseFont, scale);
   const int height = font.pixelSize() + 3;
   const int width = QFontMetrics(font).horizontalAdvance(text) + 5;
+  // At the lower right, where an index sits, so the offset reads after its
+  // axis like "slice +2"; the upper right is where a badge asks for attention.
   // Anchored by its right edge, so a longer offset grows into the glyph and
-  // the tab never leaves the corner it marks.
-  const int right = glyph.right() + qRound(3.0 * scale);
-  const int top = glyph.top() - qRound(3.0 * scale);
-  return QRect(right - width + 1, top, width, height);
+  // the tab never leaves the corner it marks. It is pinned to the drawn
+  // corner, not the box's: an enlarged glyph's artwork reaches out less far
+  // than its box, and a tab following the box would fly off the glyph.
+  const int pull = qRound(PeekGlyphArtInset * (glyph.width() - glyphBox));
+  const int right = glyph.right() - pull + qRound(3.0 * scale);
+  const int bottom = glyph.bottom() - pull + qRound(3.0 * scale);
+  return QRect(right - width + 1, bottom - height + 1, width, height);
 }
 
 void QmitkMxNCellOverlay::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox,
@@ -1922,7 +1938,6 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   // An offset rides a ribbon at its glyph's corner, in the group's colour - the
   // colour the glyph already carries - so the number is tied to its axis and to
   // what it is measured from without a line of its own under the grid.
-  const QFont ribbonFont = PeekRibbonFont(this->font(), m_PeekPaintBox);
   const auto paintRibbon = [&](int axis)
   {
     const auto& axisSlot = axisSlots[axis];
@@ -1936,7 +1951,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     painter.setPen(QPen(PeekRibbonEdge, 1));
     painter.setBrush(axisSlot.color);
     painter.drawRoundedRect(QRectF(ribbon).adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
-    painter.setFont(ribbonFont);
+    painter.setFont(PeekRibbonFont(this->font(), PeekRibbonScale(layout.glyphs[axis], m_PeekPaintBox)));
     painter.setPen(QmitkMxNInkFor(axisSlot.color));
     painter.drawText(ribbon, Qt::AlignCenter, axisSlot.offsetText);
   };

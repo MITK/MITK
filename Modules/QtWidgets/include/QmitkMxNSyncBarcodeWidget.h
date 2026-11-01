@@ -36,7 +36,7 @@ class QPainter;
  * (which axis glyph, the group hue, a tooltip) and pushes them via SetSlots.
  * When the strip is wide enough it draws the self-describing axis glyphs
  * (tinted to the hue when linked, grayed when not), marking an axis that carries
- * an offset by filling its box's upper-right corner; when it is too narrow it
+ * an offset by filling its box's lower-right corner; when it is too narrow it
  * collapses to plain color slots, which have no room for that mark and so omit
  * it.
  *
@@ -81,7 +81,7 @@ public:
     bool partial = false;
 
     // The axis carries an offset relative to its group's reference. Marked by
-    // filling the box's upper-right corner, because an offset is otherwise
+    // filling the box's lower-right corner, because an offset is otherwise
     // invisible outside the layout editor's matrix, and a window parked at
     // slice -1 looks exactly like one sitting on the group. Not marked on a slot
     // whose axis does not apply.

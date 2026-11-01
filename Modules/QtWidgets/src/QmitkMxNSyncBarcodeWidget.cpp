@@ -309,18 +309,19 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
         painter.drawLine(frameRect.bottomLeft(), frameRect.topRight());
       }
 
-      // The offset footnote: the box's upper-right corner filled. At the boxes'
-      // sizes a filled corner carries further than an outline, and a glyph
-      // stays recognisable with one corner covered.
+      // The offset footnote: the box's lower-right corner filled, where the
+      // plate puts the offset's ribbon. At the boxes' sizes a filled corner
+      // carries further than an outline, and a glyph stays recognisable with
+      // one corner covered.
       if (s.hasOffset && synced)
       {
         painter.setOpacity(slotFade);
         const QRectF frameRect = QRectF(boxRect).adjusted(0.5, 0.5, -0.5, -0.5);
         const qreal mark = std::max(4, layout.box / 3);
         QPainterPath corner;
-        corner.moveTo(frameRect.right() - mark, frameRect.top());
-        corner.lineTo(frameRect.right(), frameRect.top());
-        corner.lineTo(frameRect.right(), frameRect.top() + mark);
+        corner.moveTo(frameRect.right() - mark, frameRect.bottom());
+        corner.lineTo(frameRect.right(), frameRect.bottom());
+        corner.lineTo(frameRect.right(), frameRect.bottom() - mark);
         corner.closeSubpath();
         painter.setPen(Qt::NoPen);
         painter.setBrush(color);

@@ -81,7 +81,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(PeekPlate_SizeAtTheMinimumBox);
   MITK_TEST(PeekPlate_LineSitsAboveTheGrid);
   MITK_TEST(PeekPlate_RibbonAnchoredAtTheGlyphCorner);
-  MITK_TEST(PeekPlate_RibbonKeepsItsSizeWhenPumped);
+  MITK_TEST(PeekPlate_RibbonGrowsALittleWhenPumped);
   MITK_TEST(Barcode_GlyphBoxFillsTheHeightItIsGranted);
   MITK_TEST(Barcode_WidthAskedForFollowsTheGrantedHeight);
   MITK_TEST(Barcode_FrameStaysInsideTheTargetAtEveryPixelRatio);
@@ -122,6 +122,7 @@ class QmitkMxNSyncPeekTestSuite : public mitk::TestFixture
   MITK_TEST(Barcode_ClickableStripReportsInBothRenderModes);
   MITK_TEST(Barcode_NotApplicableSlotIsInert);
   MITK_TEST(Barcode_HoveredSlotRaisedOthersFade);
+  MITK_TEST(Barcode_OffsetFillsTheLowerRightCorner);
   MITK_TEST(Barcode_PassiveStripHoverIsAWashBehindTheContent);
   MITK_TEST(PaintPath_PlateDoesNotCrash);
   MITK_TEST(Peek_FadeOutKeepsThePlateGeometry);
@@ -476,22 +477,35 @@ public:
     const QRect glyph(100, 50, 20, 20);
     const QRect ribbon = QmitkMxNCellOverlay::PeekRibbonRect(glyph, 20, QStringLiteral("+1"), font);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Its right edge sits 3 px past the glyph's", glyph.right() + 3, ribbon.right());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Its top 3 px above the glyph's", glyph.top() - 3, ribbon.top());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Its bottom 3 px below the glyph's", glyph.bottom() + 3, ribbon.bottom());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A 9 px text plus 3", 12, ribbon.height());
 
     const QRect longer = QmitkMxNCellOverlay::PeekRibbonRect(glyph, 20, QStringLiteral("(12|-4)"), font);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A longer offset keeps the corner", ribbon.right(), longer.right());
     CPPUNIT_ASSERT_MESSAGE("and grows to the left", longer.left() < ribbon.left());
 
-    // At twice the box, everything doubles.
+    // Text and offset grow with the box only until the text is 11 px, which
+    // it is from 11/9 of the smallest box on.
     const QRect big(100, 50, 40, 40);
-    const QRect scaled = QmitkMxNCellOverlay::PeekRibbonRect(big, 40, QStringLiteral("+1"), font);
-    CPPUNIT_ASSERT_EQUAL(big.right() + 6, scaled.right());
-    CPPUNIT_ASSERT_EQUAL(big.top() - 6, scaled.top());
-    CPPUNIT_ASSERT_EQUAL(21, scaled.height());
+    const QRect capped = QmitkMxNCellOverlay::PeekRibbonRect(big, 40, QStringLiteral("+1"), font);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("An 11 px text plus 3", 14, capped.height());
+    CPPUNIT_ASSERT_EQUAL(big.right() + 4, capped.right());
+    CPPUNIT_ASSERT_EQUAL(big.bottom() + 4, capped.bottom());
+
+    // The corner glyph of the bottom row keeps its ribbon on the plate, also
+    // when it is enlarged at the largest box.
+    for (const int box : { QmitkMxNCellOverlay::PeekGlyphBoxMin, QmitkMxNCellOverlay::PeekGlyphBoxMax })
+    {
+      const int last = QmitkMxNCellOverlay::PeekAxisCount - 1;
+      const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(QSize(900, 700), box, last, LineHeight());
+      const QRect cornerRibbon =
+        QmitkMxNCellOverlay::PeekRibbonRect(layout.glyphs[last], box, QStringLiteral("(12|-4)"), font);
+      CPPUNIT_ASSERT_MESSAGE("The last glyph's ribbon stays on the plate at box " + std::to_string(box),
+                             layout.plate.contains(cornerRibbon));
+    }
   }
 
-  void PeekPlate_RibbonKeepsItsSizeWhenPumped()
+  void PeekPlate_RibbonGrowsALittleWhenPumped()
   {
     const QFont font = QApplication::font();
     const int box = 24;
@@ -501,10 +515,27 @@ public:
 
     const QRect atRest = QmitkMxNCellOverlay::PeekRibbonRect(resting.glyphs[slice], box, QStringLiteral("-1"), font);
     const QRect enlarged = QmitkMxNCellOverlay::PeekRibbonRect(pumped.glyphs[slice], box, QStringLiteral("-1"), font);
-    CPPUNIT_ASSERT_MESSAGE("The ribbon keeps its resting size", atRest.size() == enlarged.size());
-    CPPUNIT_ASSERT_MESSAGE("and moves to the enlarged glyph's corner",
-                           pumped.glyphs[slice].right() + 4 == enlarged.right()
-                             && pumped.glyphs[slice].top() - 4 == enlarged.top());
+    // A ribbon is its text plus 3 px; the text grows by a quarter, the glyph by
+    // three quarters.
+    const double textGrowth = (enlarged.height() - 3.0) / (atRest.height() - 3.0);
+    CPPUNIT_ASSERT_MESSAGE("The ribbon grows a little with its glyph", textGrowth > 1.15 && textGrowth < 1.35);
+
+    // The glyph artwork is drawn inside 4.5..19.5 of its 24 unit grid, so its
+    // corner moves out less than its box's corner when the glyph is enlarged.
+    // The ribbon's outer corner follows it, give or take a pixel of rounding
+    // and the pixel by which the ribbon's overhang grows.
+    const auto artCorner = [](const QRect& glyph)
+    {
+      const double inset = 4.5 / 24.0 * glyph.width();
+      return QPointF(glyph.right() - inset, glyph.bottom() - inset);
+    };
+    const QPointF artMove = artCorner(pumped.glyphs[slice]) - artCorner(resting.glyphs[slice]);
+    const QPoint ribbonMove = enlarged.bottomRight() - atRest.bottomRight();
+    CPPUNIT_ASSERT_MESSAGE("and moves with the drawn glyph's corner, as if pinned to it",
+                           std::abs(ribbonMove.x() - artMove.x()) <= 2.0
+                             && std::abs(ribbonMove.y() - artMove.y()) <= 2.0);
+    CPPUNIT_ASSERT_MESSAGE("not as far as the box's corner",
+                           ribbonMove.x() < pumped.glyphs[slice].right() - resting.glyphs[slice].right());
   }
 
   /** The ink in one device row of a painted strip, summed over the row. */
@@ -1277,6 +1308,30 @@ public:
         CPPUNIT_ASSERT_MESSAGE("in the gap colour, not in white", MaxGreen(pointedAtGap, gapRect) <= 100);
       }
     }
+  }
+
+  void Barcode_OffsetFillsTheLowerRightCorner()
+  {
+    // The plate's ribbon sits at the glyph's lower right, so the barcode's
+    // small version of it does too; the upper right is left to warnings.
+    const QSize size(240, 24);
+    constexpr int shifted = 0;
+    auto axisSlots = PlainSlots();
+    const int slotCount = static_cast<int>(axisSlots.size());
+    const QImage plain = PaintStrip(size, axisSlots, false, -1);
+    axisSlots[shifted].hasOffset = true;
+    const QImage marked = PaintStrip(size, axisSlots, false, -1);
+
+    const QRect box = StripSlotRect(size, slotCount, shifted);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the strip draws glyphs",
+                           QmitkMxNSyncBarcodeWidget::ComputeLayout(size.width(), size.height(), slotCount).mode
+                             == QmitkMxNSyncBarcodeWidget::BarcodeLayout::Mode::Glyphs);
+    const QRect lowerRight(box.right() - 2, box.bottom() - 2, 2, 2);
+    const QRect upperRight(box.right() - 2, box.top() + 1, 2, 2);
+    CPPUNIT_ASSERT_MESSAGE("An offset fills the box's lower-right corner",
+                           Ink(marked, lowerRight) > Ink(plain, lowerRight));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("and leaves its upper-right corner as it is",
+                                 Ink(plain, upperRight), Ink(marked, upperRight));
   }
 
   void Barcode_PassiveStripHoverIsAWashBehindTheContent()

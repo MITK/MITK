@@ -308,10 +308,10 @@ public:
 
   /**
   * \brief The ribbon that carries an axis's offset 'text' on the plate: a tab
-  *        at the upper-right corner of 'glyph', sized for the resting
-  *        'glyphBox' and growing to the left for longer text, so it keeps its
-  *        size when its glyph is enlarged. Static so it is testable without a
-  *        realized overlay.
+  *        at the lower-right corner of 'glyph', sized for the resting
+  *        'glyphBox', a little larger on an enlarged glyph, and growing to the
+  *        left for longer text. It moves with the drawn glyph's corner. Static
+  *        so it is testable without a realized overlay.
   */
   static QRect PeekRibbonRect(const QRect& glyph, int glyphBox, const QString& text, const QFont& baseFont);
 

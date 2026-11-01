@@ -316,7 +316,7 @@
 			many windows it has.
 		<li> The axis strip below shows which of the nine axes the group synchronizes.
 			Clicking an axis links or unlinks it for every window in the group; an axis
-			drawn dashed is linked for only some of them, and one with a filled upper
+			drawn dashed is linked for only some of them, and one with a filled lower
 			corner has at least one member sitting at an offset - the card speaks for
 			several windows, so it marks that a shift exists without saying whose. For
 			a group that has no windows yet, clicking an axis only prepares which

@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QHelpEvent>
+#include <QHoverEvent>
 #include <QLabel>
 #include <QListWidget>
 #include <QMenu>
@@ -45,7 +46,8 @@ namespace
   constexpr int FOLDER_ROLE = Qt::UserRole + 1;
   constexpr int AVAILABLE_ROLE = Qt::UserRole + 2;
   constexpr int MARGIN = 6;
-  constexpr int BUTTON_SPACING = 2;
+  constexpr int BUTTON_SPACING = 4;
+  constexpr int BUTTON_PADDING = 4;
 
   // Buttons of missing entries, lined up from the right in this order.
   enum class Button
@@ -59,20 +61,26 @@ namespace
     return itemRect.adjusted(MARGIN, MARGIN, -MARGIN, -MARGIN);
   }
 
-  QRect GetButtonRect(const QRect& contentRect, Button button)
+  int GetIconSize(const QStyleOptionViewItem& option)
   {
-    const int size = contentRect.height();
+    return QFontMetrics(option.font).height();
+  }
+
+  QRect GetButtonRect(const QStyleOptionViewItem& option, Button button)
+  {
+    const QRect contentRect = GetContentRect(option.rect);
+    const int size = GetIconSize(option) + 2 * BUTTON_PADDING;
     const int number = static_cast<int>(button);
     const int left = contentRect.left() + contentRect.width() - (number + 1) * size - number * BUTTON_SPACING;
 
-    return QRect(left, contentRect.top(), size, size);
+    return QRect(left, contentRect.top() + (contentRect.height() - size) / 2, size, size);
   }
 
-  std::optional<Button> GetButtonAt(const QRect& contentRect, const QPoint& pos)
+  std::optional<Button> GetButtonAt(const QStyleOptionViewItem& option, const QPoint& pos)
   {
     for (const auto button : { Button::Remove, Button::Locate })
     {
-      if (GetButtonRect(contentRect, button).contains(pos))
+      if (GetButtonRect(option, button).contains(pos))
         return button;
     }
 
@@ -101,13 +109,35 @@ namespace
   class RecentDataItemDelegate : public QStyledItemDelegate
   {
   public:
-    RecentDataItemDelegate(const QmitkWelcomePalette& palette, std::function<void(Button, const QString&)> onButtonClicked, QObject* parent)
-      : QStyledItemDelegate(parent),
+    RecentDataItemDelegate(const QmitkWelcomePalette& palette, std::function<void(Button, const QString&)> onButtonClicked, QAbstractItemView* view)
+      : QStyledItemDelegate(view),
         m_Palette(palette),
         m_OnButtonClicked(std::move(onButtonClicked)),
         m_RemoveIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/times.svg"))),
-        m_LocateIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_find.svg")))
+        m_LocateIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_find.svg"))),
+        m_View(view)
     {
+      m_View->viewport()->installEventFilter(this);
+    }
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (watched != m_View->viewport())
+        return QStyledItemDelegate::eventFilter(watched, event);
+
+      if (event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverMove)
+      {
+        m_HoverPos = static_cast<const QHoverEvent*>(event)->position().toPoint();
+
+        // The view repaints an entry only when the mouse enters or leaves it,
+        // not when it moves between the text and the buttons of a missing one.
+        const auto index = m_View->indexAt(m_HoverPos);
+
+        if (index.isValid() && !index.data(AVAILABLE_ROLE).toBool())
+          m_View->viewport()->update(m_View->visualRect(index));
+      }
+
+      return false;
     }
 
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
@@ -131,10 +161,14 @@ namespace
 
       if (!isAvailable)
       {
-        const QRect locateRect = GetButtonRect(contentRect, Button::Locate);
+        const QRect locateRect = GetButtonRect(option, Button::Locate);
+        const int iconSize = GetIconSize(option);
+        const auto hoveredButton = option.state.testFlag(QStyle::State_MouseOver)
+          ? GetButtonAt(option, m_HoverPos)
+          : std::nullopt;
 
-        this->PaintButton(painter, locateRect, m_LocateIcon, nameMetrics.height());
-        this->PaintButton(painter, GetButtonRect(contentRect, Button::Remove), m_RemoveIcon, nameMetrics.height());
+        this->PaintButton(painter, locateRect, m_LocateIcon, iconSize, hoveredButton == Button::Locate);
+        this->PaintButton(painter, GetButtonRect(option, Button::Remove), m_RemoveIcon, iconSize, hoveredButton == Button::Remove);
 
         textRect.setRight(locateRect.left() - MARGIN);
       }
@@ -168,7 +202,7 @@ namespace
         std::optional<Button> button;
 
         if (mouseEvent->button() == Qt::LeftButton && !index.data(AVAILABLE_ROLE).toBool())
-          button = GetButtonAt(GetContentRect(option.rect), mouseEvent->position().toPoint());
+          button = GetButtonAt(option, mouseEvent->position().toPoint());
 
         // Like real buttons, they only fire if the mouse was also pressed on them.
         if (event->type() == QEvent::MouseButtonPress)
@@ -191,15 +225,13 @@ namespace
     {
       if (event->type() == QEvent::ToolTip && !index.data(AVAILABLE_ROLE).toBool())
       {
-        const QRect contentRect = GetContentRect(option.rect);
-
-        if (const auto button = GetButtonAt(contentRect, event->pos()))
+        if (const auto button = GetButtonAt(option, event->pos()))
         {
           const QString text = *button == Button::Remove
             ? "Remove from list"
             : "Locate moved or renamed file...";
 
-          QToolTip::showText(event->globalPos(), text, view->viewport(), GetButtonRect(contentRect, *button));
+          QToolTip::showText(event->globalPos(), text, view->viewport(), GetButtonRect(option, *button));
           return true;
         }
       }
@@ -208,12 +240,12 @@ namespace
     }
 
   private:
-    void PaintButton(QPainter* painter, const QRect& rect, const QIcon& icon, int iconSize) const
+    void PaintButton(QPainter* painter, const QRect& rect, const QIcon& icon, int iconSize, bool isHovered) const
     {
       painter->setRenderHint(QPainter::Antialiasing);
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(m_Palette.Cell);
-      painter->drawRoundedRect(rect, 4, 4);
+      painter->setPen(QColor(QmitkIconTheme::GetColor()));
+      painter->setBrush(isHovered ? QBrush(m_Palette.Cell) : QBrush());
+      painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 4, 4);
 
       QRect iconRect(0, 0, iconSize, iconSize);
       iconRect.moveCenter(rect.center());
@@ -224,6 +256,8 @@ namespace
     std::function<void(Button, const QString&)> m_OnButtonClicked;
     QIcon m_RemoveIcon;
     QIcon m_LocateIcon;
+    QAbstractItemView* m_View;
+    QPoint m_HoverPos;
     std::optional<Button> m_PressedButton;
     QPersistentModelIndex m_PressedIndex;
   };

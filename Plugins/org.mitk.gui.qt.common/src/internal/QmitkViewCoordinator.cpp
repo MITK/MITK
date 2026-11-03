@@ -103,6 +103,14 @@ void QmitkViewCoordinator::PartOpened(const berry::IWorkbenchPartReference::Poin
   if (mitk::IRenderWindowPartListener* renderWindowListener = dynamic_cast<mitk::IRenderWindowPartListener*>(part))
   {
     m_RenderWindowListeners.insert(renderWindowListener);
+
+    // PartVisible notifies listeners only when the current render window part
+    // changes, so a listener opened while that part is covered (e.g. by the
+    // Welcome page) would otherwise never learn about it.
+    if (nullptr != m_CurrentRenderWindowPart)
+    {
+      renderWindowListener->RenderWindowPartActivated(m_CurrentRenderWindowPart);
+    }
   }
 }
 

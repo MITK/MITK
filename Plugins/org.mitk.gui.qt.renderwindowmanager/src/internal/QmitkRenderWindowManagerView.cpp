@@ -41,6 +41,13 @@ void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindow
 {
   if (m_RenderWindowPart != renderWindowPart)
   {
+    auto previousMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
+    if (nullptr != previousMultiWidgetEditor)
+    {
+      disconnect(previousMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged,
+                 this, &QmitkRenderWindowManagerView::RenderWindowChanged);
+    }
+
     m_RenderWindowPart = renderWindowPart;
     this->SetControlledRenderer();
 

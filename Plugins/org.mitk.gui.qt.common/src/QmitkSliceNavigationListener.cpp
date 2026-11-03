@@ -110,6 +110,13 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
 {
   if (m_renderWindowPart != renderWindowPart)
   {
+    // A view may activate itself with one part and then be activated by the
+    // view coordinator with another, without a deactivation in between.
+    if (nullptr != m_renderWindowPart)
+    {
+      this->RemoveAllObservers(m_renderWindowPart);
+    }
+
     m_renderWindowPart = renderWindowPart;
 
     auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();

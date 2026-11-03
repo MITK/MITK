@@ -147,8 +147,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->materialWidget, &QmitkVolumeMaterialWidget::LightingChanged,
     this, &QmitkVolumeVisualizationView::OnLightingChanged);
 
-  // The part open at this point gets no RenderWindowPartActivated of its own, so
-  // its menu has to be picked up here.
   this->ConnectLightingMode();
 
   // Auto-selection reports only a selection it actually made, so on an empty

@@ -67,6 +67,8 @@ void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart *
     return;
   }
 
+  m_Controls->renderWindowComboBox->clear();
+
   QHashIterator<QString, QmitkRenderWindow *> renderIter(renderWindowPart->GetQmitkRenderWindows());
   while (renderIter.hasNext())
   {

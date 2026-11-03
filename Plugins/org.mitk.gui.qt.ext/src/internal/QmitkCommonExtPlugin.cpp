@@ -98,7 +98,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
        {
-         if (arguments[i].right(5) == ".mitk" || arguments[i].endsWith(".mitkscene.json", Qt::CaseInsensitive))
+         if (mitk::WorkbenchUtil::IsSceneFile(arguments[i]))
          {
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
@@ -202,7 +202,7 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
 
   foreach (QString arg, args)
   {
-    if (arg.endsWith(".mitk") || arg.endsWith(".mitkscene.json", Qt::CaseInsensitive))
+    if (mitk::WorkbenchUtil::IsSceneFile(arg))
     {
       sceneArgs << arg;
     }

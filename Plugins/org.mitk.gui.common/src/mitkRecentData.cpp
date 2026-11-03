@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkRecentData.h"
+#include "mitkWorkbenchUtil.h"
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
@@ -44,7 +45,7 @@ namespace
 
   mitk::RecentData::Kind GetKind(const QString& path)
   {
-    return path.endsWith(".mitk", Qt::CaseInsensitive) || path.endsWith(".mitkscene.json", Qt::CaseInsensitive)
+    return mitk::WorkbenchUtil::IsSceneFile(path)
       ? mitk::RecentData::Kind::Project
       : mitk::RecentData::Kind::File;
   }

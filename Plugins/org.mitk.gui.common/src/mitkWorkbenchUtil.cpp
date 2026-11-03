@@ -42,7 +42,6 @@ found in the LICENSE file.
 #include <QDateTime>
 
 #include <algorithm>
-#include <optional>
 
 #include "internal/org_mitk_gui_common_Activator.h"
 
@@ -110,47 +109,50 @@ namespace mitk {
       return dsService->GetActiveDataStorageReference();
     }
 
-    static bool IsSceneFile(const QString& fileName)
+    enum class CurrentProjectChoice
     {
-      return fileName.endsWith(".mitk", Qt::CaseInsensitive) || fileName.endsWith(".mitkscene.json", Qt::CaseInsensitive);
+      Close,
+      Add,
+      Cancel
+    };
+
+    static DataStorage::SetOfObjects::ConstPointer GetProjectNodes(const mitk::DataStorage& dataStorage)
+    {
+      auto isNoHelperObject = NodePredicateNot::New(NodePredicateProperty::New("helper object", BoolProperty::New(true)));
+      return dataStorage.GetSubset(isNoHelperObject);
     }
 
     /**
      * Asks whether to close the current project before scenes are loaded into a data storage
-     * that already contains data other than helper objects.
-     *
-     * @return The nodes of the current project if the user chose to close it, \c nullptr if the
-     *         files are added to it, or \c std::nullopt if the user canceled loading.
+     * that already contains data other than helper objects. Without scenes or such data, the
+     * files are added without asking.
      */
-    static std::optional<DataStorage::SetOfObjects::ConstPointer> AskToCloseCurrentProject(const QStringList& fileNames, const mitk::DataStorage& dataStorage)
+    static CurrentProjectChoice AskToCloseCurrentProject(const QStringList& fileNames, const mitk::DataStorage& dataStorage)
     {
-      if (!std::ranges::any_of(fileNames, IsSceneFile))
-        return nullptr;
+      if (!std::ranges::any_of(fileNames, WorkbenchUtil::IsSceneFile))
+        return CurrentProjectChoice::Add;
 
-      auto isNoHelperObject = NodePredicateNot::New(NodePredicateProperty::New("helper object", BoolProperty::New(true)));
-      auto projectNodes = dataStorage.GetSubset(isNoHelperObject);
-
-      if (projectNodes->empty())
-        return nullptr;
+      if (GetProjectNodes(dataStorage)->empty())
+        return CurrentProjectChoice::Add;
 
       QMessageBox messageBox(QApplication::activeWindow());
       messageBox.setIcon(QMessageBox::Question);
       messageBox.setWindowTitle("Open Project");
       messageBox.setText("Close the current project before opening another?");
       messageBox.setInformativeText("Unsaved changes will be lost if you close it.");
-      auto* closeButton = messageBox.addButton("Close Current Project", QMessageBox::DestructiveRole);
-      auto* addButton = messageBox.addButton("Add to Current Project", QMessageBox::AcceptRole);
+      auto* closeButton = messageBox.addButton(QMessageBox::Yes);
+      auto* addButton = messageBox.addButton("No, add to current project", QMessageBox::NoRole);
       messageBox.addButton(QMessageBox::Cancel);
       messageBox.setDefaultButton(addButton);
       messageBox.exec();
 
       if (messageBox.clickedButton() == closeButton)
-        return projectNodes;
+        return CurrentProjectChoice::Close;
 
       if (messageBox.clickedButton() == addButton)
-        return nullptr;
+        return CurrentProjectChoice::Add;
 
-      return std::nullopt;
+      return CurrentProjectChoice::Cancel;
     }
 
     /**
@@ -169,7 +171,9 @@ namespace mitk {
       {
         addOnce(node);
 
-        for (const auto& derivation : *dataStorage.GetDerivations(node, nullptr, false))
+        const auto derivations = dataStorage.GetDerivations(node, nullptr, false);
+
+        for (const auto& derivation : *derivations)
           addOnce(derivation);
       }
 
@@ -194,11 +198,19 @@ namespace mitk {
     }
     mitk::DataStorage::Pointer dataStorage = dsRef.GetStorage();
 
-    auto projectToClose = WorkbenchUtilPrivate::AskToCloseCurrentProject(fileNames, *dataStorage);
+    const auto choice = WorkbenchUtilPrivate::AskToCloseCurrentProject(fileNames, *dataStorage);
 
-    if (!projectToClose)
+    if (choice == WorkbenchUtilPrivate::CurrentProjectChoice::Cancel)
     {
       return;
+    }
+
+    // Taken before loading, so that the loaded files are not closed with the current project.
+    DataStorage::SetOfObjects::ConstPointer projectToClose;
+
+    if (choice == WorkbenchUtilPrivate::CurrentProjectChoice::Close)
+    {
+      projectToClose = WorkbenchUtilPrivate::GetProjectNodes(*dataStorage);
     }
 
     // Turn off ASSERT
@@ -259,19 +271,19 @@ namespace mitk {
       if (!loadInfos[i].m_Output.empty())
       {
         loadedFileNames.append(fileNames[i]);
-        sceneLoaded = sceneLoaded || WorkbenchUtilPrivate::IsSceneFile(fileNames[i]);
+        sceneLoaded = sceneLoaded || IsSceneFile(fileNames[i]);
       }
     }
 
     // Other files may have loaded although the scene failed, so dsmodified is not enough.
-    if (sceneLoaded && projectToClose->IsNotNull())
+    if (sceneLoaded && projectToClose.IsNotNull())
     {
-      WorkbenchUtilPrivate::RemoveNodesAndDerivations(*dataStorage, **projectToClose);
+      WorkbenchUtilPrivate::RemoveNodesAndDerivations(*dataStorage, *projectToClose);
 
       // Explicitly trigger undo model again. It is also done in the data storage itself, but
       // as long as projectToClose exists, it has no effect, as the smart pointer keeps the
       // removed nodes alive.
-      projectToClose.reset();
+      projectToClose = nullptr;
 
       if (auto undoModel = mitk::UndoController::GetCurrentUndoModel(); nullptr != undoModel)
       {
@@ -326,6 +338,11 @@ namespace mitk {
           msg.arg(e.message()));
       }
     }
+  }
+
+  bool WorkbenchUtil::IsSceneFile(const QString& fileName)
+  {
+    return fileName.endsWith(".mitk", Qt::CaseInsensitive) || fileName.endsWith(".mitkscene.json", Qt::CaseInsensitive);
   }
 
   berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Pointer page, berry::IEditorInput::Pointer input, const QString &editorId, bool activate)

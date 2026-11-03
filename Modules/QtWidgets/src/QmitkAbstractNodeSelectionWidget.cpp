@@ -103,9 +103,9 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
       mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
   }
 
-  this->OnDataStorageChanged();
-
   this->HandleChangeOfInternalSelection({});
+
+  this->OnDataStorageChanged();
 }
 
 void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
@@ -263,8 +263,8 @@ void QmitkAbstractNodeSelectionWidget::SetSelectionIsOptional(bool isOptional)
 
 void QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted()
 {
-  this->OnDataStorageChanged();
   this->HandleChangeOfInternalSelection({});
+  this->OnDataStorageChanged();
 }
 
 void QmitkAbstractNodeSelectionWidget::ReviseSelectionChanged(const NodeList& /*oldInternalSelection*/, NodeList& /*newInternalSelection*/)

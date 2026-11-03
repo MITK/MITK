@@ -11,6 +11,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkDataStorageListModelTest.cpp
   QmitkDataStorageTreeModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
+  QmitkSingleNodeSelectionWidgetTest.cpp
   QmitkButtonOverlayWidgetTest.cpp
   QmitkIconThemeTest.cpp
   QmitkLineCompletionTextEditTest.cpp

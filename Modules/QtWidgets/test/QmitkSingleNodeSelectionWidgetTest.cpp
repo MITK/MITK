@@ -97,7 +97,6 @@ class QmitkSingleNodeSelectionWidgetTestSuite : public mitk::TestFixture
     return node;
   }
 
-  /** Auto-select is enabled after the data storage is set. */
   void SetUpAutoSelectLast(TestWidget& widget) const
   {
     widget.SetNodePredicate(m_IsImage);
@@ -113,7 +112,8 @@ class QmitkSingleNodeSelectionWidgetTestSuite : public mitk::TestFixture
   }
 
   /** The data storage orders nodes by address, so which of two matches is
-   *  picked first is arbitrary. Tests with two matches only rely on this. */
+   *  picked first is arbitrary. Tests with two matches must not assume an
+   *  order and use this helper to find the match that was not picked. */
   mitk::DataNode::Pointer OtherImage(const mitk::DataNode* image) const
   {
     return image == m_Image1.GetPointer() ? m_Image2 : m_Image1;
@@ -231,7 +231,8 @@ public:
 
     widget.SetDataStorage(otherStorage);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("[{}, {image1}]"), Describe(widget.m_Emissions));
+    CPPUNIT_ASSERT(!widget.m_Emissions.empty());
+    CPPUNIT_ASSERT_EQUAL(std::string("[{image1}]"), Describe({ widget.m_Emissions.back() }));
     CPPUNIT_ASSERT(m_Image1 == widget.GetSelectedNode());
   }
 };

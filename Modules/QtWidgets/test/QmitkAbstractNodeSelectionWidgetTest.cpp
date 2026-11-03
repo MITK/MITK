@@ -42,9 +42,11 @@ public:
   };
 
   int m_OnDataStorageChanged;
+  bool m_SelectionEmptyInOnDataStorageChanged = false;
   void OnDataStorageChanged() override
   {
     m_OnDataStorageChanged++;
+    m_SelectionEmptyInOnDataStorageChanged = this->GetCurrentInternalSelection().empty();
   };
 
   int m_OnInternalSelectionChanged;
@@ -203,10 +205,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
 
+    widget.m_SelectionEmptyInOnDataStorageChanged = false;
     widget.SetDataStorage(nullptr);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Set same data storage but triggered change", 2, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT(widget.m_SelectionEmptyInOnDataStorageChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
@@ -263,10 +267,12 @@ public:
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
 
     widget.SetCurrentSelection({ m_Node2 });
+    widget.m_SelectionEmptyInOnDataStorageChanged = false;
     m_DataStorage = nullptr;
     CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT(widget.m_SelectionEmptyInOnDataStorageChanged);
     CPPUNIT_ASSERT_EQUAL(4, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodeRemovedFromStorage);

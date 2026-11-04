@@ -424,8 +424,7 @@
 	center.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
-	Window views are coupled per dimension:
-	orientation, pan, zoom, slice, crosshair, windowing (level/window), and LUT (colormap).
+	Window views are coupled per dimension - the nine axes in the table below.
 	Cells that share a named group for a dimension follow each other on exactly that
 	dimension. Slice, zoom, and pan links can additionally carry an offset relative to the
 	group (e.g. a movie-frame layout showing slices -1 / 0 / +1, or a detail view kept

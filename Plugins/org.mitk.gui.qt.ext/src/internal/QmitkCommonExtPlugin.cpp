@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkRecentData.h>
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkBaseApplication.h>
 
@@ -97,7 +98,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
        {
-         if (arguments[i].right(5) == ".mitk" || arguments[i].endsWith(".mitkscene.json", Qt::CaseInsensitive))
+         if (mitk::WorkbenchUtil::IsSceneFile(arguments[i]))
          {
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
@@ -201,7 +202,7 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
 
   foreach (QString arg, args)
   {
-    if (arg.endsWith(".mitk") || arg.endsWith(".mitkscene.json", Qt::CaseInsensitive))
+    if (mitk::WorkbenchUtil::IsSceneFile(arg))
     {
       sceneArgs << arg;
     }
@@ -230,9 +231,10 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   }
   else
   {
-    loadDataFromDisk(fileArgs, false);
     if (newInstanceScene)
     {
+      loadDataFromDisk(fileArgs, false);
+
       foreach(QString sceneFile, sceneArgs)
       {
         startNewInstance(args, QStringList(sceneFile));
@@ -240,7 +242,9 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
     }
     else
     {
-      loadDataFromDisk(sceneArgs, false);
+      // Scenes first, so that closing the current project keeps the other files.
+      mitk::WorkbenchUtil::LoadFiles(sceneArgs, window);
+      loadDataFromDisk(fileArgs, false);
     }
   }
 

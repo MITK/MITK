@@ -59,6 +59,12 @@ namespace mitk {
      * If the window already has an editor open on the active datastorage then that editor
      * is activated; otherwise the default editor for the "mitk" extension is activated.
      *
+     * If the files include a scene and the data storage already contains data other than
+     * helper objects, the user is asked whether to close the current project first, to add
+     * the scene to it, or to cancel loading. The current project is closed only after the files
+     * have been loaded, so it is kept if none of the scenes could be loaded. Use mitk::IOUtil to
+     * load files without user interaction.
+     *
      * @param fileNames
      *            A list of file names with absolute path.
      * @param wnd
@@ -69,6 +75,13 @@ namespace mitk {
      * @see mitk::IOUtil
      */
     static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
+    /**
+     * Checks whether a file is an MITK scene (.mitk or .mitkscene.json, ignoring case).
+     *
+     * Unzipped scenes (.mitksceneindex) are not included since they cannot be loaded
+     * by LoadFiles().
+     */
+    static bool IsSceneFile(const QString& fileName);
     /**
      * Opens an editor on the given object.
      * <p>

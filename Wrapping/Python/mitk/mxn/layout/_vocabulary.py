@@ -32,16 +32,22 @@ NAMESPACE_DELIMITER: Final[str] = "__"
 WINDOW_ID_PATTERN: Final[str] = r"^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$"
 
 # Mirror of the schema's `groups.propertyNames.pattern` and the `links.selection.pattern`.
+# Necessary but not sufficient: the schema also excludes RESERVED_GROUP_ID.
 GROUP_NAME_PATTERN: Final[str] = r"^[A-Za-z0-9_.-]+$"
+
+# Mirror of the schema's `not` clause on group names: the engine reserves this
+# id, in every spelling, for the group that follows the application's value.
+RESERVED_GROUP_ID: Final[str] = "global"
 
 
 class LinkDimension(str, Enum):
     """Synchronization dimension keys recognised by the v2.0 schema.
 
-    v2.0 knows only SELECTION. v3.0 will additively introduce ZOOM, TIME,
-    CROSSHAIR, etc. APIs that take a dimension accept ``LinkDimension`` or a
-    plain ``str`` so callers can pass forward-compat strings before the enum
-    is updated.
+    The DSL writes 2.0, which knows only SELECTION. 3.0
+    (`mxn-layout-v3.schema.json`) adds pan, zoom, slice, crosshair,
+    orientation, windowing and lut, and requires `time`, which accepts only
+    the reserved group `global`; the DSL writes none of them. APIs that take
+    a dimension accept ``LinkDimension`` or a plain ``str``.
     """
 
     SELECTION = "selection"

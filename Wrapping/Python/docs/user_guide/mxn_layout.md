@@ -24,7 +24,9 @@ A layout document is a tree:
 Cross-window synchronization is encoded through **groups** and **links**.
 Each window declares one or more links (today only the `selection`
 dimension) referencing a named `Group`. Windows linked to the same group
-share their selection state at runtime.
+share their selection state at runtime. Group names follow
+`GROUP_NAME_PATTERN`; `global` is reserved in every spelling for the group
+that follows the application's value, and the DSL refuses it.
 
 Every public name (the dataclasses, the builders, the selector, the
 preset registry, and the file-I/O helpers) is re-exported from

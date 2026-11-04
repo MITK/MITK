@@ -208,7 +208,7 @@ public:
    */
   struct BarcodeRecorder
   {
-    QList<int> axes;       // AxisHovered, the clickable path
+    QList<int> axes;       // AxisHovered, the path where the axes take the pointer
     QList<bool> onStrip;   // PeekHovered's first argument, the passive path
     QList<int> peekAxes;   // PeekHovered's second argument
     int clicks = 0;
@@ -1071,7 +1071,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, recorder.peekAxes[0]);
     CPPUNIT_ASSERT_EQUAL(3, recorder.peekAxes[1]);
     CPPUNIT_ASSERT(recorder.onStrip[0] && recorder.onStrip[1]);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("A passive strip leaves AxisHovered to the clickable mode",
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A passive strip leaves AxisHovered to strips whose axes take the pointer",
                                  0, static_cast<int>(recorder.axes.size()));
 
     QEvent leave(QEvent::Leave);
@@ -1149,7 +1149,7 @@ public:
     for (const QSize size : { QSize(240, 24), QSize(71, 16) })
     {
       QmitkMxNSyncBarcodeWidget strip;
-      strip.SetAxisClickable(true);
+      strip.SetAxisInteraction(QmitkMxNSyncBarcodeWidget::AxisInteraction::Click);
       strip.SetSlots(PlainSlots());
       strip.resize(size);
       BarcodeRecorder recorder(strip);
@@ -1176,7 +1176,7 @@ public:
     axisSlots[notApplicable].applicable = false;
 
     QmitkMxNSyncBarcodeWidget strip;
-    strip.SetAxisClickable(true);
+    strip.SetAxisInteraction(QmitkMxNSyncBarcodeWidget::AxisInteraction::Click);
     strip.SetSlots(axisSlots);
     strip.resize(240, 24);
 
@@ -1380,8 +1380,8 @@ public:
     // to the SVG renderer instead - which is exactly what makes a large render
     // differ from an upscaled small one.
     const QColor color(200, 120, 60);
-    const QPixmap large = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Crosshair, color, 96);
-    const QPixmap small = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Crosshair, color, 24);
+    const QPixmap large = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Crosshair, color, 96);
+    const QPixmap small = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Crosshair, color, 24);
     CPPUNIT_ASSERT(!large.isNull() && !small.isNull());
     CPPUNIT_ASSERT_EQUAL(96, large.width());
 
@@ -1411,23 +1411,23 @@ public:
     // A persistent plate repaints on every render-end value change, so the
     // artwork must not be re-read and re-rasterised on each call.
     const QColor color(200, 120, 60);
-    const QPixmap first = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 35);
-    const QPixmap second = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 35);
+    const QPixmap first = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Zoom, color, 35);
+    const QPixmap second = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Zoom, color, 35);
     CPPUNIT_ASSERT(!first.isNull());
     CPPUNIT_ASSERT_EQUAL(first.cacheKey(), second.cacheKey());
 
-    const QPixmap otherColor = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, QColor(60, 120, 200), 35);
-    const QPixmap otherSize = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Zoom, color, 36);
+    const QPixmap otherColor = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Zoom, QColor(60, 120, 200), 35);
+    const QPixmap otherSize = QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Zoom, color, 36);
     CPPUNIT_ASSERT(first.cacheKey() != otherColor.cacheKey());
     CPPUNIT_ASSERT(first.cacheKey() != otherSize.cacheKey());
 
-    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 2.0);
-    const QPixmap stickerAgain = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 2.0);
+    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis::Zoom, color, 35, 2.0);
+    const QPixmap stickerAgain = QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis::Zoom, color, 35, 2.0);
     CPPUNIT_ASSERT(!sticker.isNull());
     CPPUNIT_ASSERT_EQUAL(sticker.cacheKey(), stickerAgain.cacheKey());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The sticker comes with its pixel ratio already set",
                                  2.0, sticker.devicePixelRatio());
-    const QPixmap otherRatio = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Zoom, color, 35, 1.0);
+    const QPixmap otherRatio = QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis::Zoom, color, 35, 1.0);
     CPPUNIT_ASSERT(sticker.cacheKey() != otherRatio.cacheKey());
   }
 
@@ -1435,7 +1435,7 @@ public:
   {
     const QColor hue(200, 120, 60);
     constexpr int side = 35;
-    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Crosshair, hue, side, 1.0);
+    const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis::Crosshair, hue, side, 1.0);
     CPPUNIT_ASSERT(!sticker.isNull());
     const int margin = QmitkMxNAxisGlyphStickerMargin(side);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The rings grow outward, around the full-size glyph",
@@ -1476,7 +1476,7 @@ public:
     // Its outline must still be solid there, or the sticker loses its edge on
     // exactly the side where the glyph itself is faint.
     const QPixmap sticker =
-      QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph::Lut, QColor(80, 140, 240), 70, 1.0);
+      QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis::Lut, QColor(80, 140, 240), 70, 1.0);
     CPPUNIT_ASSERT(!sticker.isNull());
     const QImage image = sticker.toImage().convertToFormat(QImage::Format_ARGB32);
     const int y = image.height() / 2;

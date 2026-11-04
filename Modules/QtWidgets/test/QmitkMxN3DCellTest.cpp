@@ -1165,11 +1165,11 @@ public:
   }
 
   static QmitkMxNSyncBarcodeWidget::AxisSlot SlotOf(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots,
-                                                    QmitkMxNAxisGlyph glyph)
+                                                    QmitkMxNSyncAxis axis)
   {
     for (const auto& slot : axisSlots)
     {
-      if (glyph == slot.glyph)
+      if (axis == slot.axis)
       {
         return slot;
       }
@@ -1188,12 +1188,12 @@ public:
 
     auto axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
     CPPUNIT_ASSERT_MESSAGE("precondition: in 2D the pan offset is shown",
-                           SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan).hasOffset);
+                           SlotOf(axisSlots, QmitkMxNSyncAxis::Pan).hasOffset);
 
     m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
 
     axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
-    const auto panSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan);
+    const auto panSlot = SlotOf(axisSlots, QmitkMxNSyncAxis::Pan);
     CPPUNIT_ASSERT_MESSAGE("A pan link stays applicable to a 3D cell and keeps its hue",
                            panSlot.applicable && panSlot.color.isValid());
     CPPUNIT_ASSERT_MESSAGE("A pan offset has no effect on a 3D cell, so the slot does not mark one",
@@ -1203,7 +1203,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The tooltip says the offset is kept for the 2D views: " + panSlot.tooltip.toStdString(),
                            panSlot.tooltip.contains(QStringLiteral("kept")));
 
-    const auto zoomSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Zoom);
+    const auto zoomSlot = SlotOf(axisSlots, QmitkMxNSyncAxis::Zoom);
     CPPUNIT_ASSERT_MESSAGE("A zoom offset still applies to a 3D cell and is shown", zoomSlot.hasOffset);
     CPPUNIT_ASSERT_MESSAGE("The zoom offset is worded", !zoomSlot.offsetText.isEmpty());
 
@@ -1216,7 +1216,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", 5.0, stored[0], 1e-9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", -3.0, stored[1], 1e-9);
     CPPUNIT_ASSERT_MESSAGE("Back in 2D the pan offset is shown again",
-                           SlotOf(m_Editor->BuildBarcodeSlots(CellId(1)), QmitkMxNAxisGlyph::Pan).hasOffset);
+                           SlotOf(m_Editor->BuildBarcodeSlots(CellId(1)), QmitkMxNSyncAxis::Pan).hasOffset);
   }
 
   // --- Camera synchronization ----------------------------------------------

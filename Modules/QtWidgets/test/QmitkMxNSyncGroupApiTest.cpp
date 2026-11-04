@@ -663,7 +663,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
     for (const auto axis : QmitkMxNAllSyncAxes)
     {
-      CPPUNIT_ASSERT(QmitkMxNSyncAxisGlyph(axis) == axisSlots[QmitkMxNSyncAxisToSlot(axis)].glyph);
+      CPPUNIT_ASSERT(axis == axisSlots[QmitkMxNSyncAxisToSlot(axis)].axis);
     }
 
     const auto& time = axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)];

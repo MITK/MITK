@@ -138,6 +138,10 @@ public:
    *        carries no offset, whatever offset it had in its previous group. An
    *        axis already linked to 'group' keeps its offset. Moving a single link
    *        while keeping its offset is SetCellAxisGroup.
+   *
+   *        A no-op for the reserved group in any spelling (see
+   *        QmitkMxNMultiWidget::NamesReservedGroup): every window already
+   *        follows it on the axes it takes.
    */
   void AssignCellsToGroup(const QStringList& windowIds, const std::string& group,
                           QmitkMxNGroupJoinMode mode = QmitkMxNGroupJoinMode::Replace);
@@ -154,7 +158,8 @@ public:
    *        cell of 'group'. Selection is single-valued per cell, so enabling
    *        moves each member's selection group to this group (last-writer-wins
    *        if a member already had a different one); disabling returns each
-   *        member to the default selection group.
+   *        member to the default selection group. A no-op for the reserved
+   *        group in any spelling, which takes no selection.
    */
   void ApplySelectionToGroup(const std::string& group, bool enabled);
 
@@ -164,7 +169,8 @@ public:
    *        assigned, then cleared) and does not touch the engine, whatever is
    *        selected; a non-empty group homogenizes the axis over its members
    *        (link all / unlink all). Public so tests can drive the axis
-   *        interaction directly.
+   *        interaction directly. A no-op on Time and for the reserved group in
+   *        any spelling, whose axes are not the user's to toggle.
    */
   void ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis);
 
@@ -195,13 +201,23 @@ public:
    * \brief Link one cell on one axis to 'group'. An existing offset on the axis
    *        is carried over, so re-grouping a cell keeps the relationship the user
    *        authored. Public so the advanced matrix's edits are testable
-   *        headlessly.
+   *        headlessly. A link the engine refuses on any other axis is logged and
+   *        not made.
+   *
+   * \throws QmitkMxNReservedGroupException for QmitkMxNSyncAxis::Time, whatever
+   *         'group' is (QmitkMxNGlobalGroupId included), before any change:
+   *         every window follows the application's time through the reserved
+   *         group and stores no Time link.
    */
   void SetCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis, const std::string& group);
 
   /**
    * \brief Unlink one cell on one axis. Data selection has no unlinked state,
    *        so the selection axis returns the cell to the default group instead.
+   *
+   * \throws QmitkMxNReservedGroupException for QmitkMxNSyncAxis::Time, before
+   *         any change: no window can leave the reserved group
+   *         QmitkMxNGlobalGroupId on Time.
    */
   void ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
 

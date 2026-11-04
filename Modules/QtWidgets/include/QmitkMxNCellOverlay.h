@@ -340,6 +340,12 @@ public:
    *         the same condition. Exposed for verification. */
   QRect PlateMenuButtonRect() const;
 
+  /** \brief The rect the plate's top line is elided and centred into, in
+   *         overlay coordinates: the grid's width, narrowed on both sides on
+   *         the plate that shows the buttons so the line stays clear of them.
+   *         Invalid without a plate. Exposed for verification. */
+  QRect SyncPeekLineRect() const;
+
   /** \brief Whether this cell's frame is bumped: arrange mode is on and the
    *         cell shares the pointed-at synchronization, or a group drag hovers
    *         it. Exposed for verification. */

@@ -91,8 +91,10 @@ public:
 /**
 * \brief Thrown when a call would create, join, remove or restyle the reserved
 *        group 'global' (QmitkMxNGlobalGroupId) on an axis that does not accept
-*        it, or would give a user group the reserved display name "Global" or a
-*        colour that cannot be told apart from the reserved group's.
+*        it, would give a window another group or no group on an axis that only
+*        'global' holds (Time), or would give a user group the reserved display
+*        name "Global" or a colour that cannot be told apart from the reserved
+*        group's.
 */
 class MITKQTWIDGETS_EXPORT QmitkMxNReservedGroupException : public mitk::Exception
 {
@@ -719,11 +721,26 @@ public:
   *
   *   The reserved group QmitkMxNGlobalGroupId takes no palette entry: its
   *   colour is the text colour of the current Workbench style, as this
-  *   widget's palette reports it (QPalette::WindowText).
+  *   widget's palette reports it (QPalette::WindowText). Surfaces that are
+  *   dark in every style draw it in a fixed light gray instead; see
+  *   GetArrangeHighlightHue.
   *
   * \throws mitk::Exception on a group that was never registered.
   */
   QColor GetSyncGroupColor(const std::string& group) const;
+
+  /**
+  * \brief The hue in which arrange mode frames the windows that share an axis
+  *        of 'group'.
+  *
+  *   The frames lie over the windows' borders and render areas, which are
+  *   dark in every style, so the reserved group QmitkMxNGlobalGroupId takes
+  *   the light gray it has on the barcodes and plates there. Every other
+  *   group takes GetSyncGroupColor.
+  *
+  * \throws mitk::Exception on a group that was never registered.
+  */
+  QColor GetArrangeHighlightHue(const std::string& group) const;
 
   /**
   * \brief The window-perspective sync-barcode slots for one cell: the nine
@@ -932,6 +949,14 @@ public:
 
   /** \brief Display name of the selection group with the given engine index. */
   QString GetSyncGroupDisplayName(GroupSyncIndexType index) const;
+
+  /**
+  * \brief Whether 'text' names the reserved group QmitkMxNGlobalGroupId: its
+  *        id in any letter case, or its display name "Global", with
+  *        surrounding whitespace ignored. Calls that create, join or rename a
+  *        group refuse every text this accepts.
+  */
+  static bool NamesReservedGroup(const std::string& text);
 
   /**
   * \brief The group id of the selection group with the given engine index.
@@ -1158,10 +1183,11 @@ public:
   *   Per-cell synchronization links are emitted for every linked dimension;
   *   `slice` / `zoom` / `pan` links carrying a non-identity offset use the
   *   object form (`{"target": ..., "offset": ...}`), all other links the
-  *   string shorthand. Every registered group is declared in the top-level
-  *   `groups` dict with its `select_all`, including one no cell references
-  *   yet; a group that is not registered and only navigation links name is
-  *   declared as an empty entry.
+  *   string shorthand. Every window carries `"time": "global"`, so the output
+  *   always meets ApplyLayout's v3.0 time requirement. Every registered group
+  *   is declared in the top-level `groups` dict with its `select_all`,
+  *   including one no cell references yet; a group that is not registered and
+  *   only navigation links name is declared as an empty entry.
   *
   *   See 'mxn-layout-v3.schema.json' for the document shape this method emits.
   *

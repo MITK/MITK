@@ -276,15 +276,6 @@ namespace
 
   constexpr const char* GLOBAL_GROUP_DISPLAY_NAME = "Global";
 
-  // Whether 'text' names the reserved group: its id in any spelling, or its
-  // display name, which differs from the id only in case. Surrounding
-  // whitespace is ignored, as a typed display name is trimmed.
-  bool NamesReservedGroup(const std::string& text)
-  {
-    return 0 == QString::fromStdString(text).trimmed().compare(QLatin1String(QmitkMxNGlobalGroupId),
-                                                               Qt::CaseInsensitive);
-  }
-
   // CIELAB (D65) coordinates of an sRGB colour.
   std::array<double, 3> ToLab(const QColor& color)
   {
@@ -522,12 +513,13 @@ namespace
   //
   // Version scope: for a "3.0" document the window and its `links` object are
   // closed (unknown keys, unknown modifiers, and misplaced or mistyped offsets
-  // throw). A "2.0" document keeps its historical lenient behavior -
-  // `links.selection` must be a bare string and every other link key and
-  // unknown window key is silently ignored - so existing v2 files load
-  // unchanged, including files with a typo'd key. Only the v3 additions
-  // `render_mode` and `free` are rejected in a "2.0" document, since ignoring
-  // them would load a 3D window as 2D, and the reserved group 'global'.
+  // throw). A "2.0" document keeps its historical lenient behavior:
+  // `links.selection` must be a bare string, and every other link key and
+  // unknown window key is silently ignored, including a typo'd key. Two
+  // exceptions throw: the v3 additions `render_mode` and `free`, since
+  // ignoring them would load a 3D window as 2D; and a `links.selection`
+  // target naming the reserved group 'global', for the reason given at its
+  // check.
   void PrewalkValidate(const nlohmann::json& node, bool isV3, PrewalkResult& result)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
@@ -659,7 +651,7 @@ namespace
       if (isV3)
       {
         selectionGroup = ParseV3LinkValue(id, "selection", std::nullopt, links["selection"]).first;
-        if (NamesReservedGroup(selectionGroup) && !QmitkMxNLinkKeyAcceptsGlobal("selection"))
+        if (QmitkMxNMultiWidget::NamesReservedGroup(selectionGroup) && !QmitkMxNLinkKeyAcceptsGlobal("selection"))
         {
           ThrowReservedLinkTarget(id, "selection");
         }
@@ -675,7 +667,7 @@ namespace
         ValidateGroupNamePattern(id, selectionGroup);
         // Loading it as an ordinary group now would change the file's meaning
         // once 'global' follows the application's selection.
-        if (NamesReservedGroup(selectionGroup))
+        if (QmitkMxNMultiWidget::NamesReservedGroup(selectionGroup))
         {
           mitkThrow() << "Layout window '" << id << "': 'links.selection' targets the reserved group '"
                       << QmitkMxNGlobalGroupId << "'. Rename the group; '" << QmitkMxNGlobalGroupId
@@ -717,7 +709,7 @@ namespace
                       << it.key() << "'.";
         }
         auto [group, offset] = ParseV3LinkValue(id, it.key(), dimension, it.value());
-        if (NamesReservedGroup(group) && !QmitkMxNLinkKeyAcceptsGlobal(it.key()))
+        if (QmitkMxNMultiWidget::NamesReservedGroup(group) && !QmitkMxNLinkKeyAcceptsGlobal(it.key()))
         {
           ThrowReservedLinkTarget(id, it.key());
         }
@@ -6384,7 +6376,7 @@ void QmitkMxNMultiWidget::SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAx
       {
         try
         {
-          hue = this->GetSyncGroupColor(group);
+          hue = this->GetArrangeHighlightHue(group);
           partners = this->CellsSharingAxis(QString::fromStdString(group), *m_SyncPeekAxis);
         }
         catch (const mitk::Exception&)
@@ -6653,7 +6645,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
   const auto selectionSlot = [this, &windowId](QmitkMxNSyncAxis axis, const QString& label)
   {
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-    slot.glyph = QmitkMxNSyncAxisGlyph(axis);
+    slot.axis = axis;
     slot.label = label;
     const auto renderWindowWidget = this->GetRenderWindowWidget(windowId);
     auto* utilityWidget = renderWindowWidget ? renderWindowWidget->GetUtilityWidget() : nullptr;
@@ -6688,7 +6680,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
       // Every window follows the application's time through 'global', drawn in
       // the colour it takes on furniture that is dark in every style.
       QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-      slot.glyph = QmitkMxNSyncAxisGlyph(axis);
+      slot.axis = axis;
       slot.label = label;
       slot.color = QColor(GLOBAL_GROUP_OVERLAY_COLOR);
       slot.tooltip = tr("%1 - group %2").arg(label, QString::fromStdString(GLOBAL_GROUP_DISPLAY_NAME));
@@ -6711,7 +6703,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
     // unsynced gap otherwise, plus the axis glyph the barcode draws when wide
     // enough.
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-    slot.glyph = QmitkMxNSyncAxisGlyph(axis);
+    slot.axis = axis;
     slot.label = label;
     if (const auto link = this->GetSyncLink(windowId, dimension); link.has_value())
     {
@@ -6799,6 +6791,11 @@ void QmitkMxNMultiWidget::RefreshSyncBarcodes()
     }
     utilityWidget->GetNodeSelectionWidget()->SetScopeText(scopeText);
   }
+}
+
+QColor QmitkMxNMultiWidget::GetArrangeHighlightHue(const std::string& group) const
+{
+  return QmitkMxNGlobalGroupId == group ? QColor(GLOBAL_GROUP_OVERLAY_COLOR) : this->GetSyncGroupColor(group);
 }
 
 QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const
@@ -6995,6 +6992,14 @@ QString QmitkMxNMultiWidget::GetSyncGroupDisplayName(GroupSyncIndexType index) c
     mitkThrow() << "GetSyncGroupDisplayName: no group with engine index " << index << ".";
   }
   return QString::fromStdString(this->GetSyncGroupDisplayName(it->second));
+}
+
+bool QmitkMxNMultiWidget::NamesReservedGroup(const std::string& text)
+{
+  // The display name differs from the id only in case, and a typed display
+  // name is trimmed.
+  return 0 == QString::fromStdString(text).trimmed().compare(QLatin1String(QmitkMxNGlobalGroupId),
+                                                             Qt::CaseInsensitive);
 }
 
 std::string QmitkMxNMultiWidget::GetSyncGroupName(GroupSyncIndexType index) const

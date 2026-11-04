@@ -209,7 +209,9 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(GlobalCard_IsFirstAndReserved);
   MITK_TEST(GlobalCard_IsNoDragSourceOrDropTarget);
   MITK_TEST(GlobalCard_RefusesAssign);
+  MITK_TEST(GlobalCard_RefusesSelectionToggle);
   MITK_TEST(GlobalCard_FollowsAStyleSwitch);
+  MITK_TEST(GlobalCard_TimeAxisHoversWithoutOfferingAClick);
   MITK_TEST(PlateMenuAndMatrixPicker_OmitGlobal);
   MITK_TEST(Matrix_NineColumnsInFamilyOrder);
   MITK_TEST(Matrix_TimeChipIsGlobalAndNotSelectable);
@@ -2957,7 +2959,10 @@ public:
     const auto group = m_Widget->CreateGroup();
     const auto selectionBefore = m_Editor->GetCellSelectionGroup(CellId(0));
 
-    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, group), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, group),
+                         QmitkMxNReservedGroupException);
+    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, QmitkMxNGlobalGroupId),
+                         QmitkMxNReservedGroupException);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Time has no other group, and selection is not Time",
                                  selectionBefore, m_Editor->GetCellSelectionGroup(CellId(0)));
   }
@@ -2968,7 +2973,7 @@ public:
     m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Selection, group);
     CPPUNIT_ASSERT_EQUAL(group, m_Editor->GetCellSelectionGroup(CellId(0)));
 
-    CPPUNIT_ASSERT_THROW(m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Time), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Time), QmitkMxNReservedGroupException);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Clearing Time leaves the selection group alone",
                                  group, m_Editor->GetCellSelectionGroup(CellId(0)));
   }
@@ -3138,13 +3143,121 @@ public:
       return state;
     };
     const auto before = snapshot();
-    for (const auto mode : { QmitkMxNGroupJoinMode::Replace, QmitkMxNGroupJoinMode::MergeOverwriteCollisions,
-                             QmitkMxNGroupJoinMode::FillEmpty })
+    // The engine reserves the id in every spelling, so a Replace join under any
+    // of them must be refused before it clears a window's other links.
+    for (const std::string spelling : { "global", "Global", "GLOBAL", " global " })
     {
-      m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, "global", mode);
-      Pump();
-      CPPUNIT_ASSERT_MESSAGE("Assigning to the reserved group changes no link", before == snapshot());
+      for (const auto mode : { QmitkMxNGroupJoinMode::Replace, QmitkMxNGroupJoinMode::MergeOverwriteCollisions,
+                               QmitkMxNGroupJoinMode::FillEmpty })
+      {
+        m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, spelling, mode);
+        Pump();
+        CPPUNIT_ASSERT_MESSAGE("Assigning to the reserved group, spelled '" + spelling + "', changes no link (mode "
+                                 + std::to_string(static_cast<int>(mode)) + ")",
+                               before == snapshot());
+      }
     }
+  }
+
+  void GlobalCard_RefusesSelectionToggle()
+  {
+    // Every window counts as a member of the reserved group, so toggling
+    // selection on it would move or reset every window's selection group.
+    const auto other = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0), CellId(1) }, other);
+    m_Widget->ApplySelectionToGroup(other, true);
+    Pump();
+    std::vector<std::string> before;
+    for (std::size_t cell = 0; cell < 3; ++cell)
+    {
+      before.push_back(m_Editor->GetCellSelectionGroup(CellId(cell)));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A window must sit in a user group's selection for the test to mean anything",
+                                 other, before[0]);
+
+    for (const std::string spelling : { "global", "Global" })
+    {
+      for (const bool enabled : { false, true })
+      {
+        m_Widget->ApplySelectionToGroup(spelling, enabled);
+        Pump();
+        for (std::size_t cell = 0; cell < 3; ++cell)
+        {
+          CPPUNIT_ASSERT_EQUAL_MESSAGE("Toggling selection on the reserved group, spelled '" + spelling + "', to "
+                                         + (enabled ? "on" : "off") + ", keeps every window's selection group",
+                                       before[cell], m_Editor->GetCellSelectionGroup(CellId(cell)));
+        }
+      }
+    }
+  }
+
+  static void MoveTo(QWidget& target, const QPoint& position)
+  {
+    const QPointF local(position);
+    QMouseEvent move(QEvent::MouseMove, local, local, local, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    static_cast<QObject&>(target).event(&move);
+  }
+
+  static void ClickAt(QWidget& target, const QPoint& position)
+  {
+    const QPointF local(position);
+    QMouseEvent press(QEvent::MouseButtonPress, local, local, local, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent release(QEvent::MouseButtonRelease, local, local, local, Qt::LeftButton, Qt::NoButton,
+                        Qt::NoModifier);
+    static_cast<QObject&>(target).event(&press);
+    static_cast<QObject&>(target).event(&release);
+  }
+
+  /** Move across 'strip''s middle until it reports hovering 'slot'; returns
+   *  where it did, or a null point when it never does. */
+  static QPoint HoverSlot(QmitkMxNSyncBarcodeWidget& strip, int slot, const QList<int>& hovered)
+  {
+    for (int x = 0; x < strip.width(); ++x)
+    {
+      const QPoint position(x, strip.height() / 2);
+      MoveTo(strip, position);
+      if (!hovered.isEmpty() && slot == hovered.back())
+      {
+        return position;
+      }
+    }
+    return QPoint();
+  }
+
+  void GlobalCard_TimeAxisHoversWithoutOfferingAClick()
+  {
+    const auto user = m_Widget->CreateGroup();
+    Pump();
+    auto* reservedStrip = CardFor("global")->findChild<QmitkMxNSyncBarcodeWidget*>();
+    auto* userStrip = CardFor(user)->findChild<QmitkMxNSyncBarcodeWidget*>();
+    CPPUNIT_ASSERT(nullptr != reservedStrip && nullptr != userStrip);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The reserved card's strip must show its axes for the test to mean anything",
+                                 QmitkMxNSyncAxisCount, static_cast<int>(reservedStrip->Slots().size()));
+    CPPUNIT_ASSERT_MESSAGE("and Time must apply, or no slot would offer a click anyway",
+                           reservedStrip->Slots()[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)].applicable);
+    reservedStrip->resize(240, 24);
+    userStrip->resize(240, 24);
+
+    QList<int> hovered;
+    int clicks = 0;
+    QObject::connect(reservedStrip, &QmitkMxNSyncBarcodeWidget::AxisHovered,
+                     [&hovered](int index) { hovered.append(index); });
+    QObject::connect(reservedStrip, &QmitkMxNSyncBarcodeWidget::AxisClicked, [&clicks](int) { ++clicks; });
+    QObject::connect(reservedStrip, &QmitkMxNSyncBarcodeWidget::Clicked, [&clicks]() { ++clicks; });
+
+    const QPoint onTime = HoverSlot(*reservedStrip, QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time), hovered);
+    CPPUNIT_ASSERT_MESSAGE("Pointing at Time is reported, so the windows that follow it light up", !onTime.isNull());
+    CPPUNIT_ASSERT_MESSAGE("but the slot offers no click",
+                           Qt::PointingHandCursor != reservedStrip->cursor().shape());
+    ClickAt(*reservedStrip, onTime);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("and a click on it reports nothing", 0, clicks);
+
+    QList<int> userHovered;
+    QObject::connect(userStrip, &QmitkMxNSyncBarcodeWidget::AxisHovered,
+                     [&userHovered](int index) { userHovered.append(index); });
+    CPPUNIT_ASSERT(!HoverSlot(*userStrip, QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice), userHovered).isNull());
+    CPPUNIT_ASSERT_MESSAGE("A user card's axis still invites a click",
+                           Qt::PointingHandCursor == userStrip->cursor().shape());
   }
 
   void PlateMenuAndMatrixPicker_OmitGlobal()

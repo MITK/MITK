@@ -1682,7 +1682,7 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
         const int glyph = metrics.height();
         const qreal dpr = nullptr != painter.device() ? painter.device()->devicePixelRatioF() : 1.0;
         const QPixmap timeGlyph =
-          QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Time, QColor(Qt::white), qRound(glyph * dpr), dpr);
+          QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis::Time, QColor(Qt::white), qRound(glyph * dpr), dpr);
         if (!timeGlyph.isNull())
         {
           painter.save();
@@ -1853,6 +1853,25 @@ QRect QmitkMxNCellOverlay::SyncPeekPlateRect() const
   return layout.plate.isValid() ? layout.plate.translated(area.topLeft()) : QRect();
 }
 
+QRect QmitkMxNCellOverlay::SyncPeekLineRect() const
+{
+  if (!m_SyncPeekVisible && m_PeekProgress <= 0.0)
+  {
+    return QRect();
+  }
+  const QRect area = this->RenderWindowRect();
+  const PeekPlateLayout layout = ComputePeekPlate(
+    area.size(), m_PeekPaintBox, m_PeekPaintAxis, PeekTextLineHeight(this->font()));
+  if (!layout.plate.isValid())
+  {
+    return QRect();
+  }
+  const int reserve = this->PlateCloseButtonRect().isValid()
+                        ? std::max(0, PlateButtonInset + 2 * PlateButtonSize + PlateButtonGap - PeekPlatePadX)
+                        : 0;
+  return layout.line.adjusted(reserve, 0, -reserve, 0).translated(area.topLeft());
+}
+
 void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
 {
   if (!m_SyncPeekVisible && m_PeekProgress <= 0.0)
@@ -1920,7 +1939,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     painter.setOpacity(m_PeekProgress * weight);
     if (axis == m_PeekPaintAxis)
     {
-      const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(axisSlot.glyph, color, sizePx, dpr);
+      const QPixmap sticker = QmitkMxNRenderAxisGlyphSticker(axisSlot.axis, color, sizePx, dpr);
       if (!sticker.isNull())
       {
         const QSizeF stickerSize = QSizeF(sticker.size()) / dpr;
@@ -1930,7 +1949,7 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
     }
     else
     {
-      const QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.glyph, color, sizePx, dpr);
+      const QPixmap glyph = QmitkMxNRenderAxisGlyph(axisSlot.axis, color, sizePx, dpr);
       if (!glyph.isNull())
       {
         painter.drawPixmap(box.topLeft(), glyph);
@@ -1986,16 +2005,15 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   }
 
   // One line, elided into the width the grid dictates: measuring text into the
-  // plate would resize it as the pointed-at axis or the window changes. In
-  // arrange mode it stays clear of the button corner, symmetrically so it
-  // remains centred over the grid.
+  // plate would resize it as the pointed-at axis or the window changes. On the
+  // plate that shows the arrange buttons it stays clear of them, symmetrically
+  // so it remains centred over the grid; every other plate keeps the full
+  // width, since arrange mode is where the names are read to pick windows.
   painter.setOpacity(m_PeekProgress);
   const QFont lineFont = PeekLineFont(this->font());
   painter.setFont(lineFont);
   const QFontMetrics metrics(lineFont);
-  const int reserve =
-    arranging ? std::max(0, PlateButtonInset + 2 * PlateButtonSize + PlateButtonGap - PeekPlatePadX) : 0;
-  const QRect line = layout.line.adjusted(reserve, 0, -reserve, 0);
+  const QRect line = this->SyncPeekLineRect().translated(-area.topLeft());
   const PeekLineContent content = this->SyncPeekLine();
   if (m_PeekPaintNamesAxis)
   {
@@ -3293,7 +3311,7 @@ void QmitkMxNCellOverlay::UpdatePlateHover(const QPoint& position)
     members = m_Editor->CellsSharingAxis(QString::fromStdString(group), *axis);
     try
     {
-      hue = m_Editor->GetSyncGroupColor(group);
+      hue = m_Editor->GetArrangeHighlightHue(group);
     }
     catch (const mitk::Exception&)
     {

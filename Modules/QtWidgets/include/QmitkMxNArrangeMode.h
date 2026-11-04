@@ -123,7 +123,7 @@ public:
   std::optional<QmitkMxNSyncAxis> GetHighlightAxis() const;
   QStringList GetHighlightedWindowIds() const;
   QColor GetHighlightHue() const;
-  /** rief The window whose plate names the highlighted axis; empty when none does. */
+  /** \brief The window whose plate names the highlighted axis; empty when none does. */
   QString GetHighlightNamingWindowId() const;
 
 Q_SIGNALS:

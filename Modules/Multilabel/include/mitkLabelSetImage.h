@@ -82,12 +82,12 @@ namespace mitk
     /**
       * \brief Check whether slice @a s at time @a t in channel @a n is set
       */
-    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+    bool IsSliceSet(int s = 0, TimeStepType t = 0, int n = 0) const override;
 
     /**
       * \brief Check whether volume at time @a t in channel @a n is set
       */
-    bool IsVolumeSet(int t = 0, int n = 0) const override;
+    bool IsVolumeSet(TimeStepType t = 0, int n = 0) const override;
 
     /**
       * \brief Check whether the channel @a n is set

@@ -205,7 +205,7 @@ namespace mitk
      *
      * Convenience shortcut for \c GetData()->GetGeometry(t)->GetVtkTransform().
      */
-    vtkLinearTransform *GetVtkTransform(int t = 0) const;
+    vtkLinearTransform *GetVtkTransform(TimeStepType t = 0) const;
 
     /**
      * \brief Set the data object (instance of BaseData, e.g., an Image)

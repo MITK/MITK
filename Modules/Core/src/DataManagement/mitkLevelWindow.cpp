@@ -336,7 +336,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
-    for (unsigned int i = 1; i < image->GetDimension(3); ++i)
+    for (TimeStepType i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
       if (minValue > minValueTemp)

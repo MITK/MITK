@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkOperation.h>
 #include <MitkCoreExports.h>
+#include <mitkTimeGeometry.h>
 
 #include <vtkPolyData.h>
 
@@ -33,7 +34,7 @@ namespace mitk
      * \param[in] polyData the polydata object to replace in the surface.
      * \param[in] t the time step.
      */
-    SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, unsigned int t);
+    SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, TimeStepType t);
 
     ~SurfaceOperation() override;
 
@@ -47,11 +48,11 @@ namespace mitk
      * \brief Get the time step associated with this operation.
      * \return The time step index.
      */
-    unsigned int GetTimeStep();
+    TimeStepType GetTimeStep();
 
   private:
     vtkPolyData *m_polyData;
-    unsigned int m_timeStep;
+    TimeStepType m_timeStep;
   };
 }
 

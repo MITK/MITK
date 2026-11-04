@@ -91,7 +91,7 @@ void
 
   //add the time frames to the descriptor filter
   std::vector<Image::Pointer> frameCache;
-  for (unsigned int i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
+  for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
     mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
@@ -102,7 +102,7 @@ void
     Image::Pointer frameMITKImage = imageTimeSelector->GetOutput();
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
-    descFilter->SetInput(i,frameImage);
+    descFilter->SetInput(static_cast<unsigned int>(i), frameImage);
   }
 
 

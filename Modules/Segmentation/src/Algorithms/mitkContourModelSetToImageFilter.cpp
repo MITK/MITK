@@ -300,7 +300,7 @@ void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
       byteSize *= output->GetDimension(dim);
     }
 
-    for (unsigned int volumeNumber = 0; volumeNumber < output->GetDimension(3); volumeNumber++)
+    for (mitk::TimeStepType volumeNumber = 0; volumeNumber < output->GetDimension(3); volumeNumber++)
     {
       mitk::ImageWriteAccessor writeAccess(output, output->GetVolumeData(volumeNumber));
 

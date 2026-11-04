@@ -45,9 +45,9 @@ namespace mitk
     itkSetMacro(SliceNr, int);
 
     /** \brief Get the time step number to extract. */
-    itkGetConstMacro(TimeNr, int);
+    itkGetConstMacro(TimeNr, TimeStepType);
     /** \brief Set the time step number to extract. */
-    itkSetMacro(TimeNr, int);
+    itkSetMacro(TimeNr, TimeStepType);
 
     /** \brief Get the channel number to extract. */
     itkGetConstMacro(ChannelNr, int);
@@ -70,7 +70,7 @@ namespace mitk
 
     int m_SliceNr;
 
-    int m_TimeNr;
+    TimeStepType m_TimeNr;
 
     int m_ChannelNr;
   };

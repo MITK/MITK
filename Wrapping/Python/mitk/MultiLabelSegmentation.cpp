@@ -244,7 +244,7 @@ std::vector<std::string> ValidateConsistency(const MultiLabelSegmentation& seg)
     std::set<Label::PixelType> present;
     const Image* img = seg.GetGroupImage(g);
     const auto steps = img->GetTimeSteps();
-    for (unsigned int t = 0; t < steps; ++t)
+    for (TimeStepType t = 0; t < steps; ++t)
     {
       auto imageTimeStep = SelectImageByTimeStep(img, t);
       std::unique_ptr<ImageReadAccessor> acc;

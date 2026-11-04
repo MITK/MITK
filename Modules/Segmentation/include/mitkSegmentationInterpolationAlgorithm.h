@@ -81,7 +81,7 @@ namespace mitk
                                        unsigned int requestedIndex,
                                        unsigned int sliceDimension,
                                        Image::Pointer resultImage,
-                                       unsigned int timeStep = 0,
+                                       TimeStepType timeStep = 0,
                                        Image::ConstPointer referenceImage = nullptr) = 0;
   };
 

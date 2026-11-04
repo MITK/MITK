@@ -348,11 +348,11 @@ namespace mitk
     Image::RegionType outputRegion = outputImage->GetRequestedRegion();
     const TimeGeometry *outputTimeGeometry = outputImage->GetTimeGeometry();
     const TimeGeometry *inputTimeGeometry = inputImage->GetTimeGeometry();
-    ScalarType timeInMS;
+    TimePointType timeInMS;
 
-    int timestep = 0;
-    int tstart = outputRegion.GetIndex(3);
-    int tmax = tstart + outputRegion.GetSize(3);
+    TimeStepType timestep = 0;
+    const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+    const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
     for (unsigned int i = 1; i < this->GetNumberOfInputs(); ++i)
     {
@@ -366,8 +366,7 @@ namespace mitk
 
       // const PlaneGeometry *clippingGeometryOfCurrentTimeStep = nullptr;
 
-      int t;
-      for (t = tstart; t < tmax; ++t)
+      for (TimeStepType t = tstart; t < tmax; ++t)
       {
         timeInMS = outputTimeGeometry->TimeStepToTimePoint(t);
         timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);

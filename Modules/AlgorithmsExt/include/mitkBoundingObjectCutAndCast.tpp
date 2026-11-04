@@ -38,14 +38,14 @@ namespace mitk
   template <typename TInputPixelType, unsigned int VImageDimension, class TBoundingObjectCutAndCastType>
   void CutImageFixedOutputType(itk::Image<TInputPixelType, VImageDimension> *inputItkImage,
                                TBoundingObjectCutAndCastType *cutter,
-                               int boTimeStep)
+                               TimeStepType boTimeStep)
   {
     CutImageWithOutputTypeSelect<TInputPixelType, VImageDimension, typename TBoundingObjectCutAndCastType::PixelType>(
       inputItkImage, cutter, boTimeStep);
   }
 
   template <typename TPixel>
-  void BoundingObjectCutAndCast<TPixel>::ComputeData(mitk::Image *input3D, int boTimeStep)
+  void BoundingObjectCutAndCast<TPixel>::ComputeData(mitk::Image *input3D, TimeStepType boTimeStep)
   {
     AccessFixedDimensionByItk_2(input3D, CutImageFixedOutputType, 3, this, boTimeStep);
   }

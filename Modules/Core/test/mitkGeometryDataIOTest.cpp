@@ -202,7 +202,7 @@ public:
     // Set Time Geometry
     m_TimeGeometry->ClearAllGeometries(); // remove default filling from setUp();
 
-    for (int t = 0; t < 4; ++t)
+    for (mitk::TimeStepType t = 0; t < 4; ++t)
     {
       // add new time steps
       mitk::Geometry3D::Pointer timestepGeometry = mitk::Geometry3D::New();
@@ -211,7 +211,7 @@ public:
       {
         for (int j = 0; j != 4; ++j)
         {
-          vtk_matrix->SetElement(i, j, t + (i + j) / 8.0); // just insignificant values
+          vtk_matrix->SetElement(i, j, static_cast<double>(t) + (i + j) / 8.0); // just insignificant values
         }
       }
 

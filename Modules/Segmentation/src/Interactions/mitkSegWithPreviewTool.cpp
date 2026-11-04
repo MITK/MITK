@@ -356,7 +356,7 @@ const mitk::Image* mitk::SegWithPreviewTool::GetReferenceData() const
   return dynamic_cast<const Image*>(m_ReferenceDataNode->GetData());
 }
 
-void mitk::SegWithPreviewTool::ResetPreviewContentAtTimeStep(unsigned int timeStep)
+void mitk::SegWithPreviewTool::ResetPreviewContentAtTimeStep(TimeStepType timeStep)
 {
   auto previewImage = this->GetPreviewSegmentation();
   if (nullptr != previewImage)
@@ -679,7 +679,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview(std::optional
 
       if (m_CreateAllTimeSteps)
       {
-        for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
+        for (TimeStepType timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
           this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
         }

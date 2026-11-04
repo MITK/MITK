@@ -71,7 +71,7 @@ namespace ResetGeometryAction
     }
 
     renderWindowPart->SetSelectedPosition(currentPosition);
-    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(static_cast<unsigned int>(imageTimeStep));
   }
 } // namespace ResetGeometryAction
 

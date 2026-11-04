@@ -186,7 +186,7 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
 mitk::Point3D mitk::BoundingShapeInteractor::UpdateHandles(const InteractionEvent *interactionEvent)
 {
   GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
   const std::array<Point3D, 8> cornerPoints = GetCornerPoints(geometry, true);
@@ -226,7 +226,7 @@ bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent *inte
     return false;
 
   GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
   // calculates translation based on offset+extent not on the transformation matrix (because the cube is located in the
@@ -402,7 +402,7 @@ bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent *interactionEve
   m_Impl->LastPickedWorldPoint = m_Impl->InitialPickedWorldPoint;
 
   // scale drags apply absolute mouse offsets to the bounds captured at the press
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   m_Impl->InitialBounds = this->GetDataNode()->GetData()->GetGeometry(timeStep)->GetBounds();
 
   return true;
@@ -414,7 +414,7 @@ void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, Intera
   if (positionEvent == nullptr)
     return;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry =
     this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
   Point3D currentPickedPoint;
@@ -456,7 +456,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
     return;
 
   GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
   const Point3D currentPickedPoint = GetHandleDragWorldPoint(positionEvent, m_Impl->ActiveHandle.GetPosition());

@@ -86,7 +86,7 @@ namespace mitk
 
     ~SurfaceStampImageFilter() override;
 
-    void SurfaceStamp(int time = 0);
+    void SurfaceStamp(TimeStepType time = 0);
 
     template <typename TPixel>
     void SurfaceStampProcessing(itk::Image<TPixel, 3> *input, MeshType *mesh);

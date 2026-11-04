@@ -38,7 +38,7 @@ static void TestContourModel(mitk::ContourModel *contour, std::string fileName)
   bool sameControlPointFlags = true;
   bool sameClosedFlags = true;
 
-  for (unsigned int t = 0; t < contour->GetTimeSteps(); ++t)
+  for (mitk::TimeStepType t = 0; t < contour->GetTimeSteps(); ++t)
   {
     sameVertexCounts &= contour->GetNumberOfVertices(t) == contour2->GetNumberOfVertices(t);
     sameClosedFlags &= contour->IsClosed(t) == contour2->IsClosed(t);
@@ -97,20 +97,20 @@ static void TestContourModelIO_OneTimeStep()
 
 static void TestContourModelIO_MultipleTimeSteps()
 {
-  const unsigned int numberOfTimeSteps = 4;
+  const mitk::TimeStepType numberOfTimeSteps = 4;
   const unsigned int numberOfVertices = 5;
 
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
   contour->Expand(numberOfTimeSteps);
 
-  for (unsigned int t = 0; t < numberOfTimeSteps; ++t)
+  for (mitk::TimeStepType t = 0; t < numberOfTimeSteps; ++t)
   {
     for (unsigned int i = 0; i < numberOfVertices; ++i)
     {
       mitk::Point3D p;
-      p[0] = 10.0 * t + i;
+      p[0] = 10.0 * static_cast<double>(t) + i;
       p[1] = -1.0 * i;
-      p[2] = 2.0 * t;
+      p[2] = 2.0 * static_cast<double>(t);
 
       // Every third vertex is a control point, so a flag that is lost or read
       // under a name nobody writes does not pass unnoticed.

@@ -375,7 +375,7 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
     QmitkPlotWidget::DataVector means(numberOfSpectra);
     QmitkPlotWidget::DataVector stdevs(numberOfSpectra);
 
-    for (unsigned int index = 0; index < numberOfSpectra; ++index)
+    for (mitk::TimeStepType index = 0; index < numberOfSpectra; ++index)
     {
       means[index] =
         statistics->GetStatistics(1,index).GetValueConverted<mitk::ImageStatisticsContainer::RealType>(
@@ -503,11 +503,11 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension> *
 
     QmitkPlotWidget::DataVector values(numberOfSpectra);
 
-    for (std::size_t step = 0; step < numberOfSpectra; ++step)
+    for (mitk::TimeStepType step = 0; step < numberOfSpectra; ++step)
     {
       if (VImageDimension == 4)
       {
-        itkIndexTime[3] = step;
+        itkIndexTime[3] = static_cast<itk::IndexValueType>(step);
       }
 
       values[step] = image->GetPixel(itkIndexTime);
@@ -653,16 +653,16 @@ void QmitkCESTStatisticsView::CopyTimesteps(itk::Image<TPixel, VImageDimension> 
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   // typedef itk::PasteImageFilter<ImageType, ImageType>    PasteImageFilterType;
 
-  unsigned int numberOfTimesteps = image->GetLargestPossibleRegion().GetSize(3);
+  const mitk::TimeStepType numberOfTimesteps = image->GetLargestPossibleRegion().GetSize(3);
 
   typename ImageType::RegionType sourceRegion = image->GetLargestPossibleRegion();
   sourceRegion.SetSize(3, 1);
   typename ImageType::RegionType targetRegion = image->GetLargestPossibleRegion();
   targetRegion.SetSize(3, 1);
 
-  for (unsigned int timestep = 1; timestep < numberOfTimesteps; ++timestep)
+  for (mitk::TimeStepType timestep = 1; timestep < numberOfTimesteps; ++timestep)
   {
-    targetRegion.SetIndex(3, timestep);
+    targetRegion.SetIndex(3, static_cast<itk::IndexValueType>(timestep));
     itk::ImageRegionConstIterator<ImageType> sourceIterator(image, sourceRegion);
     itk::ImageRegionIterator<ImageType> targetIterator(image, targetRegion);
     while (!sourceIterator.IsAtEnd())

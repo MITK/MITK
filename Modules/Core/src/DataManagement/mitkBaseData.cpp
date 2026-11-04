@@ -41,7 +41,7 @@ mitk::BaseData::~BaseData()
 {
 }
 
-void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
+void mitk::BaseData::InitializeTimeGeometry(TimeStepType timeSteps)
 {
   mitk::Geometry3D::Pointer geo3D = mitk::Geometry3D::New();
   mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry *>(geo3D.GetPointer());
@@ -81,7 +81,7 @@ const mitk::TimeGeometry *mitk::BaseData::GetUpdatedTimeGeometry()
   return GetTimeGeometry();
 }
 
-void mitk::BaseData::Expand(unsigned int timeSteps)
+void mitk::BaseData::Expand(TimeStepType timeSteps)
 {
   if (m_TimeGeometry.IsNotNull())
   {
@@ -93,7 +93,7 @@ void mitk::BaseData::Expand(unsigned int timeSteps)
   }
 }
 
-const mitk::BaseGeometry *mitk::BaseData::GetUpdatedGeometry(int t)
+const mitk::BaseGeometry *mitk::BaseData::GetUpdatedGeometry(TimeStepType t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -130,15 +130,15 @@ void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry *geometry)
   SetTimeGeometry(clonedGeometry.GetPointer());
 }
 
-void mitk::BaseData::SetClonedGeometry(const BaseGeometry *aGeometry3D, unsigned int time)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry *aGeometry3D, TimeStepType timeStep)
 {
   if (m_TimeGeometry)
   {
-    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry *>(aGeometry3D->Clone().GetPointer()), time);
+    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry *>(aGeometry3D->Clone().GetPointer()), timeStep);
   }
 }
 
-bool mitk::BaseData::IsEmptyTimeStep(unsigned int) const
+bool mitk::BaseData::IsEmptyTimeStep(TimeStepType) const
 {
   return IsInitialized() == false;
 }
@@ -150,8 +150,8 @@ bool mitk::BaseData::IsEmpty() const
   const TimeGeometry *timeGeometry = const_cast<BaseData *>(this)->GetUpdatedTimeGeometry();
   if (timeGeometry == nullptr)
     return true;
-  unsigned int timeSteps = timeGeometry->CountTimeSteps();
-  for (unsigned int t = 0; t < timeSteps; ++t)
+  const TimeStepType timeSteps = timeGeometry->CountTimeSteps();
+  for (TimeStepType t = 0; t < timeSteps; ++t)
   {
     if (IsEmptyTimeStep(t) == false)
       return false;

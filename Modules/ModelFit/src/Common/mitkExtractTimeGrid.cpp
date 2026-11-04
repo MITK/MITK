@@ -27,7 +27,7 @@ mitk::ModelBase::TimeGridType mitk::ExtractTimeGrid(const TimeGeometry* geometry
   mitk::ModelBase::TimeGridType result;
   if (geometry)
   {
-    unsigned int i = 0;
+    mitk::TimeStepType i = 0;
     std::vector<double> tempGrid;
     while(geometry->IsValidTimeStep(i))
     {

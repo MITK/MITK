@@ -136,7 +136,8 @@ void QmitkMappingJob::run()
         errorValue.id = -1;
         errorValue.pointSpec = mitk::PTUNDEFINED;
         errorValue.selected = false;
-        spResultData = mitk::PointSetMappingHelper::map(inputSet, this->GetRegistration(), -1, false, errorValue);
+        spResultData = mitk::PointSetMappingHelper::map(
+          inputSet, this->GetRegistration(), mitk::TIMESTEP_INVALID, false, errorValue);
       }
       else if (inputSeg)
       {

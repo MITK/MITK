@@ -65,8 +65,8 @@ private:
   vtkSmartPointer<vtkSphereSource> m_SphereSource;
   const mitk::TimeGeometry *m_InputTimeGeometry;
 
-  int m_Time;
-  int m_Timestep;
+  mitk::TimePointType m_Time;
+  mitk::TimeStepType m_Timestep;
 
 public:
   void setUp() override
@@ -180,11 +180,11 @@ public:
   {
     double boundsMat[5][6];
 
-    for (int i = 0; i < 5; i++)
+    for (mitk::TimeStepType i = 0; i < 5; i++)
     {
       vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
-      sphereSource->SetRadius(1.0 * (i + 1.0));
+      sphereSource->SetRadius(1.0 * (static_cast<double>(i) + 1.0));
       sphereSource->SetThetaResolution(10);
       sphereSource->SetPhiResolution(10);
       sphereSource->Update();
@@ -197,7 +197,7 @@ public:
     m_Surface->SetRequestedRegionToLargestPossibleRegion();
 
     bool passed = true;
-    for (int i = 0; i < 5; i++)
+    for (mitk::TimeStepType i = 0; i < 5; i++)
     {
       mitk::BoundingBox::BoundsArrayType surfBounds =
         (const_cast<mitk::BoundingBox *>(m_Surface->GetTimeGeometry()->GetGeometryForTimeStep(i)->GetBoundingBox()))
@@ -237,18 +237,18 @@ public:
     m_Timestep = m_InputTimeGeometry->TimePointToTimeStep(m_Time);
     CPPUNIT_ASSERT_MESSAGE(
       "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again",
-      m_Time == m_Timestep);
+      m_Time == static_cast<mitk::TimePointType>(m_Timestep));
   }
 
   void SurfaceCopyWithGraft_Failure()
   {
     double boundsMat[5][6];
 
-    for (int i = 0; i < 5; i++)
+    for (mitk::TimeStepType i = 0; i < 5; i++)
     {
       vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
-      sphereSource->SetRadius(1.0 * (i + 1.0));
+      sphereSource->SetRadius(1.0 * (static_cast<double>(i) + 1.0));
       sphereSource->SetThetaResolution(10);
       sphereSource->SetPhiResolution(10);
       sphereSource->Update();
@@ -269,11 +269,11 @@ public:
   {
     double boundsMat[5][6];
 
-    for (int i = 0; i < 5; i++)
+    for (mitk::TimeStepType i = 0; i < 5; i++)
     {
       vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
-      sphereSource->SetRadius(1.0 * (i + 1.0));
+      sphereSource->SetRadius(1.0 * (static_cast<double>(i) + 1.0));
       sphereSource->SetThetaResolution(10);
       sphereSource->SetPhiResolution(10);
       sphereSource->Update();
@@ -285,7 +285,7 @@ public:
     m_Surface->UpdateOutputInformation();
     m_Surface->SetRequestedRegionToLargestPossibleRegion();
 
-    unsigned int numberoftimesteps = m_Surface->GetTimeSteps();
+    const mitk::TimeStepType numberoftimesteps = m_Surface->GetTimeSteps();
     mitk::Surface::Pointer dummy = mitk::Surface::New();
     dummy->Graft(m_Surface);
 

@@ -263,7 +263,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr(m_Controls->timeSliceNavigationWidget->GetPos());
+    timeSelector->SetTimeNr(static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
     timeSelector->Update();
     newImage = timeSelector->GetOutput();
   }

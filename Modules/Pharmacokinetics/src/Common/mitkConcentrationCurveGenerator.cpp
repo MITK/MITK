@@ -71,7 +71,7 @@ void mitk::ConcentrationCurveGenerator::Convert()
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(this->m_DynamicImage);
 
-    for(unsigned int i = 0; i< this->m_DynamicImage->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
     {
         imageTimeSelector->SetTimeNr(i);
         imageTimeSelector->UpdateLargestPossibleRegion();
@@ -155,7 +155,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typename TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
   size_input_aux[3] = m_BaselineEndTimeStep - m_BaselineStartTimeStep + 1;
   typename TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
-  start_input_aux[3] = m_BaselineStartTimeStep;
+  start_input_aux[3] = static_cast<itk::IndexValueType>(m_BaselineStartTimeStep);
   extractionRegion.SetSize(size_input_aux);
   extractionRegion.SetIndex(start_input_aux);
   ExtractFilter->SetExtractionRegion(extractionRegion);

@@ -73,7 +73,7 @@ public:
                              const std::string &referenceSegmentationImage,
                              const std::string &toolName,
                              const std::string &interactionPattern,
-                             unsigned int timestep = 0,
+                             mitk::TimeStepType timestep = 0,
                              const std::string &preSegmentationImagePath = std::string())
   {
     // Create test helper to initialize all necessary objects for interaction

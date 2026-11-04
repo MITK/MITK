@@ -97,7 +97,7 @@ void
   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(this->m_DynamicImage);
   std::vector<Image::Pointer> frameCache;
-  for (unsigned int i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
+  for (TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
     imageTimeSelector->SetTimeNr(i);
@@ -106,7 +106,7 @@ void
     Image::Pointer frameMITKImage = imageTimeSelector->GetOutput();
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
-    fitFilter->SetInput(i,frameImage);
+    fitFilter->SetInput(static_cast<unsigned int>(i), frameImage);
   }
 
   ModelBaseType::TimeGridType timeGrid = ExtractTimeGrid(m_DynamicImage);

@@ -70,11 +70,11 @@ namespace mitk
     void SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                         const mitk::ContourModel::VertexType *nextPoint,
                                         const mitk::ContourModel::VertexType *previousPoint,
-                                        int timestep);
+                                        mitk::TimeStepType timestep);
     /// \brief Set repulsive points which should not be changed during editing of the contour.
     void SetRepulsivePoints(const mitk::ContourModel::VertexType *nextPoint,
                             mitk::ContourModel *contour,
-                            int timestep);
+                            mitk::TimeStepType timestep);
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingSlice;

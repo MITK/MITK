@@ -192,7 +192,7 @@ namespace mitk
      * \param[in] timeSteps The desired number of time steps.
      * \sa TimeGeometry::Expand
      */
-    virtual void Expand(unsigned int timeSteps);
+    virtual void Expand(TimeStepType timeSteps);
 
     /**
      * \brief Return the BaseGeometry of the data at time step \a t after ensuring it is up-to-date.
@@ -207,7 +207,7 @@ namespace mitk
      * \sa GetGeometry, GetUpdatedTimeGeometry
      * \todo Appropriate setting of the update extent is missing.
      */
-    const mitk::BaseGeometry *GetUpdatedGeometry(int t = 0);
+    const mitk::BaseGeometry *GetUpdatedGeometry(TimeStepType t = 0);
 
     /**
      * \brief Return the BaseGeometry of the data at time step \a t as a non-const pointer.
@@ -221,7 +221,7 @@ namespace mitk
      * \return Pointer to the BaseGeometry, or nullptr if the TimeGeometry is not set.
      * \sa GetUpdatedGeometry, GetTimeGeometry
      */
-    mitk::BaseGeometry *GetGeometry(int t = 0) const
+    mitk::BaseGeometry *GetGeometry(TimeStepType t = 0) const
     {
       if (m_TimeGeometry.IsNull())
         return nullptr;
@@ -338,7 +338,7 @@ namespace mitk
      * \param[in] t The time step to check.
      * \return True if the data is empty at time step \a t.
      */
-    virtual bool IsEmptyTimeStep(unsigned int t) const;
+    virtual bool IsEmptyTimeStep(TimeStepType t) const;
 
     /**
      * \brief Check whether the object contains data at any time step.
@@ -441,11 +441,11 @@ namespace mitk
      * \brief Set a clone of the provided geometry as the BaseGeometry of a given time step.
      *
      * \param[in] aGeometry3D The geometry to clone.
-     * \param[in] time The time step at which to set the cloned geometry.
+     * \param[in] timeStep The time step at which to set the cloned geometry.
      * \pre The TimeGeometry must already be set.
      * \sa SetGeometry
      */
-    virtual void SetClonedGeometry(const BaseGeometry *aGeometry3D, unsigned int time);
+    virtual void SetClonedGeometry(const BaseGeometry *aGeometry3D, TimeStepType timeStep);
 
     /**
      * \brief Get the data's property list.
@@ -520,7 +520,7 @@ namespace mitk
      *
      * \return The number of time steps.
      */
-    unsigned int GetTimeSteps() const { return m_TimeGeometry->CountTimeSteps(); }
+    TimeStepType GetTimeSteps() const { return m_TimeGeometry->CountTimeSteps(); }
 
     /**
      * \brief Get the modification time of this data object or its geometry,
@@ -548,7 +548,7 @@ namespace mitk
     //## \brief Initialize the TimeGeometry for a number of time steps.
     //## The TimeGeometry is initialized empty and evenly timed.
     //## In many cases it will be necessary to overwrite this in sub-classes.
-    virtual void InitializeTimeGeometry(unsigned int timeSteps = 1);
+    virtual void InitializeTimeGeometry(TimeStepType timeSteps = 1);
 
     //##Documentation
     //## @brief reset to non-initialized state, release memory

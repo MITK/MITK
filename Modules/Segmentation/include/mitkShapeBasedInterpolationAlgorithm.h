@@ -60,7 +60,7 @@ namespace mitk
                                  unsigned int requestedIndex,
                                  unsigned int sliceDimension,
                                  Image::Pointer resultImage,
-                                 unsigned int timeStep,
+                                 TimeStepType timeStep,
                                  Image::ConstPointer referenceImage) override;
 
   private:

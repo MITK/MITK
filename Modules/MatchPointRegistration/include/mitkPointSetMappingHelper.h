@@ -49,24 +49,27 @@ namespace mitk
      *
      * \param[in] input Point set that should be mapped.
      * \param[in] registration Pointer to the MatchPoint registration to use.
-     * \param[in] timeStep The time step to map (-1 maps all time steps, default). Other time steps are copied unmodified.
+     * \param[in] timeStep The time step to map (TIMESTEP_INVALID, the default, maps all time steps).
+     *            Other time steps are copied unmodified.
      * \param[in] throwOnMappingError If true, throws an exception when a point cannot be mapped.
      *            If false, unmappable points are transferred without mapping and tagged with \p errorPointValue.
      * \param[in] errorPointValue Point data value assigned to unmappable points (when not throwing).
      * \return Smart pointer to the resulting mapped point set.
      * \pre \p input must be valid.
      * \pre \p registration must be valid.
-     * \pre \p timeStep must be a valid time step of \p input or -1.
+     * \pre \p timeStep must be a valid time step of \p input or TIMESTEP_INVALID.
      * \pre Dimensionality of the registration must match the point set (3D).
      */
-    MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const RegistrationType* registration, int timeStep = -1,
+    MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const RegistrationType* registration,
+      ::mitk::TimeStepType timeStep = ::mitk::TIMESTEP_INVALID,
       bool throwOnMappingError = true, const ::mitk::PointSet::PointDataType& errorPointValue = ::mitk::PointSet::PointDataType());
 
     /**
      * \brief Maps a given input point set using a MITK registration wrapper.
      * \overload
      */
-    MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const MITKRegistrationType* registration, int timeStep = -1,
+    MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const MITKRegistrationType* registration,
+      ::mitk::TimeStepType timeStep = ::mitk::TIMESTEP_INVALID,
       bool throwOnMappingError = true, const ::mitk::PointSet::PointDataType& errorPointValue = ::mitk::PointSet::PointDataType());
   }
 

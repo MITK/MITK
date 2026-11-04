@@ -410,9 +410,9 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
 void RenderingController::HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const
 {
   TimeStepType timestep = 0;
-  double timepointMs = 0.0;
-  double minTimepointMs = 0.0;
-  double maxTimepointMs = 0.0;
+  TimePointType timepointMs = 0.0;
+  TimePointType minTimepointMs = 0.0;
+  TimePointType maxTimepointMs = 0.0;
   TimeStepType steps = 0;
 
   bool tncNull = false;
@@ -547,7 +547,7 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
     }
     else
     {
-      const double tp = body["timepoint_ms"].get<double>();
+      const TimePointType tp = body["timepoint_ms"].get<double>();
       computeStep = [tp](TimeNavigationController* tnc)
       {
         const auto tg = tnc->GetInputWorldTimeGeometry();
@@ -575,7 +575,7 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
     // "out of range [0, 0)" wording.
     bool noTimeGeometry = false;
     TimeStepType resolvedStep = 0;
-    unsigned int totalSteps = 0;
+    TimeStepType totalSteps = 0;
     this->Dispatch([&computeStep, &tncNull, &stepperNull,
                     &stepOutOfRange, &noTimeGeometry, &resolvedStep, &totalSteps]()
     {

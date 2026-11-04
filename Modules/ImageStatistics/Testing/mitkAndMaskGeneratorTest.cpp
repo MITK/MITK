@@ -72,7 +72,7 @@ namespace
     return size;
   }
 
-  itk::Size<4> MakeSize(unsigned int x, unsigned int y, unsigned int z, unsigned int t)
+  itk::Size<4> MakeSize(unsigned int x, unsigned int y, unsigned int z, mitk::TimeStepType t)
   {
     itk::Size<4> size;
     size[0] = x;

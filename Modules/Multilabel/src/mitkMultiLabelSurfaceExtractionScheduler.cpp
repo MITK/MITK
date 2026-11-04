@@ -123,7 +123,7 @@ namespace
 
     Pins pins;
     pins.m_Image = groupImage;
-    pins.m_Volume = groupImage->GetVolumeData(static_cast<int>(timeStep));
+    pins.m_Volume = groupImage->GetVolumeData(timeStep);
 
     if (pins.m_Volume.IsNotNull())
       pins.m_View = pins.m_Volume->CreateVtkImageDataView(groupImage);

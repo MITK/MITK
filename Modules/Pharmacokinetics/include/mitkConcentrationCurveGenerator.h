@@ -118,15 +118,15 @@ public:
 
     /** \brief Sets the first time step index included in baseline averaging (0-based).
      *  \param[in] _arg The start time step index. */
-    itkSetMacro(BaselineStartTimeStep, unsigned int);
+    itkSetMacro(BaselineStartTimeStep, TimeStepType);
     /** \brief Returns the baseline start time step index. */
-    itkGetConstReferenceMacro(BaselineStartTimeStep, unsigned int);
+    itkGetConstReferenceMacro(BaselineStartTimeStep, TimeStepType);
 
     /** \brief Sets the last time step index included in baseline averaging.
      *  \param[in] _arg The end time step index. */
-    itkSetMacro(BaselineEndTimeStep, unsigned int);
+    itkSetMacro(BaselineEndTimeStep, TimeStepType);
     /** \brief Returns the baseline end time step index. */
-    itkGetConstReferenceMacro(BaselineEndTimeStep, unsigned int);
+    itkGetConstReferenceMacro(BaselineEndTimeStep, TimeStepType);
 
     /** \brief Sets whether the input is a TurboFLASH sequence.
      *  \param[in] _arg True if TurboFLASH conversion should be used. */
@@ -221,9 +221,9 @@ private:
     double m_T2EchoTime;
     // The baseline image is averaged from the signal within time step range [m_BaselineStartTimeStep, m_BaselineEndTimeStep].
     // m_BaselineStartTimeStep is the first time frame, that is included into the baseline averaging (starting with 0).
-    unsigned int m_BaselineStartTimeStep;
+    TimeStepType m_BaselineStartTimeStep;
     // m_BaselinStopTimeStep is the last time frame, that is included into the baseline averaging.
-    unsigned int m_BaselineEndTimeStep;
+    TimeStepType m_BaselineEndTimeStep;
 };
 
 }

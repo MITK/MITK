@@ -62,7 +62,7 @@ void mitk::VolumeCalculator::ComputeVolume()
   {
     m_TimeSelector->SetInput(m_Image);
     m_Volumes.resize(m_Image->GetDimension(3));
-    for (unsigned int timeStep = 0; timeStep < m_Image->GetDimension(3); ++timeStep)
+    for (TimeStepType timeStep = 0; timeStep < m_Image->GetDimension(3); ++timeStep)
     {
       m_TimeSelector->SetTimeNr(timeStep);
       m_TimeSelector->Update();
@@ -91,7 +91,7 @@ void mitk::VolumeCalculator::ComputeVolumeFromImageStatistics()
     m_Volumes.resize(m_Image->GetDimension(3), 0);
     Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
 
-    for (unsigned int t = 0; t < m_Image->GetDimension(3); ++t)
+    for (TimeStepType t = 0; t < m_Image->GetDimension(3); ++t)
     {
       m_Volumes[t] =
         m_Image->GetStatistics()->GetCountOfMaxValuedVoxels(t) / 1000.0 * spacing[0] * spacing[1] * spacing[2];

@@ -103,7 +103,7 @@ void mitk::FeedbackContourTool::InitializeFeedbackContour(bool isClosed)
     contourTimeGeometry->ReplaceTimeStepGeometries(m_FeedbackContour->GetGeometry());
     m_FeedbackContour->SetTimeGeometry(contourTimeGeometry);
 
-    for (unsigned int t = 0; t < m_FeedbackContour->GetTimeSteps(); ++t)
+    for (TimeStepType t = 0; t < m_FeedbackContour->GetTimeSteps(); ++t)
     {
       m_FeedbackContour->SetClosed(isClosed, t);
     }

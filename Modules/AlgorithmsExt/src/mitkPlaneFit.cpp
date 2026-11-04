@@ -69,8 +69,7 @@ void mitk::PlaneFit::GenerateOutputInformation()
 
 void mitk::PlaneFit::GenerateData()
 {
-  unsigned int t;
-  for (t = 0; t < m_PointSet->GetPointSetSeriesSize(); ++t)
+  for (TimeStepType t = 0; t < m_PointSet->GetPointSetSeriesSize(); ++t)
   {
     // check number of data points - less then 3points isn't enough
     if (m_PointSet->GetSize(t) >= 3)
@@ -90,14 +89,13 @@ void mitk::PlaneFit::SetInput(const mitk::PointSet *pointSet)
   this->ProcessObject::SetNthInput(0, const_cast<mitk::PointSet *>(pointSet));
 
   m_PointSet = pointSet;
-  unsigned int pointSetSize = pointSet->GetPointSetSeriesSize();
+  const TimeStepType pointSetSize = pointSet->GetPointSetSeriesSize();
 
   m_Planes.resize(pointSetSize);
   m_Centroids.resize(pointSetSize);
   m_PlaneVectors.resize(pointSetSize);
 
-  unsigned int t;
-  for (t = 0; t < pointSetSize; ++t)
+  for (TimeStepType t = 0; t < pointSetSize; ++t)
   {
     m_Planes[t] = mitk::PlaneGeometry::New();
   }
@@ -113,7 +111,7 @@ const mitk::PointSet *mitk::PlaneFit::GetInput()
   return static_cast<const mitk::PointSet *>(this->ProcessObject::GetInput(0));
 }
 
-void mitk::PlaneFit::CalculateCentroid(int t)
+void mitk::PlaneFit::CalculateCentroid(TimeStepType t)
 {
   if (m_PointSet == nullptr)
     return;
@@ -136,7 +134,7 @@ void mitk::PlaneFit::CalculateCentroid(int t)
   m_Centroids[t][2] /= ps_total;
 }
 
-void mitk::PlaneFit::ProcessPointSet(int t)
+void mitk::PlaneFit::ProcessPointSet(TimeStepType t)
 {
   if (m_PointSet == nullptr)
     return;
@@ -171,22 +169,22 @@ void mitk::PlaneFit::ProcessPointSet(int t)
   m_PlaneVectors[t][2] = v[2];
 }
 
-mitk::PlaneGeometry::Pointer mitk::PlaneFit::GetPlaneGeometry(int t)
+mitk::PlaneGeometry::Pointer mitk::PlaneFit::GetPlaneGeometry(TimeStepType t)
 {
   return m_Planes[t];
 }
 
-const mitk::Vector3D &mitk::PlaneFit::GetPlaneNormal(int t) const
+const mitk::Vector3D &mitk::PlaneFit::GetPlaneNormal(TimeStepType t) const
 {
   return m_PlaneVectors[t];
 }
 
-const mitk::Point3D &mitk::PlaneFit::GetCentroid(int t) const
+const mitk::Point3D &mitk::PlaneFit::GetCentroid(TimeStepType t) const
 {
   return m_Centroids[t];
 }
 
-void mitk::PlaneFit::InitializePlane(int t)
+void mitk::PlaneFit::InitializePlane(TimeStepType t)
 {
   m_Planes[t]->InitializePlane(m_Centroids[t], m_PlaneVectors[t]);
 }

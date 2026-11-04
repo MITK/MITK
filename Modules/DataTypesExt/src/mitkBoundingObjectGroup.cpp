@@ -173,7 +173,7 @@ bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
   return m_Counter > 0;
 }
 
-mitk::BaseGeometry *mitk::BoundingObjectGroup::GetGeometry(int t) const
+mitk::BaseGeometry *mitk::BoundingObjectGroup::GetGeometry(TimeStepType t) const
 {
   // if ( m_BoundingObjects == nullptr )
   return Superclass::GetGeometry(t);

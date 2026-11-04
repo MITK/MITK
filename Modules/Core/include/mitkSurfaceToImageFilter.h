@@ -105,7 +105,7 @@ namespace mitk
      *
      * \param[in] time the time step to process.
      */
-    void Stencil3DImage(int time = 0);
+    void Stencil3DImage(TimeStepType time = 0);
 
     bool m_MakeOutputBinary;
     bool m_UShortBinaryPixelType;

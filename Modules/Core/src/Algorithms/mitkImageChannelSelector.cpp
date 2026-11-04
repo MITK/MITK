@@ -38,6 +38,7 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 void mitk::ImageChannelSelector::GenerateData()
 {
   const Image::RegionType &requestedRegion = GetOutput()->GetRequestedRegion();
+  const auto timeStep = static_cast<TimeStepType>(requestedRegion.GetIndex(3));
 
   // do we really need the complete channel?
   if (requestedRegion.GetSize(3) > 1)
@@ -45,12 +46,12 @@ void mitk::ImageChannelSelector::GenerateData()
   else
     // or only a complete volume at a time?
     if (requestedRegion.GetSize(2) > 1)
-    SetVolumeItem(GetVolumeData(requestedRegion.GetIndex(3), m_ChannelNr), requestedRegion.GetIndex(3), 0);
+    SetVolumeItem(GetVolumeData(timeStep, m_ChannelNr), timeStep, 0);
   else
     // not even a complete volume, so now take just a slice!
-    SetSliceItem(GetSliceData(requestedRegion.GetIndex(2), requestedRegion.GetIndex(3), m_ChannelNr),
+    SetSliceItem(GetSliceData(requestedRegion.GetIndex(2), timeStep, m_ChannelNr),
                  requestedRegion.GetIndex(2),
-                 requestedRegion.GetIndex(3),
+                 timeStep,
                  0);
 }
 

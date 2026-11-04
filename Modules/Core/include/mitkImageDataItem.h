@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <MitkCoreExports.h>
 #include <mitkImageDescriptor.h>
+#include <mitkTimeGeometry.h>
 
 #include <vtkSmartPointer.h>
 
@@ -80,7 +81,7 @@ namespace mitk
      */
     ImageDataItem(const ImageDataItem &aParent,
                   const mitk::ImageDescriptor::Pointer desc,
-                  int timestep,
+                  TimeStepType timestep,
                   unsigned int dimension,
                   void *data = nullptr,
                   bool manageMemory = false,
@@ -95,11 +96,12 @@ namespace mitk
      * Allocates a new data buffer if \p data is nullptr.
      *
      * \param[in] desc          Image descriptor providing pixel type and dimensions.
-     * \param[in] timestep      Time step index associated with this item.
+     * \param[in] timestep      Time step index associated with this item, or
+     *                          TIMESTEP_INVALID for an item covering all time steps.
      * \param[in] data          Optional external data buffer.
      * \param[in] manageMemory  If true, the provided buffer will be deleted on destruction.
      */
-    ImageDataItem(const mitk::ImageDescriptor::Pointer desc, int timestep, void *data, bool manageMemory);
+    ImageDataItem(const mitk::ImageDescriptor::Pointer desc, TimeStepType timestep, void *data, bool manageMemory);
 
     /**
      * \brief Construct a data item from explicit pixel type and dimension information.
@@ -114,7 +116,7 @@ namespace mitk
      * \param[in] manageMemory  If true, the provided buffer will be deleted on destruction.
      */
     ImageDataItem(const mitk::PixelType &type,
-                  int timestep,
+                  TimeStepType timestep,
                   unsigned int dimension,
                   unsigned int *dimensions,
                   void *data,
@@ -151,7 +153,7 @@ namespace mitk
      * \brief Set the time step index for this data item.
      * \param[in] t The time step index.
      */
-    void SetTimestep(int t) { m_Timestep = t; }
+    void SetTimestep(TimeStepType t) { m_Timestep = t; }
 
     /**
      * \brief Set whether this item owns (and will delete) its data buffer.
@@ -279,7 +281,7 @@ namespace mitk
 
     unsigned int m_Dimensions[MAX_IMAGE_DIMENSIONS];
 
-    int m_Timestep;
+    TimeStepType m_Timestep;
   };
 
 } // namespace mitk

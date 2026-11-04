@@ -311,11 +311,11 @@ private:
     of time steps the respective image has. This structure makes the business logic
     to select the correct image given a QIndex much simpler and therefore easy to
     understand/maintain. */
-    std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int> > m_TimeStepResolvedImageNodes;
+    std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> m_TimeStepResolvedImageNodes;
     /** relevant masks set by the user.*/
     std::vector<mitk::DataNode::ConstPointer> m_MaskNodes;
     /** @sa m_TimeStepResolvedImageNodes */
-    std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> m_TimeStepResolvedMaskNodes;
+    std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
     /** True once m_StatisticNames stem from complete statistics of the current inputs. Computing
     them again, e.g. after an edit of the mask, does not change which statistics they have, so the

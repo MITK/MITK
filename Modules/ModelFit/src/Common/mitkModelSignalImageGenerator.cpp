@@ -176,9 +176,9 @@ void mitk::ModelSignalImageGenerator::Generate()
 
     auto nrOfOutputs = filter->GetNumberOfOutputs();
     auto grid = generationFunctor->GetGrid();
-    for (unsigned int i = 0; i<nrOfOutputs; ++i)
+    for (mitk::TimeStepType i = 0; i < nrOfOutputs; ++i)
     {
-      mitk::Image::Pointer frame = mitk::ImportItkImage(filter->GetOutput(i))->Clone();
+      mitk::Image::Pointer frame = mitk::ImportItkImage(filter->GetOutput(static_cast<unsigned int>(i)))->Clone();
       mitk::ImageReadAccessor accessor(frame);
       dynamicImage->SetVolume(accessor.GetData(), i);
 

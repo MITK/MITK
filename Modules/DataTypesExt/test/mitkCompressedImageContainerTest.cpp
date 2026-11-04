@@ -74,13 +74,13 @@ public:
       }
     }
 
-    unsigned int numberOfTimeSteps(1);
+    mitk::TimeStepType numberOfTimeSteps(1);
     if (image->GetDimension() > 3)
     {
       numberOfTimeSteps = image->GetDimension(3);
     }
 
-    for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep)
     {
       mitk::ImageReadAccessor origImgAcc(image, image->GetVolumeData(timeStep));
       mitk::ImageReadAccessor unCompImgAcc(uncompressedImage, uncompressedImage->GetVolumeData(timeStep));

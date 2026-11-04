@@ -326,12 +326,14 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::TimeResolvedSurfac
   mitk::Surface::Pointer surface = mitk::Surface::New();
   surface->Expand(3);
 
-  for (unsigned int timeStep = 0; timeStep < 3; ++timeStep)
+  for (mitk::TimeStepType timeStep = 0; timeStep < 3; ++timeStep)
   {
+    const auto x = static_cast<double>(timeStep);
+
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    points->InsertNextPoint(timeStep, 0.0, 0.0);
-    points->InsertNextPoint(timeStep + 1.0, 0.0, 0.0);
-    points->InsertNextPoint(timeStep, 1.0, 0.0);
+    points->InsertNextPoint(x, 0.0, 0.0);
+    points->InsertNextPoint(x + 1.0, 0.0, 0.0);
+    points->InsertNextPoint(x, 1.0, 0.0);
 
     vtkSmartPointer<vtkPolygon> triangle = vtkSmartPointer<vtkPolygon>::New();
     triangle->GetPointIds()->SetNumberOfIds(3);

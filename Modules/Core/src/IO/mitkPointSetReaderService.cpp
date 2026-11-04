@@ -66,7 +66,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
              currentTimeSeries != nullptr;
              currentTimeSeries = currentTimeSeries->NextSiblingElement())
         {
-          unsigned int currentTimeStep(0);
+          mitk::TimeStepType currentTimeStep(0);
           auto *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
 
           currentTimeStep = atoi(currentTimeSeriesID->GetText());
@@ -114,7 +114,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
 
 mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::Pointer newPointSet,
                                                                 tinyxml2::XMLElement *currentTimeSeries,
-                                                                unsigned int currentTimeStep)
+                                                                mitk::TimeStepType currentTimeStep)
 {
   if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {

@@ -138,7 +138,7 @@ mitk::ThreeDnTDICOMSeriesReader
 
   SortingBlockList non3DnTBlocks;
   SortingBlockList true3DnTBlocks;
-  std::vector<unsigned int> true3DnTBlocksTimeStepCount;
+  std::vector<TimeStepType> true3DnTBlocksTimeStepCount;
 
   // we should describe our need for this tag as needed via a function
   // (however, we currently know that the superclass will always need this tag)
@@ -151,7 +151,7 @@ mitk::ThreeDnTDICOMSeriesReader
     DICOMDatasetAccessingImageFrameList current3DnTBlock = std::move( remainingBlocks.front().first );
     auto currentSplitReason = remainingBlocks.front().second;
 
-    int current3DnTBlockNumberOfTimeSteps = 1;
+    TimeStepType current3DnTBlockNumberOfTimeSteps = 1;
 
     // get block characteristics of first block
     const unsigned int currentBlockNumberOfSlices = current3DnTBlock.size();
@@ -250,7 +250,7 @@ mitk::ThreeDnTDICOMSeriesReader
     }
 
     block.SetFlag("3D+t", true);
-    block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);
+    block.SetIntProperty("timesteps", static_cast<int>(true3DnTBlocksTimeStepCount[o]));
     MITK_DEBUG << "Found " << true3DnTBlocksTimeStepCount[o] << " timesteps";
 
     this->SetOutput( o, block );
@@ -292,7 +292,7 @@ mitk::ThreeDnTDICOMSeriesReader
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
   const bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
-  const int numberOfTimesteps = block.GetNumberOfTimeSteps();
+  const TimeStepType numberOfTimesteps = block.GetNumberOfTimeSteps();
 
   if (numberOfTimesteps == 1)
   {
@@ -302,12 +302,12 @@ mitk::ThreeDnTDICOMSeriesReader
   const int numberOfFramesPerTimestep = block.GetNumberOfFramesPerTimeStep();
 
   ITKDICOMSeriesReaderHelper::StringContainerList filenamesPerTimestep;
-  for (int timeStep = 0; timeStep<numberOfTimesteps; ++timeStep)
+  for (TimeStepType timeStep = 0; timeStep < numberOfTimesteps; ++timeStep)
   {
     // use numberOfFramesPerTimestep frames for a new item in filenamesPerTimestep
     ITKDICOMSeriesReaderHelper::StringContainer filenamesOfThisTimeStep;
-    auto timeStepStart = frames.cbegin() + timeStep * numberOfFramesPerTimestep;
-    auto timeStepEnd   = frames.cbegin() + (timeStep+1) * numberOfFramesPerTimestep;
+    auto timeStepStart = frames.cbegin() + static_cast<std::ptrdiff_t>(timeStep) * numberOfFramesPerTimestep;
+    auto timeStepEnd   = frames.cbegin() + static_cast<std::ptrdiff_t>(timeStep + 1) * numberOfFramesPerTimestep;
     for (auto frameIter = timeStepStart;
         frameIter != timeStepEnd;
         ++frameIter)

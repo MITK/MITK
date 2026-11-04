@@ -139,7 +139,7 @@ namespace mitk
     /** Returns a const reference to the pixel at given world coordinate - works only with four-dimensional
      * ImageAccessor
      */
-    const TPixel &GetPixelByWorldCoordinates(mitk::Point3D position, unsigned int timestep)
+    const TPixel &GetPixelByWorldCoordinates(mitk::Point3D position, mitk::TimeStepType timestep)
     {
       itk::Index<3> itkIndex;
       m_ReadAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
@@ -151,7 +151,7 @@ namespace mitk
       for (int i = 0; i < 3; ++i)
         itk4Index[i] = itkIndex[i];
 
-      itk4Index[3] = timestep;
+      itk4Index[3] = static_cast<itk::IndexValueType>(timestep);
       return GetPixelByIndex(itk4Index);
     }
 

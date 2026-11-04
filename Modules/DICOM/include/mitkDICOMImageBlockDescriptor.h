@@ -42,7 +42,7 @@ namespace mitk
    */
   struct DICOMCachedValueInfo
   {
-    unsigned int TimePoint;       ///< The time point index this value belongs to.
+    TimeStepType TimePoint;       ///< The time point index this value belongs to.
     unsigned int SliceInTimePoint; ///< The slice index within the time point.
     std::string Value;            ///< The cached tag value as a string.
   };
@@ -188,7 +188,7 @@ namespace mitk
      * \brief Convenience method that returns the number of time steps.
      * \return The number of time steps, or 1 if not a 3D+t image.
      */
-    int GetNumberOfTimeSteps() const;
+    TimeStepType GetNumberOfTimeSteps() const;
 
     /**
      * \brief Return the number of frames that constitute one time step.

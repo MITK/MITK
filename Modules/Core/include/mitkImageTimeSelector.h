@@ -42,9 +42,9 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** \brief Get the time step number to extract. */
-    itkGetConstMacro(TimeNr, int);
+    itkGetConstMacro(TimeNr, TimeStepType);
     /** \brief Set the time step number to extract. */
-    itkSetMacro(TimeNr, int);
+    itkSetMacro(TimeNr, TimeStepType);
 
     /** \brief Get the channel number to extract. */
     itkGetConstMacro(ChannelNr, int);
@@ -65,7 +65,7 @@ namespace mitk
     /** \brief Extract the selected volume data from the input image. */
     void GenerateData() override;
 
-    int m_TimeNr;
+    TimeStepType m_TimeNr;
 
     int m_ChannelNr;
   };
@@ -84,7 +84,7 @@ namespace mitk
    *
    * \sa ImageTimeSelector
    */
-  MITKCORE_EXPORT Image::ConstPointer SelectImageByTimeStep(const Image* image, unsigned int timestep);
+  MITKCORE_EXPORT Image::ConstPointer SelectImageByTimeStep(const Image* image, TimeStepType timestep);
 
   /**
    * \brief Non-const version of SelectImageByTimeStep.
@@ -95,7 +95,7 @@ namespace mitk
    *
    * \sa ImageTimeSelector
    */
-  MITKCORE_EXPORT Image::Pointer SelectImageByTimeStep(Image* image, unsigned int timestep);
+  MITKCORE_EXPORT Image::Pointer SelectImageByTimeStep(Image* image, TimeStepType timestep);
 
   /**
    * \brief Convenience helper to extract a single time step from a 4D image by time point.

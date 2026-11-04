@@ -251,14 +251,14 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 //  return GetSlicedGeometry(t)->GetPlaneGeometry(s);
 //}
 //
-mitk::SlicedGeometry3D *mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
+mitk::SlicedGeometry3D *mitk::SlicedData::GetSlicedGeometry(TimeStepType t) const
 {
   if (GetTimeGeometry() == nullptr)
     return nullptr;
   return dynamic_cast<SlicedGeometry3D *>(GetTimeGeometry()->GetGeometryForTimeStep(t).GetPointer());
 }
 
-const mitk::SlicedGeometry3D *mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)
+const mitk::SlicedGeometry3D *mitk::SlicedData::GetUpdatedSlicedGeometry(TimeStepType t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -317,9 +317,9 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D &origin)
 
   mitk::SlicedGeometry3D *slicedGeometry;
 
-  unsigned int steps = timeGeometry->CountTimeSteps();
+  const TimeStepType steps = timeGeometry->CountTimeSteps();
 
-  for (unsigned int timestep = 0; timestep < steps; ++timestep)
+  for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
     slicedGeometry = GetSlicedGeometry(timestep);
     if (slicedGeometry != nullptr)
@@ -347,9 +347,9 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 
   assert(timeGeometry != nullptr);
 
-  unsigned int steps = timeGeometry->CountTimeSteps();
+  const TimeStepType steps = timeGeometry->CountTimeSteps();
 
-  for (unsigned int timestep = 0; timestep < steps; ++timestep)
+  for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
     mitk::SlicedGeometry3D *slicedGeometry = GetSlicedGeometry(timestep);
     if (slicedGeometry != nullptr)

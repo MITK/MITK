@@ -82,13 +82,12 @@ void mitk::SurfaceStampImageFilter::GenerateData()
 
   mitk::Image::RegionType outputRegion = outputImage->GetRequestedRegion();
 
-  int tstart = outputRegion.GetIndex(3);
-  int tmax = tstart + outputRegion.GetSize(3);
+  const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+  const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
   if (tmax > 0)
   {
-    int t;
-    for (t = tstart; t < tmax; ++t)
+    for (TimeStepType t = tstart; t < tmax; ++t)
     {
       this->SurfaceStamp(t);
     }
@@ -99,7 +98,7 @@ void mitk::SurfaceStampImageFilter::GenerateData()
   }
 }
 
-void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
+void mitk::SurfaceStampImageFilter::SurfaceStamp(TimeStepType time)
 {
   mitk::Image::Pointer inputImage = this->GetInput();
 

@@ -97,9 +97,9 @@ tinyxml2::XMLElement *mitk::PointSetWriterService::ToXML(tinyxml2::XMLDocument& 
   // (e.g. using attributes instead of tags for x/y/z). The current format is
   // kept to be compatible with the previous writer.
   auto *pointSetElement = doc.NewElement(XML_POINT_SET.c_str());
-  unsigned int timecount = pointSet->GetTimeSteps();
+  const TimeStepType timecount = pointSet->GetTimeSteps();
 
-  for (unsigned int i = 0; i < timecount; i++)
+  for (TimeStepType i = 0; i < timecount; i++)
   {
     auto *timeSeriesElement = doc.NewElement(XML_TIME_SERIES.c_str());
     pointSetElement->InsertEndChild(timeSeriesElement);

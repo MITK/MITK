@@ -50,7 +50,7 @@ found in the LICENSE file.
     if (m_LowerBoundaryTimestep > m_UpperBoundaryTimestep) {
       mitkThrow() << "lower timestep is larger than upper timestep.";
     }
-    if (m_UpperBoundaryTimestep == std::numeric_limits<unsigned int>::max()) {
+    if (m_UpperBoundaryTimestep == std::numeric_limits<TimeStepType>::max()) {
       m_UpperBoundaryTimestep = input->GetTimeSteps();
     }
     else if (m_UpperBoundaryTimestep > input->GetTimeSteps()) {
@@ -65,7 +65,7 @@ found in the LICENSE file.
     if (dimension > 3)
       memcpy(dimensions + 3, input->GetDimensions() + 3, (dimension - 3) * sizeof(unsigned int));
 
-    dimensions[3] = m_UpperBoundaryTimestep - m_LowerBoundaryTimestep;
+    dimensions[3] = static_cast<unsigned int>(m_UpperBoundaryTimestep - m_LowerBoundaryTimestep);
 
     // create basic slicedGeometry that will be initialized below
     output->Initialize(mitk::PixelType(input->GetPixelType()), dimension, dimensions);
@@ -81,18 +81,18 @@ found in the LICENSE file.
     auto index = desiredRegion.GetIndex();
     auto size = desiredRegion.GetSize();
     unsigned int timeDimension = 3;
-    index[timeDimension] = m_LowerBoundaryTimestep;
+    index[timeDimension] = static_cast<itk::IndexValueType>(m_LowerBoundaryTimestep);
     size[timeDimension] = m_UpperBoundaryTimestep - m_LowerBoundaryTimestep;
     desiredRegion.SetIndex(index);
     desiredRegion.SetSize(size);
     return desiredRegion;
   }
 
-  mitk::TimeGeometry::Pointer mitk::CropTimestepsImageFilter::AdaptTimeGeometry(mitk::TimeGeometry::ConstPointer sourceGeometry, unsigned int startTimestep, unsigned int endTimestep) const
+  mitk::TimeGeometry::Pointer mitk::CropTimestepsImageFilter::AdaptTimeGeometry(mitk::TimeGeometry::ConstPointer sourceGeometry, TimeStepType startTimestep, TimeStepType endTimestep) const
   {
     auto newTimeGeometry = mitk::ArbitraryTimeGeometry::New();
     newTimeGeometry->ClearAllGeometries();
-    for (unsigned int timestep = startTimestep; timestep < endTimestep; timestep++)
+    for (TimeStepType timestep = startTimestep; timestep < endTimestep; timestep++)
     {
       auto geometryForTimePoint = sourceGeometry->GetGeometryForTimeStep(timestep);
       auto minTP = sourceGeometry->GetMinimumTimePoint(timestep);
@@ -124,9 +124,9 @@ void mitk::CropTimestepsImageFilter::GenerateData()
 
   timeSelector->SetInput(inputImage);
 
-  unsigned int timeStart = m_DesiredRegion.GetIndex(3);
-  unsigned int timeEnd = timeStart + m_DesiredRegion.GetSize(3);
-  for (unsigned int timestep = timeStart; timestep < timeEnd; ++timestep)
+  TimeStepType timeStart = static_cast<TimeStepType>(m_DesiredRegion.GetIndex(3));
+  TimeStepType timeEnd = timeStart + m_DesiredRegion.GetSize(3);
+  for (TimeStepType timestep = timeStart; timestep < timeEnd; ++timestep)
   {
     timeSelector->SetTimeNr(timestep);
     timeSelector->UpdateLargestPossibleRegion();

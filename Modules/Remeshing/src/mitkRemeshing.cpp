@@ -405,7 +405,7 @@ void mitk::RemeshFilter::GenerateData()
 {
   const auto* input = this->GetInput();
   const auto timeStepsToRemesh = GetTimeStepsToRemesh(input);
-  const auto timeSteps = static_cast<unsigned int>(input->GetSizeOfPolyDataSeries());
+  const auto timeSteps = input->GetSizeOfPolyDataSeries();
 
   if (m_ProgressTask != nullptr && timeStepsToRemesh.size() > 1)
     m_ProgressTask->AddStepsToDo(static_cast<unsigned int>(timeStepsToRemesh.size()));
@@ -417,7 +417,7 @@ void mitk::RemeshFilter::GenerateData()
   output->Expand(timeSteps);
 
   // Time steps without polygons stay empty, but get poly data like the others.
-  for (unsigned int t = 0; t < timeSteps; ++t)
+  for (TimeStepType t = 0; t < timeSteps; ++t)
     output->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), t);
 
   for (const auto t : timeStepsToRemesh)
@@ -433,7 +433,7 @@ void mitk::RemeshFilter::GenerateData()
                                   m_BoundaryFixing,
                                   m_ProgressTask);
 
-    output->SetVtkPolyData(remeshedSurface->GetVtkPolyData(), static_cast<unsigned int>(t));
+    output->SetVtkPolyData(remeshedSurface->GetVtkPolyData(), t);
 
     if (m_ProgressTask != nullptr)
       m_ProgressTask->Progress();

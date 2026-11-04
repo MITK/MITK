@@ -45,8 +45,8 @@ found in the LICENSE file.
 }
 
 ::mitk::PointSet::Pointer
-  mitk::PointSetMappingHelper::map(const ::mitk::PointSet* input, const mitk::PointSetMappingHelper::RegistrationType* registration, int timeStep,
-  bool throwOnMappingError, const ::mitk::PointSet::PointDataType& errorPointValue)
+  mitk::PointSetMappingHelper::map(const ::mitk::PointSet* input, const mitk::PointSetMappingHelper::RegistrationType* registration,
+  ::mitk::TimeStepType timeStep, bool throwOnMappingError, const ::mitk::PointSet::PointDataType& errorPointValue)
 {
   if (!registration)
   {
@@ -56,7 +56,7 @@ found in the LICENSE file.
   {
     mitkThrow() << "Cannot map point set. Passed point set pointer is nullptr.";
   }
-  if (static_cast<int>(input->GetTimeSteps())<=timeStep && timeStep>=0)
+  if (input->GetTimeSteps()<=timeStep && timeStep!=::mitk::TIMESTEP_INVALID)
   {
     mitkThrow() << "Cannot set point set. Selected time step is larger then mitk point set. MITK time step count: "<<input->GetTimeSteps()<<"; selected time step: "<<timeStep;
   }
@@ -78,9 +78,9 @@ found in the LICENSE file.
   spTask->setThrowOnMappingError(throwOnMappingError);
   spTask->setErrorPointValue(internalErrorValue);
 
-  unsigned int timePos = timeStep;
-  unsigned int timeEndPos = timeStep+1;
-  if (timeStep < 0)
+  ::mitk::TimeStepType timePos = timeStep;
+  ::mitk::TimeStepType timeEndPos = timeStep+1;
+  if (timeStep == ::mitk::TIMESTEP_INVALID)
   {
     timePos = 0;
     timeEndPos = input->GetTimeSteps();
@@ -123,8 +123,8 @@ found in the LICENSE file.
 }
 
 ::mitk::PointSet::Pointer
-  mitk::PointSetMappingHelper::map(const ::mitk::PointSet* input, const MITKRegistrationType* registration, int timeStep,
-  bool throwOnMappingError, const ::mitk::PointSet::PointDataType& errorPointValue)
+  mitk::PointSetMappingHelper::map(const ::mitk::PointSet* input, const MITKRegistrationType* registration,
+  ::mitk::TimeStepType timeStep, bool throwOnMappingError, const ::mitk::PointSet::PointDataType& errorPointValue)
 {
   if (!registration)
   {

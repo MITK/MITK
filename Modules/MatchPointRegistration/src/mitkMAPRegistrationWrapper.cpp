@@ -44,7 +44,7 @@ bool mitk::MAPRegistrationWrapper::VerifyRequestedRegion()
     return true;
 }
 
-bool mitk::MAPRegistrationWrapper::IsEmptyTimeStep(unsigned int /*t*/) const
+bool mitk::MAPRegistrationWrapper::IsEmptyTimeStep(TimeStepType /*t*/) const
 {
   return m_spRegistration.IsNull();
 }

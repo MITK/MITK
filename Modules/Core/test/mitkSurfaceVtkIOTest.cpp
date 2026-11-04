@@ -70,10 +70,10 @@ namespace
 
     auto surface = mitk::Surface::New();
     surface->SetTimeGeometry(timeGeometry);
-    surface->Expand(static_cast<unsigned int>(timeSteps));
+    surface->Expand(timeSteps);
 
     for (mitk::TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
-      surface->SetVtkPolyData(CreateTriangle(static_cast<double>(timeStep)), static_cast<unsigned int>(timeStep));
+      surface->SetVtkPolyData(CreateTriangle(static_cast<double>(timeStep)), timeStep);
 
     return surface;
   }
@@ -116,14 +116,14 @@ namespace
     mitk::FillVector3D(origin, x, 0.0, 0.0);
 
     for (mitk::TimeStepType timeStep = 0; timeStep < surface->GetTimeGeometry()->CountTimeSteps(); ++timeStep)
-      surface->GetGeometry(static_cast<int>(timeStep))->SetOrigin(origin);
+      surface->GetGeometry(timeStep)->SetOrigin(origin);
   }
 
   double GetWorldMinimumX(const mitk::Surface *surface, mitk::TimeStepType timeStep)
   {
     auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
-    transformFilter->SetInputData(surface->GetVtkPolyData(static_cast<unsigned int>(timeStep)));
-    transformFilter->SetTransform(surface->GetGeometry(static_cast<int>(timeStep))->GetVtkTransform());
+    transformFilter->SetInputData(surface->GetVtkPolyData(timeStep));
+    transformFilter->SetTransform(surface->GetGeometry(timeStep)->GetVtkTransform());
     transformFilter->Update();
 
     return transformFilter->GetPolyDataOutput()->GetBounds()[0];
@@ -351,8 +351,8 @@ public:
     surface->SetTimeGeometry(timeGeometry);
     surface->Expand(3);
 
-    for (unsigned int timeStep = 0; timeStep < 3; ++timeStep)
-      surface->SetVtkPolyData(CreateTriangle(timeStep), timeStep);
+    for (mitk::TimeStepType timeStep = 0; timeStep < 3; ++timeStep)
+      surface->SetVtkPolyData(CreateTriangle(static_cast<double>(timeStep)), timeStep);
 
     mitk::IOUtil::Save(surface, m_Directory + "/surface.vtp");
 

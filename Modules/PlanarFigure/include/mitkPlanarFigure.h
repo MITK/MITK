@@ -325,7 +325,7 @@ namespace mitk
      */
     virtual bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const;
 
-    void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
+    void InitializeTimeGeometry(TimeStepType timeSteps = 1) override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

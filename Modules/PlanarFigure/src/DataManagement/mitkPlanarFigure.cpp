@@ -382,7 +382,7 @@ void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject *)
 {
 }
 
-void mitk::PlanarFigure::InitializeTimeGeometry(unsigned int timeSteps)
+void mitk::PlanarFigure::InitializeTimeGeometry(TimeStepType timeSteps)
 {
   auto plane = PlaneGeometry::New();
   plane->Initialize();

@@ -96,7 +96,7 @@ namespace
     int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *outputVector) override
     {
       auto *outInfo = outputVector->GetInformationObject(0);
-      std::size_t timeStep = 0;
+      mitk::TimeStepType timeStep = 0;
 
       if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
       {
@@ -104,7 +104,7 @@ namespace
         const auto next = std::upper_bound(m_TimeValues.begin(), m_TimeValues.end(), timeValue);
 
         if (next != m_TimeValues.begin())
-          timeStep = static_cast<std::size_t>(std::distance(m_TimeValues.begin(), next) - 1);
+          timeStep = static_cast<mitk::TimeStepType>(std::distance(m_TimeValues.begin(), next) - 1);
       }
 
       if (m_ProgressCallback)
@@ -161,7 +161,7 @@ namespace
       }
     }
 
-    for (std::size_t timeStep = 0; timeStep < polyDatas.size(); ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < polyDatas.size(); ++timeStep)
     {
       auto *polyData = polyDatas[timeStep].GetPointer();
       auto *arrays = polyData->GetAttributesAsFieldData(attributeType);
@@ -201,7 +201,7 @@ namespace
   {
     std::vector<mitk::TimeBounds> timeBounds(timeValues.size());
 
-    for (std::size_t timeStep = 0; timeStep < timeValues.size(); ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < timeValues.size(); ++timeStep)
     {
       timeBounds[timeStep][0] = timeValues[timeStep];
       timeBounds[timeStep][1] = timeStep + 1 < timeValues.size()
@@ -245,12 +245,12 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::SurfaceVtkHdfIO::DoRead()
   // The reader reports no time values for a single time step, which leaves
   // the stored time bounds, if any, as its only time.
   const auto isTemporal = reader->GetOutputInformation(0)->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  const auto timeSteps = static_cast<std::size_t>(std::max<vtkIdType>(1, reader->GetNumberOfSteps()));
+  const auto timeSteps = static_cast<TimeStepType>(std::max<vtkIdType>(1, reader->GetNumberOfSteps()));
 
   std::vector<vtkSmartPointer<vtkPolyData>> polyDatas;
   std::vector<double> timeValues;
   std::vector<TimeBounds> storedTimeBounds;
-  std::size_t timeStep = 0;
+  TimeStepType timeStep = 0;
 
   VtkFileIOProgressObserver progress(reader, [this, &timeStep, timeSteps](float p)
     {
@@ -302,8 +302,9 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::SurfaceVtkHdfIO::DoRead()
     // precision.
     bool useStoredTimeBounds = storedTimeBounds.size() == timeSteps && SurfaceIOHelper::AreValidTimeBounds(storedTimeBounds);
 
-    for (std::size_t i = 0; i < storedTimeBounds.size() && useStoredTimeBounds; ++i)
-      useStoredTimeBounds = static_cast<float>(storedTimeBounds[i][0]) == static_cast<float>(timeValues[i]);
+    for (TimeStepType timeStep = 0; timeStep < storedTimeBounds.size() && useStoredTimeBounds; ++timeStep)
+      useStoredTimeBounds =
+        static_cast<float>(storedTimeBounds[timeStep][0]) == static_cast<float>(timeValues[timeStep]);
 
     if (useStoredTimeBounds)
     {

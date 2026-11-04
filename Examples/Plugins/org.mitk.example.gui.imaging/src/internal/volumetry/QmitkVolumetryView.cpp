@@ -147,7 +147,7 @@ void QmitkVolumetryView::OnTimeSeriesButtonClicked()
     volCalc->ComputeVolume();
     std::vector<float> volumes = volCalc->GetVolumes();
     std::stringstream vs;
-    int timeStep = 0;
+    mitk::TimeStepType timeStep = 0;
     for (auto it = volumes.begin(); it != volumes.end(); it++)
     {
       vs << timeStep++ << "\t" << *it << std::endl;

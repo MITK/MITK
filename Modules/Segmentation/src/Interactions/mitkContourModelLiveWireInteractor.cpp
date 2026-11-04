@@ -255,7 +255,7 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
 void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                                                           const mitk::ContourModel::VertexType *nextPoint,
                                                                           const mitk::ContourModel::VertexType *previousPoint,
-                                                                          int timeStep)
+                                                                          mitk::TimeStepType timeStep)
 {
   m_ContourLeft = mitk::ContourModel::New();
   m_ContourRight = mitk::ContourModel::New();
@@ -311,7 +311,7 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
 
 void mitk::ContourModelLiveWireInteractor::SetRepulsivePoints(const mitk::ContourModel::VertexType *pointToExclude,
                                                               mitk::ContourModel *contour,
-                                                              int timeStep)
+                                                              mitk::TimeStepType timeStep)
 {
   auto it = contour->IteratorBegin();
   for (; it != contour->IteratorEnd(timeStep); it++)

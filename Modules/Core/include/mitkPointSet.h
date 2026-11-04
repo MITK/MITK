@@ -155,7 +155,7 @@ namespace mitk
      *
      * \param[in] timeSteps The desired number of time steps.
      */
-    void Expand(unsigned int timeSteps) override;
+    void Expand(TimeStepType timeSteps) override;
 
     /**
      * \brief Execute an operation on this PointSet.
@@ -174,14 +174,14 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return The number of points, or 0 if the time step is out of range.
      */
-    virtual int GetSize(unsigned int t = 0) const;
+    virtual int GetSize(TimeStepType t = 0) const;
 
     /**
      * \brief Get the number of time steps in the point set series.
      *
      * \return The number of time steps.
      */
-    virtual unsigned int GetPointSetSeriesSize() const;
+    virtual TimeStepType GetPointSetSeriesSize() const;
 
     /**
      * \brief Get the underlying itk::Mesh at time step \a t.
@@ -189,7 +189,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return Smart pointer to the mesh data, or nullptr if \a t is out of range.
      */
-    virtual DataType::Pointer GetPointSet(int t = 0) const;
+    virtual DataType::Pointer GetPointSet(TimeStepType t = 0) const;
 
     /**
      * \brief Get an iterator pointing to the first point at time step \a t.
@@ -198,10 +198,10 @@ namespace mitk
      * \return A PointsIterator to the first point, or End() if the time step is
      *         out of range.
      */
-    PointsIterator Begin(int t = 0);
+    PointsIterator Begin(TimeStepType t = 0);
 
-    /** \copydoc Begin(int) */
-    PointsConstIterator Begin(int t = 0) const;
+    /** \copydoc Begin(TimeStepType) */
+    PointsConstIterator Begin(TimeStepType t = 0) const;
 
     /**
      * \brief Get an iterator pointing past the last point at time step \a t.
@@ -209,10 +209,10 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return A PointsIterator past the last point.
      */
-    PointsIterator End(int t = 0);
+    PointsIterator End(TimeStepType t = 0);
 
-    /** \copydoc End(int) */
-    PointsConstIterator End(int t = 0) const;
+    /** \copydoc End(TimeStepType) */
+    PointsConstIterator End(TimeStepType t = 0) const;
 
     /**
      * \brief Get an iterator to the element with the maximum ID at time step \a t.
@@ -221,7 +221,7 @@ namespace mitk
      * \return A PointsIterator to the max-ID element, or End() if the PointSet
      *         is empty or the time step is out of range.
      */
-    PointsIterator GetMaxId(int t = 0);
+    PointsIterator GetMaxId(TimeStepType t = 0);
 
     /**
      * \brief Get the point with the given ID in world coordinates.
@@ -232,7 +232,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return The point in world coordinates.
      */
-    PointType GetPoint(PointIdentifier id, int t = 0) const;
+    PointType GetPoint(PointIdentifier id, TimeStepType t = 0) const;
 
     /**
      * \brief Get the point with the given ID if it exists.
@@ -245,7 +245,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return True if the point was found, false otherwise.
      */
-    bool GetPointIfExists(PointIdentifier id, PointType *point, int t = 0) const;
+    bool GetPointIfExists(PointIdentifier id, PointType *point, TimeStepType t = 0) const;
 
     /**
      * \brief Set (overwrite) the point with the given ID in world coordinates.
@@ -257,7 +257,7 @@ namespace mitk
      * \param[in] point The point in world coordinates.
      * \param[in] t Time step (default: 0).
      */
-    void SetPoint(PointIdentifier id, PointType point, int t = 0);
+    void SetPoint(PointIdentifier id, PointType point, TimeStepType t = 0);
 
     /**
      * \brief Set (overwrite) the point with the given ID and PointSpecificationType.
@@ -267,7 +267,7 @@ namespace mitk
      * \param[in] spec The point specification type.
      * \param[in] t Time step (default: 0).
      */
-    void SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t = 0);
+    void SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t = 0);
 
     /**
      * \brief Insert a point with the given ID in world coordinates.
@@ -279,7 +279,7 @@ namespace mitk
      * \param[in] point The point in world coordinates.
      * \param[in] t Time step (default: 0).
      */
-    void InsertPoint(PointIdentifier id, PointType point, int t = 0);
+    void InsertPoint(PointIdentifier id, PointType point, TimeStepType t = 0);
 
     /**
      * \brief Insert a point with the given ID, world coordinates, and
@@ -294,7 +294,7 @@ namespace mitk
      * \param[in] spec The point specification type.
      * \param[in] t Time step.
      */
-    void InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t);
+    void InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t);
 
     /**
      * \brief Insert a point with an automatically assigned ID (max ID + 1).
@@ -303,7 +303,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return The identifier assigned to the new point.
      */
-    PointIdentifier InsertPoint(PointType point, int t = 0);
+    PointIdentifier InsertPoint(PointType point, TimeStepType t = 0);
 
     /**
      * \brief Remove the point with the given ID at time step \a t, if it exists.
@@ -312,7 +312,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return True if the point was found and removed, false otherwise.
      */
-    bool RemovePointIfExists(PointIdentifier id, int t = 0);
+    bool RemovePointIfExists(PointIdentifier id, TimeStepType t = 0);
 
     /**
      * \brief Remove the point with the maximum ID at time step \a t.
@@ -320,7 +320,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return An iterator to the new last point, or End() if the set is empty.
      */
-    PointsIterator RemovePointAtEnd(int t = 0);
+    PointsIterator RemovePointAtEnd(TimeStepType t = 0);
 
     /**
      * \brief Swap a point with its neighbor in the ordered container.
@@ -334,7 +334,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return True if the swap was successful, false if the neighbor does not exist.
      */
-    bool SwapPointPosition(PointIdentifier id, bool moveUpwards, int t = 0);
+    bool SwapPointPosition(PointIdentifier id, bool moveUpwards, TimeStepType t = 0);
 
     /**
      * \brief Search for a selected point and return its ID.
@@ -342,7 +342,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return The ID of the first selected point, or -1 if none is found.
      */
-    virtual int SearchSelectedPoint(int t = 0) const;
+    virtual int SearchSelectedPoint(TimeStepType t = 0) const;
 
     /**
      * \brief Deselect all points in all time steps.
@@ -356,7 +356,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return True if a point exists at the given position.
      */
-    virtual bool IndexExists(int position, int t = 0) const;
+    virtual bool IndexExists(int position, TimeStepType t = 0) const;
 
     /**
      * \brief Get the selection state of the point at the given position.
@@ -365,7 +365,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return True if the point is selected, false otherwise.
      */
-    virtual bool GetSelectInfo(int position, int t = 0) const;
+    virtual bool GetSelectInfo(int position, TimeStepType t = 0) const;
 
     /**
      * \brief Set the selection state of the point at the given position.
@@ -374,7 +374,7 @@ namespace mitk
      * \param[in] selected True to select, false to deselect.
      * \param[in] t Time step (default: 0).
      */
-    virtual void SetSelectInfo(int position, bool selected, int t = 0);
+    virtual void SetSelectInfo(int position, bool selected, TimeStepType t = 0);
 
     /**
      * \brief Get the PointSpecificationType of the point at the given position.
@@ -383,7 +383,7 @@ namespace mitk
      * \param[in] t Time step.
      * \return The point specification type, or PTUNDEFINED if the point does not exist.
      */
-    virtual PointSpecificationType GetSpecificationTypeInfo(int position, int t) const;
+    virtual PointSpecificationType GetSpecificationTypeInfo(int position, TimeStepType t) const;
 
     /**
      * \brief Get the number of selected points at time step \a t.
@@ -391,7 +391,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return The number of selected points.
      */
-    virtual int GetNumberOfSelected(int t = 0) const;
+    virtual int GetNumberOfSelected(TimeStepType t = 0) const;
 
     /**
      * \brief Search for the closest point within a given distance.
@@ -402,7 +402,7 @@ namespace mitk
      * \return The ID of the closest point within \a distance, or -1 if no
      *         point was found.
      */
-    int SearchPoint(Point3D point, ScalarType distance, int t = 0) const;
+    int SearchPoint(Point3D point, ScalarType distance, TimeStepType t = 0) const;
 
     /**
      * \brief Check whether the point set is empty at time step \a t.
@@ -410,7 +410,7 @@ namespace mitk
      * \param[in] t The time step to check.
      * \return True if the PointSet is initialized and has zero points at time step \a t.
      */
-    bool IsEmptyTimeStep(unsigned int t) const override;
+    bool IsEmptyTimeStep(TimeStepType t) const override;
 
     /**
      * \brief Update the output information (bounding box, geometry).
@@ -464,7 +464,7 @@ namespace mitk
     void InitializeEmpty() override;
 
     /** \brief swaps point coordinates and point data of the points with identifiers id1 and id2 */
-    bool SwapPointContents(PointIdentifier id1, PointIdentifier id2, int t = 0);
+    bool SwapPointContents(PointIdentifier id1, PointIdentifier id2, TimeStepType t = 0);
 
     typedef std::vector<DataType::Pointer> PointSetSeries;
 

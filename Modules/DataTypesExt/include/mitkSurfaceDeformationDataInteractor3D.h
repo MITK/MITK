@@ -66,7 +66,7 @@ namespace mitk
 
   private:
     void ColorizeSurface(
-      vtkPolyData *polyData, int timeStep, const Point3D &pickedPoint, int mode, double scalar = 0.0);
+      vtkPolyData *polyData, TimeStepType timeStep, const Point3D &pickedPoint, int mode, double scalar = 0.0);
 
     double m_InitialPickedWorldPoint[4];
     Point3D m_InitialPickedPoint;

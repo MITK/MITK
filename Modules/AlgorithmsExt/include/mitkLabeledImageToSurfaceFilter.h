@@ -150,7 +150,7 @@ namespace mitk
 
     void GenerateOutputInformation() override;
 
-    virtual void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface *surface, LabelType label);
+    virtual void CreateSurface(TimeStepType time, vtkImageData *vtkimage, mitk::Surface *surface, LabelType label);
 
     virtual LabelMapType GetAvailableLabels();
 
@@ -159,7 +159,8 @@ namespace mitk
     ~LabeledImageToSurfaceFilter() override;
 
   private:
-    virtual void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface *surface, const ScalarType threshold);
+    virtual void CreateSurface(
+      TimeStepType time, vtkImageData *vtkimage, mitk::Surface *surface, const ScalarType threshold);
   };
 
 } // end of namespace mitk

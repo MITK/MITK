@@ -60,7 +60,7 @@ public:
    * \param[in] t The time step to check.
    * \return True if no registration is set (m_spRegistration is null).
    */
-  bool IsEmptyTimeStep(unsigned int t) const override;
+  bool IsEmptyTimeStep(TimeStepType t) const override;
 
   /**
    * \brief Checks whether the registration wrapper contains no valid registration.

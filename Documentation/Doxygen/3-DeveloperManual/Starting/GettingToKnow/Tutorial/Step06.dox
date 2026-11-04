@@ -94,7 +94,7 @@ In some cases it is useful to simply convert between ITK and MITK images. The di
 
 Images are not converted or copied: The data array is just accessed via an encapsulating VTK object.
 
-\li \code vtkImageData* mitk::Image::GetVtkImageData(int time = 0) \endcode
+\li \code vtkImageData* mitk::Image::GetVtkImageData(TimeStepType t = 0, int n = 0) \endcode
 
 \section SurfacesMITKToVTKSection MITK Surfaces to VTK and vice versa
 

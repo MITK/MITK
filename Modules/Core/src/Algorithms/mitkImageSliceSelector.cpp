@@ -26,7 +26,7 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
     m_SliceNr = input->GetDimension(2) - 1;
   }
 
-  if ((unsigned int)m_TimeNr >= input->GetDimension(3))
+  if (m_TimeNr >= input->GetDimension(3))
   {
     m_TimeNr = input->GetDimension(3) - 1;
   }
@@ -60,7 +60,7 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();
   requestedRegion.SetIndex(2, m_SliceNr);
-  requestedRegion.SetIndex(3, m_TimeNr);
+  requestedRegion.SetIndex(3, static_cast<Image::IndexValueType>(m_TimeNr));
   requestedRegion.SetIndex(4, m_ChannelNr);
   requestedRegion.SetSize(2, 1);
   requestedRegion.SetSize(3, 1);

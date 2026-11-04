@@ -34,9 +34,9 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
   auto end = inputContour->IteratorEnd();
   unsigned int pointId = 0;
 
-  std::size_t timestep = inputContour->GetTimeSteps();
+  const TimeStepType timestep = inputContour->GetTimeSteps();
 
-  for (std::size_t i = 0; i < timestep; i++)
+  for (TimeStepType i = 0; i < timestep; i++)
   {
     while (it <= end)
     {

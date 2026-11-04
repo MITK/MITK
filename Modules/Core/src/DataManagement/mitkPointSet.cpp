@@ -36,7 +36,7 @@ mitk::PointSet::PointSet(const PointSet &other)
   : BaseData(other), m_PointSetSeries(other.GetPointSetSeriesSize()), m_CalculateBoundingBox(true)
 {
   // Copy points
-  for (std::size_t t = 0; t < m_PointSetSeries.size(); ++t)
+  for (TimeStepType t = 0; t < m_PointSetSeries.size(); ++t)
   {
     m_PointSetSeries[t] = DataType::New();
 
@@ -79,12 +79,12 @@ void mitk::PointSet::InitializeEmpty()
   m_EmptyPointsContainer = DataType::PointsContainer::New();
 }
 
-bool mitk::PointSet::IsEmptyTimeStep(unsigned int t) const
+bool mitk::PointSet::IsEmptyTimeStep(TimeStepType t) const
 {
   return IsInitialized() && (GetSize(t) == 0);
 }
 
-void mitk::PointSet::Expand(unsigned int timeSteps)
+void mitk::PointSet::Expand(TimeStepType timeSteps)
 {
   // Check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
@@ -94,14 +94,14 @@ void mitk::PointSet::Expand(unsigned int timeSteps)
   // be used to make sure that the vector has enough elements to include the
   // specified time step.
 
-  unsigned int oldSize = m_PointSetSeries.size();
+  const TimeStepType oldSize = m_PointSetSeries.size();
 
   if (timeSteps > oldSize)
   {
     Superclass::Expand(timeSteps);
 
     m_PointSetSeries.resize(timeSteps);
-    for (unsigned int i = oldSize; i < timeSteps; ++i)
+    for (TimeStepType i = oldSize; i < timeSteps; ++i)
     {
       m_PointSetSeries[i] = DataType::New();
       PointDataContainer::Pointer pointData = PointDataContainer::New();
@@ -115,12 +115,12 @@ void mitk::PointSet::Expand(unsigned int timeSteps)
   }
 }
 
-unsigned int mitk::PointSet::GetPointSetSeriesSize() const
+mitk::TimeStepType mitk::PointSet::GetPointSetSeriesSize() const
 {
   return m_PointSetSeries.size();
 }
 
-int mitk::PointSet::GetSize(unsigned int t) const
+int mitk::PointSet::GetSize(TimeStepType t) const
 {
   if (t < m_PointSetSeries.size())
   {
@@ -132,9 +132,9 @@ int mitk::PointSet::GetSize(unsigned int t) const
   }
 }
 
-mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet(int t) const
+mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet(TimeStepType t) const
 {
-  if (t < (int)m_PointSetSeries.size())
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t];
   }
@@ -144,45 +144,45 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet(int t) const
   }
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::Begin(int t)
+mitk::PointSet::PointsIterator mitk::PointSet::Begin(TimeStepType t)
 {
-  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetPoints()->Begin();
   }
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsConstIterator mitk::PointSet::Begin(int t) const
+mitk::PointSet::PointsConstIterator mitk::PointSet::Begin(TimeStepType t) const
 {
-  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetPoints()->Begin();
   }
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::End(int t)
+mitk::PointSet::PointsIterator mitk::PointSet::End(TimeStepType t)
 {
-  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetPoints()->End();
   }
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
+mitk::PointSet::PointsConstIterator mitk::PointSet::End(TimeStepType t) const
 {
-  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetPoints()->End();
   }
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::GetMaxId(int t)
+mitk::PointSet::PointsIterator mitk::PointSet::GetMaxId(TimeStepType t)
 {
-  if ((unsigned int)t >= m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return m_EmptyPointsContainer->End();
   }
@@ -190,9 +190,9 @@ mitk::PointSet::PointsIterator mitk::PointSet::GetMaxId(int t)
   return this->Begin(t) == this->End(t) ? this->End(t) : --End(t);
 }
 
-int mitk::PointSet::SearchPoint(Point3D point, ScalarType distance, int t) const
+int mitk::PointSet::SearchPoint(Point3D point, ScalarType distance, TimeStepType t) const
 {
-  if (t >= (int)m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return -1;
   }
@@ -251,12 +251,12 @@ int mitk::PointSet::SearchPoint(Point3D point, ScalarType distance, int t) const
   return bestIndex;
 }
 
-mitk::PointSet::PointType mitk::PointSet::GetPoint(PointIdentifier id, int t) const
+mitk::PointSet::PointType mitk::PointSet::GetPoint(PointIdentifier id, TimeStepType t) const
 {
   PointType out;
   out.Fill(0);
 
-  if ((unsigned int)t >= m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return out;
   }
@@ -273,9 +273,9 @@ mitk::PointSet::PointType mitk::PointSet::GetPoint(PointIdentifier id, int t) co
   }
 }
 
-bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType *point, int t) const
+bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType *point, TimeStepType t) const
 {
-  if ((unsigned int)t >= m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return false;
   }
@@ -291,7 +291,7 @@ bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType *point, int 
   }
 }
 
-void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, int t)
+void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, TimeStepType t)
 {
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
@@ -310,7 +310,7 @@ void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, int t)
   this->Modified();
 }
 
-void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t)
+void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t)
 {
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
@@ -328,12 +328,12 @@ void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, PointSpecific
   this->Modified();
 }
 
-void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, int t)
+void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, TimeStepType t)
 {
   this->InsertPoint(id, point, mitk::PTUNDEFINED, t);
 }
 
-void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t)
+void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t)
 {
   this->Expand(t + 1);
 
@@ -357,7 +357,7 @@ void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpeci
   this->Modified();
 }
 
-mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, int t)
+mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, TimeStepType t)
 {
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
@@ -386,9 +386,9 @@ mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, int
   return id;
 }
 
-bool mitk::PointSet::RemovePointIfExists(PointIdentifier id, int t)
+bool mitk::PointSet::RemovePointIfExists(PointIdentifier id, TimeStepType t)
 {
-  if ((unsigned int)t < m_PointSetSeries.size())
+  if (t < m_PointSetSeries.size())
   {
     DataType *pointSet = m_PointSetSeries[t];
 
@@ -406,9 +406,9 @@ bool mitk::PointSet::RemovePointIfExists(PointIdentifier id, int t)
   return false;
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd(int t)
+mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd(TimeStepType t)
 {
-  if ((unsigned int)t < m_PointSetSeries.size())
+  if (t < m_PointSetSeries.size())
   {
     DataType *pointSet = m_PointSetSeries[t];
 
@@ -434,7 +434,7 @@ mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd(int t)
   return m_EmptyPointsContainer->End();
 }
 
-bool mitk::PointSet::SwapPointPosition(PointIdentifier id, bool moveUpwards, int t)
+bool mitk::PointSet::SwapPointPosition(PointIdentifier id, bool moveUpwards, TimeStepType t)
 {
   if (IndexExists(id, t))
   {
@@ -464,9 +464,9 @@ bool mitk::PointSet::SwapPointPosition(PointIdentifier id, bool moveUpwards, int
   return false;
 }
 
-bool mitk::PointSet::IndexExists(int position, int t) const
+bool mitk::PointSet::IndexExists(int position, TimeStepType t) const
 {
-  if ((unsigned int)t < m_PointSetSeries.size())
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetPoints()->IndexExists(position);
   }
@@ -476,7 +476,7 @@ bool mitk::PointSet::IndexExists(int position, int t) const
   }
 }
 
-bool mitk::PointSet::GetSelectInfo(int position, int t) const
+bool mitk::PointSet::GetSelectInfo(int position, TimeStepType t) const
 {
   if (this->IndexExists(position, t))
   {
@@ -490,7 +490,7 @@ bool mitk::PointSet::GetSelectInfo(int position, int t) const
   }
 }
 
-void mitk::PointSet::SetSelectInfo(int position, bool selected, int t)
+void mitk::PointSet::SetSelectInfo(int position, bool selected, TimeStepType t)
 {
   if (this->IndexExists(position, t))
   {
@@ -514,7 +514,7 @@ void mitk::PointSet::SetSelectInfo(int position, bool selected, int t)
   }
 }
 
-mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo(int position, int t) const
+mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo(int position, TimeStepType t) const
 {
   if (this->IndexExists(position, t))
   {
@@ -528,9 +528,9 @@ mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo(int positi
   }
 }
 
-int mitk::PointSet::GetNumberOfSelected(int t) const
+int mitk::PointSet::GetNumberOfSelected(TimeStepType t) const
 {
-  if ((unsigned int)t >= m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return 0;
   }
@@ -548,9 +548,9 @@ int mitk::PointSet::GetNumberOfSelected(int t) const
   return numberOfSelected;
 }
 
-int mitk::PointSet::SearchSelectedPoint(int t) const
+int mitk::PointSet::SearchSelectedPoint(TimeStepType t) const
 {
-  if ((unsigned int)t >= m_PointSetSeries.size())
+  if (t >= m_PointSetSeries.size())
   {
     return -1;
   }
@@ -580,7 +580,7 @@ void mitk::PointSet::ClearSelection()
 
 void mitk::PointSet::ExecuteOperation(Operation *operation)
 {
-  int timeStep = -1;
+  TimeStepType timeStep = TIMESTEP_INVALID;
 
   mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
@@ -589,7 +589,7 @@ void mitk::PointSet::ExecuteOperation(Operation *operation)
     timeStep = this->GetTimeGeometry()->TimePointToTimeStep(pointOp->GetTimeInMS());
   }
 
-  if (timeStep < 0)
+  if (timeStep == TIMESTEP_INVALID)
   {
     MITK_ERROR << "Time step (" << timeStep << ") outside of PointSet time bounds" << std::endl;
     return;
@@ -607,7 +607,7 @@ void mitk::PointSet::ExecuteOperation(Operation *operation)
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
-      if (timeStep >= (int)this->GetTimeSteps())
+      if (timeStep >= this->GetTimeSteps())
         this->Expand(timeStep + 1);
 
       // transfer from world to index coordinates
@@ -794,7 +794,7 @@ void mitk::PointSet::UpdateOutputInformation()
   //
   if (m_CalculateBoundingBox)
   {
-    for (unsigned int i = 0; i < m_PointSetSeries.size(); ++i)
+    for (TimeStepType i = 0; i < m_PointSetSeries.size(); ++i)
     {
       const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
       BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
@@ -872,7 +872,7 @@ void mitk::PointSet::PrintSelf(std::ostream &os, itk::Indent indent) const
   }
 }
 
-bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2, int timeStep)
+bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2, TimeStepType timeStep)
 {
   /* search and cache contents */
   PointType p1;

@@ -366,7 +366,7 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
   this->UpdateCurrentGeometries();
 }
 
-void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
+void mitk::BaseRenderer::SetTimeStep(TimeStepType timeStep)
 {
   if (m_TimeStep == timeStep)
   {
@@ -388,7 +388,7 @@ mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) c
   return data->GetTimeGeometry()->TimePointToTimeStep(GetTime());
 }
 
-mitk::ScalarType mitk::BaseRenderer::GetTime() const
+mitk::TimePointType mitk::BaseRenderer::GetTime() const
 {
   if (m_WorldTimeGeometry.IsNull())
   {
@@ -396,7 +396,7 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   }
   else
   {
-    ScalarType timeInMS = m_WorldTimeGeometry->TimeStepToTimePoint(GetTimeStep());
+    const TimePointType timeInMS = m_WorldTimeGeometry->TimeStepToTimePoint(GetTimeStep());
     if (timeInMS == itk::NumericTraits<mitk::ScalarType>::NonpositiveMin())
       return 0;
     else

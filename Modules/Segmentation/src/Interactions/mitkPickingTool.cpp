@@ -152,7 +152,7 @@ template <typename TPixel, unsigned int VImageDimension>
 void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   mitk::MultiLabelSegmentation* segmentation,
   const mitk::PointSet* seedPoints,
-  unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
+  mitk::TimeStepType timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
   const mitk::Label::PixelType backgroundValue,
   bool& emptyTimeStep)
 {

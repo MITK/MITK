@@ -566,7 +566,7 @@ if(m_Controls->NoiseCheckBox->isChecked())
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(generatedImage);
 
-    for(unsigned int i = 0; i< generatedImage->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
         imageTimeSelector->SetTimeNr(i);
         imageTimeSelector->UpdateLargestPossibleRegion();
@@ -649,7 +649,7 @@ if(m_Controls->NoiseCheckBox->isChecked())
    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
    imageTimeSelector->SetInput(generatedImage);
 
-   for(unsigned int i = 0; i< generatedImage->GetTimeSteps(); ++i)
+   for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
    {
        imageTimeSelector->SetTimeNr(i);
        imageTimeSelector->UpdateLargestPossibleRegion();
@@ -739,7 +739,7 @@ if(m_Controls->NoiseCheckBox->isChecked())
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(generatedImage);
 
-    for(unsigned int i = 0; i< generatedImage->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
         imageTimeSelector->SetTimeNr(i);
         imageTimeSelector->UpdateLargestPossibleRegion();
@@ -817,7 +817,7 @@ if(m_Controls->NoiseCheckBox->isChecked())
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(generatedImage);
 
-    for(unsigned int i = 0; i< generatedImage->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
         imageTimeSelector->SetTimeNr(i);
         imageTimeSelector->UpdateLargestPossibleRegion();

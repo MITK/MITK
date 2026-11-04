@@ -634,7 +634,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   {
     auto timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr(m_Controls->timeSliceNavigationWidget->GetPos() );
+    timeSelector->SetTimeNr(static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
     timeSelector->Update();
     newImage = timeSelector->GetOutput();
   }
@@ -1118,10 +1118,10 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
     auto timeSelector = mitk::ImageTimeSelector::New();
 
     auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
-    int time = 0;
+    mitk::TimeStepType time = 0;
 
     if( sn_widget != nullptr )
-        time = sn_widget->GetPos();
+      time = static_cast<mitk::TimeStepType>(sn_widget->GetPos());
 
     timeSelector->SetInput(newImage1);
     timeSelector->SetTimeNr( time );

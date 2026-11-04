@@ -71,21 +71,21 @@ namespace mitk
      * \param[in] t The time step (default: 0).
      * \return Const reference to the centroid point.
      */
-    virtual const mitk::Point3D &GetCentroid(int t = 0) const;
+    virtual const mitk::Point3D &GetCentroid(TimeStepType t = 0) const;
 
     /**
      * \brief Get the PlaneGeometry representing the best-fit plane.
      * \param[in] t The time step (default: 0).
      * \return Smart pointer to the PlaneGeometry.
      */
-    virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry(int t = 0);
+    virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry(TimeStepType t = 0);
 
     /**
      * \brief Get the normal vector of the best-fit plane.
      * \param[in] t The time step (default: 0).
      * \return Const reference to the normal vector.
      */
-    virtual const mitk::Vector3D &GetPlaneNormal(int t = 0) const;
+    virtual const mitk::Vector3D &GetPlaneNormal(TimeStepType t = 0) const;
 
   protected:
     PlaneFit();
@@ -94,7 +94,7 @@ namespace mitk
     /*! Calculates the centroid of the point set.
      * the center of gravity is calculated  through the mean value of the whole point set
      */
-    void CalculateCentroid(int t = 0);
+    void CalculateCentroid(TimeStepType t = 0);
 
     /*! working with an SVD algorithm form matrix dataM.
      * ITK supplies the vnl_svd to solve an plan fit eigentvector problem
@@ -103,12 +103,12 @@ namespace mitk
      * The method uses VNL library from ITK and at least the method nullvector()
      * to extract the normalvector.
      */
-    void ProcessPointSet(int t = 0);
+    void ProcessPointSet(TimeStepType t = 0);
 
     /*! Initialize Plane and configuration.
      *
      */
-    void InitializePlane(int t = 0);
+    void InitializePlane(TimeStepType t = 0);
 
   private:
     /*!keeps a copy of the pointset.*/

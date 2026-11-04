@@ -313,9 +313,9 @@ namespace mitk
      * Setting a new timestep will update the current world geometry and the
      * current world plane geometry.
      */
-    virtual void SetTimeStep(unsigned int timeStep);
+    virtual void SetTimeStep(TimeStepType timeStep);
 
-    itkGetConstMacro(TimeStep, unsigned int);
+    itkGetConstMacro(TimeStep, TimeStepType);
 
     /**
      * \brief Get the timestep of a BaseData object which
@@ -328,7 +328,7 @@ namespace mitk
     /**
      * \brief Get the time in ms of the currently display content (geometry).
      */
-    ScalarType GetTime() const;
+    TimePointType GetTime() const;
 
     /**
      * \brief Set the world time geometry using the geometry of the given event.
@@ -653,7 +653,7 @@ namespace mitk
     PlaneGeometry::Pointer m_CurrentWorldPlaneGeometry;
 
     unsigned int m_Slice;
-    unsigned int m_TimeStep;
+    TimeStepType m_TimeStep;
 
     itk::TimeStamp m_CurrentWorldPlaneGeometryUpdateTime;
     itk::TimeStamp m_TimeStepUpdateTime;

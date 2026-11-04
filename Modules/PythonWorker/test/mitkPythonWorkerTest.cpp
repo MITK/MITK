@@ -418,7 +418,7 @@ public:
     const unsigned int dynamicDimensions[] = { 4, 3, 2, 2 };
     dynamic->Initialize(mitk::MakeScalarPixelType<short>(), 4, dynamicDimensions);
 
-    for (int timeStep = 0; timeStep < 2; ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < 2; ++timeStep)
     {
       const std::vector<short> values(24, static_cast<short>(timeStep + 1));
       dynamic->SetVolume(values.data(), timeStep);

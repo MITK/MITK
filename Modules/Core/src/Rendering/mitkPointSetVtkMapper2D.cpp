@@ -247,7 +247,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   if (update == true)
     input->Update();
 
-  int timestep = this->GetTimestep();
+  const TimeStepType timestep = this->GetTimestep();
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet(timestep);
 
   if (itkPointSet.GetPointer() == nullptr)

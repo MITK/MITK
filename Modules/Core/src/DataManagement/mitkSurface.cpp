@@ -114,7 +114,7 @@ void mitk::Surface::InitializeEmpty()
   m_Initialized = true;
 }
 
-void mitk::Surface::SetVtkPolyData(vtkPolyData *polyData, unsigned int t)
+void mitk::Surface::SetVtkPolyData(vtkPolyData *polyData, TimeStepType t)
 {
   this->Expand(t + 1);
 
@@ -135,7 +135,7 @@ void mitk::Surface::SetVtkPolyData(vtkPolyData *polyData, unsigned int t)
   this->UpdateOutputInformation();
 }
 
-bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
+bool mitk::Surface::IsEmptyTimeStep(TimeStepType t) const
 {
   if (!IsInitialized())
     return false;
@@ -145,7 +145,7 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
   return polyData == nullptr;
 }
 
-vtkPolyData *mitk::Surface::GetVtkPolyData(unsigned int t) const
+vtkPolyData *mitk::Surface::GetVtkPolyData(TimeStepType t) const
 {
   if (t < m_PolyDatas.size())
   {
@@ -154,7 +154,7 @@ vtkPolyData *mitk::Surface::GetVtkPolyData(unsigned int t) const
       WarnIfOffStorageThread("Building the polygonal representation of a surface");
 
       RegionType requestedRegion;
-      requestedRegion.SetIndex(3, t);
+      requestedRegion.SetIndex(3, static_cast<RegionType::IndexValueType>(t));
       requestedRegion.SetSize(3, 1);
       this->m_RequestedRegion = requestedRegion;
       this->GetSource()->Update();
@@ -170,7 +170,7 @@ void mitk::Surface::PrebuildVtkRepresentation() const
 {
   const auto timeSteps = this->GetTimeSteps();
 
-  for (unsigned int t = 0; t < timeSteps; ++t)
+  for (TimeStepType t = 0; t < timeSteps; ++t)
     static_cast<void>(this->GetVtkPolyData(t));
 }
 
@@ -206,7 +206,7 @@ void mitk::Surface::CalculateBoundingBox()
     }
   }
 
-  for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
+  for (TimeStepType i = 0; i < m_PolyDatas.size(); ++i)
   {
     vtkPolyData *polyData = m_PolyDatas[i].GetPointer();
     double bounds[6] = {0};
@@ -302,7 +302,7 @@ void mitk::Surface::Update()
   Superclass::Update();
 }
 
-void mitk::Surface::Expand(unsigned int timeSteps)
+void mitk::Surface::Expand(TimeStepType timeSteps)
 {
   if (timeSteps > m_PolyDatas.size())
   {
@@ -324,7 +324,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
       if (surfaceOperation == nullptr)
         break;
 
-      unsigned int timeStep = surfaceOperation->GetTimeStep();
+      const TimeStepType timeStep = surfaceOperation->GetTimeStep();
 
       if (m_PolyDatas[timeStep] != nullptr)
       {
@@ -346,7 +346,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
   }
 }
 
-unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
+mitk::TimeStepType mitk::Surface::GetSizeOfPolyDataSeries() const
 {
   return m_PolyDatas.size();
 }
@@ -361,7 +361,7 @@ void mitk::Surface::Graft(const DataObject *data)
   this->CopyInformation(data);
   m_PolyDatas.clear();
 
-  for (unsigned int i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
+  for (TimeStepType i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
   {
     m_PolyDatas.push_back(vtkSmartPointer<vtkPolyData>::New());
     m_PolyDatas.back()->DeepCopy(surface->GetVtkPolyData(i));
@@ -374,7 +374,7 @@ void mitk::Surface::PrintSelf(std::ostream &os, itk::Indent indent) const
 
   os << indent << "\nNumber PolyDatas: " << m_PolyDatas.size() << "\n";
 
-  unsigned int count = 0;
+  TimeStepType count = 0;
 
   for (auto it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
   {
@@ -491,7 +491,10 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
 {
   bool noDifferenceFound = true;
 
-  if (!mitk::Equal(leftHandSide.GetSizeOfPolyDataSeries(), rightHandSide.GetSizeOfPolyDataSeries(), eps, verbose))
+  if (!mitk::Equal(static_cast<ScalarType>(leftHandSide.GetSizeOfPolyDataSeries()),
+                   static_cast<ScalarType>(rightHandSide.GetSizeOfPolyDataSeries()),
+                   eps,
+                   verbose))
   {
     if (verbose)
       MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Size of PolyData series not equal.";
@@ -506,7 +509,7 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
   //  noDifferenceFound = false;
   //}
 
-  for (unsigned int i(0); i < rightHandSide.GetSizeOfPolyDataSeries(); i++)
+  for (TimeStepType i(0); i < rightHandSide.GetSizeOfPolyDataSeries(); i++)
   {
     if (!mitk::Equal(*leftHandSide.GetVtkPolyData(i), *rightHandSide.GetVtkPolyData(i), eps, verbose))
     {

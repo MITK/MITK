@@ -164,7 +164,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the slice data is available.
      */
-    virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
+    virtual bool IsSliceSet(int s = 0, TimeStepType t = 0, int n = 0) const = 0;
 
     /**
      * \brief Check whether volume at time \a t in channel \a n is set.
@@ -173,7 +173,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the volume data is available.
      */
-    virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
+    virtual bool IsVolumeSet(TimeStepType t = 0, int n = 0) const = 0;
 
     /**
      * \brief Check whether channel \a n is set.
@@ -215,7 +215,7 @@ namespace mitk
      * \return Pointer to the SlicedGeometry3D, or nullptr if the TimeGeometry is not set.
      * \sa GetUpdatedSlicedGeometry
      */
-    SlicedGeometry3D *GetSlicedGeometry(unsigned int t = 0) const;
+    SlicedGeometry3D *GetSlicedGeometry(TimeStepType t = 0) const;
 
     /**
      * \brief Convenience access method that returns an up-to-date SlicedGeometry3D.
@@ -229,7 +229,7 @@ namespace mitk
      * \sa GetSlicedGeometry
      * \todo Appropriate setting of the update extent is missing.
      */
-    const SlicedGeometry3D *GetUpdatedSlicedGeometry(unsigned int t = 0);
+    const SlicedGeometry3D *GetUpdatedSlicedGeometry(TimeStepType t = 0);
 
     /**
      * \brief Set the BaseGeometry of the data, which will be referenced (not copied!).

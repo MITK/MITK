@@ -486,7 +486,7 @@ void mitk::DataNode::AddProperty(const char *propertyKey,
   }
 }
 
-vtkLinearTransform *mitk::DataNode::GetVtkTransform(int t) const
+vtkLinearTransform *mitk::DataNode::GetVtkTransform(TimeStepType t) const
 {
   assert(m_Data.IsNotNull());
 

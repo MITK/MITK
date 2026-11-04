@@ -82,7 +82,7 @@ namespace mitk
      * Does the same as using ImageNavigators Time slider. Use this if your data was modified in a timestep other than
      * 0.
      */
-    void SetTimeStep(int newTimeStep);
+    void SetTimeStep(TimeStepType newTimeStep);
 
     typedef std::vector<RenderWindow::Pointer> RenderWindowListType;
 

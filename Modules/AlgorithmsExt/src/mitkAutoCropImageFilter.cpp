@@ -34,7 +34,7 @@ mitk::AutoCropImageFilter::~AutoCropImageFilter()
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::AutoCropImageFilter::ITKCrop3DImage(itk::Image<TPixel, VImageDimension> *inputItkImage,
-                                               unsigned int timestep)
+                                               TimeStepType timestep)
 {
   if (inputItkImage == nullptr)
   {
@@ -211,10 +211,10 @@ void mitk::AutoCropImageFilter::GenerateData()
 
   mitk::SlicedData::RegionType outputRegion = input->GetRequestedRegion();
 
-  int tstart = outputRegion.GetIndex(3);
-  int tmax = tstart + outputRegion.GetSize(3);
+  const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+  const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
-  for (int timestep = tstart; timestep < tmax; ++timestep)
+  for (TimeStepType timestep = tstart; timestep < tmax; ++timestep)
   {
     m_TimeSelector->SetTimeNr(timestep);
     m_TimeSelector->UpdateLargestPossibleRegion();
@@ -265,7 +265,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
   else
   {
     // Check if a 3D or 4D image is present
-    unsigned int timeSteps = 1;
+    TimeStepType timeSteps = 1;
     if (inputMitk->GetDimension() == 4)
       timeSteps = inputMitk->GetDimension(3);
 
@@ -295,7 +295,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
     typedef itk::ImageRegionConstIterator<ImageType> ConstIteratorType;
 
-    for (unsigned int idx = 0; idx < timeSteps; ++idx)
+    for (TimeStepType idx = 0; idx < timeSteps; ++idx)
     {
       // if 4D image, update time step and itk image
       if (idx > 0)

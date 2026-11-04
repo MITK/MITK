@@ -276,7 +276,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
 /**Helper function to ensure the mapping of all time steps of an image.*/
 void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk::Image* result, const mitk::ImageMappingHelper::RegistrationType* registration, bool throwOnOutOfInputAreaError,double paddingValue, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry, bool throwOnMappingError, double errorValue, mitk::ImageMappingInterpolator::Type interpolatorType)
 {
-  for (unsigned int i = 0; i<input->GetTimeSteps(); ++i)
+  for (mitk::TimeStepType i = 0; i < input->GetTimeSteps(); ++i)
   {
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(input);
@@ -450,7 +450,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     result = input->Clone();
 
     //refine geometries
-    for (unsigned int i = 0; i < result->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < result->GetTimeSteps(); ++i)
     { //refine every time step
       result->GetGeometry(i)->Compose(spTransform);
     }

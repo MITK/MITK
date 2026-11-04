@@ -154,7 +154,7 @@ void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
 {
   const auto currentSelectedPosition = m_RenderWindowPart->GetSelectedPosition();
   const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  const mitk::TimeStepType currentSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
+  const mitk::TimePointType currentSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
 
   if (m_SelectedPosition != currentSelectedPosition
     || m_SelectedTimePoint != currentSelectedTimePoint

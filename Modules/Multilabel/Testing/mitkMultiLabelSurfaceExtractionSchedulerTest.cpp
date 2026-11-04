@@ -39,10 +39,10 @@ namespace
   using Scheduler = mitk::MultiLabelSurfaceExtractionScheduler;
 
   /** A cubic group image of label 1 inside background, a ball of the given radius in every time step. */
-  mitk::Image::Pointer MakeGroupImage(unsigned int size, unsigned int radius, unsigned int timeSteps = 1)
+  mitk::Image::Pointer MakeGroupImage(unsigned int size, unsigned int radius, mitk::TimeStepType timeSteps = 1)
   {
     auto image = mitk::Image::New();
-    unsigned int dimensions[4] = { size, size, size, timeSteps };
+    unsigned int dimensions[4] = { size, size, size, static_cast<unsigned int>(timeSteps) };
     image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 1 < timeSteps ? 4 : 3, dimensions);
 
     mitk::ImageWriteAccessor accessor(image);
@@ -52,7 +52,7 @@ namespace
     const auto radiusSquared = static_cast<double>(radius) * radius;
     const auto voxels = static_cast<std::size_t>(size) * size * size;
 
-    for (unsigned int t = 0; t < timeSteps; ++t)
+    for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
       for (unsigned int z = 0; z < size; ++z)
         for (unsigned int y = 0; y < size; ++y)
           for (unsigned int x = 0; x < size; ++x)

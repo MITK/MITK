@@ -67,10 +67,10 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
   mitk::Surface *surface = this->GetOutput();
   auto *inputContour = (mitk::ContourModel *)GetInput();
 
-  unsigned int numberOfTimeSteps = inputContour->GetTimeSteps();
+  const TimeStepType numberOfTimeSteps = inputContour->GetTimeSteps();
   surface->Expand(numberOfTimeSteps);
 
-  for (unsigned int currentTimeStep = 0; currentTimeStep < numberOfTimeSteps; currentTimeStep++)
+  for (TimeStepType currentTimeStep = 0; currentTimeStep < numberOfTimeSteps; currentTimeStep++)
   {
     /* First of all convert the control points of the contourModel to vtk points
     * and add lines in between them

@@ -63,7 +63,7 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
     m_SensibleMinimumThreshold = std::numeric_limits<ScalarType>::max();
     m_SensibleMaximumThreshold = std::numeric_limits<ScalarType>::lowest();
     Image::StatisticsHolderPointer statistics = referenceImage->GetStatistics();
-    for (unsigned int ts = 0; ts < referenceImage->GetTimeSteps(); ++ts)
+    for (TimeStepType ts = 0; ts < referenceImage->GetTimeSteps(); ++ts)
     {
       m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, static_cast<double>(statistics->GetScalarValueMin()));
       m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, static_cast<double>(statistics->GetScalarValueMax()));
@@ -110,7 +110,7 @@ void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
                                                     MultiLabelSegmentation *segmentation,
-                                                    unsigned int timeStep)
+                                                    TimeStepType timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;

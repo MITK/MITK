@@ -81,7 +81,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
   // get and update the PointSet
   const mitk::PointSet *pointset = this->GetInput();
   // pointset->Update();
-  int timestep = this->GetTimestep();
+  const TimeStepType timestep = this->GetTimestep();
 
   mitk::PointSet::DataType *itkPointSet = pointset->GetPointSet(timestep);
   mitk::PointSet::PointsContainer *points = itkPointSet->GetPoints();
@@ -184,7 +184,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
   /* iterate over all points in pointset and apply properties to corresponding vtk objects */
   // get and update the PointSet
   const mitk::PointSet *pointset = this->GetInput();
-  int timestep = this->GetTimestep();
+  const TimeStepType timestep = this->GetTimestep();
   mitk::PointSet::DataType *itkPointSet = pointset->GetPointSet(timestep);
   mitk::PointSet::PointsContainer *points = itkPointSet->GetPoints();
   mitk::PointSet::PointDataContainer *pointData = itkPointSet->GetPointData();

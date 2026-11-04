@@ -19,13 +19,12 @@ found in the LICENSE file.
 #include <mitkMaskedAlgorithmHelper.h>
 #include <mitkMAPAlgorithmHelper.h>
 
-mitk::Image::Pointer
-mitk::TimeFramesRegistrationHelper::GetFrameImage(const mitk::Image* image,
-    mitk::TimePointType timePoint) const
+mitk::Image::Pointer mitk::TimeFramesRegistrationHelper::GetFrameImage(const mitk::Image *image,
+                                                                       mitk::TimeStepType timeStep) const
 {
   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(timePoint);
+  imageTimeSelector->SetTimeNr(timeStep);
   imageTimeSelector->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer frameImage = imageTimeSelector->GetOutput();
@@ -56,11 +55,11 @@ mitk::TimeFramesRegistrationHelper::Generate()
     }
   }
 
-  double progressDelta = 1.0 / ((this->m_4DImage->GetTimeSteps() - 1) * 3.0);
+  double progressDelta = 1.0 / (static_cast<double>(this->m_4DImage->GetTimeSteps() - 1) * 3.0);
   m_Progress = 0.0;
 
   //process the frames
-  for (unsigned int i = 1; i < this->m_4DImage->GetTimeSteps(); ++i)
+  for (mitk::TimeStepType i = 1; i < this->m_4DImage->GetTimeSteps(); ++i)
   {
     Image::Pointer movingFrame = GetFrameImage(this->m_4DImage, i);
     Image::Pointer mappedFrame;
@@ -74,14 +73,14 @@ mitk::TimeFramesRegistrationHelper::Generate()
       RegistrationPointer reg = DoFrameRegistration(movingFrame, targetFrame, mask);
 
       m_Progress += progressDelta;
-      this->InvokeEvent(::mitk::FrameRegistrationEvent(nullptr,
-                        "Registered frame #" +::map::core::convert::toStr(i)));
+      this->InvokeEvent(::mitk::FrameRegistrationEvent(
+        nullptr, "Registered frame #" + ::map::core::convert::toStr(static_cast<unsigned int>(i))));
 
       mappedFrame = DoFrameMapping(movingFrame, reg, targetFrame);
 
       m_Progress += progressDelta;
-      this->InvokeEvent(::mitk::FrameMappingEvent(nullptr,
-                        "Mapped frame #" + ::map::core::convert::toStr(i)));
+      this->InvokeEvent(::mitk::FrameMappingEvent(
+        nullptr, "Mapped frame #" + ::map::core::convert::toStr(static_cast<unsigned int>(i))));
 
       mitk::ImageReadAccessor accessor(mappedFrame, mappedFrame->GetVolumeData(0, 0, nullptr,
                                        mitk::Image::ReferenceMemory));

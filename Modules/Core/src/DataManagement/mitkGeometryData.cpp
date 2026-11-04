@@ -60,8 +60,8 @@ bool mitk::Equal(const mitk::GeometryData &leftHandSide,
                  mitk::ScalarType eps,
                  bool verbose)
 {
-  unsigned int timeStepsLeft = leftHandSide.GetTimeGeometry()->CountTimeSteps();
-  unsigned int timeStepsRight = rightHandSide.GetTimeGeometry()->CountTimeSteps();
+  const TimeStepType timeStepsLeft = leftHandSide.GetTimeGeometry()->CountTimeSteps();
+  const TimeStepType timeStepsRight = rightHandSide.GetTimeGeometry()->CountTimeSteps();
 
   if (timeStepsLeft != timeStepsRight)
   {
@@ -75,7 +75,7 @@ bool mitk::Equal(const mitk::GeometryData &leftHandSide,
 
   bool allEqual = true;
 
-  for (unsigned int t = 0; t < timeStepsLeft; ++t)
+  for (TimeStepType t = 0; t < timeStepsLeft; ++t)
   {
     BaseGeometry *geomLeft = leftHandSide.GetGeometry(t);
     BaseGeometry *geomRight = rightHandSide.GetGeometry(t);

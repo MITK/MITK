@@ -327,9 +327,9 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
   auto contour = this->GetContour();
   contour->Concatenate(m_PreviewContour);
 
-  auto numberOfTimesteps = static_cast<int>(contour->GetTimeSteps());
+  const TimeStepType numberOfTimesteps = contour->GetTimeSteps();
 
-  for (int i = 0; i <= numberOfTimesteps; ++i)
+  for (TimeStepType i = 0; i <= numberOfTimesteps; ++i)
     contour->Close(i);
 
   this->ReleaseHelperObjects(false);

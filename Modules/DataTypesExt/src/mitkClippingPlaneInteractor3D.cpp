@@ -117,7 +117,7 @@ void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, Intera
                                                m_InitialPickedWorldPoint);
 
   // Get the timestep to also support 3D+t
-  int timeStep = 0;
+  TimeStepType timeStep = 0;
   if ((interactionEvent->GetSender()) != nullptr)
     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
@@ -142,7 +142,7 @@ void mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction *, Interacti
                                                m_InitialPickedWorldPoint);
 
   // Get the timestep to also support 3D+t
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
@@ -172,7 +172,7 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
   Point3D origin = m_OriginalGeometry->GetOrigin();
 
   // Get the timestep to also support 3D+t
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // If data is an mitk::Surface, extract it
   Surface::Pointer surface = dynamic_cast<Surface *>(this->GetDataNode()->GetData());
@@ -267,7 +267,7 @@ void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, Interac
     // Use center of data bounding box as center of rotation
     Point3D rotationCenter = m_OriginalGeometry->GetCenter();
 
-    int timeStep = 0;
+    TimeStepType timeStep = 0;
     if ((interactionEvent->GetSender()) != nullptr)
       timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
@@ -294,7 +294,7 @@ void mitk::ClippingPlaneInteractor3D::ColorizeSurface(BaseRenderer::Pointer rend
   }
 
   // Get the timestep to also support 3D+t
-  int timeStep = 0;
+  TimeStepType timeStep = 0;
   if (renderer.IsNotNull())
     timeStep = renderer->GetTimeStep(data);
 

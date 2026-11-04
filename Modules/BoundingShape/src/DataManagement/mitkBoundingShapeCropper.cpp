@@ -48,7 +48,7 @@ namespace mitk
   BoundingShapeCropper::~BoundingShapeCropper() {}
 
   template <typename TPixel, unsigned int VImageDimension>
-  void BoundingShapeCropper::CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, int timeStep)
+  void BoundingShapeCropper::CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, TimeStepType timeStep)
   {
     MITK_INFO << "Scalar Pixeltype" << std::endl;
 
@@ -284,7 +284,7 @@ namespace mitk
     m_TimeOfHeaderInitialization.Modified();
   }
 
-  void BoundingShapeCropper::ComputeData(mitk::Image *image, int boTimeStep)
+  void BoundingShapeCropper::ComputeData(mitk::Image *image, TimeStepType boTimeStep)
   {
     // examine dimension and pixeltype
     if ((image == nullptr) || (image->GetDimension() > 4) || (image->GetDimension() <= 2))
@@ -318,8 +318,8 @@ namespace mitk
 
     // iterate over all time steps and perform cropping or masking on all or a specific timestep (previously specified
     // by UseCurrentTimeStepOnly)
-    int tstart = outputRegion.GetIndex(3);
-    int tmax = tstart + outputRegion.GetSize(3);
+    const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+    const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
     if (this->m_UseCropTimeStepOnly)
     {
@@ -341,8 +341,7 @@ namespace mitk
     }
     else
     {
-      int t;
-      for (t = tstart; t < tmax; ++t)
+      for (TimeStepType t = tstart; t < tmax; ++t)
       {
         mitk::SlicedGeometry3D *slicedGeometry = output->GetSlicedGeometry(t);
         auto indexToWorldTransform = AffineTransform3D::New();

@@ -213,7 +213,7 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
 
 mitk::Image::Pointer ExtractSliceFromImage(mitk::Image* image,
                                           const mitk::PlaneGeometry * contourPlane,
-                                          unsigned int timeStep)
+                                          mitk::TimeStepType timeStep)
 {
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
   // set to false to extract a slice
@@ -1303,7 +1303,8 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
         {
           auto contourNode = it->Value();
           auto labelID = dynamic_cast<mitk::UShortProperty *>(contourNode->GetProperty("labelID"))->GetValue();
-          auto timeStep = dynamic_cast<mitk::IntProperty *>(contourNode->GetProperty("timeStep"))->GetValue();
+          auto timeStep = static_cast<mitk::TimeStepType>(
+            dynamic_cast<mitk::IntProperty *>(contourNode->GetProperty("timeStep"))->GetValue());
 
           auto planeGeometry = dynamic_cast<mitk::PlanarFigure *>(contourNode->GetData())->GetPlaneGeometry();
           auto groupID = labelSetImage->GetGroupIndexOfLabel(labelID);

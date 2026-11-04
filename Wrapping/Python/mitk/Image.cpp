@@ -159,7 +159,7 @@ py::array BuildNumpyArray(const Image& img, const void* data, bool writeable, py
 
 py::array AsNumpyDirect(Image& img, bool writeable, mitk::TimeStepType time_step)
 {
-  void* data = img.GetData(static_cast<int>(time_step));
+  void* data = img.GetData(time_step);
 
   if (data == nullptr)
     mitkThrow() << "Could not access image data at time step " << time_step;
@@ -243,8 +243,8 @@ Image::Pointer ImageFromNumpy(py::array array,
   {
     const auto bytesPerVolume = static_cast<size_t>(arr.nbytes()) / dims[3];
     const auto* base = static_cast<const unsigned char*>(arr.data());
-    for (unsigned int t = 0; t < dims[3]; ++t)
-      img->SetVolume(base + static_cast<size_t>(t) * bytesPerVolume, static_cast<int>(t));
+    for (mitk::TimeStepType t = 0; t < dims[3]; ++t)
+      img->SetVolume(base + t * bytesPerVolume, t);
   }
 
   // Apply geometry overrides to every time step so a 4D image is not left

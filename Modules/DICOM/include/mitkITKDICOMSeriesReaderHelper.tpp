@@ -99,7 +99,7 @@ mitk::ITKDICOMSeriesReaderHelper
     const GantryTiltInformation& tiltInfo,
     itk::GDCMImageIO::Pointer& io)
 {
-  unsigned int numberOfTimeSteps = filenamesForTimeSteps.size();
+  const TimeStepType numberOfTimeSteps = filenamesForTimeSteps.size();
 
   MITK_DEBUG << "Start extracting time bounds of time steps";
   const TimeBoundsList timeBoundsList = ExtractTimeBoundsOfTimeSteps(filenamesForTimeSteps);
@@ -124,7 +124,7 @@ mitk::ITKDICOMSeriesReaderHelper
                              // see NormalDirectionConsistencySorter.
 
 
-  unsigned int currentTimeStep = 0;
+  TimeStepType currentTimeStep = 0;
 
 #ifdef MBILOG_ENABLE_DEBUG
   MITK_DEBUG << "Start loading timestep " << currentTimeStep;

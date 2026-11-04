@@ -1027,7 +1027,7 @@ void QmitkMatchPointRegistrationManipulator::Update3DPreviewGeometry()
   if (m_3DPreviewCloneNode.IsNotNull() && m_3DPreviewCloneNode->GetData() != nullptr)
   {
     auto* data = m_3DPreviewCloneNode->GetData();
-    for (unsigned int i = 0; i < data->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < data->GetTimeSteps(); ++i)
     {
       data->GetGeometry(i)->SetIndexToWorldTransformByVtkMatrix(m_OriginalMovingVtkMatrix);
       data->GetGeometry(i)->Compose(directTransform);
@@ -1038,7 +1038,7 @@ void QmitkMatchPointRegistrationManipulator::Update3DPreviewGeometry()
   if (m_3DPreviewWireframeNode.IsNotNull() && m_3DPreviewWireframeNode->GetData() != nullptr)
   {
     auto* data = m_3DPreviewWireframeNode->GetData();
-    for (unsigned int i = 0; i < data->GetTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 0; i < data->GetTimeSteps(); ++i)
     {
       data->GetGeometry(i)->SetIndexToWorldTransformByVtkMatrix(m_OriginalMovingVtkMatrix);
       data->GetGeometry(i)->Compose(directTransform);

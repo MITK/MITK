@@ -105,14 +105,14 @@ mitk::Image::Pointer mitk::CompressedImageContainer::DecompressImage() const
     return nullptr;
 
   const auto numSlices = static_cast<unsigned int>(m_CompressedImageData[0].size());
-  const auto numTimeSteps = static_cast<unsigned int>(m_CompressedImageData.size());
+  const TimeStepType numTimeSteps = m_CompressedImageData.size();
   const auto numSliceBytes = m_PixelType->GetSize() * m_SliceDimensions[0] * m_SliceDimensions[1];
 
   std::array<unsigned int, 4> dimensions;
   dimensions[0] = m_SliceDimensions[0];
   dimensions[1] = m_SliceDimensions[1];
   dimensions[2] = numSlices;
-  dimensions[3] = numTimeSteps;
+  dimensions[3] = static_cast<unsigned int>(numTimeSteps);
 
   auto image = Image::New();
   image->Initialize(*m_PixelType, m_Dimension, dimensions.data());
@@ -121,7 +121,7 @@ mitk::Image::Pointer mitk::CompressedImageContainer::DecompressImage() const
 
   for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {
-    ImageWriteAccessor accessor(image, image->GetVolumeData(static_cast<int>(t)));
+    ImageWriteAccessor accessor(image, image->GetVolumeData(t));
     auto* volume = reinterpret_cast<char*>(accessor.GetData());
 
     threader->ParallelizeArray(0, numSlices, [&](itk::SizeValueType s)

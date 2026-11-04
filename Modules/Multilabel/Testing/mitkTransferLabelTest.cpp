@@ -257,10 +257,11 @@ public:
 
   using Index = std::array<std::size_t, 3>;
 
-  static mitk::MultiLabelSegmentation::Pointer CreateSurfaceTestSegmentation(unsigned int timeSteps, bool tilted = false)
+  static mitk::MultiLabelSegmentation::Pointer CreateSurfaceTestSegmentation(mitk::TimeStepType timeSteps,
+    bool tilted = false)
   {
     auto referenceImage = mitk::Image::New();
-    unsigned int dimensions[4] = { 40, 40, 40, timeSteps };
+    unsigned int dimensions[4] = { 40, 40, 40, static_cast<unsigned int>(timeSteps) };
     referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 1 < timeSteps ? 4 : 3, dimensions);
 
     if (tilted)
@@ -316,8 +317,8 @@ public:
 
     auto surface = mitk::Surface::New();
     surface->SetTimeGeometry(surfaceTimeGeometry);
-    surface->Expand(static_cast<unsigned int>(timeGeometry->CountTimeSteps()));
-    surface->SetVtkPolyData(polyData, static_cast<unsigned int>(timeStep));
+    surface->Expand(timeGeometry->CountTimeSteps());
+    surface->SetVtkPolyData(polyData, timeStep);
 
     return surface;
   }

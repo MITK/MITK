@@ -44,8 +44,8 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 
 void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   // disallow adding of new points if maximum number of points is reached
   if (m_MaxNumberOfPoints > 1 && m_PointSet->GetSize(timeStep) >= m_MaxNumberOfPoints)
@@ -120,8 +120,8 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
 
 void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
@@ -196,8 +196,8 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, Interaction
   if (!m_IsRemovalEnabled)
     return;
 
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
@@ -242,7 +242,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, Interaction
 
 void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
@@ -262,8 +262,8 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
   if (!m_IsMovementEnabled)
     return;
 
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
   {
@@ -314,8 +314,8 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
 
 void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
@@ -349,8 +349,8 @@ void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction *,
 
 void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
@@ -496,8 +496,8 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionE
   if (!m_IsMovementEnabled)
     return;
 
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
 
@@ -563,7 +563,7 @@ void mitk::PointSetDataInteractor::SetMaxPoints(unsigned int maxNumber)
   m_MaxNumberOfPoints = maxNumber;
 }
 
-int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsigned int time, float accuracy)
+int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, TimeStepType time, float accuracy)
 {
   // Iterate over point set and check if any point is close enough to the pointer to be selected.
   // Choose the closest one of these candidates.
@@ -619,7 +619,7 @@ bool mitk::PointSetDataInteractor::CanAddPoint(const InteractionEvent* interacti
   return m_Is3DPointPlacementEnabled || interactionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard3D;
 }
 
-void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType timeInMs)
+void mitk::PointSetDataInteractor::UnselectAll(TimeStepType timeStep, TimePointType timeInMs)
 {
   auto *pointSet = dynamic_cast<mitk::PointSet *>(GetDataNode()->GetData());
   if (pointSet == nullptr)
@@ -667,7 +667,7 @@ void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType
   }
 }
 
-void mitk::PointSetDataInteractor::SelectPoint(int position, unsigned int timeStep, ScalarType timeInMS)
+void mitk::PointSetDataInteractor::SelectPoint(int position, TimeStepType timeStep, TimePointType timeInMS)
 {
   auto *pointSet = dynamic_cast<mitk::PointSet *>(this->GetDataNode()->GetData());
 

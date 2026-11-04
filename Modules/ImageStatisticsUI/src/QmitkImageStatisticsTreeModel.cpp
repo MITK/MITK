@@ -516,14 +516,14 @@ QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation 
 
 void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes)
 {
-  std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> tempNodes;
+  std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> tempNodes;
   for (const auto &node : nodes)
   {
     auto data = node->GetData();
     if (data)
     {
       auto timeSteps = data->GetTimeSteps();
-      for (unsigned int i = 0; i < timeSteps; i++)
+      for (mitk::TimeStepType i = 0; i < timeSteps; i++)
       {
         tempNodes.push_back(std::make_pair(node, i));
       }
@@ -543,7 +543,7 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
 
 void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes)
 {
-  std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> tempNodes;
+  std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> tempNodes;
   for (const auto &node : nodes)
   {
     auto data = node->GetData();
@@ -555,7 +555,7 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
       {
         timeSteps = m_TimeStepResolvedImageNodes.size();
       }
-      for (unsigned int i = 0; i < timeSteps; i++)
+      for (mitk::TimeStepType i = 0; i < timeSteps; i++)
       {
         tempNodes.push_back(std::make_pair(node, i));
       }
@@ -750,7 +750,7 @@ void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const
   // 4. hierarchy level: time steps (optional, only if >1 time step)
   if (statistic->GetTimeSteps() > 1)
   {
-    for (unsigned int i = 0; i < statistic->GetTimeSteps(); i++)
+    for (mitk::TimeStepType i = 0; i < statistic->GetTimeSteps(); i++)
     {
       QString timeStepLabel = "[" + QString::number(i) + "] " +
         QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";

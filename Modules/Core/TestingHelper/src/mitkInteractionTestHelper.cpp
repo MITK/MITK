@@ -249,7 +249,7 @@ void mitk::InteractionTestHelper::LoadInteraction()
   parser.SetReferenceCount(0);
 }
 
-void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
+void mitk::InteractionTestHelper::SetTimeStep(TimeStepType newTimeStep)
 {
   auto rm = mitk::RenderingManager::GetInstance();
   rm->InitializeViewsByBoundingObjects(m_DataStorage);
@@ -258,7 +258,7 @@ void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 
   if (timeStepIsvalid)
   {
-    rm->GetTimeNavigationController()->GetStepper()->SetPos(newTimeStep);
+    rm->GetTimeNavigationController()->GetStepper()->SetPos(static_cast<unsigned int>(newTimeStep));
   }
 }
 

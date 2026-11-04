@@ -29,7 +29,7 @@ found in the LICENSE file.
 template<typename TPixel>
 void ReadVoxelInternal(const mitk::PixelType, const mitk::Image *image,
   const ::itk::Index<3> index,
-  unsigned int timestep, mitk::ModelTraitsInterface::ParameterValueType &value)
+  mitk::TimeStepType timestep, mitk::ModelTraitsInterface::ParameterValueType &value)
 {
   // Read voxel
   if (image->GetDimension() == 2)
@@ -58,7 +58,7 @@ void ReadVoxelInternal(const mitk::PixelType, const mitk::Image *image,
 
 mitk::ModelTraitsInterface::ParameterValueType
 mitk::ReadVoxel(const mitk::Image* image,
-  const mitk::Point3D& position, unsigned int timestep, bool noThrow)
+  const mitk::Point3D& position, mitk::TimeStepType timestep, bool noThrow)
 {
   // Calculate index
   ::itk::Index<3> index;
@@ -77,7 +77,7 @@ mitk::ReadVoxel(const mitk::Image* image,
 
 mitk::ModelTraitsInterface::ParameterValueType
 mitk::ReadVoxel(const mitk::Image* image,
-const ::itk::Index<3> &index, unsigned int timestep, bool noThrow)
+const ::itk::Index<3> &index, mitk::TimeStepType timestep, bool noThrow)
 {
   double result = 0.0;
 

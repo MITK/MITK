@@ -321,13 +321,13 @@ std::cout<<"[PASSED]"<<std::endl;
     // InsertPoint(id, point, spec, t) must expand the PointSet to cover time
     // step t, matching SetPoint and the other InsertPoint overloads.
     mitk::PointSet::Pointer ps = mitk::PointSet::New();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("initial time step count", 1u, ps->GetPointSetSeriesSize());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("initial time step count", mitk::TimeStepType{1}, ps->GetPointSetSeriesSize());
 
     mitk::Point3D point;
     point.Fill(42);
     ps->InsertPoint(0, point, mitk::PTEDGE, 3);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("time steps expanded to t+1", 4u, ps->GetPointSetSeriesSize());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("time steps expanded to t+1", mitk::TimeStepType{4}, ps->GetPointSetSeriesSize());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("point exists at target time step", true, ps->IndexExists(0, 3));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("point value round-trips", true, ps->GetPoint(0, 3) == point);
   }

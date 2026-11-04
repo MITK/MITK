@@ -68,8 +68,8 @@ public:
     //check for Exception if UpperBoundaryTimestep < LowerBoundaryTimestep
     auto refImage2Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename2Dt);
     m_cropTimestepsFilter->SetInput(refImage2Dt);
-    unsigned int lowerTimeStep = 5;
-    unsigned int upperTimeStep = 4;
+    mitk::TimeStepType lowerTimeStep = 5;
+    mitk::TimeStepType upperTimeStep = 4;
     m_cropTimestepsFilter->SetLowerBoundaryTimestep(lowerTimeStep);
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimeStep);
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetLowerBoundaryTimestep(), lowerTimeStep);
@@ -82,7 +82,7 @@ public:
     //check for correction if UpperBoundaryTimestep > image->GetTimestep()
     auto refImage2Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename2Dt);
     m_cropTimestepsFilter->SetInput(refImage2Dt);
-    unsigned int upperTimeStep = 11;
+    mitk::TimeStepType upperTimeStep = 11;
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimeStep);
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), upperTimeStep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
@@ -95,8 +95,8 @@ public:
     auto refImage3Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename3Dt);
     auto timeGeometryBefore = refImage3Dt->GetTimeGeometry()->Clone();
     m_cropTimestepsFilter->SetInput(refImage3Dt);
-    unsigned int expectedLowerTimestep = 0;
-    unsigned int expectedUpperTimestep = std::numeric_limits<unsigned int>::max();
+    mitk::TimeStepType expectedLowerTimestep = 0;
+    mitk::TimeStepType expectedUpperTimestep = std::numeric_limits<mitk::TimeStepType>::max();
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetLowerBoundaryTimestep(), expectedLowerTimestep);
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), expectedUpperTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
@@ -117,7 +117,7 @@ public:
     MITK_WARN << "before: " << *refImage3Dt;
     auto timeGeometryBefore = refImage3Dt->GetTimeGeometry()->Clone();
     m_cropTimestepsFilter->SetInput(refImage3Dt);
-    unsigned int lowerTimestep = 2;
+    mitk::TimeStepType lowerTimestep = 2;
     m_cropTimestepsFilter->SetLowerBoundaryTimestep(lowerTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
     auto result = m_cropTimestepsFilter->GetOutput();
@@ -133,7 +133,7 @@ public:
     auto refImage3Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename3Dt);
     auto timeGeometryBefore = refImage3Dt->GetTimeGeometry()->Clone();
     m_cropTimestepsFilter->SetInput(refImage3Dt);
-    unsigned int upperTimestep = 7;
+    mitk::TimeStepType upperTimestep = 7;
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
     auto result = m_cropTimestepsFilter->GetOutput();
@@ -149,8 +149,8 @@ public:
     auto refImage3Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename3Dt);
     m_cropTimestepsFilter->SetInput(refImage3Dt);
     auto timeGeometryBefore = refImage3Dt->GetTimeGeometry()->Clone();
-    unsigned int lowerTimestep = 1;
-    unsigned int upperTimestep = 7;
+    mitk::TimeStepType lowerTimestep = 1;
+    mitk::TimeStepType upperTimestep = 7;
     m_cropTimestepsFilter->SetLowerBoundaryTimestep(lowerTimestep);
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
@@ -166,8 +166,8 @@ public:
     //Crop lower 1 and upper 1 timestep, resulting in 1 remaining timestep (2D+t input)
     auto refImage2Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename2Dt);
     m_cropTimestepsFilter->SetInput(refImage2Dt);
-    unsigned int lowerTimestep = 1;
-    unsigned int upperTimestep = 2;
+    mitk::TimeStepType lowerTimestep = 1;
+    mitk::TimeStepType upperTimestep = 2;
     m_cropTimestepsFilter->SetLowerBoundaryTimestep(lowerTimestep);
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());

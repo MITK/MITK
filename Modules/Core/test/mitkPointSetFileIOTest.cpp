@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <vector>
 
 // unsigned int numberOfTestPointSets = 1;
-unsigned int numberOfTimeSeries = 5;
+const mitk::TimeStepType numberOfTimeSeries = 5;
 
 // create one test PointSet
 class mitkPointSetFileIOTestClass
@@ -46,7 +46,7 @@ public:
     std::uniform_real_distribution<> r(0, 1);
     std::mt19937 gen;
 
-    for (unsigned int t = 0; t < numberOfTimeSeries; t++)
+    for (mitk::TimeStepType t = 0; t < numberOfTimeSeries; t++)
     {
       for (unsigned int position = 0; position < 3; ++position)
       {
@@ -72,7 +72,7 @@ public:
   {
     MITK_TEST_CONDITION(pointSet1->GetSize() == pointSet2->GetSize(), "Testing if PointSet size is correct");
 
-    for (unsigned int t = 0; t < numberOfTimeSeries; t++)
+    for (mitk::TimeStepType t = 0; t < numberOfTimeSeries; t++)
     {
       for (unsigned int i = 0; i < (unsigned int)pointSet1->GetSize(t); ++i)
       {

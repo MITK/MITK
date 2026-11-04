@@ -44,7 +44,7 @@ namespace mitk
    * \param timePoint The time point value for this frame.
    * \return A MITK Image representing a single frame of a dynamic image.
    */
-  Image::Pointer MITKTESTINGHELPER_EXPORT GenerateTestFrame(double timePoint);
+  Image::Pointer MITKTESTINGHELPER_EXPORT GenerateTestFrame(TimePointType timePoint);
 
   /**
    * \brief Generate a test mask as a MITK Image.

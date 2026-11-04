@@ -459,5 +459,5 @@ void QmitkRenderWindowWidget::ResetGeometry(const mitk::TimeGeometry* referenceG
 
   // reset position and time step
   this->GetSliceNavigationController()->SelectSliceByPoint(currentPosition);
-  renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
+  renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(static_cast<unsigned int>(imageTimeStep));
 }

@@ -2325,7 +2325,7 @@ Applies a layout document of version 3.0 or 2.0. **All existing cells are torn d
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure (version other than 2.0 or 3.0, duplicate window ids, unknown view direction, missing group reference in strict mode, type errors). The `detail` field carries the engine's diagnostic message. |
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure, e.g. version other than 2.0 or 3.0, duplicate window ids, unknown view direction, missing group reference in strict mode, a 3.0 window whose `links.time` is missing or targets anything but `global`, the reserved group `global` in any spelling as a `groups` key or as the target of any other link (also in 2.0 documents, which read only `links.selection`), type errors; the full rule set is in the schema descriptions. The `detail` field carries the engine's diagnostic message. |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
 | 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout setter registered |

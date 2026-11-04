@@ -12,7 +12,8 @@
 
 """The layout documents in the tree validate against the v3 schema, and both
 schemas refuse what the loader refuses about `links.time` and the reserved
-group `global`.
+group `global`. The v3 schema also refuses a group named like the reserved
+group, which the loader ignores with a warning.
 
 The documents are read as raw JSON: they are 3.0 documents, and the DSL
 targets 2.0. Nothing here imports MITK.
@@ -130,6 +131,15 @@ def _v3_refused():
                 f"groups declares {group!r}",
                 _with_groups(_window_doc("3.0", time="global"), {"main": {"select_all": True}, group: {}}),
                 _with_groups(_window_doc("3.0", time="global"), {"main": {"select_all": True}}),
+            )
+        )
+    # The reserved group's display name; the loader ignores it with a warning.
+    for name in ["Global", "GLOBAL", " global "]:
+        cases.append(
+            (
+                f"a group named {name!r}",
+                _with_groups(_window_doc("3.0", time="global"), {"main": {"select_all": True, "name": name}}),
+                _with_groups(_window_doc("3.0", time="global"), {"main": {"select_all": True, "name": "Main"}}),
             )
         )
     return cases

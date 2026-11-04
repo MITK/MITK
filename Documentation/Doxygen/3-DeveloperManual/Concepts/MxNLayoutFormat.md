@@ -207,9 +207,12 @@ The properties of a group entry:
   windows that join it later.
 - `color` (v3.0): optional hue as `"#RRGGBB"`, shown verbatim by the sync
   furniture. Without it the editor assigns a default hue by group creation
-  order. A malformed value is ignored with a warning, never rejected.
+  order. A malformed value, or one too close to the reserved group's colours
+  (see below), is ignored with a warning, never rejected.
 - `name` (v3.0): optional display name, shown instead of the group id on
-  every surface. The id (the dict key) stays the URL-safe identity.
+  every surface. The id (the dict key) stays the URL-safe identity. The
+  reserved group's display name "Global" is ignored with a warning (see
+  below).
 
 Groups referenced only by navigation dimensions may use an empty entry `{}`;
 such a group exists while some window links it and goes with its last link.
@@ -312,10 +315,15 @@ instead of a value of their own - on `time`, the application's time point.
   that accept it may grow without a format change.
 - It is never a user group: the id is reserved in every spelling (`Global`,
   `GLOBAL`, ...), in `"2.0"` documents as well.
-- Its display name is "Global" and its colour the Workbench's text colour.
-  Both are fixed, so a group `name` "Global" (in any case, ignoring
-  surrounding blanks) or a `color` too close to that colour or to black is
-  ignored with a warning when a layout is loaded, like a malformed one.
+- Its display name is "Global". Its colour is the light gray `#f1f1f1` (the
+  Dark style's text colour) on the barcodes, plates and arrange-mode frames,
+  which are dark in every style, and the current style's text colour on the
+  surfaces that follow the style, such as the layout editor.
+- No user group can take either: a group `name` "Global" (in any case,
+  ignoring surrounding blanks) or a `color` at a CIE76 distance below 15 to
+  `#f1f1f1` or to black is ignored with a warning when a layout is loaded,
+  like a malformed one. The band is the same in every style, so a layout
+  loads the same in each. The v3.0 schema refuses such a `name`.
 
 ## 3D windows
 

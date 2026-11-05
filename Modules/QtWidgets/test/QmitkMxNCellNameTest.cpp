@@ -53,6 +53,7 @@ class QmitkMxNCellNameTestSuite : public mitk::TestFixture
   MITK_TEST(Rename_FromContextMenu_SetsTheAcceptedName);
   MITK_TEST(Rename_FromContextMenu_CancelChangesNothing);
   MITK_TEST(Rename_FromPlateMenu_SetsTheAcceptedName);
+  MITK_TEST(Rename_LockedWhileTheDialogIsOpen_ChangesNothing);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -115,9 +116,11 @@ public:
   /**
    * Trigger 'action' and answer the input dialog it opens: with 'answer', or
    * by cancelling without one. The dialog is modal and opens deferred, so the
-   * answer polls from a timer, which also fires inside the dialog's own loop.
+   * answer polls from a timer, which also fires inside the dialog's own loop;
+   * 'whileOpen' runs there, before the answer.
    */
-  static DialogOutcome AnswerRename(QAction* action, const std::optional<QString>& answer)
+  static DialogOutcome AnswerRename(QAction* action, const std::optional<QString>& answer,
+                                    const std::function<void()>& whileOpen = {})
   {
     DialogOutcome outcome;
     bool answered = false;
@@ -134,6 +137,10 @@ public:
       answered = true;
       outcome.opened = true;
       outcome.prefill = dialog->textValue();
+      if (whileOpen)
+      {
+        whileOpen();
+      }
       if (answer.has_value())
       {
         dialog->setTextValue(*answer);
@@ -324,6 +331,21 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The accepted name is set on that window", std::string("3D check"),
                                  DisplayName(1).toStdString());
     CPPUNIT_ASSERT_MESSAGE("No other window is renamed", DisplayName(0).isEmpty());
+  }
+
+  void Rename_LockedWhileTheDialogIsOpen_ChangesNothing()
+  {
+    // The dialog's own event loop delivers timers and REST calls; a
+    // Structure lock set there must stop the rename as one set before.
+    m_Editor->SetCellDisplayName(CellId(0), QStringLiteral("Edit"));
+    QMenu menu;
+    Overlay(0)->PopulateContextMenu(&menu, QPoint());
+
+    const auto outcome = AnswerRename(FindAction(menu, QStringLiteral("Rename window...")), QStringLiteral("Edit 2"),
+                                      [this]() { m_Editor->SetLayoutLocks(QmitkMxNLayoutLock::Structure); });
+
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the dialog opened", outcome.opened);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The locked window keeps its name", std::string("Edit"), DisplayName(0).toStdString());
   }
 };
 

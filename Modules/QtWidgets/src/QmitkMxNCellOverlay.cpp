@@ -3522,8 +3522,9 @@ void QmitkMxNCellOverlay::OpenRenameDialog()
       name = QInputDialog::getText(this, tr("Rename window"), tr("Window name:"), QLineEdit::Normal,
                                    m_Cell->GetDisplayName(), &accepted);
     }
-    // The dialog's event loop can take the cell away, e.g. with a layout load.
-    if (!accepted || self.isNull())
+    // The dialog's event loop can take the cell away, e.g. with a layout load,
+    // or deliver a lock.
+    if (!accepted || self.isNull() || this->IsLocked(QmitkMxNLayoutLock::Structure))
     {
       return;
     }

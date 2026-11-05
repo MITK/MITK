@@ -279,6 +279,9 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyFilters.reset(new mitk::PropertyFilters);
   context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
+  m_PropertyMigration.reset(new mitk::PropertyMigration);
+  context->RegisterService<mitk::IPropertyMigration>(m_PropertyMigration.get());
+
   m_PropertyPersistence.reset(new mitk::PropertyPersistence);
   context->RegisterService<mitk::IPropertyPersistence>(m_PropertyPersistence.get());
 

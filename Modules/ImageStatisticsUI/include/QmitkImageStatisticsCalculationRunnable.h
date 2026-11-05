@@ -24,6 +24,11 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsUIExports.h>
 
+namespace mitk
+{
+  class PlanarFigure;
+}
+
 /**
  * \brief Background thread runnable for computing image statistics.
  *
@@ -59,6 +64,8 @@ public:
    * \param[in] image The input image for which statistics will be calculated.
    * \param[in] mask Optional mask data. Supported types: mitk::MultiLabelSegmentation,
    *                 mitk::Image (binary mask), or mitk::PlanarFigure. Pass nullptr for no mask.
+   *                 A planar figure is copied here, so it may be edited while the
+   *                 computation runs. Call from the thread that owns the mask.
    * \throw mitk::Exception if the mask is not nullptr and not one of the supported types.
    */
   void Initialize(const mitk::Image* image, const mitk::BaseData* mask);
@@ -80,6 +87,14 @@ public:
    * \return Pointer to the mask data, or nullptr if no mask was set.
    */
   const mitk::BaseData* GetMaskData() const;
+
+  /**
+   * \brief Returns whether the image or the mask were modified after Initialize(),
+   *        so the results may no longer describe them.
+   *
+   * Call from the thread that owns the image and the mask.
+   */
+  bool HaveInputsChanged() const;
 
   /**
    * \brief Sets whether zero-valued voxels should be ignored during computation.
@@ -121,6 +136,10 @@ protected:
 private:
   mitk::Image::ConstPointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
   mitk::BaseData::ConstPointer m_MaskData;                             ///< member variable holds the data that should be used as mask statistics calculation.
+  /** Copy of a planar figure mask taken in Initialize(), owned by the computation. */
+  itk::SmartPointer<mitk::PlanarFigure> m_PlanarFigureMask;
+  /** Newest modification time of the image and the mask when Initialize() was called. */
+  itk::ModifiedTimeType m_InputTime = 0;
   mitk::ImageStatisticsContainer::Pointer m_StatisticsContainer;
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.

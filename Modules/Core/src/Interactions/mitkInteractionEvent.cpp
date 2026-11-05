@@ -17,6 +17,7 @@ const std::string mitk::InteractionEvent::KeyEsc = "Escape";
 const std::string mitk::InteractionEvent::KeyEnter = "Enter";
 const std::string mitk::InteractionEvent::KeyReturn = "Return";
 const std::string mitk::InteractionEvent::KeyDelete = "Delete";
+const std::string mitk::InteractionEvent::KeyBackspace = "Backspace";
 const std::string mitk::InteractionEvent::KeyArrowUp = "ArrowUp";
 const std::string mitk::InteractionEvent::KeyArrowDown = "ArrowDown";
 const std::string mitk::InteractionEvent::KeyArrowLeft = "ArrowLeft";

@@ -17,35 +17,28 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <MitkPlanarFigureExports.h>
 
-#include <deque>
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace mitk
 {
   class PlaneGeometry;
 
   /**
-   * \brief Base-class for geometric planar (2D) figures, such as
-   * lines, circles, rectangles, polygons, etc.
+   * \brief Base class of geometric figures on a plane, such as lines, circles and polygons.
    *
-   * \warning Currently does not support time-resolved data handling
+   * A figure is defined by its control points in the 2D coordinates of its
+   * plane, in mm. Its contours, decorations, handles and measurements are
+   * computed from them on demand, so a figure that does not change can be read
+   * concurrently. Every change calls Modified().
    *
-   * Behavior and appearance of PlanarFigures are controlled by various properties; for a detailed
-   * list of appearance properties see mitk::PlanarFigureMapper2D
+   * Figure types check their constraints when control points are set and keep
+   * them when handles are moved. Points are not restricted to the bounds of the
+   * plane; that is a matter of the interaction.
    *
-   * The following properties control general PlanarFigure behavior:
-   *
-   * <ul>
-   *   <li>"selected": true if the planar figure is selected
-   *   <li>"planarfigure.ishovering": true if the mouse "hovers" over the planar figure
-   *   <li>"planarfigure.iseditable": true if the planar figure can be edited (otherwise,
-   *       it can only be picked/selected, but its control points cannot be edited); default is true
-   *   <li>"planarfigure.isextendable": true if new control points can be inserted into the list of control points;
-   *        default is false
-   * </ul>
-   *
-   *
-   * TODO: Implement local 2D transform (including center of rotation...)
-   *
+   * \sa CreatePlanarFigure(), PlanarFigureInteractor, PlanarFigureVtkMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
   {
@@ -53,428 +46,324 @@ namespace mitk
     mitkClassMacro(PlanarFigure, BaseData);
     itkCloneMacro(Self);
 
-      /** \brief Type for individual elements of a polyline (2D points). */
-      typedef Point2D PolyLineElement;
+    /** \brief Kind of a measurement of a planar figure. Its unit follows from the kind. */
+    enum class MeasurementType
+    {
+      Length,
+      Circumference,
+      Area,
+      Angle,
+      Radius,
+      Diameter,
+      MajorAxis,
+      MinorAxis,
+      Thickness,
+      LongAxis,
+      ShortAxis
+    };
 
-    /** \brief Container type for boolean values, used for helper polyline paint flags. */
-    typedef itk::VectorContainer<unsigned long, bool> BoolContainerType;
+    /** \brief A measured value in the unit of its type, see GetUnitSymbol(). */
+    struct Measurement
+    {
+      MeasurementType Type;
+      double Value;
+    };
 
-    /** \brief Type for the list of control points defining the figure. */
-    typedef std::deque<Point2D> ControlPointListType;
-    /** \brief Type for a polyline (vector of 2D points). */
-    typedef std::vector<PolyLineElement> PolyLineType;
+    /** \brief Role of a contour within its figure. */
+    enum class ContourRole
+    {
+      Outline,
+      Hole
+    };
 
-    /** \brief Sets the 2D geometry on which this figure will be placed.
-     *
-     * In most cases, this is a Geometry already owned by another object, e.g.
-     * describing the slice of the image on which measurements will be
-     * performed.
-     */
-    virtual void SetPlaneGeometry(mitk::PlaneGeometry *geometry);
+    /** \brief A polyline of a figure in 2D plane coordinates (mm). */
+    struct Contour
+    {
+      ContourRole Role;
+      bool Closed;
+      std::vector<Point2D> Points;
+    };
 
-    /** \brief Returns (previously set) 2D geometry of this figure. */
-    virtual const PlaneGeometry *GetPlaneGeometry() const;
+    /** \brief Construction line that is not part of the shape, e.g. the control polygon of a Bezier curve. */
+    struct HelperPolyline
+    {
+      std::vector<Point2D> Points;
+    };
 
-    /** \brief True if the planar figure is closed.
-     *
-     * Default is false. The "closed" boolean property must be set in sub-classes. */
-    virtual bool IsClosed() const;
+    /** \brief Marks the angle at a vertex between two arms. Its radius is up to the display. */
+    struct AngleArc
+    {
+      Point2D Vertex;
+      Point2D End1;
+      Point2D End2;
+    };
 
-    /** \brief True if the planar figure has been placed (and can be
-     * displayed/interacted with). */
-    virtual bool IsPlaced() const { return m_FigurePlaced; };
-    /** \brief Place figure at the given point (in 2D index coordinates) onto
-     * the given 2D geometry.
-     *
-     * By default, the first two control points of the figure are set to the
-     * passed point. Further points can be set via AddControlPoint(), if the
-     * current number of control points is below the maximum number of control
-     * points.
-     *
-     * Can be re-implemented in sub-classes as needed.
-     */
-    virtual void PlaceFigure(const Point2D &point);
+    /** \brief Head of an arrow at its tip. Its size is up to the display. */
+    struct ArrowHead
+    {
+      Point2D Tip;
+      Point2D Tail;
+    };
 
-    /**
-    * \brief Adds / inserts new control-points
-    *
-    * This method adds a new control-point with the coordinates defined by point at the given index.
-    * If 'index' == -1 or index is greater than the number of control-points the new point is appended
-    * to the back of the list of control points.
-    * If a control-point already exists for 'index', an additional point is inserted at that position.
-    * It is not possible to add more points if the maximum number of control-points (GetMaximumNumberOfControlPoints())
-    * has been reached.
-    */
-    virtual bool AddControlPoint(const Point2D &point, int index = -1);
+    /** \brief Visual aid of a figure that is not part of its measured shape. */
+    using Decoration = std::variant<HelperPolyline, AngleArc, ArrowHead>;
 
-    /**
-     * \brief Sets the position of an existing control point, optionally creating it if missing.
-     *
-     * \param[in] index               Zero-based index of the control point.
-     * \param[in] point               New 2D coordinates for the control point.
-     * \param[in] createIfDoesNotExist If true, creates the control point at the given index
-     *                                if it does not already exist.
-     * \return True if the control point was set successfully.
-     */
-    virtual bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false);
+    /** \brief Meaning of a handle for editing. */
+    enum class HandleRole
+    {
+      Vertex, /**< A point of the shape. */
+      Center, /**< The center of the shape; moving it moves the whole figure. */
+      Extent  /**< Defines the size of the shape in one direction. */
+    };
 
-    /**
-     * \brief Sets the position of the currently selected control point.
-     *
-     * \param[in] point New 2D coordinates for the currently selected control point.
-     * \return True if a control point is selected and was updated successfully.
-     */
-    virtual bool SetCurrentControlPoint(const Point2D &point);
+    /** \brief A point at which the figure is edited, in 2D plane coordinates (mm). */
+    struct Handle
+    {
+      HandleRole Role;
+      Point2D Position;
+    };
 
-    /** \brief Returns the current number of 2D control points defining this figure. */
-    unsigned int GetNumberOfControlPoints() const;
+    /** \brief How a figure is placed. */
+    enum class PlacementKind
+    {
+      Span,    /**< Defined by two points, e.g. by pressing and dragging, see SetFromSpan(). */
+      Sequence /**< Defined by placing its control points one after another. */
+    };
 
-    /** \brief Returns the minimum number of control points needed to represent
-     * this figure.
-     *
-     * Must be implemented in sub-classes.
-     */
-    virtual unsigned int GetMinimumNumberOfControlPoints() const = 0;
+    /** \brief Name of a measurement type for display, e.g. "Major Axis". */
+    static std::string GetDisplayName(MeasurementType type);
 
-    /** \brief Returns the maximum number of control points allowed for
-    * this figure (e.g. 3 for triangles).
-    *
-    * Must be implemented in sub-classes.
-    */
-    virtual unsigned int GetMaximumNumberOfControlPoints() const = 0;
+    /** \brief Unit of a measurement type: "mm", "mm2" or "deg". */
+    static std::string GetUnitSymbol(MeasurementType type);
 
-    /** \brief Selects currently active control points. */
-    virtual bool SelectControlPoint(unsigned int index);
+    /** \brief Value and typeset unit for display, e.g. "12.34 mm²" or "45.00°", in UTF-8. */
+    static std::string FormatValue(const Measurement &measurement);
 
-    /** \brief Deselect control point; no control point active. */
-    virtual bool DeselectControlPoint();
-
-    /** \brief Return currently selected control point. */
-    virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
-    /** \brief Returns specified control point in 2D world coordinates. */
-    Point2D GetControlPoint(unsigned int index) const;
+    /** \brief Stable identifier of the figure type for file formats and interfaces, e.g. "four_point_angle". */
+    virtual std::string GetTypeId() const = 0;
 
     /**
-    * \brief Returns the id of the control-point that corresponds to the given
-    * polyline-point.
-    */
-    virtual int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const;
+     * \brief Sets the plane the figure lies on.
+     *
+     * The figure keeps a copy of the plane, which defines the coordinate frame
+     * of the control points.
+     *
+     * \throw mitk::Exception if the plane is null, curved or has no extent.
+     */
+    void SetPlaneGeometry(const PlaneGeometry *geometry);
 
-    /** \brief Returns specified control point in world coordinates. */
-    Point3D GetWorldControlPoint(unsigned int index) const;
+    /** \brief The plane the figure lies on. */
+    const PlaneGeometry *GetPlaneGeometry() const;
 
     /**
-     * \brief Returns the polyline representing the planar figure (mutable version).
+     * \brief Takes a time geometry of a single time step that holds a flat plane.
      *
-     * The polyline is regenerated if it is out of date.
-     *
-     * \param[in] index Zero-based index of the polyline to retrieve.
-     * \return Reference to the polyline at the given index.
+     * \throw mitk::Exception for any other geometry.
      */
-    PolyLineType& GetPolyLine(unsigned int index);
+    void SetTimeGeometry(TimeGeometry *geometry) override;
+
+    using Superclass::SetClonedGeometry;
+
+    /** \brief Takes a copy of a flat plane for time step 0. \throw mitk::Exception for any other geometry or time step. */
+    void SetClonedGeometry(const BaseGeometry *geometry, unsigned int time) override;
+
+    /** \throw mitk::Exception if the time geometry of the data is not one a figure can take. */
+    void CopyInformation(const itk::DataObject *data) override;
+
+    /** \brief The control points in 2D plane coordinates (mm). */
+    std::vector<Point2D> GetControlPoints() const;
+
+    std::size_t GetNumberOfControlPoints() const;
+
+    /** \throw mitk::Exception if the index is out of range. */
+    Point2D GetControlPoint(std::size_t index) const;
+
+    /** \brief A control point in world coordinates. \throw mitk::Exception if the index is out of range. */
+    Point3D GetWorldControlPoint(std::size_t index) const;
 
     /**
-     * \brief Returns the polyline representing the planar figure (const version).
+     * \brief Replaces all control points.
      *
-     * \param[in] index Zero-based index of the polyline to retrieve.
-     * \return Const reference to the polyline at the given index.
+     * \throw mitk::Exception if the number of points is outside of the range of
+     *        the figure type (while being placed, only the maximum applies), if
+     *        a coordinate is not finite, or if the points violate a constraint
+     *        of the figure type.
      */
-    const PolyLineType& GetPolyLine(unsigned int index) const;
+    void SetControlPoints(const std::vector<Point2D> &points);
+
+    /** \brief The number of control points a complete figure has at least. */
+    virtual std::size_t GetMinimumNumberOfControlPoints() const = 0;
+
+    /** \brief The number of control points a figure has at most. */
+    virtual std::size_t GetMaximumNumberOfControlPoints() const = 0;
+
+    /** \brief Whether control points can be inserted into and removed from a placed figure. */
+    virtual bool CanInsertControlPoints() const;
 
     /**
-     * \brief Returns a helper polyline that should be drawn at a fixed size regardless of zoom.
+     * \brief Inserts a control point before the given index, or appends it at the end.
      *
-     * Helper polylines are used for annotations such as angle arcs, arrow tips,
-     * or other decorations that should maintain a constant display size.
+     * Allowed for figures that can insert control points, and for appending
+     * while a figure is being placed.
      *
-     * \param[in] index            Zero-based index of the helper polyline.
-     * \param[in] mmPerDisplayUnit Scale factor (mm per display pixel).
-     * \param[in] displayHeight    Height of the display in pixels.
-     * \return Const reference to the helper polyline.
+     * \throw mitk::Exception if inserting is not allowed, the index is out of
+     *        range or SetControlPoints() would not take the resulting points.
      */
-    const PolyLineType& GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
-
-    /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
-    void SetPreviewControlPoint(const Point2D &point);
-
-    /** \brief Marks the PreviewControlPoint as invisible.*/
-    void ResetPreviewContolPoint();
-
-    /** \brief Returns whether or not the PreviewControlPoint is visible.*/
-    bool IsPreviewControlPointVisible() const;
-
-    /** \brief Returns the coordinates of the PreviewControlPoint. */
-    Point2D GetPreviewControlPoint() const;
+    void InsertControlPoint(std::size_t index, const Point2D &point);
 
     /**
-     * \brief Returns the number of features available for this PlanarFigure.
+     * \brief Removes a control point.
      *
-     * Features are measurable quantities such as radius, length, area, angle, etc.
+     * Allowed for figures that can insert control points, and for any figure
+     * while it is being placed.
      *
-     * \return The number of available features.
+     * \throw mitk::Exception if removing is not allowed, the index is out of
+     *        range or SetControlPoints() would not take the resulting points,
+     *        e.g. because a figure that is not being placed would fall below
+     *        its minimum number of points.
      */
-    virtual unsigned int GetNumberOfFeatures() const;
+    void RemoveControlPoint(std::size_t index);
+
+    /** \brief The handles of the figure. By default, every control point is a vertex handle. */
+    virtual std::vector<Handle> GetHandles() const;
 
     /**
-     * \brief Returns the name (identifier) of the specified feature.
+     * \brief Moves a handle and keeps the figure consistent, e.g. the axes of
+     *        an ellipse perpendicular or the center of a circle in the center.
      *
-     * \param[in] index Zero-based index of the feature.
-     * \return The feature name string (e.g., "Radius", "Length", "Area").
+     * Positions are not restricted to the bounds of the plane.
+     *
+     * \throw mitk::Exception if the index is out of range.
      */
-    const char *GetFeatureName(unsigned int index) const;
+    virtual void MoveHandle(std::size_t index, const Point2D &position);
+
+    /** \brief Moves all control points by an offset. */
+    void Translate(const Vector2D &offset);
+
+    /** \brief How the figure is placed. */
+    virtual PlacementKind GetPlacementKind() const = 0;
 
     /**
-     * \brief Returns the physical unit of the specified feature.
+     * \brief Defines the whole figure by two points, as placing it by pressing and dragging does.
      *
-     * \param[in] index Zero-based index of the feature.
-     * \return The unit string (e.g., "mm", "mm2", "deg").
+     * \throw mitk::Exception for figures that are not placed by a span.
      */
-    const char *GetFeatureUnit(unsigned int index) const;
+    virtual void SetFromSpan(const Point2D &start, const Point2D &end);
+
+    /** \brief Marks the figure as being placed, e.g. by an interactor. */
+    void BeginPlacement();
 
     /**
-     * \brief Returns the quantity of the specified feature.
+     * \brief Marks the placement of the figure as finished.
      *
-     * \param[in] index Zero-based index of the feature.
-     * \return The computed quantity (e.g., length in mm, area in mm2).
+     * \throw mitk::Exception if the figure has fewer than its minimum number of
+     *        control points; it is still being placed then.
      */
-    double GetQuantity(unsigned int index) const;
+    void EndPlacement();
 
-    /**
-     * \brief Returns whether the specified feature is active.
-     *
-     * An inactive feature is one that is currently not applicable, for example
-     * the area of a non-closed polygon.
-     *
-     * \param[in] index Zero-based index of the feature.
-     * \return True if the feature exists and is active.
-     */
-    bool IsFeatureActive(unsigned int index) const;
+    /** \brief Whether the figure is being placed. */
+    bool IsBeingPlaced() const;
 
-    /**
-     * \brief Returns whether the specified feature is set to visible.
-     *
-     * \param[in] index Zero-based index of the feature.
-     * \return True if the feature exists and is visible.
-     */
-    bool IsFeatureVisible(unsigned int index) const;
+    /** \brief Whether the figure has been placed completely and has at least the minimum number of control points. */
+    bool IsComplete() const;
 
-    /**
-     * \brief Sets the visibility of the specified feature for annotation display.
-     *
-     * \param[in] index   Zero-based index of the feature.
-     * \param[in] visible If true, the feature will be displayed as an annotation
-     *                    in the RenderWindow.
-     */
-    void SetFeatureVisible(unsigned int index, bool visible);
+    /** \brief Sets whether the shape of the figure is locked, so that editing may only move it. */
+    void SetShapeLocked(bool locked);
 
-    /** \brief Calculates quantities of all features of this planar figure. */
-    virtual void EvaluateFeatures();
+    /** \brief Whether the shape of the figure is locked, so that editing may only move it. */
+    bool IsShapeLocked() const;
 
-    /** \brief Inherited from BaseData. Updates geometry information. */
+    /** \brief Whether the outline of a complete figure is closed. */
+    virtual bool IsClosed() const = 0;
+
+    /** \brief The contours of the figure, computed from its control points. */
+    virtual std::vector<Contour> GetContours() const = 0;
+
+    /** \brief The decorations of the figure, computed from its control points. None by default. */
+    virtual std::vector<Decoration> GetDecorations() const;
+
+    /** \brief The measurements of the figure, computed from its control points in world coordinates. */
+    virtual std::vector<Measurement> GetMeasurements() const = 0;
+
+    /** \brief A single measurement, if the figure has one of this type. */
+    std::optional<double> GetMeasurement(MeasurementType type) const;
+
+    /** \brief A figure without control points is empty; its plane does not count for bounding boxes, for example. */
+    bool IsEmptyTimeStep(unsigned int timeStep) const override;
+
     void UpdateOutputInformation() override;
-
-    /** \brief Inherited from BaseData. Sets the requested region to the largest possible. */
     void SetRequestedRegionToLargestPossibleRegion() override;
-
-    /** \brief Inherited from BaseData. Checks if the requested region is outside the buffered region. */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-
-    /** \brief Inherited from BaseData. Verifies the requested region. */
     bool VerifyRequestedRegion() override;
-
-    /**
-     * \brief Inherited from BaseData. Sets the requested region from another data object.
-     * \param[in] data The data object from which to copy the requested region.
-     */
     void SetRequestedRegion(const itk::DataObject *data) override;
-
-    /** \brief  Returns the current number of polylines  */
-    virtual unsigned short GetPolyLinesSize();
-
-    /** \brief  Returns the current number of helperpolylines  */
-    virtual unsigned short GetHelperPolyLinesSize() const;
-
-    /** \brief Returns whether a helper polyline should be painted or not */
-    virtual bool IsHelperToBePainted(unsigned int index) const;
-
-    /** \brief Returns true if the planar figure is reset to "add points" mode
-     * when a point is selected.
-     *
-     * Default return value is false. Subclasses can overwrite this method and
-     * execute any reset / initialization statements required. */
-    virtual bool ResetOnPointSelect();
-    virtual bool ResetOnPointSelectNeeded() const;
-
-    /**
-     * \brief Removes the control point at the given index.
-     *
-     * \param[in] index Zero-based index of the control point to remove.
-     */
-    virtual void RemoveControlPoint(unsigned int index);
-
-    /** \brief Removes the last control point from the figure. */
-    virtual void RemoveLastControlPoint();
-
-    /**
-     * \brief Applies spatial constraints to a control point position.
-     *
-     * Sub-classes can override this method to enforce spatial constraints on
-     * specific control points (e.g., keeping them within image bounds or
-     * enforcing orthogonality). The default implementation constrains points
-     * to the image bounds.
-     *
-     * \param[in] index The zero-based index of the control point.
-     * \param[in] point The proposed 2D coordinates for the control point.
-     * \return The constrained 2D coordinates.
-     */
-    virtual Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point);
-
-    /**
-     * \brief Compares this PlanarFigure with another for equality.
-     *
-     * Checks whether control points, features, and figure properties match.
-     * All subclasses should implement this method for their specific comparison logic.
-     *
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    virtual bool Equals(const mitk::PlanarFigure &other) const;
-
-    /**
-     * \brief Resets the number of control points to the specified count.
-     *
-     * \param[in] numberOfControlPoints The new number of control points.
-     */
-    void ResetNumberOfControlPoints(int numberOfControlPoints);
 
   protected:
     PlanarFigure();
+    PlanarFigure(const Self &other) = default;
 
-    PlanarFigure(const Self &other);
-
-    /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
-     * of a planar figure object and returns integer ID for the feature element.
-     * Should be called in sub-class constructors. */
-    virtual unsigned int AddFeature(const char *featureName, const char *unitName);
-
-    /** Sets the name of the specified feature. INTERNAL METHOD. */
-    void SetFeatureName(unsigned int index, const char *featureName);
-
-    /** Sets the physical unit of the specified feature. INTERNAL METHOD. */
-    void SetFeatureUnit(unsigned int index, const char *unitName);
-
-    /** Sets quantity of the specified feature. INTERNAL METHOD. */
-    void SetQuantity(unsigned int index, double quantity);
-
-    /** Sets the specified feature as active. INTERAL METHOD. */
-    void ActivateFeature(unsigned int index);
-
-    /** Sets the specified feature as active. INTERAL METHOD. */
-    void DeactivateFeature(unsigned int index);
-
-    /** \brief Generates the poly-line representation of the planar figure.
-     * Must be implemented in sub-classes. */
-    virtual void GeneratePolyLine() = 0;
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.
-   * Must be implemented in sub-classes. */
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) = 0;
-
-    /** \brief Calculates quantities of all features of this planar figure.
-     * Must be implemented in sub-classes. */
-    virtual void EvaluateFeaturesInternal() = 0;
-
-    /** \brief Initializes the TimeGeometry describing the (time-resolved)
-     * geometry of this figure. Note that each time step holds one PlaneGeometry.
+    /**
+     * \brief Checks control points before SetControlPoints() takes them.
+     *
+     * The default checks the number of points and that their coordinates are
+     * finite. Figure types with constraints between their points extend it.
+     *
+     * \throw mitk::Exception if the points are not valid for the figure type.
      */
+    virtual void CheckControlPoints(const std::vector<Point2D> &points) const;
+
+    /** \brief Takes control points without any check, for figure types that build them. */
+    void AssignControlPoints(const std::vector<Point2D> &points);
+
+    /** \brief Sets one control point without any check, for figure types that move handles. */
+    void ReplaceControlPoint(std::size_t index, const Point2D &point);
+
+    /**
+     * \brief Compares what defines the shape beyond the control points, e.g. the
+     *        thickness of a double ellipse. Nothing by default.
+     *
+     * Called by mitk::Equal() for figures of the same class only.
+     */
+    virtual bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const;
+
     void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
-
-    /** \brief defines the number of PolyLines that will be available */
-    void SetNumberOfPolyLines(unsigned int numberOfPolyLines);
-
-    /** \brief Append a point to the PolyLine # index */
-    void AppendPointToPolyLine(unsigned int index, PolyLineElement element);
-
-    /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
-    void ClearPolyLines();
-
-    /** \brief defines the number of HelperPolyLines that will be available */
-    void SetNumberOfHelperPolyLines(unsigned int numberOfHelperPolyLines);
-
-    /** \brief Append a point to the HelperPolyLine # index */
-    void AppendPointToHelperPolyLine(unsigned int index, PolyLineElement element);
-
-    /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
-    void ClearHelperPolyLines();
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    ControlPointListType m_ControlPoints;
-    unsigned int m_NumberOfControlPoints;
-
-    // Currently selected control point; -1 means no point selected
-    int m_SelectedControlPoint;
-
-    std::vector<PolyLineType> m_PolyLines;
-    std::vector<PolyLineType> m_HelperPolyLines;
-    BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
-
-    // this point is used to store the coordinates an additional 'ControlPoint' that is rendered
-    // when the mouse cursor is above the figure (and not a control-point) and when the
-    // property 'planarfigure.isextendable' is set to true
-    Point2D m_PreviewControlPoint;
-    bool m_PreviewControlPointVisible;
-
-    bool m_FigurePlaced;
-
   private:
-    // not implemented to prevent PlanarFigure::New() calls which would create an itk::Object.
+    // Not implemented, which prevents an itk::Object from being created by PlanarFigure::New().
     static Pointer New();
 
-    struct Feature
-    {
-      Feature(const char *name, const char *unit) : Name(name), Unit(unit), Quantity(0.0), Active(true), Visible(true)
-      {
-      }
+    friend MITKPLANARFIGURE_EXPORT bool Equal(const PlanarFigure &, const PlanarFigure &, ScalarType, bool);
 
-      std::string Name;
-      std::string Unit;
-      double Quantity;
-      bool Active;
-      bool Visible;
-    };
-
-    bool m_PolyLineUpToDate;
-    bool m_HelperLinesUpToDate;
-    bool m_FeaturesUpToDate;
-
-    // Vector of features available for this geometric figure
-    typedef std::vector<Feature> FeatureVectorType;
-    FeatureVectorType m_Features;
-
-    unsigned long m_FeaturesMTime;
-
-    // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight
-    // (m_DisplaySize.second)
-    // that the helperPolyLines have been calculated for.
-    // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
-    std::pair<double, unsigned int> m_DisplaySize;
+    std::vector<Point2D> m_ControlPoints;
+    bool m_IsBeingPlaced = false;
+    bool m_IsShapeLocked = false;
   };
 
   /**
-   * \brief Compares two PlanarFigure objects with a tolerance for floating-point values.
+   * \brief Compares two planar figures: their class, whether they are being
+   *        placed or locked, their planes, their control points and their
+   *        shape parameters.
    *
-   * \param[in] leftHandSide  The first PlanarFigure.
-   * \param[in] rightHandSide The second PlanarFigure.
-   * \param[in] eps           Tolerance for floating-point comparisons.
-   * \param[in] verbose       If true, logs details about differences.
-   * \return True if both figures are considered equal within the given tolerance.
+   * Derived data like contours and measurements follows from these.
+   *
+   * \param[in] leftHandSide  The first figure.
+   * \param[in] rightHandSide The second figure.
+   * \param[in] eps           Tolerance for coordinates and parameters.
+   * \param[in] verbose       If true, differences are logged.
    */
-  MITKPLANARFIGURE_EXPORT bool Equal(const mitk::PlanarFigure &leftHandSide,
-                                     const mitk::PlanarFigure &rightHandSide,
+  MITKPLANARFIGURE_EXPORT bool Equal(const PlanarFigure &leftHandSide,
+                                     const PlanarFigure &rightHandSide,
                                      ScalarType eps,
                                      bool verbose);
 
-} // namespace mitk
+  /**
+   * \brief Creates an empty planar figure of a type.
+   *
+   * \param[in] typeId Type identifier, see PlanarFigure::GetTypeId().
+   * \throw mitk::Exception for an unknown type identifier.
+   */
+  MITKPLANARFIGURE_EXPORT PlanarFigure::Pointer CreatePlanarFigure(const std::string &typeId);
+}
 
 #endif

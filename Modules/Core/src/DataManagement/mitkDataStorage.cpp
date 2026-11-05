@@ -151,7 +151,7 @@ std::string mitk::DataStorage::GetUniqueName(const std::string& baseName, const 
   }
   else
   {
-    if (this->GetNamedDerivedNode(baseName.c_str(), sourceNode, onlyDirectDerivations))
+    if (this->GetNamedDerivedNode(baseName.c_str(), sourceNode, onlyDirectDerivations) == nullptr)
       return baseName;
   }
 

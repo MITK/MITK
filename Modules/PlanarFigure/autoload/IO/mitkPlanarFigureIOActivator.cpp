@@ -10,12 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <usGetModuleContext.h>
-#include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include <mitkPlanarFigureIO.h>
+#include "mitkLegacyPlanarFigureReader.h"
+#include "mitkPlanarFigureIO.h"
+
+#include <memory>
 
 namespace mitk
 {
@@ -24,19 +25,20 @@ namespace mitk
   */
   class PlanarFigureIOModuleActivator : public us::ModuleActivator
   {
-    std::vector<AbstractFileIO *> m_FileIOs;
+    std::unique_ptr<PlanarFigureIO> m_FileIO;
+    std::unique_ptr<LegacyPlanarFigureReader> m_LegacyReader;
 
   public:
-    void Load(us::ModuleContext * /*context*/) override
+    void Load(us::ModuleContext *) override
     {
-      m_FileIOs.push_back(new PlanarFigureIO());
+      m_FileIO = std::make_unique<PlanarFigureIO>();
+      m_LegacyReader = std::make_unique<LegacyPlanarFigureReader>();
     }
+
     void Unload(us::ModuleContext *) override
     {
-      for (auto &elem : m_FileIOs)
-      {
-        delete elem;
-      }
+      m_LegacyReader.reset();
+      m_FileIO.reset();
     }
   };
 }

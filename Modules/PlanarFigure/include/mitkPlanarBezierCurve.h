@@ -13,25 +13,19 @@ found in the LICENSE file.
 #ifndef mitkPlanarBezierCurve_h
 #define mitkPlanarBezierCurve_h
 
-#include <MitkPlanarFigureExports.h>
 #include <mitkPlanarFigure.h>
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
   /**
    * \brief Implementation of PlanarFigure representing a Bezier curve.
    *
-   * A Bezier curve defined by an arbitrary number of control points (minimum 2).
-   * The curve is evaluated using the De Casteljau algorithm. The number of
-   * line segments used to approximate the smooth curve is configurable via
-   * SetNumberOfSegments().
+   * The curve of degree n - 1 runs from the first to the last of its n control
+   * points and is approximated by a polyline. Its control polygon is shown as
+   * decoration.
    *
-   * The control polygon (lines connecting control points) is drawn as a helper
-   * polyline for visual reference.
-   *
-   * Provides one feature: the curve length (FEATURE_ID_LENGTH).
-   *
-   * \sa PlanarFigure, PlanarSubdivisionPolygon, PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarSubdivisionPolygon
    */
   class MITKPLANARFIGURE_EXPORT PlanarBezierCurve : public PlanarFigure
   {
@@ -40,78 +34,38 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /**
-       * \brief Returns the number of line segments used to approximate the curve.
-       * \return The current number of segments.
-       */
-      unsigned int GetNumberOfSegments() const;
+    /** \brief Number of segments of the polyline that approximates the curve. */
+    static constexpr unsigned int NumberOfSegments = 100;
 
-    /**
-     * \brief Sets the number of line segments used to approximate the curve.
-     *
-     * More segments produce a smoother approximation.
-     *
-     * \param[in] numSegments The desired number of segments.
-     */
-    void SetNumberOfSegments(unsigned int numSegments);
+    /** \brief Returns "bezier_curve". */
+    std::string GetTypeId() const override;
 
-    /**
-     * \brief Returns the control point index that corresponds to a given polyline point.
-     *
-     * \param[in] indexOfPolylinePoint Index of the polyline point.
-     * \param[in] polyLineIndex        Index of the polyline (0 for main, 1 for helper).
-     * \return The index of the corresponding control point, or -1 if none matches.
-     */
-    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const override;
+    /** \brief The sampled curve as an open outline. */
+    std::vector<Contour> GetContours() const override;
 
-    /**
-     * \brief Returns the maximum number of control points (32).
-     * \return The maximum number of control points.
-     */
-    unsigned int GetMaximumNumberOfControlPoints() const override;
+    /** \brief The control polygon, once there are more than two control points. */
+    std::vector<Decoration> GetDecorations() const override;
 
-    /**
-     * \brief Returns the minimum number of control points (2).
-     * \return The minimum number of control points.
-     */
-    unsigned int GetMinimumNumberOfControlPoints() const override;
+    /** \brief Length of the curve. */
+    std::vector<Measurement> GetMeasurements() const override;
 
-    /**
-     * \brief Returns whether the helper polyline at the given index should be painted.
-     *
-     * The control polygon (helper polyline) is painted when there are at least
-     * three control points.
-     *
-     * \param[in] index Zero-based index of the helper polyline.
-     * \return True if the helper polyline should be rendered.
-     */
-    bool IsHelperToBePainted(unsigned int index) const override;
+    /** \brief Placed point by point. */
+    PlacementKind GetPlacementKind() const override;
 
-    /** \brief Feature identifier for the curve length. */
-    const unsigned int FEATURE_ID_LENGTH;
+    /** \brief Returns false. */
+    bool IsClosed() const override;
 
-    /**
-     * \brief Compares this PlanarBezierCurve with another PlanarFigure for equality.
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    /** \brief Returns 2. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 2; }
+
+    /** \brief Returns 100. Every sample of the curve takes time quadratic in the number of control points. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 100; }
 
   protected:
-    PlanarBezierCurve();
-    PlanarBezierCurve(const Self& other);
+    PlanarBezierCurve() = default;
+    PlanarBezierCurve(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-      void EvaluateFeaturesInternal() override;
-    void GenerateHelperPolyLine(double, unsigned int) override;
-    void GeneratePolyLine() override;
-
-  private:
-    Point2D ComputeDeCasteljauPoint(ScalarType t);
-
-    std::vector<mitk::Point2D> m_DeCasteljauPoints;
-    unsigned int m_NumberOfSegments;
   };
 }
 

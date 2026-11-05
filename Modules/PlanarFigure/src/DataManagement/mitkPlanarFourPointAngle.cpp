@@ -11,73 +11,83 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarFourPointAngle.h>
-#include <mitkPlaneGeometry.h>
 
-mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
+#include "mitkPlanarFigureGeometryHelpers.h"
+
+#include <cmath>
+
+std::string mitk::PlanarFourPointAngle::GetTypeId() const
 {
-  // Four point angle has two control points
-  this->ResetNumberOfControlPoints(2);
-  this->SetNumberOfPolyLines(2);
+  return "four_point_angle";
 }
 
-mitk::PlanarFourPointAngle::PlanarFourPointAngle(const Self& other)
-  : PlanarFigure(other),
-    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarFourPointAngle::GetContours() const
 {
+  const auto points = this->GetControlPoints();
+  std::vector<Contour> contours;
+
+  for (std::size_t i = 0; i + 1 < points.size(); i += 2)
+    contours.push_back({ ContourRole::Outline, false, { points[i], points[i + 1] } });
+
+  return contours;
 }
 
-void mitk::PlanarFourPointAngle::GeneratePolyLine()
+std::vector<mitk::PlanarFigure::Decoration> mitk::PlanarFourPointAngle::GetDecorations() const
 {
-  this->ClearPolyLines();
+  const auto points = this->GetControlPoints();
 
-  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
-    this->AppendPointToPolyLine(i / 2, this->GetControlPoint(i));
+  if (points.size() < 4)
+    return {};
+
+  const auto first = points[1] - points[0];
+  const auto second = points[3] - points[2];
+  const auto cross = first[0] * second[1] - first[1] * second[0];
+
+  if (std::abs(cross) <= 1e-6 * first.GetNorm() * second.GetNorm())
+    return {};
+
+  // Where the extended lines meet, at points[0] + t * first and points[2] + s * second.
+  const auto offset = points[2] - points[0];
+  const auto t = (offset[0] * second[1] - offset[1] * second[0]) / cross;
+  const auto s = (offset[0] * first[1] - offset[1] * first[0]) / cross;
+  const auto vertex = points[0] + first * t;
+
+  std::vector<Decoration> decorations;
+
+  const auto addExtension = [&decorations, &vertex](const Point2D &start, const Point2D &end, double parameter) {
+    if (parameter < 0.0)
+      decorations.push_back(HelperPolyline{ { vertex, start } });
+    else if (parameter > 1.0)
+      decorations.push_back(HelperPolyline{ { end, vertex } });
+  };
+
+  addExtension(points[0], points[1], t);
+  addExtension(points[2], points[3], s);
+
+  // The angle between both directions, or between both reversed, which is the same, on the side of the lines.
+  const auto side = 1.0 - t - s < 0.0 ? -1.0 : 1.0;
+  decorations.push_back(AngleArc{ vertex, vertex + first * side, vertex + second * side });
+
+  return decorations;
 }
 
-void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
-{
-  // Generate helper-poly-line for an four point angle
-  // Need to discuss a sensible implementation
-}
-
-void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarFourPointAngle::GetMeasurements() const
 {
   if (this->GetNumberOfControlPoints() < 4)
-  {
-    // Angle not yet complete.
-    return;
-  }
+    return {};
 
-  // Calculate angle between lines
-  const Point2D &p0 = this->GetControlPoint(0);
-  const Point2D &p1 = this->GetControlPoint(1);
-  const Point2D &p2 = this->GetControlPoint(2);
-  const Point2D &p3 = this->GetControlPoint(3);
+  const auto angle = PlanarFigureGeometryHelpers::GetAngle(this->GetPlaneGeometry(),
+    this->GetControlPoint(0), this->GetControlPoint(1), this->GetControlPoint(2), this->GetControlPoint(3));
 
-  Vector2D v0 = p1 - p0;
-  Vector2D v1 = p3 - p2;
-
-  v0.Normalize();
-  v1.Normalize();
-  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
-
-  this->SetQuantity(FEATURE_ID_ANGLE, angle);
+  return { { MeasurementType::Angle, angle } };
 }
 
-void mitk::PlanarFourPointAngle::PrintSelf(std::ostream &os, itk::Indent indent) const
+mitk::PlanarFigure::PlacementKind mitk::PlanarFourPointAngle::GetPlacementKind() const
 {
-  Superclass::PrintSelf(os, indent);
+  return PlacementKind::Sequence;
 }
 
-bool mitk::PlanarFourPointAngle::Equals(const mitk::PlanarFigure &other) const
+bool mitk::PlanarFourPointAngle::IsClosed() const
 {
-  const auto *otherFourPtAngle = dynamic_cast<const mitk::PlanarFourPointAngle *>(&other);
-  if (otherFourPtAngle)
-  {
-    return Superclass::Equals(other);
-  }
-  else
-  {
-    return false;
-  }
+  return false;
 }

@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 //QT
 #include <QObject>
+#include <QTimer>
 
 //MITK
 #include <mitkDataStorage.h>
@@ -66,6 +67,10 @@ public:
    * When enabled, the generator automatically triggers regeneration when:
    * - Input data nodes have been changed or modified
    * - Generation-relevant settings in derived classes have changed
+   *
+   * Changes of nodes are collected until none arrived for a short while, so
+   * the many changes of an interactive edit, like dragging a planar figure,
+   * start a single regeneration.
    *
    * \return True if auto-update is enabled; false otherwise.
    */
@@ -118,7 +123,8 @@ public slots:
 
 protected slots:
   /**
-   * \brief Handles completed job results, adds them to the data storage, and emits NewDataAvailable.
+   * \brief Handles completed job results, adds them to the data storage, and emits NewDataAvailable
+   *        unless all of them were discarded.
    * \param[in] results The result map from the completed job.
    * \param[in] job Pointer to the job that produced the results.
    */
@@ -221,7 +227,8 @@ protected:
    * \param[in] label The result label from the job's result map.
    * \param[in] result The generated data to store.
    * \param[in] job The job that produced the result.
-   * \return A data node ready to be added to the data storage.
+   * \return A data node ready to be added to the data storage, or nullptr to discard
+   *         the result, e.g. because its inputs changed while the job ran.
    */
   virtual mitk::DataNode::Pointer PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const = 0;
 
@@ -295,6 +302,9 @@ private:
   void NodeAddedOrModified(const mitk::DataNode* node);
 
   unsigned long m_DataStorageDeletedTag;
+
+  /** Delays the recheck after relevant node changes until they have settled. */
+  QTimer m_RecheckTimer;
 };
 
 #endif

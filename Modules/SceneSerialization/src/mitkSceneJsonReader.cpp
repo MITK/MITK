@@ -907,6 +907,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
         existing->Clear();
       }
       existing->ConcatenatePropertyList(preloadedDataProps, true);
+      mitk::SceneReaderHelpers::SanitizeLoadedProperties(*existing, loaded);
     }
 
     mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(entry.dataNode->GetData());
@@ -989,10 +990,11 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
               PropertyList *defaultList = entry.dataNode->GetPropertyList();
               ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
 
-              // Drop transient properties (e.g. the "selected" UI flag) that may be
-              // present in older scene files, so reloading does not resurrect
-              // runtime or UI state. Mirrors SceneReaderV1 (XML).
-              mitk::SceneReaderHelpers::StripTransientProperties(*defaultList, entry.dataNode->GetData());
+              // Upgrade legacy properties and drop transient ones (e.g. the
+              // "selected" UI flag) that may be present in older scene files,
+              // so reloading does not resurrect runtime or UI state. Mirrors
+              // SceneReaderV1 (XML).
+              mitk::SceneReaderHelpers::SanitizeLoadedProperties(*defaultList, entry.dataNode->GetData());
             }
             catch (const mitk::Exception &e)
             {
@@ -1021,7 +1023,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
               try
               {
                 ApplyPropertyMap(*ctxList, cit.value(), basePath, ctx);
-                mitk::SceneReaderHelpers::StripTransientProperties(*ctxList, entry.dataNode->GetData());
+                mitk::SceneReaderHelpers::SanitizeLoadedProperties(*ctxList, entry.dataNode->GetData());
               }
               catch (const mitk::Exception &e)
               {

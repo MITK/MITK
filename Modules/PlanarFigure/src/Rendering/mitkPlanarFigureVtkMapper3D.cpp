@@ -11,33 +11,171 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarFigureVtkMapper3D.h>
-#include <mitkAbstractTransformGeometry.h>
-#include <mitkImage.h>
-#include <mitkPlaneGeometry.h>
+
+#include "mitkPlanarFigureViewHelpers.h"
+
 #include <mitkPlanarFigure.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+
+#include <vtkActor.h>
 #include <vtkCellArray.h>
-#include <vtkIdList.h>
+#include <vtkContourTriangulator.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPolyLine.h>
-#include <vtkPolygon.h>
+#include <vtkProperty.h>
+#include <vtkShaderProperty.h>
+#include <vtkTransform.h>
 
-mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage() : m_Actor(vtkSmartPointer<vtkActor>::New()), m_LastMTime(0)
+#include <algorithm>
+
+namespace
 {
+  double GetSignedArea(const std::vector<mitk::Point2D> &points)
+  {
+    double area = 0.0;
+
+    for (std::size_t i = 0; i < points.size(); ++i)
+    {
+      const auto &p0 = points[i];
+      const auto &p1 = points[(i + 1) % points.size()];
+      area += p0[0] * p1[1] - p1[0] * p0[1];
+    }
+
+    return 0.5 * area;
+  }
+
+  /* The contours as lines in world coordinates, closed ones first and
+   * repeating their first point. With fill, their triangulation is added.
+   * The triangulation takes contours that wind clockwise around the normal
+   * for holes, so outlines are turned counterclockwise and holes clockwise.
+   */
+  vtkSmartPointer<vtkPolyData> CreatePolyData(const mitk::PlanarFigure *figure, bool fill)
+  {
+    const auto *plane = figure->GetPlaneGeometry();
+    auto contours = figure->GetContours();
+
+    std::stable_partition(contours.begin(), contours.end(), [](const mitk::PlanarFigure::Contour &contour) {
+      return contour.Closed;
+    });
+
+    for (auto &contour : contours)
+    {
+      const auto isHole = mitk::PlanarFigure::ContourRole::Hole == contour.Role;
+
+      if (contour.Closed && (GetSignedArea(contour.Points) < 0.0) != isHole)
+        std::reverse(contour.Points.begin(), contour.Points.end());
+    }
+
+    auto points = vtkSmartPointer<vtkPoints>::New();
+    auto lines = vtkSmartPointer<vtkCellArray>::New();
+    vtkIdType numberOfClosedContours = 0;
+
+    for (const auto &contour : contours)
+    {
+      if (contour.Points.size() < 2)
+        continue;
+
+      const auto firstId = points->GetNumberOfPoints();
+      lines->InsertNextCell(static_cast<vtkIdType>(contour.Points.size() + (contour.Closed ? 1 : 0)));
+
+      for (const auto &point : contour.Points)
+      {
+        mitk::Point3D worldPoint;
+        plane->Map(point, worldPoint);
+        lines->InsertCellPoint(points->InsertNextPoint(worldPoint.GetDataPointer()));
+      }
+
+      if (contour.Closed)
+      {
+        lines->InsertCellPoint(firstId);
+        ++numberOfClosedContours;
+      }
+    }
+
+    auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->SetPoints(points);
+    polyData->SetLines(lines);
+
+    if (fill && numberOfClosedContours > 0)
+    {
+      // Counterclockwise in plane coordinates winds around this normal.
+      const auto normal = itk::CrossProduct(plane->GetAxisVector(0), plane->GetAxisVector(1));
+      const double vtkNormal[3] = { normal[0], normal[1], normal[2] };
+
+      auto polygons = vtkSmartPointer<vtkCellArray>::New();
+      vtkContourTriangulator::TriangulateContours(polyData, 0, numberOfClosedContours, polygons, vtkNormal);
+      polyData->SetPolys(polygons);
+    }
+
+    return polyData;
+  }
+
+  // The center of the outlines in world coordinates, around which the figure pulses as in 2D.
+  mitk::Point3D GetPulseCenter(const mitk::PlanarFigure *figure)
+  {
+    const auto contours = figure->GetContours();
+    const auto hasOutline = std::any_of(contours.begin(), contours.end(), [](const mitk::PlanarFigure::Contour &contour) {
+      return mitk::PlanarFigure::ContourRole::Outline == contour.Role;
+    });
+
+    mitk::Point2D center;
+    center.Fill(0.0);
+    std::size_t numberOfPoints = 0;
+
+    for (const auto &contour : contours)
+    {
+      if (hasOutline && mitk::PlanarFigure::ContourRole::Outline != contour.Role)
+        continue;
+
+      for (const auto &point : contour.Points)
+      {
+        center[0] += point[0];
+        center[1] += point[1];
+        ++numberOfPoints;
+      }
+    }
+
+    if (numberOfPoints > 0)
+    {
+      center[0] /= numberOfPoints;
+      center[1] /= numberOfPoints;
+    }
+
+    mitk::Point3D worldCenter;
+    figure->GetPlaneGeometry()->Map(center, worldCenter);
+    return worldCenter;
+  }
+}
+
+mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
+  : m_Actor(vtkSmartPointer<vtkActor>::New())
+{
+  m_Actor->SetMapper(vtkSmartPointer<vtkPolyDataMapper>::New());
+  m_Actor->SetVisibility(false);
+
+  // A figure lies in the plane of an image slice, which it would fight for depth. Like a polygon
+  // offset, it is moved a little towards the camera, more where the plane is seen at a flat angle.
+  // VTK applies its own polygon offset only if it is switched on for all mappers. The constant part
+  // is a few steps of a 24 bit depth buffer: VTK puts the near plane close to the camera, where a
+  // larger constant amounts to millimeters and lets figures show through other slices.
+  auto *shaderProperty = m_Actor->GetShaderProperty();
+  shaderProperty->AddFragmentShaderReplacement("//VTK::UniformFlow::Impl", true,
+    "float depthSlope = length(vec2(dFdx(gl_FragCoord.z), dFdy(gl_FragCoord.z)));\n"
+    "  //VTK::UniformFlow::Impl\n",
+    false);
+  shaderProperty->AddFragmentShaderReplacement("//VTK::Depth::Impl", true,
+    "gl_FragDepth = gl_FragCoord.z - 2.0 * depthSlope - 4.0 / 16777215.0;\n",
+    false);
 }
 
 mitk::PlanarFigureVtkMapper3D::LocalStorage::~LocalStorage()
 {
 }
 
-void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *, bool)
-{
-  node->AddProperty("planarfigure.3drendering", mitk::BoolProperty::New(false));
-  node->AddProperty("planarfigure.3drendering.fill", mitk::BoolProperty::New(false));
-}
-
-mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D() : m_FillPf(false)
+mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D()
 {
 }
 
@@ -45,156 +183,12 @@ mitk::PlanarFigureVtkMapper3D::~PlanarFigureVtkMapper3D()
 {
 }
 
-void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
+void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
-  if (actor == nullptr)
-    return;
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 
-  const mitk::DataNode *dataNode = this->GetDataNode();
-
-  if (dataNode == nullptr)
-    return;
-
-  bool selected = false;
-  dataNode->GetBoolProperty("selected", selected, renderer);
-
-  float color[3];
-  dataNode->GetColor(color, renderer, selected ? "planarfigure.selected.line.color" : "color");
-
-  float opacity = 1.0f;
-  dataNode->GetOpacity(opacity, renderer);
-
-  vtkProperty *property = actor->GetProperty();
-  property->SetColor(color[0], color[1], color[2]);
-  property->SetOpacity(opacity);
-}
-
-void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer *renderer, vtkActor *actor)
-{
-  if (actor == nullptr)
-    return;
-
-  const mitk::DataNode *dataNode = this->GetDataNode();
-
-  if (dataNode == nullptr)
-    return;
-
-  bool render = false;
-  dataNode->GetBoolProperty("planarfigure.3drendering", render);
-
-  actor->SetVisibility(render);
-
-  float lineWidth = 1.0f;
-  dataNode->GetFloatProperty("planarfigure.line.width", lineWidth, renderer);
-
-  vtkProperty *property = actor->GetProperty();
-  property->SetLineWidth(lineWidth);
-}
-
-void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
-{
-  const DataNode *node = this->GetDataNode();
-
-  if (node == nullptr)
-    return;
-
-  auto *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
-
-  if (planarFigure == nullptr || !planarFigure->IsPlaced())
-    return;
-
-  LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-  unsigned long mTime = planarFigure->GetMTime();
-
-  bool fillPf = false;
-  bool refresh = false;
-  node->GetBoolProperty("planarfigure.3drendering.fill", fillPf);
-  if (m_FillPf != fillPf)
-  {
-    m_FillPf = fillPf;
-    refresh = true;
-  }
-
-  if (mTime > localStorage->m_LastMTime || refresh)
-  {
-    localStorage->m_LastMTime = mTime;
-
-    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
-    const auto *abstractTransformGeometry =
-      dynamic_cast<const AbstractTransformGeometry *>(planarFigure->GetPlaneGeometry());
-
-    if (planeGeometry == nullptr && abstractTransformGeometry == nullptr)
-      return;
-
-    const size_t numPolyLines = planarFigure->GetPolyLinesSize();
-
-    if (numPolyLines == 0)
-      return;
-
-    const vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    const vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-    const vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
-    vtkIdType baseIndex = 0;
-
-    for (size_t i = 0; i < numPolyLines; ++i)
-    {
-      const auto& polyLine = planarFigure->GetPolyLine(i);
-      const vtkIdType numPoints = polyLine.size();
-
-      vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
-
-      if (numPoints < 2)
-        continue;
-
-      auto polyLineEnd = polyLine.cend();
-
-      for (auto polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
-      {
-        Point3D point;
-        planeGeometry->Map(*polyLineIt, point);
-        points->InsertNextPoint(point.GetDataPointer());
-
-        const vtkIdType id = polygon->GetPoints()->InsertNextPoint(point[0], point[1], point[2]);
-        polygon->GetPointIds()->InsertNextId(id);
-      }
-
-      vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
-
-      vtkIdList *pointIds = line->GetPointIds();
-
-      if (planarFigure->IsClosed() && numPoints > 2)
-      {
-        polygons->InsertNextCell(polygon);
-        pointIds->SetNumberOfIds(numPoints + 1);
-        pointIds->SetId(numPoints, baseIndex);
-      }
-      else
-      {
-        pointIds->SetNumberOfIds(numPoints);
-      }
-
-      for (vtkIdType j = 0; j < numPoints; ++j)
-        pointIds->SetId(j, baseIndex + j);
-
-      cells->InsertNextCell(line);
-
-      baseIndex += points->GetNumberOfPoints();
-    }
-
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-    polyData->SetPoints(points);
-    polyData->SetLines(cells);
-    if (m_FillPf)
-      polyData->SetPolys(polygons);
-
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(polyData);
-
-    localStorage->m_Actor->SetMapper(mapper);
-  }
-
-  this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
-  this->ApplyPlanarFigureProperties(renderer, localStorage->m_Actor);
+  node->AddProperty("planarfigure.3drendering", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("planarfigure.3drendering.fill", BoolProperty::New(false), renderer, overwrite);
 }
 
 vtkProp *mitk::PlanarFigureVtkMapper3D::GetVtkProp(BaseRenderer *renderer)
@@ -204,4 +198,81 @@ vtkProp *mitk::PlanarFigureVtkMapper3D::GetVtkProp(BaseRenderer *renderer)
 
 void mitk::PlanarFigureVtkMapper3D::UpdateVtkTransform(BaseRenderer *)
 {
+}
+
+void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
+{
+  auto *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  const auto *node = this->GetDataNode();
+  const auto *figure = dynamic_cast<const PlanarFigure *>(node->GetData());
+
+  bool isShownIn3D = false;
+  node->GetBoolProperty("planarfigure.3drendering", isShownIn3D, renderer);
+
+  // A figure of locked shape that is being placed is a preview under the mouse in a 2D window.
+  const auto isStamp = figure != nullptr && figure->IsBeingPlaced() && figure->IsShapeLocked();
+
+  if (figure == nullptr || isStamp || !isShownIn3D || !node->IsVisible(renderer))
+  {
+    localStorage->m_Actor->SetVisibility(false);
+    return;
+  }
+
+  bool isFilled = false;
+  node->GetBoolProperty("planarfigure.3drendering.fill", isFilled, renderer);
+
+  // The modification time of the figure leaves out its plane.
+  const auto planeTime = figure->GetPlaneGeometry()->GetMTime();
+
+  if (figure->GetMTime() != localStorage->m_FigureTime || planeTime != localStorage->m_PlaneTime || isFilled != localStorage->m_IsFilled)
+  {
+    localStorage->m_FigureTime = figure->GetMTime();
+    localStorage->m_PlaneTime = planeTime;
+    localStorage->m_IsFilled = isFilled;
+
+    auto *mapper = static_cast<vtkPolyDataMapper *>(localStorage->m_Actor->GetMapper());
+    mapper->SetInputData(CreatePolyData(figure, isFilled));
+    localStorage->m_PulseCenter = GetPulseCenter(figure);
+  }
+
+  bool pulse = false;
+  node->GetBoolProperty(PlanarFigureViewHelpers::PulseProperty, pulse, renderer);
+
+  vtkSmartPointer<vtkTransform> pulseTransform;
+
+  if (pulse)
+  {
+    auto *renderingManager = RenderingManager::GetInstance();
+    renderingManager->RequestAnimationFrame(renderer->GetRenderWindow());
+
+    float frequency = PlanarFigureViewHelpers::DefaultPulseFrequency;
+    node->GetFloatProperty(PlanarFigureViewHelpers::PulseFrequencyProperty, frequency, renderer);
+
+    const auto scale = PlanarFigureViewHelpers::GetPulseScale(renderingManager->GetAnimationTime(), frequency);
+    const auto &center = localStorage->m_PulseCenter;
+
+    pulseTransform = vtkSmartPointer<vtkTransform>::New();
+    pulseTransform->Translate(center[0], center[1], center[2]);
+    pulseTransform->Scale(scale, scale, scale);
+    pulseTransform->Translate(-center[0], -center[1], -center[2]);
+  }
+
+  localStorage->m_Actor->SetUserTransform(pulseTransform);
+
+  const auto *defaultColor = PlanarFigureViewHelpers::DefaultColor;
+  float color[3] = { defaultColor[0], defaultColor[1], defaultColor[2] };
+  node->GetColor(color, renderer);
+
+  float opacity = 1.0f;
+  node->GetOpacity(opacity, renderer);
+
+  float lineWidth = 2.0f;
+  node->GetFloatProperty("line width", lineWidth, renderer);
+
+  auto *property = localStorage->m_Actor->GetProperty();
+  property->SetColor(color[0], color[1], color[2]);
+  property->SetOpacity(opacity);
+  property->SetLineWidth(lineWidth * PlanarFigureViewHelpers::GetPixelScale(renderer));
+
+  localStorage->m_Actor->SetVisibility(true);
 }

@@ -50,6 +50,7 @@ class mitkExclusiveInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(Claim_ReleasedOnDestruction);
   MITK_TEST(Claim_DefaultConstructed_IsInactive);
   MITK_TEST(Claim_Move_TransfersClaim);
+  MITK_TEST(IsClaimed_FollowsTheSlot);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -226,6 +227,18 @@ public:
     target.Reset();
     CPPUNIT_ASSERT(constructed.IsActive());
     CPPUNIT_ASSERT_EQUAL(0, numberOfRevokes);
+  }
+
+  void IsClaimed_FollowsTheSlot()
+  {
+    CPPUNIT_ASSERT(!ExclusiveInteraction::IsClaimed());
+
+    int numberOfRevokes = 0;
+    auto claim = ExclusiveInteraction::Acquire(Agree(numberOfRevokes));
+    CPPUNIT_ASSERT(ExclusiveInteraction::IsClaimed());
+
+    claim.Reset();
+    CPPUNIT_ASSERT(!ExclusiveInteraction::IsClaimed());
   }
 };
 

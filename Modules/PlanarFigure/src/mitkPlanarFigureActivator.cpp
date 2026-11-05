@@ -16,15 +16,15 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 #include <mitkBaseRenderer.h>
-#include <mitkColorProperty.h>
 #include <mitkCoreServices.h>
-#include <mitkDataNode.h>
-#include <mitkIPropertyTransience.h>
+#include <mitkIPropertyDeserialization.h>
 #include <mitkMapperProviderBase.h>
 #include <mitkPlanarFigure.h>
-#include <mitkPlanarFigureMapper2D.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
+#include <mitkPlanarFigureVtkMapper2D.h>
 #include <mitkPlanarFigureVtkMapper3D.h>
-#include <mitkProperties.h>
+
+#include "mitkPlanarFigureLegacyProperties.h"
 
 #include <memory>
 #include <vector>
@@ -32,44 +32,23 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Provider for PlanarFigureMapper2D that resets color and opacity.
-   *
-   * Planar figures are drawn in the color scheme of their own
-   * planarfigure.* properties, so the generic node color and opacity are
-   * reset even if the node already carries values for them.
-   */
-  class PlanarFigureMapperProvider : public MapperProviderBase<PlanarFigureMapper2D, PlanarFigure>
-  {
-  public:
-    using MapperProviderBase::MapperProviderBase;
-
-    void SetDefaultProperties(DataNode *node) const override
-    {
-      MapperProviderBase::SetDefaultProperties(node);
-
-      node->AddProperty("color", ColorProperty::New(1.0, 1.0, 1.0), nullptr, true);
-      node->AddProperty("opacity", FloatProperty::New(0.8), nullptr, true);
-    }
-  };
-
-  /**
    * \brief Module activator for the PlanarFigure module.
    *
-   * Registers the mapper providers for mitk::PlanarFigure and
-   * planar-figure-specific transient properties, i.e. runtime/UI
-   * state that must not be persisted to scene files. The generic node
-   * "selected" flag is registered centrally by the Core module.
+   * Registers the mapper providers for mitk::PlanarFigure, its property types
+   * and the migration of properties of previous versions.
    */
   class PlanarFigureModuleActivator : public us::ModuleActivator
   {
   public:
     void Load(us::ModuleContext *) override
     {
-      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
-      transience->AddTransient<PlanarFigure>("planarfigure.ishovering");
+      PlanarFigureLegacyProperties::Register();
+
+      CoreServicePointer<IPropertyDeserialization> deserialization(CoreServices::GetPropertyDeserialization());
+      deserialization->RegisterProperty<PlanarFigureVisibilityProperty>();
 
       m_MapperProviders.push_back(
-        std::make_unique<PlanarFigureMapperProvider>(BaseRenderer::Standard2D));
+        std::make_unique<MapperProviderBase<PlanarFigureVtkMapper2D, PlanarFigure>>(BaseRenderer::Standard2D));
       m_MapperProviders.push_back(
         std::make_unique<MapperProviderBase<PlanarFigureVtkMapper3D, PlanarFigure>>(BaseRenderer::Standard3D));
     }

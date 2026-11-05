@@ -11,298 +11,212 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarDoubleEllipse.h>
-#include <mitkProperties.h>
+
+#include "mitkPlanarFigureGeometryHelpers.h"
 
 #include <algorithm>
+#include <cmath>
 
-mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
-  : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
-    FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
-    FEATURE_ID_THICKNESS(Superclass::AddFeature("Thickness", "mm")),
-    m_NumberOfSegments(64),
-    m_ConstrainCircle(true),
-    m_ConstrainThickness(true)
+std::optional<std::pair<double, double>> mitk::PlanarDoubleEllipse::GetOuterRadii() const
 {
-  this->ResetNumberOfControlPoints(4);
-  this->SetNumberOfPolyLines(2);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
+  if (this->GetNumberOfControlPoints() < 3)
+    return std::nullopt;
+
+  const auto center = this->GetControlPoint(0);
+  return std::make_pair(center.EuclideanDistanceTo(this->GetControlPoint(1)), center.EuclideanDistanceTo(this->GetControlPoint(2)));
 }
 
-mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(double fixedRadius, double fixedThickness)
-  : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
-  FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
-  FEATURE_ID_THICKNESS(Superclass::AddFeature("Thickness", "mm")),
-  m_NumberOfSegments(64),
-  m_ConstrainCircle(true),
-  m_ConstrainThickness(true),
-  m_FixedRadius(fixedRadius),
-  m_FixedThickness(fixedThickness),
-  m_SizeIsFixed(true)
+void mitk::PlanarDoubleEllipse::CheckControlPoints(const std::vector<Point2D> &points) const
 {
-  this->ResetNumberOfControlPoints(1);
-  this->SetNumberOfPolyLines(2);
-  this->SetProperty("closed", mitk::BoolProperty::New(true));
+  Superclass::CheckControlPoints(points);
 
-  if (fixedThickness>fixedRadius)
-  {
-    mitkThrow() << "Invalid constructor of fixed sized double ellipses. Thickness (" << fixedThickness << ") is greater than the radius (" << fixedRadius << ")";
-  }
+  if (points.size() == 3 && !PlanarFigureGeometryHelpers::ArePerpendicular(points[1] - points[0], points[2] - points[0]))
+    mitkThrow() << "The axes of a double ellipse must be perpendicular.";
 }
 
-mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(const Self& other)
-  : PlanarFigure(other),
-    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
-    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
-    FEATURE_ID_THICKNESS(other.FEATURE_ID_THICKNESS),
-    m_NumberOfSegments(other.m_NumberOfSegments),
-    m_ConstrainCircle(other.m_ConstrainCircle),
-    m_ConstrainThickness(other.m_ConstrainThickness),
-    m_FixedRadius(other.m_FixedRadius),
-    m_FixedThickness(other.m_FixedThickness),
-    m_SizeIsFixed(other.m_SizeIsFixed)
+double mitk::PlanarDoubleEllipse::GetThickness() const
 {
+  const auto radii = this->GetOuterRadii();
+
+  return radii.has_value()
+    ? std::min({ m_Thickness, radii->first, radii->second })
+    : m_Thickness;
 }
 
-mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
+void mitk::PlanarDoubleEllipse::SetThickness(double thickness)
 {
-  if (index == 2 && !m_ConstrainCircle)
+  if (!std::isfinite(thickness))
+    mitkThrow() << "The thickness of a double ellipse must be finite.";
+
+  if (thickness < 0.0)
+    mitkThrow() << "The thickness of a double ellipse must not be negative.";
+
+  if (const auto radii = this->GetOuterRadii(); radii.has_value())
   {
-    const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
-    const Vector2D outerMajorVector = this->GetControlPoint(CP_OUTER_MAJOR_AXIS) - centerPoint;
+    const auto maximum = std::min(radii->first, radii->second);
 
-    Vector2D minorDirection;
-    minorDirection[0] = outerMajorVector[1];
-    minorDirection[1] = -outerMajorVector[0];
-    minorDirection.Normalize();
+    // Tolerates the rounding of a thickness that equals a radius.
+    if (thickness > maximum * (1.0 + 1e-9))
+      mitkThrow() << "The thickness of a double ellipse must not exceed its radii.";
 
-    const double outerMajorRadius = outerMajorVector.GetNorm();
-    const double innerMajorRadius = (this->GetControlPoint(CP_INNER_MAJOR_AXIS) - centerPoint).GetNorm();
-    const ScalarType radius =
-      std::max(outerMajorRadius - innerMajorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
-
-    return Superclass::ApplyControlPointConstraints(index, centerPoint + minorDirection * radius);
-  }
-  else if (index == 3 && !m_ConstrainThickness)
-  {
-    const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
-    Vector2D outerMajorVector = this->GetControlPoint(CP_OUTER_MAJOR_AXIS) - centerPoint;
-
-    const double outerMajorRadius = outerMajorVector.GetNorm();
-    const double outerMinorRadius = (this->GetControlPoint(CP_OUTER_MINOR_AXIS) - centerPoint).GetNorm();
-    const ScalarType radius =
-      std::max(outerMajorRadius - outerMinorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
-
-    outerMajorVector.Normalize();
-
-    return Superclass::ApplyControlPointConstraints(index, centerPoint - outerMajorVector * radius);
+    thickness = std::min(thickness, maximum);
   }
 
-  return Superclass::ApplyControlPointConstraints(index, point);
+  m_Thickness = thickness;
+  this->Modified();
 }
 
-void mitk::PlanarDoubleEllipse::EvaluateFeaturesInternal()
+std::string mitk::PlanarDoubleEllipse::GetTypeId() const
 {
-  const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
-  const ScalarType outerMajorRadius = (m_SizeIsFixed)? m_FixedRadius : centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_OUTER_MAJOR_AXIS));
-  const ScalarType outerMinorRadius = (m_SizeIsFixed)? m_FixedRadius : centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_OUTER_MINOR_AXIS));
-  const ScalarType thickness = (m_SizeIsFixed)? m_FixedThickness : outerMajorRadius - centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_INNER_MAJOR_AXIS));
-
-  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * outerMajorRadius);
-  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * outerMinorRadius);
-  this->SetQuantity(FEATURE_ID_THICKNESS, thickness);
+  return "double_ellipse";
 }
 
-void mitk::PlanarDoubleEllipse::GenerateHelperPolyLine(double, unsigned int)
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarDoubleEllipse::GetContours() const
 {
-}
+  const auto radii = this->GetOuterRadii();
 
-void mitk::PlanarDoubleEllipse::GeneratePolyLine()
-{
-  this->ClearPolyLines();
+  if (!radii.has_value())
+    return {};
 
-  const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
+  const auto center = this->GetControlPoint(0);
+  const auto [firstRadius, secondRadius] = *radii;
+  const auto thickness = this->GetThickness();
+  const auto axis = this->GetControlPoint(1) - center;
 
-  Vector2D direction(0.);
-  direction[0] = 1.;
-  if (!m_SizeIsFixed)
+  std::vector<Contour> contours{ { ContourRole::Outline, true,
+    PlanarFigureGeometryHelpers::SampleEllipse(center, axis, firstRadius, secondRadius) } };
+
+  if (firstRadius > thickness && secondRadius > thickness)
   {
-    direction = this->GetControlPoint(CP_OUTER_MAJOR_AXIS) - centerPoint;
-    direction.Normalize();
+    contours.push_back({ ContourRole::Hole, true,
+      PlanarFigureGeometryHelpers::SampleEllipse(center, axis, firstRadius - thickness, secondRadius - thickness) });
   }
 
-  const ScalarType deltaAngle = vnl_math::pi / (m_NumberOfSegments / 2);
+  return contours;
+}
 
-  int start = 0;
-  int end = m_NumberOfSegments;
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarDoubleEllipse::GetMeasurements() const
+{
+  if (this->GetNumberOfControlPoints() < 3)
+    return {};
 
-  if (direction[1] < 0.0)
+  const auto *plane = this->GetPlaneGeometry();
+  const auto center = this->GetControlPoint(0);
+  const auto firstRadius = PlanarFigureGeometryHelpers::GetDistance(plane, center, this->GetControlPoint(1));
+  const auto secondRadius = PlanarFigureGeometryHelpers::GetDistance(plane, center, this->GetControlPoint(2));
+
+  return {
+    { MeasurementType::MajorAxis, 2.0 * std::max(firstRadius, secondRadius) },
+    { MeasurementType::MinorAxis, 2.0 * std::min(firstRadius, secondRadius) },
+    { MeasurementType::Thickness, this->GetThickness() }
+  };
+}
+
+mitk::PlanarFigure::PlacementKind mitk::PlanarDoubleEllipse::GetPlacementKind() const
+{
+  return PlacementKind::Span;
+}
+
+void mitk::PlanarDoubleEllipse::SetFromSpan(const Point2D &start, const Point2D &end)
+{
+  const auto radius = start.EuclideanDistanceTo(end);
+  const auto direction = PlanarFigureGeometryHelpers::GetDirection(start, end);
+
+  m_Thickness = 0.5 * radius;
+  this->AssignControlPoints({ start, end, start + PlanarFigureGeometryHelpers::GetPerpendicular(direction) * radius });
+}
+
+std::vector<mitk::PlanarFigure::Handle> mitk::PlanarDoubleEllipse::GetHandles() const
+{
+  const auto points = this->GetControlPoints();
+
+  if (points.empty())
+    return {};
+
+  if (points.size() < 3)
+    return { { HandleRole::Center, points[0] } };
+
+  const auto center = points[0];
+  const auto innerRadius = center.EuclideanDistanceTo(points[1]) - this->GetThickness();
+  const auto innerHandle = center - PlanarFigureGeometryHelpers::GetDirection(center, points[1]) * innerRadius;
+
+  return { { HandleRole::Center, center }, { HandleRole::Extent, points[1] }, { HandleRole::Extent, points[2] },
+           { HandleRole::Extent, innerHandle } };
+}
+
+void mitk::PlanarDoubleEllipse::MoveHandle(std::size_t index, const Point2D &position)
+{
+  if (index >= this->GetHandles().size())
+    mitkThrow() << "Handle index " << index << " is out of range.";
+
+  auto points = this->GetControlPoints();
+  const auto center = points[0];
+
+  if (0 == index)
   {
-    direction[0] = -direction[0];
-    end = m_NumberOfSegments / 2;
-    start = -end;
+    this->Translate(position - center);
+    return;
   }
 
-  vnl_matrix_fixed<mitk::ScalarType, 2, 2> rotation;
-  rotation[1][0] = std::sin(std::acos(direction[0]));
-  rotation[0][0] = direction[0];
-  rotation[1][1] = direction[0];
-  rotation[0][1] = -rotation[1][0];
+  const auto direction = PlanarFigureGeometryHelpers::GetDirection(center, points[1]);
+  const auto normal = PlanarFigureGeometryHelpers::GetPerpendicular(direction);
+  const auto firstRadius = center.EuclideanDistanceTo(points[1]);
+  const auto secondRadius = center.EuclideanDistanceTo(points[2]);
+  const auto thickness = this->GetThickness();
+  const auto side = (points[2] - center) * normal < 0.0 ? -1.0 : 1.0;
 
-  const ScalarType outerMajorRadius = (m_SizeIsFixed) ? m_FixedRadius : centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_OUTER_MAJOR_AXIS));
-  const ScalarType outerMinorRadius = (m_SizeIsFixed) ? m_FixedRadius : centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_OUTER_MINOR_AXIS));
-  const ScalarType innerMajorRadius = (m_SizeIsFixed) ? (m_FixedRadius-m_FixedThickness) : centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_INNER_MAJOR_AXIS));
-  const ScalarType innerMinorRadius = (m_SizeIsFixed) ? (m_FixedRadius-m_FixedThickness) : innerMajorRadius - (outerMajorRadius - outerMinorRadius);
-
-  ScalarType angle = 0;
-  ScalarType cosAngle = 0;
-  ScalarType sinAngle = 0;
-  vnl_vector_fixed<mitk::ScalarType, 2> vector;
-  Point2D point;
-
-  for (int i = start; i < end; ++i)
-  {
-    angle = i * deltaAngle;
-    cosAngle = std::cos(angle);
-    sinAngle = std::sin(angle);
-
-    vector[0] = outerMajorRadius * cosAngle;
-    vector[1] = outerMinorRadius * sinAngle;
-    vector = rotation * vector;
-
-    point[0] = centerPoint[0] + vector[0];
-    point[1] = centerPoint[1] + vector[1];
-
-    this->AppendPointToPolyLine(0, point);
-
-    vector[0] = innerMajorRadius * cosAngle;
-    vector[1] = innerMinorRadius * sinAngle;
-    vector = rotation * vector;
-
-    point[0] = centerPoint[0] + vector[0];
-    point[1] = centerPoint[1] + vector[1];
-
-    this->AppendPointToPolyLine(1, point);
-  }
-}
-
-unsigned int mitk::PlanarDoubleEllipse::GetNumberOfSegments() const
-{
-  return m_NumberOfSegments;
-}
-
-void mitk::PlanarDoubleEllipse::SetNumberOfSegments(unsigned int numSegments)
-{
-  m_NumberOfSegments = std::max(4U, numSegments);
-
-  if (this->IsPlaced())
-  {
-    this->GeneratePolyLine();
-    this->Modified();
-  }
-}
-
-unsigned int mitk::PlanarDoubleEllipse::GetMaximumNumberOfControlPoints() const
-{
-  return (m_SizeIsFixed)? 1 : 4;
-}
-
-unsigned int mitk::PlanarDoubleEllipse::GetMinimumNumberOfControlPoints() const
-{
-  return (m_SizeIsFixed)? 1 : 4;
-}
-
-bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
-{
   switch (index)
   {
-    case 0:
-    {
-      const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
-      const Vector2D vector = point - centerPoint;
-
-      Superclass::SetControlPoint(0, point, createIfDoesNotExist);
-      if (!m_SizeIsFixed)
-      {
-        Superclass::SetControlPoint(1, this->GetControlPoint(CP_OUTER_MAJOR_AXIS) + vector, createIfDoesNotExist);
-        Superclass::SetControlPoint(2, this->GetControlPoint(CP_OUTER_MINOR_AXIS) + vector, createIfDoesNotExist);
-        Superclass::SetControlPoint(3, this->GetControlPoint(CP_INNER_MAJOR_AXIS) + vector, createIfDoesNotExist);
-      }
-
-      break;
-    }
-
     case 1:
     {
-      const Vector2D vector = point - this->GetControlPoint(CP_OUTER_MAJOR_AXIS);
+      // The second axis turns with the first one; the ring keeps its thickness where possible.
+      const auto newDirection = PlanarFigureGeometryHelpers::GetDirection(center, position);
+      const auto newFirstRadius = center.EuclideanDistanceTo(position);
 
-      Superclass::SetControlPoint(1, point, createIfDoesNotExist);
-
-      const Point2D centerPoint = this->GetControlPoint(CP_CENTER);
-      const Vector2D outerMajorVector = point - centerPoint;
-
-      Vector2D outerMinorVector;
-      outerMinorVector[0] = outerMajorVector[1];
-      outerMinorVector[1] = -outerMajorVector[0];
-
-      if (!m_ConstrainCircle)
-      {
-        outerMinorVector.Normalize();
-        outerMinorVector *= centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_OUTER_MINOR_AXIS));
-      }
-
-      Superclass::SetControlPoint(2, centerPoint + outerMinorVector, createIfDoesNotExist);
-
-      Vector2D innerMajorVector = outerMajorVector;
-
-      if (!m_ConstrainThickness)
-      {
-        innerMajorVector.Normalize();
-        innerMajorVector *= centerPoint.EuclideanDistanceTo(this->GetControlPoint(CP_INNER_MAJOR_AXIS) - vector);
-      }
-
-      Superclass::SetControlPoint(3, centerPoint - innerMajorVector, createIfDoesNotExist);
-
+      points[1] = position;
+      points[2] = center + PlanarFigureGeometryHelpers::GetPerpendicular(newDirection) * (side * secondRadius);
+      m_Thickness = std::min({ thickness, newFirstRadius, secondRadius });
       break;
     }
 
     case 2:
     {
-      m_ConstrainCircle = false;
-      Superclass::SetControlPoint(2, point, createIfDoesNotExist);
-
-      break;
-    }
-
-    case 3:
-    {
-      m_ConstrainThickness = false;
-      Superclass::SetControlPoint(3, point, createIfDoesNotExist);
-
+      // The second axis cannot be shorter than the ring is thick.
+      const auto offset = (position - center) * normal;
+      const auto radius = std::max(std::abs(offset), thickness);
+      points[2] = center + normal * (offset < 0.0 ? -radius : radius);
       break;
     }
 
     default:
-      return false;
+    {
+      // The ring cannot be thicker than the outer radii.
+      const auto maximumThickness = std::min(firstRadius, secondRadius);
+      const auto innerRadius = std::clamp(center.EuclideanDistanceTo(position), firstRadius - maximumThickness, firstRadius);
+      m_Thickness = firstRadius - innerRadius;
+      break;
+    }
   }
 
+  this->AssignControlPoints(points);
+}
+
+bool mitk::PlanarDoubleEllipse::IsClosed() const
+{
   return true;
 }
 
-bool mitk::PlanarDoubleEllipse::Equals(const mitk::PlanarFigure &other) const
+bool mitk::PlanarDoubleEllipse::EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const
 {
-  const auto *otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&other);
-  if (otherDoubleEllipse)
+  const auto otherThickness = static_cast<const PlanarDoubleEllipse &>(other).GetThickness();
+
+  if (!Equal(this->GetThickness(), otherThickness, eps, verbose))
   {
-    if (this->m_ConstrainCircle != otherDoubleEllipse->m_ConstrainCircle)
-      return false;
-    if (this->m_ConstrainThickness != otherDoubleEllipse->m_ConstrainThickness)
-      return false;
-    if (this->m_NumberOfSegments != otherDoubleEllipse->m_NumberOfSegments)
-      return false;
-    return Superclass::Equals(other);
-  }
-  else
-  {
+    if (verbose)
+      MITK_INFO << "[Equal( PlanarDoubleEllipse )] Thicknesses differ.";
+
     return false;
   }
+
+  return true;
 }

@@ -106,3 +106,8 @@ mitk::ExclusiveInteraction::Claim mitk::ExclusiveInteraction::Acquire(RevokeFunc
 
   return claim;
 }
+
+bool mitk::ExclusiveInteraction::IsClaimed()
+{
+  return CurrentClaimId != 0;
+}

@@ -18,62 +18,51 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PlaneGeometry;
-
   /**
-   * \brief Implementation of PlanarFigure representing an angle measurement.
+   * \brief Implementation of PlanarFigure representing an angle between two arms.
    *
-   * Displays an angle defined by three control points: two endpoints and a
-   * vertex point in between. The angle is measured at the vertex (second
-   * control point) between the two line segments.
+   * The three control points are the end of the first arm, the vertex and the
+   * end of the second arm, in this order.
    *
-   * Provides one feature: the angle value in degrees (FEATURE_ID_ANGLE).
-   *
-   * \sa PlanarFigure, PlanarFourPointAngle, PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarFourPointAngle
    */
   class MITKPLANARFIGURE_EXPORT PlanarAngle : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarAngle, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-    itkCloneMacro(Self) public :
-      /** \brief Feature identifier for the angle measurement (in degrees). */
-      const unsigned int FEATURE_ID_ANGLE;
+    /** \brief Returns "angle". */
+    std::string GetTypeId() const override;
 
-    /** \brief Returns 3 -- an angle requires exactly three control points. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
-    /** \brief Returns 3 -- an angle requires exactly three control points. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 3; }
+    /** \brief An open outline along both arms. */
+    std::vector<Contour> GetContours() const override;
 
-    /**
-     * \brief Compares this PlanarAngle with another PlanarFigure for equality.
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    /** \brief The arc at the vertex. */
+    std::vector<Decoration> GetDecorations() const override;
+
+    /** \brief Angle between the arms. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed point by point: first arm end, vertex, second arm end. */
+    PlacementKind GetPlacementKind() const override;
+
+    /** \brief Returns false. */
+    bool IsClosed() const override;
+
+    /** \brief Returns 3. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 3; }
+
+    /** \brief Returns 3. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 3; }
 
   protected:
-    PlanarAngle();
-    PlanarAngle(const Self& other);
+    PlanarAngle() = default;
+    PlanarAngle(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    /** \brief Generates the poly-line representation of the planar figure. */
-    void GeneratePolyLine() override;
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    void EvaluateFeaturesInternal() override;
-
-    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-
-  private:
   };
-
-} // namespace mitk
+}
 
 #endif

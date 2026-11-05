@@ -121,6 +121,10 @@ namespace mitk
      * \param[in] enable True to enable interaction, false to disable.
      */
     void EnableInteraction(bool enable) { m_IsActive = enable; }
+
+    /** \brief Whether the state machine reacts to events, see EnableInteraction(). */
+    bool IsInteractionEnabled() const { return m_IsActive; }
+
   protected:
     EventStateMachine();
     ~EventStateMachine() override;

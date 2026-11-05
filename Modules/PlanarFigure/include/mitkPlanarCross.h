@@ -18,125 +18,59 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PlaneGeometry;
-
   /**
-   * \brief Implementation of PlanarFigure modeling a cross with two orthogonal lines
-   * on a plane.
+   * \brief Implementation of PlanarFigure representing two perpendicular lines for bidimensional measurements.
    *
-   * The cross consists of two two orthogonal lines, which are defined by four control points
-   * lying on a plane. The two control points of the first line are freely placable within
-   * the bounds of the underlying 2D geometry, while the two control points of the second line
-   * are ensured to meet the following constraints:
+   * Control points 0 and 1 are the ends of the first line, 2 and 3 those of
+   * the second one, which is perpendicular to the first line and crosses it
+   * between its ends. The longer line is measured as long axis, the shorter
+   * one as short axis.
    *
-   * 1.) The lines must be orthogonal to each other
-   * 2.) The second line must lie within the 2D area defined by the first line
-   * 3.) The two lines must intersect (at least with their boundaries)
-   *
-   * When placing the second line interactively, a graphical helper polyline is provided to the
-   * user to indicate the position and orthogonal orientation of the line if it would be placed
-   * at the current mouse position.
-   *
-   * When modifying one of the lines by interactively moving its control points, the respective
-   * other line is deleted and the user is prompted to draw it again.
-   *
-   * The class provide a special mode for drawing single lines (SingleLineModeOn/Off); in this
-   * case, interaction stops after the first line has been placed.
-   *
-   * The class provides the lengths of both lines via the "feature" interface, ordered by size.
-   *
-   * \sa PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarLine
    */
   class MITKPLANARFIGURE_EXPORT PlanarCross : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarCross, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
-      /**
-       * \brief Sets whether the PlanarFigure represents a single line or an orthogonal cross.
-       * \param[in] singleLineMode If true, only a single line (2 control points) is used.
-       */
-      void SetSingleLineMode(bool singleLineMode);
+    /** \brief Returns "cross". */
+    std::string GetTypeId() const override;
 
-    /**
-     * \brief Returns whether the PlanarFigure represents a single line or an orthogonal cross.
-     * \return True if in single-line mode.
-     */
-    bool GetSingleLineMode() const;
+    /** \brief Two open outlines, the first and the second line. */
+    std::vector<Contour> GetContours() const override;
 
-    /**
-     * \brief Boolean macro for single-line mode toggling.
-     *
-     * Calls SetSingleLineMode().
-     */
-    itkBooleanMacro(SingleLineMode);
+    /** \brief Long axis and short axis. */
+    std::vector<Measurement> GetMeasurements() const override;
 
-    /** \brief Returns 2 in single-line mode, 4 in cross mode. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
-    /** \brief Returns 2 in single-line mode, 4 in cross mode. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
+    /** \brief Placed by a span along the first line. */
+    PlacementKind GetPlacementKind() const override;
 
-    /**
-     * \brief Resets the cross to a single line when a control point is selected.
-     *
-     * When in cross mode, selecting a control point on the second line
-     * removes the second line and prompts the user to redraw it.
-     *
-     * \return True if a reset was performed.
-     */
-    bool ResetOnPointSelect() override;
+    /** \brief The first line from start to end and a perpendicular second line of half its length through its middle. */
+    void SetFromSpan(const Point2D &start, const Point2D &end) override;
 
-    /**
-     * \brief Returns whether a reset is needed when a control point is selected.
-     * \return True if the figure needs to be reset on point selection.
-     */
-    bool ResetOnPointSelectNeeded() const override;
+    /** \brief Moves an end point while the second line stays perpendicular to the first one and crosses it. */
+    void MoveHandle(std::size_t index, const Point2D &position) override;
 
-    /**
-     * \brief Returns 1 in single-line mode, 2 in cross mode (longest + shortest diameter).
-     * \return The number of available features.
-     */
-    unsigned int GetNumberOfFeatures() const override;
+    /** \brief Returns false. */
+    bool IsClosed() const override;
 
-    /**
-     * \brief Compares this PlanarCross with another PlanarFigure for equality.
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    bool Equals(const mitk::PlanarFigure &other) const override;
+    /** \brief Returns 4. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 4; }
+
+    /** \brief Returns 4. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 4; }
 
   protected:
-    PlanarCross();
-    PlanarCross(const Self& other);
+    PlanarCross() = default;
+    PlanarCross(const Self &other) = default;
+
     mitkCloneMacro(Self);
 
-    /** \brief Spatially constrain control points of second (orthogonal) line */
-    Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
-
-    /** \brief Generates the poly-line representation of the planar figure. */
-    void GeneratePolyLine() override;
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    void EvaluateFeaturesInternal() override;
-
-    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-
-    // Feature identifiers
-    const unsigned int FEATURE_ID_LONGESTDIAMETER;
-    const unsigned int FEATURE_ID_SHORTAXISDIAMETER;
-
-  private:
-    /** Internal method for applying spatial constraints. */
-    virtual Point2D InternalApplyControlPointConstraints(unsigned int index, const Point2D &point);
+    /** \brief Additionally requires a second line that is perpendicular to the first one and crosses it. */
+    void CheckControlPoints(const std::vector<Point2D> &points) const override;
   };
-
-} // namespace mitk
+}
 
 #endif

@@ -14,8 +14,10 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <mitkCoreServices.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
+#include <mitkIPropertyMigration.h>
 #include <mitkProperties.h>
 #include <mitkSceneJsonReader.h>
 #include <mitkStandaloneDataStorage.h>
@@ -81,6 +83,7 @@ class mitkSceneJsonReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestInlineAndFileMutuallyExclusive);
   MITK_TEST(TestContextPropertiesApplied);
   MITK_TEST(TestTransientPropertyStrippedOnLoad);
+  MITK_TEST(TestLegacyPropertyMigratedOnLoad);
   MITK_TEST(TestParentChildRelationship);
   MITK_TEST(TestEmptyContextKeyRejected);
   MITK_TEST(TestNullContextKeyRejected);
@@ -311,6 +314,41 @@ public:
     CPPUNIT_ASSERT(ctxList != nullptr);
     CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be applied from a context list",
                            ctxList->GetProperty("selected") == nullptr);
+  }
+
+  void TestLegacyPropertyMigratedOnLoad()
+  {
+    // The key is unique to this test, since migrations stay registered for the
+    // lifetime of the process.
+    mitk::CoreServicePointer<mitk::IPropertyMigration> migration(mitk::CoreServices::GetPropertyMigration());
+    migration->AddMigration<mitk::BaseData>("jsonreadertest.legacy",
+      [](const mitk::BaseData *, const mitk::BaseProperty &legacyProperty, mitk::PropertyList &properties) {
+        properties.SetProperty("jsonreadertest.current", legacyProperty.Clone());
+      });
+
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"properties":{"name":"m","jsonreadertest.legacy":"a"},
+       "context_properties":{"stdmulti.widget0":{"jsonreadertest.legacy":"b"}}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT(reader->LoadScene(file.Path(), storage));
+
+    auto node = storage->GetNamedNode("m");
+    CPPUNIT_ASSERT(node != nullptr);
+
+    std::string value;
+    CPPUNIT_ASSERT_MESSAGE("Default list is migrated", node->GetStringProperty("jsonreadertest.current", value));
+    CPPUNIT_ASSERT_EQUAL(std::string("a"), value);
+    CPPUNIT_ASSERT_MESSAGE("Legacy key is gone from the default list", node->GetProperty("jsonreadertest.legacy") == nullptr);
+
+    auto *ctxList = node->GetPropertyList("stdmulti.widget0");
+    CPPUNIT_ASSERT(ctxList != nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Context list is migrated", ctxList->GetStringProperty("jsonreadertest.current", value));
+    CPPUNIT_ASSERT_EQUAL(std::string("b"), value);
+    CPPUNIT_ASSERT_MESSAGE("Legacy key is gone from the context list", ctxList->GetProperty("jsonreadertest.legacy") == nullptr);
   }
 
   void TestParentChildRelationship()

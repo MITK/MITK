@@ -3,4 +3,17 @@
   \ingroup MITKModules
 
   \brief Planar figure data types.
+
+  A planar figure, see mitk::PlanarFigure, is a geometric figure on a plane,
+  for example a line, a circle or a polygon, that measures what it covers.
+  It is defined by its control points in the 2D coordinates of its plane;
+  contours, decorations, handles and measurements are computed from them.
+  mitk::CreatePlanarFigure() creates a figure of a type given by its
+  identifier, such as "four_point_angle".
+
+  Figures are saved as JSON files with the extension .pf.json. Files of the
+  previous XML format with the extension .pf are still read.
+
+  mitk::PlanarFigureInteractor places and edits figures in 2D render windows,
+  mitk::PlanarFigureVtkMapper2D draws them, see \ref PlanarPropertiesPage.
 */

@@ -168,6 +168,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 
     if (baseData != nullptr && properties != nullptr)
     {
+      mitk::SceneReaderHelpers::SanitizeLoadedProperties(*properties, baseData);
       baseData->SetPropertyList(properties);
       mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(baseData);
     }
@@ -458,10 +459,11 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
 
     if (readProperties.IsNotNull())
     {
-      // Drop transient properties (e.g. the "selected" UI flag) that may be
-      // present in older scene files, so reloading does not resurrect runtime
-      // or UI state. Transience is decided per the node's BaseData type.
-      mitk::SceneReaderHelpers::StripTransientProperties(*readProperties, node->GetData());
+      // Upgrade legacy properties and drop transient ones (e.g. the "selected"
+      // UI flag) that may be present in older scene files, so reloading does
+      // not resurrect runtime or UI state. Both are decided per the node's
+      // BaseData type.
+      mitk::SceneReaderHelpers::SanitizeLoadedProperties(*readProperties, node->GetData());
 
       propertyList->ConcatenatePropertyList(readProperties, true); // true = replace
     }

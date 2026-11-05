@@ -18,22 +18,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PlaneGeometry;
-
   /**
    * \brief Implementation of PlanarFigure representing an ellipse.
    *
-   * The ellipse is defined by four control points: the center, a point on the
-   * major axis, a point on the minor axis, and an additional control point for
-   * interactive manipulation. Optional minimum/maximum radius constraints and
-   * circle mode (equal radii) are supported.
+   * The three control points are the center and the ends of two
+   * perpendicular semi-axes, in this order.
    *
-   * Provides three features:
-   * - FEATURE_ID_MAJOR_AXIS: length of the major axis
-   * - FEATURE_ID_MINOR_AXIS: length of the minor axis
-   * - FEATURE_ID_AREA: the ellipse area
-   *
-   * \sa PlanarFigure, PlanarCircle, PlanarDoubleEllipse, PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarCircle, PlanarDoubleEllipse
    */
   class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
   {
@@ -42,103 +33,63 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /**
-       * \brief Places the figure at the given point and initializes all four control points.
-       * \param[in] point The initial 2D placement position.
-       */
-      void PlaceFigure(const Point2D &point) override;
+    /** \brief Returns "ellipse". */
+    std::string GetTypeId() const override;
+
+    /** \brief A closed outline. */
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief Major and minor axis (the longer and the shorter one) and area. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief Placed by a span from the center to the end of the first axis, starting as a circle. */
+    PlacementKind GetPlacementKind() const override;
+
+    void SetFromSpan(const Point2D &start, const Point2D &end) override;
+
+    /** \brief The center, which moves the ellipse, and the ends of both axes. */
+    std::vector<Handle> GetHandles() const override;
+
+    /** \brief Moves a handle while both axes stay perpendicular. */
+    void MoveHandle(std::size_t index, const Point2D &position) override;
+
+    /** \brief Returns true. */
+    bool IsClosed() const override;
+
+    /** \brief Returns 3. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 3; }
+
+    /** \brief Returns 3. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 3; }
 
     /**
-     * \brief Sets a control point position, enforcing ellipse constraints.
+     * \brief Optional unit direction in the plane that does not affect the shape.
      *
-     * \param[in] index               Zero-based index of the control point.
-     * \param[in] point               New 2D coordinates.
-     * \param[in] createIfDoesNotExist If true, creates the point if missing.
-     * \return True if the control point was set successfully.
+     * Fiberfox fiducials use it to twist fiber bundles. It has no handle and
+     * keeps its direction when the ellipse is edited. Without one, consumers
+     * use (1, 0), as fiducials of previous versions did when their fourth
+     * point was never moved.
      */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
+    std::optional<Vector2D> GetReferenceDirection() const;
 
-    /** \brief Returns 4 -- an ellipse requires exactly four control points. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
-    /** \brief Returns 4 -- an ellipse requires exactly four control points. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
-
-    /**
-     * \brief Sets the minimum allowed radius.
-     * \param[in] radius The minimum radius value.
-     */
-    void SetMinimumRadius(double radius) { m_MinRadius = radius; }
-    /**
-     * \brief Returns the minimum allowed radius.
-     * \return The minimum radius.
-     */
-    double GetMinimumRadius() { return m_MinRadius; }
-    /**
-     * \brief Sets the maximum allowed radius.
-     * \param[in] radius The maximum radius value.
-     */
-    void SetMaximumRadius(double radius) { m_MaxRadius = radius; }
-    /**
-     * \brief Returns the maximum allowed radius.
-     * \return The maximum radius.
-     */
-    double GetMaximumRadius() { return m_MaxRadius; }
-
-    /**
-     * \brief Activates or deactivates minimum/maximum radius constraints.
-     * \param[in] active If true, radius constraints are enforced.
-     */
-    void ActivateMinMaxRadiusContstraints(bool active) { m_MinMaxRadiusContraintsActive = active; }
-
-    /**
-     * \brief Sets whether the ellipse should be constrained to a circle (equal radii).
-     * \param[in] active If true, the ellipse is treated as a circle.
-     */
-    void SetTreatAsCircle(bool active) { m_TreatAsCircle = active; }
-
-    /**
-     * \brief Compares this PlanarEllipse with another PlanarFigure for equality.
-     * \param[in] other The PlanarFigure to compare with.
-     * \return True if both figures are considered equal.
-     */
-    bool Equals(const mitk::PlanarFigure &other) const override;
-
-    /** \brief Feature identifier for the major axis length. */
-    const unsigned int FEATURE_ID_MAJOR_AXIS;
-    /** \brief Feature identifier for the minor axis length. */
-    const unsigned int FEATURE_ID_MINOR_AXIS;
-    /** \brief Feature identifier for the ellipse area. */
-    const unsigned int FEATURE_ID_AREA;
+    /** \brief Sets the reference direction, normalized; throws on a zero or non-finite vector. */
+    void SetReferenceDirection(const std::optional<Vector2D> &direction);
 
   protected:
-    PlanarEllipse();
-    PlanarEllipse(const Self& other);
+    PlanarEllipse() = default;
+    PlanarEllipse(const Self &other) = default;
 
     mitkCloneMacro(Self);
 
-    /** \brief Generates the poly-line representation of the planar figure. */
-    void GeneratePolyLine() override;
+    /** \brief Additionally requires perpendicular axes. */
+    void CheckControlPoints(const std::vector<Point2D> &points) const override;
 
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-
-    /** \brief Spatially constrain control points of second (orthogonal) line */
-    Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    void EvaluateFeaturesInternal() override;
-
-    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-
-    // Member variables:
-    double m_MinRadius;
-    double m_MaxRadius;
-    bool m_MinMaxRadiusContraintsActive;
-    bool m_TreatAsCircle;
+    /** \brief Compares the reference directions. */
+    bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const override;
 
   private:
+    std::optional<Vector2D> m_ReferenceDirection;
   };
-
-} // namespace mitk
+}
 
 #endif

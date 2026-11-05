@@ -52,6 +52,10 @@ namespace {
     if (!planarFigure || !imageGeometry)
       return false;
 
+    // A figure that is still being placed is no region yet.
+    if (!planarFigure->IsComplete())
+      return false;
+
     if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry))
       return false;
 
@@ -60,7 +64,7 @@ namespace {
       return true;
 
     const auto numControlPoints = planarFigure->GetNumberOfControlPoints();
-    for (unsigned int i = 0; i < numControlPoints; ++i)
+    for (std::size_t i = 0; i < numControlPoints; ++i)
     {
       if (!imageGeometry->IsInside(planarFigure->GetWorldControlPoint(i)))
         return false;
@@ -194,7 +198,7 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
   { //only supported for one image and roi currently
     auto image = dynamic_cast<mitk::Image*>(selectedImageNodes.front()->GetData());
 
-    auto maskPlanarFigure = dynamic_cast<mitk::PlanarFigure*>(selectedROINodes.front()->GetData());
+    const auto* maskPlanarFigure = dynamic_cast<const mitk::PlanarFigure*>(selectedROINodes.front()->GetData());
 
     // The profile samples one gray value per voxel; mitk::ComputeIntensityProfile throws for e.g. RGB images.
     if (maskPlanarFigure != nullptr && image->GetPixelType().GetNumberOfComponents() == 1)

@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 void TestDataStorage(mitk::DataStorage *ds, std::string filename);
+void TestGetUniqueName();
 
 namespace mitk
 {
@@ -148,7 +149,35 @@ int mitkDataStorageTest(int argc, char *argv[])
   // TODO: Add specific StandaloneDataStorage Tests here
   sds = nullptr;
 
+  TestGetUniqueName();
+
   MITK_TEST_END();
+}
+
+void TestGetUniqueName()
+{
+  auto ds = mitk::StandaloneDataStorage::New();
+
+  auto addNode = [&ds](const std::string &name, mitk::DataNode *parent = nullptr) {
+    auto node = mitk::DataNode::New();
+    node->SetName(name);
+    ds->Add(node, parent);
+    return node;
+  };
+
+  MITK_TEST_CONDITION(ds->GetUniqueName("Line") == "Line", "GetUniqueName() keeps a free name");
+
+  auto parent = addNode("Image");
+  auto otherParent = addNode("Other image");
+
+  addNode("Line", parent);
+  addNode("Line 3", parent);
+  addNode("Line 2", otherParent);
+
+  MITK_TEST_CONDITION(ds->GetUniqueName("Line") == "Line 4", "GetUniqueName() numbers after the names taken in the whole storage");
+  MITK_TEST_CONDITION(ds->GetUniqueName("Line", parent) == "Line 2", "GetUniqueName() fills a gap among the derivations of a node");
+  MITK_TEST_CONDITION(ds->GetUniqueName("Circle", parent) == "Circle", "GetUniqueName() keeps a name free among the derivations of a node");
+  MITK_TEST_CONDITION(ds->GetUniqueName("Line 2", otherParent) == "Line 2 2", "GetUniqueName() numbers a name taken among the derivations of a node");
 }
 
 //##Documentation

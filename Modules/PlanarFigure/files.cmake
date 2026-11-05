@@ -1,5 +1,7 @@
 set(CPP_FILES
   mitkPlanarFigureActivator.cpp
+  mitkPlanarFigureLegacyProperties.cpp
+  mitkPlanarFigureViewHelpers.cpp
   Algorithms/mitkExtrudePlanarFigureFilter.cpp
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureSource.cpp
@@ -11,15 +13,19 @@ set(CPP_FILES
   DataManagement/mitkPlanarEllipse.cpp
   DataManagement/mitkPlanarCross.cpp
   DataManagement/mitkPlanarFigure.cpp
+  DataManagement/mitkPlanarFigureGeometryHelpers.cpp
+  DataManagement/mitkPlanarFigureVisibilityProperty.cpp
   DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarArrow.cpp
+  DataManagement/mitkPlanarPath.cpp
   DataManagement/mitkPlanarPolygon.cpp
   DataManagement/mitkPlanarSubdivisionPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
   Interactions/mitkPlanarFigureInteractor.cpp
-  Rendering/mitkPlanarFigureMapper2D.cpp
+  Rendering/mitkPlanarFigureTessellator.cpp
+  Rendering/mitkPlanarFigureVtkMapper2D.cpp
   Rendering/mitkPlanarFigureVtkMapper3D.cpp
 )
 

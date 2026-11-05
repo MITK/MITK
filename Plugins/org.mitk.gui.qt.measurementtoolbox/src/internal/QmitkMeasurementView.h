@@ -17,102 +17,150 @@ found in the LICENSE file.
 
 #include <mitkIRenderWindowPartListener.h>
 
-#include <usServiceRegistration.h>
+#include <memory>
+#include <vector>
 
-/// forward declarations
+class QTreeWidgetItem;
+struct QmitkFigureAppearance;
 struct QmitkMeasurementViewData;
-class QAction;
+
 namespace mitk
 {
   class PlanarFigure;
   class TimeGeometry;
 }
 
-///
-/// A view for doing measurements in digital images by means of
-/// mitk::Planarfigures which can represent drawing primitives (Lines, circles, ...).
-/// The view consists of only three main elements:
-/// 1. A toolbar for activating PlanarFigure drawing
-/// 2. A textbrowser which shows details for the selected PlanarFigures
-/// 3. A button for copying all details to the clipboard
-///
+/**
+ * \brief Places planar figures on a reference image and shows their measurements.
+ *
+ * Each tool places one figure, which is added below the reference image. Figures
+ * that are not helper objects can be edited while the view is open.
+ */
 class QmitkMeasurementView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
+  static const std::string VIEW_ID;
 
-    static const std::string VIEW_ID;
-    QmitkMeasurementView();
-    ~QmitkMeasurementView() override;
+  QmitkMeasurementView();
+  ~QmitkMeasurementView() override;
 
-    void CreateQtPartControl(QWidget* parent) override;
-    void SetFocus() override { };
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override {}
 
-    void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-
-    void NodeAdded(const mitk::DataNode* node) override;
-    /**
-    * @brief  Determine if we have to update the information of the currently
-    *         selected planar figures.
-    */
-    void NodeChanged(const mitk::DataNode* node) override;
-    void NodeRemoved(const mitk::DataNode* node) override;
-
-    void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
-
-protected Q_SLOTS:
-
-    void OnDrawLineTriggered( bool checked = false );
-    void OnDrawPathTriggered( bool checked = false );
-    void OnDrawAngleTriggered( bool checked = false );
-    void OnDrawFourPointAngleTriggered( bool checked = false );
-    void OnDrawCircleTriggered( bool checked = false );
-    void OnDrawEllipseTriggered( bool checked = false );
-    void OnDrawDoubleEllipseTriggered( bool checked = false );
-    void OnDrawRectangleTriggered( bool checked = false );
-    void OnDrawPolygonTriggered( bool checked = false );
-    void OnDrawBezierCurveTriggered( bool checked = false );
-    void OnDrawSubdivisionPolygonTriggered( bool checked = false );
-    void OnCopyToClipboard( bool checked = false );
+  /** Lets a press on a value row of the measurement tree act on its figure row. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void NodeAdded(const mitk::DataNode* node) override;
+  void NodeChanged(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
-    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-    void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
-    void CreateConnections();
-    mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& baseName, unsigned int& counter);
+  void CreateToolButtons();
+  void CreateConnections();
 
-    void SelectNode(const mitk::DataNode::Pointer& node);
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnAlignViewsClicked();
+  void OnToolClicked(int toolIndex);
+  void OnFixedSizeToggled();
+  void OnFixedSizeValueChanged();
+  void OnColorButtonClicked();
+  void OnAppearanceChanged();
 
-    void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
-    void OnAlignViewsClicked();
+  /** Updates the controls that depend on the selected figures. */
+  void OnSelectedFiguresChanged();
 
-    /**
-     * Shows the alignment overlay and enables the drawing tools according to the
-     * reference image selection and the alignment of the render windows. Cancels
-     * a pending placement when the views are not aligned.
-     */
-    void UpdateDrawingControls();
+  /** The complete figures in the selection that can be edited in this view. */
+  std::vector<mitk::DataNode*> GetSelectedFigures() const;
+  void OnCopyToClipboard();
 
-    /**
-     * Forwards the interaction reference geometry to the render window part, if there
-     * is one, and swallows the exception thrown for a time point the geometry does not
-     * cover. Passing nullptr lifts the requirement.
-     */
-    void SetInteractionReferenceGeometry(const mitk::TimeGeometry* geometry);
+  /** Takes the appearance of new figures from the preferences, or else from the defaults of the mappers. */
+  void LoadAppearance();
+  void SaveAppearance() const;
 
-    void UpdateMeasurementText();
-    void AddAllInteractors();
-    void PlanarFigureInitialized();
-    void OnPlanarFigureFinished();
-    void CancelPlacement();
-    bool BeginDrawAction(QAction* action, bool checked);
-    mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
+  /** The shown appearance with the values of the controls; the color has no control of its own. */
+  QmitkFigureAppearance GetAppearanceFromControls() const;
+  void ShowAppearance(const QmitkFigureAppearance& appearance);
 
-    QmitkMeasurementViewData* d;
+  /** Shows the appearance of the first selected figure, or of new figures while none is selected. */
+  void UpdateAppearanceControls();
+
+  /**
+   * Gives the selected figures and new ones the property that differs from the shown
+   * appearance. While none is selected, it is the appearance of new figures, including
+   * the one being placed.
+   */
+  void ChangeAppearance(const QmitkFigureAppearance& appearance);
+  void UpdateColorButton();
+  void UpdateLineWidthLabel();
+  float GetLineWidth() const;
+
+  /**
+   * Shows the alignment overlay and enables the drawing tools according to the
+   * reference image selection and the alignment of the render windows. Cancels
+   * a pending placement when the views are not aligned.
+   */
+  void UpdateDrawingControls();
+
+  /** Shows the options of the active tool only. */
+  void UpdateToolOptions();
+
+  /** Shows how to place the pending figure, how to edit the selected one, or how to start. */
+  void UpdateHint();
+
+  /** Updates the measurement tree on the next turn of the event loop, once for a burst of changes. */
+  void ScheduleMeasurementTreeUpdate();
+
+  /** Lists the complete figures of the reference image, keeping their rows, expansion and selection. */
+  void UpdateMeasurementTree();
+
+  /** Selects the rows of the selected figures. */
+  void UpdateMeasurementTreeSelection();
+
+  /** Names what the copy button copies: the selected rows, or all of them. */
+  void UpdateCopyButton();
+
+  void OnMeasurementTreeSelectionChanged();
+  void OnMeasurementTreeItemActivated(const QTreeWidgetItem* item);
+
+  /** Renames the figure of a row whose name was edited. */
+  void OnMeasurementTreeItemChanged(QTreeWidgetItem* item, int column);
+
+  /** Moves the views to the figure, and turns the closest view into its plane if no view shows it. */
+  void ShowFigure(const mitk::DataNode* node);
+
+  std::vector<mitk::DataNode*> GetMeasuredFigures() const;
+
+  /**
+   * Forwards the interaction reference geometry to the render window part, if there
+   * is one, and swallows the exception thrown for a time point the geometry does not
+   * cover. Passing nullptr lifts the requirement.
+   */
+  void SetInteractionReferenceGeometry(const mitk::TimeGeometry* geometry);
+
+  void StartPlacement(int toolIndex);
+  void CancelPlacement();
+
+  /** Resets the tools after a placement ended, was canceled or its figure got removed. */
+  void ResetPlacement();
+
+  /** Whether the figures of the tool are presets of the fixed size, placed by a single click. */
+  bool IsPlacedWithFixedSize(int toolIndex) const;
+  void ApplyFixedSize(mitk::PlanarFigure* figure, int toolIndex) const;
+  void AddFigureToDataStorage(mitk::PlanarFigure* figure, const std::string& baseName);
+  void SelectNode(mitk::DataNode* node);
+  void SelectNodes(const QList<mitk::DataNode::Pointer>& nodes);
+
+  void AddAllInteractors();
+  mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
+
+  std::unique_ptr<QmitkMeasurementViewData> d;
 };
 
 #endif

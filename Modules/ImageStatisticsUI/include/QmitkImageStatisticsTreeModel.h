@@ -293,6 +293,8 @@ private:
     bool IsCheckable(const QModelIndex& index) const;
 
     StatisticsContainerVector m_Statistics;
+    /** Statistics of m_Statistics whose inputs changed since; shown as pending until current ones arrive. */
+    std::set<const mitk::ImageStatisticsContainer*> m_OutdatedStatistics;
 
     /** Label values of the label rows in tree order, collected when the tree is built. */
     std::vector<mitk::ImageStatisticsContainer::LabelValueType> m_LabelRowValues;

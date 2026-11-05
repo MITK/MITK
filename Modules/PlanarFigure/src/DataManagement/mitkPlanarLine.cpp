@@ -11,59 +11,42 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarLine.h>
-#include <mitkPlaneGeometry.h>
 
-mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
+#include "mitkPlanarFigureGeometryHelpers.h"
+
+std::string mitk::PlanarLine::GetTypeId() const
 {
-  // Line has two control points
-  this->ResetNumberOfControlPoints(2);
-
-  this->SetNumberOfPolyLines(1);
+  return "line";
 }
 
-mitk::PlanarLine::PlanarLine(const Self& other)
-  : PlanarFigure(other),
-    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH)
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarLine::GetContours() const
 {
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
+
+  return { { ContourRole::Outline, false, this->GetControlPoints() } };
 }
 
-void mitk::PlanarLine::GeneratePolyLine()
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarLine::GetMeasurements() const
 {
-  this->ClearPolyLines();
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
 
-  this->AppendPointToPolyLine(0, this->GetControlPoint(0));
-  this->AppendPointToPolyLine(0, this->GetControlPoint(1));
+  const auto length = PlanarFigureGeometryHelpers::GetDistance(this->GetPlaneGeometry(), this->GetControlPoint(0), this->GetControlPoint(1));
+  return { { MeasurementType::Length, length } };
 }
 
-void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
+mitk::PlanarFigure::PlacementKind mitk::PlanarLine::GetPlacementKind() const
 {
-  // A line does not require a helper object
+  return PlacementKind::Span;
 }
 
-void mitk::PlanarLine::EvaluateFeaturesInternal()
+void mitk::PlanarLine::SetFromSpan(const Point2D &start, const Point2D &end)
 {
-  // Calculate line length
-  const Point3D &p0 = this->GetWorldControlPoint(0);
-  const Point3D &p1 = this->GetWorldControlPoint(1);
-  double length = p0.EuclideanDistanceTo(p1);
-
-  this->SetQuantity(FEATURE_ID_LENGTH, length);
+  this->AssignControlPoints({ start, end });
 }
 
-void mitk::PlanarLine::PrintSelf(std::ostream &os, itk::Indent indent) const
+bool mitk::PlanarLine::IsClosed() const
 {
-  Superclass::PrintSelf(os, indent);
-}
-
-bool mitk::PlanarLine::Equals(const PlanarFigure &other) const
-{
-  const auto *otherLine = dynamic_cast<const mitk::PlanarLine *>(&other);
-  if (otherLine)
-  {
-    return Superclass::Equals(other);
-  }
-  else
-  {
-    return false;
-  }
+  return false;
 }

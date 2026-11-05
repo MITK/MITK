@@ -13,81 +13,66 @@ found in the LICENSE file.
 #ifndef mitkPlanarRectangle_h
 #define mitkPlanarRectangle_h
 
-#include <mitkPlanarPolygon.h>
+#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
-  class PlaneGeometry;
-
   /**
-   * \brief Implementation of PlanarFigure representing an axis-aligned rectangle.
+   * \brief Implementation of PlanarFigure representing a rectangle aligned to the axes of its plane.
    *
-   * A rectangle defined by four control points (corners). When a control
-   * point is moved, the adjacent corners are updated to maintain the
-   * rectangular shape.
+   * The two control points are opposite corners in any order. The other two
+   * corners follow from them, so the rectangle stays aligned to the axes.
    *
-   * Provides two features:
-   * - FEATURE_ID_CIRCUMFERENCE: the rectangle perimeter
-   * - FEATURE_ID_AREA: the rectangle area
-   *
-   * \sa PlanarFigure, PlanarPolygon, PlanarFigureMapper2D
+   * \sa PlanarFigure, PlanarPolygon
    */
   class MITKPLANARFIGURE_EXPORT PlanarRectangle : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarRectangle, PlanarFigure);
-
     itkFactorylessNewMacro(Self);
-
     itkCloneMacro(Self);
 
-      /**
-       * \brief Places the rectangle at the given point, initializing all four corners.
-       * \param[in] point The initial 2D placement position.
-       */
-      void PlaceFigure(const Point2D &point) override;
-
-    /** \brief Returns 4 -- a rectangle requires exactly four control points. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
-    /** \brief Returns 4 -- a rectangle requires exactly four control points. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
+    /** \brief Returns "rectangle". */
+    std::string GetTypeId() const override;
 
     /**
-     * \brief Sets a control point and updates adjacent corners to maintain the rectangle.
+     * \brief A closed outline through the four corners.
      *
-     * \param[in] index               Zero-based index of the control point (corner).
-     * \param[in] point               New 2D coordinates.
-     * \param[in] createIfDoesNotExist If true, creates the point if missing.
-     * \return True if the control point was set successfully.
+     * The outline starts at control point 0 and passes control point 1 as
+     * its third corner.
      */
-    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
+    std::vector<Contour> GetContours() const override;
+
+    /** \brief Circumference and area. */
+    std::vector<Measurement> GetMeasurements() const override;
+
+    /** \brief One handle per corner, in the order of the outline. */
+    std::vector<Handle> GetHandles() const override;
+
+    /** \brief Moves a corner while the opposite corner stays in place. */
+    void MoveHandle(std::size_t index, const Point2D &position) override;
+
+    /** \brief Placed by a span between opposite corners. */
+    PlacementKind GetPlacementKind() const override;
+
+    void SetFromSpan(const Point2D &start, const Point2D &end) override;
+
+    /** \brief Returns true. */
+    bool IsClosed() const override;
+
+    /** \brief Returns 2. */
+    std::size_t GetMinimumNumberOfControlPoints() const override { return 2; }
+
+    /** \brief Returns 2. */
+    std::size_t GetMaximumNumberOfControlPoints() const override { return 2; }
 
   protected:
-    PlanarRectangle();
-    PlanarRectangle(const Self& other);
+    PlanarRectangle() = default;
+    PlanarRectangle(const Self &other) = default;
 
     mitkCloneMacro(Self);
-
-    /** \brief Generates the poly-line representation of the planar figure. */
-    void GeneratePolyLine() override;
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    void EvaluateFeaturesInternal() override;
-
-    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-
-    const unsigned int FEATURE_ID_CIRCUMFERENCE;
-    const unsigned int FEATURE_ID_AREA;
-
-    bool Equals(const mitk::PlanarFigure &other) const override;
-
-  private:
   };
-
-} // namespace mitk
+}
 
 #endif

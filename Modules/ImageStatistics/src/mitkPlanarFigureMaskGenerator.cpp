@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <itkMacro.h>
 #include <itkLineIterator.h>
 
+#include <vtkBox.h>
 #include <vtkPoints.h>
 #include <vtkImageStencil.h>
 #include <vtkImageImport.h>
@@ -32,12 +33,16 @@ found in the LICENSE file.
 #include <vtkLassoStencilSource.h>
 #include <vtkSmartPointer.h>
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+
 
 
 namespace mitk
 {
 
-void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure* planarFigure)
+void PlanarFigureMaskGenerator::SetPlanarFigure(const mitk::PlanarFigure* planarFigure)
 {
     if (nullptr == planarFigure )
     {
@@ -84,18 +89,11 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   maskImage->Allocate();
   maskImage->FillBuffer(1);
 
-  // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
-  // These points are used by the vtkLassoStencilSource to create
-  // a vtkImageStencil.
+  // The closed contours of the PlanarFigure are stored as vtkPoints objects.
+  // These points are used by vtkLassoStencilSources to create
+  // vtkImageStencils.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-  const auto& planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
-  // If there is a second poly line in a closed planar figure, treat it as a hole.
-  const PlanarFigure::PolyLineType* planarFigureHolePolyline = nullptr;
-
-  if (m_PlanarFigure->GetPolyLinesSize() == 2)
-    planarFigureHolePolyline = &m_PlanarFigure->GetPolyLine(1);
-
 
   // Determine x- and y-dimensions depending on principal axis
   // TODO use plane geometry normal to determine that automatically, then check whether the PF is aligned with one of the three principal axis
@@ -119,33 +117,45 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
     break;
   }
 
-  // store the polyline contour as vtkPoints object
-  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  for (const auto& point : planarFigurePolyline)
-  {
-    Point3D point3D;
+  // Converts the 2D points of a contour to the local index coordinates of the selected image.
+  const auto toSliceIndices = [&](const std::vector<Point2D>& contourPoints) {
+    auto slicePoints = vtkSmartPointer<vtkPoints>::New();
 
-    // Convert 2D point back to the local index coordinates of the selected image
-    planarFigurePlaneGeometry->Map(point, point3D);
-    imageGeometry3D->WorldToIndex(point3D, point3D);
-
-    points->InsertNextPoint(point3D[i0], point3D[i1], 0);
-  }
-
-  vtkSmartPointer<vtkPoints> holePoints;
-
-  if (planarFigureHolePolyline != nullptr && !planarFigureHolePolyline->empty())
-  {
-    holePoints = vtkSmartPointer<vtkPoints>::New();
-    Point3D point3D;
-
-    for (const auto& point : *planarFigureHolePolyline)
+    for (const auto& point : contourPoints)
     {
+      Point3D point3D;
       planarFigurePlaneGeometry->Map(point, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
-      holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
+      slicePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
+    }
+
+    return slicePoints;
+  };
+
+  vtkSmartPointer<vtkPoints> points;
+  std::vector<vtkSmartPointer<vtkPoints>> holes;
+
+  for (const auto& contour : m_PlanarFigure->GetContours())
+  {
+    if (!contour.Closed)
+      continue;
+
+    if (contour.Role == PlanarFigure::ContourRole::Hole)
+    {
+      holes.push_back(toSliceIndices(contour.Points));
+    }
+    else if (points.GetPointer() == nullptr)
+    {
+      points = toSliceIndices(contour.Points);
+    }
+    else
+    {
+      mitkThrow() << "Figure has more than one outline and cannot be used for masking.";
     }
   }
+
+  if (points.GetPointer() == nullptr)
+    mitkThrow() << "Figure has no closed outline and cannot be used for masking.";
 
   // mark a malformed 2D planar figure ( i.e. area = 0 ) as out of bounds
   // this can happen when all control points of a rectangle lie on the same line = two of the three extents are zero
@@ -166,15 +176,6 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints(points);
 
-  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = nullptr;
-
-  if (holePoints.GetPointer() != nullptr)
-  {
-    holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
-    holeLassoStencil->SetShapeToPolygon();
-    holeLassoStencil->SetPoints(holePoints);
-  }
-
   // Export from ITK to VTK (to use a VTK filter)
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
@@ -194,23 +195,28 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
-  vtkSmartPointer<vtkImageStencil> holeStencilFilter = nullptr;
+  // Every hole clears its inside again
+  auto lastStencilFilter = imageStencilFilter;
 
-  if (holeLassoStencil.GetPointer() != nullptr)
+  for (const auto& hole : holes)
   {
-    holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
-    holeStencilFilter->SetInputConnection(imageStencilFilter->GetOutputPort());
+    auto holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
+    holeLassoStencil->SetShapeToPolygon();
+    holeLassoStencil->SetPoints(hole);
+
+    auto holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
+    holeStencilFilter->SetInputConnection(lastStencilFilter->GetOutputPort());
     holeStencilFilter->SetStencilConnection(holeLassoStencil->GetOutputPort());
     holeStencilFilter->ReverseStencilOn();
     holeStencilFilter->SetBackgroundValue(0);
     holeStencilFilter->Update();
+
+    lastStencilFilter = holeStencilFilter;
   }
 
   // Export from VTK back to ITK
   vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
-  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == nullptr
-    ? imageStencilFilter->GetOutputPort()
-    : holeStencilFilter->GetOutputPort());
+  vtkExporter->SetInputConnection(lastStencilFilter->GetOutputPort());
   vtkExporter->Update();
 
   ImageImportType::Pointer itkImporter = ImageImportType::New();
@@ -232,16 +238,13 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   typedef itk::Image< unsigned short, 2 >       MaskImage2DType;
   typedef itk::LineIterator< MaskImage2DType >  LineIteratorType;
   typedef MaskImage2DType::IndexType            IndexType2D;
-  typedef std::vector< IndexType2D >            IndexVecType;
 
   MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
   maskImage->SetRegions(sliceRegion);
   maskImage->Allocate();
   maskImage->FillBuffer(0);
 
-  // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-  const auto& planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
@@ -266,29 +269,57 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
     break;
   }
 
-  int numPolyLines = m_PlanarFigure->GetPolyLinesSize();
-  for ( int lineId = 0; lineId < numPolyLines; ++lineId )
+  // The line iterator writes without bounds checks, so segments are clipped to the
+  // slice first. Voxel i covers the continuous indices from i - 0.5 to i + 0.5.
+  const auto &regionIndex = sliceRegion.GetIndex();
+  const auto &regionSize = sliceRegion.GetSize();
+  const double sliceBounds[6] = {
+    regionIndex[0] - 0.5, regionIndex[0] + static_cast<double>(regionSize[0]) - 0.5,
+    regionIndex[1] - 0.5, regionIndex[1] + static_cast<double>(regionSize[1]) - 0.5,
+    0.0, 0.0 };
+
+  const auto toIndex = [&](const double point[3]) {
+    IndexType2D index;
+
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      const auto last = regionIndex[i] + static_cast<IndexType2D::IndexValueType>(regionSize[i]) - 1;
+      index[i] = std::clamp(static_cast<IndexType2D::IndexValueType>(std::llround(point[i])), regionIndex[i], last);
+    }
+
+    return index;
+  };
+
+  for (const auto& contour : m_PlanarFigure->GetContours())
   {
-    // store the polyline contour as vtkPoints object
-    IndexVecType pointIndices;
-    for(const auto& point : planarFigurePolyline)
+    // store the contour as continuous slice indices
+    std::vector<std::array<double, 3>> points;
+    for(const auto& point : contour.Points)
     {
       Point3D point3D;
 
       planarFigurePlaneGeometry->Map(point, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
 
-      IndexType2D index2D;
-      index2D[0] = point3D[i0];
-      index2D[1] = point3D[i1];
-
-      pointIndices.push_back( index2D );
+      points.push_back({ point3D[i0], point3D[i1], 0.0 });
     }
 
-    size_t numLineSegments = pointIndices.size() - 1;
-    for (size_t i = 0; i < numLineSegments; ++i)
+    if (contour.Closed && !points.empty())
+      points.push_back(points.front());
+
+    for (size_t i = 0; i + 1 < points.size(); ++i)
     {
-      LineIteratorType lineIt(maskImage, pointIndices[i], pointIndices[i+1]);
+      double t1 = 0.0;
+      double t2 = 1.0;
+      double from[3];
+      double to[3];
+      int fromPlane = -1;
+      int toPlane = -1;
+
+      if (0 == vtkBox::IntersectWithLine(sliceBounds, points[i].data(), points[i + 1].data(), t1, t2, from, to, fromPlane, toPlane))
+        continue;
+
+      LineIteratorType lineIt(maskImage, toIndex(from), toIndex(to));
       while (!lineIt.IsAtEnd())
       {
         lineIt.Set(1);

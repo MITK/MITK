@@ -14,89 +14,49 @@ found in the LICENSE file.
 #define mitkPlanarFigureIO_h
 
 #include <mitkAbstractFileIO.h>
-#include <mitkPlanarFigure.h>
-
-namespace tinyxml2
-{
-  class XMLDocument;
-  class XMLElement;
-}
 
 namespace mitk
 {
   /**
-   * \brief Read and write mitk::PlanarFigure objects to/from XML files.
-   * \ingroup Process
+   * \brief Reads and writes a planar figure in JSON ("*.pf.json").
+   *
+   * \code{.json}
+   * {
+   *   "FileFormat": "MITK Planar Figure",
+   *   "Version": 1,
+   *   "Type": "double_ellipse",
+   *   "Plane": { "Transform": [...], "Bounds": [0, 256, 0, 256, 0, 1], "ImageGeometry": true },
+   *   "ControlPoints": [[81.56, 175.64], [104.17, 137.69], [65.97, 166.35]],
+   *   "Parameters": { "Thickness": 12.3 },
+   *   "ShapeLocked": true
+   * }
+   * \endcode
+   *
+   * "Type" is the type id of PlanarFigure::GetTypeId(). Control points are in
+   * plane coordinates (mm). "Parameters" holds the thickness of a double
+   * ellipse and the reference direction of an ellipse, if it has one;
+   * "ShapeLocked" is only written if true. Reading throws mitk::Exception on
+   * other formats, newer versions, unknown types and invalid data, and
+   * ignores unknown top-level keys.
    */
-  class PlanarFigureIO : public mitk::AbstractFileIO
+  class PlanarFigureIO : public AbstractFileIO
   {
   public:
-    typedef mitk::PlanarFigure InputType;
-
-    /** \brief Default constructor. Registers reader/writer for the PlanarFigure MIME type. */
     PlanarFigureIO();
-
-    // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
-    /** \brief Return the confidence level for reading the given file as a PlanarFigure. */
-    ConfidenceLevel GetReaderConfidenceLevel() const override;
-
-    // -------------- AbstractFileWriter -------------
-
-    /** \brief Write the PlanarFigure to an XML file. */
+    /** \brief Writes a complete planar figure; throws mitk::Exception otherwise. */
     void Write() override;
 
-    /** \brief Return the confidence level for writing the given data as a PlanarFigure. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
-    /**
-     * \brief Read PlanarFigure objects from the file system.
-     * \return A vector of mitk::PlanarFigures.
-     * \throw mitk::Exception if a parsing error occurs.
-     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
-
-    using DoubleList = std::list<double>;
-    /**
-    * \brief parses the element for the attributes name0 to nameN, where "name" and the number of attributes
-    * to read are passed as argument. Returns a list of double vales.
-    * \param[in] e the XML element that will be parsed
-    * \param[in] attributeNameBase the basic name of the parameters
-    * \param[in] count the number of parameters
-    * \return returns a mitk::Point3D with the values x,y,z
-    */
-    DoubleList GetDoubleAttributeListFromXMLNode(const tinyxml2::XMLElement* e, const char* attributeNameBase, unsigned int count);
-
-    /**
-    * \brief parses the element for the attributes x,y,z and returns a mitk::Vector3D filled with these values
-    * \param[in] e the XML element that will be parsed
-    * \return returns a mitk::Vector3D with the values x,y,z
-    */
-    static mitk::Vector3D GetVectorFromXMLNode(const tinyxml2::XMLElement* e);
-
-    /**
-    * \brief parses the element for the attributes x,y,z and returns a mitk::Point3D filled with these values
-    * \param[in] e the XML element that will be parsed
-    * \return returns a mitk::Point3D with the values x,y,z
-    */
-    static mitk::Point3D GetPointFromXMLNode(const tinyxml2::XMLElement* e);
-
-    /**Documentation
-    * \brief creates a TinyXML element that contains x, y, and z values
-    *
-    * \param[in] doc
-    * \param[in] name the name of the XML element
-    * \param[in] v the vector or point that contains the x, y and z values
-    * \return returns a XML element named name and three attributes x, y and z.
-    */
-    static tinyxml2::XMLElement* CreateXMLVectorElement(tinyxml2::XMLDocument& doc, const char* name, itk::FixedArray<mitk::ScalarType, 3> v);
 
   private:
     PlanarFigureIO *IOClone() const override;
   };
-} // end of namespace mitk
+}
 
 #endif

@@ -13,7 +13,9 @@ found in the LICENSE file.
 #include <mitkEnumerationPropertySerializer.h>
 
 #include <mitkPlanarFigureControlPointStyleProperty.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
 
 #include <tinyxml2.h>
 
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PlanarFigureControlPointStyleProperty);
+MITK_REGISTER_ENUM_SUB_SERIALIZER(PlanarFigureVisibilityProperty);

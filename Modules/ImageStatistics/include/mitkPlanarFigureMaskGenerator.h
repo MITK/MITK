@@ -50,11 +50,12 @@ namespace mitk
      *
      * The planar figure can be a closed shape (polygon, circle, ellipse, etc.)
      * or an open shape (line, bezier curve). Closed shapes produce a filled
-     * 2D binary mask; open shapes produce a mask along the figure's polyline.
+     * 2D binary mask without their holes; open shapes produce a mask along
+     * their contours.
      *
      * \param[in] planarFigure Pointer to the PlanarFigure.
      */
-    void SetPlanarFigure(mitk::PlanarFigure* planarFigure);
+    void SetPlanarFigure(const mitk::PlanarFigure* planarFigure);
 
     /**
      * \brief Get the reference image for this mask.
@@ -157,7 +158,7 @@ namespace mitk
 
     bool IsUpdateRequired() const;
 
-    mitk::PlanarFigure::Pointer m_PlanarFigure;
+    mitk::PlanarFigure::ConstPointer m_PlanarFigure;
     itk::Image<unsigned short, 2>::Pointer m_InternalITKImageMask2D;
     mitk::Image::ConstPointer m_ReferenceImage;
     unsigned int m_PlanarFigureAxis;

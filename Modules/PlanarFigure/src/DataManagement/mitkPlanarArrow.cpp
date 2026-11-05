@@ -11,115 +11,50 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPlanarArrow.h>
-#include <mitkPlaneGeometry.h>
 
-mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
+#include "mitkPlanarFigureGeometryHelpers.h"
+
+std::string mitk::PlanarArrow::GetTypeId() const
 {
-  // Directed arrow has two control points
-  this->ResetNumberOfControlPoints(2);
-  m_ArrowTipScaleFactor = -1.0;
-
-  this->SetNumberOfPolyLines(1);
-  this->SetNumberOfHelperPolyLines(2);
-
-  // Create helper polyline object (for drawing the orthogonal orientation line)
-  m_HelperPolyLinesToBePainted->InsertElement(0, false);
-  m_HelperPolyLinesToBePainted->InsertElement(1, false);
+  return "arrow";
 }
 
-mitk::PlanarArrow::PlanarArrow(const Self& other)
-  : PlanarFigure(other),
-    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH),
-    m_ArrowTipScaleFactor(other.m_ArrowTipScaleFactor)
+std::vector<mitk::PlanarFigure::Contour> mitk::PlanarArrow::GetContours() const
 {
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
+
+  return { { ContourRole::Outline, false, this->GetControlPoints() } };
 }
 
-void mitk::PlanarArrow::GeneratePolyLine()
+std::vector<mitk::PlanarFigure::Decoration> mitk::PlanarArrow::GetDecorations() const
 {
-  this->ClearPolyLines();
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
 
-  this->AppendPointToPolyLine(0, this->GetControlPoint(0));
-  this->AppendPointToPolyLine(0, this->GetControlPoint(1));
+  return { ArrowHead{ this->GetControlPoint(0), this->GetControlPoint(1) } };
 }
 
-void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+std::vector<mitk::PlanarFigure::Measurement> mitk::PlanarArrow::GetMeasurements() const
 {
-  // Generate helper polyline (orientation line orthogonal to first line)
-  // if the third control point is currently being set
-  if (this->GetNumberOfControlPoints() != 2)
-  {
-    m_HelperPolyLinesToBePainted->SetElement(0, false);
-    m_HelperPolyLinesToBePainted->SetElement(1, false);
+  if (this->GetNumberOfControlPoints() < 2)
+    return {};
 
-    return;
-  }
-
-  this->ClearHelperPolyLines();
-
-  m_HelperPolyLinesToBePainted->SetElement(0, true);
-  m_HelperPolyLinesToBePainted->SetElement(1, true);
-
-  // Fixed size depending on screen size for the angle
-  float scaleFactor = 0.015;
-  if (m_ArrowTipScaleFactor > 0.0)
-  {
-    scaleFactor = m_ArrowTipScaleFactor;
-  }
-  double nonScalingLength = displayHeight * mmPerDisplayUnit * scaleFactor;
-
-  // Calculate arrow peak
-  const Point2D p1 = this->GetControlPoint(0);
-  const Point2D p2 = this->GetControlPoint(1);
-
-  Vector2D n1 = p1 - p2;
-  n1.Normalize();
-
-  const double arrowHalfAngleRad = 30.0 * vnl_math::pi / 180.0;
-  Vector2D temp;
-  temp[0] = n1[0] * cos(arrowHalfAngleRad) - n1[1] * sin(arrowHalfAngleRad);
-  temp[1] = n1[0] * sin(arrowHalfAngleRad) + n1[1] * cos(arrowHalfAngleRad);
-  Vector2D temp2;
-  temp2[0] = n1[0] * cos(-arrowHalfAngleRad) - n1[1] * sin(-arrowHalfAngleRad);
-  temp2[1] = n1[0] * sin(-arrowHalfAngleRad) + n1[1] * cos(-arrowHalfAngleRad);
-
-  this->AppendPointToHelperPolyLine(0, p1);
-  this->AppendPointToHelperPolyLine(0, Point2D(p1 - temp * nonScalingLength));
-  this->AppendPointToHelperPolyLine(1, p1);
-  this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
+  const auto length = PlanarFigureGeometryHelpers::GetDistance(this->GetPlaneGeometry(), this->GetControlPoint(0), this->GetControlPoint(1));
+  return { { MeasurementType::Length, length } };
 }
 
-void mitk::PlanarArrow::EvaluateFeaturesInternal()
+mitk::PlanarFigure::PlacementKind mitk::PlanarArrow::GetPlacementKind() const
 {
-  // Calculate line length
-  const Point3D &p0 = this->GetWorldControlPoint(0);
-  const Point3D &p1 = this->GetWorldControlPoint(1);
-  double length = p0.EuclideanDistanceTo(p1);
-
-  this->SetQuantity(FEATURE_ID_LENGTH, length);
+  return PlacementKind::Span;
 }
 
-void mitk::PlanarArrow::PrintSelf(std::ostream &os, itk::Indent indent) const
+void mitk::PlanarArrow::SetFromSpan(const Point2D &start, const Point2D &end)
 {
-  Superclass::PrintSelf(os, indent);
+  this->AssignControlPoints({ end, start });
 }
 
-void mitk::PlanarArrow::SetArrowTipScaleFactor(float scale)
+bool mitk::PlanarArrow::IsClosed() const
 {
-  m_ArrowTipScaleFactor = scale;
-}
-
-bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure &other) const
-{
-  const auto *otherArrow = dynamic_cast<const mitk::PlanarArrow *>(&other);
-  if (otherArrow)
-  {
-    if (std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)
-      return false;
-
-    return Superclass::Equals(other);
-  }
-  else
-  {
-    return false;
-  }
+  return false;
 }

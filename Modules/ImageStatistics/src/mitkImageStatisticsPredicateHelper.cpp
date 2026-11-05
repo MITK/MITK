@@ -18,6 +18,15 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkPlanarBezierCurve.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
 
 namespace mitk
 {
@@ -54,23 +63,19 @@ namespace mitk
 
   mitk::NodePredicateBase::Pointer GetImageStatisticsPlanarFigurePredicate()
   {
-    auto isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
-    auto isPlanarRectangle = mitk::NodePredicateDataType::New("PlanarRectangle");
-    auto isPlanarEllipse = mitk::NodePredicateDataType::New("PlanarEllipse");
-    auto isPlanarDoubleEllipse = mitk::NodePredicateDataType::New("PlanarDoubleEllipse");
-    auto isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");
-    auto isPlanarSubdivisionPolygon = mitk::NodePredicateDataType::New("PlanarSubdivisionPolygon");
-    auto isPlanarBezierCurve = mitk::NodePredicateDataType::New("PlanarBezierCurve");
-    auto isPlanarLine = mitk::NodePredicateDataType::New("PlanarLine");
-    auto isNoHelperObjectPredicate = GetNoHelperObjectPredicate();
+    // Regions, and lines along which an intensity profile is computed.
+    auto isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New();
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarCircle>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarEllipse>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarRectangle>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarDoubleEllipse>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarPolygon>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarPath>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarSubdivisionPolygon>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarBezierCurve>::New());
+    isPlanarFigureForImageStatistics->AddPredicate(mitk::TNodePredicateDataType<mitk::PlanarLine>::New());
 
-    auto isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarCircle, isPlanarEllipse);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarRectangle);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarDoubleEllipse);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarPolygon);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarSubdivisionPolygon);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarBezierCurve);
-    isPlanarFigureForImageStatistics = mitk::NodePredicateOr::New(isPlanarFigureForImageStatistics, isPlanarLine);
+    auto isNoHelperObjectPredicate = GetNoHelperObjectPredicate();
     auto isPlanarFigureAndNoHelperForImageStatistics = mitk::NodePredicateAnd::New(isPlanarFigureForImageStatistics, isNoHelperObjectPredicate);
 
     return isPlanarFigureAndNoHelperForImageStatistics.GetPointer();

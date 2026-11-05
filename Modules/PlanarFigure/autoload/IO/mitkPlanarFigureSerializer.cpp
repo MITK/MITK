@@ -40,7 +40,7 @@ std::string mitk::PlanarFigureSerializer::Serialize()
   std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".pf";
+  filename += ".pf.json";
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";

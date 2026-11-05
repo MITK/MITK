@@ -234,12 +234,10 @@ void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(con
     if (contourPlaneGeometryDataNode.IsNull())
     {
       auto planeGeometryData = mitk::PlanarCircle::New();
-      planeGeometryData->SetPlaneGeometry(planeGeometry->Clone());
+      planeGeometryData->SetPlaneGeometry(planeGeometry);
       mitk::Point2D p1;
       planeGeometry->Map(planeGeometry->GetCenter(), p1);
-      planeGeometryData->PlaceFigure(p1);
-      planeGeometryData->SetCurrentControlPoint(p1);
-      planeGeometryData->SetProperty("initiallyplaced", mitk::BoolProperty::New(true));
+      planeGeometryData->SetFromSpan(p1, p1);
 
       std::string contourName = "contourPlane L " + std::to_string(contourInfo.LabelValue) + " T " + std::to_string(contourInfo.TimeStep);
 

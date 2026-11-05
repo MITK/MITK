@@ -11,68 +11,159 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMeasurementView.h"
+#include "ui_QmitkMeasurementViewControls.h"
 
-#include <QAction>
 #include <QApplication>
+#include <QButtonGroup>
 #include <QClipboard>
-#include <QGridLayout>
+#include <QColorDialog>
+#include <QHeaderView>
+#include <QMouseEvent>
+#include <QPainter>
 #include <QShortcut>
+#include <QStyledItemDelegate>
 #include <QTimer>
-#include <QToolBar>
-#include <QTextBrowser>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QVBoxLayout>
+#include <QToolButton>
+#include <QTreeWidget>
 
-#include <mitkCoreServices.h>
 #include <mitkException.h>
 #include <mitkExclusiveInteraction.h>
-#include <mitkIPropertyFilters.h>
+#include <mitkIPreferences.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkITKEventObserverGuard.h>
-#include <mitkPropertyFilter.h>
-#include <mitkRenderingManager.h>
-#include <mitkRenderWindowPartHelper.h>
-#include <mitkVtkLayerController.h>
-#include <mitkPlanarCircle.h>
-#include <mitkPlanarEllipse.h>
-#include <mitkPlanarPolygon.h>
-#include <mitkPlanarAngle.h>
-#include <mitkPlanarRectangle.h>
-#include <mitkPlanarLine.h>
-#include <mitkPlanarCross.h>
-#include <mitkPlanarFourPointAngle.h>
-#include <mitkPlanarDoubleEllipse.h>
-#include <mitkPlanarBezierCurve.h>
-#include <mitkPlanarSubdivisionPolygon.h>
-#include <mitkPlanarFigureInteractor.h>
-#include <mitkPlaneGeometry.h>
-#include <mitkILinkedRenderWindowPart.h>
 #include <mitkImage.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarArrow.h>
+#include <mitkPlanarBezierCurve.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarCross.h>
+#include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkPlanarFigureVisibilityProperty.h>
+#include <mitkPlanarFigureVtkMapper2D.h>
+#include <mitkPlanarFigureVtkMapper3D.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPath.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
+#include <mitkRenderWindowPartHelper.h>
+#include <mitkRenderingManager.h>
 
 #include <QmitkButtonOverlayWidget.h>
 #include <QmitkIconTheme.h>
+#include <QmitkNodeDescriptorManager.h>
 #include <QmitkRenderWindow.h>
-#include <QmitkSingleNodeSelectionWidget.h>
 
-#include <ctkDoubleSpinBox.h>
-
-#include "mitkPluginActivator.h"
 #include <usModuleRegistry.h>
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModuleInitialization.h>
 
+#include <algorithm>
+#include <array>
+#include <map>
+#include <cmath>
 #include <optional>
-
-US_INITIALIZE_MODULE
+#include <set>
+#include <utility>
 
 namespace
 {
+  enum class ToolGroup
+  {
+    Distances,
+    Angles,
+    Areas
+  };
+
+  enum class FixedSize
+  {
+    None,
+    Radius,
+    RadiusAndThickness
+  };
+
+  struct Tool
+  {
+    const char* Type; /**< Class name of the figure, also names its icon. */
+    const char* Name; /**< Display name, also the base of node names. */
+    ToolGroup Group;
+    FixedSize Size;
+    mitk::PlanarFigure::Pointer (*Create)();
+  };
+
+  template <class T>
+  mitk::PlanarFigure::Pointer CreateFigure()
+  {
+    return T::New().GetPointer();
+  }
+
+  const std::array<Tool, 13> Tools = {{
+    { "PlanarLine", "Line", ToolGroup::Distances, FixedSize::None, &CreateFigure<mitk::PlanarLine> },
+    { "PlanarCross", "Cross", ToolGroup::Distances, FixedSize::None, &CreateFigure<mitk::PlanarCross> },
+    { "PlanarPath", "Path", ToolGroup::Distances, FixedSize::None, &CreateFigure<mitk::PlanarPath> },
+    { "PlanarBezierCurve", "Bezier Curve", ToolGroup::Distances, FixedSize::None, &CreateFigure<mitk::PlanarBezierCurve> },
+    { "PlanarArrow", "Arrow", ToolGroup::Distances, FixedSize::None, &CreateFigure<mitk::PlanarArrow> },
+    { "PlanarAngle", "Angle", ToolGroup::Angles, FixedSize::None, &CreateFigure<mitk::PlanarAngle> },
+    { "PlanarFourPointAngle", "Four-Point Angle", ToolGroup::Angles, FixedSize::None, &CreateFigure<mitk::PlanarFourPointAngle> },
+    { "PlanarRectangle", "Rectangle", ToolGroup::Areas, FixedSize::None, &CreateFigure<mitk::PlanarRectangle> },
+    { "PlanarCircle", "Circle", ToolGroup::Areas, FixedSize::Radius, &CreateFigure<mitk::PlanarCircle> },
+    { "PlanarEllipse", "Ellipse", ToolGroup::Areas, FixedSize::None, &CreateFigure<mitk::PlanarEllipse> },
+    { "PlanarDoubleEllipse", "Ring", ToolGroup::Areas, FixedSize::RadiusAndThickness, &CreateFigure<mitk::PlanarDoubleEllipse> },
+    { "PlanarPolygon", "Polygon", ToolGroup::Areas, FixedSize::None, &CreateFigure<mitk::PlanarPolygon> },
+    { "PlanarSubdivisionPolygon", "Subdivision Polygon", ToolGroup::Areas, FixedSize::None, &CreateFigure<mitk::PlanarSubdivisionPolygon> },
+  }};
+
+  const std::string ColorPreference = "color";
+  const std::string LineWidthPreference = "line width";
+  const std::string ShowNamePreference = "show name";
+  const std::string ShowMeasurementsPreference = "show measurements";
+  const std::string ContrastOutlinePreference = "contrast outline";
+  const std::string LabelVisibilityPreference = "label visibility";
+  const std::string ShowIn3DPreference = "show in 3d";
+
+  /** The line width slider moves in steps of half a pixel. */
+  constexpr float LineWidthStep = 0.5f;
+
+  /** Sets the text of a tree cell only when it changes, to not repaint for nothing. */
+  void SetText(QTreeWidgetItem* item, int column, const QString& text)
+  {
+    if (item->text(column) != text)
+      item->setText(column, text);
+  }
+
+  /** The node of a row of the measurement tree; only compared, never dereferenced, since it may be gone. */
+  const mitk::DataNode* GetNode(const QTreeWidgetItem* item)
+  {
+    const auto* figureItem = nullptr != item->parent() ? item->parent() : item;
+    return reinterpret_cast<const mitk::DataNode*>(figureItem->data(0, Qt::UserRole).value<quintptr>());
+  }
+
+  /** Quotes a field of comma-separated values if it contains a separator, a quote or a line break (RFC 4180). */
+  QString ToCsvField(QString text)
+  {
+    if (!text.contains(QLatin1Char(',')) && !text.contains(QLatin1Char('"')) && !text.contains(QLatin1Char('\n')) && !text.contains(QLatin1Char('\r')))
+      return text;
+
+    return QLatin1Char('"') + text.replace(QLatin1String("\""), QLatin1String("\"\"")) + QLatin1Char('"');
+  }
+
+  /** Keeps the cells of a column of an item view from being edited. */
+  class QmitkReadOnlyColumnDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    QWidget* createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override
+    {
+      return nullptr;
+    }
+  };
+
   /** All render windows of a part share a single interaction reference geometry. */
   mitk::TimeGeometry::ConstPointer GetInteractionReferenceGeometry(const mitk::IRenderWindowPart* renderWindowPart)
   {
@@ -86,115 +177,185 @@ namespace
 
     return nullptr;
   }
-}
 
-struct QmitkPlanarFigureData
-{
-  QmitkPlanarFigureData()
-    : m_EndPlacementObserverTag(0),
-      m_SelectObserverTag(0),
-      m_StartInteractionObserverTag(0),
-      m_EndInteractionObserverTag(0),
-      m_DuringInteractionObserverTag(0)
+  /** Gives a figure placed by a span the size of the given radius and locks its shape, so that it is placed with a click. */
+  void MakePreset(mitk::PlanarFigure* figure, double radius)
   {
+    // A preset that already follows the mouse is resized where it is.
+    mitk::Point2D center;
+
+    if (figure->GetNumberOfControlPoints() > 0)
+      center = figure->GetControlPoint(0);
+    else
+      center.Fill(0.0);
+
+    auto rim = center;
+    rim[0] += radius;
+
+    figure->BeginPlacement();
+    figure->SetFromSpan(center, rim);
+    figure->SetShapeLocked(true);
   }
 
-  mitk::PlanarFigure::Pointer m_Figure;
-  unsigned int m_EndPlacementObserverTag;
-  unsigned int m_SelectObserverTag;
-  unsigned int m_StartInteractionObserverTag;
-  unsigned int m_EndInteractionObserverTag;
-  unsigned int m_DuringInteractionObserverTag;
+  QString GetPlacementHint(const mitk::PlanarFigure* figure)
+  {
+    const auto numberOfPoints = figure->GetNumberOfControlPoints();
+
+    if (figure->IsShapeLocked() && numberOfPoints > 0)
+      return QStringLiteral("Click to place a figure of the fixed size. The tool stays active for more. Press Esc to stop.");
+
+    if (mitk::PlanarFigure::PlacementKind::Span == figure->GetPlacementKind())
+    {
+      return 0 == numberOfPoints
+        ? QStringLiteral("Press and drag, or click twice, to place the figure. Press Esc to cancel.")
+        : QStringLiteral("Release, or click a second time, to finish the figure. Press Esc to cancel.");
+    }
+
+    // The last point follows the mouse until it is placed as well.
+    const auto numberOfPlacedPoints = numberOfPoints > 0 ? numberOfPoints - 1 : 0;
+    const auto minimum = figure->GetMinimumNumberOfControlPoints();
+    const auto maximum = figure->GetMaximumNumberOfControlPoints();
+
+    QString hint;
+
+    if (minimum == maximum)
+    {
+      hint = QStringLiteral("Click to place point %1 of %2.").arg(numberOfPlacedPoints + 1).arg(maximum);
+    }
+    else if (numberOfPlacedPoints < minimum)
+    {
+      hint = QStringLiteral("Click to place points, at least %1.").arg(minimum);
+    }
+    else
+    {
+      hint = QStringLiteral("Click to add points. Double-click to add a last one and finish, or press Enter to finish.");
+    }
+
+    // The first point stays until the placement is canceled.
+    if (numberOfPlacedPoints > 1)
+      hint += QStringLiteral(" Backspace removes the last point.");
+
+    return hint + QStringLiteral(" Press Esc to cancel.");
+  }
+
+  QString GetEditingHint(const mitk::PlanarFigure* figure)
+  {
+    if (figure->IsShapeLocked())
+      return QStringLiteral("The shape of this figure is fixed. Drag it to move it.");
+
+    auto hint = QStringLiteral("Drag a point to reshape the figure, or its outline to move it.");
+
+    if (figure->CanInsertControlPoints())
+      hint += QStringLiteral(" Ctrl+click on the outline to add a point, or on a point to remove it.");
+
+    return hint;
+  }
+}
+
+/** A figure that can be edited in this view. */
+struct QmitkMeasurementFigure
+{
+  mitk::DataNode::Pointer Node;
+  mitk::ITKEventObserverGuard EndPlacementObserver;
+  mitk::ITKEventObserverGuard SelectObserver;
+  mitk::ITKEventObserverGuard PointMovedObserver;
 };
+
+/** What the appearance group box edits, of new figures or of the selected ones. */
+struct QmitkFigureAppearance
+{
+  QColor Color;
+  float LineWidth = 2.0f;
+  bool ShowName = true;
+  bool ShowMeasurements = true;
+  bool ContrastOutline = true;
+  bool ShowIn3D = false;
+  mitk::PlanarFigureVisibilityProperty::Visibility Label = mitk::PlanarFigureVisibilityProperty::Visibility::OnHover;
+};
+
+namespace
+{
+  /** Reads an appearance from the properties of a node; missing ones keep the values of the given appearance. */
+  QmitkFigureAppearance ReadAppearance(const mitk::DataNode* node, QmitkFigureAppearance appearance)
+  {
+    float color[3] = { 1.0f, 1.0f, 1.0f };
+
+    if (node->GetColor(color))
+      appearance.Color = QColor::fromRgbF(color[0], color[1], color[2]);
+
+    node->GetFloatProperty("line width", appearance.LineWidth);
+    node->GetBoolProperty("planarfigure.drawname", appearance.ShowName);
+    node->GetBoolProperty("planarfigure.drawquantities", appearance.ShowMeasurements);
+    node->GetBoolProperty("planarfigure.drawcontrastoutline", appearance.ContrastOutline);
+    node->GetBoolProperty("planarfigure.3drendering", appearance.ShowIn3D);
+
+    if (const auto* label = dynamic_cast<const mitk::PlanarFigureVisibilityProperty*>(node->GetProperty("planarfigure.label")); nullptr != label)
+      appearance.Label = label->GetVisibility();
+
+    return appearance;
+  }
+
+  /** The appearance that the mappers give a figure by default. */
+  const QmitkFigureAppearance& GetMapperAppearance()
+  {
+    static const auto appearance = []() {
+      auto defaults = mitk::DataNode::New();
+      mitk::PlanarFigureVtkMapper2D::SetDefaultProperties(defaults);
+      mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(defaults);
+      return ReadAppearance(defaults, QmitkFigureAppearance());
+    }();
+
+    return appearance;
+  }
+
+  /** Writes an appearance to the properties of a node, or only where it differs from a previous one. */
+  void WriteAppearance(mitk::DataNode* node, const QmitkFigureAppearance& appearance, const QmitkFigureAppearance* previous = nullptr)
+  {
+    if (nullptr == previous || previous->Color != appearance.Color)
+      node->SetColor(appearance.Color.redF(), appearance.Color.greenF(), appearance.Color.blueF());
+
+    if (nullptr == previous || previous->LineWidth != appearance.LineWidth)
+      node->SetFloatProperty("line width", appearance.LineWidth);
+
+    if (nullptr == previous || previous->ShowName != appearance.ShowName)
+      node->SetBoolProperty("planarfigure.drawname", appearance.ShowName);
+
+    if (nullptr == previous || previous->ShowMeasurements != appearance.ShowMeasurements)
+      node->SetBoolProperty("planarfigure.drawquantities", appearance.ShowMeasurements);
+
+    if (nullptr == previous || previous->ContrastOutline != appearance.ContrastOutline)
+      node->SetBoolProperty("planarfigure.drawcontrastoutline", appearance.ContrastOutline);
+
+    if (nullptr == previous || previous->ShowIn3D != appearance.ShowIn3D)
+      node->SetBoolProperty("planarfigure.3drendering", appearance.ShowIn3D);
+
+    if (nullptr == previous || previous->Label != appearance.Label)
+      node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(appearance.Label));
+  }
+}
 
 struct QmitkMeasurementViewData
 {
-  QmitkMeasurementViewData()
-    : m_LineCounter(0),
-      m_PathCounter(0),
-      m_AngleCounter(0),
-      m_FourPointAngleCounter(0),
-      m_CircleCounter(0),
-      m_EllipseCounter(0),
-      m_DoubleEllipseCounter(0),
-      m_RectangleCounter(0),
-      m_PolygonCounter(0),
-      m_BezierCurveCounter(0),
-      m_SubdivisionPolygonCounter(0),
-      m_PendingCounter(nullptr),
-      m_Parent(nullptr),
-      m_SingleNodeSelectionWidget(nullptr),
-      m_DrawLine(nullptr),
-      m_DrawPath(nullptr),
-      m_DrawAngle(nullptr),
-      m_DrawFourPointAngle(nullptr),
-      m_DrawRectangle(nullptr),
-      m_DrawPolygon(nullptr),
-      m_DrawCircle(nullptr),
-      m_DrawEllipse(nullptr),
-      m_DrawDoubleEllipse(nullptr),
-      m_DrawBezierCurve(nullptr),
-      m_DrawSubdivisionPolygon(nullptr),
-      m_DrawActionsToolBar(nullptr),
-      m_CancelPlacementShortcut(nullptr),
-      m_SelectedPlanarFiguresText(nullptr),
-      m_CopyToClipboard(nullptr),
-      m_Layout(nullptr),
-      m_Radius(nullptr),
-      m_Thickness(nullptr),
-      m_FixedParameterBox(nullptr),
-      m_DrawLabel(nullptr),
-      m_HintLabel(nullptr),
-      m_DrawingControls(nullptr),
-      m_AlignmentOverlay(nullptr),
-      m_RenderWindowPart(nullptr)
-  {
-  }
+  std::unique_ptr<Ui::QmitkMeasurementViewControls> m_Controls = std::make_unique<Ui::QmitkMeasurementViewControls>();
+  QButtonGroup* m_ToolButtons = nullptr;
+  QShortcut* m_CancelPlacementShortcut = nullptr;
+  QmitkButtonOverlayWidget* m_AlignmentOverlay = nullptr;
+  mitk::IRenderWindowPart* m_RenderWindowPart = nullptr;
 
-  unsigned int m_LineCounter;
-  unsigned int m_PathCounter;
-  unsigned int m_AngleCounter;
-  unsigned int m_FourPointAngleCounter;
-  unsigned int m_CircleCounter;
-  unsigned int m_EllipseCounter;
-  unsigned int m_DoubleEllipseCounter;
-  unsigned int m_RectangleCounter;
-  unsigned int m_PolygonCounter;
-  unsigned int m_BezierCurveCounter;
-  unsigned int m_SubdivisionPolygonCounter;
-  unsigned int* m_PendingCounter;
+  /** The appearance of new figures, kept in the preferences. */
+  QmitkFigureAppearance m_NewFigureAppearance;
+
+  /** The appearance in the group box: of new figures, or of the first selected one. */
+  QmitkFigureAppearance m_ShownAppearance;
+
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
-  std::map<mitk::DataNode::Pointer, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
+  std::map<const mitk::DataNode*, QmitkMeasurementFigure> m_Figures;
   mitk::DataNode::Pointer m_SelectedImageNode;
-  mitk::DataNode::Pointer m_UninitializedNode;
 
-  QWidget* m_Parent;
-  QLabel* m_SelectedImageLabel;
-  QmitkSingleNodeSelectionWidget* m_SingleNodeSelectionWidget;
-  QAction* m_DrawLine;
-  QAction* m_DrawPath;
-  QAction* m_DrawAngle;
-  QAction* m_DrawFourPointAngle;
-  QAction* m_DrawRectangle;
-  QAction* m_DrawPolygon;
-  QAction* m_DrawCircle;
-  QAction* m_DrawEllipse;
-  QAction* m_DrawDoubleEllipse;
-  QAction* m_DrawBezierCurve;
-  QAction* m_DrawSubdivisionPolygon;
-  QToolBar* m_DrawActionsToolBar;
-  QShortcut* m_CancelPlacementShortcut;
-  QTextBrowser* m_SelectedPlanarFiguresText;
-  QPushButton* m_CopyToClipboard;
-  QGridLayout* m_Layout;
-  ctkDoubleSpinBox* m_Radius;
-  ctkDoubleSpinBox* m_Thickness;
-  QGroupBox* m_FixedParameterBox;
-  QLabel* m_DrawLabel;
-  QLabel* m_HintLabel;
-  QWidget* m_DrawingControls;
-  QmitkButtonOverlayWidget* m_AlignmentOverlay;
-  mitk::IRenderWindowPart* m_RenderWindowPart;
+  /** The node of the figure that is being placed, and the index of its tool. */
+  mitk::DataNode::Pointer m_PendingNode;
+  std::optional<int> m_PendingTool;
+
   mitk::ITKEventObserverGuard m_ViewsInitializedObserver;
 
   /** Set while a figure is being placed: the interaction reference geometry to hand
@@ -206,12 +367,20 @@ struct QmitkMeasurementViewData
 
   /** Observes the figure that is being placed, to cancel the placement once it gets deselected. */
   mitk::ITKEventObserverGuard m_PlacementSelectionObserver;
+
+  /** Observes the figure that is being placed, to keep the hint in step. */
+  mitk::ITKEventObserverGuard m_PlacementProgressObserver;
+
+  bool m_IsMeasurementTreeUpdateScheduled = false;
+
+  /** Set by a node change, e.g. a new color, until the next update of the tree. */
+  bool m_HaveMeasurementTreeIconsChanged = false;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
 
 QmitkMeasurementView::QmitkMeasurementView()
- : d(new QmitkMeasurementViewData)
+  : d(std::make_unique<QmitkMeasurementViewData>())
 {
 }
 
@@ -221,74 +390,39 @@ QmitkMeasurementView::~QmitkMeasurementView()
   // otherwise leave its half-created node behind in the data storage.
   this->CancelPlacement();
 
-  auto planarFigures = this->GetAllPlanarFigures();
-
-  for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
-    this->NodeRemoved(it.Value());
-
-  delete d;
+  for (auto& [node, figure] : d->m_Figures)
+    figure.Node->SetDataInteractor(nullptr);
 }
 
 void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
-  d->m_Parent = parent;
+  d->m_Controls->setupUi(parent);
 
-  d->m_SingleNodeSelectionWidget = new QmitkSingleNodeSelectionWidget();
-  d->m_SingleNodeSelectionWidget->SetDataStorage(GetDataStorage());
-  d->m_SingleNodeSelectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
+  auto* referenceImageSelector = d->m_Controls->referenceImageSelector;
+  referenceImageSelector->SetDataStorage(this->GetDataStorage());
+  referenceImageSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::Image>::New(),
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
-  d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
-  d->m_SingleNodeSelectionWidget->SetEmptyInfo(QStringLiteral("Please select a reference image"));
-  d->m_SingleNodeSelectionWidget->SetPopUpTitel(QStringLiteral("Select a reference image"));
+  referenceImageSelector->SetSelectionIsOptional(true);
+  referenceImageSelector->SetEmptyInfo(QStringLiteral("Please select a reference image"));
+  referenceImageSelector->SetPopUpTitel(QStringLiteral("Select a reference image"));
 
-  d->m_DrawActionsToolBar = new QToolBar;
+  this->CreateToolButtons();
+  this->LoadAppearance();
 
-  auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), tr("Draw Line"));
-  currentAction->setCheckable(true);
-  d->m_DrawLine = currentAction;
+  auto* header = d->m_Controls->measurementsTree->header();
+  header->setStretchLastSection(false);
+  header->setSectionResizeMode(0, QHeaderView::Stretch);
+  header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  d->m_Controls->measurementsTree->viewport()->installEventFilter(this);
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), tr("Draw Path"));
-  currentAction->setCheckable(true);
-  d->m_DrawPath = currentAction;
+  // Figures are renamed in the first column, which holds the name of a figure row.
+  d->m_Controls->measurementsTree->setItemDelegateForColumn(1, new QmitkReadOnlyColumnDelegate(d->m_Controls->measurementsTree));
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), tr("Draw Angle"));
-  currentAction->setCheckable(true);
-  d->m_DrawAngle = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), tr("Draw Four Point Angle"));
-  currentAction->setCheckable(true);
-  d->m_DrawFourPointAngle = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), tr("Draw Circle"));
-  currentAction->setCheckable(true);
-  d->m_DrawCircle = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/ellipse.png"), tr("Draw Ellipse"));
-  currentAction->setCheckable(true);
-  d->m_DrawEllipse = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/doubleellipse.png"), tr("Draw Double Ellipse"));
-  currentAction->setCheckable(true);
-  d->m_DrawDoubleEllipse = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), tr("Draw Rectangle"));
-  currentAction->setCheckable(true);
-  d->m_DrawRectangle = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), tr("Draw Polygon"));
-  currentAction->setCheckable(true);
-  d->m_DrawPolygon = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/beziercurve.png"), tr("Draw Bezier Curve"));
-  currentAction->setCheckable(true);
-  d->m_DrawBezierCurve = currentAction;
-
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/subdivisionpolygon.png"), tr("Draw Subdivision Polygon"));
-  currentAction->setCheckable(true);
-  d->m_DrawSubdivisionPolygon = currentAction;
-
-  d->m_DrawActionsToolBar->setEnabled(false);
+  d->m_Controls->tools->setEnabled(false);
+  d->m_Controls->thicknessSpinBox->setMaximum(d->m_Controls->radiusSpinBox->value());
+  d->m_Controls->hintCard->hide();
+  this->UpdateToolOptions();
 
   // Esc cancels a pending figure placement. A render window does not have
   // keyboard focus during placement, so an application-context shortcut is
@@ -297,70 +431,9 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_CancelPlacementShortcut->setContext(Qt::ApplicationShortcut);
   d->m_CancelPlacementShortcut->setEnabled(false);
 
-  // fixed parameter section
-  auto fixedLayout = new QGridLayout();
-
-  d->m_FixedParameterBox = new QGroupBox();
-  d->m_FixedParameterBox->setCheckable(true);
-  d->m_FixedParameterBox->setChecked(false);
-  d->m_FixedParameterBox->setEnabled(false);
-  d->m_FixedParameterBox->setTitle("Fixed sized circle/double ellipse");
-  d->m_FixedParameterBox->setToolTip("If activated, circles and double ellipses (as rings) figures will always be created with the set parameters as fixed size.");
-  d->m_FixedParameterBox->setAlignment(Qt::AlignLeft);
-
-  auto labelRadius1 = new QLabel(QString("Radius"));
-  d->m_Radius = new ctkDoubleSpinBox();
-  d->m_Radius->setMinimum(0);
-  d->m_Radius->setValue(10);
-  d->m_Radius->setSuffix(" mm");
-  d->m_Radius->setAlignment(Qt::AlignLeft);
-  d->m_Radius->setToolTip("Sets the radius for following planar figures: circle, double ellipse (as ring).");
-
-  auto labelThickness = new QLabel(QString("Thickness"));
-  d->m_Thickness = new ctkDoubleSpinBox();
-  d->m_Thickness->setMinimum(0);
-  d->m_Thickness->setMaximum(10);
-  d->m_Thickness->setValue(5);
-  d->m_Thickness->setSuffix(" mm");
-  d->m_Thickness->setAlignment(Qt::AlignLeft);
-  d->m_Thickness->setToolTip("Sets the thickness for following planar figures: double ellipse (as ring).");
-
-  fixedLayout->addWidget(labelRadius1,0,0);
-  fixedLayout->addWidget(d->m_Radius,0,1);
-  fixedLayout->addWidget(labelThickness,1,0);
-  fixedLayout->addWidget(d->m_Thickness,1,1);
-
-  d->m_FixedParameterBox->setLayout(fixedLayout);
-
-  // planar figure details text
-  d->m_SelectedPlanarFiguresText = new QTextBrowser;
-
-  // copy to clipboard button
-  d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
-
-  d->m_SelectedImageLabel = new QLabel("Selected Image");
-
-  d->m_DrawLabel = new QLabel("Place points to draw the measurement... (Esc to cancel)");
-  d->m_DrawLabel->setTextFormat(Qt::PlainText);
-  d->m_DrawLabel->setWordWrap(true);
-  d->m_DrawLabel->hide();
-
-  d->m_HintLabel = new QLabel(R"(<font color="red"><b>Hint:</b></font> Double-click to place the last point and end interaction.)");
-  d->m_HintLabel->setTextFormat(Qt::RichText);
-  d->m_HintLabel->setWordWrap(true);
-  d->m_HintLabel->hide();
-
-  // The alignment overlay covers exactly this container, so the reference image
-  // selector and the details text stay usable while the views are not aligned.
-  d->m_DrawingControls = new QWidget;
-  auto drawingLayout = new QVBoxLayout(d->m_DrawingControls);
-  drawingLayout->setContentsMargins(0, 0, 0, 0);
-  drawingLayout->addWidget(d->m_DrawActionsToolBar);
-  drawingLayout->addWidget(d->m_DrawLabel);
-  drawingLayout->addWidget(d->m_HintLabel);
-  drawingLayout->addWidget(d->m_FixedParameterBox);
-
-  d->m_AlignmentOverlay = new QmitkButtonOverlayWidget(d->m_DrawingControls);
+  // The alignment overlay covers exactly the drawing controls, so the reference image
+  // selector and the measurements stay usable while the views are not aligned.
+  d->m_AlignmentOverlay = new QmitkButtonOverlayWidget(d->m_Controls->drawingControls);
   d->m_AlignmentOverlay->setVisible(false);
   d->m_AlignmentOverlay->SetOverlayText(QStringLiteral(
     "<p style=\"color:red; text-align:center\">"
@@ -371,17 +444,9 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_AlignmentOverlay->setOpacity(200);
   d->m_AlignmentOverlay->SetButtonIcon(QmitkIconTheme::GetIcon(QLatin1String(":/Qmitk/reset.svg")));
 
-  d->m_Layout = new QGridLayout;
-  d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 0);
-  d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 1, 1, 1);
-  d->m_Layout->addWidget(d->m_DrawingControls, 1, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
-
-  d->m_Parent->setLayout(d->m_Layout);
-
   this->CreateConnections();
   this->AddAllInteractors();
+  this->OnSelectedFiguresChanged();
 
   d->m_ViewsInitializedObserver.Reset(mitk::RenderingManager::GetInstance(), mitk::RenderingManagerViewsInitializedEvent(),
     [this](const itk::EventObject&) { this->UpdateDrawingControls(); });
@@ -392,28 +457,263 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
     this->RenderWindowPartActivated(renderWindowPart);
 
   // placed after CreateConnections to trigger update of the current selection
-  d->m_SingleNodeSelectionWidget->SetAutoSelectNewNodes(true);
+  referenceImageSelector->SetAutoSelectNewNodes(true);
+}
+
+void QmitkMeasurementView::CreateToolButtons()
+{
+  d->m_ToolButtons = new QButtonGroup(d->m_Controls->tools);
+
+  // Unchecking the active tool cancels its placement, which an exclusive group would not allow.
+  d->m_ToolButtons->setExclusive(false);
+
+  for (int i = 0; i < static_cast<int>(Tools.size()); ++i)
+  {
+    const auto& tool = Tools[i];
+
+    auto* button = new QToolButton;
+    button->setIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/%1.svg").arg(QLatin1String(tool.Type))));
+    button->setIconSize(QSize(32, 32));
+    button->setToolTip(QString::fromUtf8(tool.Name));
+    button->setCheckable(true);
+    button->setAutoRaise(true);
+
+    d->m_ToolButtons->addButton(button, i);
+
+    auto* layout = ToolGroup::Distances == tool.Group ? d->m_Controls->distanceToolsLayout
+      : ToolGroup::Angles == tool.Group ? d->m_Controls->angleToolsLayout
+      : d->m_Controls->areaToolsLayout;
+
+    // Before the trailing spacer
+    layout->insertWidget(layout->count() - 1, button);
+  }
 }
 
 void QmitkMeasurementView::CreateConnections()
 {
-  connect(d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+  connect(d->m_Controls->referenceImageSelector, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkMeasurementView::OnCurrentSelectionChanged);
-  connect(d->m_DrawLine, SIGNAL(triggered(bool)), this, SLOT(OnDrawLineTriggered(bool)));
-  connect(d->m_DrawPath, SIGNAL(triggered(bool)), this, SLOT(OnDrawPathTriggered(bool)));
-  connect(d->m_DrawAngle, SIGNAL(triggered(bool)), this, SLOT(OnDrawAngleTriggered(bool)));
-  connect(d->m_DrawFourPointAngle, SIGNAL(triggered(bool)), this, SLOT(OnDrawFourPointAngleTriggered(bool)));
-  connect(d->m_DrawCircle, SIGNAL(triggered(bool)), this, SLOT(OnDrawCircleTriggered(bool)));
-  connect(d->m_DrawEllipse, SIGNAL(triggered(bool)), this, SLOT(OnDrawEllipseTriggered(bool)));
-  connect(d->m_DrawDoubleEllipse, SIGNAL(triggered(bool)), this, SLOT(OnDrawDoubleEllipseTriggered(bool)));
-  connect(d->m_DrawRectangle, SIGNAL(triggered(bool)), this, SLOT(OnDrawRectangleTriggered(bool)));
-  connect(d->m_DrawPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawPolygonTriggered(bool)));
-  connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
-  connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
+  connect(d->m_ToolButtons, &QButtonGroup::idClicked, this, &QmitkMeasurementView::OnToolClicked);
   connect(d->m_CancelPlacementShortcut, &QShortcut::activated, this, &QmitkMeasurementView::CancelPlacement);
   connect(d->m_AlignmentOverlay, &QmitkButtonOverlayWidget::Clicked, this, &QmitkMeasurementView::OnAlignViewsClicked);
-  connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
-  connect(d->m_Radius, QOverload<double>::of(&ctkDoubleSpinBox::valueChanged), d->m_Thickness, &ctkDoubleSpinBox::setMaximum);
+  connect(d->m_Controls->copyButton, &QPushButton::clicked, this, &QmitkMeasurementView::OnCopyToClipboard);
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemSelectionChanged, this, &QmitkMeasurementView::OnMeasurementTreeSelectionChanged);
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemPressed, this, &QmitkMeasurementView::OnMeasurementTreeItemActivated);
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemChanged, this, &QmitkMeasurementView::OnMeasurementTreeItemChanged);
+
+  // A press changes the current item as well and is handled above, so this is for the keyboard only.
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* item) {
+    if (Qt::NoButton == QApplication::mouseButtons())
+      this->OnMeasurementTreeItemActivated(item);
+  });
+
+  connect(d->m_Controls->radiusSpinBox, &QDoubleSpinBox::valueChanged, d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::setMaximum);
+  connect(d->m_Controls->fixedSizeGroupBox, &QGroupBox::toggled, this, &QmitkMeasurementView::OnFixedSizeToggled);
+  connect(d->m_Controls->radiusSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeValueChanged);
+  connect(d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeValueChanged);
+
+  connect(d->m_Controls->colorButton, &QToolButton::clicked, this, &QmitkMeasurementView::OnColorButtonClicked);
+  connect(d->m_Controls->lineWidthSlider, &QSlider::valueChanged, this, &QmitkMeasurementView::OnAppearanceChanged);
+  connect(d->m_Controls->showNameCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
+  connect(d->m_Controls->showMeasurementsCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
+  connect(d->m_Controls->contrastOutlineCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
+  connect(d->m_Controls->showIn3DCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
+  connect(d->m_Controls->labelVisibilityComboBox, &QComboBox::currentIndexChanged, this, &QmitkMeasurementView::OnAppearanceChanged);
+}
+
+void QmitkMeasurementView::LoadAppearance()
+{
+  // The choices are the values of the property, so they read as in the Properties view.
+  auto labelVisibility = mitk::PlanarFigureVisibilityProperty::New();
+
+  for (auto it = labelVisibility->Begin(); it != labelVisibility->End(); ++it)
+    d->m_Controls->labelVisibilityComboBox->addItem(QString::fromStdString(it->second), static_cast<int>(it->first));
+
+  auto appearance = GetMapperAppearance();
+
+  if (const auto* preferences = this->GetPreferences(); nullptr != preferences)
+  {
+    if (const QColor color(QString::fromStdString(preferences->Get(ColorPreference, ""))); color.isValid())
+      appearance.Color = color;
+
+    appearance.LineWidth = preferences->GetFloat(LineWidthPreference, appearance.LineWidth);
+    appearance.ShowName = preferences->GetBool(ShowNamePreference, appearance.ShowName);
+    appearance.ShowMeasurements = preferences->GetBool(ShowMeasurementsPreference, appearance.ShowMeasurements);
+    appearance.ContrastOutline = preferences->GetBool(ContrastOutlinePreference, appearance.ContrastOutline);
+    appearance.ShowIn3D = preferences->GetBool(ShowIn3DPreference, appearance.ShowIn3D);
+
+    if (labelVisibility->SetValue(preferences->Get(LabelVisibilityPreference, "")))
+      appearance.Label = labelVisibility->GetVisibility();
+  }
+
+  d->m_NewFigureAppearance = appearance;
+}
+
+QmitkFigureAppearance QmitkMeasurementView::GetAppearanceFromControls() const
+{
+  auto appearance = d->m_ShownAppearance;
+  appearance.LineWidth = this->GetLineWidth();
+  appearance.ShowName = d->m_Controls->showNameCheckBox->isChecked();
+  appearance.ShowMeasurements = d->m_Controls->showMeasurementsCheckBox->isChecked();
+  appearance.ContrastOutline = d->m_Controls->contrastOutlineCheckBox->isChecked();
+  appearance.ShowIn3D = d->m_Controls->showIn3DCheckBox->isChecked();
+  appearance.Label = static_cast<mitk::PlanarFigureVisibilityProperty::Visibility>(d->m_Controls->labelVisibilityComboBox->currentData().toInt());
+  return appearance;
+}
+
+void QmitkMeasurementView::ShowAppearance(const QmitkFigureAppearance& appearance)
+{
+  auto& controls = *d->m_Controls;
+
+  {
+    const QSignalBlocker lineWidthBlocker(controls.lineWidthSlider);
+    const QSignalBlocker showNameBlocker(controls.showNameCheckBox);
+    const QSignalBlocker showMeasurementsBlocker(controls.showMeasurementsCheckBox);
+    const QSignalBlocker contrastOutlineBlocker(controls.contrastOutlineCheckBox);
+    const QSignalBlocker showIn3DBlocker(controls.showIn3DCheckBox);
+    const QSignalBlocker labelVisibilityBlocker(controls.labelVisibilityComboBox);
+
+    controls.lineWidthSlider->setValue(static_cast<int>(std::lround(appearance.LineWidth / LineWidthStep)));
+    controls.showNameCheckBox->setChecked(appearance.ShowName);
+    controls.showMeasurementsCheckBox->setChecked(appearance.ShowMeasurements);
+    controls.contrastOutlineCheckBox->setChecked(appearance.ContrastOutline);
+    controls.showIn3DCheckBox->setChecked(appearance.ShowIn3D);
+    controls.labelVisibilityComboBox->setCurrentIndex(controls.labelVisibilityComboBox->findData(static_cast<int>(appearance.Label)));
+  }
+
+  // The shown appearance is what the controls show, e.g. a line width rounded to the steps
+  // of the slider, so that a change of another control does not write it to the figures.
+  d->m_ShownAppearance = appearance;
+  d->m_ShownAppearance = this->GetAppearanceFromControls();
+
+  this->UpdateColorButton();
+  this->UpdateLineWidthLabel();
+}
+
+void QmitkMeasurementView::UpdateAppearanceControls()
+{
+  auto* groupBox = d->m_Controls->appearanceGroupBox;
+
+  if (nullptr == groupBox)
+    return; // before CreateQtPartControl()
+
+  const auto selectedFigures = this->GetSelectedFigures();
+
+  if (selectedFigures.empty())
+  {
+    groupBox->setTitle(QStringLiteral("Appearance of new figures"));
+    this->ShowAppearance(d->m_NewFigureAppearance);
+  }
+  else
+  {
+    groupBox->setTitle(1 == selectedFigures.size()
+      ? QStringLiteral("Appearance of the selected figure")
+      : QStringLiteral("Appearance of the selected figures"));
+
+    this->ShowAppearance(ReadAppearance(selectedFigures.front(), GetMapperAppearance()));
+  }
+}
+
+void QmitkMeasurementView::ChangeAppearance(const QmitkFigureAppearance& appearance)
+{
+  // A copy, since a change of the first selected figure shows its appearance again.
+  const auto previous = std::exchange(d->m_ShownAppearance, appearance);
+
+  this->UpdateColorButton();
+  this->UpdateLineWidthLabel();
+
+  const auto selectedFigures = this->GetSelectedFigures();
+
+  if (selectedFigures.empty())
+  {
+    d->m_NewFigureAppearance = appearance;
+
+    // The figure that is being placed is new, too.
+    if (d->m_PendingNode.IsNotNull())
+      WriteAppearance(d->m_PendingNode, appearance);
+  }
+  else
+  {
+    // Only the changed property, so the others may still differ between the figures.
+    for (auto* node : selectedFigures)
+      WriteAppearance(node, appearance, &previous);
+
+    // New figures take the changed property as well, like the last used color of a drawing tool.
+    auto newFigure = mitk::DataNode::New();
+    WriteAppearance(newFigure, d->m_NewFigureAppearance);
+    WriteAppearance(newFigure, appearance, &previous);
+    d->m_NewFigureAppearance = ReadAppearance(newFigure, d->m_NewFigureAppearance);
+  }
+
+  this->SaveAppearance();
+  this->RequestRenderWindowUpdate();
+}
+
+float QmitkMeasurementView::GetLineWidth() const
+{
+  return LineWidthStep * d->m_Controls->lineWidthSlider->value();
+}
+
+void QmitkMeasurementView::UpdateLineWidthLabel()
+{
+  d->m_Controls->lineWidthValueLabel->setText(QStringLiteral("%1 px").arg(this->GetLineWidth(), 0, 'f', 1));
+}
+
+void QmitkMeasurementView::SaveAppearance() const
+{
+  auto* preferences = this->GetPreferences();
+
+  if (nullptr == preferences)
+    return;
+
+  const auto& appearance = d->m_NewFigureAppearance;
+
+  // The label visibility by name, as the Properties view shows it.
+  const auto labelVisibility = mitk::PlanarFigureVisibilityProperty::New(appearance.Label);
+
+  preferences->Put(ColorPreference, appearance.Color.name().toStdString());
+  preferences->PutFloat(LineWidthPreference, appearance.LineWidth);
+  preferences->PutBool(ShowNamePreference, appearance.ShowName);
+  preferences->PutBool(ShowMeasurementsPreference, appearance.ShowMeasurements);
+  preferences->PutBool(ContrastOutlinePreference, appearance.ContrastOutline);
+  preferences->Put(LabelVisibilityPreference, labelVisibility->GetValueAsString());
+  preferences->PutBool(ShowIn3DPreference, appearance.ShowIn3D);
+  preferences->Flush();
+}
+
+void QmitkMeasurementView::UpdateColorButton()
+{
+  QPixmap swatch(d->m_Controls->colorButton->iconSize());
+  swatch.fill(d->m_ShownAppearance.Color);
+
+  // Keeps colors close to the background apart from it.
+  QPainter painter(&swatch);
+  painter.setPen(d->m_Controls->colorButton->palette().color(QPalette::Mid));
+  painter.drawRect(swatch.rect().adjusted(0, 0, -1, -1));
+  painter.end();
+
+  d->m_Controls->colorButton->setIcon(QIcon(swatch));
+}
+
+void QmitkMeasurementView::OnColorButtonClicked()
+{
+  const auto title = this->GetSelectedFigures().empty()
+    ? QStringLiteral("Color of New Figures")
+    : QStringLiteral("Color of the Selected Figures");
+
+  const auto color = QColorDialog::getColor(d->m_ShownAppearance.Color, d->m_Controls->colorButton, title);
+
+  if (!color.isValid())
+    return;
+
+  auto appearance = this->GetAppearanceFromControls();
+  appearance.Color = color;
+  this->ChangeAppearance(appearance);
+}
+
+void QmitkMeasurementView::OnAppearanceChanged()
+{
+  this->ChangeAppearance(this->GetAppearanceFromControls());
 }
 
 void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
@@ -445,6 +745,7 @@ void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Point
   }
 
   this->UpdateDrawingControls();
+  this->ScheduleMeasurementTreeUpdate();
 }
 
 void QmitkMeasurementView::OnAlignViewsClicked()
@@ -477,8 +778,70 @@ void QmitkMeasurementView::UpdateDrawingControls()
     this->CancelPlacement();
 
   d->m_AlignmentOverlay->setVisible(hasReference && !isAligned);
-  d->m_DrawActionsToolBar->setEnabled(hasReference && isAligned);
-  d->m_FixedParameterBox->setEnabled(hasReference && isAligned);
+  d->m_Controls->tools->setEnabled(hasReference && isAligned);
+
+  this->UpdateHint();
+}
+
+void QmitkMeasurementView::UpdateToolOptions()
+{
+  const auto fixedSize = d->m_PendingTool.has_value() ? Tools[*d->m_PendingTool].Size : FixedSize::None;
+
+  d->m_Controls->fixedSizeGroupBox->setVisible(FixedSize::None != fixedSize);
+  d->m_Controls->thicknessLabel->setVisible(FixedSize::RadiusAndThickness == fixedSize);
+  d->m_Controls->thicknessSpinBox->setVisible(FixedSize::RadiusAndThickness == fixedSize);
+}
+
+void QmitkMeasurementView::UpdateHint()
+{
+  if (nullptr == d->m_AlignmentOverlay)
+    return;
+
+  QString hint;
+
+  if (d->m_PendingNode.IsNotNull())
+  {
+    if (const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(d->m_PendingNode->GetData()); nullptr != figure)
+      hint = GetPlacementHint(figure);
+  }
+  else if (d->m_Controls->tools->isEnabled())
+  {
+    const auto selectedFigures = this->GetSelectedFigures();
+
+    hint = !selectedFigures.empty()
+      ? GetEditingHint(static_cast<const mitk::PlanarFigure*>(selectedFigures.front()->GetData()))
+      : QStringLiteral("Pick a tool to draw a measurement on the reference image.");
+  }
+
+  if (hint != d->m_Controls->hintCard->GetMessage())
+    d->m_Controls->hintCard->SetMessage(hint);
+
+  d->m_Controls->hintCard->setVisible(!hint.isEmpty());
+}
+
+std::vector<mitk::DataNode*> QmitkMeasurementView::GetSelectedFigures() const
+{
+  std::vector<mitk::DataNode*> figures;
+
+  for (const auto& node : d->m_CurrentSelection)
+  {
+    if (node.IsNull() || d->m_Figures.count(node.GetPointer()) == 0)
+      continue;
+
+    if (const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData()); nullptr != figure && figure->IsComplete())
+      figures.push_back(node);
+  }
+
+  return figures;
+}
+
+void QmitkMeasurementView::OnSelectedFiguresChanged()
+{
+  if (nullptr == d->m_AlignmentOverlay)
+    return; // selection before CreateQtPartControl()
+
+  this->UpdateAppearanceControls();
+  this->UpdateHint();
 }
 
 void QmitkMeasurementView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -489,7 +852,7 @@ void QmitkMeasurementView::RenderWindowPartActivated(mitk::IRenderWindowPart* re
 
 void QmitkMeasurementView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  // Cancel while the part is still alive so PlanarFigureInitialized() can hand the
+  // Cancel while the part is still alive so ResetPlacement() can hand the
   // interaction reference geometry back to it.
   this->CancelPlacement();
 
@@ -504,8 +867,7 @@ void QmitkMeasurementView::RenderWindowPartInputChanged(mitk::IRenderWindowPart*
 
 void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
 {
-  // add observer for selection in renderwindow
-  mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+  auto* planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
   auto isPositionMarker = false;
   node->GetBoolProperty("isContourMarker", isPositionMarker);
@@ -514,186 +876,135 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
   auto isHelperObject = false;
   node->GetBoolProperty("helper object", isHelperObject);
 
-  if (planarFigure.IsNotNull() && !isPositionMarker && !isHelperObject)
+  if (nullptr == planarFigure || isPositionMarker || isHelperObject)
+    return;
+
+  auto nonConstNode = const_cast<mitk::DataNode*>(node);
+  mitk::PlanarFigureInteractor::Pointer interactor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+
+  if (interactor.IsNull())
   {
-    auto nonConstNode = const_cast<mitk::DataNode*>(node);
-    mitk::PlanarFigureInteractor::Pointer interactor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+    interactor = mitk::PlanarFigureInteractor::New();
+    auto planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
 
-    if (interactor.IsNull())
-    {
-      interactor = mitk::PlanarFigureInteractor::New();
-      auto planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-
-      interactor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
-      interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
-    }
-
-    interactor->SetDataNode(nonConstNode);
-
-    QmitkPlanarFigureData data;
-    data.m_Figure = planarFigure;
-
-    typedef itk::SimpleMemberCommand<QmitkMeasurementView> SimpleCommandType;
-    typedef itk::MemberCommand<QmitkMeasurementView> MemberCommandType;
-
-    // add observer for event when figure has been placed
-    auto initializationCommand = SimpleCommandType::New();
-    initializationCommand->SetCallbackFunction(this, &QmitkMeasurementView::OnPlanarFigureFinished);
-    data.m_EndPlacementObserverTag = planarFigure->AddObserver(mitk::EndPlacementPlanarFigureEvent(), initializationCommand);
-
-    // add observer for event when figure is picked (selected)
-    auto selectCommand = MemberCommandType::New();
-    selectCommand->SetCallbackFunction(this, &QmitkMeasurementView::PlanarFigureSelected);
-    data.m_SelectObserverTag = planarFigure->AddObserver(mitk::SelectPlanarFigureEvent(), selectCommand);
-
-    // add observer for event during interaction when a point is moved
-    auto duringInteractionCommand = SimpleCommandType::New();
-    duringInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::UpdateMeasurementText);
-    data.m_DuringInteractionObserverTag = planarFigure->AddObserver(mitk::PointMovedPlanarFigureEvent(), duringInteractionCommand);
-
-    // adding to the map of tracked planarfigures
-    d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
+    interactor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
+    interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
   }
+
+  interactor->SetDataNode(nonConstNode);
+
+  auto& figure = d->m_Figures[node];
+  figure.Node = nonConstNode;
+
+  figure.EndPlacementObserver.Reset(planarFigure, mitk::EndPlacementPlanarFigureEvent(), [this](const itk::EventObject&) {
+    const auto toolIndex = d->m_PendingTool;
+
+    this->ResetPlacement();
+    this->ScheduleMeasurementTreeUpdate();
+
+    // A figure of fixed size takes a single click, so its tool stays armed for the next one.
+    // Placed figures cannot be edited meanwhile, since the armed tool holds the exclusive interaction.
+    if (toolIndex.has_value() && this->IsPlacedWithFixedSize(*toolIndex))
+      this->StartPlacement(*toolIndex);
+  });
+
+  figure.SelectObserver.Reset(planarFigure, mitk::SelectPlanarFigureEvent(), [this, nonConstNode](const itk::EventObject&) {
+    this->SelectNode(nonConstNode);
+    this->OnSelectedFiguresChanged();
+    this->RequestRenderWindowUpdate();
+  });
+
+  figure.PointMovedObserver.Reset(planarFigure, mitk::PointMovedPlanarFigureEvent(),
+    [this](const itk::EventObject&) { this->ScheduleMeasurementTreeUpdate(); });
+
+  this->ScheduleMeasurementTreeUpdate();
 }
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
-  auto it = std::find(d->m_CurrentSelection.begin(), d->m_CurrentSelection.end(), node);
-  if (it != d->m_CurrentSelection.end())
+  // A figure may have been renamed, recolored or changed by other means than interaction.
+  if (d->m_Figures.count(node) != 0)
   {
-    this->UpdateMeasurementText();
+    d->m_HaveMeasurementTreeIconsChanged = true;
+    this->ScheduleMeasurementTreeUpdate();
+
+    if (const auto selectedFigures = this->GetSelectedFigures(); !selectedFigures.empty() && node == selectedFigures.front())
+      this->UpdateAppearanceControls();
   }
 }
 
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 {
-  auto nonConstNode = const_cast<mitk::DataNode*>(node);
-  auto it = d->m_DataNodeToPlanarFigureData.find(nonConstNode);
-  auto isFigureFinished = false;
-  auto isPlaced = false;
+  if (node == d->m_PendingNode)
+    this->ResetPlacement();
 
-  if (it != d->m_DataNodeToPlanarFigureData.end())
+  if (auto it = d->m_Figures.find(node); it != d->m_Figures.end())
   {
-    QmitkPlanarFigureData& data = it->second;
-
-    data.m_Figure->RemoveObserver(data.m_EndPlacementObserverTag);
-    data.m_Figure->RemoveObserver(data.m_SelectObserverTag);
-    data.m_Figure->RemoveObserver(data.m_StartInteractionObserverTag);
-    data.m_Figure->RemoveObserver(data.m_EndInteractionObserverTag);
-    data.m_Figure->RemoveObserver(data.m_DuringInteractionObserverTag);
-
-    isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced", isPlaced);
-
-    if (!isFigureFinished) // if the property does not yet exist or is false, drop the datanode
-      this->PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
-
-    d->m_DataNodeToPlanarFigureData.erase( it );
-
-    nonConstNode->SetDataInteractor(nullptr);
+    it->second.Node->SetDataInteractor(nullptr);
+    d->m_Figures.erase(it);
   }
 
+  // An unfinished figure goes with its parent.
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-  auto nodes = this->GetDataStorage()->GetDerivations(node, isPlanarFigure);
+  auto derivations = this->GetDataStorage()->GetDerivations(node, isPlanarFigure);
 
-  for (unsigned int x = 0; x < nodes->size(); ++x)
+  for (const auto& derivation : *derivations)
   {
-    mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(nodes->at(x)->GetData());
+    const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(derivation->GetData());
 
-    if (planarFigure.IsNotNull())
-    {
-      isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
-
-      if (!isFigureFinished) // if the property does not yet exist or is false, drop the datanode
-      {
-        this->GetDataStorage()->Remove(nodes->at(x));
-
-        if (!d->m_DataNodeToPlanarFigureData.empty())
-        {
-          it = d->m_DataNodeToPlanarFigureData.find(nodes->at(x));
-
-          if (it != d->m_DataNodeToPlanarFigureData.end())
-          {
-            d->m_DataNodeToPlanarFigureData.erase(it);
-            this->PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
-          }
-        }
-      }
-    }
+    if (nullptr != planarFigure && !planarFigure->IsComplete())
+      this->GetDataStorage()->Remove(derivation);
   }
+
+  // Deferred, since the node is still in the data storage at this point.
+  this->ScheduleMeasurementTreeUpdate();
 }
 
-void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::EventObject&)
+void QmitkMeasurementView::SelectNode(mitk::DataNode* node)
 {
-  auto lambda = [&object](const std::pair<mitk::DataNode::Pointer, QmitkPlanarFigureData>& element)
-  {
-    return element.second.m_Figure == object;
-  };
-
-  auto it = std::find_if(d->m_DataNodeToPlanarFigureData.begin(), d->m_DataNodeToPlanarFigureData.end(), lambda);
-
-  if (it != d->m_DataNodeToPlanarFigureData.end())
-    this->SelectNode(it->first);
-
-  this->UpdateMeasurementText();
-  this->RequestRenderWindowUpdate();
+  this->SelectNodes({ node });
+  this->UpdateMeasurementTreeSelection();
 }
 
-void QmitkMeasurementView::SelectNode(const mitk::DataNode::Pointer& node)
+void QmitkMeasurementView::SelectNodes(const QList<mitk::DataNode::Pointer>& nodes)
 {
   for (auto& selectedNode : d->m_CurrentSelection)
     selectedNode->SetSelected(false);
 
-  d->m_CurrentSelection.clear();
-  d->m_CurrentSelection.push_back(node);
+  d->m_CurrentSelection = nodes;
 
-  this->FireNodeSelected(node);
+  this->FireNodesSelected(nodes);
   this->SynchronizeDataManagerSelection();
 
   // Set "selected" last: SynchronizeDataManagerSelection updates the Data Manager
   // tree selection, whose NodeSelectionChanged handler re-derives every node's
   // "selected" property and transiently clears it for the picked node. Setting it
   // afterwards leaves the figure in the selected (red) appearance.
-  node->SetSelected(true);
+  for (auto& node : nodes)
+    node->SetSelected(true);
 }
 
-void QmitkMeasurementView::OnPlanarFigureFinished()
-{
-  // The figure is now actually placed, so the reserved number is earned.
-  if (d->m_PendingCounter != nullptr)
-    ++(*d->m_PendingCounter);
-
-  this->PlanarFigureInitialized();
-}
-
-void QmitkMeasurementView::PlanarFigureInitialized()
+void QmitkMeasurementView::ResetPlacement()
 {
   d->m_PlacementSelectionObserver.Reset();
-  d->m_UninitializedNode = nullptr;
-  d->m_PendingCounter = nullptr;
+  d->m_PlacementProgressObserver.Reset();
+  d->m_PendingNode = nullptr;
+  d->m_PendingTool.reset();
   d->m_ExclusiveInteractionClaim.Reset();
 
   d->m_CancelPlacementShortcut->setEnabled(false);
 
-  d->m_DrawLine->setChecked(false);
-  d->m_DrawPath->setChecked(false);
-  d->m_DrawAngle->setChecked(false);
-  d->m_DrawFourPointAngle->setChecked(false);
-  d->m_DrawCircle->setChecked(false);
-  d->m_DrawEllipse->setChecked(false);
-  d->m_DrawDoubleEllipse->setChecked(false);
-  d->m_DrawRectangle->setChecked(false);
-  d->m_DrawPolygon->setChecked(false);
-  d->m_DrawBezierCurve->setChecked(false);
-  d->m_DrawSubdivisionPolygon->setChecked(false);
-
-  d->m_DrawLabel->hide();
-  d->m_HintLabel->hide();
+  for (auto* button : d->m_ToolButtons->buttons())
+    button->setChecked(false);
 
   if (d->m_RestoreInteractionReferenceGeometry.has_value())
   {
     this->SetInteractionReferenceGeometry(*d->m_RestoreInteractionReferenceGeometry);
     d->m_RestoreInteractionReferenceGeometry.reset();
   }
+
+  this->UpdateToolOptions();
+  this->OnSelectedFiguresChanged();
 }
 
 void QmitkMeasurementView::SetInteractionReferenceGeometry(const mitk::TimeGeometry* geometry)
@@ -714,30 +1025,56 @@ void QmitkMeasurementView::SetInteractionReferenceGeometry(const mitk::TimeGeome
 
 void QmitkMeasurementView::CancelPlacement()
 {
-  if (d->m_UninitializedNode.IsNull())
+  if (d->m_PendingNode.IsNull())
     return;
 
-  // Keep the node alive: NodeRemoved() resets m_UninitializedNode while the
+  // Keep the node alive: NodeRemoved() resets m_PendingNode while the
   // removal is still in progress.
-  mitk::DataNode::Pointer node = d->m_UninitializedNode;
+  mitk::DataNode::Pointer node = d->m_PendingNode;
   this->GetDataStorage()->Remove(node);
 
   // A programmatic removal does not trigger OnSelectionChanged, so drop the
-  // canceled node from the selection and refresh the details text explicitly.
+  // canceled node from the selection explicitly.
   d->m_CurrentSelection.removeAll(node);
-  this->UpdateMeasurementText();
+  this->OnSelectedFiguresChanged();
 
   this->RequestRenderWindowUpdate();
 }
 
-bool QmitkMeasurementView::BeginDrawAction(QAction* action, bool checked)
+void QmitkMeasurementView::OnToolClicked(int toolIndex)
 {
-  if (!checked)
+  if (d->m_ToolButtons->button(toolIndex)->isChecked())
+  {
+    this->StartPlacement(toolIndex);
+  }
+  else
   {
     this->CancelPlacement();
-    return false;
   }
+}
 
+void QmitkMeasurementView::OnFixedSizeToggled()
+{
+  // A preset and a figure drawn by hand are placed differently, so start over.
+  if (d->m_PendingTool.has_value() && FixedSize::None != Tools[*d->m_PendingTool].Size)
+    this->StartPlacement(*d->m_PendingTool);
+}
+
+void QmitkMeasurementView::OnFixedSizeValueChanged()
+{
+  // Resized in place: a restart would hide the options and take the focus from the spin box.
+  if (d->m_PendingNode.IsNull() || !d->m_PendingTool.has_value() || !this->IsPlacedWithFixedSize(*d->m_PendingTool))
+    return;
+
+  if (auto* figure = dynamic_cast<mitk::PlanarFigure*>(d->m_PendingNode->GetData()); nullptr != figure)
+  {
+    this->ApplyFixedSize(figure, *d->m_PendingTool);
+    this->RequestRenderWindowUpdate();
+  }
+}
+
+void QmitkMeasurementView::StartPlacement(int toolIndex)
+{
   this->CancelPlacement();
 
   d->m_ExclusiveInteractionClaim = mitk::ExclusiveInteraction::Acquire([this]() {
@@ -745,298 +1082,141 @@ bool QmitkMeasurementView::BeginDrawAction(QAction* action, bool checked)
     return true;
   });
 
+  auto* button = d->m_ToolButtons->button(toolIndex);
+
   // The armed tool of another view keeps the exclusive interaction, e.g. to
   // keep its unconfirmed results.
   if (!d->m_ExclusiveInteractionClaim.IsActive())
   {
-    action->setChecked(false);
-    return false;
+    button->setChecked(false);
+    return;
   }
 
-  // CancelPlacement() unchecks all draw actions, including the clicked one
-  action->setChecked(true);
+  const auto& tool = Tools[toolIndex];
+  auto figure = tool.Create();
+  this->ApplyFixedSize(figure, toolIndex);
 
-  return true;
+  this->AddFigureToDataStorage(figure, tool.Name);
+  d->m_PendingTool = toolIndex;
+
+  // CancelPlacement() unchecks all tools, including the clicked one.
+  button->setChecked(true);
+
+  d->m_PlacementProgressObserver.Reset(figure, itk::ModifiedEvent(), [this](const itk::EventObject&) { this->UpdateHint(); });
+
+  this->UpdateToolOptions();
+
+  // The new figure took the selection, so the appearance group box is for new figures again.
+  this->OnSelectedFiguresChanged();
+}
+
+bool QmitkMeasurementView::IsPlacedWithFixedSize(int toolIndex) const
+{
+  return FixedSize::None != Tools[toolIndex].Size && d->m_Controls->fixedSizeGroupBox->isChecked();
+}
+
+void QmitkMeasurementView::ApplyFixedSize(mitk::PlanarFigure* figure, int toolIndex) const
+{
+  if (!this->IsPlacedWithFixedSize(toolIndex))
+    return;
+
+  const auto fixedSize = Tools[toolIndex].Size;
+
+  const auto radius = d->m_Controls->radiusSpinBox->value();
+  MakePreset(figure, radius);
+
+  if (auto* ring = dynamic_cast<mitk::PlanarDoubleEllipse*>(figure); nullptr != ring && FixedSize::RadiusAndThickness == fixedSize)
+    ring->SetThickness(std::min(d->m_Controls->thicknessSpinBox->value(), radius));
 }
 
 void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
   d->m_CurrentSelection = nodes;
-  this->UpdateMeasurementText();
+  this->UpdateMeasurementTreeSelection();
 
   // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
-  if (d->m_CurrentSelection.size() == 0)
+  if (d->m_CurrentSelection.empty())
   {
-    auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-    auto planarFigures = this->GetDataStorage()->GetSubset(isPlanarFigure);
+    auto planarFigures = this->GetAllPlanarFigures();
 
-    // setting all planar figures which are not helper objects not selected
-    for (mitk::DataStorage::SetOfObjects::ConstIterator it = planarFigures->Begin(); it != planarFigures->End(); ++it)
-    {
-      auto node = it.Value();
-
-      auto isHelperObject = false;
-      node->GetBoolProperty("helper object", isHelperObject);
-
-      if (!isHelperObject)
-        node->SetSelected(false);
-    }
+    for (const auto& node : *planarFigures)
+      node->SetSelected(false);
   }
 
-  for (int i = d->m_CurrentSelection.size() - 1; i >= 0; --i)
-  {
-    auto node = d->m_CurrentSelection[i];
-    mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-
-    // the last selected planar figure
-    if (planarFigure.IsNotNull() && planarFigure->GetPlaneGeometry())
-    {
-      auto planarFigureInitializedWindow = false;
-      auto linkedRenderWindow = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-      QmitkRenderWindow* selectedRenderWindow;
-
-      if (!linkedRenderWindow)
-        return;
-
-      auto axialRenderWindow = linkedRenderWindow->GetQmitkRenderWindow("axial");
-      auto sagittalRenderWindow = linkedRenderWindow->GetQmitkRenderWindow("sagittal");
-      auto coronalRenderWindow = linkedRenderWindow->GetQmitkRenderWindow("coronal");
-      auto threeDimRenderWindow = linkedRenderWindow->GetQmitkRenderWindow("3d");
-
-      if (node->GetBoolProperty("planarFigureInitializedWindow", planarFigureInitializedWindow, axialRenderWindow->GetRenderer()))
-      {
-        selectedRenderWindow = axialRenderWindow;
-      }
-      else if (node->GetBoolProperty("planarFigureInitializedWindow", planarFigureInitializedWindow, sagittalRenderWindow->GetRenderer()))
-      {
-        selectedRenderWindow = sagittalRenderWindow;
-      }
-      else if (node->GetBoolProperty("planarFigureInitializedWindow", planarFigureInitializedWindow, coronalRenderWindow->GetRenderer()))
-      {
-        selectedRenderWindow = coronalRenderWindow;
-      }
-      else if (node->GetBoolProperty("planarFigureInitializedWindow", planarFigureInitializedWindow, threeDimRenderWindow->GetRenderer()))
-      {
-        selectedRenderWindow = threeDimRenderWindow;
-      }
-      else
-      {
-        selectedRenderWindow = nullptr;
-      }
-
-      auto planeGeometry = dynamic_cast<const mitk::PlaneGeometry*>(planarFigure->GetPlaneGeometry());
-      auto normal = planeGeometry->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer axialPlane = axialRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      auto axialNormal = axialPlane->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer sagittalPlane = sagittalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      auto sagittalNormal = sagittalPlane->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer coronalPlane = coronalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      auto coronalNormal = coronalPlane->GetNormalVnl();
-
-      normal[0]         = fabs(normal[0]);
-      normal[1]         = fabs(normal[1]);
-      normal[2]         = fabs(normal[2]);
-      axialNormal[0]    = fabs(axialNormal[0]);
-      axialNormal[1]    = fabs(axialNormal[1]);
-      axialNormal[2]    = fabs(axialNormal[2]);
-      sagittalNormal[0] = fabs(sagittalNormal[0]);
-      sagittalNormal[1] = fabs(sagittalNormal[1]);
-      sagittalNormal[2] = fabs(sagittalNormal[2]);
-      coronalNormal[0]  = fabs(coronalNormal[0]);
-      coronalNormal[1]  = fabs(coronalNormal[1]);
-      coronalNormal[2]  = fabs(coronalNormal[2]);
-
-      auto ang1 = angle(normal, axialNormal);
-      auto ang2 = angle(normal, sagittalNormal);
-      auto ang3 = angle(normal, coronalNormal);
-
-      if (ang1 < ang2 && ang1 < ang3)
-      {
-        selectedRenderWindow = axialRenderWindow;
-      }
-      else
-      {
-        if (ang2 < ang3)
-        {
-          selectedRenderWindow = sagittalRenderWindow;
-        }
-        else
-        {
-          selectedRenderWindow = coronalRenderWindow;
-        }
-      }
-
-      // re-orient view
-      if (selectedRenderWindow)
-        selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(planeGeometry->GetOrigin(), planeGeometry->GetNormal());
-    }
-
-    break;
-  }
-
+  this->OnSelectedFiguresChanged();
   this->RequestRenderWindowUpdate();
 }
 
-void QmitkMeasurementView::OnDrawLineTriggered(bool checked)
+void QmitkMeasurementView::OnCopyToClipboard()
 {
-  if (!this->BeginDrawAction(d->m_DrawLine, checked))
-    return;
+  const auto* tree = d->m_Controls->measurementsTree;
 
-  this->AddFigureToDataStorage(mitk::PlanarLine::New(), "Line", d->m_LineCounter);
+  std::set<int> rows; // in the order of the tree
+
+  for (auto* item : tree->selectedItems())
+    rows.insert(tree->indexOfTopLevelItem(nullptr != item->parent() ? item->parent() : item));
+
+  if (rows.empty())
+  {
+    for (int i = 0; i < tree->topLevelItemCount(); ++i)
+      rows.insert(i);
+  }
+
+  auto text = QStringLiteral("Figure,Measurement,Value,Unit\n");
+
+  for (const auto row : rows)
+  {
+    const auto it = d->m_Figures.find(GetNode(tree->topLevelItem(row)));
+
+    if (it == d->m_Figures.end())
+      continue;
+
+    const auto& node = it->second.Node;
+    const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
+
+    if (nullptr == figure)
+      continue;
+
+    const auto name = ToCsvField(QString::fromStdString(node->GetName()));
+
+    for (const auto& measurement : figure->GetMeasurements())
+    {
+      text += QStringLiteral("%1,%2,%3,%4\n")
+        .arg(name)
+        .arg(QString::fromStdString(mitk::PlanarFigure::GetDisplayName(measurement.Type)))
+        .arg(QString::number(measurement.Value, 'f', 2))
+        .arg(QString::fromStdString(mitk::PlanarFigure::GetUnitSymbol(measurement.Type)));
+    }
+  }
+
+  QApplication::clipboard()->setText(text, QClipboard::Clipboard);
 }
 
-void QmitkMeasurementView::OnDrawPathTriggered(bool checked)
+void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const std::string& baseName)
 {
-  if (!this->BeginDrawAction(d->m_DrawPath, checked))
-    return;
+  auto dataStorage = this->GetDataStorage();
 
-  mitk::CoreServicePointer<mitk::IPropertyFilters> propertyFilters(mitk::CoreServices::GetPropertyFilters());
-
-  mitk::PropertyFilter filter;
-  filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
-
-  propertyFilters->AddFilter(filter, "PlanarPolygon");
-
-  mitk::PlanarPolygon::Pointer planarFigure = mitk::PlanarPolygon::New();
-  planarFigure->ClosedOff();
-
-  auto node = this->AddFigureToDataStorage(planarFigure, "Path", d->m_PathCounter);
-
-  node->SetProperty("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
-  node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
-
-  d->m_HintLabel->show();
-}
-
-void QmitkMeasurementView::OnDrawAngleTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawAngle, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarAngle::New(), "Angle", d->m_AngleCounter);
-}
-
-void QmitkMeasurementView::OnDrawFourPointAngleTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawFourPointAngle, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarFourPointAngle::New(), "Four Point Angle", d->m_FourPointAngleCounter);
-}
-
-void QmitkMeasurementView::OnDrawCircleTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawCircle, checked))
-    return;
-
-  auto circle = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarCircle::New(d->m_Radius->value()) : mitk::PlanarCircle::New();
-
-  this->AddFigureToDataStorage(circle, "Circle", d->m_CircleCounter);
-}
-
-void QmitkMeasurementView::OnDrawEllipseTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawEllipse, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarEllipse::New(), "Ellipse", d->m_EllipseCounter);
-}
-
-void QmitkMeasurementView::OnDrawDoubleEllipseTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawDoubleEllipse, checked))
-    return;
-
-  auto ellipse = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarDoubleEllipse::New(d->m_Radius->value(),d->m_Thickness->value()) : mitk::PlanarDoubleEllipse::New();
-
-  this->AddFigureToDataStorage(ellipse, "DoubleEllipse", d->m_DoubleEllipseCounter);
-}
-
-void QmitkMeasurementView::OnDrawBezierCurveTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawBezierCurve, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarBezierCurve::New(), "BezierCurve", d->m_BezierCurveCounter);
-
-  d->m_HintLabel->show();
-}
-
-void QmitkMeasurementView::OnDrawSubdivisionPolygonTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawSubdivisionPolygon, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarSubdivisionPolygon::New(), "SubdivisionPolygon", d->m_SubdivisionPolygonCounter);
-
-  d->m_HintLabel->show();
-}
-
-void QmitkMeasurementView::OnDrawRectangleTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawRectangle, checked))
-    return;
-
-  this->AddFigureToDataStorage(mitk::PlanarRectangle::New(), "Rectangle", d->m_RectangleCounter);
-}
-
-void QmitkMeasurementView::OnDrawPolygonTriggered(bool checked)
-{
-  if (!this->BeginDrawAction(d->m_DrawPolygon, checked))
-    return;
-
-  auto planarFigure = mitk::PlanarPolygon::New();
-  planarFigure->ClosedOn();
-
-  auto node = this->AddFigureToDataStorage(planarFigure, "Polygon", d->m_PolygonCounter);
-
-  node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
-
-  d->m_HintLabel->show();
-}
-
-void QmitkMeasurementView::OnCopyToClipboard(bool)
-{
-  QApplication::clipboard()->setText(d->m_SelectedPlanarFiguresText->toPlainText(), QClipboard::Clipboard);
-}
-
-mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& baseName, unsigned int& counter)
-{
   auto newNode = mitk::DataNode::New();
-  newNode->SetName((baseName + QString::number(counter + 1)).toStdString());
+  newNode->SetName(dataStorage->GetUniqueName(baseName));
   newNode->SetData(figure);
+  WriteAppearance(newNode, d->m_NewFigureAppearance);
 
-  if (d->m_SelectedImageNode.IsNotNull())
-  {
-    this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
-  }
-  else
-  {
-    this->GetDataStorage()->Add(newNode);
-  }
-
+  dataStorage->Add(newNode, d->m_SelectedImageNode);
   this->SelectNode(newNode);
 
-  this->UpdateMeasurementText();
-
-  d->m_UninitializedNode = newNode;
-  d->m_PendingCounter = &counter;
+  d->m_PendingNode = newNode;
   d->m_CancelPlacementShortcut->setEnabled(true);
-  d->m_DrawLabel->show();
 
-  // The planar figure interactor ignores points added to a figure that is not
-  // selected, so the placement ends once something else takes the selection,
-  // e.g. the Data Manager when another node gets selected. The cancellation is
-  // deferred to not remove the figure while its deselection is still processed.
+  // A figure being placed is canceled once something else takes the selection,
+  // e.g. the Data Manager when another node gets selected, so no unfinished
+  // figure stays behind. The cancellation is deferred to not remove the figure
+  // while its deselection is still processed.
   d->m_PlacementSelectionObserver.Reset(newNode, itk::ModifiedEvent(), [this](const itk::EventObject&) {
-    if (d->m_UninitializedNode.IsNull() || d->m_UninitializedNode->IsSelected())
+    if (d->m_PendingNode.IsNull() || d->m_PendingNode->IsSelected())
       return;
 
     QTimer::singleShot(0, this, [this]() {
-      if (d->m_UninitializedNode.IsNotNull() && !d->m_UninitializedNode->IsSelected())
+      if (d->m_PendingNode.IsNotNull() && !d->m_PendingNode->IsSelected())
         this->CancelPlacement();
     });
   });
@@ -1046,79 +1226,326 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   // There is only one such geometry per renderer and the Segmentation view claims
   // it for as long as one of its tools is active, so borrow it for the placement
   // and hand it back afterwards instead of clearing it.
-  const auto* referenceData = d->m_SelectedImageNode.IsNotNull() ? d->m_SelectedImageNode->GetData() : nullptr;
-
-  if (nullptr != d->m_RenderWindowPart && nullptr != referenceData)
+  if (nullptr != d->m_RenderWindowPart)
   {
     d->m_RestoreInteractionReferenceGeometry = GetInteractionReferenceGeometry(d->m_RenderWindowPart);
-    this->SetInteractionReferenceGeometry(referenceData->GetTimeGeometry());
+    this->SetInteractionReferenceGeometry(d->m_SelectedImageNode->GetData()->GetTimeGeometry());
   }
-
-  return newNode;
 }
 
-void QmitkMeasurementView::UpdateMeasurementText()
+void QmitkMeasurementView::ScheduleMeasurementTreeUpdate()
 {
-  d->m_SelectedPlanarFiguresText->clear();
+  // Before CreateQtPartControl(), or while an update is pending
+  if (nullptr == d->m_Controls->measurementsTree || d->m_IsMeasurementTreeUpdateScheduled)
+    return;
 
-  QString infoText;
-  QString plainInfoText;
-  int j = 1;
+  d->m_IsMeasurementTreeUpdateScheduled = true;
+  QTimer::singleShot(0, d->m_Controls->measurementsTree, [this]() { this->UpdateMeasurementTree(); });
+}
 
-  mitk::PlanarFigure::Pointer planarFigure;
-  mitk::DataNode::Pointer node;
+std::vector<mitk::DataNode*> QmitkMeasurementView::GetMeasuredFigures() const
+{
+  std::vector<mitk::DataNode*> figures;
 
-  for (int i = 0; i < d->m_CurrentSelection.size(); ++i, ++j)
+  if (d->m_SelectedImageNode.IsNull())
+    return figures;
+
+  auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+  auto derivations = this->GetDataStorage()->GetDerivations(d->m_SelectedImageNode, isPlanarFigure, false);
+
+  for (const auto& node : *derivations)
   {
-    plainInfoText.clear();
-    node = d->m_CurrentSelection[i];
-    planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-
-    if (planarFigure.IsNull())
+    if (d->m_Figures.count(node) == 0)
       continue;
 
-    if (j > 1)
-      infoText.append("<br />");
+    const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
 
-    infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(node->GetName())));
-    plainInfoText.append(QString("%1").arg(QString::fromStdString(node->GetName())));
-
-    double featureQuantity = 0.0;
-
-    for (unsigned int k = 0; k < planarFigure->GetNumberOfFeatures(); ++k)
-    {
-      if (!planarFigure->IsFeatureActive(k))
-        continue;
-
-      featureQuantity = planarFigure->GetQuantity(k);
-
-      infoText.append(QString("<i>%1</i>: %2 %3")
-        .arg(QString(planarFigure->GetFeatureName(k)))
-        .arg(featureQuantity, 0, 'f', 2)
-        .arg(QString(planarFigure->GetFeatureUnit(k))));
-
-      plainInfoText.append(QString("\n%1: %2 %3")
-        .arg(QString(planarFigure->GetFeatureName(k)))
-        .arg(featureQuantity, 0, 'f', 2)
-        .arg(QString(planarFigure->GetFeatureUnit(k))));
-
-      if (k + 1 != planarFigure->GetNumberOfFeatures())
-        infoText.append("<br />");
-    }
-
-    if (j != d->m_CurrentSelection.size())
-      infoText.append("<br />");
+    if (nullptr != figure && figure->IsComplete())
+      figures.push_back(node);
   }
 
-  d->m_SelectedPlanarFiguresText->setHtml(infoText);
+  return figures;
+}
+
+void QmitkMeasurementView::UpdateMeasurementTree()
+{
+  d->m_IsMeasurementTreeUpdateScheduled = false;
+
+  auto* tree = d->m_Controls->measurementsTree;
+  const QSignalBlocker blocker(tree);
+
+  const auto figures = this->GetMeasuredFigures();
+  const auto numberOfFigures = static_cast<int>(figures.size());
+
+  // Icons cannot be compared, so setting them repaints the rows even while only values change.
+  const bool updateIcons = std::exchange(d->m_HaveMeasurementTreeIconsChanged, false);
+
+  for (int i = 0; i < numberOfFigures; ++i)
+  {
+    auto* node = figures[i];
+
+    QTreeWidgetItem* item = nullptr;
+    bool isExpanded = true;
+
+    for (int j = i; j < tree->topLevelItemCount(); ++j)
+    {
+      if (GetNode(tree->topLevelItem(j)) == node)
+      {
+        isExpanded = tree->topLevelItem(j)->isExpanded();
+        item = j == i ? tree->topLevelItem(j) : tree->takeTopLevelItem(j);
+        break;
+      }
+    }
+
+    const bool isNew = nullptr == item;
+
+    if (isNew)
+    {
+      item = new QTreeWidgetItem;
+      item->setData(0, Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(node)));
+      item->setFlags(item->flags() | Qt::ItemIsEditable);
+    }
+
+    if (tree->indexOfTopLevelItem(item) != i)
+    {
+      tree->insertTopLevelItem(i, item);
+      item->setExpanded(isExpanded);
+    }
+
+    SetText(item, 0, QString::fromStdString(node->GetName()));
+
+    if (isNew || updateIcons)
+    {
+      if (auto* descriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node); nullptr != descriptor)
+        item->setIcon(0, descriptor->GetIcon(node));
+    }
+
+    const auto measurements = static_cast<const mitk::PlanarFigure*>(node->GetData())->GetMeasurements();
+    const auto numberOfMeasurements = static_cast<int>(measurements.size());
+
+    while (item->childCount() > numberOfMeasurements)
+      delete item->takeChild(item->childCount() - 1);
+
+    while (item->childCount() < numberOfMeasurements)
+    {
+      // A selection ranges over the figure rows only; otherwise a drag would select the
+      // value rows in between, which the selection of the figures then clears again.
+      auto* child = new QTreeWidgetItem(item);
+      child->setFlags(child->flags() & ~Qt::ItemIsSelectable);
+      child->setTextAlignment(1, Qt::AlignRight | Qt::AlignVCenter);
+    }
+
+    for (int j = 0; j < numberOfMeasurements; ++j)
+    {
+      auto* child = item->child(j);
+      SetText(child, 0, QString::fromStdString(mitk::PlanarFigure::GetDisplayName(measurements[j].Type)));
+      SetText(child, 1, QString::fromStdString(mitk::PlanarFigure::FormatValue(measurements[j])));
+    }
+  }
+
+  while (tree->topLevelItemCount() > numberOfFigures)
+    delete tree->takeTopLevelItem(numberOfFigures);
+
+  this->UpdateMeasurementTreeSelection();
+}
+
+void QmitkMeasurementView::UpdateMeasurementTreeSelection()
+{
+  auto* tree = d->m_Controls->measurementsTree;
+
+  if (nullptr == tree)
+    return; // selection before CreateQtPartControl()
+
+  const QSignalBlocker blocker(tree);
+
+  tree->clearSelection();
+
+  QTreeWidgetItem* firstSelectedItem = nullptr;
+
+  for (int i = 0; i < tree->topLevelItemCount(); ++i)
+  {
+    auto* item = tree->topLevelItem(i);
+    const auto* node = GetNode(item);
+
+    if (std::find(d->m_CurrentSelection.begin(), d->m_CurrentSelection.end(), node) == d->m_CurrentSelection.end())
+      continue;
+
+    item->setSelected(true);
+
+    if (nullptr == firstSelectedItem)
+      firstSelectedItem = item;
+  }
+
+  if (nullptr != firstSelectedItem)
+    tree->scrollToItem(firstSelectedItem);
+
+  this->UpdateCopyButton();
+}
+
+void QmitkMeasurementView::UpdateCopyButton()
+{
+  d->m_Controls->copyButton->setText(d->m_Controls->measurementsTree->selectedItems().empty()
+    ? QStringLiteral("Copy all as CSV")
+    : QStringLiteral("Copy selection as CSV"));
+}
+
+void QmitkMeasurementView::OnMeasurementTreeSelectionChanged()
+{
+  QList<mitk::DataNode::Pointer> nodes;
+
+  for (const auto* item : d->m_Controls->measurementsTree->selectedItems())
+  {
+    if (auto it = d->m_Figures.find(GetNode(item)); it != d->m_Figures.end() && !nodes.contains(it->second.Node))
+      nodes.append(it->second.Node);
+  }
+
+  this->UpdateCopyButton();
+  this->SelectNodes(nodes);
+  this->OnSelectedFiguresChanged();
+  this->RequestRenderWindowUpdate();
+}
+
+void QmitkMeasurementView::OnMeasurementTreeItemActivated(const QTreeWidgetItem* item)
+{
+  if (nullptr == item)
+    return;
+
+  // A value row stands for its figure.
+  if (nullptr != item->parent())
+    item = item->parent();
+
+  if (auto it = d->m_Figures.find(GetNode(item)); it != d->m_Figures.end())
+    this->ShowFigure(it->second.Node);
+}
+
+void QmitkMeasurementView::OnMeasurementTreeItemChanged(QTreeWidgetItem* item, int column)
+{
+  // The tree is updated with its signals blocked, so this is a rename by the user.
+  if (0 != column || nullptr != item->parent())
+    return;
+
+  const auto it = d->m_Figures.find(GetNode(item));
+
+  if (it == d->m_Figures.end())
+    return;
+
+  const auto& node = it->second.Node;
+  const auto name = item->text(0).trimmed();
+
+  if (!name.isEmpty())
+    node->SetName(name.toStdString());
+
+  // Shows the trimmed name, or the previous one instead of an empty one.
+  const QSignalBlocker blocker(d->m_Controls->measurementsTree);
+  SetText(item, 0, QString::fromStdString(node->GetName()));
+
+  this->RequestRenderWindowUpdate();
+}
+
+bool QmitkMeasurementView::eventFilter(QObject* watched, QEvent* event)
+{
+  auto* tree = d->m_Controls->measurementsTree;
+
+  if (nullptr != tree && watched == tree->viewport() &&
+      (QEvent::MouseButtonPress == event->type() || QEvent::MouseButtonDblClick == event->type()))
+  {
+    const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+    const auto* item = tree->itemAt(mouseEvent->position().toPoint());
+    auto* figureItem = nullptr != item ? item->parent() : nullptr;
+
+    // Pressing a value row would clear the selection, since the row is not selectable.
+    // Shift is left to Qt: its range reaches the figure rows up to the value row anyway.
+    if (nullptr != figureItem && Qt::LeftButton == mouseEvent->button() && !mouseEvent->modifiers().testFlag(Qt::ShiftModifier))
+    {
+      const auto command = mouseEvent->modifiers().testFlag(Qt::ControlModifier)
+        ? QItemSelectionModel::Toggle
+        : QItemSelectionModel::ClearAndSelect;
+
+      tree->setCurrentItem(figureItem, 0, command | QItemSelectionModel::Rows);
+      this->OnMeasurementTreeItemActivated(figureItem);
+      return true;
+    }
+  }
+
+  return QmitkAbstractView::eventFilter(watched, event);
+}
+
+void QmitkMeasurementView::ShowFigure(const mitk::DataNode* node)
+{
+  if (nullptr == d->m_RenderWindowPart)
+    return;
+
+  const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
+  const auto* plane = nullptr != figure ? figure->GetPlaneGeometry() : nullptr;
+
+  if (nullptr == plane || !figure->IsComplete())
+    return;
+
+  const auto points = figure->GetControlPoints();
+
+  mitk::Vector2D sum;
+  sum.Fill(0.0);
+
+  for (const auto& point : points)
+    sum += point.GetVectorFromOrigin();
+
+  mitk::Point2D planeCenter;
+  planeCenter.Fill(0.0);
+  planeCenter += sum / static_cast<double>(points.size());
+
+  mitk::Point3D center;
+  plane->Map(planeCenter, center);
+
+  d->m_RenderWindowPart->SetSelectedPosition(center);
+
+  // A figure drawn on a rotated slice lies in no plane of views that are aligned to the image again.
+  auto normal = plane->GetNormal();
+  normal.Normalize();
+
+  QmitkRenderWindow* closestRenderWindow = nullptr;
+  double closestAlignment = -1.0;
+
+  for (auto* renderWindow : d->m_RenderWindowPart->GetQmitkRenderWindows())
+  {
+    auto* renderer = renderWindow->GetRenderer();
+
+    if (nullptr == renderer || mitk::BaseRenderer::Standard2D != renderer->GetMapperID())
+      continue;
+
+    const auto* rendererPlane = renderer->GetCurrentWorldPlaneGeometry();
+
+    if (nullptr == rendererPlane)
+      continue;
+
+    auto rendererNormal = rendererPlane->GetNormal();
+    rendererNormal.Normalize();
+
+    const auto alignment = std::abs(normal * rendererNormal);
+
+    // Planes of rotated views carry the rounding errors of the rotation.
+    if (alignment > 1.0 - 1e-6)
+      return; // shown already
+
+    if (alignment > closestAlignment)
+    {
+      closestAlignment = alignment;
+      closestRenderWindow = renderWindow;
+    }
+  }
+
+  if (nullptr != closestRenderWindow)
+  {
+    closestRenderWindow->GetSliceNavigationController()->ReorientSlices(center, plane->GetNormal());
+    this->RequestRenderWindowUpdate();
+  }
 }
 
 void QmitkMeasurementView::AddAllInteractors()
 {
   auto planarFigures = this->GetAllPlanarFigures();
 
-  for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
-    this->NodeAdded(it.Value());
+  for (const auto& node : *planarFigures)
+    this->NodeAdded(node);
 }
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkMeasurementView::GetAllPlanarFigures() const

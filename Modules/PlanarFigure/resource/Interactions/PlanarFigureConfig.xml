@@ -1,30 +1,89 @@
 <config>
-  <!-- Undeclared tags are filled with standard values -->
-  <!-- Mouse Events -->
-  <!-- MousePressEvents -->
+  <!-- In logical pixels: the reach of handles and strokes beyond their size, and how far a press moves before it drags. -->
+  <param name="hitTolerance" value="4" />
+  <param name="dragThreshold" value="3" />
+
+  <!-- Variants match modifiers and held buttons exactly. Moves and releases are mapped with every combination of
+       Shift, Ctrl and Alt, or with the other buttons held, so a drag or placement cannot get stuck on them. -->
   <event_variant class="MousePressEvent" name="PrimaryButtonPressed">
     <attribute name="EventButton" value="LeftMouseButton" />
   </event_variant>
-  <event_variant class="MousePressEvent" name="SecondaryButtonPressed">
-    <attribute name="EventButton" value="RightMouseButton" />
+  <event_variant class="MousePressEvent" name="CtrlPrimaryButtonPressed">
+    <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="ctrl" />
   </event_variant>
 
   <event_variant class="MouseDoubleClickEvent" name="PrimaryButtonDoubleClick">
     <attribute name="EventButton" value="LeftMouseButton" />
   </event_variant>
 
-
-  <!-- MouseMoveEvents -->
   <event_variant class="MouseMoveEvent" name="MouseMove" />
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="shift" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="ctrl" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="shift,ctrl" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="shift,alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="ctrl,alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove">
+    <attribute name="Modifiers" value="shift,ctrl,alt" />
+  </event_variant>
+
   <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
     <attribute name="ButtonState" value="LeftMouseButton" />
   </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="ctrl" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,ctrl" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="ctrl,alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,ctrl,alt" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton,RightMouseButton" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton,MiddleMouseButton" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton,RightMouseButton,MiddleMouseButton" />
+  </event_variant>
 
-  <!-- MouseReleaseEvents -->
   <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton" />
   </event_variant>
-  <!-- Variants match modifiers and held buttons exactly; a release must end a drag whatever else is held -->
   <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton" />
     <attribute name="Modifiers" value="shift" />
@@ -39,16 +98,50 @@
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,ctrl" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,alt" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="ctrl,alt" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="Modifiers" value="shift,ctrl,alt" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
     <attribute name="ButtonState" value="RightMouseButton" />
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton" />
     <attribute name="ButtonState" value="MiddleMouseButton" />
   </event_variant>
-
-  <event_variant class="InternalEvent" name="Dummy-Event" >
-    <attribute name="SignalName" value="Dummy-Event" />
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
+    <attribute name="ButtonState" value="RightMouseButton,MiddleMouseButton" />
   </event_variant>
 
+  <event_variant class="InteractionKeyEvent" name="CtrlKeyPressed">
+    <attribute name="Key" value="Control" />
+  </event_variant>
+  <event_variant class="InteractionKeyReleaseEvent" name="CtrlKeyReleased">
+    <attribute name="Key" value="Control" />
+  </event_variant>
 
+  <event_variant class="InteractionKeyEvent" name="Finish">
+    <attribute name="Key" value="Return" />
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="Finish">
+    <attribute name="Key" value="Enter" />
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="RemoveLastPoint">
+    <attribute name="Key" value="Backspace" />
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="RemoveLastPoint">
+    <attribute name="Key" value="Delete" />
+  </event_variant>
 </config>

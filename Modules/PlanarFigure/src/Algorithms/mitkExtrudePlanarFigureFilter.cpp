@@ -20,22 +20,20 @@ found in the LICENSE file.
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
 
-static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType &polyLine)
+static mitk::Point2D GetCenterPoint(const std::vector<mitk::Point2D> &points)
 {
   mitk::Point2D centerPoint;
 
   centerPoint[0] = 0;
   centerPoint[1] = 0;
 
-  auto polyLineEnd = polyLine.cend();
-
-  for (auto polyLineIter = polyLine.cbegin(); polyLineIter != polyLineEnd; ++polyLineIter)
+  for (const auto &point : points)
   {
-    centerPoint[0] += static_cast<mitk::Point2D>(*polyLineIter)[0];
-    centerPoint[1] += static_cast<mitk::Point2D>(*polyLineIter)[1];
+    centerPoint[0] += point[0];
+    centerPoint[1] += point[1];
   }
 
-  const size_t numPoints = polyLine.size();
+  const size_t numPoints = points.size();
 
   centerPoint[0] /= numPoints;
   centerPoint[1] /= numPoints;
@@ -43,25 +41,23 @@ static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType &poly
   return centerPoint;
 }
 
-static mitk::Point2D GetCenterPoint(mitk::PlanarFigure *planarFigure)
+static mitk::Point2D GetCenterPoint(const std::vector<mitk::PlanarFigure::Contour> &contours)
 {
   mitk::Point2D centerPoint;
 
   centerPoint[0] = 0;
   centerPoint[1] = 0;
 
-  const size_t numPolyLines = planarFigure->GetPolyLinesSize();
-
-  for (size_t i = 0; i < numPolyLines; ++i)
+  for (const auto &contour : contours)
   {
-    const mitk::Point2D polyLineCenterPoint = GetCenterPoint(planarFigure->GetPolyLine(i));
+    const mitk::Point2D contourCenterPoint = GetCenterPoint(contour.Points);
 
-    centerPoint[0] += polyLineCenterPoint[0];
-    centerPoint[1] += polyLineCenterPoint[1];
+    centerPoint[0] += contourCenterPoint[0];
+    centerPoint[1] += contourCenterPoint[1];
   }
 
-  centerPoint[0] /= numPolyLines;
-  centerPoint[1] /= numPolyLines;
+  centerPoint[0] /= contours.size();
+  centerPoint[1] /= contours.size();
 
   return centerPoint;
 }
@@ -116,10 +112,10 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   if (input == nullptr)
     mitkThrow() << "Primary input is not a planar figure!";
 
-  size_t numPolyLines = input->GetPolyLinesSize();
+  const auto contours = input->GetContours();
 
-  if (numPolyLines == 0)
-    mitkThrow() << "Primary input does not contain any poly lines!";
+  if (contours.empty())
+    mitkThrow() << "Primary input does not contain any contours!";
 
   const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
 
@@ -129,7 +125,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   Vector3D planeNormal = planeGeometry->GetNormal();
   planeNormal.Normalize();
 
-  const Point2D centerPoint2d = GetCenterPoint(input);
+  const Point2D centerPoint2d = GetCenterPoint(contours);
 
   Point3D centerPoint3d;
   planeGeometry->Map(centerPoint2d, centerPoint3d);
@@ -147,22 +143,20 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
   vtkIdType baseIndex = 0;
 
-  for (size_t i = 0; i < numPolyLines; ++i)
+  for (size_t i = 0; i < contours.size(); ++i)
   {
-    const auto& polyLine = input->GetPolyLine(i);
-    const size_t numPoints = polyLine.size();
+    const auto &contour = contours[i];
+    const size_t numPoints = contour.Points.size();
 
     if (numPoints < 2)
-      mitkThrow() << "Poly line " << i << " of primary input consists of less than two points!";
+      mitkThrow() << "Contour " << i << " of primary input consists of less than two points!";
 
     std::vector<mitk::Point3D> crossSection;
 
-    auto polyLineEnd = polyLine.end();
-
-    for (auto polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
+    for (const auto &contourPoint : contour.Points)
     {
       Point3D point;
-      planeGeometry->Map(*polyLineIter, point);
+      planeGeometry->Map(contourPoint, point);
       crossSection.push_back(point);
     }
 
@@ -233,7 +227,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
         cells->InsertNextCell(3, cell);
       }
 
-      if (input->IsClosed() && numPoints > 2)
+      if (contour.Closed && numPoints > 2)
       {
         vtkIdType cell[3];
         cell[0] = baseIndex + j * numPoints + (numPoints - 1);
@@ -249,7 +243,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
       }
     }
 
-    baseIndex += points->GetNumberOfPoints();
+    baseIndex = points->GetNumberOfPoints();
   }
 
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();

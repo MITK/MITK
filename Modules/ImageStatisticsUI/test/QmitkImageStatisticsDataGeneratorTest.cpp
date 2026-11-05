@@ -12,6 +12,10 @@ found in the LICENSE file.
 
 #include <QmitkImageStatisticsDataGenerator.h>
 #include <QApplication>
+#include <QEventLoop>
+#include <QSemaphore>
+#include <QThreadPool>
+#include <QTimer>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
 #include <mitkPlanarFigure.h>
@@ -78,6 +82,8 @@ class QmitkImageStatisticsDataGeneratorTestSuite : public mitk::TestFixture
   MITK_TEST(InputChangedTest);
   MITK_TEST(SettingsChangedTest);
   MITK_TEST(DataStorageModificationTest);
+  MITK_TEST(ChangesAreCollectedTest);
+  MITK_TEST(EditDuringJobTest);
   MITK_TEST(FailedJobTest);
   CPPUNIT_TEST_SUITE_END();
 
@@ -139,6 +145,14 @@ public:
     delete m_TestApp;
   }
 
+
+  /** Runs the event loop longer than the generator waits for changes to settle (250 ms), so a generation it wrongly starts shows. */
+  void ProcessEventsBeyondRecheck()
+  {
+    QEventLoop loop;
+    QTimer::singleShot(500, &loop, &QEventLoop::quit);
+    loop.exec();
+  }
 
   bool CheckResultNode(const std::vector<mitk::DataNode::Pointer> resultNodes, const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, unsigned int histBin = 100, bool noZero = false)
   {
@@ -360,7 +374,7 @@ public:
     QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode2 };
 
     generator.SetImageNodes(imageNodes);
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationFinishedEmited);
@@ -379,7 +393,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 1 == generator.m_NewDataAvailable.size());
 
     generator.SetImageNodes(imageNodes);
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 1, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 1, generator.m_GenerationFinishedEmited);
@@ -445,7 +459,7 @@ public:
     CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[3]->front() }, m_ImageNode1, nullptr, 5, true));
 
     generator.SetHistogramNBins(5);
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 4, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 4, generator.m_GenerationFinishedEmited);
@@ -462,7 +476,7 @@ public:
     CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[4]->front() }, m_ImageNode1, nullptr, 5, false));
 
     generator.SetIgnoreZeroValueVoxel(false);
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 5, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 5, generator.m_GenerationFinishedEmited);
@@ -488,7 +502,7 @@ public:
 
     m_PF->Modified();
     m_PFNode->Modified();
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
@@ -516,7 +530,7 @@ public:
 
 
     m_DataStorage->Add(mitk::DataNode::New());
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
@@ -525,12 +539,83 @@ public:
 
     m_Image2->Modified();
     m_ImageNode2->Modified();
-    m_TestApp->processEvents();
+    this->ProcessEventsBeyondRecheck();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
+  }
+
+  void ChangesAreCollectedTest()
+  {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_PFNode };
+
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+
+    // Like dragging a planar figure: the ROI changes again and again in quick
+    // succession.
+    generator.SetAutoUpdate(true);
+
+    for (int i = 0; i < 5; ++i)
+    {
+      m_PF->Modified();
+      m_PFNode->Modified();
+      m_TestApp->processEvents();
+    }
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Generation started before the changes settled.", 1, generator.m_DataGenerationStartedEmited);
+
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Changes were not collected into one generation.", 2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(2 == generator.m_NewDataAvailable.size());
+  }
+
+  void EditDuringJobTest()
+  {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_PFNode };
+
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
+    generator.SetAutoUpdate(true);
+
+    // With the only thread of the pool blocked, the job computes after the edit,
+    // so its result is newer than the edit although it describes the figure before.
+    auto* threadPool = QThreadPool::globalInstance();
+    const auto maxThreadCount = threadPool->maxThreadCount();
+    threadPool->setMaxThreadCount(1);
+
+    QSemaphore blocker;
+    threadPool->start([&blocker]() { blocker.acquire(); });
+
+    generator.Generate();
+
+    m_PF->Modified();
+    m_PFNode->Modified();
+
+    blocker.release();
+    m_TestApp->exec();
+
+    threadPool->waitForDone();
+    threadPool->setMaxThreadCount(maxThreadCount);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: The result of the figure before the edit was taken as current.", 2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(generator.Generate());
   }
 
   void FailedJobTest()

@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <MitkPlanarFigureExports.h>
 
-#include <mitkCommon.h>
 #include <mitkDataInteractor.h>
+#include <mitkInteractionPositionEvent.h>
 #include <mitkNumericTypes.h>
 
 #ifdef __GNUC__
@@ -27,14 +27,16 @@ found in the LICENSE file.
 #pragma GCC visibility pop
 #endif
 
+#include <vtkRenderWindow.h>
+#include <vtkWeakPointer.h>
+
+#include <optional>
+#include <string>
+
 namespace mitk
 {
-  class DataNode;
-  class PlaneGeometry;
-  class PlanarFigure;
-  class PositionEvent;
   class BaseRenderer;
-  class InteractionPositionEvent;
+  class PlanarFigure;
   class StateMachineAction;
 
 #ifdef __GNUC__
@@ -43,14 +45,9 @@ namespace mitk
 
   // Define events for PlanarFigure interaction notifications
   itkEventMacroDeclaration(PlanarFigureEvent, itk::AnyEvent);
-  itkEventMacroDeclaration(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(SelectPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacroDeclaration(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacroDeclaration(StartHoverPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacroDeclaration(EndHoverPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacroDeclaration(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(PointMovedPlanarFigureEvent, PlanarFigureEvent);
 
 #ifdef __GNUC__
@@ -58,23 +55,42 @@ namespace mitk
 #endif
 
   /**
-   * \brief Interactor for creating, editing, and manipulating PlanarFigure objects.
+   * \brief Places and edits planar figures in 2D render windows.
    *
-   * Handles mouse-based interaction with PlanarFigure objects, including:
-   * - Placement of new planar figures by clicking control points
-   * - Selection and hovering of existing figures
-   * - Moving control points to modify figure geometry
-   * - Adding and removing control points
-   * - Context menu requests
+   * A figure without control points is placed by the first press: a span
+   * from the press to the release, or to the next click, for figures placed
+   * by a span; one point per click for the others, finished by a double
+   * click or Enter, where Backspace or Delete removes the last point. A
+   * figure whose shape is locked follows the mouse until it is dropped by a
+   * click; beside the image it is hidden, and a click does not drop it.
    *
-   * Emits various events (StartPlacementPlanarFigureEvent, EndPlacementPlanarFigureEvent,
-   * SelectPlanarFigureEvent, etc.) that other components can observe.
+   * Placed figures show their handles while hovered. Dragging a handle moves
+   * it, dragging the stroke or the inside moves the whole figure. Pressing a
+   * figure selects it. Centers and vertices stay within the bounds of the
+   * plane, extents of round figures may leave them. Figures that can insert
+   * control points take a new one by Ctrl+click on their stroke, which can be
+   * dragged right away, and lose one by Ctrl+click on it.
    *
-   * The interaction behavior is defined by a state machine configuration loaded
-   * during construction.
+   * The cursor of the render window shows what a press would do: a pointing
+   * hand on handles, a move cursor on strokes and insides, and a crosshair
+   * where Ctrl+click would insert or remove a point.
    *
-   * \ingroup MitkPlanarFigureModule
-   * \sa PlanarFigure, PlanarFigureMapper2D, DataInteractor
+   * Placed figures ignore input while an armed tool holds the
+   * ExclusiveInteraction, e.g. so that a new figure can be started inside
+   * them. Where visible figures overlap, the inside of a figure yields to
+   * figures hit at their handles or strokes, and to figures with a smaller
+   * inside, and a stroke yields to figures hit at their handles.
+   *
+   * The figure is notified by EndPlacementPlanarFigureEvent,
+   * SelectPlanarFigureEvent (only when a press hits a figure whose node is
+   * not selected yet, so a selection of several nodes is kept),
+   * PointMovedPlanarFigureEvent and EndInteractionPlanarFigureEvent. Mappers
+   * read what to highlight from GetFeedback().
+   *
+   * Configuration parameters, in logical pixels: \c hitTolerance (4) around
+   * handles and strokes, \c dragThreshold (3) a press has to move to drag.
+   *
+   * \sa PlanarFigure, PlanarFigureVtkMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarFigureInteractor : public DataInteractor
   {
@@ -83,162 +99,145 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    /**
-     * \brief Sets the precision for picking control points and figure edges.
-     *
-     * Defines how close (in display coordinates) a mouse click must be
-     * to a control point or figure edge to select it.
-     *
-     * \param[in] precision The precision value in display units.
-     */
-    void SetPrecision(ScalarType precision);
+    /** \brief What a render window shows of the interaction with the figure. */
+    struct Feedback
+    {
+      const BaseRenderer *Renderer = nullptr;
+      bool IsHovered = false;
+      std::optional<std::size_t> HoveredHandle;
 
-    /**
-     * \brief Sets the minimal distance between two control points.
-     *
-     * Prevents adding a new control point too close to an existing one.
-     *
-     * \param[in] minimumDistance The minimum allowed distance between control points.
-     */
-    void SetMinimumPointDistance(ScalarType minimumDistance);
+      /** \brief Where a Ctrl+click would insert a control point, in plane coordinates. */
+      std::optional<Point2D> InsertionPreview;
 
-    /**
-     * \brief Enables continuous points mode.
-     *
-     * In this mode, control points are added continuously while moving the
-     * mouse, rather than requiring individual clicks.
-     */
-    void EnableContinuousPointsMode();
+      /** \brief Whether a Ctrl+click would remove the hovered handle. */
+      bool IsRemovalPreview = false;
+
+      bool operator==(const Feedback &) const = default;
+    };
+
+    /** \brief The feedback for a render window; empty for other windows than the one interacted in. */
+    Feedback GetFeedback(const BaseRenderer *renderer) const;
 
   protected:
     PlanarFigureInteractor();
     ~PlanarFigureInteractor() override;
 
     void ConnectActionsAndFunctions() override;
-
-    ////////  Conditions ////////
-    bool CheckFigurePlaced(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureHovering(const InteractionEvent *interactionEvent);
-
-    bool CheckControlPointHovering(const InteractionEvent *interactionEvent);
-
-    bool CheckSelection(const InteractionEvent *interactionEvent);
-
-    bool CheckPointValidity(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureFinished(const InteractionEvent *interactionEvent);
-
-    bool CheckResetOnPointSelect(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureOnRenderingGeometry(const InteractionEvent *interactionEvent);
-
-    bool CheckMinimalFigureFinished(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureIsExtendable(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureIsDeletable(const InteractionEvent *interactionEvent);
-
-    bool CheckFigureIsEditable(const InteractionEvent *interactionEvent);
-
-    bool CheckContinuousPointsMode(const InteractionEvent* interactionEvent);
-
-    ////////  Actions ////////
-
-    void FinalizeFigure(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void MoveCurrentPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void DeselectPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void AddPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void AddInitialPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void StartHovering(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void EndHovering(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void DeleteFigure(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void PerformPointResetOnSelect(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void SetPreviewPointPosition(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void HidePreviewPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void HideControlPoints(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void RemoveSelectedPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void RequestContextMenu(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void SelectFigure(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void SelectPoint(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    void EndInteraction(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    bool FilterEvents(InteractionEvent *interactionEvent, DataNode *) override;
-
-    /**
-      \brief Used when clicking to determine if a point is too close to the previous point.
-      */
-    bool IsMousePositionAcceptableAsNewControlPoint(const mitk::InteractionPositionEvent *positionEvent,
-                                                    const PlanarFigure *);
-
-    bool TransformPositionEventToPoint2D(const InteractionPositionEvent *positionEvent,
-                                         const PlaneGeometry *planarFigureGeometry,
-                                         Point2D &point2D);
-
-    bool TransformObjectToDisplay(const mitk::Point2D &point2D,
-                                  mitk::Point2D &displayPoint,
-                                  const mitk::PlaneGeometry *objectGeometry,
-                                  const mitk::PlaneGeometry *rendererGeometry,
-                                  const mitk::BaseRenderer *renderer) const;
-
-    /** \brief Returns true if the first specified point is in proximity of the line defined
-     * the other two point; false otherwise.
-     *
-     * Proximity is defined as the rectangle around the line with pre-defined distance
-     * from the line. */
-    bool IsPointNearLine(const mitk::Point2D &point,
-                         const mitk::Point2D &startPoint,
-                         const mitk::Point2D &endPoint,
-                         mitk::Point2D &projectedPoint) const;
-
-    /** \brief Returns true if the point contained in the passed event (in display coordinates)
-     * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
-    int IsPositionOverFigure(const InteractionPositionEvent *positionEvent,
-                             PlanarFigure *planarFigure,
-                             const PlaneGeometry *planarFigureGeometry,
-                             const PlaneGeometry *rendererGeometry,
-                             Point2D &pointProjectedOntoLine) const;
-
-    /** \brief Returns the index of the marker (control point) over which the point contained
-     * in the passed event (in display coordinates) currently is; -1 if the point is not over
-     * a marker. */
-    int IsPositionInsideMarker(const InteractionPositionEvent *positionEvent,
-                               const PlanarFigure *planarFigure,
-                               const PlaneGeometry *planarFigureGeometry,
-                               const PlaneGeometry *rendererGeometry,
-                               const BaseRenderer *renderer) const;
-
-    void LogPrintPlanarFigureQuantities(const PlanarFigure *planarFigure);
-
     void ConfigurationChanged() override;
+    void DataNodeChanged() override;
+    bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 
   private:
-    /** \brief to store the value of precision to pick a point */
-    ScalarType m_Precision;
+    enum class HitKind
+    {
+      None,
+      Handle,
+      Removal,
+      Insertion,
+      Stroke,
+      Interior
+    };
 
-    /** \brief Store the minimal distance between two control points. */
-    ScalarType m_MinimumPointDistance;
+    struct Hit
+    {
+      HitKind Kind = HitKind::None;
 
-    /** \brief True if the mouse is currently hovering over the image. */
-    bool m_IsHovering;
+      /** \brief The handle hit, also for a removal. */
+      std::optional<std::size_t> Handle;
 
-    bool m_ContinuousPointsMode = false;
+      /** \brief For an insertion, the index of the new control point and its position in plane coordinates. */
+      std::size_t InsertionIndex = 0;
+      Point2D InsertionPosition = Point2D(0.0);
+    };
+
+    PlanarFigure *GetFigure() const;
+
+    /** \brief Position of the event in plane coordinates of the figure, or nothing if the event is not in its plane. */
+    std::optional<Point2D> GetPlanePosition(const InteractionEvent *interactionEvent) const;
+
+    /** \brief Where the position hits the figure, regardless of other figures. Held Ctrl turns hits into insertions and removals. */
+    Hit HitTest(const InteractionPositionEvent *positionEvent, bool isControlHeld) const;
+
+    /**
+     * \brief Where the event hits the figure, or nothing if the hit is left to an armed tool or another figure.
+     *
+     * Events without a position, like a press of Ctrl, are taken at the position of the last move.
+     */
+    Hit GetHit(const InteractionEvent *interactionEvent) const;
+    double GetMillimetersPerPixel(const BaseRenderer *renderer) const;
+    double GetDisplayDistance(const InteractionEvent *interactionEvent, const Point2D &displayPosition) const;
+
+    /**
+     * \brief Replaces the feedback and updates the render windows of the previous and the new one.
+     *
+     * Feedback of another interactor is cleared, since the dispatcher may not
+     * have sent it the event that moved the mouse away from its figure.
+     */
+    void SetFeedback(const Feedback &feedback, vtkRenderWindow *renderWindow);
+
+    bool IsEmpty(const InteractionEvent *interactionEvent);
+    bool IsOnFlatPlane(const InteractionEvent *interactionEvent);
+    bool IsPlacedBySpan(const InteractionEvent *interactionEvent);
+    bool IsStamp(const InteractionEvent *interactionEvent);
+    bool IsInsideSlice(const InteractionEvent *interactionEvent);
+    bool IsComplete(const InteractionEvent *interactionEvent);
+    bool IsHit(const InteractionEvent *interactionEvent);
+    bool IsBeyondDragThreshold(const InteractionEvent *interactionEvent);
+    bool IsValidPoint(const InteractionEvent *interactionEvent);
+    bool ReachesMaximum(const InteractionEvent *interactionEvent);
+    bool CanFinish(const InteractionEvent *interactionEvent);
+    bool IsRemovable(const InteractionEvent *interactionEvent);
+    bool IsInsertable(const InteractionEvent *interactionEvent);
+
+    void UpdateHover(StateMachineAction *, InteractionEvent *interactionEvent);
+    void EndHover(StateMachineAction *, InteractionEvent *interactionEvent);
+    void Press(StateMachineAction *, InteractionEvent *interactionEvent);
+    void Drag(StateMachineAction *, InteractionEvent *interactionEvent);
+    void EndDrag(StateMachineAction *, InteractionEvent *interactionEvent);
+    void RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void InsertPoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void BeginPlacement(StateMachineAction *, InteractionEvent *interactionEvent);
+    void MoveFloatingPoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void AppendPoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void RemoveFloatingPoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void RemoveLastPoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    void EndPlacement(StateMachineAction *, InteractionEvent *interactionEvent);
+    void MoveStamp(StateMachineAction *, InteractionEvent *interactionEvent);
+    void HideStamp(StateMachineAction *, InteractionEvent *interactionEvent);
+
+    /** \brief Shows the stamp in the given window only, or nowhere for nullptr. */
+    void ShowStampIn(const BaseRenderer *renderer);
+
+    // In logical pixels, also for configurations that leave them out or give invalid values.
+    static constexpr double DefaultHitTolerance = 4.0;
+    static constexpr double DefaultDragThreshold = 3.0;
+
+    double m_HitTolerance = DefaultHitTolerance;
+    double m_DragThreshold = DefaultDragThreshold;
+
+    Feedback m_Feedback;
+
+    vtkWeakPointer<vtkRenderWindow> m_FeedbackWindow;
+
+    /** \brief Where the last press happened, in display coordinates. */
+    Point2D m_PressPosition;
+
+    /** \brief The last event with a position while hovering, for events without one. */
+    InteractionPositionEvent::ConstPointer m_LastMove;
+
+    /**
+     * \brief What the last press grabbed, and the offset of the grabbed handle,
+     * or of the first control point for the whole figure, from the press in
+     * plane coordinates.
+     */
+    Hit m_Grab;
+    Vector2D m_GrabOffset;
+
+    /** \brief Where the span of the figure being placed starts, in plane coordinates. */
+    Point2D m_SpanStart;
+
+    /** \brief The name of the renderer that shows the stamp, or empty while it is hidden. */
+    std::string m_StampRendererName;
   };
 }
 

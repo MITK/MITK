@@ -19,7 +19,9 @@ found in the LICENSE file.
 #include <mitkSceneIO.h>
 #include <mitkSceneIOTestScenarioProvider.h>
 
+#include <mitkCoreServices.h>
 #include <mitkDataNode.h>
+#include <mitkIPropertyMigration.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -96,6 +98,7 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   MITK_TEST(Test_ReconstructionOfScenes);
   MITK_TEST(Test_SelectedPropertyNotPersisted);
   MITK_TEST(Test_SelectedPropertyNotPersistedForDataLessNode);
+  MITK_TEST(Test_LegacyPropertiesMigratedOnLoad);
   MITK_TEST(Test_SurfaceTimeKept);
   MITK_TEST(Test_StaticSurfaceWithTimePropertiesStaysStatic);
   CPPUNIT_TEST_SUITE_END();
@@ -289,6 +292,57 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be persisted for a data-less node",
                            !hasSelected || !selected);
     CPPUNIT_ASSERT_MESSAGE("Non-transient 'name' must survive", restoredNode->GetName() == "group");
+  }
+
+  void Test_LegacyPropertiesMigratedOnLoad()
+  {
+    // The keys are unique to this test, since migrations stay registered for
+    // the lifetime of the process.
+    mitk::CoreServicePointer<mitk::IPropertyMigration> migration(mitk::CoreServices::GetPropertyMigration());
+    migration->AddMigration<mitk::PointSet>("sceneiotest.legacy width",
+      [](const mitk::BaseData *, const mitk::BaseProperty &legacyProperty, mitk::PropertyList &properties) {
+        properties.SetProperty("sceneiotest.width", legacyProperty.Clone());
+      });
+    migration->AddRemoval<mitk::PointSet>("sceneiotest.legacy flag");
+
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    auto node = mitk::DataNode::New();
+    auto pointSet = mitk::PointSet::New();
+    mitk::Point3D point;
+    point.Fill(1.0);
+    pointSet->InsertPoint(0, point); // empty point sets are not saved
+    pointSet->GetPropertyList()->SetBoolProperty("sceneiotest.legacy flag", true);
+    node->SetData(pointSet);
+    node->SetName("legacy");
+    node->SetFloatProperty("sceneiotest.legacy width", 4.0f);
+    node->GetPropertyList("stdmulti.widget0")->SetFloatProperty("sceneiotest.legacy width", 5.0f);
+    originalStorage->Add(node);
+
+    mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
+    CPPUNIT_ASSERT_MESSAGE("Saving scene with legacy properties",
+                           writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::SceneIO::Pointer reader = mitk::SceneIO::New();
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
+
+    mitk::DataNode::Pointer restoredNode = restoredStorage->GetNamedNode("legacy");
+    CPPUNIT_ASSERT_MESSAGE("Reloaded node must exist", restoredNode.IsNotNull());
+
+    float width = 0.0f;
+    CPPUNIT_ASSERT_MESSAGE("Node property is migrated", restoredNode->GetFloatProperty("sceneiotest.width", width));
+    CPPUNIT_ASSERT_EQUAL(4.0f, width);
+    CPPUNIT_ASSERT_MESSAGE("Legacy node property is gone", restoredNode->GetProperty("sceneiotest.legacy width") == nullptr);
+
+    auto *rendererList = restoredNode->GetPropertyList("stdmulti.widget0");
+    CPPUNIT_ASSERT_MESSAGE("Render-window property is migrated", rendererList->GetFloatProperty("sceneiotest.width", width));
+    CPPUNIT_ASSERT_EQUAL(5.0f, width);
+    CPPUNIT_ASSERT_MESSAGE("Legacy render-window property is gone", rendererList->GetProperty("sceneiotest.legacy width") == nullptr);
+
+    CPPUNIT_ASSERT_MESSAGE("Legacy data property is gone",
+                           restoredNode->GetData()->GetProperty("sceneiotest.legacy flag").IsNull());
   }
 
 }; // class

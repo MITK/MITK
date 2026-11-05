@@ -37,6 +37,7 @@ class QmitkImageStatisticsTreeModelTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(QmitkImageStatisticsTreeModelTestSuite);
   MITK_TEST(ImageNodeRenamed_ModelIsUpdated);
   MITK_TEST(ImageNodeWithNameOnDataRenamed_ModelIsUpdated);
+  MITK_TEST(MaskModified_RowStaysAsPending);
   MITK_TEST(MaskNodeRenamed_ModelIsUpdated);
   MITK_TEST(LabelRenamed_ModelIsUpdated);
   MITK_TEST(LabelRenamedToAmbiguousName_ModelShowsDisambiguation);
@@ -419,6 +420,23 @@ public:
     Settle();
 
     CPPUNIT_ASSERT_EQUAL(std::string("Renamed on data"), ImageText(model));
+  }
+
+  void MaskModified_RowStaysAsPending()
+  {
+    QmitkImageStatisticsTreeModel model;
+    this->SetUpModel(model);
+
+    CPPUNIT_ASSERT_MESSAGE("Precondition failed: the statistics are not shown.",
+      std::string("...") != Text(model, model.index(0, 1, MaskIndex(model))));
+
+    // Like a figure being dragged: the generator adds no placeholder until the changes settle.
+    m_Mask->Modified();
+    m_MaskNode->Modified();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The mask row stays.", std::string("Mask"), MaskText(model));
+    CPPUNIT_ASSERT_EQUAL(2, model.rowCount(MaskIndex(model)));
+    CPPUNIT_ASSERT_EQUAL(std::string("..."), Text(model, model.index(0, 1, MaskIndex(model))));
   }
 
   void MaskNodeRenamed_ModelIsUpdated()

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <itkListSample.h>
 #include <mitkImage.h>
-#include <mitkPlanarLine.h>
+#include <mitkPlanarFigure.h>
 #include <mitkImageStatisticsCalculator.h>
 #include <MitkImageStatisticsExports.h>
 
@@ -23,14 +23,15 @@ namespace mitk
 {
   typedef itk::Statistics::ListSample<itk::Statistics::MeasurementVectorPixelTraits<ScalarType>::MeasurementVectorType> IntensityProfile;
 
-  /** \brief Compute intensity profile of an image for each pixel along the first PolyLine of a given planar figure.
+  /** \brief Compute intensity profile of an image for each pixel along the outline of a planar figure.
     *
     * \param[in] image A two or three-dimensional image which consists of single component pixels.
-    * \param[in] planarFigure A planar figure from which the first PolyLine is used to evaluate the intensity profile.
+    * \param[in] planarFigure An open planar figure, e.g. a line or a path. Only its first contour is followed.
+    * \throw mitk::Exception if the figure is null or has no outline.
     *
     * \return The computed intensity profile.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const PlanarFigure *planarFigure);
 
   namespace InterpolateImageFunction
   {
@@ -56,17 +57,17 @@ namespace mitk
     };
   }
 
-  /** \brief Compute intensity profile of an image for each sample along a planar line.
+  /** \brief Compute intensity profile of an image for each sample along the outline of a planar figure.
     *
     * \param[in] image A three-dimensional image which consists of single component pixels.
-    * \param[in] planarLine A planar line along which the intensity profile will be evaluated.
-    * \param[in] numSamples Number of samples along the planar line (must be at least 2).
+    * \param[in] planarFigure An open planar figure, e.g. a line or a path. Only its first contour is followed.
+    * \param[in] numSamples Number of samples along the outline (must be at least 2).
     * \param[in] interpolator Image interpolation function which is used to read each sample.
-    * \throw if image is 4D
+    * \throw if image is 4D, or if the figure is null or has no outline
     *
     * \return The computed intensity profile.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const PlanarFigure *planarFigure, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
   /** \brief Compute intensity profile of an image for each sample between two points.
     *

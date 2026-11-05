@@ -41,8 +41,8 @@ namespace mitk
    *
    * The predicate matches: (DataType:PlanarCircle || DataType:PlanarRectangle ||
    * DataType:PlanarEllipse || DataType:PlanarDoubleEllipse || DataType:PlanarPolygon ||
-   * DataType:PlanarSubdivisionPolygon || DataType:PlanarBezierCurve || DataType:PlanarLine)
-   * && !(Property:helper object).
+   * DataType:PlanarPath || DataType:PlanarSubdivisionPolygon || DataType:PlanarBezierCurve ||
+   * DataType:PlanarLine) && !(Property:helper object).
    *
    * \return A node predicate suitable for selecting planar figures.
    */

@@ -189,7 +189,7 @@ namespace
     const auto numberOfPoints = figure->GetNumberOfControlPoints();
 
     if (figure->IsShapeLocked() && numberOfPoints > 0)
-      return QStringLiteral("Click to place a figure of the fixed size. The tool stays armed for more. Press Esc to stop.");
+      return QStringLiteral("Click to place a figure of the fixed size. The tool stays active for more. Press Esc to stop.");
 
     if (mitk::PlanarFigure::PlacementKind::Span == figure->GetPlacementKind())
     {
@@ -233,7 +233,7 @@ namespace
     auto hint = QStringLiteral("Drag a point to reshape the figure, or its outline to move it.");
 
     if (figure->CanInsertControlPoints())
-      hint += QStringLiteral(" Ctrl+click on an edge to add a point, or on a point to remove it.");
+      hint += QStringLiteral(" Ctrl+click on the outline to add a point, or on a point to remove it.");
 
     return hint;
   }
@@ -1242,6 +1242,15 @@ void QmitkMeasurementView::UpdateMeasurementTreeSelection()
 
   if (nullptr != firstSelectedItem)
     tree->scrollToItem(firstSelectedItem);
+
+  this->UpdateCopyButton();
+}
+
+void QmitkMeasurementView::UpdateCopyButton()
+{
+  d->m_Controls->copyButton->setText(d->m_Controls->measurementsTree->selectedItems().empty()
+    ? QStringLiteral("Copy all as CSV")
+    : QStringLiteral("Copy selection as CSV"));
 }
 
 void QmitkMeasurementView::OnMeasurementTreeSelectionChanged()
@@ -1254,6 +1263,7 @@ void QmitkMeasurementView::OnMeasurementTreeSelectionChanged()
       nodes.append(it->second.Node);
   }
 
+  this->UpdateCopyButton();
   this->SelectNodes(nodes);
   this->OnSelectedFiguresChanged();
   this->RequestRenderWindowUpdate();

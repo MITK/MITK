@@ -429,7 +429,7 @@
       <string>Copy the measurements of the selected figures, or of all figures, as comma-separated values</string>
      </property>
      <property name="text">
-      <string>Copy as CSV</string>
+      <string>Copy all as CSV</string>
      </property>
     </widget>
    </item>

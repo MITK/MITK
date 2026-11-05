@@ -110,6 +110,9 @@ private:
   /** Selects the rows of the selected figures. */
   void UpdateMeasurementTreeSelection();
 
+  /** Names what the copy button copies: the selected rows, or all of them. */
+  void UpdateCopyButton();
+
   void OnMeasurementTreeSelectionChanged();
   void OnMeasurementTreeItemActivated(const QTreeWidgetItem* item);
 

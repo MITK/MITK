@@ -38,7 +38,8 @@ namespace mitk
    * display coordinates, so line widths and handle sizes are given in logical
    * pixels and do not depend on the zoom. The base color never changes with
    * the state of the figure: hovering and selection add a halo, and the
-   * handles appear only while the mouse hovers over the figure.
+   * handles appear while the mouse hovers over the figure. The handles of
+   * Bezier curves, which lie off the curve, appear while it is selected as well.
    *
    * Node properties:
    *   - \c color (ColorProperty): base color of the figure
@@ -50,7 +51,7 @@ namespace mitk
    *     never for helper objects and hidden objects
    *   - \c planarfigure.drawcontrastoutline (BoolProperty): black or white outline that keeps strokes visible on any image, true by default
    *   - \c planarfigure.helperlines (PlanarFigureVisibilityProperty): when helper lines like the arc of an angle are shown;
-   *     always by default, on hover like the handles for the control polygon of Bezier curves
+   *     always by default, on hover or when selected like the handles for the control polygon of Bezier curves
    *   - \c font.size (IntProperty): font size of the label in points
    *   - \c animated.pulse (BoolProperty): while true, the figure grows and shrinks by up to 8 percent
    *   - \c animated.pulse.frequency (FloatProperty): pulses per second, 2 by default

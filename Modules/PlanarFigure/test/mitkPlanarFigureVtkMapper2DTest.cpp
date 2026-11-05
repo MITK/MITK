@@ -54,6 +54,7 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(RenderInsertionPreview);
   MITK_TEST(RenderRemovalPreview);
   MITK_TEST(HelperLines_FollowTheirProperty);
+  MITK_TEST(Handles_OfSelectedBezierCurves_AreShown);
   MITK_TEST(MovedPlane_IsDrawnAgain);
   MITK_TEST(UnchangedFigure_IsNotDrawnAgain);
   CPPUNIT_TEST_SUITE_END();
@@ -354,7 +355,7 @@ public:
     const auto angle = this->AddFigure("angle", 6);
 
     const auto *byDefault = dynamic_cast<mitk::PlanarFigureVisibilityProperty *>(curve->GetProperty("planarfigure.helperlines"));
-    CPPUNIT_ASSERT_MESSAGE("The control polygon follows the handles by default", nullptr != byDefault && Visibility::OnHover == byDefault->GetVisibility());
+    CPPUNIT_ASSERT_MESSAGE("The control polygon follows the handles by default", nullptr != byDefault && Visibility::OnHoverOrWhenSelected == byDefault->GetVisibility());
 
     const auto curveAtRest = this->RenderAndCountPoints(curve);
 
@@ -382,6 +383,27 @@ public:
     const auto angleWithArc = this->RenderAndCountPoints(angle);
     angle->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(Visibility::Never));
     CPPUNIT_ASSERT_MESSAGE("The arc of an angle is shown by default", this->RenderAndCountPoints(angle) < angleWithArc);
+  }
+
+  void Handles_OfSelectedBezierCurves_AreShown()
+  {
+    const auto curve = this->AddFigure("bezier_curve", 5);
+    const auto polygon = this->AddFigure("polygon", 6);
+
+    // A locked shape hides the handles of its points, so it tells whether they are drawn.
+    const auto countWithAndWithoutHandles = [this](mitk::DataNode *node) {
+      node->SetProperty("planarfigure.helperlines", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Never));
+      node->SetSelected(true);
+      const auto withHandles = this->RenderAndCountPoints(node);
+      static_cast<mitk::PlanarFigure *>(node->GetData())->SetShapeLocked(true);
+      return std::make_pair(withHandles, this->RenderAndCountPoints(node));
+    };
+
+    const auto [curveWithHandles, curveWithoutHandles] = countWithAndWithoutHandles(curve);
+    CPPUNIT_ASSERT_MESSAGE("A selected Bezier curve shows its handles", curveWithoutHandles < curveWithHandles);
+
+    const auto [polygonWithHandles, polygonWithoutHandles] = countWithAndWithoutHandles(polygon);
+    CPPUNIT_ASSERT_MESSAGE("A selected polygon shows no handles", polygonWithoutHandles == polygonWithHandles);
   }
 
   void MovedPlane_IsDrawnAgain()

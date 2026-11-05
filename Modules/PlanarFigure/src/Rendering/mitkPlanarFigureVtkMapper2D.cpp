@@ -174,12 +174,19 @@ namespace
     return nullptr != property ? property->GetVisibility() : fallback;
   }
 
+  // Only the control points of Bezier curves lie off their contour, where they could not be found
+  // to be dragged unless they are shown while the figure is selected as well.
+  bool HasHandlesOffItsContour(const mitk::BaseData *data)
+  {
+    return nullptr != dynamic_cast<const mitk::PlanarBezierCurve *>(data);
+  }
+
   // The control polygon of a Bezier curve helps to edit it, so it comes and goes with the handles,
   // while the arc of an angle shows what is measured.
   mitk::PlanarFigureVisibilityProperty::Visibility GetDefaultHelperLines(const mitk::BaseData *data)
   {
-    return nullptr != dynamic_cast<const mitk::PlanarBezierCurve *>(data)
-      ? mitk::PlanarFigureVisibilityProperty::Visibility::OnHover
+    return HasHandlesOffItsContour(data)
+      ? mitk::PlanarFigureVisibilityProperty::Visibility::OnHoverOrWhenSelected
       : mitk::PlanarFigureVisibilityProperty::Visibility::Always;
   }
 
@@ -529,7 +536,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   // While a figure is placed point by point, its last point follows the mouse.
   const auto isPlacedPointByPoint = figure->IsBeingPlaced() && PlanarFigure::PlacementKind::Sequence == figure->GetPlacementKind();
 
-  if (isHovered || isPlacedPointByPoint)
+  if (isHovered || isPlacedPointByPoint || (isSelected && HasHandlesOffItsContour(figure)))
   {
     auto handles = figure->GetHandles();
 

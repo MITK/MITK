@@ -14,7 +14,7 @@ them can also be set for a single render window.
 | planarfigure.drawquantities | BoolProperty | true | Shows the measurements in the label, one per line. |
 | planarfigure.label | PlanarFigureVisibilityProperty | On hover | When the label is shown, with the same values as planarfigure.helperlines. Figures that are helper objects or hidden objects never show a label. |
 | planarfigure.drawcontrastoutline | BoolProperty | true | Draws a black outline behind light figures and a white one behind dark figures, so they stay visible on any image. |
-| planarfigure.helperlines | PlanarFigureVisibilityProperty | Always, On hover for Bezier curves | When helper lines are shown: the arc of an angle, the arc and the extended lines of a four-point angle, the control polygon of a Bezier curve. Besides "Always" and "Never", they can be shown on hover, when selected, on hover or when selected, or on hover while selected; these also show them while the figure is placed. |
+| planarfigure.helperlines | PlanarFigureVisibilityProperty | Always, On hover or when selected for Bezier curves | When helper lines are shown: the arc of an angle, the arc and the extended lines of a four-point angle, the control polygon of a Bezier curve. Besides "Always" and "Never", they can be shown on hover, when selected, on hover or when selected, or on hover while selected; these also show them while the figure is placed. |
 | font.size | IntProperty | 13 | Font size of the label in points. |
 | planarfigure.3drendering | BoolProperty | false | Shows the figure in 3D render windows. |
 | planarfigure.3drendering.fill | BoolProperty | false | Fills closed figures in 3D render windows. |

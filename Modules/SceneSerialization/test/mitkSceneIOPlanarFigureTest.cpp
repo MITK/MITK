@@ -206,7 +206,7 @@ public:
       return property->GetVisibility();
     };
 
-    CPPUNIT_ASSERT(Visibility::OnHover == getVisibility("BezierCurve1", "planarfigure.helperlines"));
+    CPPUNIT_ASSERT(Visibility::OnHoverOrWhenSelected == getVisibility("BezierCurve1", "planarfigure.helperlines"));
     CPPUNIT_ASSERT(Visibility::Always == getVisibility("Line1", "planarfigure.helperlines"));
     CPPUNIT_ASSERT(Visibility::OnHover == getVisibility("Line1", "planarfigure.label"));
 

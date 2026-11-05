@@ -79,7 +79,7 @@ The <i>Appearance of new figures</i> group defines how new measurements are show
 
 <h2>Modify measurements</h2>
 
-Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open.
+Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. The handles of a Bezier curve lie off the curve, so they are shown while it is selected as well. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open.
 
 <h2>List of measurements</h2>
 

@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkIPreferences.h>
 
@@ -158,15 +159,23 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
 {
   auto selectedNodes = GetCurrentSelection();
   auto nodeSet = m_NodeTreeModel->GetNodeSet();
+  bool hasSelectionChanged = false;
 
   for (auto node : std::as_const(nodeSet))
   {
     if (node.IsNotNull())
     {
-      node->SetSelected(selectedNodes.contains(node));
+      const bool isSelected = selectedNodes.contains(node);
+      hasSelectionChanged |= node->IsSelected() != isSelected;
+      node->SetSelected(isSelected);
     }
   }
   m_DataNodeContextMenu->SetSelectedNodes(selectedNodes);
+
+  // Mappers draw selected nodes differently, e.g. planar figures with a halo,
+  // and changing a property does not request rendering by itself.
+  if (hasSelectionChanged)
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()

@@ -30,7 +30,6 @@ found in the LICENSE file.
 #include <QPainter>
 #include <QPromise>
 #include <QPushButton>
-#include <QScopeGuard>
 #include <QStyledItemDelegate>
 #include <QThreadPool>
 #include <QToolTip>
@@ -124,6 +123,24 @@ namespace
     {
       if (watched != m_View->viewport())
         return QStyledItemDelegate::eventFilter(watched, event);
+
+      // The list reacts to single clicks only. A click may rebuild the list
+      // and move another entry under the mouse, and Qt would turn the second
+      // click of a double-click into a fresh click on that entry.
+      if (event->type() == QEvent::MouseButtonPress)
+      {
+        m_IgnoreNextRelease = false;
+      }
+      else if (event->type() == QEvent::MouseButtonDblClick)
+      {
+        m_IgnoreNextRelease = true;
+        return true;
+      }
+      else if (event->type() == QEvent::MouseButtonRelease && m_IgnoreNextRelease)
+      {
+        m_IgnoreNextRelease = false;
+        return true;
+      }
 
       if (event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverMove)
       {
@@ -260,6 +277,7 @@ namespace
     QPoint m_HoverPos;
     std::optional<Button> m_PressedButton;
     QPersistentModelIndex m_PressedIndex;
+    bool m_IgnoreNextRelease = false;
   };
 }
 
@@ -269,8 +287,7 @@ QmitkWelcomeRecentDataPage::QmitkWelcomeRecentDataPage(berry::IWorkbenchWindow::
     m_Palette(palette),
     m_Projects{ mitk::RecentData::Kind::Project, nullptr, nullptr, nullptr },
     m_Files{ mitk::RecentData::Kind::File, nullptr, nullptr, nullptr },
-    m_IsAvailabilityCheckPending(false),
-    m_IsLocating(false)
+    m_IsAvailabilityCheckPending(false)
 {
   auto* cards = new QHBoxLayout;
   cards->setSpacing(16);
@@ -461,12 +478,6 @@ void QmitkWelcomeRecentDataPage::CheckAvailability()
 
 void QmitkWelcomeRecentDataPage::Locate(const QString& path)
 {
-  // Loading the located file keeps the GUI responsive, so locating could
-  // otherwise start again before it is done.
-  if (m_IsLocating)
-    return;
-
-  m_IsLocating = true;
   m_PathToLocate = path;
 
   auto promise = std::make_shared<QPromise<QString>>();
@@ -556,7 +567,6 @@ void QmitkWelcomeRecentDataPage::OnAvailabilityChecked()
 
 void QmitkWelcomeRecentDataPage::OnLocateFolderFound()
 {
-  const auto endLocating = qScopeGuard([this]() { m_IsLocating = false; });
   auto window = m_Window.Lock();
 
   if (window.IsNull() || m_LocateFolderSearch.future().resultCount() == 0)
@@ -566,14 +576,11 @@ void QmitkWelcomeRecentDataPage::OnLocateFolderFound()
   const QString folder = m_LocateFolderSearch.result();
   const QString fileName = QFileInfo(m_PathToLocate).fileName();
   const QString newPath = QFileDialog::getOpenFileName(this, "Locate " + fileName,
-    folder.isEmpty() ? fileName : QDir(folder).filePath(fileName), QmitkIOUtil::GetFileOpenFilterString());
+    QDir(folder.isEmpty() ? QDir::homePath() : folder).filePath(fileName), QmitkIOUtil::GetFileOpenFilterString());
 
   if (newPath.isEmpty() || mitk::WorkbenchUtil::LoadFiles({ newPath }, window).isEmpty())
     return;
 
-  // Compared without disk access, which could block on unreachable network
-  // paths. Ignoring case at worst keeps an obsolete entry on case-sensitive
-  // file systems.
-  if (QDir::cleanPath(newPath).compare(QDir::cleanPath(m_PathToLocate), Qt::CaseInsensitive) != 0)
-    mitk::RecentData::Remove(m_PathToLocate);
+  mitk::RecentData::Remove(m_PathToLocate);
+  mitk::RecentData::Add({ newPath });
 }

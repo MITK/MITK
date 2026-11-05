@@ -79,7 +79,6 @@ private:
   QSet<QString> m_MissingPaths;
   QFutureWatcher<QSet<QString>> m_AvailabilityCheck;
   bool m_IsAvailabilityCheckPending;
-  bool m_IsLocating;
   QString m_PathToLocate;
   QFutureWatcher<QString> m_LocateFolderSearch;
 };

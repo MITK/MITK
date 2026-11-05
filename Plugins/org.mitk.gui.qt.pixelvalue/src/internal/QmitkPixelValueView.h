@@ -59,6 +59,9 @@ private:
   void ClearCoords();
 
   void Update();
+  void UpdateAllPixelValues(const mitk::Point3D& position, mitk::TimePointType timePoint);
+  void AddImageRow(const mitk::DataNode* node, const mitk::Point3D& position, mitk::TimePointType timePoint);
+  void AddSegmentationRows(const mitk::DataNode* node, const mitk::Point3D& position, mitk::TimePointType timePoint);
   void UpdateCoords(const mitk::Image* image, const itk::Index<3>& index, const mitk::Point3D& position);
   void UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension = 3);
   void UpdateWorldCoord(const mitk::Point3D& position, unsigned int dimension = 3);

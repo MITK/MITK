@@ -35,7 +35,6 @@ found in the LICENSE file.
 #include <QPointer>
 #include <QTimer>
 
-#include <memory>
 #include <optional>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
@@ -281,40 +280,9 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::DynamicLayoutRequested,
     m_LayoutEditorWidget, [this, multiWidget](const QmitkMxNDynamicLayout& requested)
     {
-      if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
-      {
-        return;
-      }
-
-      // Applied from a short timer for the reason given at LoadLayout below;
-      // the layout is copied, as the reference dies with this emit.
-      auto layout = std::make_shared<QmitkMxNDynamicLayout>(requested);
-      multiWidget->ShowLayoutLoadFeedback();
-      const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
-      QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, layout]()
-      {
-        if (!IsBindable(multiWidget))
-        {
-          multiWidget->HideLayoutLoadFeedback();
-          return;
-        }
-
-        std::optional<QString> failure;
-        try
-        {
-          multiWidget->ApplyDynamicLayout(*layout);
-        }
-        catch (const std::exception& e)
-        {
-          failure = QString::fromUtf8(e.what());
-        }
-        multiWidget->HideLayoutLoadFeedback();
-        if (failure.has_value())
-        {
-          QMessageBox::warning(dialogParent.isNull() ? static_cast<QWidget*>(multiWidget) : dialogParent.data(),
-                               QmitkMxNLayoutEditorView::tr("Dynamic layout failed"), *failure);
-        }
-      });
+      // Copied: the reference dies with this emit.
+      this->ApplyDeferred(multiWidget, [layout = requested](QmitkMxNMultiWidget& widget) { widget.ApplyDynamicLayout(layout); },
+                          tr("Dynamic layout failed"));
     }));
   // Direct connection: the stream pointer is only valid during the emit.
   m_LayoutConnections.push_back(connect(
@@ -324,57 +292,63 @@ void QmitkMxNLayoutEditorView::RenderWindowPartActivated(mitk::IRenderWindowPart
     m_LayoutEditorWidget, &QmitkMxNLayoutEditorWidget::LoadLayout,
     m_LayoutEditorWidget, [this, multiWidget](const nlohmann::json* jsonData)
     {
-      if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
-      {
-        return;
-      }
-
-      // Applying blocks the UI thread for a second or more on a large document,
-      // and a window whose thread pumps no messages is not composited - so an
-      // overlay raised and painted inside the apply never reaches the screen.
-      // Raise it here, let this handler return so the event loop presents it,
-      // and apply from a short timer.
-      //
-      // The document must be copied: 'jsonData' points at a local in the
-      // emitter and dies with this emit. The sender's try/catch frame dies with
-      // it too, so failures are reported here instead.
-      auto document = std::make_shared<nlohmann::json>(*jsonData);
-      multiWidget->ShowLayoutLoadFeedback();
-
-      // One display frame is ~16 ms; this leaves the compositor room to present
-      // the overlay before the thread stops answering.
-      // Timed on the editor, which the apply needs; the view may close before
-      // the timer fires, so its widget is only used through a guard.
-      const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
-      QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, document]()
-      {
-        // Its plugin may have locked the structure while the load waited; the
-        // confirmed load is then dropped without a change.
-        if (!IsBindable(multiWidget))
-        {
-          multiWidget->HideLayoutLoadFeedback();
-          return;
-        }
-
-        std::optional<QString> failure;
-        try
-        {
-          multiWidget->ApplyLayout(*document);
-        }
-        catch (const std::exception& e)
-        {
-          failure = QString::fromUtf8(e.what());
-        }
-        // Before any warning: the editor counts as busy until the feedback is
-        // hidden, and a modal box would hold that for as long as it is open.
-        multiWidget->HideLayoutLoadFeedback();
-        if (failure.has_value())
-        {
-          QMessageBox::warning(dialogParent.isNull() ? static_cast<QWidget*>(multiWidget) : dialogParent.data(),
-                               QmitkMxNLayoutEditorView::tr("Layout load failed"), *failure);
-        }
-      });
+      // Copied: 'jsonData' points at a local in the emitter and dies with this
+      // emit.
+      this->ApplyDeferred(multiWidget, [document = *jsonData](QmitkMxNMultiWidget& widget) { widget.ApplyLayout(document); },
+                          tr("Layout load failed"));
     }));
+}
+
+void QmitkMxNLayoutEditorView::ApplyDeferred(QmitkMxNMultiWidget* multiWidget,
+                                             const std::function<void(QmitkMxNMultiWidget&)>& apply,
+                                             const QString& failureTitle)
+{
+  if (!this->ConfirmDestructiveLayoutChange() || !this->IsStillBoundTo(multiWidget))
+  {
+    return;
+  }
+
+  // Applying blocks the UI thread for a second or more on a large layout, and
+  // a window whose thread pumps no messages is not composited - so an overlay
+  // raised and painted inside the apply never reaches the screen. Raise it
+  // here, let the caller return so the event loop presents it, and apply from
+  // a short timer. The sender's try/catch frame is gone by then, so failures
+  // are reported here instead.
+  multiWidget->ShowLayoutLoadFeedback();
+
+  // One display frame is ~16 ms; this leaves the compositor room to present
+  // the overlay before the thread stops answering.
+  // Timed on the editor, which the apply needs; the view may close before
+  // the timer fires, so its widget is only used through a guard.
+  const QPointer<QWidget> dialogParent = m_LayoutEditorWidget;
+  QTimer::singleShot(50, multiWidget, [dialogParent, multiWidget, apply, failureTitle]()
+  {
+    // Its plugin may have locked the structure while the change waited; the
+    // confirmed change is then dropped.
+    if (!IsBindable(multiWidget))
+    {
+      multiWidget->HideLayoutLoadFeedback();
+      return;
+    }
+
+    std::optional<QString> failure;
+    try
+    {
+      apply(*multiWidget);
+    }
+    catch (const std::exception& e)
+    {
+      failure = QString::fromUtf8(e.what());
+    }
+    // Before any warning: the editor counts as busy until the feedback is
+    // hidden, and a modal box would hold that for as long as it is open.
+    multiWidget->HideLayoutLoadFeedback();
+    if (failure.has_value())
+    {
+      QMessageBox::warning(dialogParent.isNull() ? static_cast<QWidget*>(multiWidget) : dialogParent.data(),
+                           failureTitle, *failure);
+    }
+  });
 }
 
 bool QmitkMxNLayoutEditorView::IsBindable(const QmitkMxNMultiWidget* multiWidget)

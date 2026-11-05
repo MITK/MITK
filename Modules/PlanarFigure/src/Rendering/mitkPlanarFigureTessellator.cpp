@@ -18,12 +18,32 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <tuple>
+#include <utility>
 
 namespace
 {
   // Joins whose miter would exceed this multiple of the half width are beveled.
   constexpr double MiterLimit = 4.0;
   constexpr double Epsilon = 1e-9;
+
+  // A glow fades out along a smoothstep, sampled in this many steps.
+  constexpr int GlowSteps = 6;
+
+  // Round parts of a glow are fans with steps of at most this angle. A miter of
+  // a turn this small is indistinguishable from a round join.
+  constexpr double MaxFanStep = std::numbers::pi / 12.0;
+
+  mitk::Vector2D Rotated(const mitk::Vector2D &vector, double angle)
+  {
+    const auto cosine = std::cos(angle);
+    const auto sine = std::sin(angle);
+
+    mitk::Vector2D result;
+    result[0] = cosine * vector[0] - sine * vector[1];
+    result[1] = sine * vector[0] + cosine * vector[1];
+    return result;
+  }
 
   mitk::Vector2D Normalized(const mitk::Vector2D &vector)
   {
@@ -236,6 +256,153 @@ void mitk::PlanarFigureTessellator::AddStroke(
     const auto endCap = this->AddRow(vertices.back() + directions.back() * feather,
       LeftNormal(directions.back()), innerOffset, outerOffset, color, 0.0);
     this->ConnectRows(incomingRows.back(), endCap);
+  }
+}
+
+void mitk::PlanarFigureTessellator::AddGlow(
+  const std::vector<Point2D> &points, bool closed, double innerRadius, double outerRadius, const Color &color)
+{
+  auto vertices = WithoutDuplicates(points, closed);
+
+  if (closed && vertices.size() < 3)
+    closed = false;
+
+  if (vertices.size() < 2 || outerRadius <= innerRadius || color[3] <= 0.0)
+    return;
+
+  // Offsets from the polyline with their alpha. A linear fade would show an edge
+  // where it ends, a smoothstep ends without one.
+  std::vector<std::pair<double, double>> profile;
+
+  if (innerRadius > 0.0)
+    profile.emplace_back(innerRadius, color[3]);
+
+  for (int step = 1; step <= GlowSteps; ++step)
+  {
+    const auto t = static_cast<double>(step) / GlowSteps;
+    profile.emplace_back(innerRadius + t * (outerRadius - innerRadius), color[3] * (1.0 - t * t * (3.0 - 2.0 * t)));
+  }
+
+  // The vertices of the profile from a point of the polyline outward. Spokes of a
+  // miter are longer, so the offsets hold perpendicular to both segments.
+  using Spoke = std::vector<vtkIdType>;
+
+  const auto addSpoke = [&](const Point2D &center, const Vector2D &direction, double scale) {
+    Spoke spoke;
+
+    for (const auto &[offset, alpha] : profile)
+      spoke.push_back(this->AddVertex(center + direction * (offset * scale), color, alpha));
+
+    return spoke;
+  };
+
+  const auto connectSpokes = [&](vtkIdType fromCenter, vtkIdType toCenter, const Spoke &from, const Spoke &to) {
+    if (fromCenter == toCenter)
+      this->AddTriangle(fromCenter, to[0], from[0]);
+    else
+      this->AddQuad(fromCenter, toCenter, to[0], from[0]);
+
+    for (std::size_t k = 0; k + 1 < from.size(); ++k)
+      this->AddQuad(from[k], to[k], to[k + 1], from[k + 1]);
+  };
+
+  // Spokes around a center, swept from a direction by an angle; returns the first and the last.
+  const auto addFan = [&](vtkIdType centerId, const Point2D &center, const Vector2D &from, double angle) {
+    const auto numberOfSteps = std::max(1, static_cast<int>(std::ceil(std::abs(angle) / MaxFanStep)));
+    std::vector<Spoke> spokes;
+
+    for (int step = 0; step <= numberOfSteps; ++step)
+      spokes.push_back(addSpoke(center, Rotated(from, angle * step / numberOfSteps), 1.0));
+
+    for (int step = 0; step < numberOfSteps; ++step)
+      connectSpokes(centerId, centerId, spokes[step], spokes[step + 1]);
+
+    return std::make_pair(spokes.front(), spokes.back());
+  };
+
+  struct Joint
+  {
+    vtkIdType Center = 0;
+    Spoke LeftIn;
+    Spoke LeftOut;
+    Spoke RightIn;
+    Spoke RightOut;
+  };
+
+  const auto numberOfVertices = vertices.size();
+  const auto numberOfSegments = closed ? numberOfVertices : numberOfVertices - 1;
+
+  std::vector<Vector2D> directions(numberOfSegments);
+
+  for (std::size_t i = 0; i < numberOfSegments; ++i)
+    directions[i] = Normalized(vertices[(i + 1) % numberOfVertices] - vertices[i]);
+
+  std::vector<Joint> joints(numberOfVertices);
+
+  for (std::size_t i = 0; i < numberOfVertices; ++i)
+  {
+    auto &joint = joints[i];
+    const auto &vertex = vertices[i];
+    joint.Center = this->AddVertex(vertex, color, color[3]);
+
+    // The ends are round: half a turn from one side around the end to the other side.
+    if (!closed && 0 == i)
+    {
+      std::tie(joint.LeftOut, joint.RightOut) = addFan(joint.Center, vertex, LeftNormal(directions.front()), std::numbers::pi);
+      continue;
+    }
+
+    if (!closed && numberOfVertices - 1 == i)
+    {
+      std::tie(joint.RightIn, joint.LeftIn) = addFan(joint.Center, vertex, LeftNormal(directions.back()) * -1.0, std::numbers::pi);
+      continue;
+    }
+
+    const auto &incoming = directions[(i + numberOfSegments - 1) % numberOfSegments];
+    const auto &outgoing = directions[i % numberOfSegments];
+    const auto incomingNormal = LeftNormal(incoming);
+    const auto outgoingNormal = LeftNormal(outgoing);
+    const auto turn = std::atan2(Cross(incoming, outgoing), incoming * outgoing);
+
+    const auto miter = Normalized(incomingNormal + outgoingNormal);
+    const auto cosine = miter * outgoingNormal;
+
+    if (std::abs(turn) <= MaxFanStep)
+    {
+      joint.LeftIn = joint.LeftOut = addSpoke(vertex, miter, 1.0 / cosine);
+      joint.RightIn = joint.RightOut = addSpoke(vertex, miter * -1.0, 1.0 / cosine);
+      continue;
+    }
+
+    // The inner side of the turn is mitered, so that the segments do not overlap there,
+    // except for turns sharper than the miter limit. The outer side is round.
+    const auto isTurnLeft = turn > 0.0;
+    const auto innerSign = isTurnLeft ? 1.0 : -1.0;
+    auto &innerIn = isTurnLeft ? joint.LeftIn : joint.RightIn;
+    auto &innerOut = isTurnLeft ? joint.LeftOut : joint.RightOut;
+
+    if (cosine > 1.0 / MiterLimit)
+    {
+      innerIn = innerOut = addSpoke(vertex, miter * innerSign, 1.0 / cosine);
+    }
+    else
+    {
+      innerIn = addSpoke(vertex, incomingNormal * innerSign, 1.0);
+      innerOut = addSpoke(vertex, outgoingNormal * innerSign, 1.0);
+    }
+
+    auto &outerIn = isTurnLeft ? joint.RightIn : joint.LeftIn;
+    auto &outerOut = isTurnLeft ? joint.RightOut : joint.LeftOut;
+    std::tie(outerIn, outerOut) = addFan(joint.Center, vertex, incomingNormal * -innerSign, turn);
+  }
+
+  for (std::size_t i = 0; i < numberOfSegments; ++i)
+  {
+    const auto &from = joints[i];
+    const auto &to = joints[(i + 1) % numberOfVertices];
+
+    connectSpokes(from.Center, to.Center, from.LeftOut, to.LeftIn);
+    connectSpokes(from.Center, to.Center, from.RightOut, to.RightIn);
   }
 }
 

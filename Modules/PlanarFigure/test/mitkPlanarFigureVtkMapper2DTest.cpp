@@ -321,7 +321,7 @@ public:
     this->MoveTo(P(6, 0.65, 0.5));
     CPPUNIT_ASSERT_MESSAGE("The circle is hovered", hoveredInteractor->GetFeedback(this->GetRenderer()).IsHovered);
 
-    this->CompareWithReference("States");
+    this->CompareWithReference("StatesSoftHalo");
   }
 
   void RenderInsertionPreview()
@@ -334,7 +334,7 @@ public:
     this->MoveTo(P(5, 0.5, 0.25), mitk::InteractionEvent::ControlKey);
     CPPUNIT_ASSERT_MESSAGE("An insertion is previewed", interactor->GetFeedback(this->GetRenderer()).InsertionPreview.has_value());
 
-    this->CompareWithReference("InsertionPreview");
+    this->CompareWithReference("InsertionPreviewSoftHalo");
   }
 
   void RenderRemovalPreview()
@@ -343,7 +343,7 @@ public:
     this->MoveTo(P(5, 0.85, 0.3), mitk::InteractionEvent::ControlKey);
     CPPUNIT_ASSERT_MESSAGE("A removal is previewed", interactor->GetFeedback(this->GetRenderer()).IsRemovalPreview);
 
-    this->CompareWithReference("RemovalPreview");
+    this->CompareWithReference("RemovalPreviewSoftHalo");
   }
 
   void HelperLines_FollowTheirProperty()

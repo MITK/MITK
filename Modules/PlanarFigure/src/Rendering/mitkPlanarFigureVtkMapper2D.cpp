@@ -46,8 +46,7 @@ namespace
   /* The look of planar figures. Lengths are in logical pixels. */
   namespace Style
   {
-    constexpr double HaloExtraWidth = 2.0;
-    constexpr double HaloFeather = 6.0;
+    constexpr double HaloFalloff = 8.0;
     constexpr double HoveredHaloAlpha = 0.30;
     constexpr double SelectedHaloAlpha = 0.45;
     constexpr double HoveredAndSelectedHaloAlpha = 0.60;
@@ -468,16 +467,22 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
 
   PlanarFigureTessellator tessellator;
 
+  bool drawContrastOutline = true;
+  node->GetBoolProperty("planarfigure.drawcontrastoutline", drawContrastOutline, renderer);
+
   if (isHovered || isSelected)
   {
     const auto alpha = isHovered && isSelected ? Style::HoveredAndSelectedHaloAlpha
                      : isSelected ? Style::SelectedHaloAlpha
                      : Style::HoveredHaloAlpha;
 
+    // The halo fades out from where the stroke on top of it ends, including the contrast outline.
+    const auto haloRadius = (lineWidth + (drawContrastOutline ? Style::OutlineExtraWidth * scale : 0.0)) / 2.0;
+
     for (const auto &contour : contours)
     {
-      tessellator.AddStroke(contour.Points, contour.Closed, lineWidth + Style::HaloExtraWidth * scale,
-        WithAlpha(base, alpha * opacity), Style::HaloFeather * scale);
+      tessellator.AddGlow(contour.Points, contour.Closed, haloRadius, haloRadius + Style::HaloFalloff * scale,
+        WithAlpha(base, alpha * opacity));
     }
   }
 
@@ -487,9 +492,6 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   Point2D viewportUpperRight;
   viewportUpperRight[0] = renderer->GetViewportSize()[0];
   viewportUpperRight[1] = renderer->GetViewportSize()[1];
-
-  bool drawContrastOutline = true;
-  node->GetBoolProperty("planarfigure.drawcontrastoutline", drawContrastOutline, renderer);
 
   if (drawContrastOutline)
   {

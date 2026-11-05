@@ -67,6 +67,15 @@ namespace mitk
     void AddDashedStroke(const std::vector<Point2D> &points, bool closed, double width, const Color &color, double dash, double gap,
       const Point2D &clipLowerLeft, const Point2D &clipUpperRight);
 
+    /**
+     * \brief Adds a soft glow around a polyline, e.g. to highlight a stroke.
+     *
+     * The glow has the alpha of the color up to the inner radius around the
+     * polyline and fades out to the outer radius without a visible edge. It
+     * is round at the ends and on the outer side of turns.
+     */
+    void AddGlow(const std::vector<Point2D> &points, bool closed, double innerRadius, double outerRadius, const Color &color);
+
     /** \brief Adds a filled disc. */
     void AddDisc(const Point2D &center, double radius, const Color &color);
 

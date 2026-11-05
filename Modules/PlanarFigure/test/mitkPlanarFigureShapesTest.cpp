@@ -204,6 +204,11 @@ public:
     CPPUNIT_ASSERT(head != nullptr);
     CPPUNIT_ASSERT(head->Tip == P(10, 10));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, GetMeasurement(arrow, MeasurementType::Length), Epsilon);
+
+    arrow->SetFromSpan(P(20, 20), P(23, 24));
+    const auto spanDecorations = arrow->GetDecorations();
+    head = std::get_if<mitk::PlanarFigure::ArrowHead>(&spanDecorations[0]);
+    CPPUNIT_ASSERT_MESSAGE("A span ends at the tip", head != nullptr && head->Tip == P(23, 24));
   }
 
   void Angle()

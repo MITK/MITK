@@ -81,8 +81,10 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
     const auto center = P(cell, 0.5, 0.5);
     const auto rim = P(cell, 0.85, 0.5);
 
-    if ("line" == typeId || "arrow" == typeId)
+    if ("line" == typeId)
       figure->SetFromSpan(P(cell, 0.15, 0.2), P(cell, 0.85, 0.8));
+    else if ("arrow" == typeId)
+      figure->SetFromSpan(P(cell, 0.85, 0.8), P(cell, 0.15, 0.2));
     else if ("angle" == typeId)
       figure->SetControlPoints({ P(cell, 0.2, 0.8), P(cell, 0.2, 0.2), P(cell, 0.8, 0.45) });
     else if ("four_point_angle" == typeId)

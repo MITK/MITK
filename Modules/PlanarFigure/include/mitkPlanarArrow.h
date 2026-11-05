@@ -45,9 +45,10 @@ namespace mitk
     /** \brief Length. */
     std::vector<Measurement> GetMeasurements() const override;
 
-    /** \brief Placed by a span from the tip to the tail. */
+    /** \brief Placed by a span from the tail to the tip. */
     PlacementKind GetPlacementKind() const override;
 
+    /** \brief Places the tail at the start and the tip at the end of the span. */
     void SetFromSpan(const Point2D &start, const Point2D &end) override;
 
     /** \brief Returns false. */

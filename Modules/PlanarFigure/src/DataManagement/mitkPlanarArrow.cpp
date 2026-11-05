@@ -51,7 +51,7 @@ mitk::PlanarFigure::PlacementKind mitk::PlanarArrow::GetPlacementKind() const
 
 void mitk::PlanarArrow::SetFromSpan(const Point2D &start, const Point2D &end)
 {
-  this->AssignControlPoints({ start, end });
+  this->AssignControlPoints({ end, start });
 }
 
 bool mitk::PlanarArrow::IsClosed() const

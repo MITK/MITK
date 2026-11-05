@@ -40,7 +40,7 @@ Measurements are placed on the slices of the reference image, so the render wind
 <li> <b>Cross:</b> Two perpendicular lines for bidimensional measurements, e.g. of lesions. The first line is drawn like a line; the second one starts at half its length through its middle. Dragging an end keeps the lines perpendicular. The measured values are the long and the short axis.
 <li> <b>Path:</b> Lines through two or more points. The measured value is the length of all lines summed up.
 <li> <b>Bezier Curve:</b> A curve through its first and last control point, shaped by the ones in between. The measured value is its length.
-<li> <b>Arrow:</b> A line with an arrow head, drawn from the tip to the tail, e.g. to point at a finding. The measured value is its length.
+<li> <b>Arrow:</b> A line with an arrow head, drawn from the tail to the tip, e.g. to point at a finding. The measured value is its length.
 </ul>
 
 <b>Angles</b>

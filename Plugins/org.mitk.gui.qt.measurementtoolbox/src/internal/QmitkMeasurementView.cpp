@@ -979,7 +979,7 @@ void QmitkMeasurementView::SelectNodes(const QList<mitk::DataNode::Pointer>& nod
   // Set "selected" last: SynchronizeDataManagerSelection updates the Data Manager
   // tree selection, whose NodeSelectionChanged handler re-derives every node's
   // "selected" property and transiently clears it for the picked node. Setting it
-  // afterwards leaves the figure in the selected (red) appearance.
+  // afterwards leaves the figure selected, i.e. drawn with its halo.
   for (auto& node : nodes)
     node->SetSelected(true);
 }

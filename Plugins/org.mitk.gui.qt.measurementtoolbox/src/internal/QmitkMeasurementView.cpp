@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QPainter>
 #include <QShortcut>
+#include <QStyledItemDelegate>
 #include <QTimer>
 #include <QToolButton>
 #include <QTreeWidget>
@@ -150,6 +151,18 @@ namespace
 
     return QLatin1Char('"') + text.replace(QLatin1String("\""), QLatin1String("\"\"")) + QLatin1Char('"');
   }
+
+  /** Keeps the cells of a column of an item view from being edited. */
+  class QmitkReadOnlyColumnDelegate : public QStyledItemDelegate
+  {
+  public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    QWidget* createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override
+    {
+      return nullptr;
+    }
+  };
 
   /** All render windows of a part share a single interaction reference geometry. */
   mitk::TimeGeometry::ConstPointer GetInteractionReferenceGeometry(const mitk::IRenderWindowPart* renderWindowPart)
@@ -326,6 +339,9 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
   d->m_Controls->measurementsTree->viewport()->installEventFilter(this);
 
+  // Figures are renamed in the first column, which holds the name of a figure row.
+  d->m_Controls->measurementsTree->setItemDelegateForColumn(1, new QmitkReadOnlyColumnDelegate(d->m_Controls->measurementsTree));
+
   d->m_Controls->tools->setEnabled(false);
   d->m_Controls->thicknessSpinBox->setMaximum(d->m_Controls->radiusSpinBox->value());
   d->m_Controls->hintCard->hide();
@@ -405,6 +421,7 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_Controls->copyButton, &QPushButton::clicked, this, &QmitkMeasurementView::OnCopyToClipboard);
   connect(d->m_Controls->measurementsTree, &QTreeWidget::itemSelectionChanged, this, &QmitkMeasurementView::OnMeasurementTreeSelectionChanged);
   connect(d->m_Controls->measurementsTree, &QTreeWidget::itemPressed, this, &QmitkMeasurementView::OnMeasurementTreeItemActivated);
+  connect(d->m_Controls->measurementsTree, &QTreeWidget::itemChanged, this, &QmitkMeasurementView::OnMeasurementTreeItemChanged);
 
   // A press changes the current item as well and is handled above, so this is for the keyboard only.
   connect(d->m_Controls->measurementsTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* item) {
@@ -1168,6 +1185,7 @@ void QmitkMeasurementView::UpdateMeasurementTree()
     {
       item = new QTreeWidgetItem;
       item->setData(0, Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(node)));
+      item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
 
     if (tree->indexOfTopLevelItem(item) != i)
@@ -1280,6 +1298,30 @@ void QmitkMeasurementView::OnMeasurementTreeItemActivated(const QTreeWidgetItem*
 
   if (auto it = d->m_Figures.find(GetNode(item)); it != d->m_Figures.end())
     this->ShowFigure(it->second.Node);
+}
+
+void QmitkMeasurementView::OnMeasurementTreeItemChanged(QTreeWidgetItem* item, int column)
+{
+  // The tree is updated with its signals blocked, so this is a rename by the user.
+  if (0 != column || nullptr != item->parent())
+    return;
+
+  const auto it = d->m_Figures.find(GetNode(item));
+
+  if (it == d->m_Figures.end())
+    return;
+
+  const auto& node = it->second.Node;
+  const auto name = item->text(0).trimmed();
+
+  if (!name.isEmpty())
+    node->SetName(name.toStdString());
+
+  // Shows the trimmed name, or the previous one instead of an empty one.
+  const QSignalBlocker blocker(d->m_Controls->measurementsTree);
+  SetText(item, 0, QString::fromStdString(node->GetName()));
+
+  this->RequestRenderWindowUpdate();
 }
 
 bool QmitkMeasurementView::eventFilter(QObject* watched, QEvent* event)

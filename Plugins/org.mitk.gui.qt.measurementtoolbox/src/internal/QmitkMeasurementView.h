@@ -116,6 +116,9 @@ private:
   void OnMeasurementTreeSelectionChanged();
   void OnMeasurementTreeItemActivated(const QTreeWidgetItem* item);
 
+  /** Renames the figure of a row whose name was edited. */
+  void OnMeasurementTreeItemChanged(QTreeWidgetItem* item, int column);
+
   /** Moves the views to the figure, and turns the closest view into its plane if no view shows it. */
   void ShowFigure(const mitk::DataNode* node);
 

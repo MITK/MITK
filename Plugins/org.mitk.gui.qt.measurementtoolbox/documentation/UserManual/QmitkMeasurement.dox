@@ -83,7 +83,7 @@ Moving the mouse over a measurement shows its handles, and the cursor shows what
 
 <h2>List of measurements</h2>
 
-The list at the bottom of the view shows the measured values of all measurements of the reference image. Selecting a measurement in the list selects it in the render windows and in the Data Manager and moves the views to it; selecting it elsewhere selects it in the list. Where measurements overlap in a render window, a click inside them selects the smaller one, and the handles of a measurement take precedence over the outline of another. The selected measurement is surrounded by a halo in its own color.
+The list at the bottom of the view shows the measured values of all measurements of the reference image. Selecting a measurement in the list selects it in the render windows and in the Data Manager and moves the views to it; selecting it elsewhere selects it in the list. Where measurements overlap in a render window, a click inside them selects the smaller one, and the handles of a measurement take precedence over the outline of another. The selected measurement is surrounded by a halo in its own color. Double-click the name of a measurement in the list to rename it.
 
 <i>Copy selection as CSV</i> copies the values of the selected measurements, and <i>Copy all as CSV</i> those of all measurements while none is selected, to the clipboard as comma-separated values with the columns figure, measurement, value and unit, e.g. for a spreadsheet application.
 

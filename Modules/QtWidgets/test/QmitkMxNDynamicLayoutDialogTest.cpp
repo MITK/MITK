@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <QTimer>
 #include <QToolButton>
 
+#include <algorithm>
 #include <memory>
 #include <optional>
 
@@ -53,6 +54,7 @@ class QmitkMxNDynamicLayoutDialogTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_GeneratesTheLayoutAndAccepts);
   MITK_TEST(Options_FollowTheSlotsUntilChanged);
   MITK_TEST(SwapRoles_ExchangesTheSlotsAndMovesTheDefaults);
+  MITK_TEST(Slots_NeverTakeANodeAnotherSlotHolds);
   MITK_TEST(Reopen_StartsOnTheTemplateChosenLast);
 
   CPPUNIT_TEST_SUITE_END();
@@ -196,6 +198,28 @@ public:
     CPPUNIT_ASSERT_MESSAGE("...and the defaults follow the new fused image",
                            static_cast<int>(QmitkMxNFusionColormap::HotIron) == colormap->currentData().toInt()
                              && !mip->isChecked());
+  }
+
+  void Slots_NeverTakeANodeAnotherSlotHolds()
+  {
+    // One image as anatomy and as fused image would put the fusion's
+    // colormap and opacity on the anatomy itself.
+    const auto a = this->AddImage("a");
+    const auto b = this->AddImage("b");
+    auto dialog = this->MakeDialog({ a, b }, QmitkMxNDynamicTemplate::FusionPair);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: a is the anatomy, b the fused image",
+                           a == dialog->GetBindings().at(QmitkMxNSlot::Anatomy).front()
+                             && b == dialog->GetBindings().at(QmitkMxNSlot::FusedImage).front());
+
+    CPPUNIT_ASSERT_MESSAGE("The fused image is not offered the anatomy", !Slot(*dialog, 1)->GetNodePredicate()->CheckNode(a));
+    CPPUNIT_ASSERT_MESSAGE("...nor the anatomy the fused image", !Slot(*dialog, 0)->GetNodePredicate()->CheckNode(b));
+
+    Slot(*dialog, 1)->SetCurrentSelection({ a });
+    const auto bindings = dialog->GetBindings();
+    const auto fused = bindings.find(QmitkMxNSlot::FusedImage);
+    CPPUNIT_ASSERT_MESSAGE("Setting the anatomy as fused image is refused",
+                           fused == bindings.end() || std::find(fused->second.begin(), fused->second.end(), a) == fused->second.end());
+    CPPUNIT_ASSERT_MESSAGE("...and leaves the anatomy", a == bindings.at(QmitkMxNSlot::Anatomy).front());
   }
 
   void Reopen_StartsOnTheTemplateChosenLast()

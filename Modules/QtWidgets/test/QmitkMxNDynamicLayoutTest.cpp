@@ -19,12 +19,14 @@ found in the LICENSE file.
 
 #include <mitkBaseRenderer.h>
 #include <mitkImageGenerator.h>
+#include <mitkInteractionConst.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLevelWindow.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkPointSet.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkRenderingManager.h>
+#include <mitkRotationOperation.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStepper.h>
@@ -33,6 +35,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <mitkTimeNavigationController.h>
+#include <mitkTransferFunctionProperty.h>
 
 #include <nlohmann/json.hpp>
 
@@ -41,6 +44,8 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 #include <vtkVolumeMapper.h>
 
 #include <QCoreApplication>
@@ -84,6 +89,11 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_BindsEveryGroupToExactlyItsNodes);
   MITK_TEST(Apply_WritesRendererStateOnTheNamedWindowsOnly);
   MITK_TEST(Apply_FitsTheViewsAndKeepsTheTimeStep);
+  MITK_TEST(Apply_ObliqueDataset_ShownInItsAcquisitionPlanes);
+  MITK_TEST(Apply_FrameOfReferenceAlignedDatasets_FitTheirJointExtent);
+  MITK_TEST(Apply_MixedTimeData_GlobalTimeCoversAll);
+  MITK_TEST(Apply_WhileHidden_GlobalTimeStillCoversAllOnceShown);
+  MITK_TEST(Apply_ObjectFormSelectionLinks_Accepted);
   MITK_TEST(Apply_ValidationFailuresChangeNothing);
   MITK_TEST(Cleanup_ReusedIdInheritsNoRendererState);
   MITK_TEST(Cleanup_UnlinkKeepsTheCellsOtherRendererState);
@@ -729,7 +739,8 @@ public:
                            2 == layout.opacities.size() && std::abs(layout.opacities[0].opacity - 0.5f) < 1e-6f);
     CPPUNIT_ASSERT_MESSAGE("A maximum intensity projection in the MIP window",
                            1 == layout.volumeRenderings.size()
-                             && vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND == layout.volumeRenderings[0].blendMode);
+                             && QmitkMxNVolumeBlendMode::MaximumIntensity == layout.volumeRenderings[0].blendMode
+                             && layout.volumeRenderings[0].transferFunction.IsNotNull());
 
     layout = this->Generate(bindings, QmitkMxNFusionPairOptions{ QmitkMxNFusionColormap::HotIron, false,
                                                                  QmitkMxNFusionOpacity::Percent70 });
@@ -754,7 +765,16 @@ public:
                                  this->Generate({ { QmitkMxNSlot::Datasets, { a } } }, QmitkMxNOneViewPerDatasetOptions{}),
                                  mitk::Exception);
     CPPUNIT_ASSERT_THROW_MESSAGE("More than the maximum",
-                                 this->Generate({ { QmitkMxNSlot::Datasets, { a, b, a, b, a } } }, planes), mitk::Exception);
+                                 this->Generate({ { QmitkMxNSlot::Datasets,
+                                                    { a, b, this->AddImage("c"), this->AddImage("d"), this->AddImage("e") } } },
+                                                planes),
+                                 mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("One node twice in a slot",
+                                 this->Generate({ { QmitkMxNSlot::Datasets, { a, a } } }, planes), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("One node in two slots",
+                                 this->Generate({ { QmitkMxNSlot::Anatomy, { a } }, { QmitkMxNSlot::FusedImage, { a } } },
+                                                QmitkMxNFusionPairOptions{}),
+                                 mitk::Exception);
     CPPUNIT_ASSERT_THROW_MESSAGE("A node of another data class",
                                  this->Generate({ { QmitkMxNSlot::Datasets, { mask } } }, planes), mitk::Exception);
     CPPUNIT_ASSERT_THROW_MESSAGE("A slot the template does not have",
@@ -830,6 +850,7 @@ public:
     const auto anatomy = this->AddImage("anatomy");
     const auto fused = this->AddImage("fused");
     fused->SetOpacity(1.0f);
+    fused->SetLevelWindow(mitk::LevelWindow(100.0, 200.0));
     this->ShowEditor();
     const auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
                                        QmitkMxNFusionPairOptions{});
@@ -865,7 +886,28 @@ public:
       }
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Volume rendering only in the MIP window" + where, 6 == i,
                                    HasRendererProperty(*fused, id(i), "volumerendering"));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A transfer function only in the MIP window" + where, 6 == i,
+                                   HasRendererProperty(*fused, id(i), "TransferFunction"));
     }
+
+    // Without a transfer function the volume mapper renders nothing; the MIP
+    // window gets a white ramp over the fused image's level window.
+    auto* mipRenderer = this->Renderer(id(6));
+    int blendMode = -1;
+    CPPUNIT_ASSERT_MESSAGE("A maximum intensity projection",
+                           fused->GetIntProperty("volumerendering.blendmode", blendMode, mipRenderer)
+                             && vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND == blendMode);
+    auto* transferFunction = dynamic_cast<mitk::TransferFunctionProperty*>(fused->GetProperty("TransferFunction", mipRenderer));
+    CPPUNIT_ASSERT_MESSAGE("The MIP window has a transfer function", nullptr != transferFunction);
+    auto* opacity = transferFunction->GetValue()->GetScalarOpacityFunction();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Transparent at the lower window bound", 0.0, opacity->GetValue(0.0), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Half opaque at the level", 0.5, opacity->GetValue(100.0), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Opaque at the upper window bound", 1.0, opacity->GetValue(200.0), 1e-6);
+    double color[3] = { 0.0, 0.0, 0.0 };
+    transferFunction->GetValue()->GetColorTransferFunction()->GetColor(100.0, color);
+    CPPUNIT_ASSERT_MESSAGE("White", color[0] > 1.0 - 1e-6 && color[1] > 1.0 - 1e-6 && color[2] > 1.0 - 1e-6);
+    CPPUNIT_ASSERT_MESSAGE("No node-global transfer function", nullptr == fused->GetProperty("TransferFunction"));
+
     float globalOpacity = 0.0f;
     fused->GetOpacity(globalOpacity, nullptr);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The node-global opacity is unchanged", 1.0, globalOpacity, 1e-6);
@@ -921,6 +963,179 @@ public:
     }
   }
 
+  mitk::DataNode::Pointer AddImage(const std::string& name, unsigned int x, unsigned int y, unsigned int z,
+                                   unsigned int t = 1)
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName(name);
+    node->SetData(mitk::ImageGenerator::GenerateRandomImage<unsigned short>(x, y, z, t));
+    m_DataStorage->Add(node);
+    return node;
+  }
+
+  void Apply_ObliqueDataset_ShownInItsAcquisitionPlanes()
+  {
+    // An obliquely acquired image is shown in its own planes, as a reinit
+    // with the image does, not resliced along the world axes.
+    const auto oblique = this->AddImage("oblique", 16, 16, 8);
+    auto* image = dynamic_cast<mitk::Image*>(oblique->GetData());
+    auto* geometry = image->GetGeometry();
+    mitk::Vector3D axis;
+    axis[0] = 1.0;
+    axis[1] = 0.0;
+    axis[2] = 0.0;
+    mitk::RotationOperation rotation(mitk::OpROTATE, geometry->GetCenter(), axis, 30.0);
+    geometry->ExecuteOperation(&rotation);
+    image->GetTimeGeometry()->UpdateBoundingBox();
+    this->ShowEditor();
+
+    m_Editor->ApplyDynamicLayout(
+      this->Generate({ { QmitkMxNSlot::Datasets, { oblique } } }, QmitkMxNDatasetsByPlanesOptions{}));
+    Pump();
+
+    const auto imageNormal = geometry->GetAxisVector(2);
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      if ("axial" != descriptor.viewDirection)
+      {
+        continue;
+      }
+      auto* renderer = this->Renderer(descriptor.id);
+      const auto planeNormal = renderer->GetCurrentWorldPlaneGeometry()->GetNormal();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The axial plane is the image's own", 1.0,
+                                           std::abs(planeNormal * imageNormal)
+                                             / (planeNormal.GetNorm() * imageNormal.GetNorm()),
+                                           1e-6);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("...with the image's slices", image->GetDimension(2),
+                                   renderer->GetSliceNavigationController()->GetStepper()->GetSteps());
+    }
+  }
+
+  void Apply_FrameOfReferenceAlignedDatasets_FitTheirJointExtent()
+  {
+    // Series in one Frame of Reference, e.g. a CT and a PET with a longer
+    // scan range: aligned, but of different extents. Every window must reach
+    // every dataset's slices, not only the first dataset's.
+    const auto shorter = this->AddImage("shorter", 16, 16, 8);
+    const auto longer = this->AddImage("longer", 16, 16, 24);
+    SetTag(shorter, 0x0020, 0x0052, "1.2.3");
+    SetTag(longer, 0x0020, 0x0052, "1.2.3");
+    this->ShowEditor();
+
+    const QmitkMxNSlotBindings datasets{ { QmitkMxNSlot::Datasets, { shorter, longer } } };
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the defaults call them aligned",
+                           std::get<QmitkMxNDatasetsByPlanesOptions>(QmitkMxNDynamicLayouts::DefaultOptions(
+                             QmitkMxNDynamicTemplate::DatasetsByPlanes, datasets, *m_DataStorage)).aligned);
+    const std::pair<std::string, QmitkMxNDynamicOptions> variants[] = {
+      { "datasets x planes", QmitkMxNDatasetsByPlanesOptions{ true } },
+      { "one view per dataset", QmitkMxNOneViewPerDatasetOptions{ true } } };
+    const double halfSlice = 0.5 + 1e-3;
+    for (const auto& [name, options] : variants)
+    {
+      m_Editor->ApplyDynamicLayout(this->Generate(datasets, options));
+      Pump();
+
+      for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+      {
+        const std::string where = " of " + descriptor.id.toStdString() + " (" + name + ")";
+        auto* renderer = this->Renderer(descriptor.id);
+        if ("axial" == descriptor.viewDirection)
+        {
+          CPPUNIT_ASSERT_EQUAL_MESSAGE("Every slice of the longer dataset" + where,
+                                       dynamic_cast<const mitk::Image*>(longer->GetData())->GetDimension(2),
+                                       renderer->GetSliceNavigationController()->GetStepper()->GetSteps());
+        }
+        const auto view = renderer->GetWorldTimeGeometry()->GetBoundsInWorld();
+        for (const auto& dataset : { shorter, longer })
+        {
+          const auto data = dataset->GetData()->GetTimeGeometry()->GetBoundsInWorld();
+          for (int axis = 0; axis < 3; ++axis)
+          {
+            // Slices laid over a joint extent sit half a slice off a dataset's
+            // own grid, as after a global reinit.
+            CPPUNIT_ASSERT_MESSAGE("The view covers " + dataset->GetName() + where,
+                                   view[2 * axis] <= data[2 * axis] + halfSlice
+                                     && view[2 * axis + 1] >= data[2 * axis + 1] - halfSlice);
+          }
+        }
+      }
+    }
+  }
+
+  void Apply_MixedTimeData_GlobalTimeCoversAll()
+  {
+    // A dynamic series beside a static one: the time navigation must still
+    // step through the dynamic series, whichever window was fitted last.
+    const auto dynamic = this->AddImage("dynamic", 16, 16, 8, 3);
+    const auto still = this->AddImage("static", 16, 16, 8);
+    this->ShowEditor();
+
+    m_Editor->ApplyDynamicLayout(
+      this->Generate({ { QmitkMxNSlot::Datasets, { dynamic, still } } }, QmitkMxNDatasetsByPlanesOptions{}));
+    Pump();
+
+    auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The time steps of the dynamic series", mitk::TimeStepType(3),
+                                 timeNavigation->GetInputWorldTimeGeometry()->CountTimeSteps());
+    timeNavigation->GetStepper()->SetPos(2);
+    const auto* dynamicTime = dynamic->GetData()->GetTimeGeometry();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The last step reaches the series' last time step", mitk::TimeStepType(2),
+                                 dynamicTime->TimePointToTimeStep(timeNavigation->GetSelectedTimePoint()));
+  }
+
+  void Apply_WhileHidden_GlobalTimeStillCoversAllOnceShown()
+  {
+    // Applied to a hidden display, the windows are fitted to their size once
+    // it is shown; that repair of the 3D windows must not narrow the time
+    // range the layout set to one window's data.
+    const auto dynamic = this->AddImage("dynamic", 16, 16, 8, 3);
+    const auto still = this->AddImage("static", 16, 16, 8);
+    m_Editor->ApplyDynamicLayout(this->Generate({ { QmitkMxNSlot::Datasets, { dynamic, still } } },
+                                                QmitkMxNDatasetsByPlanesOptions{ false, true, false }));
+    auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: applied, the time covers the dynamic series", mitk::TimeStepType(3),
+                                 timeNavigation->GetInputWorldTimeGeometry()->CountTimeSteps());
+
+    this->ShowEditor();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Shown, it still does", mitk::TimeStepType(3),
+                                 timeNavigation->GetInputWorldTimeGeometry()->CountTimeSteps());
+  }
+
+  /** Every window's selection link 's' rewritten as '{"target": s}'. */
+  static void UseObjectFormSelectionLinks(nlohmann::json& node)
+  {
+    if ("window" == node.at("type").get<std::string>())
+    {
+      auto& links = node.at("links");
+      links["selection"] = nlohmann::json{ { "target", links.at("selection") } };
+      return;
+    }
+    for (auto& child : node.at("children"))
+    {
+      UseObjectFormSelectionLinks(child);
+    }
+  }
+
+  void Apply_ObjectFormSelectionLinks_Accepted()
+  {
+    // The layout format accepts a link as a group name or as an object
+    // naming it; a hand-built dynamic layout may use either.
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    UseObjectFormSelectionLinks(layout.document.at("root"));
+
+    CPPUNIT_ASSERT_NO_THROW(m_Editor->ApplyDynamicLayout(layout));
+    std::set<std::string> bound;
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      bound.insert(descriptor.selectionGroup.toStdString());
+    }
+    CPPUNIT_ASSERT_MESSAGE("Every window shows its group", (std::set<std::string>{ "anat", "fused", "fusion" }) == bound);
+  }
+
   void Apply_ValidationFailuresChangeNothing()
   {
     const auto anatomy = this->AddImage("anatomy");
@@ -939,8 +1154,12 @@ public:
     layout.lookupTables.push_back({ anatomyWindow, fused, mitk::LookupTable::GRAYSCALE });
     broken.emplace_back("a lookup table for a window without a LUT link", layout);
     layout = valid;
-    layout.volumeRenderings.push_back({ anatomyWindow, fused, vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND });
+    layout.volumeRenderings.push_back(
+      { anatomyWindow, fused, QmitkMxNVolumeBlendMode::MaximumIntensity, mitk::TransferFunction::New() });
     broken.emplace_back("a volume rendering for a 2D window", layout);
+    layout = valid;
+    layout.volumeRenderings.front().transferFunction = nullptr;
+    broken.emplace_back("a volume rendering without a transfer function", layout);
     layout = valid;
     layout.fits.push_back({ QStringLiteral("mxn__widget99"), true });
     broken.emplace_back("a fit of a window the document does not have", layout);
@@ -949,6 +1168,24 @@ public:
     stranger->SetData(mitk::ImageGenerator::GenerateGradientImage<short>(4, 4, 4));
     layout.groupNodes["anat"] = { stranger };
     broken.emplace_back("a node outside the data storage", layout);
+    // The first window of the document is the anatomy window.
+    const auto anatomyLinks = [](QmitkMxNDynamicLayout& l) -> nlohmann::json& {
+      auto* node = &l.document.at("root");
+      while ("window" != node->at("type").get<std::string>())
+      {
+        node = &node->at("children").at(0);
+      }
+      return node->at("links");
+    };
+    layout = valid;
+    anatomyLinks(layout)["selection"] = 5;
+    broken.emplace_back("a selection link that is a number", layout);
+    layout = valid;
+    anatomyLinks(layout)["selection"] = nlohmann::json{ { "target", 5 } };
+    broken.emplace_back("a selection link whose target is a number", layout);
+    layout = valid;
+    anatomyLinks(layout) = nlohmann::json::array();
+    broken.emplace_back("links that are not an object", layout);
 
     for (const auto& [what, layout] : broken)
     {

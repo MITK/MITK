@@ -183,9 +183,23 @@ void QmitkMxNDynamicLayoutDialog::BuildSlotRows()
     }
     widget->setObjectName(QStringLiteral("slot%1").arg(index++));
     widget->SetDataStorage(m_DataStorage);
+    // A node another slot holds is not offered: the generator rejects a node
+    // in two roles. Read live, so the predicate needs no update when another
+    // slot changes.
     const auto dataClass = slot.dataClass;
-    widget->SetNodePredicate(mitk::NodePredicateFunction::New([dataClass](const mitk::DataNode* node) {
-      return nullptr != node && QmitkMxNDynamicLayouts::IsOfDataClass(*node, dataClass);
+    widget->SetNodePredicate(mitk::NodePredicateFunction::New([this, widget, dataClass](const mitk::DataNode* node) {
+      if (nullptr == node || !QmitkMxNDynamicLayouts::IsOfDataClass(*node, dataClass))
+      {
+        return false;
+      }
+      return std::none_of(m_SlotWidgets.begin(), m_SlotWidgets.end(), [widget, node](const auto& entry) {
+        if (entry.second == widget)
+        {
+          return false;
+        }
+        const auto held = entry.second->GetSelectedNodes();
+        return std::any_of(held.begin(), held.end(), [node](const auto& other) { return other.GetPointer() == node; });
+      });
     }));
     widget->SetSelectionIsOptional(true);
     widget->SetEmptyInfo(tr("Select %1").arg(slot.role.toLower()));
@@ -445,6 +459,9 @@ void QmitkMxNDynamicLayoutDialog::SwapRoles()
   const auto secondNodes = second->GetSelectedNodes();
   {
     const QScopedValueRollback<bool> updating(m_Updating, true);
+    // Emptied first: a slot refuses a node the other one still holds.
+    first->SetCurrentSelection({});
+    second->SetCurrentSelection({});
     first->SetCurrentSelection(secondNodes);
     second->SetCurrentSelection(firstNodes);
   }

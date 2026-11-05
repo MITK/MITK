@@ -199,6 +199,13 @@
 		<li> The fusion opacity is set per window. The Data Manager's opacity slider does not
 			reach the fusion windows; the Properties view, which edits a window's own values,
 			does, and so does applying the layout again.
+		<li> The MIP window shows the fused image's level/window range as it was when the layout
+			was applied: transparent at the lower bound, opaque at the upper one. The curve is
+			the window's own, so the Volume Visualization view does not change it; applying the
+			layout again takes the current level/window.
+		<li> The windows of a dataset show the planes its image was acquired in, also for an
+			oblique series. Aligned datasets of different extents, such as a CT and a PET with a
+			longer scan range, are shown along the world axes, in a frame that holds all of them.
 		<li> Data created later from a bound image appears in every window that shows that
 			image: a new segmentation of the shared image or of the anatomy appears in every
 			column.

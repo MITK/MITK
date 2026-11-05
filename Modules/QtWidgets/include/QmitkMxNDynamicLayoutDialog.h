@@ -40,7 +40,8 @@ class QPushButton;
  *
  * The slots are filled from the selection the dialog opens with, and the
  * options from the data in the slots; switching the template fills both
- * again. An option follows the data until the user changes it. Apply stays
+ * again. A slot does not offer a node another slot holds. An option follows
+ * the data until the user changes it. Apply stays
  * disabled, with a line naming the slot, while a slot holds too few or too
  * many nodes. Accepting generates the layout; the dialog applies nothing.
  */

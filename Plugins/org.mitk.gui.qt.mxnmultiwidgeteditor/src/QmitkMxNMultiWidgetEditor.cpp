@@ -36,7 +36,6 @@ found in the LICENSE file.
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPointer>
-#include <QTimer>
 
 // c++
 #include <algorithm>
@@ -372,15 +371,13 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   layout->addWidget(multiWidget);
 
   // Only the stock display starts with the layout the user chose; a display
-  // another plugin declares starts the way that plugin decides. The preset is
-  // applied once the display is shown, so that its windows are fitted to the
-  // size they are laid out to.
+  // another plugin declares starts the way that plugin decides.
   if (EDITOR_ID == m_Impl->m_EditorId)
   {
     const auto presetId = QString::fromStdString(preferences->Get("Layout when opened", ""));
     if (!presetId.isEmpty())
     {
-      QTimer::singleShot(0, multiWidget, [multiWidget, presetId]() { ApplyStartPreset(*multiWidget, presetId); });
+      ApplyStartPreset(*multiWidget, presetId);
     }
   }
 

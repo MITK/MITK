@@ -53,6 +53,7 @@ struct QmitkMxN3DCameraState;
 class QDialog;
 class QLabel;
 class QProgressBar;
+class QShowEvent;
 class QSplitter;
 class QTimer;
 
@@ -1255,8 +1256,10 @@ public:
   void ApplyLayout(const nlohmann::json& doc);
 
   /**
-  * \brief True while an 'ApplyLayout' is in progress, including its rollback on
-  *        failure, and while a layout load announced by
+  * \brief True while an 'ApplyLayout' or 'ApplyDynamicLayout' is in progress,
+  *        including its rollback on failure, while a grid change ('SetLayout',
+  *        'AddGridRow', 'AddGridColumn') lets the event loop lay out its new
+  *        cells, and while a layout load announced by
   *        'ShowLayoutLoadFeedback' has not yet been closed by
   *        'HideLayoutLoadFeedback'.
   *
@@ -1464,6 +1467,9 @@ protected:
   *   increments this by exactly N; a propagation cycle would inflate it.
   */
   unsigned int GetOrientationApplyCount() const;
+
+  /** \brief Fits the cells whose fit was deferred while the editor was hidden. */
+  void showEvent(QShowEvent* event) override;
 
 private:
 
@@ -1878,18 +1884,35 @@ private:
   /** \brief The checks 'ApplyDynamicLayout' runs before it changes anything. */
   void ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const;
 
+  /** \brief The bounding geometry, time included, of the data visible in
+  *          any cell; null when none is. */
+  mitk::TimeGeometry::ConstPointer ComputeShownTimeGeometry() const;
+
   /** \brief Fit one cell, alone, to the data visible in it. */
   void FitCellToVisibleData(const QString& windowId);
+
+  /**
+  * \brief Initialize every cell of the geometry-authority component of
+  *        'windowId' (see 'ReinitSyncGroupGeometry') to 'geometry', then
+  *        re-converge the component's geometry-relative groups.
+  */
+  void InitializeGeometryComponent(const QString& windowId, const mitk::TimeGeometry* geometry);
 
   /**
   * \brief Lay out the editor, then fit the camera of each cell of
   *        'windowIds' to the size it is laid out to: a 2D cell's camera to
   *        its plane, a 3D cell's view to its geometry.
   *
-  *   For cells created since the event loop last ran. Nothing happens while
-  *   the editor is hidden. The global time step is kept.
+  *   For cells created since the event loop last ran. While the editor is
+  *   hidden, nothing can be laid out: the fit is deferred until it is shown,
+  *   and the zoom, pan and slice groups of the deferred cells then converge
+  *   again. The global time range and step are kept.
   */
   void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
+
+  /** \brief The deferred part of 'FitNewCellsToTheirSize', run once the
+  *          editor is shown. */
+  void FitCellsDeferredWhileHidden();
 
   /**
   * \brief Set the 2D members of the zoom group of 'sender' to the zoom of
@@ -2190,6 +2213,9 @@ private:
 
   /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
   bool m_ApplyingLayout = false;
+  /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
+  *          hidden; they are fitted once it is shown. */
+  std::vector<QString> m_CellsToFitWhenShown;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
   *          see 'IsApplyingLayout'. */
   bool m_LayoutLoadPending = false;

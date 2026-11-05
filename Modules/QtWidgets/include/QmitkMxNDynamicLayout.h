@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
 #include <mitkLookupTable.h>
+#include <mitkTransferFunction.h>
 
 #include <nlohmann/json.hpp>
 
@@ -42,6 +43,11 @@ found in the LICENSE file.
  * A generator only arranges windows, links them, binds selection groups and
  * sets renderer-specific state of existing nodes; it never creates nodes and
  * never writes node-global properties.
+ *
+ * The 2D windows of a dataset are fitted to its image's geometry, so an
+ * oblique acquisition is shown in its own planes. Aligned datasets share one
+ * geometry: the first one's when all are identical, else their joint extent
+ * along the world axes.
  *
  * Data classes: an Image is an 'mitk::Image' that is not binary; an Overlay
  * is a multi-label segmentation, a surface, a point set or a binary image.
@@ -160,6 +166,17 @@ using QmitkMxNDynamicOptions = std::variant<QmitkMxNDatasetsByPlanesOptions,
 
 using QmitkMxNSlotBindings = std::map<QmitkMxNSlot, std::vector<mitk::DataNode::Pointer>>;
 
+/** \brief How a volume rendering combines the samples along a ray: the blend
+ *         modes the volume mapper renders. */
+enum class QmitkMxNVolumeBlendMode
+{
+  Composite,
+  MaximumIntensity,
+  MinimumIntensity,
+  AverageIntensity,
+  Additive
+};
+
 /** \brief A generated layout and everything 'ApplyDynamicLayout' writes after loading it. */
 struct QmitkMxNDynamicLayout
 {
@@ -185,21 +202,27 @@ struct QmitkMxNDynamicLayout
   };
   std::vector<OpacityAssignment> opacities;
 
+  /** Written for the window's renderer only; the volume mapper renders
+      nothing without a transfer function. */
   struct VolumeRenderingAssignment
   {
     QString windowId;  // a 3D window
     mitk::DataNode::Pointer node;
-    int blendMode;     // a vtkVolumeMapper blend mode
+    QmitkMxNVolumeBlendMode blendMode;
+    mitk::TransferFunction::Pointer transferFunction;  // not null
   };
   std::vector<VolumeRenderingAssignment> volumeRenderings;
 
   struct Fit
   {
     QString windowId;
-    /** True: fit the window's slice/orientation component from this window
-        ('ReinitSyncGroupGeometry'). False: fit this window alone to the
-        nodes its selection group shows. */
+    /** True: fit the window's slice/orientation component. False: fit this
+        window alone. */
     bool wholeComponent;
+    /** The geometry to fit to. Null: the nodes the window's selection group
+        shows, for a component as seen from this window
+        ('ReinitSyncGroupGeometry'). */
+    mitk::TimeGeometry::ConstPointer geometry = nullptr;
   };
   std::vector<Fit> fits;
 };
@@ -271,7 +294,8 @@ namespace QmitkMxNDynamicLayouts
   *
   * \throws mitk::Exception when a slot of the template is missing or holds
   *         fewer or more nodes than its cardinality, a node does not match
-  *         its slot's data class, a binding names a slot the template does
+  *         its slot's data class, a node is bound more than once (in one
+  *         slot or in two), a binding names a slot the template does
   *         not have, the 3D view of one view per dataset is chosen without
   *         every dataset having a 3D representation, the widget name is not
   *         a valid MxN widget name, or the aspect ratio is not positive.

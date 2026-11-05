@@ -45,6 +45,8 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -105,6 +107,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(AddGridColumn_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(Apply_WhileHidden_EndsAsAppliedWhileShown);
+  MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
   MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
   MITK_TEST(Apply_ThreeDWindow_FramesTheData);
 
@@ -1084,6 +1088,94 @@ public:
     AssertNewWindowsShowTheirWholePlane(*editor, existing);
   }
 
+  /** The cameras' parallel scales after applying 'doc' to an editor that is
+   *  shown before or only after the layout is applied. */
+  std::map<QString, double> ParallelScalesAfterApplying(const nlohmann::json& doc, bool shownBefore)
+  {
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    if (shownBefore)
+    {
+      editor->show();
+      Pump();
+    }
+    editor->ApplyLayout(doc);
+    editor->show();
+    Pump();
+
+    std::map<QString, double> scales;
+    for (const auto& windowId : WindowIds(*editor))
+    {
+      auto* renderer = mitk::BaseRenderer::GetInstance(
+        editor->GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow());
+      scales[windowId] = renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+    }
+    return scales;
+  }
+
+  void Apply_WhileHidden_EndsAsAppliedWhileShown()
+  {
+    // A layout can reach a display before it is shown: an editor's initial
+    // layout, a preset applied on opening, a call while the editor's tab is
+    // hidden. The windows must end as if it had been applied while shown -
+    // fitted to their size, a zoom group converged on its seed.
+    AddSquareImage();
+    for (const bool zoomGroup : { false, true })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "version": "3.0",
+        "root": { "type": "split", "orientation": "horizontal", "children": [
+          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+        ] }
+      })json");
+      if (zoomGroup)
+      {
+        doc["root"]["children"][0]["links"]["zoom"] = "z";
+        doc["root"]["children"][1]["links"]["zoom"] = "z";
+      }
+      const std::string where = zoomGroup ? " (zoom group)" : " (no zoom group)";
+
+      const auto shown = this->ParallelScalesAfterApplying(doc, true);
+      const auto hidden = this->ParallelScalesAfterApplying(doc, false);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The same windows" + where, shown.size(), hidden.size());
+      for (const auto& [windowId, scale] : shown)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera of " + windowId.toStdString() + where, scale,
+                                             hidden.at(windowId), 1e-6);
+      }
+    }
+  }
+
+  void GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy()
+  {
+    // The fit of new cells pumps the event loop to lay them out. A queued
+    // call it delivers - a REST request, say - must find the editor busy,
+    // as during a layout load, or it could rebuild the cell tree under the
+    // running operation.
+    auto editor = MakeShownEditor(900, 600);
+    auto* widget = editor.get();
+    const std::pair<std::string, std::function<void()>> operations[] = {
+      { "SetLayout", [widget]() { widget->SetLayout(1, 3); } },
+      { "AddGridColumn", [widget]() { widget->AddGridColumn(); } },
+      { "AddGridRow", [widget]() { widget->AddGridRow(); } } };
+    for (const auto& [name, operation] : operations)
+    {
+      bool ran = false;
+      bool busy = false;
+      QMetaObject::invokeMethod(widget, [widget, &ran, &busy]() {
+        ran = true;
+        busy = widget->IsApplyingLayout();
+      }, Qt::QueuedConnection);
+      operation();
+      CPPUNIT_ASSERT_MESSAGE("Fixture: " + name + " delivers the queued call", ran);
+      CPPUNIT_ASSERT_MESSAGE("The queued call finds the editor busy during " + name, busy);
+      Pump();
+    }
+  }
+
   void Apply_DeclaredSizes_SetTheProportions()
   {
     // Sizes are weights: only their ratio counts, however small they are.
@@ -1144,6 +1236,7 @@ public:
                              + std::to_string(halfHeight) + " mm",
                            halfHeight < 100.0);
   }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkMxNLayoutV3)

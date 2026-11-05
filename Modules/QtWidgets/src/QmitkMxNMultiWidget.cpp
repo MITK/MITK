@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkSliceNavigationHelper.h>
+#include <mitkTransferFunctionProperty.h>
 #include <mitkVtkPropRenderer.h>
 
 // itk
@@ -36,6 +37,7 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
+#include <vtkVolumeMapper.h>
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
@@ -194,6 +196,48 @@ namespace
   bool IsThreeD(const mitk::BaseRenderer* renderer)
   {
     return nullptr != renderer && mitk::BaseRenderer::Standard3D == renderer->GetMapperID();
+  }
+
+  int ToVtkBlendMode(QmitkMxNVolumeBlendMode mode)
+  {
+    switch (mode)
+    {
+      case QmitkMxNVolumeBlendMode::Composite:        return vtkVolumeMapper::COMPOSITE_BLEND;
+      case QmitkMxNVolumeBlendMode::MaximumIntensity: return vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::MinimumIntensity: return vtkVolumeMapper::MINIMUM_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::AverageIntensity: return vtkVolumeMapper::AVERAGE_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::Additive:         return vtkVolumeMapper::ADDITIVE_BLEND;
+    }
+    mitkThrow() << "ToVtkBlendMode: unsupported QmitkMxNVolumeBlendMode value.";
+  }
+
+  /** The nodes a fit bounds: not excluded from the bounding box and no
+   *  helper objects. Core's own reinit leaves helper objects in; a fit here
+   *  must not frame a crosshair or an interactor's handle. */
+  mitk::DataStorage::SetOfObjects::ConstPointer BoundingNodes(const mitk::DataStorage& dataStorage)
+  {
+    const auto includeInBoundingBox =
+      mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
+    const auto helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+    return dataStorage.GetSubset(mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(includeInBoundingBox),
+                                                             mitk::NodePredicateNot::New(helperObject)));
+  }
+
+  /** View initializations reset the application-global time: set it to
+   *  'timeGeometry' (null: leave it), and to 'timePoint' where that lies in it. */
+  void RestoreGlobalTime(mitk::TimeNavigationController* timeNavigation, const mitk::TimeGeometry* timeGeometry,
+                         mitk::TimePointType timePoint)
+  {
+    if (nullptr != timeGeometry && timeGeometry != timeNavigation->GetInputWorldTimeGeometry())
+    {
+      timeNavigation->SetInputWorldTimeGeometry(timeGeometry);
+      timeNavigation->Update();
+    }
+    const auto* current = timeNavigation->GetInputWorldTimeGeometry();
+    if (nullptr != current && current->IsValidTimePoint(timePoint))
+    {
+      timeNavigation->GetStepper()->SetPos(current->TimePointToTimeStep(timePoint));
+    }
   }
 
   mitk::BaseRenderer* RendererOf(const QmitkRenderWindowWidget* cell)
@@ -3150,7 +3194,9 @@ void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout
     {
       auto* renderer = RendererOf(this->GetRenderWindowWidget(assignment.windowId).get());
       assignment.node->SetBoolProperty("volumerendering", true, renderer);
-      assignment.node->SetIntProperty("volumerendering.blendmode", assignment.blendMode, renderer);
+      assignment.node->SetIntProperty("volumerendering.blendmode", ToVtkBlendMode(assignment.blendMode), renderer);
+      assignment.node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(assignment.transferFunction),
+                                   renderer);
     }
   });
 
@@ -3158,7 +3204,19 @@ void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout
   {
     for (const auto& fit : layout.fits)
     {
-      if (fit.wholeComponent)
+      if (fit.geometry.IsNotNull())
+      {
+        if (fit.wholeComponent)
+        {
+          this->InitializeGeometryComponent(fit.windowId, fit.geometry);
+        }
+        else
+        {
+          mitk::RenderingManager::GetInstance()->InitializeView(
+            this->GetRenderWindowWidget(fit.windowId)->GetRenderWindow()->GetVtkRenderWindow(), fit.geometry);
+        }
+      }
+      else if (fit.wholeComponent)
       {
         this->ReinitSyncGroupGeometry(fit.windowId);
       }
@@ -3167,11 +3225,10 @@ void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout
         this->FitCellToVisibleData(fit.windowId);
       }
     }
-    const auto* timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
-    if (nullptr != timeGeometry && timeGeometry->IsValidTimePoint(timePoint))
-    {
-      timeNavigation->GetStepper()->SetPos(timeGeometry->TimePointToTimeStep(timePoint));
-    }
+    // Each fit set the global time to its own geometry; the layout replaced
+    // what the display shows, so the time covers all of that, as a global
+    // reinit does.
+    RestoreGlobalTime(timeNavigation, this->ComputeShownTimeGeometry(), timePoint);
   });
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -3185,21 +3242,35 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
     bool threeD = false;
     bool linkedOnLut = false;
   };
+  // Shapes are the loader's to reject; a value of an unexpected shape only
+  // yields no fact here, and whatever relies on it fails the checks below.
+  const auto stringAt = [](const nlohmann::json& object, const char* key)
+  {
+    const auto it = object.find(key);
+    return object.end() != it && it->is_string() ? it->get<std::string>() : std::string();
+  };
   std::map<QString, WindowFacts> windows;
-  std::function<void(const nlohmann::json&)> collect = [&windows, &collect](const nlohmann::json& node)
+  std::function<void(const nlohmann::json&)> collect = [&windows, &collect, &stringAt](const nlohmann::json& node)
   {
     if (!node.is_object())
     {
       return;
     }
-    if ("window" == node.value("type", std::string()) && node.contains("id") && node.at("id").is_string())
+    if ("window" == stringAt(node, "type") && !stringAt(node, "id").empty())
     {
       WindowFacts facts;
-      const auto& links = node.value("links", nlohmann::json::object());
-      facts.selection = links.value("selection", std::string());
-      facts.threeD = "3d" == node.value("render_mode", std::string());
-      facts.linkedOnLut = links.contains("lut");
-      windows[QString::fromStdString(node.at("id").get<std::string>())] = facts;
+      const auto links = node.find("links");
+      if (node.end() != links && links->is_object())
+      {
+        if (const auto selection = links->find("selection"); links->end() != selection)
+        {
+          facts.selection = selection->is_object() ? stringAt(*selection, "target")
+                                                   : stringAt(*links, "selection");
+        }
+        facts.linkedOnLut = links->contains("lut");
+      }
+      facts.threeD = "3d" == stringAt(node, "render_mode");
+      windows[QString::fromStdString(stringAt(node, "id"))] = facts;
     }
     if (node.contains("children") && node.at("children").is_array())
     {
@@ -3270,6 +3341,11 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
       mitkThrow() << "ApplyDynamicLayout: a volume rendering goes to window '" << assignment.windowId.toStdString()
                   << "', which is not a 3D window.";
     }
+    if (assignment.transferFunction.IsNull())
+    {
+      mitkThrow() << "ApplyDynamicLayout: the volume rendering of window '" << assignment.windowId.toStdString()
+                  << "' has no transfer function.";
+    }
     checkNode(assignment.node, "a volume rendering");
   }
   for (const auto& fit : layout.fits)
@@ -3286,13 +3362,7 @@ void QmitkMxNMultiWidget::FitCellToVisibleData(const QString& windowId)
   {
     return;
   }
-  // The data a single-cell reinit would fit to, as in ReinitSyncGroupGeometry.
-  const auto includeInBoundingBox =
-    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
-  const auto helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  const auto predicate = mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(includeInBoundingBox),
-                                                     mitk::NodePredicateNot::New(helperObject));
-  const auto bounds = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetSubset(predicate), "visible",
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(BoundingNodes(*dataStorage), "visible",
                                                              RendererOf(widget.get()));
   if (bounds.IsNotNull())
   {
@@ -3300,21 +3370,69 @@ void QmitkMxNMultiWidget::FitCellToVisibleData(const QString& windowId)
   }
 }
 
+mitk::TimeGeometry::ConstPointer QmitkMxNMultiWidget::ComputeShownTimeGeometry() const
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return nullptr;
+  }
+  std::vector<const mitk::BaseRenderer*> renderers;
+  for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    renderers.push_back(RendererOf(cell.get()));
+  }
+  auto shown = mitk::DataStorage::SetOfObjects::New();
+  // Held: a range-for over the dereferenced temporary iterates a freed set.
+  const auto candidates = BoundingNodes(*dataStorage);
+  for (const auto& node : *candidates)
+  {
+    if (std::any_of(renderers.begin(), renderers.end(),
+                    [&node](const mitk::BaseRenderer* renderer) { return node->IsVisible(renderer); }))
+    {
+      shown->push_back(node);
+    }
+  }
+  return dataStorage->ComputeBoundingGeometry3D(shown);
+}
+
 void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& windowIds)
 {
-  if (windowIds.empty() || !this->isVisible())
+  if (windowIds.empty())
   {
+    return;
+  }
+  if (!this->isVisible())
+  {
+    // A hidden editor is not laid out; its cells get their size when shown.
+    for (const auto& windowId : windowIds)
+    {
+      if (std::find(m_CellsToFitWhenShown.begin(), m_CellsToFitWhenShown.end(), windowId)
+          == m_CellsToFitWhenShown.end())
+      {
+        m_CellsToFitWhenShown.push_back(windowId);
+      }
+    }
     return;
   }
   // A cell fits its camera when it is constructed, before it is laid out.
   // Core narrows a fit when a window shrinks but never widens it, so a cell
   // laid out narrower than it was constructed would show its plane cut off at
   // the sides. One pass of the event loop lays the new cells out; user input
-  // stays excluded, as while the load feedback is shown.
-  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  // stays excluded, as while the load feedback is shown. The pass also
+  // delivers queued calls, which must find the editor busy, as during a load,
+  // so they do not rebuild the cells under the running operation. Not held
+  // longer: the operation's LayoutChanged handlers skip their refresh while
+  // the editor is busy.
+  {
+    const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  }
 
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   auto* timeNavigation = renderingManager->GetTimeNavigationController();
+  // A repair of the cells' cameras; the time it found stays.
+  const mitk::TimeGeometry::ConstPointer timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
   const auto timePoint = timeNavigation->GetSelectedTimePoint();
   for (const auto& windowId : windowIds)
   {
@@ -3342,11 +3460,52 @@ void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& win
       renderingManager->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
     }
   }
-  // A view initialization resets the application-global time.
-  const auto* timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
-  if (nullptr != timeGeometry && timeGeometry->IsValidTimePoint(timePoint))
+  RestoreGlobalTime(timeNavigation, timeGeometry, timePoint);
+}
+
+void QmitkMxNMultiWidget::showEvent(QShowEvent* event)
+{
+  QmitkAbstractMultiWidget::showEvent(event);
+  if (!m_CellsToFitWhenShown.empty())
   {
-    timeNavigation->GetStepper()->SetPos(timeGeometry->TimePointToTimeStep(timePoint));
+    // Queued: the fit lets the event loop lay the cells out, which must not
+    // run inside this event.
+    QTimer::singleShot(0, this, [this]() { this->FitCellsDeferredWhileHidden(); });
+  }
+}
+
+void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
+{
+  // A running layout operation fits the cells it builds itself; the cells
+  // deferred before it stay pending for the next show.
+  if (this->IsApplyingLayout())
+  {
+    return;
+  }
+  std::vector<QString> windowIds;
+  for (const auto& windowId : std::exchange(m_CellsToFitWhenShown, {}))
+  {
+    // Cells may have gone, e.g. with a layout applied in the meantime.
+    if (nullptr != this->GetRenderWindowWidget(windowId))
+    {
+      windowIds.push_back(windowId);
+    }
+  }
+  this->FitNewCellsToTheirSize(windowIds);
+  if (!this->isVisible())
+  {
+    return;  // Hidden again: deferred once more.
+  }
+  // The links converged while the cells still had their construction camera;
+  // the deferred cells adapt to the members that kept theirs, and a group
+  // made only of them to its seed - as after a fit while shown.
+  try
+  {
+    this->ReconvergeGeometryRelativeGroups(windowIds);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "MxN display: re-converging after the deferred fit failed: " << e.GetDescription();
   }
 }
 
@@ -5297,6 +5456,14 @@ std::map<QString, unsigned int> QmitkMxNMultiWidget::SnapshotCrosshairTargetSlic
 void QmitkMxNMultiWidget::ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,
                                                          const std::map<QString, unsigned int>& before)
 {
+  // Runs on every crosshair move; the walk below only matters for a
+  // crosshair target in a slice group.
+  if (std::none_of(before.begin(), before.end(), [this](const auto& target) {
+        return this->GetSyncLink(target.first, QmitkMxNSyncDimension::Slice).has_value();
+      }))
+  {
+    return;
+  }
   const auto senderId = QString::fromUtf8(sender->GetName());
   try
   {
@@ -5617,18 +5784,14 @@ void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
   }
   auto* triggerRenderer = mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow());
 
-  // The bounding geometry a single-cell reinit would compute (nodes not
-  // excluded from the bounding box, non-helper), evaluated with the
-  // triggering cell's visibility - "last reinit wins" for the component.
-  const auto includeInBoundingBox =
-    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
-  const auto helperObject =
-    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  const auto predicate = mitk::NodePredicateAnd::New(
-    mitk::NodePredicateNot::New(includeInBoundingBox), mitk::NodePredicateNot::New(helperObject));
-  const auto filteredNodes = dataStorage->GetSubset(predicate);
-  const auto bounds = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", triggerRenderer);
+  // Evaluated with the triggering cell's visibility - "last reinit wins" for
+  // the component.
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(BoundingNodes(*dataStorage), "visible", triggerRenderer);
+  this->InitializeGeometryComponent(windowId, bounds);
+}
 
+void QmitkMxNMultiWidget::InitializeGeometryComponent(const QString& windowId, const mitk::TimeGeometry* geometry)
+{
   const auto component = this->ComputeGeometryComponent(windowId);
   for (const auto& memberId : component)
   {
@@ -5636,7 +5799,7 @@ void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
     if (nullptr != memberWidget)
     {
       mitk::RenderingManager::GetInstance()->InitializeView(
-        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry);
     }
   }
   this->ReconvergeGeometryRelativeGroups(component);

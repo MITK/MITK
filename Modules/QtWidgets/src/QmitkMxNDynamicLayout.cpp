@@ -17,12 +17,11 @@ found in the LICENSE file.
 #include <mitkBaseGeometry.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImage.h>
+#include <mitkLevelWindow.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkPointSet.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSurface.h>
-
-#include <vtkVolumeMapper.h>
 
 #include <algorithm>
 #include <cmath>
@@ -105,6 +104,23 @@ namespace
     return nodes;
   }
 
+  /** Identical geometry at time step 0 on all. */
+  bool HaveIdenticalGeometry(const NodeList& images)
+  {
+    if (images.empty())
+    {
+      return false;
+    }
+    const auto geometryOf = [](const mitk::DataNode::Pointer& image) -> const mitk::BaseGeometry* {
+      return nullptr != image->GetData() ? image->GetData()->GetGeometry(0) : nullptr;
+    };
+    const auto* first = geometryOf(images.front());
+    return std::all_of(images.begin(), images.end(), [first, &geometryOf](const auto& image) {
+      const auto* geometry = geometryOf(image);
+      return nullptr != first && nullptr != geometry && mitk::Equal(*first, *geometry, mitk::eps, false);
+    });
+  }
+
   /** Identical geometry at time step 0, or one shared Frame of Reference UID
    *  on all. A mismatch only means "not aligned". */
   bool AreAligned(const NodeList& images)
@@ -113,22 +129,7 @@ namespace
     {
       return false;
     }
-
-    const auto geometryOf = [](const mitk::DataNode::Pointer& image) -> const mitk::BaseGeometry* {
-      return nullptr != image->GetData() ? image->GetData()->GetGeometry(0) : nullptr;
-    };
-    bool sameGeometry = true;
-    const auto* first = geometryOf(images.front());
-    for (const auto& image : images)
-    {
-      const auto* geometry = geometryOf(image);
-      if (nullptr == first || nullptr == geometry || !mitk::Equal(*first, *geometry, mitk::eps, false))
-      {
-        sameGeometry = false;
-        break;
-      }
-    }
-    if (sameGeometry)
+    if (HaveIdenticalGeometry(images))
     {
       return true;
     }
@@ -141,6 +142,24 @@ namespace
     return std::all_of(images.begin(), images.end(), [&frameOfReference](const auto& image) {
       return DicomTag(*image, FrameOfReferenceGroup, FrameOfReferenceElement) == frameOfReference;
     });
+  }
+
+  /** The geometry the windows of aligned datasets are fitted to: the first
+   *  one's when all have identical geometry, so an oblique acquisition keeps
+   *  its planes; else the joint extent of all, along the world axes - the
+   *  only frame that holds datasets of different extents. */
+  mitk::TimeGeometry::ConstPointer SharedGeometry(const NodeList& images, const mitk::DataStorage& dataStorage)
+  {
+    if (HaveIdenticalGeometry(images))
+    {
+      return images.front()->GetData()->GetTimeGeometry();
+    }
+    auto nodes = mitk::DataStorage::SetOfObjects::New();
+    for (const auto& image : images)
+    {
+      nodes->push_back(image);
+    }
+    return dataStorage.ComputeBoundingGeometry3D(nodes);
   }
 
   /** Columns and rows for 'n' equal windows: the shape whose aspect is
@@ -279,6 +298,19 @@ namespace
         }
       }
     }
+    // A node in two roles would get the look of both on itself.
+    std::set<const mitk::DataNode*> bound;
+    for (const auto& [slot, nodes] : bindings)
+    {
+      for (const auto& node : nodes)
+      {
+        if (!bound.insert(node.GetPointer()).second)
+        {
+          mitkThrow() << "Dynamic layout '" << description.name.toStdString() << "': node '" << node->GetName()
+                      << "' is bound more than once.";
+        }
+      }
+    }
   }
 
   std::string NodeName(const mitk::DataNode::Pointer& node)
@@ -304,6 +336,7 @@ namespace
 
     const std::pair<const char*, const char*> planes[] = { { "axial", "ax" }, { "sagittal", "sag" },
                                                            { "coronal", "cor" } };
+    const auto shared = options.aligned ? SharedGeometry(datasets, dataStorage) : nullptr;
     Json datasetSplits = Json::array();
     for (std::size_t i = 0; i < datasets.size(); ++i)
     {
@@ -327,10 +360,13 @@ namespace
           links["pan"] = plane;
         }
         // Aligned: one fit per plane group, from its first window. Otherwise
-        // every window is a component of its own and fits itself.
+        // every window is a component of its own and fits its image, so an
+        // oblique acquisition shows its own planes.
         if (!options.aligned || 0 == i)
         {
-          layout.fits.push_back({ builder.NextId(), options.aligned });
+          layout.fits.push_back({ builder.NextId(), options.aligned,
+                                  options.aligned ? shared
+                                                  : mitk::TimeGeometry::ConstPointer(datasets[i]->GetData()->GetTimeGeometry()) });
         }
         windows.push_back(builder.Window(direction, std::move(links)));
       }
@@ -405,6 +441,7 @@ namespace
       default: break;
     }
 
+    const auto shared = options.aligned ? SharedGeometry(datasets, dataStorage) : nullptr;
     const int n = static_cast<int>(datasets.size());
     const auto [columns, rows] = GridShape(n, editorAspectRatio);
     Json rowSplits = Json::array();
@@ -440,10 +477,19 @@ namespace
         }
         // Aligned datasets share one world: one fit from the first window.
         // Fitting a component to the first one's bounds would send the other
-        // subjects of unaligned datasets out of view, so each fits itself.
-        if (!options.aligned || 0 == index)
+        // subjects of unaligned datasets out of view, so each fits itself: a
+        // 2D view its image, a 3D view all it shows.
+        if (options.aligned)
         {
-          layout.fits.push_back({ builder.NextId(), options.aligned });
+          if (0 == index)
+          {
+            layout.fits.push_back({ builder.NextId(), true, shared });
+          }
+        }
+        else
+        {
+          layout.fits.push_back({ builder.NextId(), false,
+                                  threeD ? nullptr : datasets[index]->GetData()->GetTimeGeometry() });
         }
         windows.push_back(builder.Window(direction, std::move(links), QString(), threeD));
       }
@@ -539,6 +585,24 @@ namespace
     }
   }
 
+  /** A MIP ramp over the image's level window: transparent at its lower
+   *  bound, opaque at its upper one, white throughout. The MIP so shows the
+   *  range the 2D windows show, and outliers that drive a ramp over the full
+   *  scalar range do not dim the rest. */
+  mitk::TransferFunction::Pointer LevelWindowRamp(const mitk::DataNode& image)
+  {
+    mitk::LevelWindow levelWindow;
+    if (!image.GetLevelWindow(levelWindow))
+    {
+      levelWindow.SetAuto(dynamic_cast<const mitk::Image*>(image.GetData()));
+    }
+    auto transferFunction = mitk::TransferFunction::New();
+    transferFunction->ClearScalarOpacityPoints();
+    transferFunction->AddScalarOpacityPoint(levelWindow.GetLowerWindowBound(), 0.0);
+    transferFunction->AddScalarOpacityPoint(levelWindow.GetUpperWindowBound(), 1.0);
+    return transferFunction;
+  }
+
   float OpacityOf(QmitkMxNFusionOpacity opacity)
   {
     switch (opacity)
@@ -627,7 +691,7 @@ namespace
       const auto mipId = builder.NextId();
       auto mip = builder.Window("coronal", { { "selection", "fused" } }, QStringLiteral("MIP"), true);
       mip["size"] = 1;
-      layout.volumeRenderings.push_back({ mipId, fused, vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND });
+      layout.volumeRenderings.push_back({ mipId, fused, QmitkMxNVolumeBlendMode::MaximumIntensity, LevelWindowRamp(*fused) });
       layout.fits.push_back({ mipId, false });
       root = DocumentBuilder::Split("horizontal", Json::array({ std::move(root), std::move(mip) }));
     }

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <vector>
 
 class QTreeWidgetItem;
+struct QmitkFigureAppearance;
 struct QmitkMeasurementViewData;
 
 namespace mitk
@@ -71,7 +72,6 @@ private:
   void OnFixedSizeValueChanged();
   void OnColorButtonClicked();
   void OnAppearanceChanged();
-  void OnApplyAppearanceClicked();
 
   /** Updates the controls that depend on the selected figures. */
   void OnSelectedFiguresChanged();
@@ -80,10 +80,23 @@ private:
   std::vector<mitk::DataNode*> GetSelectedFigures() const;
   void OnCopyToClipboard();
 
-  /** Takes the appearance of new figures from the preferences, or else from the defaults of the mapper. */
+  /** Takes the appearance of new figures from the preferences, or else from the defaults of the mappers. */
   void LoadAppearance();
   void SaveAppearance() const;
-  void ApplyAppearance(mitk::DataNode* node) const;
+
+  /** The shown appearance with the values of the controls; the color has no control of its own. */
+  QmitkFigureAppearance GetAppearanceFromControls() const;
+  void ShowAppearance(const QmitkFigureAppearance& appearance);
+
+  /** Shows the appearance of the first selected figure, or of new figures while none is selected. */
+  void UpdateAppearanceControls();
+
+  /**
+   * Gives the selected figures the property that differs from the shown appearance, or
+   * makes it the appearance of new figures, including the one being placed, while none
+   * is selected.
+   */
+  void ChangeAppearance(const QmitkFigureAppearance& appearance);
   void UpdateColorButton();
   void UpdateLineWidthLabel();
   float GetLineWidth() const;

@@ -63,9 +63,9 @@ Measurements are placed on the slices of the reference image, so the render wind
 
 Circles and rings can be placed with a fixed size, e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. While the circle or ring tool is active, check <i>Fixed size</i> below the tools and set the radius, and for rings the thickness. The measurement then follows the mouse over the image and is dropped by a click; beside the image it is hidden. The tool stays active, so you can place several measurements of the same size in a row; press Esc or click the tool again to stop. Their shape stays locked, so they can only be moved.
 
-<h2>Appearance of new measurements</h2>
+<h2>Appearance</h2>
 
-The <i>Appearance of new figures</i> group defines how new measurements are shown. The values are kept for the next session.
+While no measurement is selected, the <i>Appearance of new figures</i> group defines how new measurements are shown. The values are kept for the next session. While measurements are selected, the group shows the appearance of the first of them, and every change applies right away to all selected measurements. Only the changed setting is applied, so e.g. different colors of the selected measurements are kept when their line width is changed. A new measurement is selected once it is placed, so a change right after placing it applies to that measurement; to change the appearance of new measurements instead, deselect it first, e.g. by a Ctrl+click on it in the list.
 
 <ul>
 <li> <b>Color:</b> The color of the measurement.
@@ -75,7 +75,7 @@ The <i>Appearance of new figures</i> group defines how new measurements are show
 <li> <b>Label:</b> When the label of the measurement is shown, e.g. on hover, and whether it contains the name, the measured values, or both.
 </ul>
 
-<i>Apply to selected figures</i> gives the selected measurements this appearance. Each measurement can also be changed individually in the Properties view.
+Further properties of a measurement can be changed in the Properties view.
 
 <h2>Modify measurements</h2>
 

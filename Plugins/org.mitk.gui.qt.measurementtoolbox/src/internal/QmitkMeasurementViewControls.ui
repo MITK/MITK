@@ -253,7 +253,7 @@
       <item row="0" column="1" alignment="Qt::AlignmentFlag::AlignLeft">
        <widget class="QToolButton" name="colorButton">
         <property name="toolTip">
-         <string>Choose the color of new figures</string>
+         <string>Choose the color</string>
         </property>
         <property name="iconSize">
          <size>
@@ -372,25 +372,6 @@
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="2">
-       <widget class="QPushButton" name="applyAppearanceButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Give the selected figures this appearance</string>
-        </property>
-        <property name="text">
-         <string>Apply to selected figures</string>
         </property>
        </widget>
       </item>

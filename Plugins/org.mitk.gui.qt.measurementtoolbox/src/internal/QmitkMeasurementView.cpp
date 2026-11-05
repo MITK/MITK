@@ -261,6 +261,79 @@ struct QmitkMeasurementFigure
   mitk::ITKEventObserverGuard PointMovedObserver;
 };
 
+/** What the appearance group box edits, of new figures or of the selected ones. */
+struct QmitkFigureAppearance
+{
+  QColor Color;
+  float LineWidth = 2.0f;
+  bool ShowName = true;
+  bool ShowMeasurements = true;
+  bool ContrastOutline = true;
+  bool ShowIn3D = false;
+  mitk::PlanarFigureVisibilityProperty::Visibility Label = mitk::PlanarFigureVisibilityProperty::Visibility::OnHover;
+};
+
+namespace
+{
+  /** Reads an appearance from the properties of a node; missing ones keep the values of the given appearance. */
+  QmitkFigureAppearance ReadAppearance(const mitk::DataNode* node, QmitkFigureAppearance appearance)
+  {
+    float color[3] = { 1.0f, 1.0f, 1.0f };
+
+    if (node->GetColor(color))
+      appearance.Color = QColor::fromRgbF(color[0], color[1], color[2]);
+
+    node->GetFloatProperty("line width", appearance.LineWidth);
+    node->GetBoolProperty("planarfigure.drawname", appearance.ShowName);
+    node->GetBoolProperty("planarfigure.drawquantities", appearance.ShowMeasurements);
+    node->GetBoolProperty("planarfigure.drawcontrastoutline", appearance.ContrastOutline);
+    node->GetBoolProperty("planarfigure.3drendering", appearance.ShowIn3D);
+
+    if (const auto* label = dynamic_cast<const mitk::PlanarFigureVisibilityProperty*>(node->GetProperty("planarfigure.label")); nullptr != label)
+      appearance.Label = label->GetVisibility();
+
+    return appearance;
+  }
+
+  /** The appearance that the mappers give a figure by default. */
+  const QmitkFigureAppearance& GetMapperAppearance()
+  {
+    static const auto appearance = []() {
+      auto defaults = mitk::DataNode::New();
+      mitk::PlanarFigureVtkMapper2D::SetDefaultProperties(defaults);
+      mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(defaults);
+      return ReadAppearance(defaults, QmitkFigureAppearance());
+    }();
+
+    return appearance;
+  }
+
+  /** Writes an appearance to the properties of a node, or only where it differs from a previous one. */
+  void WriteAppearance(mitk::DataNode* node, const QmitkFigureAppearance& appearance, const QmitkFigureAppearance* previous = nullptr)
+  {
+    if (nullptr == previous || previous->Color != appearance.Color)
+      node->SetColor(appearance.Color.redF(), appearance.Color.greenF(), appearance.Color.blueF());
+
+    if (nullptr == previous || previous->LineWidth != appearance.LineWidth)
+      node->SetFloatProperty("line width", appearance.LineWidth);
+
+    if (nullptr == previous || previous->ShowName != appearance.ShowName)
+      node->SetBoolProperty("planarfigure.drawname", appearance.ShowName);
+
+    if (nullptr == previous || previous->ShowMeasurements != appearance.ShowMeasurements)
+      node->SetBoolProperty("planarfigure.drawquantities", appearance.ShowMeasurements);
+
+    if (nullptr == previous || previous->ContrastOutline != appearance.ContrastOutline)
+      node->SetBoolProperty("planarfigure.drawcontrastoutline", appearance.ContrastOutline);
+
+    if (nullptr == previous || previous->ShowIn3D != appearance.ShowIn3D)
+      node->SetBoolProperty("planarfigure.3drendering", appearance.ShowIn3D);
+
+    if (nullptr == previous || previous->Label != appearance.Label)
+      node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(appearance.Label));
+  }
+}
+
 struct QmitkMeasurementViewData
 {
   std::unique_ptr<Ui::QmitkMeasurementViewControls> m_Controls = std::make_unique<Ui::QmitkMeasurementViewControls>();
@@ -269,7 +342,11 @@ struct QmitkMeasurementViewData
   QmitkButtonOverlayWidget* m_AlignmentOverlay = nullptr;
   mitk::IRenderWindowPart* m_RenderWindowPart = nullptr;
 
-  QColor m_FigureColor;
+  /** The appearance of new figures, kept in the preferences. */
+  QmitkFigureAppearance m_NewFigureAppearance;
+
+  /** The appearance in the group box: of new figures, or of the first selected one. */
+  QmitkFigureAppearance m_ShownAppearance;
 
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
   std::map<const mitk::DataNode*, QmitkMeasurementFigure> m_Figures;
@@ -369,6 +446,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   this->CreateConnections();
   this->AddAllInteractors();
+  this->OnSelectedFiguresChanged();
 
   d->m_ViewsInitializedObserver.Reset(mitk::RenderingManager::GetInstance(), mitk::RenderingManagerViewsInitializedEvent(),
     [this](const itk::EventObject&) { this->UpdateDrawingControls(); });
@@ -435,87 +513,134 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_Controls->thicknessSpinBox, &QDoubleSpinBox::valueChanged, this, &QmitkMeasurementView::OnFixedSizeValueChanged);
 
   connect(d->m_Controls->colorButton, &QToolButton::clicked, this, &QmitkMeasurementView::OnColorButtonClicked);
-  connect(d->m_Controls->lineWidthSlider, &QSlider::valueChanged, this, [this]() {
-    this->UpdateLineWidthLabel();
-    this->OnAppearanceChanged();
-  });
+  connect(d->m_Controls->lineWidthSlider, &QSlider::valueChanged, this, &QmitkMeasurementView::OnAppearanceChanged);
   connect(d->m_Controls->showNameCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
   connect(d->m_Controls->showMeasurementsCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
   connect(d->m_Controls->contrastOutlineCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
   connect(d->m_Controls->showIn3DCheckBox, &QCheckBox::toggled, this, &QmitkMeasurementView::OnAppearanceChanged);
   connect(d->m_Controls->labelVisibilityComboBox, &QComboBox::currentIndexChanged, this, &QmitkMeasurementView::OnAppearanceChanged);
-  connect(d->m_Controls->applyAppearanceButton, &QPushButton::clicked, this, &QmitkMeasurementView::OnApplyAppearanceClicked);
 }
 
 void QmitkMeasurementView::LoadAppearance()
 {
-  auto defaults = mitk::DataNode::New();
-  mitk::PlanarFigureVtkMapper2D::SetDefaultProperties(defaults);
-  mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(defaults);
-
   // The choices are the values of the property, so they read as in the Properties view.
   auto labelVisibility = mitk::PlanarFigureVisibilityProperty::New();
 
   for (auto it = labelVisibility->Begin(); it != labelVisibility->End(); ++it)
     d->m_Controls->labelVisibilityComboBox->addItem(QString::fromStdString(it->second), static_cast<int>(it->first));
 
-  if (const auto* defaultLabelVisibility = dynamic_cast<const mitk::PlanarFigureVisibilityProperty*>(defaults->GetProperty("planarfigure.label")); nullptr != defaultLabelVisibility)
-    labelVisibility->SetVisibility(defaultLabelVisibility->GetVisibility());
-
-  auto labelVisibilityName = labelVisibility->GetValueAsString();
-
-  auto showIn3D = false;
-  defaults->GetBoolProperty("planarfigure.3drendering", showIn3D);
-
-  float color[3] = { 1.0f, 1.0f, 1.0f };
-  defaults->GetColor(color);
-
-  auto lineWidth = 2.0f;
-  defaults->GetFloatProperty("line width", lineWidth);
-
-  auto showName = true;
-  defaults->GetBoolProperty("planarfigure.drawname", showName);
-
-  auto showMeasurements = true;
-  defaults->GetBoolProperty("planarfigure.drawquantities", showMeasurements);
-
-  auto contrastOutline = true;
-  defaults->GetBoolProperty("planarfigure.drawcontrastoutline", contrastOutline);
-
-  auto colorName = QColor::fromRgbF(color[0], color[1], color[2]).name().toStdString();
+  auto appearance = GetMapperAppearance();
 
   if (const auto* preferences = this->GetPreferences(); nullptr != preferences)
   {
-    colorName = preferences->Get(ColorPreference, colorName);
-    lineWidth = preferences->GetFloat(LineWidthPreference, lineWidth);
-    showName = preferences->GetBool(ShowNamePreference, showName);
-    showMeasurements = preferences->GetBool(ShowMeasurementsPreference, showMeasurements);
-    contrastOutline = preferences->GetBool(ContrastOutlinePreference, contrastOutline);
-    labelVisibilityName = preferences->Get(LabelVisibilityPreference, labelVisibilityName);
-    showIn3D = preferences->GetBool(ShowIn3DPreference, showIn3D);
+    if (const QColor color(QString::fromStdString(preferences->Get(ColorPreference, ""))); color.isValid())
+      appearance.Color = color;
+
+    appearance.LineWidth = preferences->GetFloat(LineWidthPreference, appearance.LineWidth);
+    appearance.ShowName = preferences->GetBool(ShowNamePreference, appearance.ShowName);
+    appearance.ShowMeasurements = preferences->GetBool(ShowMeasurementsPreference, appearance.ShowMeasurements);
+    appearance.ContrastOutline = preferences->GetBool(ContrastOutlinePreference, appearance.ContrastOutline);
+    appearance.ShowIn3D = preferences->GetBool(ShowIn3DPreference, appearance.ShowIn3D);
+
+    if (labelVisibility->SetValue(preferences->Get(LabelVisibilityPreference, "")))
+      appearance.Label = labelVisibility->GetVisibility();
   }
 
-  auto* labelVisibilityComboBox = d->m_Controls->labelVisibilityComboBox;
-  auto labelVisibilityIndex = labelVisibilityComboBox->findText(QString::fromStdString(labelVisibilityName));
+  d->m_NewFigureAppearance = appearance;
+}
 
-  if (labelVisibilityIndex < 0)
-    labelVisibilityIndex = labelVisibilityComboBox->findText(QString::fromStdString(labelVisibility->GetValueAsString()));
+QmitkFigureAppearance QmitkMeasurementView::GetAppearanceFromControls() const
+{
+  auto appearance = d->m_ShownAppearance;
+  appearance.LineWidth = this->GetLineWidth();
+  appearance.ShowName = d->m_Controls->showNameCheckBox->isChecked();
+  appearance.ShowMeasurements = d->m_Controls->showMeasurementsCheckBox->isChecked();
+  appearance.ContrastOutline = d->m_Controls->contrastOutlineCheckBox->isChecked();
+  appearance.ShowIn3D = d->m_Controls->showIn3DCheckBox->isChecked();
+  appearance.Label = static_cast<mitk::PlanarFigureVisibilityProperty::Visibility>(d->m_Controls->labelVisibilityComboBox->currentData().toInt());
+  return appearance;
+}
 
-  labelVisibilityComboBox->setCurrentIndex(labelVisibilityIndex);
+void QmitkMeasurementView::ShowAppearance(const QmitkFigureAppearance& appearance)
+{
+  auto& controls = *d->m_Controls;
 
-  d->m_FigureColor = QColor(QString::fromStdString(colorName));
+  {
+    const QSignalBlocker lineWidthBlocker(controls.lineWidthSlider);
+    const QSignalBlocker showNameBlocker(controls.showNameCheckBox);
+    const QSignalBlocker showMeasurementsBlocker(controls.showMeasurementsCheckBox);
+    const QSignalBlocker contrastOutlineBlocker(controls.contrastOutlineCheckBox);
+    const QSignalBlocker showIn3DBlocker(controls.showIn3DCheckBox);
+    const QSignalBlocker labelVisibilityBlocker(controls.labelVisibilityComboBox);
 
-  if (!d->m_FigureColor.isValid())
-    d->m_FigureColor = QColor::fromRgbF(color[0], color[1], color[2]);
+    controls.lineWidthSlider->setValue(static_cast<int>(std::lround(appearance.LineWidth / LineWidthStep)));
+    controls.showNameCheckBox->setChecked(appearance.ShowName);
+    controls.showMeasurementsCheckBox->setChecked(appearance.ShowMeasurements);
+    controls.contrastOutlineCheckBox->setChecked(appearance.ContrastOutline);
+    controls.showIn3DCheckBox->setChecked(appearance.ShowIn3D);
+    controls.labelVisibilityComboBox->setCurrentIndex(controls.labelVisibilityComboBox->findData(static_cast<int>(appearance.Label)));
+  }
 
-  d->m_Controls->lineWidthSlider->setValue(static_cast<int>(std::lround(lineWidth / LineWidthStep)));
-  d->m_Controls->showNameCheckBox->setChecked(showName);
-  d->m_Controls->showMeasurementsCheckBox->setChecked(showMeasurements);
-  d->m_Controls->contrastOutlineCheckBox->setChecked(contrastOutline);
-  d->m_Controls->showIn3DCheckBox->setChecked(showIn3D);
+  // The shown appearance is what the controls show, e.g. a line width rounded to the steps
+  // of the slider, so that a change of another control does not write it to the figures.
+  d->m_ShownAppearance = appearance;
+  d->m_ShownAppearance = this->GetAppearanceFromControls();
 
   this->UpdateColorButton();
   this->UpdateLineWidthLabel();
+}
+
+void QmitkMeasurementView::UpdateAppearanceControls()
+{
+  auto* groupBox = d->m_Controls->appearanceGroupBox;
+
+  if (nullptr == groupBox)
+    return; // before CreateQtPartControl()
+
+  const auto selectedFigures = this->GetSelectedFigures();
+
+  if (selectedFigures.empty())
+  {
+    groupBox->setTitle(QStringLiteral("Appearance of new figures"));
+    this->ShowAppearance(d->m_NewFigureAppearance);
+  }
+  else
+  {
+    groupBox->setTitle(1 == selectedFigures.size()
+      ? QStringLiteral("Appearance of the selected figure")
+      : QStringLiteral("Appearance of the selected figures"));
+
+    this->ShowAppearance(ReadAppearance(selectedFigures.front(), GetMapperAppearance()));
+  }
+}
+
+void QmitkMeasurementView::ChangeAppearance(const QmitkFigureAppearance& appearance)
+{
+  // A copy, since a change of the first selected figure shows its appearance again.
+  const auto previous = std::exchange(d->m_ShownAppearance, appearance);
+
+  this->UpdateColorButton();
+  this->UpdateLineWidthLabel();
+
+  const auto selectedFigures = this->GetSelectedFigures();
+
+  if (selectedFigures.empty())
+  {
+    d->m_NewFigureAppearance = appearance;
+    this->SaveAppearance();
+
+    // The figure that is being placed is new, too.
+    if (d->m_PendingNode.IsNotNull())
+      WriteAppearance(d->m_PendingNode, appearance);
+  }
+  else
+  {
+    // Only the changed property, so the others may still differ between the figures.
+    for (auto* node : selectedFigures)
+      WriteAppearance(node, appearance, &previous);
+  }
+
+  this->RequestRenderWindowUpdate();
 }
 
 float QmitkMeasurementView::GetLineWidth() const
@@ -535,32 +660,25 @@ void QmitkMeasurementView::SaveAppearance() const
   if (nullptr == preferences)
     return;
 
-  preferences->Put(ColorPreference, d->m_FigureColor.name().toStdString());
-  preferences->PutFloat(LineWidthPreference, this->GetLineWidth());
-  preferences->PutBool(ShowNamePreference, d->m_Controls->showNameCheckBox->isChecked());
-  preferences->PutBool(ShowMeasurementsPreference, d->m_Controls->showMeasurementsCheckBox->isChecked());
-  preferences->PutBool(ContrastOutlinePreference, d->m_Controls->contrastOutlineCheckBox->isChecked());
-  preferences->Put(LabelVisibilityPreference, d->m_Controls->labelVisibilityComboBox->currentText().toStdString());
-  preferences->PutBool(ShowIn3DPreference, d->m_Controls->showIn3DCheckBox->isChecked());
-  preferences->Flush();
-}
+  const auto& appearance = d->m_NewFigureAppearance;
 
-void QmitkMeasurementView::ApplyAppearance(mitk::DataNode* node) const
-{
-  node->SetColor(d->m_FigureColor.redF(), d->m_FigureColor.greenF(), d->m_FigureColor.blueF());
-  node->SetFloatProperty("line width", this->GetLineWidth());
-  node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(
-    static_cast<mitk::PlanarFigureVisibilityProperty::Visibility>(d->m_Controls->labelVisibilityComboBox->currentData().toInt())));
-  node->SetBoolProperty("planarfigure.3drendering", d->m_Controls->showIn3DCheckBox->isChecked());
-  node->SetBoolProperty("planarfigure.drawname", d->m_Controls->showNameCheckBox->isChecked());
-  node->SetBoolProperty("planarfigure.drawquantities", d->m_Controls->showMeasurementsCheckBox->isChecked());
-  node->SetBoolProperty("planarfigure.drawcontrastoutline", d->m_Controls->contrastOutlineCheckBox->isChecked());
+  // The label visibility by name, as the Properties view shows it.
+  const auto labelVisibility = mitk::PlanarFigureVisibilityProperty::New(appearance.Label);
+
+  preferences->Put(ColorPreference, appearance.Color.name().toStdString());
+  preferences->PutFloat(LineWidthPreference, appearance.LineWidth);
+  preferences->PutBool(ShowNamePreference, appearance.ShowName);
+  preferences->PutBool(ShowMeasurementsPreference, appearance.ShowMeasurements);
+  preferences->PutBool(ContrastOutlinePreference, appearance.ContrastOutline);
+  preferences->Put(LabelVisibilityPreference, labelVisibility->GetValueAsString());
+  preferences->PutBool(ShowIn3DPreference, appearance.ShowIn3D);
+  preferences->Flush();
 }
 
 void QmitkMeasurementView::UpdateColorButton()
 {
   QPixmap swatch(d->m_Controls->colorButton->iconSize());
-  swatch.fill(d->m_FigureColor);
+  swatch.fill(d->m_ShownAppearance.Color);
 
   // Keeps colors close to the background apart from it.
   QPainter painter(&swatch);
@@ -573,26 +691,23 @@ void QmitkMeasurementView::UpdateColorButton()
 
 void QmitkMeasurementView::OnColorButtonClicked()
 {
-  const auto color = QColorDialog::getColor(d->m_FigureColor, d->m_Controls->colorButton, QStringLiteral("Color of New Figures"));
+  const auto title = this->GetSelectedFigures().empty()
+    ? QStringLiteral("Color of New Figures")
+    : QStringLiteral("Color of the Selected Figures");
+
+  const auto color = QColorDialog::getColor(d->m_ShownAppearance.Color, d->m_Controls->colorButton, title);
 
   if (!color.isValid())
     return;
 
-  d->m_FigureColor = color;
-  this->UpdateColorButton();
-  this->OnAppearanceChanged();
+  auto appearance = this->GetAppearanceFromControls();
+  appearance.Color = color;
+  this->ChangeAppearance(appearance);
 }
 
 void QmitkMeasurementView::OnAppearanceChanged()
 {
-  this->SaveAppearance();
-
-  // The figure that is being placed is new, too.
-  if (d->m_PendingNode.IsNotNull())
-  {
-    this->ApplyAppearance(d->m_PendingNode);
-    this->RequestRenderWindowUpdate();
-  }
+  this->ChangeAppearance(this->GetAppearanceFromControls());
 }
 
 void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
@@ -719,16 +834,8 @@ void QmitkMeasurementView::OnSelectedFiguresChanged()
   if (nullptr == d->m_AlignmentOverlay)
     return; // selection before CreateQtPartControl()
 
-  d->m_Controls->applyAppearanceButton->setEnabled(!this->GetSelectedFigures().empty());
+  this->UpdateAppearanceControls();
   this->UpdateHint();
-}
-
-void QmitkMeasurementView::OnApplyAppearanceClicked()
-{
-  for (auto* node : this->GetSelectedFigures())
-    this->ApplyAppearance(node);
-
-  this->RequestRenderWindowUpdate();
 }
 
 void QmitkMeasurementView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -814,6 +921,9 @@ void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
   {
     d->m_HaveMeasurementTreeIconsChanged = true;
     this->ScheduleMeasurementTreeUpdate();
+
+    if (const auto selectedFigures = this->GetSelectedFigures(); !selectedFigures.empty() && node == selectedFigures.front())
+      this->UpdateAppearanceControls();
   }
 }
 
@@ -989,7 +1099,9 @@ void QmitkMeasurementView::StartPlacement(int toolIndex)
   d->m_PlacementProgressObserver.Reset(figure, itk::ModifiedEvent(), [this](const itk::EventObject&) { this->UpdateHint(); });
 
   this->UpdateToolOptions();
-  this->UpdateHint();
+
+  // The new figure took the selection, so the appearance group box is for new figures again.
+  this->OnSelectedFiguresChanged();
 }
 
 bool QmitkMeasurementView::IsPlacedWithFixedSize(int toolIndex) const
@@ -1081,7 +1193,7 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
   auto newNode = mitk::DataNode::New();
   newNode->SetName(dataStorage->GetUniqueName(baseName));
   newNode->SetData(figure);
-  this->ApplyAppearance(newNode);
+  WriteAppearance(newNode, d->m_NewFigureAppearance);
 
   dataStorage->Add(newNode, d->m_SelectedImageNode);
   this->SelectNode(newNode);

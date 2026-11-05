@@ -62,7 +62,7 @@ class QmitkMxNPresetsTestSuite : public mitk::TestFixture
   MITK_TEST(Menu_EndsWithTheDynamicLayoutEntry);
   MITK_TEST(DynamicLayoutEntry_NeedsImageData);
   MITK_TEST(DynamicLayoutEntry_OpensTheDialog);
-  MITK_TEST(Presets_AreIdentifiedByTheirFileNames);
+  MITK_TEST(Presets_AreIdentifiedWithoutTheirOrderingPrefix);
   MITK_TEST(DocumentFor_QualifiesTheWindowIds);
   MITK_TEST(Presets_MatchTheirSpecification_OnTheDefaultNamedEditor);
   MITK_TEST(Presets_MatchTheirSpecification_OnAnotherNamedEditor);
@@ -406,14 +406,13 @@ public:
 
   // --- The presets as a module service ---------------------------------------
 
-  void Presets_AreIdentifiedByTheirFileNames()
+  void Presets_AreIdentifiedWithoutTheirOrderingPrefix()
   {
-    // Preferences store a preset by its id, so the ids must not follow the
-    // display names.
-    const QStringList expected = { "mxnLayout_01_mprAnd3d",     "mxnLayout_02_focusContext",
-                                   "mxnLayout_03_twoLooks",     "mxnLayout_04_lightbox",
-                                   "mxnLayout_05_sliceContext", "mxnLayout_06_2dAnd3d",
-                                   "mxnLayout_07_3dThreeSides", "mxnLayout_08_overviewDetail" };
+    // Preferences store a preset by its id, so the ids must follow neither
+    // the display names nor the file names' ordering prefixes, which change
+    // when a preset is inserted or moved.
+    const QStringList expected = { "mprAnd3d",     "focusContext", "twoLooks",     "lightbox",
+                                   "sliceContext", "2dAnd3d",      "3dThreeSides", "overviewDetail" };
     QStringList ids;
     QStringList names;
     for (const auto& preset : QmitkMxNPresets::All())

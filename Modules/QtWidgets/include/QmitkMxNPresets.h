@@ -29,8 +29,10 @@ namespace QmitkMxNPresets
 {
   struct Preset
   {
-    /** \brief The resource's file name without extension. Unlike the name,
-    *          it does not change when a preset is renamed. */
+    /** \brief The resource's file name without its ordering prefix and
+    *          extension ("sliceContext" for "mxnLayout_05_sliceContext.json").
+    *          It changes neither when a preset is renamed nor when the
+    *          presets are reordered. */
     QString id;
 
     /** \brief The display name, the document's "name". */

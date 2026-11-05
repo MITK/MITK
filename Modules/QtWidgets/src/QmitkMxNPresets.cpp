@@ -12,7 +12,10 @@ found in the LICENSE file.
 
 #include <QmitkMxNPresets.h>
 
+#include <mitkExceptionMacro.h>
+
 #include <algorithm>
+#include <regex>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -42,6 +45,19 @@ namespace
     }
   }
 
+  /** The file name without its ordering prefix and extension. */
+  QString PresetId(const us::ModuleResource& resource)
+  {
+    static const std::regex orderedName("mxnLayout_[0-9]{2}_(.+)");
+    const auto baseName = resource.GetCompleteBaseName();
+    std::smatch match;
+    if (!std::regex_match(baseName, match, orderedName))
+    {
+      mitkThrow() << "MxN preset '" << resource.GetName() << "' is not named mxnLayout_<two digits>_<id>.json.";
+    }
+    return QString::fromStdString(match[1].str());
+  }
+
   std::vector<QmitkMxNPresets::Preset> ReadPresets()
   {
     auto resources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
@@ -55,8 +71,8 @@ namespace
     {
       us::ModuleResourceStream stream(resource);
       auto document = nlohmann::json::parse(stream);
-      presets.push_back({ QString::fromStdString(resource.GetCompleteBaseName()),
-                          QString::fromStdString(document["name"].get<std::string>()), std::move(document) });
+      presets.push_back({ PresetId(resource), QString::fromStdString(document["name"].get<std::string>()),
+                          std::move(document) });
     }
     return presets;
   }

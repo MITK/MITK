@@ -177,7 +177,7 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
   prefs->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
   if (QmitkMxNMultiWidgetEditor::EDITOR_ID == m_EditorId)
   {
-    // The preset's file name, which survives renaming the preset.
+    // The preset's id, which survives renaming and reordering the presets.
     prefs->Put("Layout when opened", m_Ui->m_StartLayout->currentData().toString().toStdString());
   }
 

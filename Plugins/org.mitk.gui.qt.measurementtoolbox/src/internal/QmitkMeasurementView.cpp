@@ -1129,22 +1129,16 @@ void QmitkMeasurementView::ApplyFixedSize(mitk::PlanarFigure* figure, int toolIn
     ring->SetThickness(std::min(d->m_Controls->thicknessSpinBox->value(), radius));
 }
 
-void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  d->m_CurrentSelection = nodes;
+  // The selected figures are those of the Data Manager, which also sets the "selected"
+  // property drawn as a halo. The selection of another part, e.g. the initial one of
+  // this view, which comes from whichever part is active, says nothing about them.
+  const bool isDataManager = part.IsNotNull() && part->GetSite()->GetId() == QLatin1String("org.mitk.views.datamanager");
+
+  d->m_CurrentSelection = isDataManager ? nodes : this->GetDataManagerSelection();
   this->UpdateMeasurementTreeSelection();
-
-  // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
-  if (d->m_CurrentSelection.empty())
-  {
-    auto planarFigures = this->GetAllPlanarFigures();
-
-    for (const auto& node : *planarFigures)
-      node->SetSelected(false);
-  }
-
   this->OnSelectedFiguresChanged();
-  this->RequestRenderWindowUpdate();
 }
 
 void QmitkMeasurementView::OnCopyToClipboard()

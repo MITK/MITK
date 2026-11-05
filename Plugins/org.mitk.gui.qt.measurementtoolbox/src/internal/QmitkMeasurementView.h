@@ -92,9 +92,9 @@ private:
   void UpdateAppearanceControls();
 
   /**
-   * Gives the selected figures the property that differs from the shown appearance, or
-   * makes it the appearance of new figures, including the one being placed, while none
-   * is selected.
+   * Gives the selected figures and new ones the property that differs from the shown
+   * appearance. While none is selected, it is the appearance of new figures, including
+   * the one being placed.
    */
   void ChangeAppearance(const QmitkFigureAppearance& appearance);
   void UpdateColorButton();

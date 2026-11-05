@@ -627,7 +627,6 @@ void QmitkMeasurementView::ChangeAppearance(const QmitkFigureAppearance& appeara
   if (selectedFigures.empty())
   {
     d->m_NewFigureAppearance = appearance;
-    this->SaveAppearance();
 
     // The figure that is being placed is new, too.
     if (d->m_PendingNode.IsNotNull())
@@ -638,8 +637,15 @@ void QmitkMeasurementView::ChangeAppearance(const QmitkFigureAppearance& appeara
     // Only the changed property, so the others may still differ between the figures.
     for (auto* node : selectedFigures)
       WriteAppearance(node, appearance, &previous);
+
+    // New figures take the changed property as well, like the last used color of a drawing tool.
+    auto newFigure = mitk::DataNode::New();
+    WriteAppearance(newFigure, d->m_NewFigureAppearance);
+    WriteAppearance(newFigure, appearance, &previous);
+    d->m_NewFigureAppearance = ReadAppearance(newFigure, d->m_NewFigureAppearance);
   }
 
+  this->SaveAppearance();
   this->RequestRenderWindowUpdate();
 }
 

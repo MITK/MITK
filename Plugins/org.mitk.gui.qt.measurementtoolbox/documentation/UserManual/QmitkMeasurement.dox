@@ -65,7 +65,7 @@ Circles and rings can be placed with a fixed size, e.g. for diagnostic studies w
 
 <h2>Appearance</h2>
 
-While no measurement is selected, the <i>Appearance of new figures</i> group defines how new measurements are shown. The values are kept for the next session. While measurements are selected, the group shows the appearance of the first of them, and every change applies right away to all selected measurements. Only the changed setting is applied, so e.g. different colors of the selected measurements are kept when their line width is changed. A new measurement is selected once it is placed, so a change right after placing it applies to that measurement; to change the appearance of new measurements instead, deselect it first, e.g. by a Ctrl+click on it in the list.
+While no measurement is selected, the <i>Appearance of new figures</i> group defines how new measurements are shown. While measurements are selected, the group shows the appearance of the first of them, and every change applies right away to all selected measurements and to new ones. Only the changed setting is applied, so e.g. different colors of the selected measurements are kept when their line width is changed. The appearance of new measurements is kept for the next session.
 
 <ul>
 <li> <b>Color:</b> The color of the measurement.

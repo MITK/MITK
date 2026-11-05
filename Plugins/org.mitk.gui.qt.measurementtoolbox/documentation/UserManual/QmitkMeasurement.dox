@@ -79,7 +79,7 @@ Further properties of a measurement can be changed in the Properties view.
 
 <h2>Modify measurements</h2>
 
-Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. The handles of a Bezier curve lie off the curve, so they are shown while it is selected as well. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open.
+Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. The handles of a Bezier curve lie off the curve, so they are shown while it is selected as well. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open. The same holds for hovering: while the view is closed, neither handles nor labels that are shown on hover appear.
 
 <h2>List of measurements</h2>
 
@@ -89,7 +89,7 @@ The list at the bottom of the view shows the measured values of all measurements
 
 <h2>Save the measurement information</h2>
 
-The entire scene containing the image and the measurements can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can save a single measurement (with file extension '.pf.json') by right-clicking its node in the Data Manager. Measurements saved by previous versions of MITK (with file extension '.pf') can still be opened.
+The entire scene containing the image and the measurements can be saved for future use. Scenes are saved with a '.mitk' extension by pressing 'Save Project' and contain all nodes and relevant information. Alternatively, you can save a single measurement (with file extension '.pf.json') by right-clicking its node in the Data Manager. Measurements saved by previous versions of MITK (with file extension '.pf') can still be opened. An opened measurement is added at the top level of the Data Manager; drag it onto its image to list it in the view.
 
 <h2>Remove measurements or the image</h2>
 

@@ -65,8 +65,8 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
     Image::StatisticsHolderPointer statistics = referenceImage->GetStatistics();
     for (TimeStepType ts = 0; ts < referenceImage->GetTimeSteps(); ++ts)
     {
-      m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, static_cast<double>(statistics->GetScalarValueMin()));
-      m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, static_cast<double>(statistics->GetScalarValueMax()));
+      m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, static_cast<double>(statistics->GetScalarValueMin(ts)));
+      m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, static_cast<double>(statistics->GetScalarValueMax(ts)));
     }
 
     if (m_LockedUpperThreshold)

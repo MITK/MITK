@@ -823,6 +823,29 @@ public:
   }
 
   /* random a float value */
+  /*
+   * An invalid time step must not crash the filter. The 3D test image has only time step 0.
+   */
+  static void InvalidTimeStepTest()
+  {
+    auto scene = mitk::Geometry3D::New();
+    mitk::BoundingBox::BoundsArrayType sceneBounds;
+    sceneBounds[0] = sceneBounds[2] = sceneBounds[4] = 0.0;
+    sceneBounds[1] = sceneBounds[3] = sceneBounds[5] = 100.0;
+    scene->SetBounds(sceneBounds);
+
+    auto axialPlane = mitk::PlaneGeometry::New();
+    axialPlane->InitializeStandardPlane(scene, mitk::AnatomicalPlane::Axial, 50.0);
+
+    auto slicer = mitk::ExtractSliceFilter::New();
+    slicer->SetInput(CreateFineSpacedImage(5.0));
+    slicer->SetWorldGeometry(axialPlane);
+    slicer->SetTimeStep(1);
+    slicer->Update();
+
+    MITK_TEST_CONDITION(!slicer->GetOutput()->IsInitialized(), "invalid time step: no slice is extracted");
+  }
+
   static float randFloat()
   {
     return (((float)rand() + 1.0) / ((float)RAND_MAX + 1.0)) +
@@ -990,6 +1013,8 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   // clipping to the input in a larger scene
   mitkExtractSliceFilterTestClass::ClipToInputGeometryTest();
+
+  mitkExtractSliceFilterTestClass::InvalidTimeStepTest();
 
   // initialize sphere test volume
   mitkExtractSliceFilterTestClass::InitializeTestVolume();

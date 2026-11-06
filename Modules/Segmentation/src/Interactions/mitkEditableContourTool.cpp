@@ -126,6 +126,13 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
+  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(positionEvent);
+  if (m_ReferenceDataSlice.IsNull())
+  {
+    this->ResetToStartState();
+    return;
+  }
+
   auto contour = this->CreateNewContour();
   m_ContourNode = mitk::DataNode::New();
   m_ContourNode->SetData(contour);
@@ -164,8 +171,6 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_PreviewContourNode, workingDataNode);
   dataStorage->Add(m_ClosureContourNode, workingDataNode);
-
-  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(positionEvent);
 
   auto origin = m_ReferenceDataSlice->GetSlicedGeometry()->GetOrigin();
   m_ReferenceDataSlice->GetSlicedGeometry()->WorldToIndex(origin, origin);

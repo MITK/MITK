@@ -118,6 +118,10 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   auto workingSlice = this->GetAffectedWorkingSlice(positionEvent);
+  if (workingSlice.IsNull())
+  {
+    return;
+  }
 
   auto click = positionEvent->GetPositionInWorld();
 

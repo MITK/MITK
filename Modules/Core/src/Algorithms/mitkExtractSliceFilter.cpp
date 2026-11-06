@@ -122,6 +122,12 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
         return;
       }
 
+      if (!inputTimeGeometry->IsValidTimeStep(m_TimeStep))
+      {
+        itkWarningMacro(<< "This is not a valid timestep: " << m_TimeStep);
+        return;
+      }
+
       // Resampling grid corresponds to the input geometry. This means that
       // the spacing of the output 2D image is directly derived from the
       // associated input image, regardless of the currently selected world

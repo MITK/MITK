@@ -302,6 +302,9 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   assert(positionEvent->GetSender()); // sure, right?
   const auto timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
 
+  if (nullptr == image || !image->GetTimeGeometry()->IsValidTimeStep(timeStep))
+    return nullptr;
+
   return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
 }
 

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
@@ -112,6 +113,9 @@ namespace mitk
 
         bool hadOutdatedProperties = false;
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem, &hadOutdatedProperties);
+        // The layer index is the group membership now. Kept as a property, every later save
+        // would write it back, and after "Split layers" it would be stale.
+        label->RemoveProperty("layer");
 
         if (label->GetValue() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {
@@ -154,11 +158,16 @@ namespace mitk
       mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << groupImages.size() << "; found labelsets: " << labelsets.size();
     }
 
-    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    auto props = ExtractSegmentationPropertiesFromNrrdHeader(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
 
     const Options userOptions = this->GetOptions();
 
-    const auto multiLayerStrategy = userOptions.find(OPTION_NAME_MULTI_LAYER)->second.ToString();
+    const auto multiLayerStrategy = IFileIO::ResolveEnumOption(userOptions, OPTION_NAME_MULTI_LAYER);
+    if (multiLayerStrategy != OPTION_NAME_MULTI_LAYER_ADAPT && multiLayerStrategy != OPTION_NAME_MULTI_LAYER_SPLIT)
+    {
+      mitkThrow() << "Unknown value \"" << multiLayerStrategy << "\" of the option \"" << OPTION_NAME_MULTI_LAYER
+                  << "\". Valid values: " << OPTION_NAME_MULTI_LAYER_ADAPT << ", " << OPTION_NAME_MULTI_LAYER_SPLIT << ".";
+    }
 
     if (multiLayerStrategy == OPTION_NAME_MULTI_LAYER_SPLIT)
     { //just split layers in different multi label images
@@ -260,17 +269,7 @@ namespace mitk
 
   void LegacyLabelSetImageIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys.push_back("NRRD.space");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
-    this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("label.");
-    this->m_DefaultMetaDataKeys.push_back("layer.");
-    this->m_DefaultMetaDataKeys.push_back("layers");
-    this->m_DefaultMetaDataKeys.push_back("modality");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
-    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
+    this->m_DefaultMetaDataKeys = GetLegacyLabelSetNrrdMetaDataKeys();
   }
 
 } // namespace

@@ -2,6 +2,7 @@ set(CPP_FILES
   mitkLegacyLabelSetImageIO.cpp
   mitkMultilabelActivator.cpp
   mitkMultilabelIOMimeTypes.cpp
+  mitkMultiLabelNrrdMetaData.cpp
   mitkMultiLabelSegmentationIO.cpp
   mitkMultiLabelSegmentationSerializer.cpp
   mitkMultiLabelSegmentationStackWriterBase.cpp

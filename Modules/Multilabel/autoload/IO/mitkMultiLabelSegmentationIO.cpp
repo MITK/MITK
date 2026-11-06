@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
@@ -215,23 +216,10 @@ namespace mitk
     output->SetUnlabeledLabelLock(unlabeledLock);
 
     //meta data handling
-    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    auto props = ExtractSegmentationPropertiesFromNrrdHeader(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
     for (auto& [name, prop] : *(props->GetMap()))
     {
-      bool addProp = true;
-      for (auto unwantedName : m_DefaultMetaDataKeys)
-      {
-        // Only add properties that are not default meta information
-        if (name.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
-        {
-          addProp = false;
-          break;
-        }
-      }
-      if (addProp)
-      {
-        output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
-      }
+      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
     }
 
     // Handle UID
@@ -264,15 +252,7 @@ namespace mitk
 
   void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.uid");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.space");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
-    this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.multilabel.");
-    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
-    this->m_DefaultMetaDataKeys.push_back(MULTILABEL_SEGMENTATION_MODALITY_KEY);
+    this->m_DefaultMetaDataKeys = GetMultiLabelNrrdMetaDataKeys();
   }
 
 } // namespace

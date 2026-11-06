@@ -40,23 +40,12 @@ void QmitkDataStorageSimpleTreeModel::ResetTree()
 
 void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
 {
-  if (m_Root)
-  {
-    m_Root->Delete();
-  }
-
-  beginResetModel();
-  ResetTree();
-  UpdateModelData();
-  endResetModel();
+  this->RebuildTree();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodePredicateChanged()
 {
-  beginResetModel();
-  ResetTree();
-  UpdateModelData();
-  endResetModel();
+  this->RebuildTree();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodeAdded(const mitk::DataNode *node)
@@ -101,21 +90,72 @@ void QmitkDataStorageSimpleTreeModel::NodeRemoved(const mitk::DataNode *node)
   TreeItem *parentTreeItem = treeItem->GetParent();
   QModelIndex parentIndex = this->IndexFromTreeItem(parentTreeItem);
 
-  // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
+  // The children take over the sources of the node in the data storage, so
+  // they move to the item of its first source. A rebuild would add the node
+  // again, as it is still in the data storage while this event is handled.
+  // Moves keep the expanded state and the selection of the children in views.
+  for (TreeItem *child : treeItem->GetChildren())
+    this->MoveTreeItem(child, parentTreeItem);
+
   this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());
 
   // remove node
-  std::vector<TreeItem *> children = treeItem->GetChildren();
   m_TreeItems.remove(treeItem);
   delete treeItem; //delete in tree
   this->endRemoveRows();
+}
 
-  if (!children.empty())
+void QmitkDataStorageSimpleTreeModel::NodeSourcesChanged(const mitk::DataNode *node)
+{
+  if (node == nullptr || m_Root == nullptr || (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node)))
+    return;
+
+  TreeItem *treeItem = m_Root->Find(node);
+  TreeItem *parentTreeItem = m_Root;
+
+  if (mitk::DataNode *parentDataNode = this->GetParentNode(node); parentDataNode != nullptr)
+    parentTreeItem = m_Root->Find(parentDataNode);
+
+  // A node is shown only below a shown parent, so a node that appears or
+  // disappears with its new parent needs the tree built anew.
+  if (treeItem == nullptr || parentTreeItem == nullptr)
   {
-    //if not empty we have to rebuild the whole representation,
-    //because the children could be now top level, or at another
-    //source/parent.
-    this->UpdateModelData();
+    this->RebuildTree();
+    return;
+  }
+
+  if (parentTreeItem != treeItem->GetParent())
+    this->MoveTreeItem(treeItem, parentTreeItem);
+}
+
+void QmitkDataStorageSimpleTreeModel::RebuildTree()
+{
+  this->beginResetModel();
+
+  if (m_Root)
+    m_Root->Delete();
+
+  m_TreeItems.clear();
+  this->ResetTree();
+
+  m_IsRebuilding = true;
+  this->UpdateModelData();
+  m_IsRebuilding = false;
+
+  this->endResetModel();
+}
+
+void QmitkDataStorageSimpleTreeModel::MoveTreeItem(TreeItem *item, TreeItem *newParentItem)
+{
+  TreeItem *oldParentItem = item->GetParent();
+  const int row = this->GetLayerRow(newParentItem, item->GetDataNode());
+
+  if (this->beginMoveRows(this->IndexFromTreeItem(oldParentItem), item->GetIndex(), item->GetIndex(),
+                          this->IndexFromTreeItem(newParentItem), row))
+  {
+    oldParentItem->RemoveChild(item);
+    newParentItem->InsertChild(item, row);
+    this->endMoveRows();
   }
 }
 
@@ -336,28 +376,40 @@ void QmitkDataStorageSimpleTreeModel::AddNodeInternal(const mitk::DataNode *node
     index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
   }
 
-  int firstRowWithASiblingBelow = 0;
+  const int row = this->GetLayerRow(parentTreeItem, node);
+
+  // Inside a model reset, views still hold indexes of the deleted items, which
+  // row signals would make them look up.
+  if (!m_IsRebuilding)
+    beginInsertRows(index, row, row);
+
+  auto newNode = new TreeItem(const_cast<mitk::DataNode *>(node));
+  parentTreeItem->InsertChild(newNode, row);
+  m_TreeItems.push_back(newNode);
+
+  if (!m_IsRebuilding)
+    endInsertRows();
+}
+
+int QmitkDataStorageSimpleTreeModel::GetLayerRow(TreeItem *parentItem, const mitk::DataNode *node) const
+{
   int nodeLayer = -1;
   node->GetIntProperty("layer", nodeLayer);
-  for (TreeItem *siblingTreeItem : parentTreeItem->GetChildren())
+
+  int row = 0;
+  for (TreeItem *siblingTreeItem : parentItem->GetChildren())
   {
     int siblingLayer = -1;
     if (mitk::DataNode *siblingNode = siblingTreeItem->GetDataNode())
-    {
       siblingNode->GetIntProperty("layer", siblingLayer);
-    }
-    if (nodeLayer > siblingLayer)
-    {
-      break;
-    }
-    ++firstRowWithASiblingBelow;
-  }
-  beginInsertRows(index, firstRowWithASiblingBelow, firstRowWithASiblingBelow);
-  auto newNode = new TreeItem(const_cast<mitk::DataNode *>(node));
-  parentTreeItem->InsertChild(newNode, firstRowWithASiblingBelow);
-  m_TreeItems.push_back(newNode);
 
-  endInsertRows();
+    if (nodeLayer > siblingLayer)
+      break;
+
+    ++row;
+  }
+
+  return row;
 }
 
 QModelIndex QmitkDataStorageSimpleTreeModel::IndexFromTreeItem(TreeItem *item) const

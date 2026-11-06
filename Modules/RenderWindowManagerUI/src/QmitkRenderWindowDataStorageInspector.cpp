@@ -91,6 +91,7 @@ void QmitkRenderWindowDataStorageInspector::Initialize()
 void QmitkRenderWindowDataStorageInspector::SetUpConnections()
 {
   connect(m_StorageModel.get(), &QAbstractItemModel::rowsInserted, this, &QmitkRenderWindowDataStorageInspector::ModelRowsInserted);
+  connect(m_StorageModel.get(), &QAbstractItemModel::rowsMoved, this, &QmitkRenderWindowDataStorageInspector::ModelRowsMoved);
 
   QSignalMapper* changeViewDirectionSignalMapper = new QSignalMapper(this);
   changeViewDirectionSignalMapper->setMapping(m_Controls->radioButtonAxial, QString("axial"));
@@ -140,6 +141,11 @@ void QmitkRenderWindowDataStorageInspector::SetActiveRenderWindow(const QString&
 void QmitkRenderWindowDataStorageInspector::ModelRowsInserted(const QModelIndex& parent, int /*start*/, int /*end*/)
 {
   m_Controls->renderWindowTreeView->setExpanded(parent, true);
+}
+
+void QmitkRenderWindowDataStorageInspector::ModelRowsMoved(const QModelIndex& /*sourceParent*/, int /*start*/, int /*end*/, const QModelIndex& destinationParent, int /*row*/)
+{
+  m_Controls->renderWindowTreeView->setExpanded(destinationParent, true);
 }
 
 void QmitkRenderWindowDataStorageInspector::ChangeViewDirection(const QString& viewDirection)

@@ -128,6 +128,12 @@ public:
   /// Sets a node to modified. Called by the DataStorage
   ///
   virtual void SetNodeModified(const mitk::DataNode *node);
+  /**
+   * \brief Moves the item of a node, together with the items below it, under the item of its first source.
+   *
+   * Called by the DataStorage after the sources of the node were replaced.
+   */
+  virtual void UpdateNodeParent(const mitk::DataNode *node);
 
   ///
   /// \return an index for the given datatreenode in the tree. If the node is not found
@@ -185,9 +191,6 @@ protected:
   bool m_PlaceNewNodesOnTop;
   TreeItem *m_Root;
 
-  /// Flag to block the data storage events if nodes are added/removed by this class.
-  bool m_BlockDataStorageEvents;
-
   /// This decides whether or not it is allowed to assign a different parent to a node
   /// If it is false, it is not possible to change the hierarchy of nodes by dragging
   /// and dropping.
@@ -198,6 +201,16 @@ protected:
 private:
   void AddNodeInternal(const mitk::DataNode *);
   void RemoveNodeInternal(const mitk::DataNode *);
+
+  /**
+   * \brief Moves an item, with the items below it, before another child of a new parent item, or to its end.
+   *
+   * Announced as a move, so that views keep the expanded state and the selection of the items.
+   */
+  void MoveTreeItem(TreeItem *item, TreeItem *newParentItem, TreeItem *nextItem = nullptr);
+
+  /** \brief The row of a new child item for the node: the top or by layer, depending on m_PlaceNewNodesOnTop. */
+  int GetNewChildRow(TreeItem *parentItem, const mitk::DataNode *node) const;
   ///
   /// Checks if dicom properties patient name, study names and series name exists
   ///

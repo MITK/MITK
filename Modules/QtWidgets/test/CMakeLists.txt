@@ -6,6 +6,10 @@ mitkAddCustomModuleTest(QmitkDataStorageListModelTest QmitkDataStorageListModelT
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkDataStorageSimpleTreeModelTest QmitkDataStorageSimpleTreeModelTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkDataStorageTreeModelTest QmitkDataStorageTreeModelTest
   -platform minimal
 )
@@ -110,6 +114,10 @@ mitkAddCustomModuleTest(QmitkMxNSyncPeekTest QmitkMxNSyncPeekTest
 )
 
 mitkAddCustomModuleTest(QmitkMxNUtilityStripTest QmitkMxNUtilityStripTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkRenderWindowDataStorageTreeModelTest QmitkRenderWindowDataStorageTreeModelTest
   -platform minimal
 )
 

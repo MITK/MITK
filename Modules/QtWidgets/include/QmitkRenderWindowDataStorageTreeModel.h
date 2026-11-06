@@ -59,6 +59,10 @@ public:
   * \brief See 'QmitkAbstractDataStorageModel'
   */
   void NodeRemoved(const mitk::DataNode* node) override;
+  /**
+  * \brief See 'QmitkAbstractDataStorageModel'
+  */
+  void NodeSourcesChanged(const mitk::DataNode* node) override;
 
   // override from 'QAbstractItemModel'
   QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
@@ -109,14 +113,18 @@ private:
   */
   void AddNodeInternal(const mitk::DataNode* dataNode, const mitk::BaseRenderer* renderer);
   /**
-  * \brief Remove the tree item that contains the given data node. Removing an item may
-  *        leave the child items of the removed item without a parent. In this case
-  *        the children have to be moved inside the tree so the tree has to be rebuild
-  *        according to the current status of the data storage.
+  * \brief Remove the tree item that contains the given data node. Its child items move
+  *        to the parent item, as their nodes take over the sources of the removed node.
   *
   * \param dataNode   The data node that should be removed.
   */
   void RemoveNodeInternal(const mitk::DataNode* dataNode);
+
+  /** \brief Moves an item, with the items below it, to a new parent item, placed by its layer in the current renderer. */
+  void MoveTreeItem(QmitkDataStorageTreeModelInternalItem* item, QmitkDataStorageTreeModelInternalItem* newParentItem);
+
+  /** \brief The row of a child item for the node among the children of the parent item, by its layer in the renderer. */
+  int GetLayerRow(QmitkDataStorageTreeModelInternalItem* parentItem, const mitk::DataNode* dataNode, const mitk::BaseRenderer* renderer) const;
 
   mitk::DataNode* GetParentNode(const mitk::DataNode* node) const;
   QmitkDataStorageTreeModelInternalItem* GetItemByIndex(const QModelIndex& index) const;

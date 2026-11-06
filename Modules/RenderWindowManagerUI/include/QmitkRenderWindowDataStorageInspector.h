@@ -117,6 +117,7 @@ public:
 private Q_SLOTS:
 
   void ModelRowsInserted(const QModelIndex& parent, int start, int end);
+  void ModelRowsMoved(const QModelIndex& sourceParent, int start, int end, const QModelIndex& destinationParent, int row);
 
   void ChangeViewDirection(const QString& viewDirection);
 

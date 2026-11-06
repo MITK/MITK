@@ -66,6 +66,9 @@ public Q_SLOTS:
   /// will setup m_CurrentRowCount
   void NodeTreeViewRowsRemoved(const QModelIndex& parent, int start, int end);
 
+  /** \brief Expands the item that rows were moved into, as for inserted rows. */
+  void NodeTreeViewRowsMoved(const QModelIndex& sourceParent, int start, int end, const QModelIndex& destinationParent, int row);
+
   /// Whenever the selection changes set the "selected" property respectively
   void NodeSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 

@@ -101,6 +101,7 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   MITK_TEST(Test_LegacyPropertiesMigratedOnLoad);
   MITK_TEST(Test_SurfaceTimeKept);
   MITK_TEST(Test_StaticSurfaceWithTimePropertiesStaysStatic);
+  MITK_TEST(Test_RemovedParentKeepsGrandchildBelowGrandparent);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
@@ -171,6 +172,30 @@ public:
     const auto timeBounds = restoredStorage->GetNamedNode("timed")->GetData()->GetTimeGeometry()->GetTimeBounds(0);
     CPPUNIT_ASSERT_EQUAL(1234.567, timeBounds[0]);
     CPPUNIT_ASSERT_EQUAL(1234.567 + 1234.567, timeBounds[1]);
+  }
+
+  void Test_RemovedParentKeepsGrandchildBelowGrandparent()
+  {
+    // Like a polygon model of a label whose segmentation was removed.
+    auto image = CreateSurfaceNode("image");
+    auto segmentation = CreateSurfaceNode("segmentation");
+    auto polygonModel = CreateSurfaceNode("polygon model");
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    originalStorage->Add(image);
+    originalStorage->Add(segmentation, image);
+    originalStorage->Add(polygonModel, segmentation);
+    originalStorage->Remove(segmentation);
+
+    const auto archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", m_Directory);
+    CPPUNIT_ASSERT(mitk::SceneIO::New()->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = mitk::SceneIO::New()->LoadScene(archiveFilename));
+
+    const auto sources = restoredStorage->GetSources(restoredStorage->GetNamedNode("polygon model"));
+    CPPUNIT_ASSERT_EQUAL(1u, sources->Size());
+    CPPUNIT_ASSERT(sources->GetElement(0) == restoredStorage->GetNamedNode("image"));
   }
   void Test_StaticSurfaceWithTimePropertiesStaysStatic()
   {

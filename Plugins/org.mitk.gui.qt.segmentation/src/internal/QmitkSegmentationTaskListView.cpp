@@ -48,6 +48,11 @@ void QmitkSegmentationTaskListView::NodeRemoved(const mitk::DataNode* removedNod
   m_Ui->segmentationTaskListWidget->CheckDataStorage(removedNode);
 }
 
+void QmitkSegmentationTaskListView::NodeSourcesChanged(const mitk::DataNode*)
+{
+  m_Ui->segmentationTaskListWidget->CheckDataStorage();
+}
+
 bool QmitkSegmentationTaskListView::PreShutdown(berry::IWorkbench*, bool)
 {
   return m_Ui->segmentationTaskListWidget->OnPreShutdown();

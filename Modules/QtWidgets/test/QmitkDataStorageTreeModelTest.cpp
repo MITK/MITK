@@ -10,8 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkSignalConsistencyGuard.h"
 #include "QmitkTestQApplication.h"
 
+#include <QmitkDataStorageFilterProxyModel.h>
 #include <QmitkDataStorageTreeModel.h>
 
 #include <mitkDataNode.h>
@@ -22,7 +24,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <QMimeData>
-#include <QStack>
+#include <QTreeView>
 
 #include <memory>
 #include <string>
@@ -30,113 +32,6 @@ found in the LICENSE file.
 
 namespace
 {
-  /**
-   * Live validator for a model's structural change signals.
-   *
-   * QAbstractItemModel promises its views that every rowsInserted /
-   * rowsRemoved names the parent under which the change happened and a range
-   * that matches the resulting change in that parent's rowCount(). A
-   * QTreeView and a QSortFilterProxyModel keep their internal bookkeeping in
-   * sync by trusting exactly this. When a model announces the change under
-   * the wrong parent, that bookkeeping is corrupted and later index lookups
-   * dereference stale items - the mechanism behind the intermittent Data
-   * Manager crashes on drag-and-drop.
-   *
-   * The guard connects to the model and records, per emitted change, whether
-   * the announced parent's rowCount() actually moved by the announced amount.
-   * It also rejects a structurally invalid announced range (negative first row
-   * or last < first), which no valid model may emit.
-   */
-  class SignalConsistencyGuard
-  {
-  public:
-    explicit SignalConsistencyGuard(QAbstractItemModel *model)
-      : m_Model(model)
-    {
-      m_Connections.push_back(QObject::connect(
-        model, &QAbstractItemModel::rowsAboutToBeInserted,
-        [this](const QModelIndex &parent, int first, int last)
-        {
-          const int before = m_Model->rowCount(parent);
-          if (first < 0 || last < first)
-            this->Fail(QStringLiteral("rowsAboutToBeInserted announced an invalid range [%1,%2] under parent(row=%3)")
-                         .arg(first).arg(last).arg(parent.row()));
-          else if (first > before)
-            this->Fail(QStringLiteral("rowsAboutToBeInserted announced first row %1 under parent(row=%2), "
-                                      "but that parent only has %3 row(s)")
-                         .arg(first).arg(parent.row()).arg(before));
-          m_InsertBefore.push(before);
-        }));
-
-      m_Connections.push_back(QObject::connect(
-        model, &QAbstractItemModel::rowsInserted,
-        [this](const QModelIndex &parent, int first, int last)
-        {
-          const int before = m_InsertBefore.isEmpty() ? -1 : m_InsertBefore.pop();
-          const int actual = m_Model->rowCount(parent);
-          if (before < 0 || actual != before + (last - first + 1))
-          {
-            this->Fail(QStringLiteral("rowsInserted announced %1 new row(s) under parent(row=%2), "
-                                      "but that parent's rowCount went from %3 to %4")
-                         .arg(last - first + 1).arg(parent.row()).arg(before).arg(actual));
-          }
-        }));
-
-      m_Connections.push_back(QObject::connect(
-        model, &QAbstractItemModel::rowsAboutToBeRemoved,
-        [this](const QModelIndex &parent, int first, int last)
-        {
-          if (first < 0 || last < first)
-            this->Fail(QStringLiteral("rowsAboutToBeRemoved announced an invalid range [%1,%2] under parent(row=%3)")
-                         .arg(first).arg(last).arg(parent.row()));
-          m_RemoveBefore.push(m_Model->rowCount(parent));
-        }));
-
-      m_Connections.push_back(QObject::connect(
-        model, &QAbstractItemModel::rowsRemoved,
-        [this](const QModelIndex &parent, int first, int last)
-        {
-          const int before = m_RemoveBefore.isEmpty() ? -1 : m_RemoveBefore.pop();
-          const int actual = m_Model->rowCount(parent);
-          if (before < 0 || actual != before - (last - first + 1))
-          {
-            this->Fail(QStringLiteral("rowsRemoved announced %1 removed row(s) under parent(row=%2), "
-                                      "but that parent's rowCount went from %3 to %4")
-                         .arg(last - first + 1).arg(parent.row()).arg(before).arg(actual));
-          }
-        }));
-    }
-
-    ~SignalConsistencyGuard()
-    {
-      for (const auto &connection : m_Connections)
-        QObject::disconnect(connection);
-    }
-
-    SignalConsistencyGuard(const SignalConsistencyGuard &) = delete;
-    SignalConsistencyGuard &operator=(const SignalConsistencyGuard &) = delete;
-
-    bool IsConsistent() const { return m_Consistent; }
-    std::string FailureText() const { return m_Failure.toStdString(); }
-
-  private:
-    void Fail(const QString &message)
-    {
-      if (m_Consistent)
-      {
-        m_Consistent = false;
-        m_Failure = message;
-      }
-    }
-
-    QAbstractItemModel *m_Model;
-    std::vector<QMetaObject::Connection> m_Connections;
-    QStack<int> m_InsertBefore;
-    QStack<int> m_RemoveBefore;
-    bool m_Consistent = true;
-    QString m_Failure;
-  };
-
   mitk::DataNode::Pointer MakeImageNode(const std::string &name)
   {
     auto node = mitk::DataNode::New();
@@ -144,13 +39,38 @@ namespace
     node->SetData(mitk::Image::New());
     return node;
   }
+
+  /** A tree view behind the filter proxy model, as the Data Manager shows the model. */
+  struct DataManagerTreeView
+  {
+    explicit DataManagerTreeView(QmitkDataStorageTreeModel *model)
+    {
+      Proxy.setSourceModel(model);
+      View.setModel(&Proxy);
+    }
+
+    void SetExpanded(const QModelIndex &modelIndex, bool expanded)
+    {
+      View.setExpanded(Proxy.mapFromSource(modelIndex), expanded);
+    }
+
+    bool IsExpanded(const QModelIndex &modelIndex) const
+    {
+      return View.isExpanded(Proxy.mapFromSource(modelIndex));
+    }
+
+    QmitkDataStorageFilterProxyModel Proxy;
+    QTreeView View;
+  };
 }
 
 /**
  * Tests for QmitkDataStorageTreeModel, the model backing the Data Manager
- * view. The focus is dropMimeData: sibling reordering under the default
- * preference and, where a test enables it, hierarchy-changing reparent drops,
- * pinning observable tree behaviour so a fix there cannot silently regress it.
+ * view. The focus is dropMimeData: sibling reordering with hierarchy changes
+ * off, the default of the model, and, where a test enables them,
+ * hierarchy-changing reparent drops, pinning observable tree behaviour so a fix
+ * there cannot silently regress it. Further tests cover how the model follows
+ * removals and source changes in the data storage.
  */
 class QmitkDataStorageTreeModelTestSuite : public mitk::TestFixture
 {
@@ -165,6 +85,20 @@ class QmitkDataStorageTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(AllChildrenReorder_KeepsSignalsConsistent);
   MITK_TEST(ChildReorder_ParentNotAtRowZero_KeepsCorrectOrder);
   MITK_TEST(Reparent_OntoChildlessNodeAtNonzeroRow_KeepsSignalsConsistent);
+  MITK_TEST(Reparent_NodeWithChildren_KeepsChildrenBelowItInStorage);
+  MITK_TEST(Reparent_OntoEmptySpace_LeavesNodeWithoutSources);
+  MITK_TEST(SetSourcesInStorage_MovesItemWithChildren);
+  MITK_TEST(RemoveNodeWithChildren_StorageMatchesTree);
+  MITK_TEST(Reparent_NodeWithChildren_KeepsExpandedStates);
+  MITK_TEST(TopLevelReorder_NodeWithChildren_StaysExpanded);
+  MITK_TEST(SetSourcesInStorage_NodeWithChildren_StaysExpanded);
+  MITK_TEST(RemoveNodeWithChildren_ChildrenStayExpanded);
+  MITK_TEST(DropOntoEmptySpace_AppendsToTopLevelItems);
+  MITK_TEST(DropOntoDraggedItem_IsRejected);
+  MITK_TEST(DropOntoNodeDerivedThroughOtherSource_IsRejected);
+  MITK_TEST(Reorder_NodeWithSeveralSources_KeepsSources);
+  MITK_TEST(RemoveFirstSourceWithoutSources_ChildMovesBelowOtherSource);
+  MITK_TEST(SetSourcesInStorage_PlacesItemLikeNewNode);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -199,8 +133,9 @@ public:
 
     // Mirror the production Data Manager wiring: it constructs the model with
     // "Place new nodes on top" defaulting to true. Hierarchy changes via DnD
-    // are governed by a separate flag (m_AllowHierarchyChange, off by default),
-    // not by this argument.
+    // are governed by a separate flag (m_AllowHierarchyChange), not by this
+    // argument. The model turns it off by default, the Data Manager turns it
+    // on unless its preference says otherwise.
     m_Model = std::make_unique<QmitkDataStorageTreeModel>(m_DataStorage, true);
   }
 
@@ -316,10 +251,10 @@ public:
     CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(1, 0, imageAIndex)) == child0);
   }
 
-  //! Dragging several children at once removes them one at a time before
-  //! re-inserting (dropMimeData relies on GetIndex() staying valid across
-  //! those removals). This exercises that multi-item path and checks that the
-  //! removal and insertion signals stay consistent and the order is correct.
+  //! Dragging several children at once moves them one at a time, each before
+  //! the child that follows the dropped items. This exercises that multi-item
+  //! path and checks that the move signals stay consistent and the order is
+  //! correct.
   void MultiNodeChildReorder_KeepsSignalsConsistent()
   {
     // A third child so we can drag two of them together.
@@ -394,11 +329,10 @@ public:
     CPPUNIT_ASSERT(model.GetNode(model.index(5, 0, parentIndex)) == ordered[5]);
   }
 
-  //! Dragging every child of a node to a between-drop (row != -1) empties the
-  //! insert target in the removal loop before the re-insertion. With the target
-  //! emptied, the drop index must still resolve to a valid position within it
-  //! so the announced beginInsertRows range matches the actual insertion and
-  //! the view's index bookkeeping stays consistent.
+  //! Dragging every child of a node to a between-drop (row != -1) leaves no
+  //! child that stays in place to drop the items before. The drop position
+  //! must still resolve to a valid one, so the announced moves match the
+  //! actual ones and the view's index bookkeeping stays consistent.
   void AllChildrenReorder_KeepsSignalsConsistent()
   {
     const QModelIndex imageAIndex = m_Model->GetIndex(m_ImageA);
@@ -517,6 +451,278 @@ public:
     CPPUNIT_ASSERT(handled);
     CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
     CPPUNIT_ASSERT_EQUAL(1, model.rowCount(model.GetIndex(target)));
+  }
+
+  //! A reparent drop moves the node with the nodes below it. The data storage
+  //! has to keep them derived from it, since a scene saves the hierarchy of the
+  //! data storage, not the one of the tree.
+  void Reparent_NodeWithChildren_KeepsChildrenBelowItInStorage()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+    m_Model->SetAllowHierarchyChange(true);
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(m_ChildA)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, -1, -1, m_Model->GetIndex(m_ImageB));
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageB));
+    CPPUNIT_ASSERT(m_Model->GetIndex(grandchild).parent() == m_Model->GetIndex(m_ChildA));
+
+    const auto childSources = m_DataStorage->GetSources(m_ChildA);
+    CPPUNIT_ASSERT_EQUAL(1u, childSources->Size());
+    CPPUNIT_ASSERT(childSources->GetElement(0) == m_ImageB);
+
+    const auto grandchildSources = m_DataStorage->GetSources(grandchild);
+    CPPUNIT_ASSERT_EQUAL(1u, grandchildSources->Size());
+    CPPUNIT_ASSERT(grandchildSources->GetElement(0) == m_ChildA);
+  }
+
+  //! Dropping onto empty space makes the node a top-level node. The root item
+  //! holds a placeholder node that is not in the data storage, which must not
+  //! become the source of the node.
+  void Reparent_OntoEmptySpace_LeavesNodeWithoutSources()
+  {
+    m_Model->SetAllowHierarchyChange(true);
+
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(m_ChildA)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, 0, 0, QModelIndex());
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT(!m_Model->GetIndex(m_ChildA).parent().isValid());
+    CPPUNIT_ASSERT_EQUAL(0u, m_DataStorage->GetSources(m_ChildA)->Size());
+  }
+
+  //! Sources replaced in the data storage, for example by a script, move the
+  //! item of the node with the items below it.
+  void SetSourcesInStorage_MovesItemWithChildren()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageB);
+    m_DataStorage->SetSources(m_ChildA, sources);
+
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageB));
+    CPPUNIT_ASSERT(m_Model->GetIndex(grandchild).parent() == m_Model->GetIndex(m_ChildA));
+    CPPUNIT_ASSERT_EQUAL(1, m_Model->rowCount(m_Model->GetIndex(m_ImageA)));
+  }
+
+  //! The tree shows the children of a removed node below its parent, and the
+  //! data storage has to agree, so that a scene keeps them there.
+  void RemoveNodeWithChildren_StorageMatchesTree()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+
+    m_DataStorage->Remove(m_ChildA);
+
+    CPPUNIT_ASSERT(m_Model->GetIndex(grandchild).parent() == m_Model->GetIndex(m_ImageA));
+
+    const auto sources = m_DataStorage->GetSources(grandchild);
+    CPPUNIT_ASSERT_EQUAL(1u, sources->Size());
+    CPPUNIT_ASSERT(sources->GetElement(0) == m_ImageA);
+  }
+
+  //! A reparent drop moves the items, so a view keeps which of the moved items
+  //! are expanded and which are collapsed.
+  void Reparent_NodeWithChildren_KeepsExpandedStates()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    const mitk::DataNode::Pointer greatGrandchild = MakeImageNode("great-grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+    m_DataStorage->Add(greatGrandchild, grandchild);
+    m_Model->SetAllowHierarchyChange(true);
+
+    DataManagerTreeView view(m_Model.get());
+    view.SetExpanded(m_Model->GetIndex(m_ChildA), true);
+    view.SetExpanded(m_Model->GetIndex(grandchild), false);
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(m_ChildA)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, -1, -1, m_Model->GetIndex(m_ImageB));
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageB));
+    CPPUNIT_ASSERT(view.IsExpanded(m_Model->GetIndex(m_ChildA)));
+    CPPUNIT_ASSERT(!view.IsExpanded(m_Model->GetIndex(grandchild)));
+  }
+
+  //! Reordering keeps the expanded state of the moved node as well.
+  void TopLevelReorder_NodeWithChildren_StaysExpanded()
+  {
+    DataManagerTreeView view(m_Model.get());
+    view.SetExpanded(m_Model->GetIndex(m_ImageA), true);
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    // Move imageA to the other end of the two top-level nodes.
+    const int dropRow = m_Model->GetIndex(m_ImageA).row() == 0 ? 2 : 0;
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(m_ImageA)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, dropRow, 0, QModelIndex());
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT_EQUAL(dropRow == 0 ? 0 : 1, m_Model->GetIndex(m_ImageA).row());
+    CPPUNIT_ASSERT(view.IsExpanded(m_Model->GetIndex(m_ImageA)));
+  }
+
+  //! Sources replaced in the data storage move the item as well.
+  void SetSourcesInStorage_NodeWithChildren_StaysExpanded()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+
+    DataManagerTreeView view(m_Model.get());
+    view.SetExpanded(m_Model->GetIndex(m_ChildA), true);
+
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageB);
+    m_DataStorage->SetSources(m_ChildA, sources);
+
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageB));
+    CPPUNIT_ASSERT(view.IsExpanded(m_Model->GetIndex(m_ChildA)));
+  }
+
+  //! The children of a removed node move to its parent with their expanded state.
+  void RemoveNodeWithChildren_ChildrenStayExpanded()
+  {
+    const mitk::DataNode::Pointer grandchild = MakeImageNode("grandchild");
+    const mitk::DataNode::Pointer greatGrandchild = MakeImageNode("great-grandchild");
+    m_DataStorage->Add(grandchild, m_ChildA);
+    m_DataStorage->Add(greatGrandchild, grandchild);
+
+    DataManagerTreeView view(m_Model.get());
+    view.SetExpanded(m_Model->GetIndex(grandchild), true);
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    m_DataStorage->Remove(m_ChildA);
+
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT(m_Model->GetIndex(grandchild).parent() == m_Model->GetIndex(m_ImageA));
+    CPPUNIT_ASSERT(view.IsExpanded(m_Model->GetIndex(grandchild)));
+  }
+
+  //! Qt passes row -1 under the root for a drop below the last item.
+  void DropOntoEmptySpace_AppendsToTopLevelItems()
+  {
+    const mitk::DataNode::Pointer first = m_Model->GetNode(m_Model->index(0, 0, QModelIndex()));
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(first)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, -1, -1, QModelIndex());
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT_EQUAL(1, m_Model->GetIndex(first).row());
+  }
+
+  //! A selection dropped onto one of its own items has nowhere to go. The
+  //! model must stay untouched and keep following the data storage.
+  void DropOntoDraggedItem_IsRejected()
+  {
+    m_Model->SetAllowHierarchyChange(true);
+
+    QModelIndexList movers;
+    movers << m_Model->GetIndex(m_ChildA) << m_Model->GetIndex(m_ChildB);
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(movers));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, -1, -1, m_Model->GetIndex(m_ChildB));
+
+    CPPUNIT_ASSERT(!handled);
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageA));
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildB).parent() == m_Model->GetIndex(m_ImageA));
+
+    const mitk::DataNode::Pointer added = MakeImageNode("added");
+    m_DataStorage->Add(added);
+    CPPUNIT_ASSERT(m_Model->GetIndex(added).isValid());
+  }
+
+  //! The tree shows a node below its first source only. Dropping a node onto
+  //! one derived from it through another source would make the node derived
+  //! from itself, which the data storage refuses.
+  void DropOntoNodeDerivedThroughOtherSource_IsRejected()
+  {
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageB);
+    sources->push_back(m_ImageA);
+    const mitk::DataNode::Pointer derived = MakeImageNode("derived");
+    m_DataStorage->Add(derived, sources);
+    m_Model->SetAllowHierarchyChange(true);
+
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(m_ImageA)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, -1, -1, m_Model->GetIndex(derived));
+
+    CPPUNIT_ASSERT(!handled);
+    CPPUNIT_ASSERT(!m_Model->GetIndex(m_ImageA).parent().isValid());
+    CPPUNIT_ASSERT_EQUAL(0u, m_DataStorage->GetSources(m_ImageA)->Size());
+
+    const mitk::DataNode::Pointer added = MakeImageNode("added");
+    m_DataStorage->Add(added);
+    CPPUNIT_ASSERT(m_Model->GetIndex(added).isValid());
+  }
+
+  //! The tree shows a node with several sources below the first one only. A
+  //! reorder among its siblings must keep the others.
+  void Reorder_NodeWithSeveralSources_KeepsSources()
+  {
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageA);
+    sources->push_back(m_ImageB);
+    const mitk::DataNode::Pointer derived = MakeImageNode("derived");
+    m_DataStorage->Add(derived, sources);
+    m_Model->SetAllowHierarchyChange(true);
+
+    const QModelIndex imageAIndex = m_Model->GetIndex(m_ImageA);
+    const int dropRow = m_Model->GetIndex(derived).row() == 0 ? m_Model->rowCount(imageAIndex) : 0;
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{m_Model->GetIndex(derived)}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, dropRow, 0, imageAIndex);
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_EQUAL(2u, m_DataStorage->GetSources(derived)->Size());
+  }
+
+  //! A child shown below a removed top-level node keeps its other source, so
+  //! the tree has to show it there instead of at the top level.
+  void RemoveFirstSourceWithoutSources_ChildMovesBelowOtherSource()
+  {
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageA);
+    sources->push_back(m_ImageB);
+    const mitk::DataNode::Pointer derived = MakeImageNode("derived");
+    m_DataStorage->Add(derived, sources);
+    CPPUNIT_ASSERT(m_Model->GetIndex(derived).parent() == m_Model->GetIndex(m_ImageA));
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    m_DataStorage->Remove(m_ImageA);
+
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT(m_Model->GetIndex(derived).parent() == m_Model->GetIndex(m_ImageB));
+  }
+
+  //! With "Place new nodes on top", a node that code gives a new parent goes on
+  //! top of its new siblings, as a new node would, so it is drawn above them.
+  void SetSourcesInStorage_PlacesItemLikeNewNode()
+  {
+    m_DataStorage->Add(MakeImageNode("existing"), m_ImageB);
+
+    auto sources = mitk::DataStorage::SetOfObjects::New();
+    sources->push_back(m_ImageB);
+    m_DataStorage->SetSources(m_ChildA, sources);
+
+    CPPUNIT_ASSERT(m_Model->GetIndex(m_ChildA).parent() == m_Model->GetIndex(m_ImageB));
+    CPPUNIT_ASSERT_EQUAL(0, m_Model->GetIndex(m_ChildA).row());
   }
 };
 

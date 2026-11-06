@@ -60,7 +60,9 @@ Data nodes can also be sorted hierarchically as a parent-child-relation.
 For example after using the <em>Segmentation-Plugin</em> to create a segmentation on <em>DataNode</em>, the result is created as <em>ChildNode</em>,
 which is a child of <em>DataNode</em> (see \ref ParentChild "Parent-Child-Relation" screenshot).<br>
 A parent-child-relation can be changed by dragging a child of a data node and dropping it onto another data node.
-For this the Property <em>Allow changing of parent nodes</em> needs to be enabled (see \ref DataManagerPreferences "Preferences").
+This can be turned off with the preference <em>Allow changing of parent node</em> (see \ref DataManagerPreferences "Preferences").
+The children of the dragged data node move along with it.
+When a data node is removed, its children become children of its parent.
 
 \anchor ParentChild
 \imageMacro{QmitkDatamanager_ParentChild.png, "Parent-Child-Relation", 16.00}
@@ -159,7 +161,7 @@ It allows to set the following preferences for the Datamanager, which define the
   <li> <em>Show nodes containing no data</em>: If enabled, data nodes that have no underlying base data defined will be displayed in the Datamanager.
   If disabled, data nodes that have no underlying base data defined will not be visible in the Datamanager.
   If disabled, the surface will have its original number of triangles in the triangle mesh.
-  <li> <em>Allow changing of parent node</em>: If enabled, the user can change the hierarchy of the data nodes manually by dragging one or multiple data nodes and
+  <li> <em>Allow changing of parent node</em> (enabled by default): If enabled, the user can change the hierarchy of the data nodes manually by dragging one or multiple data nodes and
   dropping them at any position inside the Datamanager (see \ref DataManagerWorking "Working with the Datamanager") for changing the order of the data nodes manually).
 </ul>
 

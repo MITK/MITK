@@ -77,7 +77,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_NodeTreeModel = new QmitkDataStorageTreeModel(GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
   m_NodeTreeModel->setParent(parent);
-  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
+  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", true));
 
   // Prepare filters
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
@@ -108,6 +108,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   connect(m_NodeTreeModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(NodeTreeViewRowsInserted(const QModelIndex&, int, int)));
   connect(m_NodeTreeModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(NodeTreeViewRowsRemoved(const QModelIndex&, int, int)));
+  connect(m_NodeTreeModel, &QAbstractItemModel::rowsMoved, this, &QmitkDataManagerView::NodeTreeViewRowsMoved);
   connect(m_NodeTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(NodeSelectionChanged(const QItemSelection &, const QItemSelection &)));
   connect(m_NodeTreeModel, &QmitkDataStorageTreeModel::nodeVisibilityChanged, this, &QmitkDataManagerView::OnNodeVisibilityChanged);
 
@@ -152,6 +153,12 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted(const QModelIndex& parent, i
 
 void QmitkDataManagerView::NodeTreeViewRowsRemoved(const QModelIndex& /*parent*/, int /*start*/, int /*end*/)
 {
+  m_CurrentRowCount = m_NodeTreeModel->rowCount();
+}
+
+void QmitkDataManagerView::NodeTreeViewRowsMoved(const QModelIndex& /*sourceParent*/, int /*start*/, int /*end*/, const QModelIndex& destinationParent, int /*row*/)
+{
+  m_NodeTreeView->setExpanded(m_FilterModel->mapFromSource(destinationParent), true);
   m_CurrentRowCount = m_NodeTreeModel->rowCount();
 }
 
@@ -224,7 +231,7 @@ void QmitkDataManagerView::OnPreferencesChanged(const mitk::IPreferences* prefs)
   }
   m_NodeTreeView->expandAll();
 
-  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
+  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", true));
 
   GlobalReinitAction::Run(GetSite(), GetDataStorage());
 }

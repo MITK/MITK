@@ -220,9 +220,9 @@ namespace mitk
     /**
      * \brief Update a node.
      *
-     * Currently supports reparenting via "parent_uid" field.
-     * Reparenting is done by removing the node from DataStorage and
-     * re-adding it under the new parent (same approach as Data Manager UI).
+     * Currently supports reparenting via "parent_uid" field. The node stays
+     * in the DataStorage (DataStorage::SetSources()), so it keeps its UID and
+     * the nodes derived from it.
      *
      * \param uid The node UID.
      * \param updates JSON object with fields to update (e.g., "parent_uid").

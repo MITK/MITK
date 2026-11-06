@@ -29,9 +29,10 @@ found in the LICENSE file.
  * This class bridges the Qt model/view framework with the MITK DataStorage by
  * accepting an mitk::DataStorage and an optional mitk::NodePredicateBase for
  * filtering. It automatically registers itself as a listener for node events
- * (AddNodeEvent, ChangedNodeEvent, RemoveNodeEvent) on the data storage and
- * provides pure virtual callbacks (NodeAdded, NodeChanged, NodeRemoved) so that
- * subclasses can react to these events and update their internal state.
+ * (AddNodeEvent, ChangedNodeEvent, RemoveNodeEvent, SourcesChangedNodeEvent) on
+ * the data storage and provides virtual callbacks (NodeAdded, NodeChanged,
+ * NodeRemoved, NodeSourcesChanged) so that subclasses can react to these events
+ * and update their internal state.
  *
  * Subclasses must also implement DataStorageChanged() and NodePredicateChanged()
  * to handle changes of the data storage or predicate, respectively.
@@ -56,7 +57,7 @@ public:
    *
    * Removes listeners from the previous data storage (if any), sets the new
    * data storage, and registers listeners for AddNodeEvent, RemoveNodeEvent,
-   * ChangedNodeEvent, and the DeleteEvent. Finally calls DataStorageChanged()
+   * ChangedNodeEvent, SourcesChangedNodeEvent, and the DeleteEvent. Finally calls DataStorageChanged()
    * to allow the subclass to update its internal representation.
    *
    * \param[in] dataStorage Pointer to the new data storage. May be nullptr.
@@ -93,6 +94,13 @@ protected:
   virtual void NodeAdded(const mitk::DataNode* node) = 0;
   virtual void NodeChanged(const mitk::DataNode* node) = 0;
   virtual void NodeRemoved(const mitk::DataNode* node) = 0;
+
+  /**
+   * \brief Called after the sources of the node were replaced.
+   *
+   * Does nothing by default. Models that show the source hierarchy override it.
+   */
+  virtual void NodeSourcesChanged(const mitk::DataNode* node);
 
   QmitkAbstractDataStorageModel(QObject* parent = nullptr);
   QmitkAbstractDataStorageModel(mitk::DataStorage* dataStorage, QObject* parent = nullptr);

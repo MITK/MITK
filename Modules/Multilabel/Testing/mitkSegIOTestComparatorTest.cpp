@@ -94,39 +94,39 @@ public:
 
   void IdenticalSegmentationsHaveNoDifferences()
   {
-    AssertNoDifference();
+    this->AssertNoDifference();
 
     m_Original = mitk::test::BuildRichSegmentation({ true, false, true, true });
     m_Copy = mitk::test::CloneKeepingUID(*m_Original);
-    AssertNoDifference();
+    this->AssertNoDifference();
   }
 
   void LabelPropertyValueIsDetected()
   {
     m_Copy->GetLabel(7)->SetOpacity(0.55f);
-    AssertDetected("label 7 ('Liver'): property 'opacity'");
+    this->AssertDetected("label 7 ('Liver'): property 'opacity'");
   }
 
   void LostLabelPropertyIsDetected()
   {
     m_Copy->GetLabel(4)->RemoveProperty("tracking_id");
-    AssertDetected("label 4 ('Kidney'): property 'tracking_id' expected StringProperty \"TID-4\", actual <absent>");
+    this->AssertDetected("label 4 ('Kidney'): property 'tracking_id' expected StringProperty \"TID-4\", actual <absent>");
   }
 
   void SparseAnatomicRegionIsDetectedWithoutThrowing()
   {
     m_Copy->GetLabel(21)->RemoveAnatomicRegion(0);
-    AssertDetected("label 21 ('Spleen'): property 'anatomic_region.[0].value'");
+    this->AssertDetected("label 21 ('Spleen'): property 'anatomic_region.[0].value'");
   }
 
   void MissingAndUnexpectedLabelsAreDetected()
   {
     m_Copy->RemoveLabel(12);
     m_Copy->AddLabel(mitk::Label::New(50, "Extra"), 1, true, false);
-    AssertDetected("label 12 ('Quote \" back\\slash {braces}'): missing");
-    AssertDetected("label 50 ('Extra'): unexpected");
-    AssertDetected("group 0: label values expected [7, 2, 12], actual [7, 2]");
-    AssertDetected("group 1: label values expected [30, 4, 21], actual [30, 4, 21, 50]");
+    this->AssertDetected("label 12 ('Quote \" back\\slash {braces}'): missing");
+    this->AssertDetected("label 50 ('Extra'): unexpected");
+    this->AssertDetected("group 0: label values expected [7, 2, 12], actual [7, 2]");
+    this->AssertDetected("group 1: label values expected [30, 4, 21], actual [30, 4, 21, 50]");
   }
 
   void ColorToleranceIsApplied()
@@ -135,32 +135,32 @@ public:
     color.SetRed(color.GetRed() + 0.004f);
     m_Copy->GetLabel(30)->SetColor(color);
 
-    AssertDetected("property 'color'");
+    this->AssertDetected("property 'color'");
 
     mitk::test::SegComparisonOptions options{};
     options.colorTolerance = 0.005f;
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
   }
 
   void GroupNameIsDetected()
   {
     m_Copy->SetGroupName(1, "Renamed");
-    AssertDetected("group 1: name expected 'Organs at risk', actual 'Renamed'");
+    this->AssertDetected("group 1: name expected 'Organs at risk', actual 'Renamed'");
   }
 
   void VoxelIsDetected()
   {
     // Index 9 of time step 0, row 0, slice 0 lies outside every box of group 0.
-    SetVoxel(0, 0, 9, 7);
-    AssertDetected("label 7 ('Liver'): 1 of 320 voxels differ in time step 0");
+    this->SetVoxel(0, 0, 9, 7);
+    this->AssertDetected("label 7 ('Liver'): 1 of 320 voxels differ in time step 0");
   }
 
   void VoxelIsDetectedInLaterTimeStep()
   {
     m_Original = mitk::test::BuildRichSegmentation({ true, false, false, false });
     m_Copy = mitk::test::CloneKeepingUID(*m_Original);
-    SetVoxel(0, 2, 9, 7);
-    AssertDetected("label 7 ('Liver'): 1 of 320 voxels differ in time step 2");
+    this->SetVoxel(0, 2, 9, 7);
+    this->AssertDetected("label 7 ('Liver'): 1 of 320 voxels differ in time step 2");
   }
 
   void StrayValueOutsideLabelsIsDetected()
@@ -183,10 +183,10 @@ public:
   void SegmentationPropertyIsDetected()
   {
     m_Copy->SetProperty(mitk::test::RichFixtureCustomPropertyName(), mitk::IntProperty::New(43));
-    AssertDetected("segmentation: property 'mitk.test.custom' expected IntProperty \"42\", actual IntProperty \"43\"");
+    this->AssertDetected("segmentation: property 'mitk.test.custom' expected IntProperty \"42\", actual IntProperty \"43\"");
 
     m_Copy->SetProperty("mitk.test.added", mitk::StringProperty::New("x"));
-    AssertDetected("segmentation: unexpected property 'mitk.test.added'");
+    this->AssertDetected("segmentation: unexpected property 'mitk.test.added'");
   }
 
   void PropertyExclusionsAreApplied()
@@ -199,31 +199,31 @@ public:
     mitk::test::SegComparisonOptions options{};
     options.notComparedKeys = { mitk::test::RichFixtureCustomPropertyName() };
     options.allowedAddedKeyPrefixes = { "mitk.test.add" };
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
 
     // An exact key must not hide its namesakes.
     m_Copy->SetProperty(mitk::test::RichFixtureCustomPropertyName() + "ed", mitk::IntProperty::New(1));
-    AssertDetected("unexpected property 'mitk.test.customed'", options);
+    this->AssertDetected("unexpected property 'mitk.test.customed'", options);
 
     options.notComparedKeys.clear();
     options.notComparedKeyPrefixes = { "mitk.test.custom" };
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
   }
 
   void UIDIsDetectedUnlessNotCompared()
   {
     m_Copy = m_Original->Clone();
-    AssertDetected("segmentation UID");
+    this->AssertDetected("segmentation UID");
 
     mitk::test::SegComparisonOptions options{};
     options.notCompared = { mitk::test::NotCompared::SegmentationUID };
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
   }
 
   void UnlabeledLockIsDetected()
   {
     m_Copy->SetUnlabeledLabelLock(false);
-    AssertDetected("unlabeled lock: expected on, actual off");
+    this->AssertDetected("unlabeled lock: expected on, actual off");
   }
 
   void GeometryToleranceIsApplied()
@@ -232,11 +232,11 @@ public:
     origin[1] += 1e-4;
     m_Copy->GetGeometry()->SetOrigin(origin);
 
-    AssertDetected("time step 0: geometry differs");
+    this->AssertDetected("time step 0: geometry differs");
 
     mitk::test::SegComparisonOptions options{};
     options.geometryTolerance = 1e-3;
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
   }
 
   void TimeBoundsAreDetected()
@@ -255,11 +255,11 @@ public:
     }
     m_Copy->SetTimeGeometry(shifted);
 
-    AssertDetected("time step 2: time bounds expected [2.5, 7], actual [2.5, 7.5]");
+    this->AssertDetected("time step 2: time bounds expected [2.5, 7], actual [2.5, 7.5]");
 
     mitk::test::SegComparisonOptions options{};
     options.timeTolerance = 0.6;
-    AssertNoDifference(options);
+    this->AssertNoDifference(options);
   }
 
   void RelationIsDetected()
@@ -270,7 +270,7 @@ public:
       "1.2.826.0.1.3680043.10.999.42.1", "1.2.826.0.1.3680043.10.999.42.2", "1.2.826.0.1.3680043.10.999.42.3",
       mitk::test::detail::RichSizeZ);
     mitk::SegSourceImageRelationRule::Connect(m_Copy, otherSource);
-    AssertDetected("actual source series is '1.2.826.0.1.3680043.10.999.42.2'");
+    this->AssertDetected("actual source series is '1.2.826.0.1.3680043.10.999.42.2'");
   }
 
   void DocumentedLossIsApplied()

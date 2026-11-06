@@ -87,14 +87,14 @@ private:
 
   mitk::MultiLabelSegmentation::Pointer SaveAndReload(const mitk::MultiLabelSegmentation* segmentation)
   {
-    const auto path = TempPath("roundtrip.nrrd");
+    const auto path = this->TempPath("roundtrip.nrrd");
     mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*segmentation), path);
     return LoadSingleSegmentation(path);
   }
 
   void AssertRoundTrip(const mitk::MultiLabelSegmentation* original)
   {
-    const auto reloaded = SaveAndReload(original);
+    const auto reloaded = this->SaveAndReload(original);
     mitk::test::AssertReloadMatchesCapabilities({ original }, { reloaded.GetPointer() },
                                                 mitk::test::NativeNrrdCapabilities());
   }
@@ -102,7 +102,7 @@ private:
   /** Saves the 3D rich fixture and returns its path, as a valid file to corrupt. */
   std::string SaveValidFile()
   {
-    const auto path = TempPath("valid.nrrd");
+    const auto path = this->TempPath("valid.nrrd");
     mitk::IOUtil::Save(mitk::test::BuildRichSegmentation({ false, false, false, false }), path);
     return path;
   }
@@ -247,10 +247,10 @@ public:
       "Native^Patient", sourcePatientID, "Native-Study",
       sourceStudyUID, "1.2.826.0.1.3680043.10.999.20.2", sourceForUID);
 
-    auto seg = BuildSegFromDicomSource(source);
-    const auto preSaveSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
+    auto seg = this->BuildSegFromDicomSource(source);
+    const auto preSaveSeriesUID = this->ReadStringProp(seg, 0x0020, 0x000E);
 
-    const std::string path = TempPath("native-roundtrip.nrrd");
+    const std::string path = this->TempPath("native-roundtrip.nrrd");
     mitk::IOUtil::Save(seg, path);
 
     const auto loaded = mitk::IOUtil::Load(path);
@@ -261,15 +261,15 @@ public:
                            loadedSeg != nullptr);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("PatientID survives native NRRD round trip",
-                                 sourcePatientID, ReadStringProp(loadedSeg, 0x0010, 0x0020));
+                                 sourcePatientID, this->ReadStringProp(loadedSeg, 0x0010, 0x0020));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("StudyInstanceUID survives native NRRD round trip",
-                                 sourceStudyUID, ReadStringProp(loadedSeg, 0x0020, 0x000D));
+                                 sourceStudyUID, this->ReadStringProp(loadedSeg, 0x0020, 0x000D));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("StudyID survives native NRRD round trip",
-                                 std::string("Native-Study"), ReadStringProp(loadedSeg, 0x0020, 0x0010));
+                                 std::string("Native-Study"), this->ReadStringProp(loadedSeg, 0x0020, 0x0010));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("FrameOfReferenceUID survives native NRRD round trip",
-                                 sourceForUID, ReadStringProp(loadedSeg, 0x0020, 0x0052));
+                                 sourceForUID, this->ReadStringProp(loadedSeg, 0x0020, 0x0052));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("SeriesInstanceUID (seg's own, minted at construction) survives native NRRD round trip",
-                                 preSaveSeriesUID, ReadStringProp(loadedSeg, 0x0020, 0x000E));
+                                 preSaveSeriesUID, this->ReadStringProp(loadedSeg, 0x0020, 0x000E));
   }
 
   // Load a DICOM-derived seg from native NRRD; re-save as DICOM SEG in
@@ -279,9 +279,9 @@ public:
   void TestNativeNrrdReloadCanBeReSavedAsDicomSegStrict()
   {
     auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
-    auto seg = BuildSegFromDicomSource(source);
+    auto seg = this->BuildSegFromDicomSource(source);
 
-    const auto nrrdPath = TempPath("native-then-seg.nrrd");
+    const auto nrrdPath = this->TempPath("native-then-seg.nrrd");
     mitk::IOUtil::Save(seg, nrrdPath);
 
     const auto loaded = mitk::IOUtil::Load(nrrdPath);
@@ -305,7 +305,7 @@ public:
     // - that is covered by mitkSegSourceImageRelationRoundTripTest.
     mitk::SegSourceImageRelationRule::Connect(reloadedSeg, source.GetPointer());
 
-    const auto dcmPath = TempPath("native-then-seg.dcm");
+    const auto dcmPath = this->TempPath("native-then-seg.dcm");
     CPPUNIT_ASSERT_NO_THROW_MESSAGE(
       "Re-saving the native-reloaded seg as DICOM SEG in strict mode must succeed",
       mitk::IOUtil::Save(reloadedSeg, dcmPath));
@@ -313,22 +313,22 @@ public:
 
   void TestRoundTrip3D()
   {
-    AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, false }));
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, false }));
   }
 
   void TestRoundTrip4D()
   {
-    AssertRoundTrip(mitk::test::BuildRichSegmentation({ true, false, false, false }));
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ true, false, false, false }));
   }
 
   void TestRoundTripWithEmptyLabel()
   {
-    AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, true, false }));
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, true, false }));
   }
 
   void TestRoundTripWithEmptyGroup()
   {
-    AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, true }));
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, true }));
   }
 
   void TestRoundTripMaxLabelValue()
@@ -340,7 +340,7 @@ public:
       mitk::ImageWriteAccessor accessor(segmentation->GetGroupImage(1));
       static_cast<mitk::Label::PixelType*>(accessor.GetData())[0] = mitk::Label::MAX_LABEL_VALUE;
     }
-    AssertRoundTrip(segmentation);
+    this->AssertRoundTrip(segmentation);
   }
 
   void TestCustomPropertyWithoutPersistenceInfoIsDropped()
@@ -348,7 +348,7 @@ public:
     mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
     persistence->RemoveInfo(mitk::test::RichFixtureCustomPropertyName());
 
-    const auto reloaded = SaveAndReload(mitk::test::BuildRichSegmentation({ false, false, false, false }));
+    const auto reloaded = this->SaveAndReload(mitk::test::BuildRichSegmentation({ false, false, false, false }));
     CPPUNIT_ASSERT_MESSAGE("A custom property without persistence info is not written to the NRRD header",
                            reloaded->GetConstProperty(mitk::test::RichFixtureCustomPropertyName()).IsNull());
   }
@@ -454,14 +454,14 @@ public:
                            readWarnings.front().find("labels affected: 8") != std::string::npos);
 
     mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
-    const auto reloaded = SaveAndReload(segmentation);
+    const auto reloaded = this->SaveAndReload(segmentation);
     CPPUNIT_ASSERT_MESSAGE("Saving again removes the cause of the warning", warnings.GetWarnings().empty());
     CPPUNIT_ASSERT(mitk::test::FindOutdatedLabelProperties(*reloaded).empty());
   }
 
   void TestReadVersionAbove4Fails()
   {
-    const auto path = SaveValidFile();
+    const auto path = this->SaveValidFile();
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, "org.mitk.multilabel.segmentation.version", "5");
     });
@@ -470,7 +470,7 @@ public:
 
   void TestReadGroupCountMismatchFails()
   {
-    const auto path = SaveValidFile();
+    const auto path = this->SaveValidFile();
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":[]},{"labels":[]},{"labels":[]}])");
     });
@@ -479,7 +479,7 @@ public:
 
   void TestReadMalformedLabelGroupsFails()
   {
-    const auto path = SaveValidFile();
+    const auto path = this->SaveValidFile();
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":)");
     });
@@ -488,7 +488,7 @@ public:
 
   void TestReadWithoutLabelGroupsFails()
   {
-    const auto path = SaveValidFile();
+    const auto path = this->SaveValidFile();
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::RemoveNrrdHeaderKey(lines, LabelGroupsKey());
     });
@@ -497,7 +497,7 @@ public:
 
   void TestReadLabelCustomPropertyOfWrongTypeFails()
   {
-    const auto path = SaveValidFile();
+    const auto path = this->SaveValidFile();
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(),
         R"([{"labels":[{"value":7,"name":"Liver","mitk.test.label.custom":{"type":5,"value":70}}]},{"labels":[]}])");
@@ -513,7 +513,7 @@ public:
 
     try
     {
-      mitk::IOUtil::Save(segmentation, TempPath("no-groups.nrrd"));
+      mitk::IOUtil::Save(segmentation, this->TempPath("no-groups.nrrd"));
       CPPUNIT_FAIL("Saving a segmentation without groups did not fail");
     }
     catch (const mitk::Exception& e)

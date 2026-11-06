@@ -236,7 +236,7 @@ namespace
     const auto* current = timeNavigation->GetInputWorldTimeGeometry();
     if (nullptr != current && current->IsValidTimePoint(timePoint))
     {
-      timeNavigation->GetStepper()->SetPos(current->TimePointToTimeStep(timePoint));
+      timeNavigation->GetStepper()->SetPos(static_cast<unsigned int>(current->TimePointToTimeStep(timePoint)));
     }
   }
 

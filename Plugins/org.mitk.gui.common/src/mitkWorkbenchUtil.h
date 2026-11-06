@@ -71,10 +71,11 @@ namespace mitk {
      *            The Workbench window in which the data will be loaded.
      * @param openEditor
      *            Whether an Editor is to be opened on file loading (for cases there is none).
+     * @return The given file names that were loaded.
      *
      * @see mitk::IOUtil
      */
-    static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
+    static QStringList LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
     /**
      * Checks whether a file is an MITK scene (.mitk or .mitkscene.json, ignoring case).
      *

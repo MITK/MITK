@@ -14,26 +14,77 @@ found in the LICENSE file.
 
 #include <mitkWorkbenchUtil.h>
 
+#include <QmitkIOUtil.h>
+#include <QmitkIconTheme.h>
+
 #include <QDir>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QHelpEvent>
+#include <QHoverEvent>
 #include <QLabel>
 #include <QListWidget>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPromise>
 #include <QPushButton>
 #include <QStyledItemDelegate>
 #include <QThreadPool>
+#include <QToolTip>
 #include <QVBoxLayout>
 
+#include <functional>
 #include <memory>
+#include <optional>
 
 namespace
 {
   constexpr int PATH_ROLE = Qt::UserRole;
   constexpr int FOLDER_ROLE = Qt::UserRole + 1;
+  constexpr int AVAILABLE_ROLE = Qt::UserRole + 2;
   constexpr int MARGIN = 6;
+  constexpr int BUTTON_SPACING = 4;
+  constexpr int BUTTON_PADDING = 4;
+
+  // Buttons of missing entries, lined up from the right in this order.
+  enum class Button
+  {
+    Remove,
+    Locate
+  };
+
+  QRect GetContentRect(const QRect& itemRect)
+  {
+    return itemRect.adjusted(MARGIN, MARGIN, -MARGIN, -MARGIN);
+  }
+
+  int GetIconSize(const QStyleOptionViewItem& option)
+  {
+    return QFontMetrics(option.font).height();
+  }
+
+  QRect GetButtonRect(const QStyleOptionViewItem& option, Button button)
+  {
+    const QRect contentRect = GetContentRect(option.rect);
+    const int size = GetIconSize(option) + 2 * BUTTON_PADDING;
+    const int number = static_cast<int>(button);
+    const int left = contentRect.left() + contentRect.width() - (number + 1) * size - number * BUTTON_SPACING;
+
+    return QRect(left, contentRect.top() + (contentRect.height() - size) / 2, size, size);
+  }
+
+  std::optional<Button> GetButtonAt(const QStyleOptionViewItem& option, const QPoint& pos)
+  {
+    for (const auto button : { Button::Remove, Button::Locate })
+    {
+      if (GetButtonRect(option, button).contains(pos))
+        return button;
+    }
+
+    return std::nullopt;
+  }
 
   QFont GetFolderFont(const QFont& font)
   {
@@ -53,22 +104,67 @@ namespace
 
   // Draws the file name above its folder, which is elided in the middle so
   // that both the drive or root and the innermost folders stay visible.
+  // Missing entries get buttons instead of being clickable themselves.
   class RecentDataItemDelegate : public QStyledItemDelegate
   {
   public:
-    RecentDataItemDelegate(const QmitkWelcomePalette& palette, QObject* parent)
-      : QStyledItemDelegate(parent),
-        m_Palette(palette)
+    RecentDataItemDelegate(const QmitkWelcomePalette& palette, std::function<void(Button, const QString&)> onButtonClicked, QAbstractItemView* view)
+      : QStyledItemDelegate(view),
+        m_Palette(palette),
+        m_OnButtonClicked(std::move(onButtonClicked)),
+        m_RemoveIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/times.svg"))),
+        m_LocateIcon(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/icon_find.svg"))),
+        m_View(view)
     {
+      m_View->viewport()->installEventFilter(this);
+    }
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (watched != m_View->viewport())
+        return QStyledItemDelegate::eventFilter(watched, event);
+
+      // The list reacts to single clicks only. A click may rebuild the list
+      // and move another entry under the mouse, and Qt would turn the second
+      // click of a double-click into a fresh click on that entry.
+      if (event->type() == QEvent::MouseButtonPress)
+      {
+        m_IgnoreNextRelease = false;
+      }
+      else if (event->type() == QEvent::MouseButtonDblClick)
+      {
+        m_IgnoreNextRelease = true;
+        return true;
+      }
+      else if (event->type() == QEvent::MouseButtonRelease && m_IgnoreNextRelease)
+      {
+        m_IgnoreNextRelease = false;
+        return true;
+      }
+
+      if (event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverMove)
+      {
+        m_HoverPos = static_cast<const QHoverEvent*>(event)->position().toPoint();
+
+        // The view repaints an entry only when the mouse enters or leaves it,
+        // not when it moves between the text and the buttons of a missing one.
+        const auto index = m_View->indexAt(m_HoverPos);
+
+        if (index.isValid() && !index.data(AVAILABLE_ROLE).toBool())
+          m_View->viewport()->update(m_View->visualRect(index));
+      }
+
+      return false;
     }
 
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
     {
-      const bool isAvailable = index.flags().testFlag(Qt::ItemIsEnabled);
+      const bool isAvailable = index.data(AVAILABLE_ROLE).toBool();
       const QFontMetrics nameMetrics(option.font);
       const QFont folderFont = GetFolderFont(option.font);
       const QFontMetrics folderMetrics(folderFont);
-      const QRect rect = option.rect.adjusted(MARGIN, MARGIN, -MARGIN, -MARGIN);
+      const QRect contentRect = GetContentRect(option.rect);
+      QRect textRect = contentRect;
 
       QString name = index.data(Qt::DisplayRole).toString();
 
@@ -80,15 +176,29 @@ namespace
       if (isAvailable && option.state.testFlag(QStyle::State_MouseOver))
         painter->fillRect(option.rect, m_Palette.Cell);
 
+      if (!isAvailable)
+      {
+        const QRect locateRect = GetButtonRect(option, Button::Locate);
+        const int iconSize = GetIconSize(option);
+        const auto hoveredButton = option.state.testFlag(QStyle::State_MouseOver)
+          ? GetButtonAt(option, m_HoverPos)
+          : std::nullopt;
+
+        this->PaintButton(painter, locateRect, m_LocateIcon, iconSize, hoveredButton == Button::Locate);
+        this->PaintButton(painter, GetButtonRect(option, Button::Remove), m_RemoveIcon, iconSize, hoveredButton == Button::Remove);
+
+        textRect.setRight(locateRect.left() - MARGIN);
+      }
+
       painter->setFont(option.font);
       painter->setPen(isAvailable ? m_Palette.Text : m_Palette.MutedText);
-      painter->drawText(QRect(rect.left(), rect.top(), rect.width(), nameMetrics.height()),
-        Qt::AlignLeft | Qt::AlignVCenter, nameMetrics.elidedText(name, Qt::ElideRight, rect.width()));
+      painter->drawText(QRect(textRect.left(), textRect.top(), textRect.width(), nameMetrics.height()),
+        Qt::AlignLeft | Qt::AlignVCenter, nameMetrics.elidedText(name, Qt::ElideRight, textRect.width()));
 
       painter->setFont(folderFont);
       painter->setPen(m_Palette.MutedText);
-      painter->drawText(QRect(rect.left(), rect.top() + nameMetrics.height(), rect.width(), folderMetrics.height()),
-        Qt::AlignLeft | Qt::AlignVCenter, folderMetrics.elidedText(index.data(FOLDER_ROLE).toString(), Qt::ElideMiddle, rect.width()));
+      painter->drawText(QRect(textRect.left(), textRect.top() + nameMetrics.height(), textRect.width(), folderMetrics.height()),
+        Qt::AlignLeft | Qt::AlignVCenter, folderMetrics.elidedText(index.data(FOLDER_ROLE).toString(), Qt::ElideMiddle, textRect.width()));
 
       painter->restore();
     }
@@ -101,8 +211,73 @@ namespace
       return QSize(0, nameMetrics.height() + folderMetrics.height() + 2 * MARGIN);
     }
 
+    bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) override
+    {
+      if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)
+      {
+        const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
+        std::optional<Button> button;
+
+        if (mouseEvent->button() == Qt::LeftButton && !index.data(AVAILABLE_ROLE).toBool())
+          button = GetButtonAt(option, mouseEvent->position().toPoint());
+
+        // Like real buttons, they only fire if the mouse was also pressed on them.
+        if (event->type() == QEvent::MouseButtonPress)
+        {
+          m_PressedButton = button;
+          m_PressedIndex = index;
+        }
+        else if (button.has_value() && button == m_PressedButton && index == m_PressedIndex)
+        {
+          m_PressedButton.reset();
+          m_OnButtonClicked(*button, index.data(PATH_ROLE).toString());
+          return true;
+        }
+      }
+
+      return QStyledItemDelegate::editorEvent(event, model, option, index);
+    }
+
+    bool helpEvent(QHelpEvent* event, QAbstractItemView* view, const QStyleOptionViewItem& option, const QModelIndex& index) override
+    {
+      if (event->type() == QEvent::ToolTip && !index.data(AVAILABLE_ROLE).toBool())
+      {
+        if (const auto button = GetButtonAt(option, event->pos()))
+        {
+          const QString text = *button == Button::Remove
+            ? "Remove from list"
+            : "Locate moved or renamed file...";
+
+          QToolTip::showText(event->globalPos(), text, view->viewport(), GetButtonRect(option, *button));
+          return true;
+        }
+      }
+
+      return QStyledItemDelegate::helpEvent(event, view, option, index);
+    }
+
   private:
+    void PaintButton(QPainter* painter, const QRect& rect, const QIcon& icon, int iconSize, bool isHovered) const
+    {
+      painter->setRenderHint(QPainter::Antialiasing);
+      painter->setPen(QColor(QmitkIconTheme::GetColor()));
+      painter->setBrush(isHovered ? QBrush(m_Palette.Cell) : QBrush());
+      painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 4, 4);
+
+      QRect iconRect(0, 0, iconSize, iconSize);
+      iconRect.moveCenter(rect.center());
+      icon.paint(painter, iconRect);
+    }
+
     const QmitkWelcomePalette& m_Palette;
+    std::function<void(Button, const QString&)> m_OnButtonClicked;
+    QIcon m_RemoveIcon;
+    QIcon m_LocateIcon;
+    QAbstractItemView* m_View;
+    QPoint m_HoverPos;
+    std::optional<Button> m_PressedButton;
+    QPersistentModelIndex m_PressedIndex;
+    bool m_IgnoreNextRelease = false;
   };
 }
 
@@ -126,6 +301,7 @@ QmitkWelcomeRecentDataPage::QmitkWelcomeRecentDataPage(berry::IWorkbenchWindow::
   layout->addStretch(1);
 
   connect(&m_AvailabilityCheck, &QFutureWatcherBase::finished, this, &QmitkWelcomeRecentDataPage::OnAvailabilityChecked);
+  connect(&m_LocateFolderSearch, &QFutureWatcherBase::finished, this, &QmitkWelcomeRecentDataPage::OnLocateFolderFound);
 
   mitk::RecentData::OnChanged().AddListener(
     mitk::MessageDelegate<QmitkWelcomeRecentDataPage>(this, &QmitkWelcomeRecentDataPage::OnRecentDataChanged));
@@ -178,8 +354,20 @@ QWidget* QmitkWelcomeRecentDataPage::CreateCard(const QString& title, const QStr
   titleRow->addWidget(titleLabel, 1);
   titleRow->addWidget(recentList.ClearButton);
 
+  auto onButtonClicked = [this](Button button, const QString& path)
+  {
+    if (button == Button::Remove)
+    {
+      mitk::RecentData::Remove(path);
+    }
+    else
+    {
+      this->Locate(path);
+    }
+  };
+
   recentList.List = new QListWidget;
-  recentList.List->setItemDelegate(new RecentDataItemDelegate(m_Palette, recentList.List));
+  recentList.List->setItemDelegate(new RecentDataItemDelegate(m_Palette, onButtonClicked, recentList.List));
   recentList.List->setSelectionMode(QAbstractItemView::NoSelection);
   recentList.List->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   recentList.List->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
@@ -251,8 +439,7 @@ void QmitkWelcomeRecentDataPage::UpdateAvailability(const RecentList& recentList
   for (int i = 0; i < recentList.List->count(); ++i)
   {
     auto* item = recentList.List->item(i);
-    const bool isAvailable = !m_MissingPaths.contains(item->data(PATH_ROLE).toString());
-    item->setFlags(isAvailable ? Qt::ItemIsEnabled : Qt::NoItemFlags);
+    item->setData(AVAILABLE_ROLE, !m_MissingPaths.contains(item->data(PATH_ROLE).toString()));
   }
 }
 
@@ -289,9 +476,41 @@ void QmitkWelcomeRecentDataPage::CheckAvailability()
   });
 }
 
+void QmitkWelcomeRecentDataPage::Locate(const QString& path)
+{
+  m_PathToLocate = path;
+
+  auto promise = std::make_shared<QPromise<QString>>();
+  promise->start();
+  m_LocateFolderSearch.setFuture(promise->future());
+
+  // Like the availability check, the search for the innermost existing folder
+  // may block for a long time on unreachable network paths.
+  QThreadPool::globalInstance()->start([promise, path]()
+  {
+    QString folder = QFileInfo(path).absolutePath();
+
+    while (!QFileInfo::exists(folder))
+    {
+      const QString parentFolder = QFileInfo(folder).absolutePath();
+
+      if (parentFolder == folder)
+      {
+        folder.clear();
+        break;
+      }
+
+      folder = parentFolder;
+    }
+
+    promise->addResult(folder);
+    promise->finish();
+  });
+}
+
 void QmitkWelcomeRecentDataPage::OnItemClicked(const QListWidgetItem* item)
 {
-  if (item == nullptr || !item->flags().testFlag(Qt::ItemIsEnabled))
+  if (item == nullptr || !item->data(AVAILABLE_ROLE).toBool())
     return;
 
   auto window = m_Window.Lock();
@@ -344,4 +563,24 @@ void QmitkWelcomeRecentDataPage::OnAvailabilityChecked()
     m_IsAvailabilityCheckPending = false;
     this->CheckAvailability();
   }
+}
+
+void QmitkWelcomeRecentDataPage::OnLocateFolderFound()
+{
+  auto window = m_Window.Lock();
+
+  if (window.IsNull() || m_LocateFolderSearch.future().resultCount() == 0)
+    return;
+
+  // An empty folder means that not even the root of the path exists.
+  const QString folder = m_LocateFolderSearch.result();
+  const QString fileName = QFileInfo(m_PathToLocate).fileName();
+  const QString newPath = QFileDialog::getOpenFileName(this, "Locate " + fileName,
+    QDir(folder.isEmpty() ? QDir::homePath() : folder).filePath(fileName), QmitkIOUtil::GetFileOpenFilterString());
+
+  if (newPath.isEmpty() || mitk::WorkbenchUtil::LoadFiles({ newPath }, window).isEmpty())
+    return;
+
+  mitk::RecentData::Remove(m_PathToLocate);
+  mitk::RecentData::Add({ newPath });
 }

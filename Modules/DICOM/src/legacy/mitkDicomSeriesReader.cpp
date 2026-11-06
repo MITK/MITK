@@ -1383,7 +1383,7 @@ namespace mitk
     const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
 
     const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
-    unsigned int timeStep(0);
+    TimeStepType timeStep(0);
 
     std::string propertyKeySliceLocation = "dicom.image.0020.1041";
     std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";

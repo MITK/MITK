@@ -100,9 +100,9 @@ Images are not converted or copied: The data array is just accessed via an encap
 
 Again: not a conversion, just accessing.
 
-\li \code vtkPolyData* mitk::Surface::GetVtkPolyData(int time = 0) \endcode
+\li \code vtkPolyData* mitk::Surface::GetVtkPolyData(TimeStepType t = 0) \endcode
 
-\li \code mitk::Surface::SetVtkPolyData(vtkPolyData*, int time = 0) \endcode
+\li \code mitk::Surface::SetVtkPolyData(vtkPolyData*, TimeStepType t = 0) \endcode
 
 
 \ref Step05Page "[Previous step]" \ref Step07Page "[Next step]" \ref TutorialPage "[Main tutorial page]"

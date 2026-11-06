@@ -302,9 +302,8 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::SurfaceVtkHdfIO::DoRead()
     // precision.
     bool useStoredTimeBounds = storedTimeBounds.size() == timeSteps && SurfaceIOHelper::AreValidTimeBounds(storedTimeBounds);
 
-    for (TimeStepType timeStep = 0; timeStep < storedTimeBounds.size() && useStoredTimeBounds; ++timeStep)
-      useStoredTimeBounds =
-        static_cast<float>(storedTimeBounds[timeStep][0]) == static_cast<float>(timeValues[timeStep]);
+    for (TimeStepType i = 0; i < storedTimeBounds.size() && useStoredTimeBounds; ++i)
+      useStoredTimeBounds = static_cast<float>(storedTimeBounds[i][0]) == static_cast<float>(timeValues[i]);
 
     if (useStoredTimeBounds)
     {

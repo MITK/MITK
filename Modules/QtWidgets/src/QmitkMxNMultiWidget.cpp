@@ -4900,7 +4900,7 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
     if (referenceGeometry->IsValidTimePoint(timePoint))
     {
       renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
-        referenceGeometry->TimePointToTimeStep(timePoint));
+        static_cast<unsigned int>(referenceGeometry->TimePointToTimeStep(timePoint)));
     }
   }
 

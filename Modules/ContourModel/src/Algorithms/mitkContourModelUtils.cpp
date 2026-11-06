@@ -37,7 +37,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
   projectedContour->Initialize(*contourIn3D);
 
   auto sliceGeometry = slice->GetGeometry();
-  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
+  const auto numberOfTimesteps = contourIn3D->GetTimeSteps();
 
   for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {
@@ -70,7 +70,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   auto worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
+  const auto numberOfTimesteps = contourIn2D->GetTimeSteps();
 
   for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {

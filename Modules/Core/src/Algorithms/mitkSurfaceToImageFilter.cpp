@@ -57,7 +57,7 @@ void mitk::ForEachVoxelRunInsideSurface(const Surface* surface, TimeStepType sur
   if (!image->GetTimeGeometry()->IsValidTimeStep(imageTimeStep))
     mitkThrow() << "Cannot rasterize surface. The image does not have time step " << imageTimeStep << ".";
 
-  auto* polyData = surface->GetVtkPolyData(static_cast<unsigned int>(surfaceTimeStep));
+  auto* polyData = surface->GetVtkPolyData(surfaceTimeStep);
 
   if (nullptr == polyData || 0 == polyData->GetNumberOfPoints())
     return;

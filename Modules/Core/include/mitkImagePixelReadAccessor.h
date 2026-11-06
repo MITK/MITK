@@ -143,9 +143,14 @@ namespace mitk
     {
       itk::Index<3> itkIndex;
       m_ReadAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
-      if (m_ReadAccessor.GetImage()->GetTimeSteps() < timestep)
+      const auto timeSteps = m_ReadAccessor.GetImage()->GetTimeSteps();
+      if (0 == timeSteps)
       {
-        timestep = m_ReadAccessor.GetImage()->GetTimeSteps();
+        mitkThrow() << "Cannot read pixel: the image has no time steps.";
+      }
+      if (timestep >= timeSteps)
+      {
+        timestep = timeSteps - 1;
       }
       itk::Index<4> itk4Index;
       for (int i = 0; i < 3; ++i)

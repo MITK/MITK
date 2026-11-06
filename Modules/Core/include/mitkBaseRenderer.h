@@ -321,7 +321,10 @@ namespace mitk
      * \brief Get the timestep of a BaseData object which
      *        exists at the time of the currently displayed content.
      *
-     * Returns -1 if there is no data at the current time.
+     * Returns TIMESTEP_INVALID if data is nullptr or not initialized.
+     * Otherwise, a current time before the time range of data gives
+     * time step 0, and a time after it gives a time step past the last
+     * one, so check the result with IsValidTimeStep() where needed.
      */
     TimeStepType GetTimeStep(const BaseData* data) const;
 

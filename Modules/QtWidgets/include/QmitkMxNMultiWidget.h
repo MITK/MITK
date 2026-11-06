@@ -1210,13 +1210,15 @@ public:
   *   - every assignment and fit names a window of the document;
   *   - lookup tables only go to windows the document links on LUT;
   *   - volume renderings only go to 3D windows;
+  *   - every volume rendering carries a transfer function;
   *   - every node is in the data storage.
   *
   *   Then it loads 'layout.document' as 'ApplyLayout' does. It makes every
   *   bound group show exactly its nodes, drawn bottom to top in the given
   *   order, writes the lookup tables (through 'SetLookupTable'), opacities
-  *   and volume renderings for the named windows' renderers, runs the fits,
-  *   and restores the global time step the fits reset. 'IsApplyingLayout' is
+  *   and volume renderings for the named windows' renderers, and runs the
+  *   fits. The global time range then covers all data the display shows, and
+  *   the selected time point stays where it lies in it. 'IsApplyingLayout' is
   *   true throughout. Only renderer-specific properties are written. Nothing
   *   throws after the document is loaded.
   *
@@ -1341,8 +1343,9 @@ public:
   /**
   * \brief True while an 'ApplyLayout' or 'ApplyDynamicLayout' is in progress,
   *        including its rollback on failure, while a grid change ('SetLayout',
-  *        'AddGridRow', 'AddGridColumn') lets the event loop lay out its new
-  *        cells, and while a layout load announced by
+  *        'AddGridRow', 'AddGridColumn') or the fit of cells built while the
+  *        editor was hidden lets the event loop lay out the cells, and while
+  *        a layout load announced by
   *        'ShowLayoutLoadFeedback' has not yet been closed by
   *        'HideLayoutLoadFeedback'.
   *
@@ -2289,7 +2292,8 @@ private:
   /** \brief Window id of the maximized cell, empty while the grid is shown. */
   QString m_MaximizedCell;
 
-  /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
+  /** \brief Set while a layout operation lets the event loop run; see
+  *          'IsApplyingLayout'. */
   bool m_ApplyingLayout = false;
   /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
   *          hidden; they are fitted once it is shown, unless they are

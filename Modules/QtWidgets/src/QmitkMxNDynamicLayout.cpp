@@ -419,7 +419,7 @@ namespace
         }))
     {
       mitkThrow() << "Dynamic layout 'One view per dataset': the 3D view needs a 3D representation "
-                  << "(a segmentation or a surface) for every dataset.";
+                  << "(a multi-label segmentation or a surface) for every dataset.";
     }
 
     QmitkMxNDynamicLayout layout;

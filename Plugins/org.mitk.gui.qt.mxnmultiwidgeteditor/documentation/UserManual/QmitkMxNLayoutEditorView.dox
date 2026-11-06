@@ -167,7 +167,8 @@
 	from another one is a dataset of its own.
 
 	<b>Datasets x planes.</b> Up to four datasets, one row each, with an axial, a sagittal
-	and a coronal window and, when a dataset has a segmentation or a surface, a 3D window.
+	and a coronal window and, when a dataset has a multi-label segmentation or a surface, a
+	3D window.
 	The windows of a dataset share the crosshair, the level/window and the colormap. Aligned
 	datasets share the crosshair across the rows as well, and every plane shares slice,
 	zoom and pan with the same plane of the other datasets. "Datasets as columns" turns the
@@ -176,13 +177,13 @@
 	<b>One view per dataset.</b> Two to sixteen datasets, one window each, in a grid shaped
 	to the display. Aligned datasets share slice, zoom, pan and the crosshair; every window
 	keeps its image's own level/window. The view is axial, sagittal, coronal, or 3D when
-	every dataset has a segmentation or a surface - the 3D windows then turn and zoom
+	every dataset has a multi-label segmentation or a surface - the 3D windows then turn and zoom
 	together. When every dataset has an acquisition date, the earliest comes first.
 
 	<b>Shared base, varying segmentation.</b> One image and up to four segmentations (here
 	also masks, surfaces or point sets): one axial window per segmentation, showing the
 	image with that segmentation, optionally a last window with all of them, and a row of
-	3D windows under them when one is a segmentation or a surface. All windows share the
+	3D windows under them when one is a multi-label segmentation or a surface. All windows share the
 	crosshair, slice, zoom and pan, and the image's level/window and colormap. The image is
 	the selected one, or the one the selected segmentations derive from; the segmentations
 	are the selected ones, or those of the image. Images are not taken as segmentations:
@@ -205,9 +206,11 @@
 			was applied: transparent at the lower bound, opaque at the upper one. The curve is
 			the window's own, so the Volume Visualization view does not change it; applying the
 			layout again takes the current level/window.
-		<li> The windows of a dataset show the planes its image was acquired in, also for an
-			oblique series. Aligned datasets of different extents, such as a CT and a PET with a
-			longer scan range, are shown along the world axes, in a frame that holds all of them.
+		<li> In Datasets x planes and One view per dataset, the windows of a dataset show the
+			planes its image was acquired in, also for an oblique series. Aligned datasets of
+			different extents, such as a CT and a PET with a longer scan range, are shown along
+			the world axes, in a frame that holds all of them. The shared base and the fusion
+			pair are always shown along the world axes.
 		<li> Data created later from a bound image appears in every window that shows that
 			image: a new segmentation of the shared image or of the anatomy appears in every
 			column.

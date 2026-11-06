@@ -44,10 +44,11 @@ found in the LICENSE file.
  * sets renderer-specific state of existing nodes; it never creates nodes and
  * never writes node-global properties.
  *
- * The 2D windows of a dataset are fitted to its image's geometry, so an
- * oblique acquisition is shown in its own planes. Aligned datasets share one
- * geometry: the first one's when all are identical, else their joint extent
- * along the world axes.
+ * In Datasets x planes and One view per dataset, the 2D windows of a dataset
+ * are fitted to its image's geometry, so an oblique acquisition is shown in
+ * its own planes. Aligned datasets share one geometry: the first one's when
+ * all are identical, else their joint extent along the world axes. Shared
+ * base and Fusion pair are fitted along the world axes.
  *
  * Data classes: an Image is an 'mitk::Image' that is not binary. A
  * Segmentation, in the wide sense these templates use, is a multi-label
@@ -221,9 +222,10 @@ struct QmitkMxNDynamicLayout
     /** True: fit the window's slice/orientation component. False: fit this
         window alone. */
     bool wholeComponent;
-    /** The geometry to fit to. Null: the nodes the window's selection group
-        shows, for a component as seen from this window
-        ('ReinitSyncGroupGeometry'). */
+    /** The geometry to fit to. Null: the data the window shows, along the
+        world axes - with 'wholeComponent', the nodes the window's selection
+        group shows, for its component ('ReinitSyncGroupGeometry'); without,
+        the data visible in this window alone. */
     mitk::TimeGeometry::ConstPointer geometry = nullptr;
   };
   std::vector<Fit> fits;

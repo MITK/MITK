@@ -264,7 +264,7 @@ void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
   {
     case QmitkMxNDynamicTemplate::DatasetsByPlanes:
       m_Aligned = check("aligned", tr("Aligned"), alignedToolTip);
-      m_ThreeDColumn = check("threeDColumn", tr("3D column"), tr("A 3D view per dataset, for its segmentations and surfaces."));
+      m_ThreeDColumn = check("threeDColumn", tr("3D column"), tr("A 3D view per dataset, for its multi-label segmentations and surfaces."));
       m_DatasetsAsColumns = check("datasetsAsColumns", tr("Datasets as columns"), tr("One column per dataset instead of one row."));
       break;
     case QmitkMxNDynamicTemplate::OneViewPerDataset:
@@ -279,7 +279,7 @@ void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
                         { tr("Acquisition date"), static_cast<int>(QmitkMxNDatasetOrder::AcquisitionDate) } });
       break;
     case QmitkMxNDynamicTemplate::SharedBase:
-      m_ThreeDRow = check("threeDRow", tr("3D row"), tr("A 3D view under every window, for the segmentations and surfaces."));
+      m_ThreeDRow = check("threeDRow", tr("3D row"), tr("A 3D view under every window, for the multi-label segmentations and surfaces."));
       m_AllSegmentationsWindow = check("allSegmentationsWindow", tr("All-segmentations window"),
                                        tr("One more window that shows every segmentation."));
       break;

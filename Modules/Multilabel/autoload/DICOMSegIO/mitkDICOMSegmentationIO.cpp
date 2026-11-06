@@ -61,33 +61,6 @@ namespace
   constexpr const char *OPTION_ENCODING_LABELMAP = "labelmap";
   constexpr const char *OPTION_ENCODING_BINARY = "binary";
 
-  // Resolve an enum-style writer option to its selected string value.
-  // The option's default is registered as std::vector<std::string> (the
-  // shape MITK's QmitkFileReaderWriterOptionsWidget renders as a combo
-  // box); once the user picks an entry the Any holds a std::string. When
-  // the writer is invoked without a UI (programmatic IOUtil::Save with
-  // empty options or unset enum), the Any still holds the registered
-  // vector and the first entry is the default by convention. ToString()
-  // on a vector<string> returns "[a,b,...]", so a direct string compare
-  // against the expected choice silently misses the default - handle
-  // both shapes explicitly here.
-  std::string ResolveEnumOption(const mitk::IFileWriter::Options &options,
-                                const std::string &name,
-                                const std::string &fallback)
-  {
-    const auto it = options.find(name);
-    if (it == options.end() || it->second.Empty())
-      return fallback;
-    if (it->second.Type() == typeid(std::string))
-      return us::any_cast<std::string>(it->second);
-    if (it->second.Type() == typeid(std::vector<std::string>))
-    {
-      const auto &vec = us::ref_any_cast<std::vector<std::string>>(it->second);
-      return vec.empty() ? fallback : vec.front();
-    }
-    return fallback;
-  }
-
   // Format one MissingItem to human-readable for exception messages. The
   // structured shape (Scope, identifier, description) is preserved for
   // diagnostic tooling; the formatter is the textual face the user sees.
@@ -835,10 +808,8 @@ namespace mitk
     auto *input = const_cast<MultiLabelSegmentation *>(constInput);
 
     const auto options = this->AbstractFileWriter::GetOptions();
-    const std::string synthesisMode = ResolveEnumOption(options, OPTION_SYNTHESIS_MODE,
-                                                        OPTION_SYNTHESIS_MODE_STRICT);
-    const std::string encoding = ResolveEnumOption(options, OPTION_ENCODING,
-                                                   OPTION_ENCODING_BINARY);
+    const std::string synthesisMode = IFileIO::ResolveEnumOption(options, OPTION_SYNTHESIS_MODE);
+    const std::string encoding = IFileIO::ResolveEnumOption(options, OPTION_ENCODING);
 
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
 

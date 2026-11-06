@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <variant>
 #include <vector>
@@ -63,6 +64,7 @@ class QmitkMxNPresetsTestSuite : public mitk::TestFixture
   MITK_TEST(DynamicLayoutEntry_NeedsImageData);
   MITK_TEST(DynamicLayoutEntry_OpensTheDialog);
   MITK_TEST(Presets_AreIdentifiedWithoutTheirOrderingPrefix);
+  MITK_TEST(Presets_HaveUniqueIds);
   MITK_TEST(DocumentFor_QualifiesTheWindowIds);
   MITK_TEST(Presets_MatchTheirSpecification_OnTheDefaultNamedEditor);
   MITK_TEST(Presets_MatchTheirSpecification_OnAnotherNamedEditor);
@@ -463,6 +465,18 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL(menuNames.join(QStringLiteral(" | ")).toStdString(),
                          names.join(QStringLiteral(" | ")).toStdString());
+  }
+
+  void Presets_HaveUniqueIds()
+  {
+    // Preferences and the start preset find a preset by its id. Without the
+    // ordering prefix, two resources can end in the same name.
+    std::set<QString> ids;
+    for (const auto& preset : QmitkMxNPresets::All())
+    {
+      CPPUNIT_ASSERT_MESSAGE("The preset id '" + preset.id.toStdString() + "' occurs once",
+                             ids.insert(preset.id).second);
+    }
   }
 
   /** The window ids below 'node'. */

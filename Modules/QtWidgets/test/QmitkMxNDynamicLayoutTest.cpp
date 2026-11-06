@@ -72,6 +72,7 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
 
   MITK_TEST(DataClasses_ImagesSegmentationsAndNeither);
   MITK_TEST(R1_Prefill_TakesTheSelectionInItsOrderPerDataClass);
+  MITK_TEST(UnshownSelection_NamesWhatNoWindowWouldShow);
   MITK_TEST(R2_DatasetIsTheImageWithItsSegmentationDerivations);
   MITK_TEST(R3_SharedBase_FromTheSelectionOrTheDataTree);
   MITK_TEST(R4_Aligned_ByIdenticalGeometry);
@@ -323,6 +324,42 @@ public:
                            (std::vector<mitk::DataNode::Pointer>{ c }) == fusion.at(QmitkMxNSlot::Anatomy));
     CPPUNIT_ASSERT_MESSAGE("...the next one the first match no earlier slot took",
                            (std::vector<mitk::DataNode::Pointer>{ a }) == fusion.at(QmitkMxNSlot::FusedImage));
+  }
+
+  void UnshownSelection_NamesWhatNoWindowWouldShow()
+  {
+    using QmitkMxNDynamicLayouts::Prefill;
+    using QmitkMxNDynamicLayouts::UnshownSelection;
+    using NodeList = std::vector<mitk::DataNode::Pointer>;
+    const auto a = this->AddImage("a");
+    const auto b = this->AddImage("b");
+    const auto c = this->AddImage("c");
+    const auto d = this->AddImage("d");
+    const auto e = this->AddImage("e");
+    const auto mask = this->AddMask(a, "mask", 1);
+    const auto strayMask = this->AddMask(e, "stray mask", 1);
+    auto helper = this->AddImage("helper");
+    helper->SetBoolProperty("helper object", true);
+
+    const auto unshown = [this](QmitkMxNDynamicTemplate templateId, const NodeList& selection) {
+      return UnshownSelection(templateId, selection, Prefill(templateId, selection, *m_DataStorage), *m_DataStorage);
+    };
+
+    CPPUNIT_ASSERT_MESSAGE("Datasets x planes: images beyond the maximum and segmentations of no bound dataset; "
+                           "a bound dataset's own segmentation is shown",
+                           (NodeList{ e, strayMask })
+                             == unshown(QmitkMxNDynamicTemplate::DatasetsByPlanes, { mask, c, a, b, d, e, strayMask, helper }));
+    CPPUNIT_ASSERT_MESSAGE("Shared base: every image but the base",
+                           (NodeList{ b, c }) == unshown(QmitkMxNDynamicTemplate::SharedBase, { a, b, c, mask }));
+    CPPUNIT_ASSERT_MESSAGE("Fusion pair: a third image and every segmentation",
+                           (NodeList{ c, mask }) == unshown(QmitkMxNDynamicTemplate::FusionPair, { a, b, c, mask }));
+    CPPUNIT_ASSERT_MESSAGE("Nothing left out",
+                           unshown(QmitkMxNDynamicTemplate::OneViewPerDataset, { a, b, mask }).empty());
+
+    const QmitkMxNSlotBindings edited{ { QmitkMxNSlot::Anatomy, { b } }, { QmitkMxNSlot::FusedImage, { c } } };
+    CPPUNIT_ASSERT_MESSAGE("The slots as they are, not as prefilled",
+                           (NodeList{ a }) == UnshownSelection(QmitkMxNDynamicTemplate::FusionPair, { a, b, c }, edited,
+                                                               *m_DataStorage));
   }
 
   void R2_DatasetIsTheImageWithItsSegmentationDerivations()

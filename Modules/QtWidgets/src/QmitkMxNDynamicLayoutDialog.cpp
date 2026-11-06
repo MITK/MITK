@@ -99,6 +99,11 @@ QmitkMxNDynamicLayoutDialog::QmitkMxNDynamicLayoutDialog(mitk::DataStorage* data
   m_SwapButton->setObjectName(QStringLiteral("swapRoles"));
   connect(m_SwapButton, &QPushButton::clicked, this, &QmitkMxNDynamicLayoutDialog::SwapRoles);
   layout->addWidget(m_SwapButton, 0, Qt::AlignRight);
+  m_UnshownSelection = new QLabel(this);
+  m_UnshownSelection->setObjectName(QStringLiteral("unshownSelection"));
+  m_UnshownSelection->setWordWrap(true);
+  m_UnshownSelection->hide();
+  layout->addWidget(m_UnshownSelection);
 
   m_OptionRows = new QFormLayout;
   layout->addLayout(m_OptionRows);
@@ -424,7 +429,42 @@ void QmitkMxNDynamicLayoutDialog::OnSlotsChanged()
       }
     }
   }
+  this->UpdateUnshownSelection();
   this->UpdateApplyState();
+}
+
+void QmitkMxNDynamicLayoutDialog::UpdateUnshownSelection()
+{
+  const auto unshown =
+    QmitkMxNDynamicLayouts::UnshownSelection(m_Template, m_Selection, this->GetBindings(), *m_DataStorage);
+  if (unshown.empty())
+  {
+    m_UnshownSelection->clear();
+    m_UnshownSelection->hide();
+    return;
+  }
+
+  constexpr std::size_t namesShown = 3;
+  QStringList names;
+  for (std::size_t i = 0; i < std::min(unshown.size(), namesShown); ++i)
+  {
+    names << QString::fromStdString(unshown[i]->GetName());
+  }
+  auto text = tr("Selected, not in this layout: %1").arg(names.join(QStringLiteral(", ")));
+  if (unshown.size() > namesShown)
+  {
+    text += tr(" and %1 more").arg(unshown.size() - namesShown);
+  }
+  text += QStringLiteral(".");
+  const bool anImage = std::any_of(unshown.begin(), unshown.end(), [](const auto& node) {
+    return QmitkMxNDynamicLayouts::IsOfDataClass(*node, QmitkMxNSlotDataClass::Image);
+  });
+  if (QmitkMxNDynamicTemplate::SharedBase == m_Template && anImage)
+  {
+    text += tr(" To show an image on top of another one, use the fusion pair.");
+  }
+  m_UnshownSelection->setText(text);
+  m_UnshownSelection->show();
 }
 
 void QmitkMxNDynamicLayoutDialog::UpdateApplyState()

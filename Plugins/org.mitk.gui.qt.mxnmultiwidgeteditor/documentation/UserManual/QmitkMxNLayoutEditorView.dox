@@ -152,7 +152,8 @@
 	the order the Data Manager reports it, and sets the options from the data. Everything
 	can be changed there; an option you set keeps your choice while you change the data,
 	and switching the template starts it afresh. <b>Apply</b> stays disabled, with a line
-	naming the missing data, until every slot holds what it needs. Applying replaces the
+	naming the missing data, until every slot holds what it needs. A line under the slots
+	names selected data the layout leaves out. Applying replaces the
 	layout like a preset and asks for the same confirmation.
 
 	The options follow the data's structure. Datasets count as aligned when they have

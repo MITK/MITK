@@ -866,6 +866,52 @@ QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate tem
   return bindings;
 }
 
+std::vector<mitk::DataNode::Pointer> QmitkMxNDynamicLayouts::UnshownSelection(
+  QmitkMxNDynamicTemplate templateId,
+  const std::vector<mitk::DataNode::Pointer>& selection,
+  const QmitkMxNSlotBindings& bindings,
+  const mitk::DataStorage& dataStorage)
+{
+  std::set<const mitk::DataNode*> shown;
+  for (const auto& [slot, nodes] : bindings)
+  {
+    for (const auto& node : nodes)
+    {
+      shown.insert(node.GetPointer());
+    }
+  }
+  const auto datasets = bindings.find(QmitkMxNSlot::Datasets);
+  if (datasets != bindings.end()
+      && (QmitkMxNDynamicTemplate::DatasetsByPlanes == templateId || QmitkMxNDynamicTemplate::OneViewPerDataset == templateId))
+  {
+    for (const auto& dataset : datasets->second)
+    {
+      if (dataset.IsNull())
+      {
+        continue;
+      }
+      for (const auto& segmentation : SegmentationDerivations(*dataset, dataStorage))
+      {
+        shown.insert(segmentation.GetPointer());
+      }
+    }
+  }
+
+  std::vector<mitk::DataNode::Pointer> unshown;
+  for (const auto& node : selection)
+  {
+    if (node.IsNull() || 0 != shown.count(node.GetPointer()))
+    {
+      continue;
+    }
+    if (IsOfDataClass(*node, QmitkMxNSlotDataClass::Image) || IsOfDataClass(*node, QmitkMxNSlotDataClass::Segmentation))
+    {
+      unshown.push_back(node);
+    }
+  }
+  return unshown;
+}
+
 QmitkMxNDynamicOptions QmitkMxNDynamicLayouts::DefaultOptions(QmitkMxNDynamicTemplate templateId,
                                                               const QmitkMxNSlotBindings& bindings,
                                                               const mitk::DataStorage& dataStorage)

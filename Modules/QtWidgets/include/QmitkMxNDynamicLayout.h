@@ -257,11 +257,26 @@ namespace QmitkMxNDynamicLayouts
   *   base's direct derivations of the Segmentation class. The fusion pair
   *   takes a CT as anatomy and a PT as fused image when the selection has
   *   exactly one of each (DICOM Modality). Nodes the template cannot use are
-  *   left out; a slot may stay empty.
+  *   left out ('UnshownSelection' names them); a slot may stay empty.
   */
   MITKQTWIDGETS_EXPORT QmitkMxNSlotBindings Prefill(QmitkMxNDynamicTemplate templateId,
                                                     const std::vector<mitk::DataNode::Pointer>& selection,
                                                     const mitk::DataStorage& dataStorage);
+
+  /**
+  * \brief The nodes of 'selection' of the Image or Segmentation data class
+  *        that a layout of 'templateId' generated from 'bindings' would not
+  *        show, in selection order.
+  *
+  *   A node is shown when a slot holds it or, for the two dataset templates,
+  *   when it is a direct segmentation derivation of a dataset a slot holds.
+  *   Nodes of neither data class are never reported: no template takes them.
+  */
+  MITKQTWIDGETS_EXPORT std::vector<mitk::DataNode::Pointer> UnshownSelection(
+    QmitkMxNDynamicTemplate templateId,
+    const std::vector<mitk::DataNode::Pointer>& selection,
+    const QmitkMxNSlotBindings& bindings,
+    const mitk::DataStorage& dataStorage);
 
   /**
   * \brief The automatic options for the given bindings; fields without a

@@ -41,7 +41,8 @@ class QPushButton;
  * The slots are filled from the selection the dialog opens with, and the
  * options from the data in the slots; switching the template fills both
  * again. A slot does not offer a node another slot holds. An option follows
- * the data until the user changes it. Apply stays
+ * the data until the user changes it. A line under the slots names the
+ * selected nodes the layout would leave out. Apply stays
  * disabled, with a line naming the slot, while a slot holds too few or too
  * many nodes. Accepting generates the layout; the dialog applies nothing.
  */
@@ -94,6 +95,9 @@ private:
    *         defaults, and update what depends on the slots. */
   void OnSlotsChanged();
 
+  /** \brief Name the selected nodes the layout would leave out. */
+  void UpdateUnshownSelection();
+
   void UpdateApplyState();
   void SwapRoles();
   void OnApply();
@@ -114,6 +118,7 @@ private:
   QFormLayout* m_SlotRows = nullptr;
   QFormLayout* m_OptionRows = nullptr;
   QLabel* m_Message = nullptr;
+  QLabel* m_UnshownSelection = nullptr;
   QPushButton* m_ApplyButton = nullptr;
   QPushButton* m_SwapButton = nullptr;
   std::vector<std::pair<QmitkMxNSlot, QmitkAbstractNodeSelectionWidget*>> m_SlotWidgets;

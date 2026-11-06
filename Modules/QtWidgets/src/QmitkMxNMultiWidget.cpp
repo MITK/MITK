@@ -741,6 +741,109 @@ namespace
     }
   }
 
+  void ValidateIdsHavePrefix(const nlohmann::json& doc, const std::string& requiredPrefix)
+  {
+    // The schema's id pattern cannot encode "matches THIS editor instance's
+    // `multiWidgetName`" - that is a loader-instance constraint. Walk every
+    // window node and reject ids that do not start with this editor's prefix.
+    std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
+    {
+      if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
+      {
+        // Shape errors are surfaced by PrewalkValidate; this pass focuses on
+        // the prefix check and only inspects well-shaped window nodes.
+        return;
+      }
+      const auto type = node["type"].get<std::string>();
+      if (type == "split")
+      {
+        if (node.contains("children") && node["children"].is_array())
+        {
+          for (const auto& child : node["children"])
+          {
+            walk(child);
+          }
+        }
+      }
+      else if (type == "window")
+      {
+        if (!node.contains("id") || !node["id"].is_string())
+        {
+          return;  // Defer to PrewalkValidate for the missing/wrong-type message.
+        }
+        const auto id = node["id"].get<std::string>();
+        if (id.rfind(requiredPrefix, 0) != 0)
+        {
+          mitkThrow() << "ApplyLayout: window id '" << id
+                      << "' does not start with this editor's required prefix '"
+                      << requiredPrefix
+                      << "'. The layout was written for a different editor instance, "
+                      << "or the id is malformed.";
+        }
+      }
+    };
+
+    if (doc.is_object() && doc.contains("root"))
+    {
+      walk(doc.at("root"));
+    }
+  }
+
+  /** The checks every layout load runs before it changes anything: the
+   *  version and root, the window ids' editor prefix 'requiredIdPrefix', each
+   *  node's shape and links, and the orientation-group rules. Returns what
+   *  the pre-walk collected. */
+  PrewalkResult ValidateLayoutStructure(const nlohmann::json& doc, const std::string& requiredIdPrefix)
+  {
+    if (!doc.is_object())
+    {
+      mitkThrow() << "Layout document must be a JSON object.";
+    }
+    if (!doc.contains("version") || !doc["version"].is_string())
+    {
+      mitkThrow() << "Layout document is missing the 'version' string field; only '2.0' and '3.0' are supported.";
+    }
+    const auto version = doc["version"].get<std::string>();
+    if (version != "2.0" && version != "3.0")
+    {
+      // Point v1.x documents at the migration documentation. This message
+      // surfaces to end users via the QMessageBox load wrapper, so it stays
+      // neutral about install location: the developer documentation is the
+      // canonical reference for the migration tool. The phrase 'migration
+      // tool' is pinned by the 'Version_RejectsAllNonV2' test for v1.x
+      // versions.
+      const bool looksV1 = version.size() >= 2 && version[0] == '1' && version[1] == '.';
+      if (looksV1)
+      {
+        mitkThrow() << "Layout document version is '" << version
+                    << "'; only '2.0' and '3.0' are supported. If this is a v1.x layout "
+                    << "from before the format change, see the MxN layout "
+                    << "developer documentation for the migration tool "
+                    << "(Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py).";
+      }
+      mitkThrow() << "Layout document version is '" << version
+                  << "'; only '2.0' and '3.0' are supported.";
+    }
+    const bool isV3 = ("3.0" == version);
+    if (!doc.contains("root"))
+    {
+      mitkThrow() << "Layout document is missing the 'root' field.";
+    }
+
+    // Run the prefix check before PrewalkValidate so a misrouted document
+    // fails with a precise "wrong editor" message rather than a downstream
+    // symptom. Both passes run before any engine state is mutated.
+    ValidateIdsHavePrefix(doc, requiredIdPrefix);
+
+    // Pre-walk: validate structural shape, collect window ids + referenced
+    // group labels + navigation links, and capture document-order seeding
+    // pairs for the post-build group-seeding pass.
+    PrewalkResult prewalk;
+    PrewalkValidate(doc.at("root"), isV3, prewalk);
+    ValidateOrientationGroups(prewalk);
+    return prewalk;
+  }
+
   /**
    * The synchronized display actions, plus what follows from a gesture that
    * Core's synchronized actions leave out:
@@ -1771,7 +1874,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   }
 
   // Guards in-process API misuse (an unqualified bare name slipping through);
-  // document-driven creation is additionally gated by ValidateIdsForThisEditor.
+  // document-driven creation is additionally gated by ValidateIdsHavePrefix.
   const auto requiredPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
   if (!id.startsWith(requiredPrefix))
   {
@@ -2848,7 +2951,7 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
       else  // "window"
       {
         // Id and view direction pass through verbatim - validation already
-        // happened upstream (PrewalkValidate + ValidateIdsForThisEditor).
+        // happened upstream (PrewalkValidate + ValidateIdsHavePrefix).
         const auto id = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>(), true);
         const auto renderMode = child.contains("render_mode")
@@ -3145,55 +3248,6 @@ void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()
   this->SetLayout(1, 1);
 }
 
-void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) const
-{
-  // The schema's id pattern cannot encode "matches THIS editor instance's
-  // `multiWidgetName`" - that is a loader-instance constraint. Walk every
-  // window node and reject ids that do not start with this editor's prefix.
-  const auto requiredPrefix = (this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString();
-  std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
-  {
-    if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
-    {
-      // Shape errors are surfaced by PrewalkValidate; this pass focuses on
-      // the prefix check and only inspects well-shaped window nodes.
-      return;
-    }
-    const auto type = node["type"].get<std::string>();
-    if (type == "split")
-    {
-      if (node.contains("children") && node["children"].is_array())
-      {
-        for (const auto& child : node["children"])
-        {
-          walk(child);
-        }
-      }
-    }
-    else if (type == "window")
-    {
-      if (!node.contains("id") || !node["id"].is_string())
-      {
-        return;  // Defer to PrewalkValidate for the missing/wrong-type message.
-      }
-      const auto id = node["id"].get<std::string>();
-      if (id.rfind(requiredPrefix, 0) != 0)
-      {
-        mitkThrow() << "ApplyLayout: window id '" << id
-                    << "' does not start with this editor's required prefix '"
-                    << requiredPrefix
-                    << "'. The layout was written for a different editor instance, "
-                    << "or the id is malformed.";
-      }
-    }
-  };
-
-  if (doc.is_object() && doc.contains("root"))
-  {
-    walk(doc.at("root"));
-  }
-}
-
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
   if (m_ApplyingLayout)
@@ -3329,57 +3383,27 @@ void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout
 
 void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const
 {
-  struct WindowFacts
+  const auto prewalk =
+    ValidateLayoutStructure(layout.document, (this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString());
+  std::set<std::string> threeDWindows;
+  for (const auto& view : prewalk.windowViews)
   {
-    std::string selection;
-    bool threeD = false;
-    bool linkedOnLut = false;
-  };
-  // Shapes are the loader's to reject; a value of an unexpected shape only
-  // yields no fact here, and whatever relies on it fails the checks below.
-  const auto stringAt = [](const nlohmann::json& object, const char* key)
-  {
-    const auto it = object.find(key);
-    return object.end() != it && it->is_string() ? it->get<std::string>() : std::string();
-  };
-  std::map<QString, WindowFacts> windows;
-  std::function<void(const nlohmann::json&)> collect = [&windows, &collect, &stringAt](const nlohmann::json& node)
-  {
-    if (!node.is_object())
+    if (RenderMode::ThreeD == view.renderMode)
     {
-      return;
+      threeDWindows.insert(view.id);
     }
-    if ("window" == stringAt(node, "type") && !stringAt(node, "id").empty())
-    {
-      WindowFacts facts;
-      const auto links = node.find("links");
-      if (node.end() != links && links->is_object())
-      {
-        if (const auto selection = links->find("selection"); links->end() != selection)
-        {
-          facts.selection = selection->is_object() ? stringAt(*selection, "target")
-                                                   : stringAt(*links, "selection");
-        }
-        facts.linkedOnLut = links->contains("lut");
-      }
-      facts.threeD = "3d" == stringAt(node, "render_mode");
-      windows[QString::fromStdString(stringAt(node, "id"))] = facts;
-    }
-    if (node.contains("children") && node.at("children").is_array())
-    {
-      for (const auto& child : node.at("children"))
-      {
-        collect(child);
-      }
-    }
-  };
-  if (layout.document.is_object() && layout.document.contains("root"))
+  }
+  std::set<std::string> lutLinkedWindows;
+  for (const auto& [windowId, specs] : prewalk.navLinks)
   {
-    collect(layout.document.at("root"));
+    if (std::any_of(specs.begin(), specs.end(),
+                    [](const NavLinkSpec& spec) { return QmitkMxNSyncDimension::Lut == spec.dimension; }))
+    {
+      lutLinkedWindows.insert(windowId);
+    }
   }
 
-  const auto groups = layout.document.is_object() ? layout.document.value("groups", nlohmann::json::object())
-                                                  : nlohmann::json::object();
+  const auto groups = layout.document.value("groups", nlohmann::json::object());
   const auto* dataStorage = this->GetDataStorage();
   const auto checkNode = [dataStorage](const mitk::DataNode::Pointer& node, const std::string& where)
   {
@@ -3388,22 +3412,20 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
       mitkThrow() << "ApplyDynamicLayout: " << where << " names a node that is not in the data storage.";
     }
   };
-  const auto checkWindow = [&windows](const QString& windowId, const std::string& where) -> const WindowFacts&
+  const auto checkWindow = [&prewalk](const QString& windowId, const std::string& where)
   {
-    const auto it = windows.find(windowId);
-    if (it == windows.end())
+    auto id = windowId.toStdString();
+    if (0 == prewalk.windowIds.count(id))
     {
-      mitkThrow() << "ApplyDynamicLayout: " << where << " names window '" << windowId.toStdString()
+      mitkThrow() << "ApplyDynamicLayout: " << where << " names window '" << id
                   << "', which the document does not have.";
     }
-    return it->second;
+    return id;
   };
 
   for (const auto& [group, nodes] : layout.groupNodes)
   {
-    const bool isSelectionGroup = std::any_of(windows.begin(), windows.end(),
-                                              [&group = group](const auto& entry) { return entry.second.selection == group; });
-    if (!groups.contains(group) || !isSelectionGroup)
+    if (!groups.contains(group) || 0 == prewalk.selectionGroups.count(group))
     {
       mitkThrow() << "ApplyDynamicLayout: the data of group '" << group
                   << "' is bound to no selection group the document declares.";
@@ -3415,7 +3437,7 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
   }
   for (const auto& assignment : layout.lookupTables)
   {
-    if (!checkWindow(assignment.windowId, "a lookup table").linkedOnLut)
+    if (0 == lutLinkedWindows.count(checkWindow(assignment.windowId, "a lookup table")))
     {
       mitkThrow() << "ApplyDynamicLayout: a lookup table goes to window '" << assignment.windowId.toStdString()
                   << "', which the document does not link on 'lut'.";
@@ -3429,7 +3451,7 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
   }
   for (const auto& assignment : layout.volumeRenderings)
   {
-    if (!checkWindow(assignment.windowId, "a volume rendering").threeD)
+    if (0 == threeDWindows.count(checkWindow(assignment.windowId, "a volume rendering")))
     {
       mitkThrow() << "ApplyDynamicLayout: a volume rendering goes to window '" << assignment.windowId.toStdString()
                   << "', which is not a 3D window.";
@@ -3617,52 +3639,8 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
   try
   {
     // ----- Validation pass (no engine mutation) -----
-    if (!doc.is_object())
-    {
-      mitkThrow() << "Layout document must be a JSON object.";
-    }
-    if (!doc.contains("version") || !doc["version"].is_string())
-    {
-      mitkThrow() << "Layout document is missing the 'version' string field; only '2.0' and '3.0' are supported.";
-    }
-    const auto version = doc["version"].get<std::string>();
-    if (version != "2.0" && version != "3.0")
-    {
-      // Point v1.x documents at the migration documentation. This message
-      // surfaces to end users via the QMessageBox load wrapper, so it stays
-      // neutral about install location: the developer documentation is the
-      // canonical reference for the migration tool. The phrase 'migration
-      // tool' is pinned by the 'Version_RejectsAllNonV2' test for v1.x
-      // versions.
-      const bool looksV1 = version.size() >= 2 && version[0] == '1' && version[1] == '.';
-      if (looksV1)
-      {
-        mitkThrow() << "Layout document version is '" << version
-                    << "'; only '2.0' and '3.0' are supported. If this is a v1.x layout "
-                    << "from before the format change, see the MxN layout "
-                    << "developer documentation for the migration tool "
-                    << "(Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py).";
-      }
-      mitkThrow() << "Layout document version is '" << version
-                  << "'; only '2.0' and '3.0' are supported.";
-    }
-    const bool isV3 = ("3.0" == version);
-    if (!doc.contains("root"))
-    {
-      mitkThrow() << "Layout document is missing the 'root' field.";
-    }
-
-    // Run the prefix check before PrewalkValidate so a misrouted document
-    // fails with a precise "wrong editor" message rather than a downstream
-    // symptom. Both passes run before any engine state is mutated.
-    this->ValidateIdsForThisEditor(doc);
-
-    // Pre-walk: validate structural shape, collect window ids + referenced
-    // group labels + navigation links, and capture document-order seeding
-    // pairs for the post-build group-seeding pass.
-    PrewalkResult prewalk;
-    PrewalkValidate(doc.at("root"), isV3, prewalk);
-    ValidateOrientationGroups(prewalk);
+    const auto prewalk =
+      ValidateLayoutStructure(doc, (this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString());
     const auto& seedingOrder = prewalk.seedingOrder;
 
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode

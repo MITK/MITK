@@ -97,6 +97,7 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_AlignedStaticFirst_DynamicWindowsStepThroughTime);
   MITK_TEST(Apply_DynamicSeriesOnDifferentGrids_EveryWindowShowsTheSelectedTime);
   MITK_TEST(Apply_ObjectFormSelectionLinks_Accepted);
+  MITK_TEST(Apply_MalformedSelectionLinks_ReportTheLoadersMessage);
   MITK_TEST(Apply_ValidationFailuresChangeNothing);
   MITK_TEST(Cleanup_ReusedIdInheritsNoRendererState);
   MITK_TEST(Cleanup_UnlinkKeepsTheCellsOtherRendererState);
@@ -1300,6 +1301,45 @@ public:
       bound.insert(descriptor.selectionGroup.toStdString());
     }
     CPPUNIT_ASSERT_MESSAGE("Every window shows its group", (std::set<std::string>{ "anat", "fused", "fusion" }) == bound);
+  }
+
+  /** Every window's selection link 's' rewritten as '{"group": s}', an
+   *  object without the 'target' the layout format requires. */
+  static void UseTargetlessSelectionLinks(nlohmann::json& node)
+  {
+    if ("window" == node.at("type").get<std::string>())
+    {
+      auto& links = node.at("links");
+      links["selection"] = nlohmann::json{ { "group", links.at("selection") } };
+      return;
+    }
+    for (auto& child : node.at("children"))
+    {
+      UseTargetlessSelectionLinks(child);
+    }
+  }
+
+  void Apply_MalformedSelectionLinks_ReportTheLoadersMessage()
+  {
+    // A dynamic layout is validated by the layout format's own rules, so a
+    // malformed link is reported as such, not as a consequence of it.
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    UseTargetlessSelectionLinks(layout.document.at("root"));
+
+    std::string message;
+    try
+    {
+      m_Editor->ApplyDynamicLayout(layout);
+    }
+    catch (const mitk::Exception& e)
+    {
+      message = e.GetDescription();
+    }
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("without the required 'target' string"));
   }
 
   void Apply_ValidationFailuresChangeNothing()

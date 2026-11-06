@@ -1204,6 +1204,7 @@ public:
   *
   *   Validates the whole layout first, against the document and the data
   *   storage, and throws before anything changes:
+  *   - the document passes the structural checks 'ApplyLayout' runs;
   *   - every 'groupNodes' entry names a selection group the document
   *     declares;
   *   - every assignment and fit names a window of the document;
@@ -1567,22 +1568,6 @@ protected:
 private:
 
   void SetLayoutImpl() override;
-
-  /**
-  * \brief Pre-mutation check that every window id in `doc` belongs to this
-  *        editor instance.
-  *
-  *   Walks every `window` node in the layout tree and rejects ids that do
-  *   not start with `<multiWidgetName>__`. Throws with a message naming the
-  *   offending id and the expected prefix. Run as the first step of
-  *   `ApplyLayout`, before any engine state is touched, so a misrouted
-  *   document does not destroy the existing layout on the way out.
-  *
-  *   The schema's pattern enforces structural shape (id must contain `__`)
-  *   but cannot encode "matches THIS editor's `multiWidgetName`": that
-  *   constraint is loader-instance-specific and lives here.
-  */
-  void ValidateIdsForThisEditor(const nlohmann::json& doc) const;
 
   /**
   * \brief Positional convenience overload used by 'SetLayout(r, c)' (and so by

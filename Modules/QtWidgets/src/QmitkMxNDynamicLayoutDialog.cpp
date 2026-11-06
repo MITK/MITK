@@ -204,6 +204,15 @@ void QmitkMxNDynamicLayoutDialog::BuildSlotRows()
     widget->SetSelectionIsOptional(true);
     widget->SetEmptyInfo(tr("Select %1").arg(slot.role.toLower()));
     widget->SetPopUpTitel(tr("Select %1").arg(slot.role.toLower()));
+    if (QmitkMxNSlotDataClass::Segmentation == dataClass)
+    {
+      // Images are not offered here, which users may not expect of a map
+      // (ADC, PET, activation) they think of as an overlay.
+      const auto hint = tr("Segmentations, masks, surfaces or point sets. "
+                           "To show an image on top of another one, use the fusion pair.");
+      widget->SetPopUpHint(hint);
+      widget->setToolTip(hint);
+    }
     connect(widget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, [this]()
     {
       if (!m_Updating)
@@ -220,7 +229,7 @@ void QmitkMxNDynamicLayoutDialog::BuildSlotRows()
 void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
 {
   ClearRows(m_OptionRows);
-  m_Aligned = m_ThreeDColumn = m_DatasetsAsColumns = m_ThreeDRow = m_AllOverlaysWindow = m_MipWindow = nullptr;
+  m_Aligned = m_ThreeDColumn = m_DatasetsAsColumns = m_ThreeDRow = m_AllSegmentationsWindow = m_MipWindow = nullptr;
   m_View = m_Order = m_Colormap = m_Opacity = nullptr;
 
   const auto check = [this](const char* name, const QString& text, const QString& toolTip) {
@@ -266,7 +275,8 @@ void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
       break;
     case QmitkMxNDynamicTemplate::SharedBase:
       m_ThreeDRow = check("threeDRow", tr("3D row"), tr("A 3D view under every window, for the segmentations and surfaces."));
-      m_AllOverlaysWindow = check("allOverlaysWindow", tr("All-overlays window"), tr("One more window that shows every overlay."));
+      m_AllSegmentationsWindow = check("allSegmentationsWindow", tr("All-segmentations window"),
+                                       tr("One more window that shows every segmentation."));
       break;
     case QmitkMxNDynamicTemplate::FusionPair:
       m_Colormap = combo("colormap", tr("Fused colormap"),
@@ -335,7 +345,7 @@ QmitkMxNDynamicOptions QmitkMxNDynamicLayoutDialog::GetOptions() const
                                                static_cast<QmitkMxNDatasetView>(m_View->currentData().toInt()),
                                                static_cast<QmitkMxNDatasetOrder>(m_Order->currentData().toInt()) };
     case QmitkMxNDynamicTemplate::SharedBase:
-      return QmitkMxNSharedBaseOptions{ m_ThreeDRow->isChecked(), m_AllOverlaysWindow->isChecked() };
+      return QmitkMxNSharedBaseOptions{ m_ThreeDRow->isChecked(), m_AllSegmentationsWindow->isChecked() };
     case QmitkMxNDynamicTemplate::FusionPair:
     default:
       return QmitkMxNFusionPairOptions{ static_cast<QmitkMxNFusionColormap>(m_Colormap->currentData().toInt()),
@@ -401,7 +411,7 @@ void QmitkMxNDynamicLayoutDialog::OnSlotsChanged()
       {
         const auto& options = std::get<QmitkMxNSharedBaseOptions>(defaults);
         follow(m_ThreeDRow, options.threeDRow);
-        follow(m_AllOverlaysWindow, options.allOverlaysWindow);
+        follow(m_AllSegmentationsWindow, options.allSegmentationsWindow);
         break;
       }
       case QmitkMxNDynamicTemplate::FusionPair:

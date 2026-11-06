@@ -69,9 +69,9 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkMxNDynamicLayoutTestSuite);
 
-  MITK_TEST(DataClasses_ImagesOverlaysAndNeither);
+  MITK_TEST(DataClasses_ImagesSegmentationsAndNeither);
   MITK_TEST(R1_Prefill_TakesTheSelectionInItsOrderPerDataClass);
-  MITK_TEST(R2_DatasetIsTheImageWithItsOverlayDerivations);
+  MITK_TEST(R2_DatasetIsTheImageWithItsSegmentationDerivations);
   MITK_TEST(R3_SharedBase_FromTheSelectionOrTheDataTree);
   MITK_TEST(R4_Aligned_ByIdenticalGeometry);
   MITK_TEST(T1_Aligned_ByFrameOfReference_PresentAndAbsent);
@@ -265,7 +265,7 @@ public:
 
   // --- Data classes and rules --------------------------------------------------
 
-  void DataClasses_ImagesOverlaysAndNeither()
+  void DataClasses_ImagesSegmentationsAndNeither()
   {
     using QmitkMxNDynamicLayouts::IsOfDataClass;
     const auto image = this->AddImage("image");
@@ -279,17 +279,17 @@ public:
     hidden->SetBoolProperty("hidden object", true);
 
     CPPUNIT_ASSERT(IsOfDataClass(*image, QmitkMxNSlotDataClass::Image));
-    CPPUNIT_ASSERT(!IsOfDataClass(*image, QmitkMxNSlotDataClass::Overlay));
-    for (const auto& overlay : { mask, segmentation, surface, points })
+    CPPUNIT_ASSERT(!IsOfDataClass(*image, QmitkMxNSlotDataClass::Segmentation));
+    for (const auto& candidate : { mask, segmentation, surface, points })
     {
-      CPPUNIT_ASSERT_MESSAGE(overlay->GetName() + " is an overlay",
-                             IsOfDataClass(*overlay, QmitkMxNSlotDataClass::Overlay));
-      CPPUNIT_ASSERT_MESSAGE(overlay->GetName() + " is no image", !IsOfDataClass(*overlay, QmitkMxNSlotDataClass::Image));
+      CPPUNIT_ASSERT_MESSAGE(candidate->GetName() + " is a segmentation",
+                             IsOfDataClass(*candidate, QmitkMxNSlotDataClass::Segmentation));
+      CPPUNIT_ASSERT_MESSAGE(candidate->GetName() + " is no image", !IsOfDataClass(*candidate, QmitkMxNSlotDataClass::Image));
     }
     for (const auto& neither : { helper, hidden })
     {
       CPPUNIT_ASSERT(!IsOfDataClass(*neither, QmitkMxNSlotDataClass::Image));
-      CPPUNIT_ASSERT(!IsOfDataClass(*neither, QmitkMxNSlotDataClass::Overlay));
+      CPPUNIT_ASSERT(!IsOfDataClass(*neither, QmitkMxNSlotDataClass::Segmentation));
     }
   }
 
@@ -315,7 +315,7 @@ public:
                            (std::vector<mitk::DataNode::Pointer>{ a }) == fusion.at(QmitkMxNSlot::FusedImage));
   }
 
-  void R2_DatasetIsTheImageWithItsOverlayDerivations()
+  void R2_DatasetIsTheImageWithItsSegmentationDerivations()
   {
     const auto image = this->AddImage("image");
     const auto mask = this->AddMask(image, "mask", 3);
@@ -325,7 +325,7 @@ public:
 
     const auto layout = this->Generate({ { QmitkMxNSlot::Datasets, { image, derived } } },
                                        QmitkMxNDatasetsByPlanesOptions{});
-    CPPUNIT_ASSERT_MESSAGE("The image, then its overlays by layer; the derived image is not one",
+    CPPUNIT_ASSERT_MESSAGE("The image, then its segmentations by layer; the derived image is not one",
                            (std::vector<mitk::DataNode::Pointer>{ image, surface, mask }) == layout.groupNodes.at("ds00"));
     CPPUNIT_ASSERT_MESSAGE("A derived image that is not binary is a dataset of its own",
                            (std::vector<mitk::DataNode::Pointer>{ derived }) == layout.groupNodes.at("ds01"));
@@ -341,16 +341,16 @@ public:
     auto bindings = QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate::SharedBase, { second, base }, *m_DataStorage);
     CPPUNIT_ASSERT_MESSAGE("The selected image is the base",
                            (std::vector<mitk::DataNode::Pointer>{ base }) == bindings.at(QmitkMxNSlot::BaseImage));
-    CPPUNIT_ASSERT_MESSAGE("...and the selected overlays its overlays",
-                           (std::vector<mitk::DataNode::Pointer>{ second }) == bindings.at(QmitkMxNSlot::Overlays));
+    CPPUNIT_ASSERT_MESSAGE("...and the selected segmentations its segmentations",
+                           (std::vector<mitk::DataNode::Pointer>{ second }) == bindings.at(QmitkMxNSlot::Segmentations));
 
     bindings = QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate::SharedBase, { first, second }, *m_DataStorage);
-    CPPUNIT_ASSERT_MESSAGE("Without a selected image, the source the overlays share is the base",
+    CPPUNIT_ASSERT_MESSAGE("Without a selected image, the source the segmentations share is the base",
                            (std::vector<mitk::DataNode::Pointer>{ base }) == bindings.at(QmitkMxNSlot::BaseImage));
 
     bindings = QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate::SharedBase, { base }, *m_DataStorage);
-    CPPUNIT_ASSERT_MESSAGE("Without selected overlays, the base's overlays are taken",
-                           (std::vector<mitk::DataNode::Pointer>{ first, second }) == bindings.at(QmitkMxNSlot::Overlays));
+    CPPUNIT_ASSERT_MESSAGE("Without selected segmentations, the base's segmentations are taken",
+                           (std::vector<mitk::DataNode::Pointer>{ first, second }) == bindings.at(QmitkMxNSlot::Segmentations));
   }
 
   static QmitkMxNDatasetsByPlanesOptions DatasetsByPlanesDefaults(const QmitkMxNSlotBindings& bindings,
@@ -409,12 +409,12 @@ public:
     this->AddSegmentation(plain, "segmentation", 2);
     CPPUNIT_ASSERT_NO_THROW(this->Generate({ { QmitkMxNSlot::Datasets, { withSurface, plain } } }, threeD));
 
-    const auto sharedBase = [this](const mitk::DataNode::Pointer& base, const mitk::DataNode::Pointer& overlay) {
+    const auto sharedBase = [this](const mitk::DataNode::Pointer& base, const mitk::DataNode::Pointer& segmentation) {
       return std::get<QmitkMxNSharedBaseOptions>(QmitkMxNDynamicLayouts::DefaultOptions(
         QmitkMxNDynamicTemplate::SharedBase,
-        { { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Overlays, { overlay } } }, *m_DataStorage));
+        { { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Segmentations, { segmentation } } }, *m_DataStorage));
     };
-    CPPUNIT_ASSERT_MESSAGE("No 3D row for a binary overlay", !sharedBase(plain, mask).threeDRow);
+    CPPUNIT_ASSERT_MESSAGE("No 3D row for a binary segmentation", !sharedBase(plain, mask).threeDRow);
     const auto segmentation = this->AddSegmentation(plain, "second segmentation", 3);
     CPPUNIT_ASSERT_MESSAGE("A 3D row for a segmentation", sharedBase(plain, segmentation).threeDRow);
   }
@@ -563,7 +563,7 @@ public:
         }
 
     const QmitkMxNSlotBindings shared{ { QmitkMxNSlot::BaseImage, { a } },
-                                       { QmitkMxNSlot::Overlays, { segmentationA, maskA } } };
+                                       { QmitkMxNSlot::Segmentations, { segmentationA, maskA } } };
     for (const bool threeDRow : { false, true })
       for (const bool all : { false, true })
       {
@@ -675,11 +675,11 @@ public:
     const auto base = this->AddImage("base");
     const auto first = this->AddMask(base, "first", 1);
     const auto second = this->AddSegmentation(base, "second", 2);
-    const auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Overlays, { first, second } } },
+    const auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Segmentations, { first, second } } },
                                        QmitkMxNSharedBaseOptions{ true, true });
     const auto windows = Windows(layout.document);
     CPPUNIT_ASSERT_EQUAL(std::size_t(6), windows.size());
-    const char* groups[] = { "ov0", "ov1", "all" };
+    const char* groups[] = { "seg0", "seg1", "all" };
     for (std::size_t i = 0; i < 3; ++i)
     {
       CPPUNIT_ASSERT_EQUAL(std::string(groups[i]), Link(windows[i], "selection"));
@@ -690,14 +690,14 @@ public:
                                    Link(windows[i + 3], "selection"));
       CPPUNIT_ASSERT_EQUAL(std::string("spin"), Link(windows[i + 3], "orientation"));
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The all-overlays window comes last", std::string("All overlays"), Name(windows[2]));
-    CPPUNIT_ASSERT_EQUAL(std::string("All overlays"), Name(windows[5]));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Overlay windows are unnamed", std::string(), Name(windows[0]));
-    CPPUNIT_ASSERT_MESSAGE("A column shows the base and its overlay",
-                           (std::vector<mitk::DataNode::Pointer>{ base, second }) == layout.groupNodes.at("ov1"));
-    CPPUNIT_ASSERT_MESSAGE("The all-overlays group shows them all",
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The all-segmentations window comes last", std::string("All segmentations"), Name(windows[2]));
+    CPPUNIT_ASSERT_EQUAL(std::string("All segmentations"), Name(windows[5]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Segmentation windows are unnamed", std::string(), Name(windows[0]));
+    CPPUNIT_ASSERT_MESSAGE("A column shows the base and its segmentation",
+                           (std::vector<mitk::DataNode::Pointer>{ base, second }) == layout.groupNodes.at("seg1"));
+    CPPUNIT_ASSERT_MESSAGE("The all-segmentations group shows them all",
                            (std::vector<mitk::DataNode::Pointer>{ base, first, second }) == layout.groupNodes.at("all"));
-    CPPUNIT_ASSERT_MESSAGE("Fitted from the all-overlays window and the first 3D window",
+    CPPUNIT_ASSERT_MESSAGE("Fitted from the all-segmentations window and the first 3D window",
                            2 == layout.fits.size() && windows[2].at("id").get<std::string>() == layout.fits[0].windowId.toStdString()
                              && windows[3].at("id").get<std::string>() == layout.fits[1].windowId.toStdString());
   }
@@ -778,7 +778,7 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("A node of another data class",
                                  this->Generate({ { QmitkMxNSlot::Datasets, { mask } } }, planes), mitk::Exception);
     CPPUNIT_ASSERT_THROW_MESSAGE("A slot the template does not have",
-                                 this->Generate({ { QmitkMxNSlot::Datasets, { a } }, { QmitkMxNSlot::Overlays, { mask } } },
+                                 this->Generate({ { QmitkMxNSlot::Datasets, { a } }, { QmitkMxNSlot::Segmentations, { mask } } },
                                                 planes),
                                  mitk::Exception);
     QmitkMxNOneViewPerDatasetOptions threeD;
@@ -819,7 +819,7 @@ public:
     const auto second = this->AddMask(base, "second", 2);
     const auto other = this->AddImage("other");
     this->ShowEditor();
-    const auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Overlays, { first, second } } },
+    const auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Segmentations, { first, second } } },
                                        QmitkMxNSharedBaseOptions{ false, true });
     m_Editor->ApplyDynamicLayout(layout);
     Pump();

@@ -49,10 +49,12 @@ found in the LICENSE file.
  * geometry: the first one's when all are identical, else their joint extent
  * along the world axes.
  *
- * Data classes: an Image is an 'mitk::Image' that is not binary; an Overlay
- * is a multi-label segmentation, a surface, a point set or a binary image.
- * Helper and hidden objects are neither. A 3D representation is a multi-label
- * segmentation or a surface.
+ * Data classes: an Image is an 'mitk::Image' that is not binary. A
+ * Segmentation, in the wide sense these templates use, is a multi-label
+ * segmentation, a binary image (mask), a surface or a point set: data that
+ * marks structures of an image rather than measuring it. Helper and hidden
+ * objects are neither. A 3D representation is a multi-label segmentation or
+ * a surface.
  */
 
 /** \brief The dynamic layout templates. */
@@ -67,18 +69,18 @@ enum class QmitkMxNDynamicTemplate
 /** \brief The slots across all templates. */
 enum class QmitkMxNSlot
 {
-  Datasets,    // DatasetsByPlanes, OneViewPerDataset
-  BaseImage,   // SharedBase
-  Overlays,    // SharedBase
-  Anatomy,     // FusionPair
-  FusedImage   // FusionPair
+  Datasets,       // DatasetsByPlanes, OneViewPerDataset
+  BaseImage,      // SharedBase
+  Segmentations,  // SharedBase
+  Anatomy,        // FusionPair
+  FusedImage      // FusionPair
 };
 
 /** \brief What a slot accepts; see the data classes above. */
 enum class QmitkMxNSlotDataClass
 {
   Image,
-  Overlay
+  Segmentation
 };
 
 struct QmitkMxNSlotDescription
@@ -132,7 +134,7 @@ struct QmitkMxNOneViewPerDatasetOptions
 struct QmitkMxNSharedBaseOptions
 {
   bool threeDRow = false;
-  bool allOverlaysWindow = false;
+  bool allSegmentationsWindow = false;
 };
 
 enum class QmitkMxNFusionColormap
@@ -240,7 +242,7 @@ namespace QmitkMxNDynamicLayouts
 
   /** \brief Whether an image, with its direct derivations, has a 3D
    *         representation: a multi-label segmentation or a surface among
-   *         its direct derivations of the Overlay class. */
+   *         its direct derivations of the Segmentation class. */
   MITKQTWIDGETS_EXPORT bool HasThreeDRepresentation(const mitk::DataNode& image,
                                                     const mitk::DataStorage& dataStorage);
 
@@ -251,11 +253,11 @@ namespace QmitkMxNDynamicLayouts
   *   selection reports them: a single slot the first one no earlier slot
   *   took, a multi slot up to its maximum. The shared-base template takes as
   *   base the first selected image, else the one direct source all selected
-  *   overlays share; as overlays the selected ones, else the base's direct
-  *   derivations of the Overlay class. The fusion pair takes a CT as anatomy
-  *   and a PT as fused image when the selection has exactly one of each
-  *   (DICOM Modality). Nodes the template cannot use are left out; a slot
-  *   may stay empty.
+  *   segmentations share; as segmentations the selected ones, else the
+  *   base's direct derivations of the Segmentation class. The fusion pair
+  *   takes a CT as anatomy and a PT as fused image when the selection has
+  *   exactly one of each (DICOM Modality). Nodes the template cannot use are
+  *   left out; a slot may stay empty.
   */
   MITKQTWIDGETS_EXPORT QmitkMxNSlotBindings Prefill(QmitkMxNDynamicTemplate templateId,
                                                     const std::vector<mitk::DataNode::Pointer>& selection,
@@ -268,7 +270,7 @@ namespace QmitkMxNDynamicLayouts
   *
   *   Datasets count as aligned when all have identical geometry at time step
   *   0, or all share one Frame of Reference UID. A 3D column or row is on
-  *   when any dataset or overlay has a 3D representation. Datasets are
+  *   when any dataset or segmentation has a 3D representation. Datasets are
   *   ordered by acquisition date when every dataset has one. A fused image
   *   whose DICOM Modality is known and not PT gets hot iron and no MIP
   *   window.

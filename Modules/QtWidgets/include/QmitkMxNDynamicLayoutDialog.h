@@ -125,7 +125,7 @@ private:
   QComboBox* m_View = nullptr;
   QComboBox* m_Order = nullptr;
   QCheckBox* m_ThreeDRow = nullptr;
-  QCheckBox* m_AllOverlaysWindow = nullptr;
+  QCheckBox* m_AllSegmentationsWindow = nullptr;
   QComboBox* m_Colormap = nullptr;
   QCheckBox* m_MipWindow = nullptr;
   QComboBox* m_Opacity = nullptr;

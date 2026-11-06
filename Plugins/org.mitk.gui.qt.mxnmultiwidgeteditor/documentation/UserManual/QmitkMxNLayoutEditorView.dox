@@ -178,13 +178,14 @@
 	every dataset has a segmentation or a surface - the 3D windows then turn and zoom
 	together. When every dataset has an acquisition date, the earliest comes first.
 
-	<b>Shared base, varying overlay.</b> One image and up to four overlays (segmentations,
-	surfaces, point sets or masks): one axial window per overlay, showing the image with
-	that overlay, optionally a last window with all of them, and a row of 3D windows under
-	them when an overlay is a segmentation or a surface. All windows share the crosshair,
-	slice, zoom and pan, and the image's level/window and colormap. The image is the
-	selected one, or the one the selected overlays derive from; the overlays are the
-	selected ones, or those of the image.
+	<b>Shared base, varying segmentation.</b> One image and up to four segmentations (here
+	also masks, surfaces or point sets): one axial window per segmentation, showing the
+	image with that segmentation, optionally a last window with all of them, and a row of
+	3D windows under them when one is a segmentation or a surface. All windows share the
+	crosshair, slice, zoom and pan, and the image's level/window and colormap. The image is
+	the selected one, or the one the selected segmentations derive from; the segmentations
+	are the selected ones, or those of the image. Images are not taken as segmentations:
+	to see a map such as ADC or PET on top of an image, use the fusion pair.
 
 	<b>Fusion pair.</b> An anatomy and a fused image, typically CT and PET: an axial and a
 	coronal row with the anatomy, the fused image and the fusion of both, all on one

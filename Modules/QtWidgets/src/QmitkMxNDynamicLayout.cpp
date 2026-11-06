@@ -70,19 +70,19 @@ namespace
     return value;
   }
 
-  NodeList OverlayDerivations(const mitk::DataNode& image, const mitk::DataStorage& dataStorage)
+  NodeList SegmentationDerivations(const mitk::DataNode& image, const mitk::DataStorage& dataStorage)
   {
-    NodeList overlays;
+    NodeList segmentations;
     // Held: a range-for over the dereferenced temporary iterates a freed set.
     const auto derivations = dataStorage.GetDerivations(&image, nullptr, true);
     for (const auto& derivation : *derivations)
     {
-      if (QmitkMxNDynamicLayouts::IsOfDataClass(*derivation, QmitkMxNSlotDataClass::Overlay))
+      if (QmitkMxNDynamicLayouts::IsOfDataClass(*derivation, QmitkMxNSlotDataClass::Segmentation))
       {
-        overlays.push_back(derivation);
+        segmentations.push_back(derivation);
       }
     }
-    return overlays;
+    return segmentations;
   }
 
   int NodeLayer(const mitk::DataNode& node)
@@ -92,15 +92,15 @@ namespace
     return layer;
   }
 
-  /** An image and its overlays, bottom to top: the image, then its overlay
-   *  derivations by ascending node-global layer. */
+  /** An image and its segmentations, bottom to top: the image, then its
+   *  segmentation derivations by ascending node-global layer. */
   NodeList DatasetNodes(const mitk::DataNode::Pointer& image, const mitk::DataStorage& dataStorage)
   {
-    auto overlays = OverlayDerivations(*image, dataStorage);
-    std::stable_sort(overlays.begin(), overlays.end(),
+    auto segmentations = SegmentationDerivations(*image, dataStorage);
+    std::stable_sort(segmentations.begin(), segmentations.end(),
                      [](const auto& a, const auto& b) { return NodeLayer(*a) < NodeLayer(*b); });
     NodeList nodes{ image };
-    nodes.insert(nodes.end(), overlays.begin(), overlays.end());
+    nodes.insert(nodes.end(), segmentations.begin(), segmentations.end());
     return nodes;
   }
 
@@ -506,8 +506,8 @@ namespace
                                    const QString& widgetName)
   {
     const auto& base = SlotNodes(bindings, QmitkMxNSlot::BaseImage).front();
-    const auto& overlays = SlotNodes(bindings, QmitkMxNSlot::Overlays);
-    const QString allOverlaysName = QStringLiteral("All overlays");
+    const auto& segmentations = SlotNodes(bindings, QmitkMxNSlot::Segmentations);
+    const QString allSegmentationsName = QStringLiteral("All segmentations");
 
     QmitkMxNDynamicLayout layout;
     DocumentBuilder builder(widgetName);
@@ -518,29 +518,29 @@ namespace
       builder.NavigationGroup("spin", "Turn together");
     }
 
-    // The columns: one per overlay, then the one with all of them.
+    // The columns: one per segmentation, then the one with all of them.
     std::vector<std::pair<std::string, QString>> columns;
-    for (std::size_t i = 0; i < overlays.size(); ++i)
+    for (std::size_t i = 0; i < segmentations.size(); ++i)
     {
-      const auto group = "ov" + std::to_string(i);
-      builder.SelectionGroup(group, NodeName(overlays[i]));
-      layout.groupNodes[group] = { base, overlays[i] };
+      const auto group = "seg" + std::to_string(i);
+      builder.SelectionGroup(group, NodeName(segmentations[i]));
+      layout.groupNodes[group] = { base, segmentations[i] };
       columns.emplace_back(group, QString());
     }
-    if (options.allOverlaysWindow)
+    if (options.allSegmentationsWindow)
     {
-      builder.SelectionGroup("all", allOverlaysName.toStdString());
+      builder.SelectionGroup("all", allSegmentationsName.toStdString());
       NodeList all{ base };
-      all.insert(all.end(), overlays.begin(), overlays.end());
+      all.insert(all.end(), segmentations.begin(), segmentations.end());
       layout.groupNodes["all"] = all;
-      columns.emplace_back("all", allOverlaysName);
+      columns.emplace_back("all", allSegmentationsName);
     }
 
     Json twoD = Json::array();
     for (const auto& [group, name] : columns)
     {
       // Every window shows the same base image, which the look group acts on.
-      if (options.allOverlaysWindow ? "all" == group : twoD.empty())
+      if (options.allSegmentationsWindow ? "all" == group : twoD.empty())
       {
         layout.fits.push_back({ builder.NextId(), true });
       }
@@ -710,9 +710,9 @@ const std::vector<QmitkMxNTemplateDescription>& QmitkMxNDynamicLayouts::Template
       { { QmitkMxNSlot::Datasets, QStringLiteral("Datasets"), DataClass::Image, 1, 4 } }, false },
     { QmitkMxNDynamicTemplate::OneViewPerDataset, QStringLiteral("One view per dataset"),
       { { QmitkMxNSlot::Datasets, QStringLiteral("Datasets"), DataClass::Image, 2, 16 } }, false },
-    { QmitkMxNDynamicTemplate::SharedBase, QStringLiteral("Shared base, varying overlay"),
+    { QmitkMxNDynamicTemplate::SharedBase, QStringLiteral("Shared base, varying segmentation"),
       { { QmitkMxNSlot::BaseImage, QStringLiteral("Base image"), DataClass::Image, 1, 1 },
-        { QmitkMxNSlot::Overlays, QStringLiteral("Overlays"), DataClass::Overlay, 1, 4 } }, false },
+        { QmitkMxNSlot::Segmentations, QStringLiteral("Segmentations"), DataClass::Segmentation, 1, 4 } }, false },
     { QmitkMxNDynamicTemplate::FusionPair, QStringLiteral("Fusion pair"),
       { { QmitkMxNSlot::Anatomy, QStringLiteral("Anatomy"), DataClass::Image, 1, 1 },
         { QmitkMxNSlot::FusedImage, QStringLiteral("Fused image"), DataClass::Image, 1, 1 } }, true },
@@ -745,8 +745,9 @@ bool QmitkMxNDynamicLayouts::IsOfDataClass(const mitk::DataNode& node, QmitkMxNS
 
 bool QmitkMxNDynamicLayouts::HasThreeDRepresentation(const mitk::DataNode& image, const mitk::DataStorage& dataStorage)
 {
-  const auto overlays = OverlayDerivations(image, dataStorage);
-  return std::any_of(overlays.begin(), overlays.end(), [](const auto& overlay) { return IsThreeDRepresentation(*overlay); });
+  const auto segmentations = SegmentationDerivations(image, dataStorage);
+  return std::any_of(segmentations.begin(), segmentations.end(),
+                     [](const auto& segmentation) { return IsThreeDRepresentation(*segmentation); });
 }
 
 QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate templateId,
@@ -754,7 +755,7 @@ QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate tem
                                                      const mitk::DataStorage& dataStorage)
 {
   NodeList images;
-  NodeList overlays;
+  NodeList segmentations;
   for (const auto& node : selection)
   {
     if (node.IsNull())
@@ -765,9 +766,9 @@ QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate tem
     {
       images.push_back(node);
     }
-    else if (IsOfDataClass(*node, QmitkMxNSlotDataClass::Overlay))
+    else if (IsOfDataClass(*node, QmitkMxNSlotDataClass::Segmentation))
     {
-      overlays.push_back(node);
+      segmentations.push_back(node);
     }
   }
 
@@ -790,15 +791,15 @@ QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate tem
     case QmitkMxNDynamicTemplate::SharedBase:
     {
       mitk::DataNode::Pointer base = images.empty() ? nullptr : images.front();
-      if (base.IsNull() && !overlays.empty())
+      if (base.IsNull() && !segmentations.empty())
       {
-        // The one direct source all selected overlays share.
+        // The one direct source all selected segmentations share.
         std::optional<std::set<mitk::DataNode*>> shared;
-        for (const auto& overlay : overlays)
+        for (const auto& segmentation : segmentations)
         {
           std::set<mitk::DataNode*> sources;
-          const auto overlaySources = dataStorage.GetSources(overlay, nullptr, true);
-          for (const auto& source : *overlaySources)
+          const auto segmentationSources = dataStorage.GetSources(segmentation, nullptr, true);
+          for (const auto& source : *segmentationSources)
           {
             sources.insert(source.GetPointer());
           }
@@ -820,12 +821,12 @@ QmitkMxNSlotBindings QmitkMxNDynamicLayouts::Prefill(QmitkMxNDynamicTemplate tem
       if (base.IsNotNull())
       {
         bindings[QmitkMxNSlot::BaseImage] = { base };
-        if (overlays.empty())
+        if (segmentations.empty())
         {
-          overlays = OverlayDerivations(*base, dataStorage);
+          segmentations = SegmentationDerivations(*base, dataStorage);
         }
       }
-      take(QmitkMxNSlot::Overlays, overlays, description.slotDescriptions.back().max);
+      take(QmitkMxNSlot::Segmentations, segmentations, description.slotDescriptions.back().max);
       break;
     }
 
@@ -896,10 +897,10 @@ QmitkMxNDynamicOptions QmitkMxNDynamicLayouts::DefaultOptions(QmitkMxNDynamicTem
     }
     case QmitkMxNDynamicTemplate::SharedBase:
     {
-      const auto& overlays = SlotNodes(bindings, QmitkMxNSlot::Overlays);
+      const auto& segmentations = SlotNodes(bindings, QmitkMxNSlot::Segmentations);
       QmitkMxNSharedBaseOptions options;
-      options.threeDRow = std::any_of(overlays.begin(), overlays.end(),
-                                      [](const auto& overlay) { return IsThreeDRepresentation(*overlay); });
+      options.threeDRow = std::any_of(segmentations.begin(), segmentations.end(),
+                                      [](const auto& segmentation) { return IsThreeDRepresentation(*segmentation); });
       return options;
     }
     case QmitkMxNDynamicTemplate::FusionPair:

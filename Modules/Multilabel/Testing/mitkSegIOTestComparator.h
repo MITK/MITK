@@ -210,9 +210,10 @@ namespace mitk
       }
 
       /**
-       * Compares the voxels of every label present on both sides, as masks: a
-       * voxel matches when it carries the label on both sides or on neither.
-       * Group images of different shape are reported once per label.
+       * Compares every group image voxel by voxel in every time step, so
+       * values that belong to no label count as well. A differing time step
+       * is also broken down per label the group has on both sides, as masks:
+       * a voxel matches when it carries the label on both sides or on neither.
        */
       inline void CompareVoxels(const MultiLabelSegmentation& expected,
                                 const MultiLabelSegmentation& actual,
@@ -220,18 +221,16 @@ namespace mitk
       {
         const auto labelPixelType = MakeScalarPixelType<Label::PixelType>();
 
-        for (const auto value : expected.GetAllLabelValues())
+        const auto groupCount = std::min(expected.GetNumberOfGroups(), actual.GetNumberOfGroups());
+        for (MultiLabelSegmentation::GroupIndexType group = 0; group < groupCount; ++group)
         {
-          if (!actual.ExistLabel(value))
-            continue;
-
-          const auto context = DescribeLabel(expected.GetLabel(value));
-          const auto* expectedImage = expected.GetGroupImage(expected.GetGroupIndexOfLabel(value));
-          const auto* actualImage = actual.GetGroupImage(actual.GetGroupIndexOfLabel(value));
+          const auto context = "group " + std::to_string(group);
+          const auto* expectedImage = expected.GetGroupImage(group);
+          const auto* actualImage = actual.GetGroupImage(group);
 
           if (expectedImage->GetPixelType() != labelPixelType || actualImage->GetPixelType() != labelPixelType)
           {
-            differences.push_back(context + ": group image pixel type differs from the label pixel type");
+            differences.push_back(context + ": image pixel type differs from the label pixel type");
             continue;
           }
 
@@ -240,8 +239,16 @@ namespace mitk
             sameShape = expectedImage->GetDimension(axis) == actualImage->GetDimension(axis);
           if (!sameShape)
           {
-            differences.push_back(context + ": group images differ in shape");
+            differences.push_back(context + ": images differ in shape");
             continue;
+          }
+
+          const auto actualValues = actual.GetLabelValuesByGroup(group);
+          MultiLabelSegmentation::LabelValueVectorType sharedValues;
+          for (const auto value : expected.GetLabelValuesByGroup(group))
+          {
+            if (std::find(actualValues.begin(), actualValues.end(), value) != actualValues.end())
+              sharedValues.push_back(value);
           }
 
           const std::size_t voxelsPerTimeStep =
@@ -255,18 +262,32 @@ namespace mitk
 
           for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
           {
+            const auto* expectedBegin = expectedVoxels + timeStep * voxelsPerTimeStep;
+            const auto* actualBegin = actualVoxels + timeStep * voxelsPerTimeStep;
+            if (std::equal(expectedBegin, expectedBegin + voxelsPerTimeStep, actualBegin))
+              continue;
+
+            const auto ofVoxels = " of " + std::to_string(voxelsPerTimeStep) + " voxels differ in time step " +
+                                  std::to_string(timeStep);
             std::size_t mismatches = 0;
-            const std::size_t offset = timeStep * voxelsPerTimeStep;
-            for (std::size_t i = offset; i < offset + voxelsPerTimeStep; ++i)
+            for (std::size_t i = 0; i < voxelsPerTimeStep; ++i)
             {
-              if ((expectedVoxels[i] == value) != (actualVoxels[i] == value))
+              if (expectedBegin[i] != actualBegin[i])
                 ++mismatches;
             }
-            if (mismatches > 0)
+            differences.push_back(context + ": " + std::to_string(mismatches) + ofVoxels);
+
+            // The breakdown costs one pass per label, so equal time steps skip it.
+            for (const auto value : sharedValues)
             {
-              differences.push_back(context + ": " + std::to_string(mismatches) + " of " +
-                                    std::to_string(voxelsPerTimeStep) + " voxels differ in time step " +
-                                    std::to_string(timeStep));
+              std::size_t labelMismatches = 0;
+              for (std::size_t i = 0; i < voxelsPerTimeStep; ++i)
+              {
+                if ((expectedBegin[i] == value) != (actualBegin[i] == value))
+                  ++labelMismatches;
+              }
+              if (labelMismatches > 0)
+                differences.push_back(DescribeLabel(expected.GetLabel(value)) + ": " + std::to_string(labelMismatches) + ofVoxels);
             }
           }
         }
@@ -414,8 +435,8 @@ namespace mitk
      * and custom label properties; presence is compared as well, so a lost
      * tracking ID or algorithm name shows up even where the getter would
      * fall back to a default.
-     * Per group: name, member label values in order, and the voxels of
-     * every label in every time step.
+     * Per group: name, member label values in order, and every voxel in
+     * every time step, with differing time steps broken down per label.
      * Per segmentation: UID, unlabeled lock, the property list by key, type
      * and value, source-image relations, the geometry of every time step,
      * and the time bounds of every time step.

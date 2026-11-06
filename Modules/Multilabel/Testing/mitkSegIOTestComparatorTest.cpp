@@ -32,6 +32,8 @@ class mitkSegIOTestComparatorTestSuite : public mitk::TestFixture
   MITK_TEST(GroupNameIsDetected);
   MITK_TEST(VoxelIsDetected);
   MITK_TEST(VoxelIsDetectedInLaterTimeStep);
+  MITK_TEST(StrayValueOutsideLabelsIsDetected);
+  MITK_TEST(EmptyGroupImageIsDetected);
   MITK_TEST(SegmentationPropertyIsDetected);
   MITK_TEST(PropertyExclusionsAreApplied);
   MITK_TEST(UIDIsDetectedUnlessNotCompared);
@@ -159,6 +161,23 @@ public:
     m_Copy = mitk::test::CloneKeepingUID(*m_Original);
     SetVoxel(0, 2, 9, 7);
     AssertDetected("label 7 ('Liver'): 1 of 320 voxels differ in time step 2");
+  }
+
+  void StrayValueOutsideLabelsIsDetected()
+  {
+    // 999 is no label value, so no label mask changes.
+    this->SetVoxel(0, 0, 9, 999);
+    this->AssertDetected("group 0: 1 of 320 voxels differ in time step 0");
+  }
+
+  void EmptyGroupImageIsDetected()
+  {
+    m_Original = mitk::test::BuildRichSegmentation({ false, false, false, true });
+    m_Copy = mitk::test::CloneKeepingUID(*m_Original);
+    CPPUNIT_ASSERT_MESSAGE("The fixture's empty group has no labels", m_Original->GetLabelValuesByGroup(2).empty());
+
+    this->SetVoxel(2, 0, 0, 7);
+    this->AssertDetected("group 2: 1 of 320 voxels differ in time step 0");
   }
 
   void SegmentationPropertyIsDetected()

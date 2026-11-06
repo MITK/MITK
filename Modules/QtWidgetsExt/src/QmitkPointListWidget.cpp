@@ -215,7 +215,7 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
   ObserveNewNode(newNode);
-  dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(newNode);
+  m_PointListView->SetPointSetNode(newNode);
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()

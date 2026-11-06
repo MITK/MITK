@@ -25,6 +25,16 @@ found in the LICENSE file.
 #include <QPalette>
 #include <QTimer>
 
+namespace
+{
+  QString TimeStepToolTip(mitk::TimeStepType timeStep)
+  {
+    return QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
+                   "wheel to change the timestep.\n\nTimeStep:\t%1")
+      .arg(timeStep);
+  }
+}
+
 QmitkPointListView::QmitkPointListView(QWidget *parent)
   : QListView(parent),
     m_PointListModel(new QmitkPointListModel()),
@@ -37,10 +47,7 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
   QListView::setSelectionBehavior(QAbstractItemView::SelectItems);
   QListView::setSelectionMode(QAbstractItemView::SingleSelection);
   QListView::setModel(m_PointListModel);
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
-                            "wheel to change the timestep.\n\nTimeStep:\t%1")
-                      .arg(0);
-  QListView::setToolTip(tooltip);
+  QListView::setToolTip(TimeStepToolTip(0));
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   this->setMinimumHeight(40);
@@ -68,6 +75,10 @@ QmitkPointListView::~QmitkPointListView()
 void QmitkPointListView::SetPointSetNode(mitk::DataNode *pointSetNode)
 {
   m_PointListModel->SetPointSetNode(pointSetNode);
+
+  const auto timeStep = m_PointListModel->GetTimeStep();
+  this->setToolTip(TimeStepToolTip(timeStep));
+  emit SignalTimeStepChanged(static_cast<int>(timeStep));
 }
 
 const mitk::PointSet *QmitkPointListView::GetPointSet() const
@@ -242,10 +253,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
     this->m_PointListModel->SetTimeStep(--currentTS);
   }
 
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
-                            "wheel to change the timestep.\n\nTimeStep:\t%1")
-                      .arg(currentTS);
-  this->setToolTip(tooltip);
+  this->setToolTip(TimeStepToolTip(currentTS));
 
   emit SignalTimeStepChanged(static_cast<int>(currentTS));
 }

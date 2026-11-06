@@ -74,6 +74,28 @@ namespace mitk
 
       return capabilities;
     }
+
+    /** Segmentation stack (MultiLabelSegmentationStackReader, NIfTI stack writer); the same for every save strategy. */
+    inline FormatCapabilities StackCapabilities()
+    {
+      FormatCapabilities capabilities;
+      capabilities.formatName = "stack";
+
+      // The label colours travel as JSON floats, which round trip exactly.
+      capabilities.options.colorTolerance = 0.f;
+      // NIfTI stores origin, spacing and orientation as float32, which rounds to 2^-24 relative.
+      // At the largest coordinate of the fixtures, 30.25 mm, that bounds the error by 1.8e-6.
+      capabilities.options.geometryTolerance = 2e-6;
+      // The writer refuses dynamic segmentations, and the reload rebuilds the same single
+      // time step, so its bounds come back exactly.
+      capabilities.options.timeTolerance = 0.0;
+
+      capabilities.losses.push_back({
+        "the unlabeled lock: the stack format has no field for it, and the reader leaves it unlocked",
+        [](MultiLabelSegmentation& segmentation) { segmentation.SetUnlabeledLabelLock(false); } });
+
+      return capabilities;
+    }
   }
 }
 

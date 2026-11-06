@@ -198,7 +198,7 @@ namespace
     std::ifstream input(this->GetLocalFileName());
     if (!input.is_open())
     {
-      return result;
+      mitkThrow() << "Cannot open the segmentation stack file \"" << this->GetInputLocation() << "\".";
     }
 
     auto filePathBase = itksys::SystemTools::GetFilenamePath(this->GetLocalFileName());
@@ -210,8 +210,12 @@ namespace
     }
     catch (const nlohmann::json::parse_error& e)
     {
-      MITK_ERROR << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
-      throw;
+      mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" is not valid JSON: " << e.what();
+    }
+
+    if (!fileContent.contains("groups") || !fileContent["groups"].is_array() || fileContent["groups"].empty())
+    {
+      mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" defines no groups.";
     }
 
     //check version
@@ -232,8 +236,16 @@ namespace
 
     //get pixel content
     std::vector<Label::PixelType> labelsWithOutdatedProperties;
-    auto groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"],
-      &labelsWithOutdatedProperties);
+    std::vector<MultiLabelIOHelper::LabelGroupMetaData> groupInfos;
+    try
+    {
+      groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"],
+        &labelsWithOutdatedProperties);
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+      mitkThrow() << "The groups in the segmentation stack file \"" << this->GetInputLocation() << "\" are invalid: " << e.what();
+    }
 
     for (const auto& groupInfo : groupInfos)
     {
@@ -267,6 +279,8 @@ namespace
       }
 
       auto groupIndex = segmentation->AddGroup(cleanedLabels);
+      if (!groupInfo.name.empty())
+        segmentation->SetGroupName(groupIndex, groupInfo.name);
 
       if (groupImage.IsNotNull())
       {

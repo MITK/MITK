@@ -14,8 +14,11 @@ found in the LICENSE file.
 #define mitkSegIOTestFixtures_h
 
 #include <mitkArbitraryTimeGeometry.h>
+#include <mitkCoreServices.h>
 #include <mitkDICOMCodeSequenceWithModifiers.h>
+#include <mitkFileReaderRegistry.h>
 #include <mitkFileReaderSelector.h>
+#include <mitkIMimeTypeProvider.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLog.h>
@@ -24,6 +27,8 @@ found in the LICENSE file.
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkSegTestSourceImageFactory.h>
 #include <mitkTestingMacros.h>
+
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <array>
@@ -298,6 +303,33 @@ namespace mitk
     }
 
     /**
+     * Like ReadWithReader, but without asking the reader for its confidence first.
+     * FileReaderSelector drops a reader that rates the file Unsupported, which is
+     * what a reader does with a file it cannot open or parse; this reaches the
+     * reader's own handling of such files.
+     */
+    inline std::vector<BaseData::Pointer> ReadWithReaderIgnoringConfidence(const std::string& path,
+                                                                           const std::string& readerDescription)
+    {
+      CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+      FileReaderRegistry registry;
+      for (const auto& mimeType : mimeTypeProvider->GetMimeTypesForFile(path))
+      {
+        for (const auto& reference : FileReaderRegistry::GetReferences(mimeType))
+        {
+          if (reference.GetProperty(IFileReader::PROP_DESCRIPTION()).ToString() == readerDescription)
+          {
+            auto* reader = registry.GetReader(reference);
+            reader->SetInput(path);
+            return reader->Read();
+          }
+        }
+      }
+      CPPUNIT_FAIL("No reader \"" + readerDescription + "\" is registered for " + path);
+      return {};
+    }
+
+    /**
      * Rewrites the header of the attached NRRD file at path, leaving its data
      * untouched: edit receives the header lines and may change, add or remove
      * any of them. This turns a valid file into a malformed one.
@@ -329,6 +361,21 @@ namespace mitk
         output << line << '\n';
       output << '\n';
       output.write(content.data() + headerEnd + 2, content.size() - headerEnd - 2);
+    }
+
+    /** Reads a JSON file, e.g. the meta file of a segmentation stack, to inspect or edit it. */
+    inline nlohmann::json ReadJsonFile(const std::string& path)
+    {
+      std::ifstream input(path);
+      CPPUNIT_ASSERT_MESSAGE("Cannot open " + path, input.is_open());
+      return nlohmann::json::parse(input);
+    }
+
+    inline void WriteJsonFile(const std::string& path, const nlohmann::json& content)
+    {
+      std::ofstream output(path, std::ios::trunc);
+      CPPUNIT_ASSERT_MESSAGE("Cannot write " + path, output.is_open());
+      output << content.dump(2);
     }
 
     /** Replaces the value of the NRRD header field key (the part after ":="); fails if the key is absent. */

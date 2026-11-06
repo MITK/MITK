@@ -47,11 +47,13 @@ found in the LICENSE file.
 #include <vector>
 
 class QmitkMxNArrangeMode;
+struct QmitkMxNDynamicLayout;
 class QmitkRenderWindowProximity;
 struct QmitkMxN3DCameraState;
 class QDialog;
 class QLabel;
 class QProgressBar;
+class QShowEvent;
 class QSplitter;
 class QTimer;
 
@@ -115,15 +117,15 @@ enum class QmitkMxNLayoutLock
   Structure = 0x1,
   /** A cell's view direction through the cell's own chrome (context menu and
       plane label). Without 'Structure', the Layout Editor view can still change
-      directions through a grid change, a data-based layout or a layout load. */
+      directions through a grid change, a dynamic layout or a layout load. */
   Direction = 0x2,
   /** The proportions between cells through the splitter handles. Without
       'Structure', the Layout Editor view can still change them through a grid
-      change, a data-based layout or a layout load. */
+      change, a dynamic layout or a layout load. */
   Proportions = 0x4,
   /** The data a cell shows through the cell's own chrome (its node selection,
       which propagates to its selection group). Without 'Structure', the Layout
-      Editor view can still change content through a data-based layout or a
+      Editor view can still change content through a dynamic layout or a
       layout load. */
   Content = 0x8
 };
@@ -718,6 +720,20 @@ public:
   QString CellLabel(const QString& windowId) const;
 
   /**
+  * \brief Set or clear the display name of a window.
+  *
+  *   The name is the window's role in the layout; it is shown as the
+  *   window's title, on its sync plate and in the advanced matrix, and is
+  *   written back by 'SerializeLayout'. Leading and trailing white space is
+  *   removed; an empty result clears the name. Emits 'SyncLinksChanged' when
+  *   the name changes, so the sync surfaces refresh as for any other layout
+  *   cosmetic.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  void SetCellDisplayName(const QString& windowId, const QString& name);
+
+  /**
   * \brief Raise or lower the sync peek in every visible cell that can host it,
   *        emphasising 'axis' - or none of them without one, which is what the
   *        pointer resting on a barcode between two glyphs shows.
@@ -936,6 +952,12 @@ public:
   void SetLevelWindowReadoutVisible(bool visible);
 
   /**
+  * \brief Show or hide the window titles of every cell, including cells
+  *        created later. On by default. Clean view hides them regardless.
+  */
+  void SetWindowTitlesVisible(bool visible);
+
+  /**
   * \brief Per-cell navigator mode, mirrored editor-wide: compact (the slice
   *        slider only, the frequent action) or expanded (the full 3D
   *        crosshair as three axis sliders plus coordinate entry). "Show
@@ -1105,6 +1127,32 @@ public:
   nlohmann::json SerializeLayout() const;
 
   /**
+  * \brief Replace the layout with a dynamic layout and bind its data.
+  *
+  *   Validates the whole layout first, against the document and the data
+  *   storage, and throws before anything changes:
+  *   - every 'groupNodes' entry names a selection group the document
+  *     declares;
+  *   - every assignment and fit names a window of the document;
+  *   - lookup tables only go to windows the document links on LUT;
+  *   - volume renderings only go to 3D windows;
+  *   - every node is in the data storage.
+  *
+  *   Then it loads 'layout.document' as 'ApplyLayout' does. It makes every
+  *   bound group show exactly its nodes, drawn bottom to top in the given
+  *   order, writes the lookup tables (through 'SetLookupTable'), opacities
+  *   and volume renderings for the named windows' renderers, runs the fits,
+  *   and restores the global time step the fits reset. 'IsApplyingLayout' is
+  *   true throughout. Only renderer-specific properties are written. Nothing
+  *   throws after the document is loaded.
+  *
+  * \throws QmitkMxNLayoutBusyException and mitk::Exception as 'ApplyLayout'
+  *         does (from validation or loading), with the current layout
+  *         untouched by validation failures.
+  */
+  void ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout);
+
+  /**
   * \brief Plain-data summary of one cell leaf in the layout tree.
   *
   *   Holds the per-cell fields that the layout document persists for a
@@ -1208,8 +1256,10 @@ public:
   void ApplyLayout(const nlohmann::json& doc);
 
   /**
-  * \brief True while an 'ApplyLayout' is in progress, including its rollback on
-  *        failure, and while a layout load announced by
+  * \brief True while an 'ApplyLayout' or 'ApplyDynamicLayout' is in progress,
+  *        including its rollback on failure, while a grid change ('SetLayout',
+  *        'AddGridRow', 'AddGridColumn') lets the event loop lay out its new
+  *        cells, and while a layout load announced by
   *        'ShowLayoutLoadFeedback' has not yet been closed by
   *        'HideLayoutLoadFeedback'.
   *
@@ -1331,16 +1381,6 @@ public Q_SLOTS:
   */
   void SaveLayout(std::ostream* outStream);
 
-  /**
-  * \brief Replace the layout with one row per node, each row holding an axial,
-  *        a coronal and a sagittal window that show only that node.
-  *
-  *   Each row gets a selection group of its own. Unlike the cells of
-  *   'SetLayout' and the grid operations, the cells built here carry no
-  *   Windowing or LUT link, so a level/window or LUT change in one of them
-  *   writes the node's properties for every renderer.
-  */
-  void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
 Q_SIGNALS:
 
@@ -1428,6 +1468,9 @@ protected:
   */
   unsigned int GetOrientationApplyCount() const;
 
+  /** \brief Fits the cells whose fit was deferred while the editor was hidden. */
+  void showEvent(QShowEvent* event) override;
+
 private:
 
   void SetLayoutImpl() override;
@@ -1489,7 +1532,7 @@ private:
   *        'LayoutProportionsChanged' and make its children non-collapsible.
   *
   *        Splitters are created in several places (grid builder, layout
-  *        loader, data-based layout, grid operations), so the tree is walked
+  *        loader, grid operations), so the tree is walked
   *        after a structural change instead of wiring each construction
   *        site. The connection is unique, which makes re-walking idempotent,
   *        and the walk is by child index rather than findChildren so
@@ -1758,6 +1801,13 @@ private:
   void RemoveCellRendererProperties(const QString& windowId, std::initializer_list<const char*> propertyKeys);
 
   /**
+  * \brief Clear the whole renderer-specific property list of cell 'windowId'
+  *        on every node, for a cell that goes away: whatever was written for
+  *        its renderer would otherwise restyle the next cell under its id.
+  */
+  void ClearCellRendererProperties(const QString& windowId);
+
+  /**
   * \brief Shared member loop of 'SetLevelWindow' / 'AdjustLevelWindow':
   *        validate, resolve the cell's `Windowing` group, and run 'modify'
   *        on the level window of every target (renderer-specific for group
@@ -1827,6 +1877,71 @@ private:
   * \param zoomFactor The sender's zoom-in factor (> 1 magnifies).
   */
   void RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor);
+
+  /** \brief The body of 'ApplyLayout'; the caller holds the busy flag. */
+  void LoadLayoutDocument(const nlohmann::json& doc);
+
+  /** \brief The checks 'ApplyDynamicLayout' runs before it changes anything. */
+  void ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const;
+
+  /** \brief The bounding geometry, time included, of the data visible in
+  *          any cell; null when none is. */
+  mitk::TimeGeometry::ConstPointer ComputeShownTimeGeometry() const;
+
+  /** \brief Fit one cell, alone, to the data visible in it. */
+  void FitCellToVisibleData(const QString& windowId);
+
+  /**
+  * \brief Initialize every cell of the geometry-authority component of
+  *        'windowId' (see 'ReinitSyncGroupGeometry') to 'geometry', then
+  *        re-converge the component's geometry-relative groups.
+  */
+  void InitializeGeometryComponent(const QString& windowId, const mitk::TimeGeometry* geometry);
+
+  /**
+  * \brief Lay out the editor, then fit the camera of each cell of
+  *        'windowIds' to the size it is laid out to: a 2D cell's camera to
+  *        its plane, a 3D cell's view to its geometry.
+  *
+  *   For cells created since the event loop last ran. While the editor is
+  *   hidden, nothing can be laid out: the fit is deferred until it is shown,
+  *   and the zoom, pan and slice groups of the deferred cells then converge
+  *   again. The global time range and step are kept.
+  */
+  void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
+
+  /** \brief The deferred part of 'FitNewCellsToTheirSize', run once the
+  *          editor is shown. */
+  void FitCellsDeferredWhileHidden();
+
+  /**
+  * \brief Set the 2D members of the zoom group of 'sender' to the zoom of
+  *        'sender' and their offsets, within each member's zoom-out limit.
+  *        Members that already agree are left untouched.
+  */
+  void ConvergeZoomGroupToSender(const mitk::BaseRenderer* sender);
+
+  /**
+  * \brief The slice positions of the cells a crosshair gesture of 'sender'
+  *        can move: its 2D crosshair targets, the sender included, by
+  *        window id.
+  */
+  std::map<QString, unsigned int> SnapshotCrosshairTargetSlices(const mitk::BaseRenderer* sender) const;
+
+  /**
+  * \brief Converge the slice groups of the cells a crosshair gesture moved.
+  *
+  *   Core's crosshair relay puts each of its targets on the crosshair's
+  *   slice, without the scroll event that slice links relay, so a moved cell
+  *   would leave its slice group, and members on the crosshair would lose
+  *   their offsets. Each slice group with a moved target converges once,
+  *   anchored on one of its targets: the sender when it is a member, else
+  *   the first target in pre-order without a slice offset, else the first
+  *   moved target. A target counts as moved when its slice differs from
+  *   'before', the snapshot taken ahead of Core's relay.
+  */
+  void ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,
+                                      const std::map<QString, unsigned int>& before);
 
   /**
   * \brief Turn the members of an orientation group whose direction is 'Free'
@@ -2098,6 +2213,9 @@ private:
 
   /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
   bool m_ApplyingLayout = false;
+  /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
+  *          hidden; they are fitted once it is shown. */
+  std::vector<QString> m_CellsToFitWhenShown;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
   *          see 'IsApplyingLayout'. */
   bool m_LayoutLoadPending = false;
@@ -2111,6 +2229,9 @@ private:
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;
+
+  /** \brief Preference-backed visibility of the window titles. */
+  bool m_WindowTitlesVisible = true;
 
   /** \brief Editor-wide navigator mode (compact vs. expanded); the preference
    *         sets the default, the top-chrome toggle flips it live. Applied to

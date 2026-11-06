@@ -11,3 +11,7 @@ mitkAddCustomModuleTest(QmitkMultiLabelSelectionLabelTest QmitkMultiLabelSelecti
 mitkAddCustomModuleTest(QmitkMultiLabelInspectorTest QmitkMultiLabelInspectorTest
   -platform minimal
 )
+
+mitkAddCustomModuleTest(QmitkSlicesInterpolatorTest QmitkSlicesInterpolatorTest
+  -platform minimal
+)

@@ -38,12 +38,13 @@
 		<li> The grid controls in the row below it add or remove a trailing row or column in
 			place, which leaves the existing window views and their settings untouched.
 		<li> "Edit grid..." opens the picker for a rectangular grid of a chosen size ("Set multi
-			widget layout"), or for an arrangement derived from the loaded data ("Data-based
-			layout"). A new grid size re-flows the window views, in reading order, into a plain
+			widget layout"), or for a layout built from the selected data ("Dynamic layout...", see
+			\ref org_mitk_views_mxnlayouteditor_Dynamic). A new grid size re-flows the window views,
+			in reading order, into a plain
 			grid: window views beyond the new size are removed, additional ones are added at the
 			end with a sagittal view direction, and the others keep their settings,
 			synchronization and selected data.
-			A data-based layout replaces all window views and synchronization groups, so the
+			A dynamic layout replaces all window views and synchronization groups, so the
 			view asks for confirmation first when synchronization goes beyond the default: a
 			second group, any link other than the default group's windowing, LUT and data
 			selection, or a window view detached from windowing or LUT. The window arrangement
@@ -106,8 +107,7 @@
 			through the default group (see \ref org_mitk_editors_mxnmultiwidget_Sync_Group). A window
 			taken out of windowing or LUT synchronization drops its own value and shows the image's
 			global level/window or colormap again; its controls then behave like the classic global
-			controls. The windows of a data-based layout are the
-			exception: they start without windowing and LUT synchronization.
+			controls.
 	</ul>
 
 	Slice and orientation links also decide which windows share a reference geometry: every
@@ -175,6 +175,10 @@
 			expanded forms for every window at once (see \ref org_mitk_editors_mxnmultiwidget_Navigator)
 		<li> Crosshair button: Show or hide the crosshair in every window
 		<li> Clean-view button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
+		<li> Window title: the window's name, in the room the buttons and the barcode leave,
+			centered on the window where the title of the collapsed strip is (see
+			\ref org_mitk_editors_mxnmultiwidget_Readouts). It is shortened where that room is
+			small and left out where it is too small.
 		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
 			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
 			linked group's hue and left empty where the window is not synchronized. Pointing at one of its axis
@@ -244,6 +248,11 @@
 	A window view keeps navigation and intensity information on opposite sides so the
 	two never read as one. The always-on readouts are quiet and faint by default:
 	<ul>
+		<li> Top center: the window's title, its role in the layout ("Working plane",
+			"Overview"), right under the collapsed utility menu. Presets and layout files name
+			windows; "Rename window..." in the context menu changes the name. A window without a
+			name shows no title, and a window too narrow for a few characters hides it. When the
+			utility menu reveals, the title moves into it without changing its place.
 		<li> Bottom left (navigation): the view-plane label on the first line, and the
 			current <tt>slice/total</tt> on the second line. Time-resolved data adds a small
 			clock and <tt>time/total</tt> after the slice.
@@ -286,7 +295,8 @@
 	A right click into a window view (without dragging - the right-button gestures
 	keep working) opens a context menu with the view direction, entries that open the
 	data selection, the level/window entry and the coordinate entry, the sync actions
-	(re-converge, fit group views to visible data), the layout editor, and the toggles
+	(re-converge, fit group views to visible data), the layout editor, "Rename window..."
+	to set or clear the window's name, and the toggles
 	maximized, show crosshair, clean view and expanded navigator, which switch the same
 	state as the strip's maximize, crosshair, clean-view and navigator buttons. With the keyboard, the Menu key or Shift+F10 opens the same menu for the window
 	you last clicked into. Shift+F11 toggles clean view while you work in the editor.
@@ -464,7 +474,7 @@
 			Drag the bar's body to shift the level and its ends to move the window bounds.
 	</ul>
 	For a window in a windowing or LUT group - which every new window is, through the default
-	group, except the windows of a data-based layout - these controls drive every group member (each keeping its relative
+	group - these controls drive every group member (each keeping its relative
 	difference during drags) and leave other windows and the node-global values untouched;
 	the global level/window slider intentionally does not affect grouped windows. Only a
 	window taken out of windowing or LUT synchronization altogether behaves like the classic
@@ -486,12 +496,17 @@
 		<li> "Show level/window readout in render windows" (default on): keep the W/L readout
 			always visible; when off it follows the proximity reveal like the rest of the
 			furniture.
+		<li> "Show window titles" (default on): show each window's name at the top of the
+			window (see \ref org_mitk_editors_mxnmultiwidget_Readouts).
 		<li> "Expand the per-cell navigator by default" (default off): start each window's
 			navigator in its expanded form (the full crosshair plus coordinate entry) instead
 			of the compact slice slider. The navigator button still toggles the mode live for the
 			whole editor at any time.
 		<li> "Use PACS like mouse interaction" (default off): start in the PACS interaction
 			mouse mode (see \ref org_mitk_editors_mxnmultiwidget_Interaction_Mode).
+		<li> "Layout when opened" (default "One window"): the preset a newly opened MxN Display
+			starts with. Displays that other plugins add start with the layout their plugin
+			chooses, so their preference pages do not offer this choice.
 	</ul>
 
 */

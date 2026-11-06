@@ -32,8 +32,93 @@ found in the LICENSE file.
 
 // mitk qt widgets
 #include <QmitkIconTheme.h>
+#include <QmitkMxNCellOverlay.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
+
+#include <algorithm>
+#include <utility>
+
+/**
+ * The window title between the strip's controls and its barcode. It takes only
+ * the room they leave, but centres its text on the strip, which spans the cell:
+ * that is where the overlay puts the title while the strip is collapsed, so the
+ * title stays in place when the strip reveals.
+ */
+class QmitkRenderWindowUtilityWidget::TitleLabel : public QWidget
+{
+public:
+  explicit TitleLabel(QWidget* strip)
+    : QWidget(strip), m_Strip(strip)
+  {
+    this->setFont(QmitkMxNCellOverlay::TitleFont(strip->font()));
+    this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    this->setMinimumWidth(0);
+    this->setAttribute(Qt::WA_TransparentForMouseEvents);
+    this->setObjectName(QStringLiteral("WindowTitle"));
+  }
+
+  void SetText(const QString& text)
+  {
+    if (text != m_Text)
+    {
+      m_Text = text;
+      this->update();
+    }
+  }
+
+  void SetShown(bool shown)
+  {
+    if (shown != m_Shown)
+    {
+      m_Shown = shown;
+      this->update();
+    }
+  }
+
+  /** The text as painted and its rect in this widget; empty and invalid when none fits. */
+  std::pair<QString, QRect> Layout() const
+  {
+    if (!m_Shown || m_Text.isEmpty())
+    {
+      return {};
+    }
+    const QFontMetrics metrics(this->font());
+    const int centre = this->mapFrom(m_Strip, QPoint(m_Strip->width() / 2, 0)).x();
+    const int room = 2 * std::min(centre, this->width() - centre);
+    if (room < QmitkMxNCellOverlay::TitleMinimumCharacters * metrics.averageCharWidth())
+    {
+      return {};
+    }
+    const QString text = metrics.elidedText(m_Text, Qt::ElideRight, room);
+    const int width = metrics.horizontalAdvance(text);
+    const int height = metrics.height();
+    return { text, QRect(centre - width / 2, (this->height() - height) / 2, width, height) };
+  }
+
+  QSize sizeHint() const override
+  {
+    return QSize(0, QFontMetrics(this->font()).height());
+  }
+
+protected:
+  void paintEvent(QPaintEvent*) override
+  {
+    const auto [text, rect] = this->Layout();
+    if (!rect.isValid())
+    {
+      return;
+    }
+    QPainter painter(this);
+    painter.setPen(this->palette().color(QPalette::BrightText));
+    painter.drawText(rect, Qt::AlignCenter, text);
+  }
+
+private:
+  QWidget* m_Strip;
+  QString m_Text;
+  bool m_Shown = true;
+};
 
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent,
@@ -104,7 +189,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
     "QToolButton:hover { background: rgba(255, 255, 255, 26); }"
     "QToolButton:checked { background: rgba(255, 255, 255, 38); border-color: %1; }"
     "QToolButton:focus { border-color: %1; }"
-    "QToolButton::menu-indicator { image: none; }").arg(QmitkIconTheme::GetAccentColor()));
+    "QToolButton::menu-indicator { image: none; }"
+    // A style that gives plain widgets a background (the dark Workbench style
+    // does) would paint one behind the window title.
+    "QWidget#WindowTitle { background: transparent; }").arg(QmitkIconTheme::GetAccentColor()));
 
   m_DataButton = new QToolButton(this);
   m_DataButton->setAutoRaise(true);
@@ -178,8 +266,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   this->UpdateCleanViewIcon();
   layout->addWidget(m_CleanViewButton);
 
-  // The gap that separates the controls from the cell's state read-out.
-  layout->addStretch(1);
+  // The gap that separates the controls from the cell's state read-out holds
+  // the window title. Its room is whatever the controls and the barcode leave.
+  m_TitleLabel = new TitleLabel(this);
+  layout->addWidget(m_TitleLabel, 1);
 
   // Per-axis sync barcode for this cell; filled by the multi widget. The strip
   // doubles as the entry point to the layout editor. Parked behind the gap it
@@ -331,4 +421,25 @@ void QmitkRenderWindowUtilityWidget::SetDataSelectionVisible(bool visible)
     // it open, and the node selection inside applies picks immediately.
     m_DataMenu->hide();
   }
+}
+
+void QmitkRenderWindowUtilityWidget::SetTitle(const QString& title)
+{
+  m_TitleLabel->SetText(title);
+}
+
+void QmitkRenderWindowUtilityWidget::SetTitleVisible(bool visible)
+{
+  m_TitleLabel->SetShown(visible);
+}
+
+QString QmitkRenderWindowUtilityWidget::TitleText() const
+{
+  return m_TitleLabel->Layout().first;
+}
+
+QRect QmitkRenderWindowUtilityWidget::TitleRect() const
+{
+  const QRect rect = m_TitleLabel->Layout().second;
+  return rect.isValid() ? rect.translated(m_TitleLabel->pos()) : QRect();
 }

@@ -36,6 +36,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <optional>
+#include <utility>
 #include <vector>
 
 class QmitkMxNMultiWidget;
@@ -149,6 +150,29 @@ public:
    *        furniture instead of being always-on.
    */
   void SetReadoutVisible(bool visible);
+
+  /** \brief Follows 'QmitkMxNMultiWidget::SetWindowTitlesVisible'. */
+  void SetTitleVisible(bool visible);
+
+  /**
+  * \brief Where the collapsed-strip title is painted; invalid while it is
+  *        not painted (no name, revealed strip, clean view, titles off, or
+  *        less room than the minimum width). Public for headless tests, like
+  *        the other furniture rects.
+  */
+  QRect TitleRect() const;
+
+  /**
+  * \brief The font of the window title in both of its places, under the
+  *        collapsed strip and in the revealed utility strip: the readout font
+  *        of a widget whose font is 'baseFont'. One font for both keeps the
+  *        title from changing size when the strip reveals.
+  */
+  static QFont TitleFont(const QFont& baseFont);
+
+  /** \brief A title shows only where at least this many average characters
+   *         of its font fit. */
+  static constexpr int TitleMinimumCharacters = 4;
 
   /** \brief Clean-view mode: while set, the overlay paints none of the viewport
    *         furniture. In arrange mode the sync peek plate and the bumped frame
@@ -326,6 +350,11 @@ public:
    *         value refresh. Exposed for verification. */
   bool IsThreeD() const;
 
+  /** \brief The node the level/window readout, the colorbar and its colormap
+   *         picker act on, as of the last value refresh; null in a 3D cell or
+   *         while the cell shows no such image. Exposed for verification. */
+  mitk::DataNode* LevelWindowNode() const;
+
   /**
   * \brief Add the direction picker's entries to 'menu': the standard planes,
   *        'Free' for a 3D cell (disabled with the reason where the cell's
@@ -342,6 +371,14 @@ public:
   *        open a popup of their own reuse. Exposed for verification.
   */
   void PopulateContextMenu(QMenu* menu, const QPoint& globalPosition);
+
+  /**
+  * \brief Add the plate menu's entries for this cell to 'menu'; leaves it
+  *        empty while the editor cannot report its groups (a layout change
+  *        in progress), and 'OpenPlateMenu' then shows nothing. Exposed for
+  *        verification.
+  */
+  void PopulatePlateMenu(QMenu* menu);
 
 protected:
 
@@ -539,9 +576,17 @@ private:
   QColor SelectionColor() const;
 
   /** \brief The plate's menu: add the window (or the selection it belongs to)
-   *         to a group, remove it from one of the groups it is on, or clear the
-   *         selection. */
+   *         to a group, remove it from one of the groups it is on, rename it,
+   *         or clear the selection. */
   void OpenPlateMenu(const QPoint& globalPosition);
+
+  /** \brief The collapsed-strip title as painted, elided to its room, and its
+   *         rect; empty and invalid while it is not painted (see TitleRect). */
+  std::pair<QString, QRect> TitleLayout() const;
+
+  /** \brief Asks for a new display name for this cell, once the menu that
+   *         offered it has closed. */
+  void OpenRenameDialog();
 
   /** \brief Send a copy of the mouse or wheel 'event' (overlay coordinates)
    *         to the render window, mapped into its coordinates. */
@@ -586,7 +631,8 @@ private:
   /** \brief Re-read node, level/window, and LUT; repaint on change. */
   void RefreshValues();
 
-  /** \brief Topmost image node visible in this cell's renderer, or null. */
+  /** \brief Topmost image visible in this cell's renderer that is not binary
+   *         and has a level/window, or null. */
   mitk::DataNode::Pointer ResolveTopImageNode() const;
 
   void RebuildLutStrip();
@@ -657,6 +703,7 @@ private:
   QPointer<QPropertyAnimation> m_PeekAnimation;
 
   bool m_ReadoutVisible = true;
+  bool m_TitleVisible = true;
   bool m_CleanView = false;
   bool m_RefreshPending = false;
 

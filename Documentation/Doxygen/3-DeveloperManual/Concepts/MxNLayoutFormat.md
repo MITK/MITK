@@ -554,7 +554,7 @@ tolerated in both versions.
 
 - Normative schema: `Modules/QtWidgets/resource/mxn-layout-v3.schema.json`
   (v2.0 documents: `Modules/QtWidgets/resource/mxn-layout-v2.schema.json`)
-- Default in-tree preset: `Modules/QtWidgets/resource/mxnLayout_twoRowsEachDirection.json`
+- In-tree presets: `Modules/QtWidgets/resource/mxnLayout_*.json`
 - Migration script: `Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py`
 - Loader / serializer: `QmitkMxNMultiWidget::ApplyLayout` and
   `QmitkMxNMultiWidget::SerializeLayout`

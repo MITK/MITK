@@ -1,0 +1,73 @@
+{
+  "version": "3.0",
+  "name": "MPR + 3D",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "name": "Axial",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Sagittal",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ]
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Coronal",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "3D",
+            "view_direction": "coronal",
+            "render_mode": "3d",
+            "links": {
+              "selection": "main"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

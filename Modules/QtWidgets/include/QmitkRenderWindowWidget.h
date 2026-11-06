@@ -90,7 +90,12 @@ public:
   *   `GetWidgetName` via the editor-prefix strip).
   */
   const QString& GetDisplayName() const { return m_DisplayName; };
-  void SetDisplayName(const QString& displayName) { m_DisplayName = displayName; };
+
+  /**
+  * \brief Set the window's display name (its role in the layout; empty for
+  *        none). Emits 'DisplayNameChanged' when the name changes.
+  */
+  void SetDisplayName(const QString& displayName);
 
   mitk::SliceNavigationController* GetSliceNavigationController() const;
 
@@ -146,6 +151,11 @@ public:
 public Q_SLOTS:
 
   void OnResetGeometry();
+
+Q_SIGNALS:
+
+  /** \brief The display name changed; 'displayName' is the new one, empty for none. */
+  void DisplayNameChanged(const QString& displayName);
 
 protected:
 

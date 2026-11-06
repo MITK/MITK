@@ -6,4 +6,5 @@ set(MODULE_CUSTOM_TESTS
   QmitkMultiLabelTreeModelTest.cpp
   QmitkMultiLabelSelectionLabelTest.cpp
   QmitkMultiLabelInspectorTest.cpp
+  QmitkSlicesInterpolatorTest.cpp
 )

@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkSliceNavigationHelper.h>
+#include <mitkTransferFunctionProperty.h>
 #include <mitkVtkPropRenderer.h>
 
 // itk
@@ -36,9 +37,11 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
+#include <vtkVolumeMapper.h>
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxN3DCamera.h>
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellOverlay.h>
@@ -73,6 +76,7 @@ found in the LICENSE file.
 #include <limits>
 #include <numeric>
 #include <fstream>
+#include <utility>
 #include <vector>
 
 namespace
@@ -192,6 +196,48 @@ namespace
   bool IsThreeD(const mitk::BaseRenderer* renderer)
   {
     return nullptr != renderer && mitk::BaseRenderer::Standard3D == renderer->GetMapperID();
+  }
+
+  int ToVtkBlendMode(QmitkMxNVolumeBlendMode mode)
+  {
+    switch (mode)
+    {
+      case QmitkMxNVolumeBlendMode::Composite:        return vtkVolumeMapper::COMPOSITE_BLEND;
+      case QmitkMxNVolumeBlendMode::MaximumIntensity: return vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::MinimumIntensity: return vtkVolumeMapper::MINIMUM_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::AverageIntensity: return vtkVolumeMapper::AVERAGE_INTENSITY_BLEND;
+      case QmitkMxNVolumeBlendMode::Additive:         return vtkVolumeMapper::ADDITIVE_BLEND;
+    }
+    mitkThrow() << "ToVtkBlendMode: unsupported QmitkMxNVolumeBlendMode value.";
+  }
+
+  /** The nodes a fit bounds: not excluded from the bounding box and no
+   *  helper objects. Core's own reinit leaves helper objects in; a fit here
+   *  must not frame a crosshair or an interactor's handle. */
+  mitk::DataStorage::SetOfObjects::ConstPointer BoundingNodes(const mitk::DataStorage& dataStorage)
+  {
+    const auto includeInBoundingBox =
+      mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
+    const auto helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+    return dataStorage.GetSubset(mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(includeInBoundingBox),
+                                                             mitk::NodePredicateNot::New(helperObject)));
+  }
+
+  /** View initializations reset the application-global time: set it to
+   *  'timeGeometry' (null: leave it), and to 'timePoint' where that lies in it. */
+  void RestoreGlobalTime(mitk::TimeNavigationController* timeNavigation, const mitk::TimeGeometry* timeGeometry,
+                         mitk::TimePointType timePoint)
+  {
+    if (nullptr != timeGeometry && timeGeometry != timeNavigation->GetInputWorldTimeGeometry())
+    {
+      timeNavigation->SetInputWorldTimeGeometry(timeGeometry);
+      timeNavigation->Update();
+    }
+    const auto* current = timeNavigation->GetInputWorldTimeGeometry();
+    if (nullptr != current && current->IsValidTimePoint(timePoint))
+    {
+      timeNavigation->GetStepper()->SetPos(current->TimePointToTimeStep(timePoint));
+    }
   }
 
   mitk::BaseRenderer* RendererOf(const QmitkRenderWindowWidget* cell)
@@ -605,22 +651,39 @@ namespace
   }
 
   /**
-   * The synchronized display actions, plus a relay of the pan and zoom
-   * gestures of 2D cells to 3D cells, which Core's synchronized actions leave
-   * out. The relay takes the change the gesture actually made to the
-   * sender's camera, which Core's action may have clamped
-   * (ConstrainZoomingAndPanning): an observer connected before Core's action
-   * records the sender's camera, one connected after it compares. Observers
-   * of the broadcast run in the order they were connected.
+   * The synchronized display actions, plus what follows from a gesture that
+   * Core's synchronized actions leave out:
+   *   - the pan and zoom gestures of 2D cells reach 3D cells. The relay takes
+   *     the change the gesture actually made to the sender's camera, which
+   *     Core's action may have clamped (ConstrainZoomingAndPanning);
+   *   - the slice groups of the cells a crosshair gesture moved converge,
+   *     because Core's crosshair relay moves slices without the scroll event
+   *     that slice links relay;
+   *   - after a zoom gesture, the 2D members of the sender's zoom group are
+   *     set to the sender's zoom and their offsets. Core zooms every member
+   *     by the gesture's factor, which a member at its zoom-out limit does
+   *     not follow; the group's ratios would be lost from then on.
+   * Both compare a state recorded by an observer connected before Core's
+   * action with the state an observer connected after it sees. Observers of
+   * the broadcast run in the order they were connected.
    */
-  class ThreeDRelayingEventHandler : public mitk::DisplayActionEventHandlerSynchronized
+  class MxNSynchronizedEventHandler : public mitk::DisplayActionEventHandlerSynchronized
   {
   public:
     using Relay =
       std::function<void(const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)>;
+    using SliceSnapshot = std::map<QString, unsigned int>;
+    using SnapshotSlices = std::function<SliceSnapshot(const mitk::BaseRenderer* sender)>;
+    using ConvergeMovedSlices = std::function<void(const mitk::BaseRenderer* sender, const SliceSnapshot& before)>;
+    using ConvergeZoom = std::function<void(const mitk::BaseRenderer* sender)>;
 
-    ThreeDRelayingEventHandler(const Predicates& predicates, Relay relay)
-      : DisplayActionEventHandlerSynchronized(predicates), m_Relay(std::move(relay))
+    MxNSynchronizedEventHandler(const Predicates& predicates, Relay relay, SnapshotSlices snapshotSlices,
+                                ConvergeMovedSlices convergeMovedSlices, ConvergeZoom convergeZoom)
+      : DisplayActionEventHandlerSynchronized(predicates)
+      , m_Relay(std::move(relay))
+      , m_SnapshotSlices(std::move(snapshotSlices))
+      , m_ConvergeMovedSlices(std::move(convergeMovedSlices))
+      , m_ConvergeZoom(std::move(convergeZoom))
     {
     }
 
@@ -629,14 +692,36 @@ namespace
     {
       const auto record = [this](const itk::EventObject& event) { this->RecordSender(event); };
       const auto relay = [this](const itk::EventObject& event) { this->RelaySender(event); };
+      const auto recordSlices = [this](const itk::EventObject& event) { this->RecordSlices(event); };
+      const auto convergeSlices = [this](const itk::EventObject& event) { this->ConvergeSlices(event); };
       this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), record);
       this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), record);
+      this->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), recordSlices);
       DisplayActionEventHandlerSynchronized::InitActionsImpl(prefixFilter);
       this->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), relay);
       this->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), relay);
+      this->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), convergeSlices);
     }
 
   private:
+    void RecordSlices(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      m_SlicesBefore = nullptr != sender ? m_SnapshotSlices(sender) : SliceSnapshot();
+    }
+
+    void ConvergeSlices(const itk::EventObject& event)
+    {
+      const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
+      auto* sender = nullptr != displayEvent ? displayEvent->GetSender() : nullptr;
+      const auto before = std::exchange(m_SlicesBefore, SliceSnapshot());
+      if (nullptr != sender && !before.empty())
+      {
+        m_ConvergeMovedSlices(sender, before);
+      }
+    }
+
     void RecordSender(const itk::EventObject& event)
     {
       const auto* displayEvent = dynamic_cast<const mitk::DisplayActionEvent*>(&event);
@@ -669,6 +754,7 @@ namespace
       }
       else
       {
+        m_ConvergeZoom(sender);
         const double scaleAfter = sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
         if (scaleAfter <= 0.0)
         {
@@ -680,9 +766,13 @@ namespace
     }
 
     Relay m_Relay;
+    SnapshotSlices m_SnapshotSlices;
+    ConvergeMovedSlices m_ConvergeMovedSlices;
+    ConvergeZoom m_ConvergeZoom;
     const mitk::BaseRenderer* m_Sender = nullptr;
     mitk::Point2D m_PositionBefore;
     double m_ScaleBefore = 1.0;
+    SliceSnapshot m_SlicesBefore;
   };
 
 }  // namespace
@@ -886,7 +976,7 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
   // A reopened editor takes the same cell ids again.
   for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
   {
-    this->RemoveCellRendererProperties(windowId, { "levelwindow", "LookupTable" });
+    this->ClearCellRendererProperties(windowId);
     // The cells outlive this destructor (the base class releases them), but
     // their overlays query this editor; they go while it is still whole.
     delete cell->findChild<QmitkMxNCellOverlay*>();
@@ -897,13 +987,35 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 
 void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
 {
-  this->RemoveCellRendererProperties(widgetName, { "levelwindow", "LookupTable" });
   // Cell ids are reused; a new cell under this id starts canonical, with
-  // nothing remembered.
+  // nothing remembered - not its appearance either, which a dynamic layout
+  // writes beyond level/window and lookup table (opacity, volume rendering).
+  this->ClearCellRendererProperties(widgetName);
   m_FreeCells.erase(widgetName);
   m_SeenRenderModes.erase(widgetName);
   m_TwoDViews.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
+}
+
+void QmitkMxNMultiWidget::ClearCellRendererProperties(const QString& windowId)
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  const auto context = windowId.toStdString();
+  const auto nodes = dataStorage->GetAll();
+  for (const auto& node : *nodes)
+  {
+    const auto contexts = node->GetPropertyListNames();
+    // GetPropertyList would create the list of a context the node lacks.
+    if (std::find(contexts.begin(), contexts.end(), context) != contexts.end())
+    {
+      node->GetPropertyList(context)->Clear();
+    }
+  }
 }
 
 void QmitkMxNMultiWidget::RemoveCellRendererProperties(const QString& windowId,
@@ -964,10 +1076,22 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
   {
     return this->IsWindowingTarget(sender, target);
   };
-  auto handler = std::make_unique<ThreeDRelayingEventHandler>(predicates,
+  auto handler = std::make_unique<MxNSynchronizedEventHandler>(predicates,
     [this](const mitk::BaseRenderer* sender, const mitk::Vector2D& panVector, double zoomFactor)
     {
       this->RelayTwoDGestureToThreeD(sender, panVector, zoomFactor);
+    },
+    [this](const mitk::BaseRenderer* sender)
+    {
+      return this->SnapshotCrosshairTargetSlices(sender);
+    },
+    [this](const mitk::BaseRenderer* sender, const std::map<QString, unsigned int>& before)
+    {
+      this->ConvergeSlicesMovedByCrosshair(sender, before);
+    },
+    [this](const mitk::BaseRenderer* sender)
+    {
+      this->ConvergeZoomGroupToSender(sender);
     });
   this->SetDisplayActionEventHandler(std::move(handler));
 
@@ -1453,9 +1577,11 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   const int existingRenderWindowWidgets = this->GetRenderWindowWidgets().size();
 
   int difference = requiredRenderWindowWidgets - existingRenderWindowWidgets;
+  std::vector<QString> newCells;
   while (0 < difference)
   {
-    readingOrder.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
+    newCells.push_back(this->CreateRenderWindowWidget()->GetWidgetName());
+    readingOrder.push_back(newCells.back());
     --difference;
   }
 
@@ -1490,6 +1616,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   }
 
   this->BuildGridTree(readingOrder);
+  this->FitNewCellsToTheirSize(newCells);
 
   if (auto firstCell = this->FirstCellInReadingOrder())
   {
@@ -1600,8 +1727,16 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
+  cellOverlay->SetTitleVisible(m_WindowTitlesVisible);
   cellOverlay->SetCleanView(m_CleanView);
   cellOverlay->SetNavigatorExpanded(m_NavigatorExpanded);
+
+  // ApplyLayout names a cell after creating it, so the strip follows the name
+  // rather than reading it once.
+  utilityWidget->SetTitleVisible(m_WindowTitlesVisible);
+  utilityWidget->SetTitle(renderWindowWidget->GetDisplayName());
+  connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::DisplayNameChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetTitle);
 
   // The utility row auto-hides into a top-edge strip; approaching the top
   // reveals it as a floating panel, so the render window never resizes.
@@ -2108,6 +2243,7 @@ void QmitkMxNMultiWidget::AddGridColumn()
   // have columns+1 cells, later rows still columns). Nothing reads
   // ResolveGridShape mid-loop; the furniture refreshes once, on the
   // LayoutChanged that FinalizeGridSurgery emits.
+  std::vector<QString> newCells;
   for (int r = 0; r < rows; ++r)
   {
     auto* rowSplit = dynamic_cast<QSplitter*>(root->widget(r));
@@ -2115,8 +2251,10 @@ void QmitkMxNMultiWidget::AddGridColumn()
     rowSplit->addWidget(cell.get());
     cell->show();
     SizeNewTrailingChild(rowSplit);
+    newCells.push_back(cell->GetWidgetName());
   }
 
+  this->FitNewCellsToTheirSize(newCells);
   this->FinalizeGridSurgery();
 }
 
@@ -2176,17 +2314,20 @@ void QmitkMxNMultiWidget::AddGridRow()
   // identical to constructing with 'root' as parent, with the trailing
   // placement made explicit.
   auto* rowSplit = new QSplitter(Qt::Horizontal);
+  std::vector<QString> newCells;
   for (int c = 0; c < columns; ++c)
   {
     auto cell = this->CreateRenderWindowWidget();
     rowSplit->addWidget(cell.get());
     cell->show();
+    newCells.push_back(cell->GetWidgetName());
   }
   DistributeSplitterEvenly(rowSplit);
   root->addWidget(rowSplit);
   rowSplit->show();
   SizeNewTrailingChild(root);
 
+  this->FitNewCellsToTheirSize(newCells);
   this->FinalizeGridSurgery();
 }
 
@@ -2602,8 +2743,7 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
     {
       const auto type = child["type"].get<std::string>();
       // 'size' is optional; default weight 1 matches the schema default.
-      // Only the ratio between siblings matters at runtime - QSplitter
-      // redistributes weights proportionally on resize. PrewalkValidate has
+      // Only the ratio between siblings matters. PrewalkValidate has
       // rejected anything but an integer >= 1.
       sizes.append(child.value("size", 1));
 
@@ -2680,6 +2820,14 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJson(
     throw;
   }
 
+  // QSplitter takes sizes in pixels and raises each to its widget's minimum,
+  // so weights like 3:1 would come out about even. Scaled up they stay clear
+  // of any minimum, and the splitter keeps their ratio when it is laid out.
+  const double totalWeight = std::accumulate(sizes.begin(), sizes.end(), 0.0);
+  for (auto& size : sizes)
+  {
+    size = std::max(1, static_cast<int>(std::lround(size * 100000.0 / totalWeight)));
+  }
   split->setSizes(sizes);
   return split.release();
 }
@@ -2960,10 +3108,409 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     mitkThrowException(QmitkMxNLayoutBusyException)
       << "A layout is already being applied to this editor; retry once it has finished.";
   }
-  // Outside the try so the rollback in the handlers below, which pumps the
-  // event loop as well, still runs with the flag set.
+  // Outside the load so its rollback, which pumps the event loop as well,
+  // still runs with the flag set.
   const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  this->LoadLayoutDocument(doc);
+}
 
+void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout)
+{
+  if (m_ApplyingLayout)
+  {
+    mitkThrowException(QmitkMxNLayoutBusyException)
+      << "A layout is already being applied to this editor; retry once it has finished.";
+  }
+  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  this->ValidateDynamicLayout(layout);
+  // Every view initialization resets the global time step: the new cells'
+  // own on creation, and the fits below.
+  auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  const auto timePoint = timeNavigation->GetSelectedTimePoint();
+  this->LoadLayoutDocument(layout.document);
+
+  // Validated above, so a throw from here on is a defect; it must not leave a
+  // half-applied layout behind a caller that expects a clean failure.
+  const auto guarded = [](const char* step, const std::function<void()>& action)
+  {
+    try
+    {
+      action();
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Dynamic layout: " << step << " failed: " << e.GetDescription();
+    }
+  };
+
+  guarded("binding the selection groups", [this, &layout]()
+  {
+    for (const auto& [group, nodes] : layout.groupNodes)
+    {
+      const auto index = std::find_if(m_GroupNameByIndex.begin(), m_GroupNameByIndex.end(),
+                                      [&group = group](const auto& entry) { return entry.second == group; });
+      auto* connector = index != m_GroupNameByIndex.end() ? this->GetSyncGroupConnector(index->first) : nullptr;
+      if (nullptr == connector)
+      {
+        continue;
+      }
+      connector->ChangeSelectionMode(false);
+      connector->ChangeSelection(QmitkSynchronizedWidgetConnector::NodeList(nodes.begin(), nodes.end()));
+
+      // The selection group copies the node-global layers, so the order the
+      // layout asks for is written per renderer.
+      for (const auto& descriptor : this->ListWindowDescriptors())
+      {
+        if (descriptor.selectionGroup.toStdString() != group)
+        {
+          continue;
+        }
+        auto* renderer = RendererOf(this->GetRenderWindowWidget(descriptor.id).get());
+        for (std::size_t layer = 0; layer < nodes.size(); ++layer)
+        {
+          nodes[layer]->SetIntProperty("layer", static_cast<int>(layer), renderer);
+        }
+      }
+    }
+  });
+
+  guarded("writing the lookup tables", [this, &layout]()
+  {
+    for (const auto& assignment : layout.lookupTables)
+    {
+      auto lookupTable = mitk::LookupTable::New();
+      lookupTable->SetType(assignment.type);
+      this->SetLookupTable(assignment.windowId, assignment.node, lookupTable);
+    }
+  });
+
+  guarded("writing the opacities and volume renderings", [this, &layout]()
+  {
+    for (const auto& assignment : layout.opacities)
+    {
+      assignment.node->SetOpacity(assignment.opacity, RendererOf(this->GetRenderWindowWidget(assignment.windowId).get()));
+    }
+    for (const auto& assignment : layout.volumeRenderings)
+    {
+      auto* renderer = RendererOf(this->GetRenderWindowWidget(assignment.windowId).get());
+      assignment.node->SetBoolProperty("volumerendering", true, renderer);
+      assignment.node->SetIntProperty("volumerendering.blendmode", ToVtkBlendMode(assignment.blendMode), renderer);
+      assignment.node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(assignment.transferFunction),
+                                   renderer);
+    }
+  });
+
+  guarded("fitting the views", [this, &layout, timeNavigation, timePoint]()
+  {
+    for (const auto& fit : layout.fits)
+    {
+      if (fit.geometry.IsNotNull())
+      {
+        if (fit.wholeComponent)
+        {
+          this->InitializeGeometryComponent(fit.windowId, fit.geometry);
+        }
+        else
+        {
+          mitk::RenderingManager::GetInstance()->InitializeView(
+            this->GetRenderWindowWidget(fit.windowId)->GetRenderWindow()->GetVtkRenderWindow(), fit.geometry);
+        }
+      }
+      else if (fit.wholeComponent)
+      {
+        this->ReinitSyncGroupGeometry(fit.windowId);
+      }
+      else
+      {
+        this->FitCellToVisibleData(fit.windowId);
+      }
+    }
+    // Each fit set the global time to its own geometry; the layout replaced
+    // what the display shows, so the time covers all of that, as a global
+    // reinit does.
+    RestoreGlobalTime(timeNavigation, this->ComputeShownTimeGeometry(), timePoint);
+  });
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& layout) const
+{
+  struct WindowFacts
+  {
+    std::string selection;
+    bool threeD = false;
+    bool linkedOnLut = false;
+  };
+  // Shapes are the loader's to reject; a value of an unexpected shape only
+  // yields no fact here, and whatever relies on it fails the checks below.
+  const auto stringAt = [](const nlohmann::json& object, const char* key)
+  {
+    const auto it = object.find(key);
+    return object.end() != it && it->is_string() ? it->get<std::string>() : std::string();
+  };
+  std::map<QString, WindowFacts> windows;
+  std::function<void(const nlohmann::json&)> collect = [&windows, &collect, &stringAt](const nlohmann::json& node)
+  {
+    if (!node.is_object())
+    {
+      return;
+    }
+    if ("window" == stringAt(node, "type") && !stringAt(node, "id").empty())
+    {
+      WindowFacts facts;
+      const auto links = node.find("links");
+      if (node.end() != links && links->is_object())
+      {
+        if (const auto selection = links->find("selection"); links->end() != selection)
+        {
+          facts.selection = selection->is_object() ? stringAt(*selection, "target")
+                                                   : stringAt(*links, "selection");
+        }
+        facts.linkedOnLut = links->contains("lut");
+      }
+      facts.threeD = "3d" == stringAt(node, "render_mode");
+      windows[QString::fromStdString(stringAt(node, "id"))] = facts;
+    }
+    if (node.contains("children") && node.at("children").is_array())
+    {
+      for (const auto& child : node.at("children"))
+      {
+        collect(child);
+      }
+    }
+  };
+  if (layout.document.is_object() && layout.document.contains("root"))
+  {
+    collect(layout.document.at("root"));
+  }
+
+  const auto groups = layout.document.is_object() ? layout.document.value("groups", nlohmann::json::object())
+                                                  : nlohmann::json::object();
+  const auto* dataStorage = this->GetDataStorage();
+  const auto checkNode = [dataStorage](const mitk::DataNode::Pointer& node, const std::string& where)
+  {
+    if (node.IsNull() || nullptr == dataStorage || !dataStorage->Exists(node))
+    {
+      mitkThrow() << "ApplyDynamicLayout: " << where << " names a node that is not in the data storage.";
+    }
+  };
+  const auto checkWindow = [&windows](const QString& windowId, const std::string& where) -> const WindowFacts&
+  {
+    const auto it = windows.find(windowId);
+    if (it == windows.end())
+    {
+      mitkThrow() << "ApplyDynamicLayout: " << where << " names window '" << windowId.toStdString()
+                  << "', which the document does not have.";
+    }
+    return it->second;
+  };
+
+  for (const auto& [group, nodes] : layout.groupNodes)
+  {
+    const bool isSelectionGroup = std::any_of(windows.begin(), windows.end(),
+                                              [&group = group](const auto& entry) { return entry.second.selection == group; });
+    if (!groups.contains(group) || !isSelectionGroup)
+    {
+      mitkThrow() << "ApplyDynamicLayout: the data of group '" << group
+                  << "' is bound to no selection group the document declares.";
+    }
+    for (const auto& node : nodes)
+    {
+      checkNode(node, "group '" + group + "'");
+    }
+  }
+  for (const auto& assignment : layout.lookupTables)
+  {
+    if (!checkWindow(assignment.windowId, "a lookup table").linkedOnLut)
+    {
+      mitkThrow() << "ApplyDynamicLayout: a lookup table goes to window '" << assignment.windowId.toStdString()
+                  << "', which the document does not link on 'lut'.";
+    }
+    checkNode(assignment.node, "a lookup table");
+  }
+  for (const auto& assignment : layout.opacities)
+  {
+    checkWindow(assignment.windowId, "an opacity");
+    checkNode(assignment.node, "an opacity");
+  }
+  for (const auto& assignment : layout.volumeRenderings)
+  {
+    if (!checkWindow(assignment.windowId, "a volume rendering").threeD)
+    {
+      mitkThrow() << "ApplyDynamicLayout: a volume rendering goes to window '" << assignment.windowId.toStdString()
+                  << "', which is not a 3D window.";
+    }
+    if (assignment.transferFunction.IsNull())
+    {
+      mitkThrow() << "ApplyDynamicLayout: the volume rendering of window '" << assignment.windowId.toStdString()
+                  << "' has no transfer function.";
+    }
+    checkNode(assignment.node, "a volume rendering");
+  }
+  for (const auto& fit : layout.fits)
+  {
+    checkWindow(fit.windowId, "a fit");
+  }
+}
+
+void QmitkMxNMultiWidget::FitCellToVisibleData(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == widget || nullptr == dataStorage)
+  {
+    return;
+  }
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(BoundingNodes(*dataStorage), "visible",
+                                                             RendererOf(widget.get()));
+  if (bounds.IsNotNull())
+  {
+    mitk::RenderingManager::GetInstance()->InitializeView(widget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+  }
+}
+
+mitk::TimeGeometry::ConstPointer QmitkMxNMultiWidget::ComputeShownTimeGeometry() const
+{
+  const auto* dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return nullptr;
+  }
+  std::vector<const mitk::BaseRenderer*> renderers;
+  for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    renderers.push_back(RendererOf(cell.get()));
+  }
+  auto shown = mitk::DataStorage::SetOfObjects::New();
+  // Held: a range-for over the dereferenced temporary iterates a freed set.
+  const auto candidates = BoundingNodes(*dataStorage);
+  for (const auto& node : *candidates)
+  {
+    if (std::any_of(renderers.begin(), renderers.end(),
+                    [&node](const mitk::BaseRenderer* renderer) { return node->IsVisible(renderer); }))
+    {
+      shown->push_back(node);
+    }
+  }
+  return dataStorage->ComputeBoundingGeometry3D(shown);
+}
+
+void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& windowIds)
+{
+  if (windowIds.empty())
+  {
+    return;
+  }
+  if (!this->isVisible())
+  {
+    // A hidden editor is not laid out; its cells get their size when shown.
+    for (const auto& windowId : windowIds)
+    {
+      if (std::find(m_CellsToFitWhenShown.begin(), m_CellsToFitWhenShown.end(), windowId)
+          == m_CellsToFitWhenShown.end())
+      {
+        m_CellsToFitWhenShown.push_back(windowId);
+      }
+    }
+    return;
+  }
+  // A cell fits its camera when it is constructed, before it is laid out.
+  // Core narrows a fit when a window shrinks but never widens it, so a cell
+  // laid out narrower than it was constructed would show its plane cut off at
+  // the sides. One pass of the event loop lays the new cells out; user input
+  // stays excluded, as while the load feedback is shown. The pass also
+  // delivers queued calls, which must find the editor busy, as during a load,
+  // so they do not rebuild the cells under the running operation. Not held
+  // longer: the operation's LayoutChanged handlers skip their refresh while
+  // the editor is busy.
+  {
+    const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  }
+
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  auto* timeNavigation = renderingManager->GetTimeNavigationController();
+  // A repair of the cells' cameras; the time it found stays.
+  const mitk::TimeGeometry::ConstPointer timeGeometry = timeNavigation->GetInputWorldTimeGeometry();
+  const auto timePoint = timeNavigation->GetSelectedTimePoint();
+  for (const auto& windowId : windowIds)
+  {
+    const auto cell = this->GetRenderWindowWidget(windowId);
+    auto* renderer = RendererOf(cell.get());
+    if (nullptr == renderer)
+    {
+      continue;
+    }
+    if (IsThreeD(renderer))
+    {
+      // A cell turned 3D while it was built still has the camera of its 2D
+      // construction. It gets the view initialization a cell switched to 3D
+      // later gets; the editor applies its direction afterwards.
+      const auto* geometry = cell->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+      if (nullptr != geometry)
+      {
+        renderingManager->InitializeView(cell->GetRenderWindow()->GetVtkRenderWindow(), geometry, true);
+      }
+    }
+    else if (nullptr != renderer->GetCurrentWorldPlaneGeometry())
+    {
+      // The camera only: slice and time step stay as the construction set them.
+      renderer->GetCameraController()->Fit();
+      renderingManager->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
+    }
+  }
+  RestoreGlobalTime(timeNavigation, timeGeometry, timePoint);
+}
+
+void QmitkMxNMultiWidget::showEvent(QShowEvent* event)
+{
+  QmitkAbstractMultiWidget::showEvent(event);
+  if (!m_CellsToFitWhenShown.empty())
+  {
+    // Queued: the fit lets the event loop lay the cells out, which must not
+    // run inside this event.
+    QTimer::singleShot(0, this, [this]() { this->FitCellsDeferredWhileHidden(); });
+  }
+}
+
+void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
+{
+  // A running layout operation fits the cells it builds itself; the cells
+  // deferred before it stay pending for the next show.
+  if (this->IsApplyingLayout())
+  {
+    return;
+  }
+  std::vector<QString> windowIds;
+  for (const auto& windowId : std::exchange(m_CellsToFitWhenShown, {}))
+  {
+    // Cells may have gone, e.g. with a layout applied in the meantime.
+    if (nullptr != this->GetRenderWindowWidget(windowId))
+    {
+      windowIds.push_back(windowId);
+    }
+  }
+  this->FitNewCellsToTheirSize(windowIds);
+  if (!this->isVisible())
+  {
+    return;  // Hidden again: deferred once more.
+  }
+  // The links converged while the cells still had their construction camera;
+  // the deferred cells adapt to the members that kept theirs, and a group
+  // made only of them to its seed - as after a fit while shown.
+  try
+  {
+    this->ReconvergeGeometryRelativeGroups(windowIds);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "MxN display: re-converging after the deferred fit failed: " << e.GetDescription();
+  }
+}
+
+void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
+{
   // 'didMutate' guards rollback. As long as we are in the validation phase
   // (no engine state touched yet) a throw must rethrow without rolling back,
   // so a malformed document does not destroy the user's existing layout.
@@ -3210,6 +3757,14 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(rootSplitter);
     this->StepLayoutLoadFeedback(LoadPercentCellsEnd, tr("Linking synchronization groups"));
+    // Before the links: the members of a zoom or pan group converge to their
+    // seed's camera, so the seed's fit has to be final.
+    std::vector<QString> newCells;
+    for ([[maybe_unused]] const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+    {
+      newCells.push_back(windowId);
+    }
+    this->FitNewCellsToTheirSize(newCells);
 
     // ----- Group seeding pass + divergence detection -----
     // Make the seed cell of each group authoritative for the group's runtime
@@ -3335,73 +3890,6 @@ void QmitkMxNMultiWidget::ApplyLayoutLocksToCell(QmitkRenderWindowWidget& cell)
 QmitkMxNLayoutLocks QmitkMxNMultiWidget::GetLayoutLocks() const
 {
   return m_LayoutLocks;
-}
-
-void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
-{
-  // Tear the existing cell tree down first rather than recycling 'widget<i>'
-  // cells by positional index: after a layout with custom ids is loaded,
-  // those lookups return null, new cells are appended while the custom-named
-  // ones stay in the map, and both are then deleted twice by
-  // 'delete this->layout()'. Mirroring 'ApplyLayout's structure (tear down,
-  // allocate groups, build fresh) works whatever the prior naming scheme.
-  this->ResetGridState();
-  this->TearDownAllCells();
-
-  auto vSplit = new QSplitter(Qt::Vertical);
-
-  unsigned int rowCounter = 0;
-  unsigned int cellCounter = 0;
-  for (auto node : nodes)
-  {
-    rowCounter++;
-    // Pre-create the row's synchronization group via the canonical API so that
-    // its connector and hue exist before SetSyncGroup() binds cells to it.
-    this->AddSynchronizationGroup(rowCounter);
-
-    auto hSplit = new QSplitter(Qt::Horizontal);
-    for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
-    {
-      // Use the explicit-id overload (which leaves cells unattached) and
-      // place each cell directly into its row group via the canonical API,
-      // mirroring ApplyLayout. Avoids the churn of the positional overload's
-      // initial seeding into group 1 followed by an immediate move.
-      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER
-                      + QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(id, viewPlane);
-      this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
-
-      auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
-      node->SetVisibility(true, baseRenderer);
-      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());
-      hSplit->addWidget(window.get());
-      window->show();
-    }
-
-    auto* const rowConnector = this->GetSyncGroupConnector(rowCounter);
-    rowConnector->ChangeSelectionMode(false);
-    rowConnector->ChangeSelection(QList({ node }));
-
-    auto sizes = QList<int>({1, 1, 1});
-    hSplit->setSizes(sizes);
-    vSplit->addWidget(hSplit);
-  }
-
-  auto hBoxLayout = new QHBoxLayout(this);
-  this->setLayout(hBoxLayout);
-  hBoxLayout->addWidget(vSplit);
-
-  // Deterministic active-cell assignment after rebuild. ResetGridState()
-  // nulled out the previous active pointer; without this the editor would
-  // be left with a null active cell until the user clicks one.
-  if (auto firstCell = this->FirstCellInReadingOrder())
-  {
-    this->SetActiveRenderWindowWidget(firstCell);
-  }
-
-  this->EnableCrosshair();
-  this->ConfigureLayoutSplitters();
-  emit LayoutChanged();
 }
 
 void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name)
@@ -4911,6 +5399,134 @@ void QmitkMxNMultiWidget::RelayTwoDGestureToThreeD(const mitk::BaseRenderer* sen
   }
 }
 
+void QmitkMxNMultiWidget::ConvergeZoomGroupToSender(const mitk::BaseRenderer* sender)
+{
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto link = this->GetSyncLink(senderId, QmitkMxNSyncDimension::Zoom);
+  if (!link.has_value())
+  {
+    return;
+  }
+  const double referenceHalfHeight =
+    sender->GetVtkRenderer()->GetActiveCamera()->GetParallelScale() * std::get<double>(link->offset);
+
+  for (const auto& [memberId, member] : this->GetRenderWindowWidgets())
+  {
+    auto* memberRenderer = RendererOf(member.get());
+    const auto memberLink = this->GetSyncLink(memberId, QmitkMxNSyncDimension::Zoom);
+    // 3D members follow the gesture through the 2D-to-3D relay.
+    if (memberId == senderId || !memberLink.has_value() || memberLink->group != link->group
+        || nullptr == memberRenderer || IsThreeD(memberRenderer)
+        || nullptr == memberRenderer->GetCurrentWorldGeometry())
+    {
+      continue;
+    }
+    auto* camera = memberRenderer->GetVtkRenderer()->GetActiveCamera();
+    const double targetHalfHeight = referenceHalfHeight / std::get<double>(memberLink->offset);
+    if (std::abs(camera->GetParallelScale() - targetHalfHeight) <= 1e-9 * targetHalfHeight)
+    {
+      continue;
+    }
+    camera->SetParallelScale(targetHalfHeight);
+    // Within the member's zoom-out limit, as Core's own zoom keeps it; the
+    // ratio returns once the sender zooms back in.
+    memberRenderer->GetCameraController()->AdjustCameraToPlane();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(member->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+std::map<QString, unsigned int> QmitkMxNMultiWidget::SnapshotCrosshairTargetSlices(
+  const mitk::BaseRenderer* sender) const
+{
+  std::map<QString, unsigned int> slices;
+  for (const auto& [windowId, cell] : this->GetRenderWindowWidgets())
+  {
+    auto* renderer = RendererOf(cell.get());
+    // Core's crosshair relay moves 2D cells only.
+    if (nullptr == renderer || mitk::BaseRenderer::Standard2D != renderer->GetMapperID()
+        || !this->IsNavTarget(QmitkMxNSyncDimension::Crosshair, sender, renderer))
+    {
+      continue;
+    }
+    slices.emplace(windowId, renderer->GetSliceNavigationController()->GetStepper()->GetPos());
+  }
+  return slices;
+}
+
+void QmitkMxNMultiWidget::ConvergeSlicesMovedByCrosshair(const mitk::BaseRenderer* sender,
+                                                         const std::map<QString, unsigned int>& before)
+{
+  // Runs on every crosshair move; the walk below only matters for a
+  // crosshair target in a slice group.
+  if (std::none_of(before.begin(), before.end(), [this](const auto& target) {
+        return this->GetSyncLink(target.first, QmitkMxNSyncDimension::Slice).has_value();
+      }))
+  {
+    return;
+  }
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  try
+  {
+    struct GroupMembers
+    {
+      std::string group;
+      QString sender;
+      QString firstWithoutOffset;
+      QString firstMoved;
+    };
+    std::vector<GroupMembers> groups;
+    for (const auto& descriptor : this->ListWindowDescriptors())
+    {
+      const auto slice = before.find(descriptor.id);
+      const auto link = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Slice);
+      if (slice == before.end() || !link.has_value())
+      {
+        continue;
+      }
+      auto members = std::find_if(groups.begin(), groups.end(),
+                                  [&link](const auto& entry) { return entry.group == link->group; });
+      if (members == groups.end())
+      {
+        members = groups.insert(groups.end(), GroupMembers{ link->group, {}, {}, {} });
+      }
+      if (descriptor.id == senderId)
+      {
+        members->sender = descriptor.id;
+      }
+      if (0 == std::get<int>(link->offset) && members->firstWithoutOffset.isEmpty())
+      {
+        members->firstWithoutOffset = descriptor.id;
+      }
+      auto* renderer = RendererOf(this->GetRenderWindowWidget(descriptor.id).get());
+      if (renderer->GetSliceNavigationController()->GetStepper()->GetPos() != slice->second
+          && members->firstMoved.isEmpty())
+      {
+        members->firstMoved = descriptor.id;
+      }
+    }
+
+    for (const auto& members : groups)
+    {
+      if (members.firstMoved.isEmpty())
+      {
+        continue;
+      }
+      // Core's relay put every member it reached on the crosshair's slice. The
+      // anchor is the member meant to show that slice: the sender, where the
+      // user clicked, else a member showing the group's reference slice.
+      const auto& anchorId = !members.sender.isEmpty()               ? members.sender
+                             : !members.firstWithoutOffset.isEmpty() ? members.firstWithoutOffset
+                                                                     : members.firstMoved;
+      this->ConvergeSyncGroupToAnchor(QmitkMxNSyncDimension::Slice, members.group, anchorId);
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    // This runs inside the interaction broadcast, which must not see a throw.
+    MITK_WARN << "Crosshair move: slice groups not converged: " << e.GetDescription();
+  }
+}
+
 void QmitkMxNMultiWidget::OnThreeDCameraRotated(const QString& windowId)
 {
   ViewDirectionNotifier notifier(this);
@@ -5168,18 +5784,14 @@ void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
   }
   auto* triggerRenderer = mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow());
 
-  // The bounding geometry a single-cell reinit would compute (nodes not
-  // excluded from the bounding box, non-helper), evaluated with the
-  // triggering cell's visibility - "last reinit wins" for the component.
-  const auto includeInBoundingBox =
-    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
-  const auto helperObject =
-    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  const auto predicate = mitk::NodePredicateAnd::New(
-    mitk::NodePredicateNot::New(includeInBoundingBox), mitk::NodePredicateNot::New(helperObject));
-  const auto filteredNodes = dataStorage->GetSubset(predicate);
-  const auto bounds = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", triggerRenderer);
+  // Evaluated with the triggering cell's visibility - "last reinit wins" for
+  // the component.
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(BoundingNodes(*dataStorage), "visible", triggerRenderer);
+  this->InitializeGeometryComponent(windowId, bounds);
+}
 
+void QmitkMxNMultiWidget::InitializeGeometryComponent(const QString& windowId, const mitk::TimeGeometry* geometry)
+{
   const auto component = this->ComputeGeometryComponent(windowId);
   for (const auto& memberId : component)
   {
@@ -5187,7 +5799,7 @@ void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
     if (nullptr != memberWidget)
     {
       mitk::RenderingManager::GetInstance()->InitializeView(
-        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), geometry);
     }
   }
   this->ReconvergeGeometryRelativeGroups(component);
@@ -5384,6 +5996,23 @@ void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
           QString(), Qt::FindDirectChildrenOnly))
     {
       cellOverlay->SetReadoutVisible(visible);
+    }
+  }
+}
+
+void QmitkMxNMultiWidget::SetWindowTitlesVisible(bool visible)
+{
+  m_WindowTitlesVisible = visible;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetTitleVisible(visible);
+    }
+    if (auto* utilityWidget = renderWindowWidget->GetUtilityWidget(); nullptr != utilityWidget)
+    {
+      utilityWidget->SetTitleVisible(visible);
     }
   }
 }
@@ -5829,6 +6458,23 @@ std::string QmitkMxNMultiWidget::ResolveCellAxisGroup(const QString& windowId, Q
     return link->group;
   }
   return std::string();
+}
+
+void QmitkMxNMultiWidget::SetCellDisplayName(const QString& windowId, const QString& name)
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell)
+  {
+    mitkThrow() << "SetCellDisplayName: unknown window '" << windowId.toStdString() << "'.";
+  }
+
+  const auto displayName = name.trimmed();
+  if (displayName == cell->GetDisplayName())
+  {
+    return;
+  }
+  cell->SetDisplayName(displayName);
+  emit SyncLinksChanged();
 }
 
 QString QmitkMxNMultiWidget::CellLabel(const QString& windowId) const

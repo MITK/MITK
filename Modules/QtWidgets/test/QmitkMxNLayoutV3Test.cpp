@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxN3DCamera.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
@@ -25,6 +26,7 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 
 #include <vtkCamera.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -38,9 +40,13 @@ found in the LICENSE file.
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QEvent>
+#include <QResizeEvent>
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -97,6 +103,14 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3Doc_ThreeDWindows_Load);
   MITK_TEST(InTreeV3Documents_Load);
   MITK_TEST(Apply_WithDataLoaded_CellsShowTheirDeclaredDirection);
+  MITK_TEST(Apply_NarrowWindow_ShowsItsWholePlane);
+  MITK_TEST(SetLayout_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(AddGridColumn_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
+  MITK_TEST(Apply_WhileHidden_EndsAsAppliedWhileShown);
+  MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
+  MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
+  MITK_TEST(Apply_ThreeDWindow_FramesTheData);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -800,11 +814,15 @@ public:
   {
     std::vector<std::pair<std::string, nlohmann::json>> documents;
 
-    const auto resource =
-      us::ModuleRegistry::GetModule("MitkQtWidgets")->GetResource("mxnLayout_twoRowsEachDirection.json");
-    CPPUNIT_ASSERT(resource.IsValid());
-    us::ModuleResourceStream resourceStream(resource);
-    documents.emplace_back("mxnLayout_twoRowsEachDirection.json", nlohmann::json::parse(resourceStream));
+    // Every shipped preset, found the way the layout selection widget finds them.
+    const auto presets =
+      us::ModuleRegistry::GetModule("MitkQtWidgets")->FindResources("/", "mxnLayout_*.json", false);
+    CPPUNIT_ASSERT_MESSAGE("The module ships presets", !presets.empty());
+    for (const auto& resource : presets)
+    {
+      us::ModuleResourceStream resourceStream(resource);
+      documents.emplace_back(resource.GetName(), nlohmann::json::parse(resourceStream));
+    }
 
     const auto schema = ReadJson(MITK_MXN_LAYOUT_V3_SCHEMA_PATH);
     for (const auto& example : schema.at("examples"))
@@ -899,6 +917,326 @@ public:
       }
     }
   }
+
+  /**
+   * Stands in for the GL widget, which never sizes its VTK window headless:
+   * every render window's VTK window takes the size the window is laid out to.
+   */
+  class VtkSizeFollowsWidget : public QObject
+  {
+  public:
+    VtkSizeFollowsWidget()
+    {
+      QCoreApplication::instance()->installEventFilter(this);
+    }
+    ~VtkSizeFollowsWidget() override
+    {
+      QCoreApplication::instance()->removeEventFilter(this);
+    }
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+      if (QEvent::Resize == event->type())
+      {
+        if (auto* renderWindow = qobject_cast<QmitkRenderWindow*>(watched))
+        {
+          const auto size = static_cast<QResizeEvent*>(event)->size();
+          renderWindow->GetVtkRenderWindow()->SetSize(size.width(), size.height());
+        }
+      }
+      return false;
+    }
+  };
+
+  /** A 16 x 16 mm axial plane: a fit to its height has a half-height of 8 mm. */
+  void AddSquareImage()
+  {
+    auto imageNode = mitk::DataNode::New();
+    imageNode->SetName("image");
+    imageNode->SetData(mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f));
+    imageNode->SetIntProperty("layer", 2);
+    m_DataStorage->Add(imageNode);
+  }
+
+  /** The half-height at which the cell shows its whole plane and no more. */
+  static double FittedHalfHeight(mitk::BaseRenderer* renderer)
+  {
+    const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
+    const double widthInMM = plane->GetExtentInMM(0);
+    double heightInMM = plane->GetExtentInMM(1);
+    const double displayWidth = renderer->GetViewportSize()[0];
+    const double displayHeight = renderer->GetViewportSize()[1];
+    if (displayWidth / widthInMM < displayHeight / heightInMM)
+    {
+      heightInMM = widthInMM / displayWidth * displayHeight;
+    }
+    return heightInMM * 0.5;
+  }
+
+  static void AssertShowsWholePlane(const QmitkMxNMultiWidget& editor, const QString& windowId)
+  {
+    auto* renderer = mitk::BaseRenderer::GetInstance(
+      editor.GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The window shows its whole plane (" + windowId.toStdString() + ")",
+                                         FittedHalfHeight(renderer),
+                                         renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_NarrowWindow_ShowsItsWholePlane()
+  {
+    // A cell fits its camera when it is constructed, before the editor has laid
+    // it out. Core narrows a fit when a window shrinks but never widens it, so
+    // a window laid out narrower than it was constructed would show its plane
+    // cut off at the sides. The wide window is the control.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    editor->show();
+    Pump();
+    const VtkSizeFollowsWidget vtkSizes;
+
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+      ] }
+    })json"));
+    Pump();
+
+    auto* narrow = mitk::BaseRenderer::GetInstance(
+      editor->GetRenderWindowWidget("mxn__narrow")->GetRenderWindow()->GetVtkRenderWindow());
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the narrow window is fitted to its width", FittedHalfHeight(narrow) > 8.5);
+    AssertShowsWholePlane(*editor, "mxn__narrow");
+    AssertShowsWholePlane(*editor, "mxn__wide");
+  }
+
+  static std::vector<QString> WindowIds(const QmitkMxNMultiWidget& editor)
+  {
+    std::vector<QString> ids;
+    for ([[maybe_unused]] const auto& [windowId, cell] : editor.GetRenderWindowWidgets())
+    {
+      ids.push_back(windowId);
+    }
+    return ids;
+  }
+
+  /** A cell that already existed keeps its zoom; only the new ones are checked. */
+  static void AssertNewWindowsShowTheirWholePlane(const QmitkMxNMultiWidget& editor,
+                                                  const std::vector<QString>& existing)
+  {
+    const auto ids = WindowIds(editor);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: windows were added", ids.size() > existing.size());
+    for (const auto& windowId : ids)
+    {
+      if (std::find(existing.begin(), existing.end(), windowId) == existing.end())
+      {
+        AssertShowsWholePlane(editor, windowId);
+      }
+    }
+  }
+
+  /** A shown editor of the given size, holding the square image. */
+  std::unique_ptr<QmitkMxNMultiWidget> MakeShownEditor(int width, int height)
+  {
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(width, height);
+    editor->show();
+    Pump();
+    return editor;
+  }
+
+  void SetLayout_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // The grid picker's new cells are constructed before they are laid out,
+    // like a loaded layout's.
+    auto editor = MakeShownEditor(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    const auto existing = WindowIds(*editor);
+
+    editor->SetLayout(1, 4);
+    Pump();
+
+    CPPUNIT_ASSERT_EQUAL(4u, editor->GetNumberOfRenderWindowWidgets());
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
+  }
+
+  void AddGridColumn_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // A column added to a narrow editor makes windows taller than wide.
+    auto editor = MakeShownEditor(400, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    const auto existing = WindowIds(*editor);
+
+    editor->AddGridColumn();
+    Pump();
+
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
+  }
+
+  void AddGridRow_NarrowNewWindows_ShowTheirWholePlane()
+  {
+    // A row added to a tall editor makes windows taller than wide.
+    auto editor = MakeShownEditor(300, 900);
+    const VtkSizeFollowsWidget vtkSizes;
+    const auto existing = WindowIds(*editor);
+
+    editor->AddGridRow();
+    Pump();
+
+    AssertNewWindowsShowTheirWholePlane(*editor, existing);
+  }
+
+  /** The cameras' parallel scales after applying 'doc' to an editor that is
+   *  shown before or only after the layout is applied. */
+  std::map<QString, double> ParallelScalesAfterApplying(const nlohmann::json& doc, bool shownBefore)
+  {
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    if (shownBefore)
+    {
+      editor->show();
+      Pump();
+    }
+    editor->ApplyLayout(doc);
+    editor->show();
+    Pump();
+
+    std::map<QString, double> scales;
+    for (const auto& windowId : WindowIds(*editor))
+    {
+      auto* renderer = mitk::BaseRenderer::GetInstance(
+        editor->GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow());
+      scales[windowId] = renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+    }
+    return scales;
+  }
+
+  void Apply_WhileHidden_EndsAsAppliedWhileShown()
+  {
+    // A layout can reach a display before it is shown: an editor's initial
+    // layout, a preset applied on opening, a call while the editor's tab is
+    // hidden. The windows must end as if it had been applied while shown -
+    // fitted to their size, a zoom group converged on its seed.
+    AddSquareImage();
+    for (const bool zoomGroup : { false, true })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "version": "3.0",
+        "root": { "type": "split", "orientation": "horizontal", "children": [
+          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+        ] }
+      })json");
+      if (zoomGroup)
+      {
+        doc["root"]["children"][0]["links"]["zoom"] = "z";
+        doc["root"]["children"][1]["links"]["zoom"] = "z";
+      }
+      const std::string where = zoomGroup ? " (zoom group)" : " (no zoom group)";
+
+      const auto shown = this->ParallelScalesAfterApplying(doc, true);
+      const auto hidden = this->ParallelScalesAfterApplying(doc, false);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The same windows" + where, shown.size(), hidden.size());
+      for (const auto& [windowId, scale] : shown)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera of " + windowId.toStdString() + where, scale,
+                                             hidden.at(windowId), 1e-6);
+      }
+    }
+  }
+
+  void GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy()
+  {
+    // The fit of new cells pumps the event loop to lay them out. A queued
+    // call it delivers - a REST request, say - must find the editor busy,
+    // as during a layout load, or it could rebuild the cell tree under the
+    // running operation.
+    auto editor = MakeShownEditor(900, 600);
+    auto* widget = editor.get();
+    const std::pair<std::string, std::function<void()>> operations[] = {
+      { "SetLayout", [widget]() { widget->SetLayout(1, 3); } },
+      { "AddGridColumn", [widget]() { widget->AddGridColumn(); } },
+      { "AddGridRow", [widget]() { widget->AddGridRow(); } } };
+    for (const auto& [name, operation] : operations)
+    {
+      bool ran = false;
+      bool busy = false;
+      QMetaObject::invokeMethod(widget, [widget, &ran, &busy]() {
+        ran = true;
+        busy = widget->IsApplyingLayout();
+      }, Qt::QueuedConnection);
+      operation();
+      CPPUNIT_ASSERT_MESSAGE("Fixture: " + name + " delivers the queued call", ran);
+      CPPUNIT_ASSERT_MESSAGE("The queued call finds the editor busy during " + name, busy);
+      Pump();
+    }
+  }
+
+  void Apply_DeclaredSizes_SetTheProportions()
+  {
+    // Sizes are weights: only their ratio counts, however small they are.
+    auto editor = MakeEditor();
+    editor->resize(1200, 600);
+    editor->show();
+    Pump();
+
+    for (const int scale : { 1, 100 })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "version": "3.0",
+        "root": { "type": "split", "orientation": "horizontal", "children": [
+          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "split", "orientation": "vertical", "children": [
+            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main" } },
+            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main" } }
+          ] }
+        ] }
+      })json");
+      doc["root"]["children"][0]["size"] = 3 * scale;
+      doc["root"]["children"][1]["size"] = 1 * scale;
+      editor->ApplyLayout(doc);
+      Pump();
+
+      const double large = editor->GetRenderWindowWidget("mxn__large")->width();
+      const double top = editor->GetRenderWindowWidget("mxn__top")->width();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Weights 3:1 at scale " + std::to_string(scale), 3.0, large / top, 0.1);
+    }
+  }
+
+  void Apply_ThreeDWindow_FramesTheData()
+  {
+    // Every cell is constructed as 2D, with a camera hundreds of meters away
+    // from its plane. A window the layout declares 3D must be initialized like
+    // a cell switched to 3D later; kept, that camera shows nothing.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    editor->show();
+    Pump();
+    const VtkSizeFollowsWidget vtkSizes;
+
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
+          "links": { "selection": "main" } }
+      ] }
+    })json"));
+    Pump();
+
+    auto* renderer = mitk::BaseRenderer::GetInstance(
+      editor->GetRenderWindowWidget("mxn__volume")->GetRenderWindow()->GetVtkRenderWindow());
+    const double halfHeight = QmitkMxN3DCamera::VisibleHalfHeight(renderer->GetVtkRenderer()->GetActiveCamera());
+    CPPUNIT_ASSERT_MESSAGE("The 3D window frames the 16 mm image; it shows a half-height of "
+                             + std::to_string(halfHeight) + " mm",
+                           halfHeight < 100.0);
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkMxNLayoutV3)

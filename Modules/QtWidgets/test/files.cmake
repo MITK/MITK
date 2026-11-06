@@ -25,12 +25,16 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNNavLinksTest.cpp
   QmitkMxNLayoutEditorWidgetTest.cpp
   QmitkMxNArrangeModeTest.cpp
+  QmitkMxNCellNameTest.cpp
   QmitkMxNCellOverlayTest.cpp
+  QmitkMxNDynamicLayoutDialogTest.cpp
+  QmitkMxNDynamicLayoutTest.cpp
   QmitkMxNNavigatorTest.cpp
+  QmitkMxNPresetsTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNSyncPeekTest.cpp
-  QmitkMxNDataBasedLayoutTest.cpp
+  QmitkMxNUtilityStripTest.cpp
   QmitkRenderWindowProximityTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
   QmitkRunInputBlockingTest.cpp

@@ -94,9 +94,12 @@
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="dataBasedLayoutButton">
+    <widget class="QPushButton" name="dynamicLayoutButton">
+     <property name="toolTip">
+      <string>Build a layout from the selected data: its windows, their synchronization and the data each one shows</string>
+     </property>
      <property name="text">
-      <string>Data-based layout</string>
+      <string>Dynamic layout...</string>
      </property>
     </widget>
    </item>

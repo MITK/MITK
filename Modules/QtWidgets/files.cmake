@@ -11,7 +11,6 @@ set(CPP_FILES
   QmitkAbstractMultiWidget.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkApplicationCursor.cpp
-  QmitkAutomatedLayoutWidget.cpp
   QmitkDataStorageComboBox.cpp
   QmitkDataStorageDefaultListModel.cpp
   QmitkDataStorageHistoryModel.cpp
@@ -76,9 +75,12 @@ set(CPP_FILES
   QmitkMxNArrangeMode.cpp
   QmitkMxNAxisGlyph.cpp
   QmitkMxNCellOverlay.cpp
+  QmitkMxNDynamicLayout.cpp
+  QmitkMxNDynamicLayoutDialog.cpp
   QmitkMxNGroupJoinMode.cpp
   QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
+  QmitkMxNPresets.cpp
   QmitkMxNSyncBarcodeWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
@@ -105,7 +107,6 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  QmitkAutomatedLayoutWidget.ui
   QmitkFileReaderOptionsDialog.ui
   QmitkFileWriterOptionsDialog.ui
   QmitkLevelWindowPresetDefinition.ui
@@ -129,7 +130,14 @@ set(UI_FILES
 )
 
 set(RESOURCE_FILES
-  mxnLayout_twoRowsEachDirection.json
+  mxnLayout_01_mprAnd3d.json
+  mxnLayout_02_focusContext.json
+  mxnLayout_03_twoLooks.json
+  mxnLayout_04_lightbox.json
+  mxnLayout_05_sliceContext.json
+  mxnLayout_06_2dAnd3d.json
+  mxnLayout_07_3dThreeSides.json
+  mxnLayout_08_overviewDetail.json
 )
 
 set(QRC_FILES

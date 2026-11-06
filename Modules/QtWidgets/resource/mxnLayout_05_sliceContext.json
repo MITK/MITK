@@ -1,0 +1,110 @@
+{
+  "version": "3.0",
+  "name": "Slice context",
+  "groups": {
+    "main": {
+      "select_all": true
+    },
+    "ctx": {
+      "name": "Slice context"
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "name": "Previous slice",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "ctx",
+                "offset": -1
+              },
+              "zoom": "ctx",
+              "pan": "ctx",
+              "windowing": "main",
+              "lut": "main"
+            },
+            "size": 2
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "name": "Working slice",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": "ctx",
+              "zoom": "ctx",
+              "pan": "ctx",
+              "windowing": "main",
+              "lut": "main"
+            },
+            "size": 3
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "name": "Next slice",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "ctx",
+                "offset": 1
+              },
+              "zoom": "ctx",
+              "pan": "ctx",
+              "windowing": "main",
+              "lut": "main"
+            },
+            "size": 2
+          }
+        ],
+        "size": 3
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "name": "Context 1",
+            "view_direction": "sagittal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget4",
+            "name": "Context 2",
+            "view_direction": "coronal",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ],
+        "size": 2
+      }
+    ]
+  }
+}

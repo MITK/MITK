@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMxNDynamicLayout.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkMxNSyncDimension.h>
 #include <QmitkRenderWindow.h>
@@ -77,7 +78,7 @@ class QmitkMxNGridOpsTestSuite : public mitk::TestFixture
   MITK_TEST(Maximize_RemoveGridColumnRestoresTheGrid);
   MITK_TEST(Maximize_AddGridRowRestoresTheGrid);
   MITK_TEST(Maximize_RemoveGridRowRestoresTheGrid);
-  MITK_TEST(Maximize_DataBasedLayoutRestoresTheGrid);
+  MITK_TEST(Maximize_DynamicLayoutRestoresTheGrid);
   MITK_TEST(Maximize_RejectedDocumentKeepsTheMaximize);
   MITK_TEST(Maximize_LegacyLayoutDesignSignalCannotRebuildTheTree);
   MITK_TEST(Collapse_CollapsedCellRoundTrips);
@@ -543,10 +544,10 @@ public:
     }
   }
 
-  void Maximize_DataBasedLayoutRestoresTheGrid()
+  void Maximize_DynamicLayoutRestoresTheGrid()
   {
-    // SetDataBasedLayout reinitializes each window to the node's geometry, so
-    // the node must carry real image data.
+    // A dynamic layout fits its windows to the node's geometry, so the node
+    // must carry real image data.
     auto image = mitk::DataNode::New();
     image->SetName("image");
     image->SetData(mitk::ImageGenerator::GenerateGradientImage<unsigned char>(8, 8, 8));
@@ -557,10 +558,12 @@ public:
     m_Editor->SetMaximizedCell(CellId(0));
 
     // The rebuild frees every splitter the maximize recorded sizes for.
-    m_Editor->SetDataBasedLayout(QList<mitk::DataNode::Pointer>{ image });
+    m_Editor->ApplyDynamicLayout(QmitkMxNDynamicLayouts::Generate(
+      { { QmitkMxNSlot::Datasets, { image } } }, QmitkMxNDatasetsByPlanesOptions{}, m_Editor->GetMultiWidgetName(), 1.0,
+      *m_DataStorage));
     QCoreApplication::processEvents();
 
-    CPPUNIT_ASSERT_MESSAGE("A data-based layout drops the maximized state",
+    CPPUNIT_ASSERT_MESSAGE("A dynamic layout drops the maximized state",
                            m_Editor->GetMaximizedCell().isEmpty());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("One image, three view directions -> three visible windows",
                                  3, this->VisibleCellCount());

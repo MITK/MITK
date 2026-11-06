@@ -35,7 +35,9 @@
 \section org_mitk_views_mxnlayouteditor_Layout The layout row
 	The <b>Layout</b> row at the top of the view acts on the layout document as a whole:
 	<ul>
-		<li> <b>Presets</b> applies one of the arrangements that ship with MITK.
+		<li> <b>Presets</b> applies one of the arrangements that ship with MITK. Its last entry,
+			<b>Dynamic layout...</b>, builds a layout from the loaded data instead (see
+			\ref org_mitk_views_mxnlayouteditor_Dynamic).
 		<li> <b>Load...</b> replaces the current layout with one read from a layout file
 			(see \ref org_mitk_editors_mxnmultiwidget_LayoutFile).
 		<li> <b>Save...</b> writes the current layout to a file. A saved layout carries the
@@ -43,7 +45,7 @@
 			a change made purely on the synchronization side is kept.
 	</ul>
 
-	Applying a preset, a file or a data-based arrangement replaces the window arrangement
+	Applying a preset, a file or a dynamic layout replaces the window arrangement
 	and discards the current synchronization groups, so the view asks for confirmation
 	first when synchronization goes beyond the default: a second group, any link other
 	than the default group's windowing, LUT and data selection, or a window detached from
@@ -53,13 +55,166 @@
 	The grid of the arrangement is edited in the row below: the row and column buttons
 	add or remove a trailing row or column in place, which leaves the existing windows
 	and their settings untouched, while <b>Edit grid...</b> opens the picker for a grid of
-	a chosen size or for an arrangement derived from the loaded data.
+	a chosen size or for a dynamic layout (see \ref org_mitk_views_mxnlayouteditor_Dynamic).
 
-	A new grid size keeps the remaining windows and their synchronization; a data-based
-	arrangement replaces all windows and synchronization groups and is confirmed like a
-	preset. Its windows are not linked on windowing or LUT, so a fresh data-based
-	arrangement already counts as synchronization beyond the default, and applying a
-	preset or a file over it asks for confirmation as well.
+	A new grid size keeps the remaining windows and their synchronization; a dynamic layout
+	replaces all windows and synchronization groups and is confirmed like a preset.
+
+\subsection org_mitk_views_mxnlayouteditor_Presets Presets
+	A preset is a starting point for one way of working: it sets up the windows, their
+	names and their synchronization, and all of it can be changed afterwards. Every window
+	of a preset shows all data, and its name is its title in the display (see
+	\ref org_mitk_editors_mxnmultiwidget_Readouts).
+
+	<b>MPR + 3D.</b> Axial, sagittal and coronal windows that share the crosshair, the
+	level/window and the colormap, and a 3D window. The arrangement of the Standard Display,
+	as a starting point that can be grown.
+
+	\imageMacroEx{QmitkMxN_Preset_MprAnd3D.png, "The MPR + 3D preset", 16, 720px}
+
+	<b>Focus + context.</b> One large axial working plane, and beside it two small context
+	planes (sagittal and coronal) on the same crosshair, level/window and colormap, and a
+	"3D check" that zooms with the working plane. For manual segmentation, annotation and
+	reading, which happen in one plane; a 2x2 grid would spend three quarters of the screen
+	on aids.
+
+	\imageMacroEx{QmitkMxN_Preset_FocusContext.png, "The Focus + context preset", 16, 720px}
+
+	<b>Same data, two looks.</b> Two rows of axial, sagittal and coronal windows. All six
+	share the crosshair, each column shares slice, zoom and pan, and each row has a
+	level/window and colormap of its own ("Look A" and "Look B"). For the lung and the
+	soft-tissue window of one CT side by side, or a parametric map in gray and in color.
+	Curating the data selection of the "Look B" group shows a second dataset below the
+	first.
+
+	\imageMacroEx{QmitkMxN_Preset_TwoLooks.png, "The Same data\, two looks preset", 16, 720px}
+
+	<b>Lightbox 3x3.</b> Nine axial windows that share the crosshair, zoom, pan,
+	level/window and colormap and show nine consecutive slices: their slice offsets run
+	from -4 to +4 in reading order, so scrolling any of them, or setting the crosshair in
+	one, moves the whole sheet. "Ramp" in the <b>Advanced</b> matrix sets larger steps. The
+	film sheet, for figures, quality control and teaching.
+
+	\imageMacroEx{QmitkMxN_Preset_Lightbox.png, "The Lightbox 3x3 preset", 16, 720px}
+
+	<b>Slice context.</b> The working slice with the previous and the next slice beside
+	it, all axial and sharing zoom and pan, above a sagittal and a coronal context window,
+	all five on one crosshair. For manual segmentation and delineation: whether a structure
+	continues, splits or ends shows in the neighboring slices. A click in a context window
+	puts the working slice where the crosshair is, and the previous and next slices follow.
+
+	\imageMacroEx{QmitkMxN_Preset_SliceContext.png, "The Slice context preset", 16, 720px}
+
+	<b>2D | 3D.</b> An axial window to edit in and a "3D check" that zooms with it: the
+	simplest view of what a segmentation looks like in 3D while it is edited, and one that
+	suits a small screen.
+
+	\imageMacroEx{QmitkMxN_Preset_2DAnd3D.png, "The 2D | 3D preset", 16, 720px}
+
+	<b>3D from three sides.</b> 3D windows looking from the coronal, sagittal and axial
+	directions, and one that is turned freely, all zoomed and panned together. For shape
+	quality control and surgical planning, which need several standard views at one scale.
+	Each window keeps its direction: turning the free window does not turn the others.
+
+	\imageMacroEx{QmitkMxN_Preset_3DThreeSides.png, "The 3D from three sides preset", 16, 720px}
+
+	<b>Overview + detail.</b> A narrow overview beside a wide detail window on the same
+	slice, crosshair and pan, with the detail zoomed four times as far: a live minimap for
+	work on small structures.
+
+	\imageMacroEx{QmitkMxN_Preset_OverviewDetail.png, "The Overview + detail preset", 16, 720px}
+
+	Things to know:
+	<ul>
+		<li> A jump to a position that comes from outside the display - the Image Navigator,
+			a label's position chosen in the Segmentation view, resetting the views - puts all
+			windows of "Slice context" and "Lightbox 3x3" on one slice. "Re-converge sync groups"
+			in a window's context menu restores their offsets.
+		<li> The first window of a slice group keeps the slice the display shows when the
+			preset is applied, and the others take their offsets from it. The middle window of
+			"Lightbox 3x3" therefore starts four slices after that slice, and the working slice of
+			"Slice context" one slice after it.
+		<li> 3D windows show segmentations, surfaces and volume renderings; on a plain image
+			they stay empty.
+		<li> Each 3D window of "3D from three sides" looks from one side of its axis only; the
+			free window shows the others.
+		<li> Zooming at the pointer moves the centers of "Overview + detail" apart;
+			"Re-converge sync groups" brings them back together.
+	</ul>
+
+\subsection org_mitk_views_mxnlayouteditor_Dynamic Dynamic layouts
+	A dynamic layout is built from the data it is to show: its windows, their
+	synchronization and the data every window shows. <b>Dynamic layout...</b>, the last entry
+	of the <b>Presets</b> menu and a button in the <b>Edit grid...</b> picker, opens a dialog
+	with four templates; the menu entry is available as soon as an image is loaded. Select
+	the data in the Data Manager first: the dialog fills the template's data slots from that
+	selection, in
+	the order the Data Manager reports it, and sets the options from the data. Everything
+	can be changed there; an option you set keeps your choice while you change the data,
+	and switching the template starts it afresh. <b>Apply</b> stays disabled, with a line
+	naming the missing data, until every slot holds what it needs. Applying replaces the
+	layout like a preset and asks for the same confirmation.
+
+	The options follow the data's structure. Datasets count as aligned when they have
+	identical geometry, and only aligned datasets share navigation. DICOM tags only refine
+	that: one Frame of Reference counts as aligned too, the Modality chooses the roles and
+	the look of a fusion, and acquisition dates order the datasets. Data without DICOM tags
+	gets the same layouts.
+
+	A dataset is an image together with the segmentations, surfaces, point sets and masks
+	derived from it. Every window that shows a dataset shows all of them; an image derived
+	from another one is a dataset of its own.
+
+	<b>Datasets x planes.</b> Up to four datasets, one row each, with an axial, a sagittal
+	and a coronal window and, when a dataset has a segmentation or a surface, a 3D window.
+	The windows of a dataset share the crosshair, the level/window and the colormap. Aligned
+	datasets share the crosshair across the rows as well, and every plane shares slice,
+	zoom and pan with the same plane of the other datasets. "Datasets as columns" turns the
+	rows into columns.
+
+	<b>One view per dataset.</b> Two to sixteen datasets, one window each, in a grid shaped
+	to the display. Aligned datasets share slice, zoom, pan and the crosshair; every window
+	keeps its image's own level/window. The view is axial, sagittal, coronal, or 3D when
+	every dataset has a segmentation or a surface - the 3D windows then turn and zoom
+	together. When every dataset has an acquisition date, the earliest comes first.
+
+	<b>Shared base, varying segmentation.</b> One image and up to four segmentations (here
+	also masks, surfaces or point sets): one axial window per segmentation, showing the
+	image with that segmentation, optionally a last window with all of them, and a row of
+	3D windows under them when one is a segmentation or a surface. All windows share the
+	crosshair, slice, zoom and pan, and the image's level/window and colormap. The image is
+	the selected one, or the one the selected segmentations derive from; the segmentations
+	are the selected ones, or those of the image. Images are not taken as segmentations:
+	to see a map such as ADC or PET on top of an image, use the fusion pair.
+
+	<b>Fusion pair.</b> An anatomy and a fused image, typically CT and PET: an axial and a
+	coronal row with the anatomy, the fused image and the fusion of both, all on one
+	crosshair, and a maximum intensity projection (MIP) of the fused image. "Swap roles"
+	exchanges the two images. With the Modality tag, the CT is the anatomy and the PT the
+	fused image, and a fused image that is not a PT gets hot iron and no MIP window. With
+	the PET colour colormap, the fused column shows the PET in inverted gray. Both images
+	keep their own level/window, so the anatomy looks the same alone and under the fusion.
+
+	Things to know:
+	<ul>
+		<li> The fusion opacity is set per window. The Data Manager's opacity slider does not
+			reach the fusion windows; the Properties view, which edits a window's own values,
+			does, and so does applying the layout again.
+		<li> The MIP window shows the fused image's level/window range as it was when the layout
+			was applied: transparent at the lower bound, opaque at the upper one. The curve is
+			the window's own, so the Volume Visualization view does not change it; applying the
+			layout again takes the current level/window.
+		<li> The windows of a dataset show the planes its image was acquired in, also for an
+			oblique series. Aligned datasets of different extents, such as a CT and a PET with a
+			longer scan range, are shown along the world axes, in a frame that holds all of them.
+		<li> Data created later from a bound image appears in every window that shows that
+			image: a new segmentation of the shared image or of the anatomy appears in every
+			column.
+		<li> A layout file keeps the windows and their synchronization, not which data the
+			windows show: a saved dynamic layout reloads with every window showing all data.
+		<li> Under a mask, the level/window readout and colorbar of a window act on the image
+			below; the right-drag windowing gesture does not reach it yet.
+	</ul>
 
 \section org_mitk_views_mxnlayouteditor_Arrange Arranging the windows
 	While the MxN Layout Editor is visible, its MxN display is in <i>arrange mode</i>:
@@ -127,6 +282,10 @@
 	The plate under the pointer carries two buttons in its top-right corner: the menu
 	button (three dots) opens the plate menu, which a right-click on the plate opens as
 	well, and the close button ends arrange mode.
+
+	Besides adding to and removing from groups, the plate menu offers "Rename window...",
+	which sets the name shown on the plate and as the window's title. An empty name
+	removes it. The name is saved with the layout.
 
 \subsection org_mitk_views_mxnlayouteditor_ArrangeLimits Limits
 	<ul>

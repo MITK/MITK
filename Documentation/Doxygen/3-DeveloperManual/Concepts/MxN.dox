@@ -155,7 +155,7 @@ A lock withdraws one aspect from users:
    would also change the cell's selection group.
 
 Only `structure` keeps the MxN Layout Editor view away. The other three locks cover the
-cell's own controls; while `structure` is unlocked, the view's grid changes, data-based
+cell's own controls; while `structure` is unlocked, the view's grid changes, dynamic
 layouts and layout loads still replace directions, proportions and content. Lock
 `structure` as well when these must stay fixed.
 

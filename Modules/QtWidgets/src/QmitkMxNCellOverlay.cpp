@@ -52,6 +52,8 @@ found in the LICENSE file.
 #include <QFrame>
 #include <QGuiApplication>
 #include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
@@ -388,6 +390,14 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
     this->update();
   });
 
+  // A layout load names the cell only after this overlay exists, and a rename
+  // changes the name later; the title and its share of the mask follow.
+  connect(cell, &QmitkRenderWindowWidget::DisplayNameChanged, this, [this]()
+  {
+    this->UpdateInteractivity();
+    this->update();
+  });
+
   // The plane label shows the direction; a direction change need not render.
   connect(m_Editor, &QmitkMxNMultiWidget::ViewDirectionChanged, this, [this](const QString& windowId)
   {
@@ -500,6 +510,57 @@ void QmitkMxNCellOverlay::SetReadoutVisible(bool visible)
   m_ReadoutVisible = visible;
   this->UpdateInteractivity();
   this->update();
+}
+
+void QmitkMxNCellOverlay::SetTitleVisible(bool visible)
+{
+  if (visible == m_TitleVisible)
+  {
+    return;
+  }
+
+  m_TitleVisible = visible;
+  this->UpdateInteractivity();
+  this->update();
+}
+
+QFont QmitkMxNCellOverlay::TitleFont(const QFont& baseFont)
+{
+  return ReadoutFont(baseFont);
+}
+
+std::pair<QString, QRect> QmitkMxNCellOverlay::TitleLayout() const
+{
+  // While the frame is revealed, the utility strip shows the title.
+  const QString name = m_Cell->GetDisplayName();
+  if (!m_TitleVisible || m_CleanView || m_FrameRevealed || name.isEmpty())
+  {
+    return {};
+  }
+
+  const QRect area = m_Cell->contentsRect();
+  const QFontMetrics metrics(TitleFont(this->font()));
+  const int room = area.width() - 2 * ReadoutMargin;
+  if (room < TitleMinimumCharacters * metrics.averageCharWidth())
+  {
+    return {};
+  }
+  const QString title = metrics.elidedText(name, Qt::ElideRight, room);
+
+  // On the revealed strip's centre line, where the strip centres its own
+  // title, so that the title does not move when the strip reveals. The strip
+  // spans the cell's contents, and its height is its size hint.
+  const auto* strip = m_Cell->GetUtilityWidget();
+  const int height = metrics.height();
+  const int top = nullptr != strip ? area.top() + (strip->sizeHint().height() - height) / 2
+                                   : area.top() + TopStripHeight;
+  const int width = metrics.horizontalAdvance(title);
+  return { title, QRect(area.left() + area.width() / 2 - width / 2, top, width, height) };
+}
+
+QRect QmitkMxNCellOverlay::TitleRect() const
+{
+  return this->TitleLayout().second;
 }
 
 void QmitkMxNCellOverlay::SetCleanView(bool cleanView)
@@ -991,6 +1052,11 @@ bool QmitkMxNCellOverlay::IsThreeD() const
   return m_ThreeD;
 }
 
+mitk::DataNode* QmitkMxNCellOverlay::LevelWindowNode() const
+{
+  return m_TopNode;
+}
+
 void QmitkMxNCellOverlay::SetNavigatorExpanded(bool expanded)
 {
   if (expanded == m_NavigatorExpanded)
@@ -1390,6 +1456,9 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
     }
   }
   mask += QRect(0, 0, this->width(), TopStripHeight);
+  // Masked while it is painted, at no cost to image interaction: the pointer
+  // reveals the strip, which hides this title, before it gets this close.
+  mask += this->TitleRect();
 
   // This mask clips painting as well as input, and the cell whose barcode is
   // being pointed at is normally masked (the strip sits at the trailing edge,
@@ -1733,6 +1802,12 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
   if (!m_FrameRevealed)
   {
     painter.fillRect(QRect(0, 0, this->width(), TopStripHeight), QColor(255, 255, 255, 40));
+    if (const auto [title, titleRect] = this->TitleLayout(); titleRect.isValid())
+    {
+      painter.setFont(TitleFont(this->font()));
+      painter.setPen(IdleText);
+      painter.drawText(titleRect, Qt::AlignCenter, title);
+    }
   }
 
   this->PaintArrangeFrame(painter);
@@ -2901,6 +2976,15 @@ mitk::DataNode::Pointer QmitkMxNCellOverlay::ResolveTopImageNode() const
     {
       continue;
     }
+    // A mask drawn over an image has no level/window to show; like the level
+    // window manager, the furniture skips it for the image underneath.
+    bool binary = false;
+    mitk::LevelWindow levelWindow;
+    if ((node->GetBoolProperty("binary", binary, renderer) && binary)
+        || !node->GetLevelWindow(levelWindow, renderer))
+    {
+      continue;
+    }
     int layer = 0;
     node->GetIntProperty("layer", layer, renderer);
     if (topNode.IsNull() || layer > topLayer)
@@ -3330,6 +3414,16 @@ QRect QmitkMxNCellOverlay::PlateMenuButtonRect() const
 
 void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
 {
+  QMenu menu;  // No parent, see OpenColormapMenu.
+  this->PopulatePlateMenu(&menu);
+  if (!menu.isEmpty())
+  {
+    menu.exec(globalPosition);
+  }
+}
+
+void QmitkMxNCellOverlay::PopulatePlateMenu(QMenu* menu)
+{
   auto* arrangeMode = m_Editor->GetArrangeMode();
   const QString windowId = m_Cell->GetWidgetName();
 
@@ -3349,11 +3443,9 @@ void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
     return QIcon(pixmap);
   };
 
-  QMenu menu;  // No parent, see OpenColormapMenu.
-
   // Replace is what the group cards' "Add selected windows" does, so the two
   // ways of adding mean the same.
-  auto* addMenu = menu.addMenu(tr("Add to group"));
+  auto* addMenu = menu->addMenu(tr("Add to group"));
   for (const auto& info : infos)
   {
     const auto group = QString::fromStdString(info.id);
@@ -3365,7 +3457,7 @@ void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
 
   // A window can be on different groups on different axes, and removal (like
   // the cards') is per group, so every group it is on is offered.
-  auto* removeMenu = menu.addMenu(tr("Remove from group"));
+  auto* removeMenu = menu->addMenu(tr("Remove from group"));
   std::vector<std::string> linked;
   for (int slot = 0; slot < PeekAxisCount; ++slot)
   {
@@ -3399,12 +3491,52 @@ void QmitkMxNCellOverlay::OpenPlateMenu(const QPoint& globalPosition)
   }
   removeMenu->setEnabled(!removeMenu->isEmpty());
 
-  menu.addSeparator();
-  auto* clear = menu.addAction(tr("Clear selection"));
+  // Arrange mode runs only while the Layout Editor view is bound, which a
+  // Structure lock keeps it from, so unlike the context menu this needs no gate.
+  menu->addSeparator();
+  connect(menu->addAction(tr("Rename window...")), &QAction::triggered, this, &QmitkMxNCellOverlay::OpenRenameDialog);
+
+  menu->addSeparator();
+  auto* clear = menu->addAction(tr("Clear selection"));
   clear->setEnabled(!arrangeMode->GetSelectedWindowIds().isEmpty());
   connect(clear, &QAction::triggered, arrangeMode, &QmitkMxNArrangeMode::ClearSelection);
+}
 
-  menu.exec(globalPosition);
+void QmitkMxNCellOverlay::OpenRenameDialog()
+{
+  QTimer::singleShot(0, this, [this]()
+  {
+    // A lock can land between the menu closing and this deferred call.
+    if (this->IsLocked(QmitkMxNLayoutLock::Structure))
+    {
+      return;
+    }
+
+    const QString windowId = m_Cell->GetWidgetName();
+    auto* editor = m_Editor;
+    const QPointer<QmitkMxNCellOverlay> self(this);
+    bool accepted = false;
+    QString name;
+    {
+      ScopedProximityPin pin(m_Proximity);
+      name = QInputDialog::getText(this, tr("Rename window"), tr("Window name:"), QLineEdit::Normal,
+                                   m_Cell->GetDisplayName(), &accepted);
+    }
+    // The dialog's event loop can take the cell away, e.g. with a layout load,
+    // or deliver a lock.
+    if (!accepted || self.isNull() || this->IsLocked(QmitkMxNLayoutLock::Structure))
+    {
+      return;
+    }
+    try
+    {
+      editor->SetCellDisplayName(windowId, name);
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Rename window ignored: " << e.GetDescription();
+    }
+  });
 }
 
 bool QmitkMxNCellOverlay::IsArrangeFrameBumped() const
@@ -3661,6 +3793,8 @@ void QmitkMxNCellOverlay::PopulateContextMenu(QMenu* menu, const QPoint& globalP
     {
       m_Editor->RequestLayoutEditor(QmitkMxNMultiWidget::LayoutEditorRequest::Show);
     });
+    // The name is part of the layout document, which Structure protects.
+    connect(menu->addAction(tr("Rename window...")), &QAction::triggered, this, &QmitkMxNCellOverlay::OpenRenameDialog);
   }
 
   auto* expandedNavigatorAction = menu->addAction(tr("Expanded navigator"));

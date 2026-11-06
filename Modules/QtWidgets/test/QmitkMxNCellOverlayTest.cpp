@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkException.h>
 #include <mitkImageGenerator.h>
 #include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
@@ -37,6 +38,7 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
+#include <QFontMetrics>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPointer>
@@ -90,6 +92,11 @@ class QmitkMxNCellOverlayTestSuite : public mitk::TestFixture
   MITK_TEST(Picker_OffersTheOtherRenderModeAndFree);
   MITK_TEST(Picker_DirectionLockedWhileOpen_EveryEntryIsInert);
   MITK_TEST(PlaneLabel_FreeGroupBackToItsDirection_RepaintsMembers);
+  MITK_TEST(Title_FromALoadedDocument_ShowsInBothStripStates);
+  MITK_TEST(Title_HiddenWithoutNameInCleanViewOrWhenSwitchedOff);
+  MITK_TEST(Title_NarrowWindowHidesBothTitles);
+  MITK_TEST(Title_RenameRepaintsAndResizes);
+  MITK_TEST(LevelWindow_ActsOnTheImageUnderABinaryOverlay);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -873,6 +880,123 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::string("3D | Sagittal (locked)"), this->Overlay(2)->PlaneLabel().toStdString());
     CPPUNIT_ASSERT_MESSAGE("The other member repaints its label", paints.count > 0);
+  }
+
+  // --- The window title ------------------------------------------------------
+
+  /** Bring the pointer to the top edge of cell 'index', which reveals its strip. */
+  void RevealStrip(std::size_t index) const
+  {
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(index));
+    this->Proximity(index)->HandlePointerMoved(QPoint(cell->width() / 2, 2));
+    QmitkTestPopupProbe::Pump(300);
+  }
+
+  void Title_FromALoadedDocument_ShowsInBothStripStates()
+  {
+    // A layout load names a cell only after its furniture exists.
+    m_Editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "groups": { "main": { "select_all": true } },
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__widget0", "name": "Working plane", "view_direction": "axial",
+          "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } }
+      ] }
+    })json"));
+    // Wide enough that the strip's controls leave room around the centre.
+    m_Editor->resize(1400, 480);
+    m_Editor->show();
+    QmitkTestPopupProbe::Pump(200);
+
+    CPPUNIT_ASSERT_MESSAGE("Collapsed, the overlay paints the loaded name", this->Overlay(0)->TitleRect().isValid());
+    CPPUNIT_ASSERT_MESSAGE("An unnamed window shows no title", !this->Overlay(1)->TitleRect().isValid());
+
+    this->RevealStrip(0);
+    auto* strip = m_Editor->GetRenderWindowWidget(CellId(0))->GetUtilityWidget();
+    CPPUNIT_ASSERT_MESSAGE("Revealed, the overlay paints no title", !this->Overlay(0)->TitleRect().isValid());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("...and the strip shows the loaded name", std::string("Working plane"),
+                                 strip->TitleText().toStdString());
+  }
+
+  void Title_HiddenWithoutNameInCleanViewOrWhenSwitchedOff()
+  {
+    this->ShowEditor();
+    CPPUNIT_ASSERT_MESSAGE("An unnamed window shows no title", !this->Overlay(0)->TitleRect().isValid());
+
+    m_Editor->SetCellDisplayName(CellId(0), QStringLiteral("Overview"));
+    CPPUNIT_ASSERT_MESSAGE("A named window shows its title", this->Overlay(0)->TitleRect().isValid());
+
+    m_Editor->SetCleanView(true);
+    CPPUNIT_ASSERT_MESSAGE("Clean view hides it", !this->Overlay(0)->TitleRect().isValid());
+    m_Editor->SetCleanView(false);
+    CPPUNIT_ASSERT_MESSAGE("...and gives it back", this->Overlay(0)->TitleRect().isValid());
+
+    m_Editor->SetWindowTitlesVisible(false);
+    CPPUNIT_ASSERT_MESSAGE("Switching titles off hides it", !this->Overlay(0)->TitleRect().isValid());
+    m_Editor->SetLayout(1, 4);
+    m_Editor->SetCellDisplayName(CellId(3), QStringLiteral("Detail"));
+    CPPUNIT_ASSERT_MESSAGE("...in cells created later, too", !this->Overlay(3)->TitleRect().isValid());
+    m_Editor->SetWindowTitlesVisible(true);
+    CPPUNIT_ASSERT_MESSAGE("Switching them on shows it again", this->Overlay(3)->TitleRect().isValid());
+  }
+
+  void Title_NarrowWindowHidesBothTitles()
+  {
+    m_Editor->SetLayout(1, 1);
+    m_Editor->SetCellDisplayName(CellId(0), QStringLiteral("Overview"));
+    m_Editor->resize(30, 300);
+    m_Editor->show();
+    QmitkTestPopupProbe::Pump(200);
+
+    const auto cell = m_Editor->GetRenderWindowWidget(CellId(0));
+    const QFontMetrics metrics(QmitkMxNCellOverlay::TitleFont(cell->font()));
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the window is narrower than the title's minimum",
+                           cell->contentsRect().width()
+                             < QmitkMxNCellOverlay::TitleMinimumCharacters * metrics.averageCharWidth() + 10);
+
+    CPPUNIT_ASSERT_MESSAGE("The collapsed title is hidden", !this->Overlay(0)->TitleRect().isValid());
+    this->RevealStrip(0);
+    CPPUNIT_ASSERT_MESSAGE("...and so is the strip's", cell->GetUtilityWidget()->TitleText().isEmpty());
+  }
+
+  void Title_RenameRepaintsAndResizes()
+  {
+    this->ShowEditor();
+    m_Editor->SetCellDisplayName(CellId(0), QStringLiteral("Edit"));
+    QmitkTestPopupProbe::Pump(100);
+    const QRect before = this->Overlay(0)->TitleRect();
+
+    PaintCounter paints;
+    this->Overlay(0)->installEventFilter(&paints);
+    m_Editor->SetCellDisplayName(CellId(0), QStringLiteral("Working plane"));
+    QmitkTestPopupProbe::Pump(100);
+    this->Overlay(0)->removeEventFilter(&paints);
+
+    CPPUNIT_ASSERT_MESSAGE("A rename repaints the title", paints.count > 0);
+    CPPUNIT_ASSERT_MESSAGE("The title fits the new name", this->Overlay(0)->TitleRect().width() > before.width());
+  }
+
+  // --- Level/window target -------------------------------------------------
+
+  void LevelWindow_ActsOnTheImageUnderABinaryOverlay()
+  {
+    // A binary mask drawn above an image, as a segmentation overlay is, has no
+    // level/window of its own; the furniture must act on the image under it.
+    m_ImageNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 50.0)));
+    auto maskNode = mitk::DataNode::New();
+    maskNode->SetName("mask");
+    maskNode->SetData(mitk::ImageGenerator::GenerateGradientImage<unsigned char>(16, 16, 8, 1.0f, 1.0f, 1.0f));
+    maskNode->SetBoolProperty("binary", true);
+    maskNode->SetIntProperty("layer", 1);
+    m_DataStorage->Add(maskNode);
+    this->ShowEditor();
+
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the mask is drawn in the cell",
+                           maskNode->IsVisible(mitk::BaseRenderer::GetInstance(
+                             m_Editor->GetRenderWindowWidget(CellId(0))->GetRenderWindow()->GetVtkRenderWindow())));
+    CPPUNIT_ASSERT_MESSAGE("The level/window furniture acts on the image, not on the mask",
+                           m_ImageNode.GetPointer() == this->Overlay(0)->LevelWindowNode());
   }
 };
 

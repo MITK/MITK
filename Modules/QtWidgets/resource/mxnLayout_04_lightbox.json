@@ -1,0 +1,183 @@
+{
+  "version": "3.0",
+  "name": "Lightbox 3x3",
+  "groups": {
+    "main": {
+      "select_all": true
+    }
+  },
+  "root": {
+    "type": "split",
+    "orientation": "vertical",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget0",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": -4
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget1",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": -3
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget2",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": -2
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ]
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget3",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": -1
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget4",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": "main",
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget5",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": 1
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ]
+      },
+      {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          {
+            "type": "window",
+            "id": "mxn__widget6",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": 2
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget7",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": 3
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          },
+          {
+            "type": "window",
+            "id": "mxn__widget8",
+            "view_direction": "axial",
+            "links": {
+              "selection": "main",
+              "crosshair": "main",
+              "slice": {
+                "target": "main",
+                "offset": 4
+              },
+              "zoom": "main",
+              "pan": "main",
+              "windowing": "main",
+              "lut": "main"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

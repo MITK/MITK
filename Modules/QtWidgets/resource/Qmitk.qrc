@@ -34,6 +34,10 @@
     <file>mxn-axis-lut.svg</file>
     <file>mxn-axis-selection.svg</file>
     <file>mxn-crosshair.svg</file>
+    <file>mxn-dynamic-datasets-planes.svg</file>
+    <file>mxn-dynamic-fusion.svg</file>
+    <file>mxn-dynamic-one-view.svg</file>
+    <file>mxn-dynamic-shared-base.svg</file>
     <file>mxn-grid-column-add.svg</file>
     <file>mxn-grid-column-remove.svg</file>
     <file>mxn-grid-edit.svg</file>

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 #include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
+#include <QmitkMxNPresets.h>
+
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -21,34 +23,6 @@ found in the LICENSE file.
 
 #include <sstream>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usModuleResourceStream.h>
-
-namespace
-{
-  /** Replaces the editor segment of every window id below 'node'. An id without
-   *  the "__" separator is left for the loader to reject. */
-  void RequalifyWindowIds(nlohmann::json& node, const std::string& widgetName)
-  {
-    if (const auto id = node.find("id"); node.end() != id && id->is_string())
-    {
-      const auto separator = id->get_ref<const std::string&>().find("__");
-      if (std::string::npos != separator)
-      {
-        *id = widgetName + id->get_ref<const std::string&>().substr(separator);
-      }
-    }
-    if (const auto children = node.find("children"); node.end() != children && children->is_array())
-    {
-      for (auto& child : *children)
-      {
-        RequalifyWindowIds(child, widgetName);
-      }
-    }
-  }
-}
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
@@ -74,30 +48,10 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
                    "QTableWidget::item:selected { background-color: %2; }")
       .arg(palette.color(QPalette::Base).name(), palette.color(QPalette::Highlight).name()));
 
-  m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
-  connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);
-  m_AutomatedDataLayoutWidget->hide();
-
   connect(ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
   connect(ui->setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
-  connect(ui->dataBasedLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked);
+  connect(ui->dynamicLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::DynamicLayoutRequested);
 
-  // The presets ship as module resources; they are read once here and offered
-  // by name, so the host can present them without knowing about the resources.
-  auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
-  for (const auto& resource : presetResources)
-  {
-    us::ModuleResourceStream jsonStream(resource);
-    auto data = nlohmann::json::parse(jsonStream);
-    m_Presets.push_back({ QString::fromStdString(data["name"].get<std::string>()), data });
-  }
-}
-
-void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  if (m_AutomatedDataLayoutWidget == nullptr)
-    return;
-  m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
@@ -108,8 +62,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::ResetSelection()
 QStringList QmitkMultiWidgetLayoutSelectionWidget::PresetNames() const
 {
   QStringList names;
-  names.reserve(static_cast<int>(m_Presets.size()));
-  for (const auto& preset : m_Presets)
+  for (const auto& preset : QmitkMxNPresets::All())
   {
     names.append(preset.name);
   }
@@ -160,21 +113,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
-}
-
-void QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked()
-{
-  // Taken before the host reacts to DataBasedLayoutStarted, while this picker is
-  // still on screen. A popup is a top-level window, so it is placed in global
-  // coordinates.
-  const QPoint topRight = this->mapToGlobal(QPoint(this->width(), 0));
-  emit DataBasedLayoutStarted();
-
-  m_AutomatedDataLayoutWidget->setWindowFlags(Qt::Popup);
-  // A widget that was never shown has no laid-out size yet.
-  m_AutomatedDataLayoutWidget->adjustSize();
-  m_AutomatedDataLayoutWidget->move(topRight.x() - m_AutomatedDataLayoutWidget->width(), topRight.y());
-  m_AutomatedDataLayoutWidget->show();
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::RequestSave()
@@ -251,15 +189,12 @@ void QmitkMultiWidgetLayoutSelectionWidget::RequestLoad()
 
 void QmitkMultiWidgetLayoutSelectionWidget::ApplyPreset(int index, const QString& widgetName)
 {
-  if (index < 0 || static_cast<std::size_t>(index) >= m_Presets.size())
+  const auto& presets = QmitkMxNPresets::All();
+  if (index < 0 || static_cast<std::size_t>(index) >= presets.size())
   {
     return;
   }
 
-  nlohmann::json layout = m_Presets[index].layout;
-  if (auto root = layout.find("root"); layout.end() != root)
-  {
-    RequalifyWindowIds(*root, widgetName.toStdString());
-  }
+  auto layout = QmitkMxNPresets::DocumentFor(presets[index], widgetName);
   emit LoadLayout(&layout);
 }

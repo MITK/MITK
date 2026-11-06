@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QMetaObject>
 #include <QPointer>
 
+#include <functional>
 #include <vector>
 
 class QCheckBox;
@@ -92,6 +93,14 @@ private:
   /** \brief After a modal or a deferred step: whether 'multiWidget' is still
    *         the bound widget, so a change confirmed before can still go to it. */
   bool IsStillBoundTo(const QmitkMxNMultiWidget* multiWidget) const;
+
+  /** \brief Apply a confirmed layout change to 'multiWidget' from a short
+   *         timer, behind the load feedback, unless its structure was locked
+   *         meanwhile; a failure is shown in a warning box titled
+   *         'failureTitle'. */
+  void ApplyDeferred(QmitkMxNMultiWidget* multiWidget,
+                     const std::function<void(QmitkMxNMultiWidget&)>& apply,
+                     const QString& failureTitle);
 
   /** \brief Why the view is not bound to the shown part, or that it is. */
   enum class Binding

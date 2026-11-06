@@ -12,11 +12,11 @@
 
 """Fixtures for the `mitk.mxn.layout` test suite.
 
-The schema fixture resolves its path from the source tree by walking up
-from this file; the preset fixture reads the 2.0 form of the two-rows
-preset kept beside this file. Both fail soft when their file is not on
-disk (a wheel-test environment, for example): the fixture returns
-``None`` and the depending test should skip itself with a clear reason.
+The schema fixtures resolve their paths from the source tree by walking
+up from this file; the preset fixture reads a 2.0 two-rows document kept
+beside this file. All fail soft when their file is not on disk (a
+wheel-test environment, for example): the fixture returns ``None`` and
+the depending test should skip itself with a clear reason.
 
 Source-tree CI runs cover the schema integration; wheel-test CI runs
 cover everything else. Snapshotting the schema into ``Wrapping/Python``
@@ -53,11 +53,24 @@ def schema_path() -> Path | None:
 
 
 @pytest.fixture(scope="session")
-def two_rows_preset_path() -> Path | None:
-    """Path to the v2.0 form of the two-rows preset, or None.
+def v3_schema_path() -> Path | None:
+    """Path to `mxn-layout-v3.schema.json`, or None when unavailable.
 
-    The in-tree preset is written as 3.0 by the C++ engine; the DSL targets
-    2.0, so the suite keeps the 2.0 form of the same document beside it.
+    The DSL targets 2.0, so only tests of raw 3.0 documents use this one.
+    """
+    root = _find_repo_root()
+    if root is None:
+        return None
+    candidate = root / "Modules" / "QtWidgets" / "resource" / "mxn-layout-v3.schema.json"
+    return candidate if candidate.is_file() else None
+
+
+@pytest.fixture(scope="session")
+def two_rows_preset_path() -> Path | None:
+    """Path to a 2.0 layout document with two rows of three directions, or None.
+
+    The DSL targets 2.0, so the suite keeps its fixture document in that
+    form beside this file. It is independent of the presets MITK ships.
     """
     candidate = Path(__file__).resolve().parent / "mxnLayout_twoRowsEachDirection_v2.json"
     return candidate if candidate.is_file() else None

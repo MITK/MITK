@@ -1,4 +1,6 @@
-MITK_CREATE_MODULE_TESTS()
+# The dynamic layout tests classify real multi-label segmentations, which
+# MitkQtWidgets itself only knows by class name.
+MITK_CREATE_MODULE_TESTS(EXTRA_DEPENDS MitkMultilabel)
 
 mitkAddCustomModuleTest(QmitkDataStorageListModelTest QmitkDataStorageListModelTest
   -platform minimal
@@ -71,11 +73,27 @@ mitkAddCustomModuleTest(QmitkMxNArrangeModeTest QmitkMxNArrangeModeTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNCellNameTest QmitkMxNCellNameTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNCellOverlayTest QmitkMxNCellOverlayTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNDynamicLayoutDialogTest QmitkMxNDynamicLayoutDialogTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNDynamicLayoutTest QmitkMxNDynamicLayoutTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNNavigatorTest QmitkMxNNavigatorTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNPresetsTest QmitkMxNPresetsTest
   -platform minimal
 )
 
@@ -91,7 +109,7 @@ mitkAddCustomModuleTest(QmitkMxNSyncPeekTest QmitkMxNSyncPeekTest
   -platform minimal
 )
 
-mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
+mitkAddCustomModuleTest(QmitkMxNUtilityStripTest QmitkMxNUtilityStripTest
   -platform minimal
 )
 

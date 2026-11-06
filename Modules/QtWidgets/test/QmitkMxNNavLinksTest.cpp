@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 
 #include <QColor>
+#include <QCoreApplication>
 
 #include <array>
 
@@ -57,9 +58,16 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
 
   MITK_TEST(SliceLink_PropagatesToGroupOnly);
   MITK_TEST(Scroll_CrossPlaneSliceGroup_KeepsDisplayedRelation);
+  MITK_TEST(Crosshair_MovedPeer_ConvergesItsSliceGroup);
+  MITK_TEST(Crosshair_MovedSender_AnchorsItsSliceGroup);
+  MITK_TEST(Crosshair_SliceGroupOnTheCrosshair_KeepsItsOffsets);
+  MITK_TEST(Crosshair_ClickInALightboxWindow_KeepsTheSheet);
+  MITK_TEST(Crosshair_EveryLinkedWindowShowsIt);
+  MITK_TEST(Crosshair_ClickInTheShownPlane_ConvergesNothing);
   MITK_TEST(Converge_Slice_MovieFrameOffsets);
   MITK_TEST(Converge_Slice_SeedAtZero_SignedClamp);
   MITK_TEST(Converge_Zoom_FactorOffset);
+  MITK_TEST(Zoom_MemberAtTheLimitKeepsTheRatio);
   MITK_TEST(Converge_Pan_WorldOffset);
   MITK_TEST(Converge_JoinFromEarlierCell_ConvergesJoiner);
   MITK_TEST(Converge_Slice_OffsetOnSeed_ShiftsSeed);
@@ -329,6 +337,170 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A scroll from the other cell keeps them together", ShownSlice(0), ShownSlice(1));
   }
 
+  // --- A crosshair move keeps slice groups together ----------------------------
+
+  /** A world point inside the 16 x 16 x 8 image, on axial slice 'z'. */
+  static mitk::Point3D PointOnAxialSlice(double z)
+  {
+    mitk::Point3D point;
+    point[0] = 5.0;
+    point[1] = 9.0;
+    point[2] = z;
+    return point;
+  }
+
+  void FireCrosshair(std::size_t senderIndex, const mitk::Point3D& position)
+  {
+    Fire<mitk::DisplaySetCrosshairEvent>(senderIndex, position);
+  }
+
+  void Crosshair_MovedPeer_ConvergesItsSliceGroup()
+  {
+    // "Slice context": a click in a context window moves the working slice
+    // over the crosshair link; its neighbour on the slice group must follow.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "ctx");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "ctx", -1);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Crosshair, "main");
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Crosshair, "main");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the neighbour shows the previous slice", 3u, ShownSlice(0));
+
+    FireCrosshair(2, PointOnAxialSlice(6.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the crosshair moved the working slice", 6u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour follows to the slice before the working slice",
+                                 5u, ShownSlice(0));
+  }
+
+  void Crosshair_MovedSender_AnchorsItsSliceGroup()
+  {
+    // A crosshair set from the navigator ("Go to coordinate...") moves the
+    // sender's own slice; its slice group follows the sender.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(0, 4);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the second frame shows the next slice", 5u, ShownSlice(1));
+
+    FireCrosshair(0, PointOnAxialSlice(2.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the sender moved to the point's slice", 2u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The group follows the sender, keeping its offset", 3u, ShownSlice(1));
+  }
+
+  /** For an axial window. */
+  void AssertShowsCrosshair(std::size_t index, const mitk::Point3D& target)
+  {
+    // x and y only: they lie in the axial plane, while the stored z follows
+    // the window's slice.
+    const auto crosshair = m_Editor->GetSelectedPosition(CellId(index));
+    const std::string where = " in window " + std::to_string(index);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The crosshair follows in x" + where, target[0], crosshair[0], 1e-3);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The crosshair follows in y" + where, target[1], crosshair[1], 1e-3);
+  }
+
+  void Crosshair_SliceGroupOnTheCrosshair_KeepsItsOffsets()
+  {
+    // "Slice context" with every window on the crosshair: a click in a
+    // context window puts the working slice (offset 0) on the crosshair's
+    // slice and its neighbour on the slice before, and both show the point.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "ctx");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "ctx", -1);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "main");
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the neighbour shows the previous slice", 3u, ShownSlice(0));
+
+    const auto target = PointOnAxialSlice(6.0);
+    FireCrosshair(2, target);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The working slice is where the crosshair is", 6u, ShownSlice(1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The neighbour shows the slice before it", 5u, ShownSlice(0));
+    AssertShowsCrosshair(0, target);
+    AssertShowsCrosshair(1, target);
+  }
+
+  void Crosshair_ClickInALightboxWindow_KeepsTheSheet()
+  {
+    // "Lightbox": a click in the slice a window shows changes no slice the
+    // sheet shows, whichever window of the sheet it is in, and every window
+    // shows the point.
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetViewDirection(CellId(i), mitk::AnatomicalPlane::Axial);
+    }
+    SetShownSlice(1, 4);
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "sheet");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "sheet", -1);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Slice, "sheet", 1);
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "main");
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the first window shows the previous slice", 3u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the last window shows the next slice", 5u, ShownSlice(2));
+
+    const auto target = PointOnAxialSlice(5.0);
+    FireCrosshair(2, target);
+
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The sheet stays in window " + std::to_string(i),
+                                   static_cast<unsigned int>(3 + i), ShownSlice(i));
+      AssertShowsCrosshair(i, target);
+    }
+  }
+
+  void Crosshair_EveryLinkedWindowShowsIt()
+  {
+    // "Datasets x planes", aligned: the axial windows of two datasets share
+    // a slice group and, with a third window, the crosshair. Every member of
+    // the slice group shows the crosshair where it was set.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Slice, "ax");
+    }
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      m_Editor->SetSyncLink(CellId(i), QmitkMxNSyncDimension::Crosshair, "nav");
+    }
+
+    const auto target = PointOnAxialSlice(6.0);
+    FireCrosshair(2, target);
+
+    for (std::size_t i = 0; i < 2; ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The slice follows in window " + std::to_string(i), 6u, ShownSlice(i));
+      AssertShowsCrosshair(i, target);
+    }
+  }
+
+  void Crosshair_ClickInTheShownPlane_ConvergesNothing()
+  {
+    // A click in a window's own plane moves no slice. Its slice group stays as
+    // the user left it, even where it has drifted from its offsets.
+    m_Editor->SetViewDirection(CellId(0), mitk::AnatomicalPlane::Axial);
+    m_Editor->SetViewDirection(CellId(1), mitk::AnatomicalPlane::Axial);
+    SetShownSlice(0, 4);
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "film");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Slice, "film", 1);
+    SetShownSlice(1, 7);
+
+    FireCrosshair(0, PointOnAxialSlice(4.0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The clicked window stays on its slice", 4u, ShownSlice(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A drifted member is left where it is", 7u, ShownSlice(1));
+  }
+
   void Converge_Slice_MovieFrameOffsets()
   {
     // Offsets count displayed slices. Axial cells step against the identity
@@ -382,6 +554,39 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(seedScale / 2.0, Camera(0)->GetParallelScale(), 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Identical factors preserve the zoom ratio",
       seedScale / 4.0, Camera(1)->GetParallelScale(), 1e-6);
+  }
+
+  void Zoom_MemberAtTheLimitKeepsTheRatio()
+  {
+    // "Overview + detail": zooming the overview out stops at its limit, while
+    // the detail could still go on. The detail must stay four times as far
+    // zoomed in, and zooming back in must find the ratio intact.
+    m_Editor->resize(900, 300);
+    m_Editor->show();
+    QCoreApplication::processEvents();
+    RealiseViews();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Zoom, "zoom");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Zoom, "zoom", 4.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: the detail starts at four times the zoom", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
+
+    for (int i = 0; i < 12; ++i)
+    {
+      FireZoom(0, 0.5f);
+    }
+    const double atTheLimit = Camera(0)->GetParallelScale();
+    FireZoom(0, 0.5f);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: the overview is at its zoom-out limit", atTheLimit,
+                                         Camera(0)->GetParallelScale(), 1e-9 * atTheLimit);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("At the limit the detail keeps its ratio", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
+
+    for (int i = 0; i < 3; ++i)
+    {
+      FireZoom(0, 2.0f);
+    }
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Back from the limit the ratio is intact", 4.0,
+                                         Camera(0)->GetParallelScale() / Camera(1)->GetParallelScale(), 1e-6);
   }
 
   void Converge_Pan_WorldOffset()

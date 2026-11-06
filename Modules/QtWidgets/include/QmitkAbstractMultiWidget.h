@@ -97,8 +97,7 @@ public:
 
   /**
    * \brief Returns the row count of the last `SetLayout(r, c)` call, or 0 if
-   *        a non-grid layout has been loaded since (e.g. via `ApplyLayout` or
-   *        `SetDataBasedLayout`).
+   *        a non-grid layout has been loaded since (e.g. via `ApplyLayout`).
    *
    *        Callers that need to enumerate cells should use
    *        `GetNumberOfRenderWindowWidgets()` / `GetRenderWindowWidgets()`
@@ -404,8 +403,8 @@ protected:
    *        active render-window pointer to nullptr.
    *
    *        Called by subclasses immediately before they tear down the
-   *        existing cell tree (e.g. `QmitkMxNMultiWidget::ApplyLayout` /
-   *        `SetDataBasedLayout`). After this call, `GetRowCount()` and
+   *        existing cell tree (e.g. `QmitkMxNMultiWidget::ApplyLayout`).
+   *        After this call, `GetRowCount()` and
    *        `GetColumnCount()` both return 0 to signal that the current cell
    *        set is no longer a regular grid; subsequent `SetLayout(r, c)`
    *        calls restore both fields.

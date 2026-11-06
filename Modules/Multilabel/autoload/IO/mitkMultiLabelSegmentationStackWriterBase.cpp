@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkMultiLabelSegmentationStackWriterBase.h>
+#include <mitkCustomMimeType.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
 #include <mitkLabelSetImageConverter.h>
@@ -19,6 +20,9 @@ found in the LICENSE file.
 
 // itk
 #include <itksys/SystemTools.hxx>
+
+#include <algorithm>
+#include <set>
 
 namespace
 {
@@ -29,6 +33,31 @@ namespace
   constexpr const char* OPTION_INSTANCE_VALUE_BINARY = "binary";
   constexpr const char* OPTION_INSTANCE_VALUE_ORIGINAL = "original";
   constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+
+  std::string JoinWithCommas(const std::vector<std::string>& items, const std::string& prefix)
+  {
+    std::string result;
+    for (const auto& item : items)
+      result += (result.empty() ? "" : ", ") + prefix + item;
+    return result;
+  }
+
+  /** A value outside the choices is refused rather than taken for one of them. */
+  std::string ResolveChoice(const mitk::IFileIO::Options& options, const std::string& name, const std::vector<std::string>& choices)
+  {
+    auto value = mitk::IFileIO::ResolveEnumOption(options, name);
+    if (std::find(choices.begin(), choices.end(), value) == choices.end())
+    {
+      mitkThrow() << "Unknown value \"" << value << "\" of the option \"" << name << "\". Valid values: "
+                  << JoinWithCommas(choices, "") << ".";
+    }
+    return value;
+  }
+
+  std::string DescribeExtensions(const mitk::CustomMimeType& mimeType)
+  {
+    return JoinWithCommas(mimeType.GetExtensions(), ".");
+  }
 }
 
 namespace mitk
@@ -88,19 +117,50 @@ namespace mitk
 
     auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
+    if (0 == input->GetNumberOfGroups())
+    {
+      mitkThrow() << "Cannot write the segmentation: it has no groups.";
+    }
+
     const auto options = this->GetOptions();
 
-    const auto groupSaveStrategy = options.find(OPTION_SAVE_STRATEGY)->second.ToString() == OPTION_SAVE_STRATEGY_GROUP;
-    const auto binaryValueMapping = options.find(OPTION_INSTANCE_VALUE)->second.ToString() == OPTION_INSTANCE_VALUE_BINARY;
+    const auto groupSaveStrategy = ResolveChoice(options, OPTION_SAVE_STRATEGY,
+      { OPTION_SAVE_STRATEGY_GROUP, OPTION_SAVE_STRATEGY_INSTANCE }) == OPTION_SAVE_STRATEGY_GROUP;
+    const auto binaryValueMapping = ResolveChoice(options, OPTION_INSTANCE_VALUE,
+      { OPTION_INSTANCE_VALUE_ORIGINAL, OPTION_INSTANCE_VALUE_BINARY }) == OPTION_INSTANCE_VALUE_BINARY;
 
     LocalFile localFile(this);
     const auto path = localFile.GetFileName();
 
-    const auto imageFileExt = this->GetStackImageExtension();
-    const auto absFileStemPath = itksys::SystemTools::JoinPath({"", itksys::SystemTools::GetFilenamePath(path), itksys::SystemTools::GetFilenameWithoutExtension(path)});
-    const auto relFileStemPath = itksys::SystemTools::JoinPath({"", ".", itksys::SystemTools::GetFilenameWithoutExtension(path) });
+    // The stem ends before the extension the mime type matched, which can contain dots
+    // itself (.mitklabel.json, .nii.gz), while the stem may contain dots too.
+    const auto fileStem = this->GetMimeType()->GetFilenameWithoutExtension(path);
+    if (fileStem.empty())
+    {
+      mitkThrow() << "Cannot write the segmentation stack to \"" << path << "\": the file name has none of the extensions "
+                  << DescribeExtensions(*(this->GetMimeType())) << ".";
+    }
 
-    const auto saveStrategy = options.find(OPTION_SAVE_STRATEGY)->second.ToString();
+    const auto imageFileExt = this->GetStackImageExtension();
+    // A path without a directory is relative to the working directory; joined with the empty
+    // directory, it would point to the root of the drive.
+    const auto directory = itksys::SystemTools::GetFilenamePath(path);
+    const auto absFileStemPath = directory.empty() ? fileStem : itksys::SystemTools::JoinPath({ "", directory, fileStem });
+    const auto relFileStemPath = itksys::SystemTools::JoinPath({"", ".", fileStem });
+
+    auto imageIO = this->GetITKIO();
+    // use compression if available
+    imageIO->UseCompressionOn();
+    mitk::LocaleSwitch localeSwitch("C");
+
+    const auto writeImage = [&imageIO](const Image* image, const std::string& fileName)
+      {
+        ItkImageIO::PreparImageIOToWriteImage(imageIO, image);
+        imageIO->SetFileName(fileName);
+
+        ImageReadAccessor imageAccess(image);
+        imageIO->Write(imageAccess.GetData());
+      };
 
     nlohmann::json metaInfo;
 
@@ -113,19 +173,9 @@ namespace mitk
 
       metaInfo = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input, groupFileNameCallback);
 
-      auto imageIO = this->GetITKIO();
-      // use compression if available
-      imageIO->UseCompressionOn();
-      mitk::LocaleSwitch localeSwitch("C");
-
       for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < input->GetNumberOfGroups(); ++groupID)
       {
-        const auto groupImage = input->GetGroupImage(groupID);
-        ItkImageIO::PreparImageIOToWriteImage(imageIO, groupImage);
-        imageIO->SetFileName(GenerateGroupFilePath(absFileStemPath, groupID, imageFileExt));
-
-        ImageReadAccessor imageAccess(groupImage);
-        imageIO->Write(imageAccess.GetData());
+        writeImage(input->GetGroupImage(groupID), GenerateGroupFilePath(absFileStemPath, groupID, imageFileExt));
       }
     }
     else
@@ -145,19 +195,21 @@ namespace mitk
 
       metaInfo = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input, nullptr, labelFileNameCallback, labelFileValueCallback);
 
-      auto imageIO = this->GetITKIO();
-      // use compression if available
-      imageIO->UseCompressionOn();
-      mitk::LocaleSwitch localeSwitch("C");
-
       for (const auto labelValue : input->GetAllLabelValues())
       {
-        const auto labelImage = CreateLabelMask(input, labelValue, binaryValueMapping);
-        ItkImageIO::PreparImageIOToWriteImage(imageIO, labelImage);
-        imageIO->SetFileName(GenerateLabelFilePath(absFileStemPath, labelValue, imageFileExt));
+        writeImage(CreateLabelMask(input, labelValue, binaryValueMapping),
+                   GenerateLabelFilePath(absFileStemPath, labelValue, imageFileExt));
+      }
 
-        ImageReadAccessor imageAccess(labelImage);
-        imageIO->Write(imageAccess.GetData());
+      // A group without labels has no label image. Written as a group image, it still carries
+      // the geometry, which the reader needs when no group has labels.
+      for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < input->GetNumberOfGroups(); ++groupID)
+      {
+        if (input->GetLabelValuesByGroup(groupID).empty())
+        {
+          metaInfo[groupID]["_file"] = GenerateGroupFilePath(relFileStemPath, groupID, imageFileExt);
+          writeImage(input->GetGroupImage(groupID), GenerateGroupFilePath(absFileStemPath, groupID, imageFileExt));
+        }
       }
     }
 
@@ -171,19 +223,17 @@ namespace mitk
     {
       //clone properties to sort out the ones that should not be seriealized
       auto cleanedProps = properties->Clone();
-      std::vector<std::string> unwantedPropNames = { "NRRD", "MITK.IO", "modality",
-        "org.mitk.multilabel.segmentation", "org.mitk.uid", "path"};
+      // Single keys are matched exactly, so that e.g. "pathology.grade" is not taken for "path".
+      const std::set<std::string> unwantedPropNames = { "modality", "org.mitk.uid", "path" };
+      const std::vector<std::string> unwantedPropPrefixes = { "NRRD.", "MITK.IO.", "org.mitk.multilabel.segmentation." };
 
-      for (auto propName : cleanedProps->GetPropertyKeys())
+      for (const auto& propName : cleanedProps->GetPropertyKeys())
       {
-        for (auto unwantedName : unwantedPropNames)
+        const auto isUnwantedPrefix = [&propName](const std::string& prefix) { return propName.compare(0, prefix.size(), prefix) == 0; };
+        if (unwantedPropNames.count(propName) > 0 ||
+            std::any_of(unwantedPropPrefixes.begin(), unwantedPropPrefixes.end(), isUnwantedPrefix))
         {
-          // does the start match the default key
-          if (propName.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
-          {
-            cleanedProps->RemoveProperty(propName);
-            break;
-          }
+          cleanedProps->RemoveProperty(propName);
         }
       }
       cleanedProps->ToJSON(stackContent["properties"]);

@@ -108,7 +108,7 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
     point.SetElement(0, x);
     point.SetElement(1, y);
     point.SetElement(2, z);
-    d->m_PointSet->SetPoint(d->m_PointId, point);
+    d->m_PointSet->SetPoint(d->m_PointId, point, d->m_Timestep);
     this->accept();
   }
 }

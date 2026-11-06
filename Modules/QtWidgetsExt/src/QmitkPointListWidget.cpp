@@ -89,6 +89,7 @@ void QmitkPointListWidget::SetupConnections()
 
 void QmitkPointListWidget::OnTimeStepChanged(int timeStep)
 {
+  m_TimeStep = static_cast<mitk::TimeStepType>(timeStep);
   m_TimeStepLabel->setText(QString("%1").arg(timeStep));
 }
 
@@ -391,14 +392,14 @@ void QmitkPointListWidget::OnBtnAddPointManually()
   mitk::PointSet *pointSet = this->GetPointSet();
   QmitkEditPointDialog editPointDialog(this);
 
-  if (this->GetPointSet()->IsEmpty())
+  if (this->GetPointSet()->IsEmptyTimeStep(m_TimeStep))
   {
       editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
   }
 
   else
   {
-      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId(m_TimeStep);
       mitk::PointSet::PointIdentifier maxId = maxIt->Index();
       editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
   }

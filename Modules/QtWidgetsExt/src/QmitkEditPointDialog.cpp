@@ -46,7 +46,7 @@ struct QmitkEditPointDialogData
   QLineEdit *m_XCoord;
   QLineEdit *m_YCoord;
   QLineEdit *m_ZCoord;
-  int m_Timestep;
+  mitk::TimeStepType m_Timestep;
 };
 
 QmitkEditPointDialog::QmitkEditPointDialog(QWidget *parent, Qt::WindowFlags f)
@@ -77,7 +77,9 @@ QmitkEditPointDialog::~QmitkEditPointDialog()
   delete d;
 }
 
-void QmitkEditPointDialog::SetPoint(mitk::PointSet *_PointSet, mitk::PointSet::PointIdentifier _PointId, int timestep)
+void QmitkEditPointDialog::SetPoint(mitk::PointSet *_PointSet,
+                                    mitk::PointSet::PointIdentifier _PointId,
+                                    mitk::TimeStepType timestep)
 {
   d->m_PointSet = _PointSet;
   d->m_PointId = _PointId;

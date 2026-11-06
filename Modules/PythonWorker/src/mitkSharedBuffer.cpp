@@ -302,12 +302,12 @@ std::unique_ptr<mitk::SharedBuffer> mitk::SharedBuffer::CopyOf(const Image* imag
   if (image == nullptr)
     mitkThrow() << "Cannot copy a null image into a shared buffer.";
 
-  if (!image->IsVolumeSet(static_cast<int>(timeStep)))
+  if (!image->IsVolumeSet(timeStep))
     mitkThrow() << "The image has no data at time step " << timeStep << '.';
 
   auto buffer = std::make_unique<SharedBuffer>(image->GetPixelType(), ShapeOf(image));
 
-  ImageReadAccessor accessor(image, image->GetVolumeData(static_cast<int>(timeStep)));
+  ImageReadAccessor accessor(image, image->GetVolumeData(timeStep));
   std::memcpy(buffer->GetData(), accessor.GetData(), buffer->GetSize());
 
   return buffer;

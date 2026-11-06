@@ -161,20 +161,20 @@ public:
 
   void GetGeometryForSingleTimeGeometries_Failure()
   {
-    // test method GetGeometry(int timeStep)
+    // test method GetGeometry(TimeStepType timeStep)
     CPPUNIT_ASSERT_MESSAGE("Testing Creation of single TimeGeometries", m_BaseDataImpl->GetGeometry(1) == nullptr);
   }
 
   void TestingExpand_Success()
   {
-    // test method Expand(unsigned int timeSteps)
+    // test method Expand(TimeStepType timeSteps)
     m_BaseDataImpl->Expand(5);
     CPPUNIT_ASSERT_MESSAGE("Expand the geometry to further time slices!", m_BaseDataImpl->GetTimeSteps() == 5);
   }
 
   void TestingGetUpdateGeometry_Success()
   {
-    // test method GetUpdatedGeometry(int timeStep);
+    // test method GetUpdatedGeometry(TimeStepType timeStep);
     m_BaseDataImpl->Expand(5);
     mitk::ProportionalTimeGeometry::Pointer timeGeometry =
       dynamic_cast<mitk::ProportionalTimeGeometry *>(m_BaseDataImpl->GetTimeGeometry());

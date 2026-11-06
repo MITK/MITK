@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkNumericTypes.h>
 #include <mitkOperation.h>
+#include <mitkTimeGeometry.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
@@ -59,7 +60,7 @@ namespace mitk
      * \param type The point specification type.
      */
     PointOperation(OperationType operationType,
-                   ScalarType timeInMS,
+                   TimePointType timeInMS,
                    Point3D point,
                    int index = -1,
                    bool selected = true,
@@ -80,7 +81,7 @@ namespace mitk
     PointSpecificationType GetPointType();
 
     /** \brief Get the time stamp of this operation in milliseconds. */
-    ScalarType GetTimeInMS() const;
+    TimePointType GetTimeInMS() const;
 
   private:
     Point3D m_Point;
@@ -94,7 +95,7 @@ namespace mitk
     /** \brief The specification type of the point. \sa PointSpecificationType */
     PointSpecificationType m_Type;
 
-    ScalarType m_TimeInMS;
+    TimePointType m_TimeInMS;
   };
 } // namespace mitk
 #endif

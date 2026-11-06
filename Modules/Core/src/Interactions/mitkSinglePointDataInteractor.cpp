@@ -36,8 +36,8 @@ mitk::SinglePointDataInteractor::~SinglePointDataInteractor()
 void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction * /*stateMachineAction*/,
                                                InteractionEvent *interactionEvent)
 {
-  unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+  const TimePointType timeInMs = interactionEvent->GetSender()->GetTime();
 
   // To add a point the minimal information is the position, this method accepts all InteractionsPositionEvents
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);

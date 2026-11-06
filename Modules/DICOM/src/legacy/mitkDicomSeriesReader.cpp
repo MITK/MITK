@@ -980,7 +980,7 @@ namespace mitk
             {
               // start a new block
               groupsOf3DPlusTBlocks[thisBlockKey] = block3DIter->second;
-              int numberOfTimeSteps =
+              const TimeStepType numberOfTimeSteps =
                 groupsOf3DPlusTBlocks[previousBlockKey].GetFilenames().size() / numberOfFilesInPreviousBlock;
               MITK_DEBUG << "  ==> group closed with " << numberOfTimeSteps << " time steps";
               previousBlockKey = thisBlockKey;
@@ -1383,7 +1383,7 @@ namespace mitk
     const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
 
     const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
-    unsigned int timeStep(0);
+    TimeStepType timeStep(0);
 
     std::string propertyKeySliceLocation = "dicom.image.0020.1041";
     std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
@@ -1542,7 +1542,7 @@ namespace mitk
 
         std::list<StringContainer> imageBlocks =
           SortIntoBlocksFor3DplusT(filenames, tagValueMappings, sort, canLoadAs4D);
-        unsigned int volume_count = imageBlocks.size();
+        const TimeStepType volume_count = imageBlocks.size();
 
         imageBlockDescriptor.SetSeriesInstanceUID(
           DicomSeriesReader::ConstCharStarToString(scanner.GetValue(filenames.front().c_str(), tagSeriesInstanceUID)));
@@ -1712,7 +1712,7 @@ namespace mitk
     StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
 
     std::string firstPosition;
-    unsigned int numberOfBlocks(0); // number of 3D image blocks
+    TimeStepType numberOfBlocks(0); // number of 3D image blocks
 
     static const gdcm::Tag tagImagePositionPatient(0x0020, 0x0032); // Image position (Patient)
     const gdcm::Tag tagModality(0x0008, 0x0060);
@@ -1765,17 +1765,18 @@ namespace mitk
 
     // loop files to sort them into image blocks
     unsigned int numberOfExpectedSlices(0);
-    for (unsigned int block = 0; block < numberOfBlocks; ++block)
+    for (TimeStepType block = 0; block < numberOfBlocks; ++block)
     {
       StringContainer filesOfCurrentBlock;
 
-      for (StringContainer::const_iterator fileIter = sorted_filenames.begin() + block;
+      for (StringContainer::const_iterator fileIter =
+             sorted_filenames.begin() + static_cast<StringContainer::difference_type>(block);
            fileIter != sorted_filenames.end();
            // fileIter += numberOfBlocks) // TODO shouldn't this work? give invalid iterators on first attempts
            )
       {
         filesOfCurrentBlock.push_back(*fileIter);
-        for (unsigned int b = 0; b < numberOfBlocks; ++b)
+        for (TimeStepType b = 0; b < numberOfBlocks; ++b)
         {
           if (fileIter != sorted_filenames.end())
             ++fileIter;

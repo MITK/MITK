@@ -67,7 +67,7 @@ namespace mitk
      */
     mitk::PointSet::Pointer ReadPoints(mitk::PointSet::Pointer newPointSet,
                                        tinyxml2::XMLElement *currentTimeSeries,
-                                       unsigned int currentTimeStep);
+                                       mitk::TimeStepType currentTimeStep);
 
     PointSetReaderService *Clone() const override;
   };

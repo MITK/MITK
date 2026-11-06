@@ -274,7 +274,7 @@ void mitk::AffineBaseDataInteractor3D::TranslateGeometry(mitk::Vector3D translat
 mitk::BaseGeometry *mitk::AffineBaseDataInteractor3D::GetUpdatedTimeGeometry(mitk::InteractionEvent *interactionEvent)
 {
   // Get the correct time geometry to support 3D + t
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   BaseGeometry *geometry = this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
   if (geometry == nullptr)
     MITK_ERROR << "Geometry is nullptr. Cannot modify it.";
@@ -384,7 +384,7 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interaction
   m_InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
 
   // Get the timestep to also support 3D+t
-  int timeStep = 0;
+  TimeStepType timeStep = 0;
   if ((interactionEvent->GetSender()) != nullptr)
     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
@@ -408,7 +408,7 @@ void mitk::AffineBaseDataInteractor3D::TranslateObject(StateMachineAction *, Int
   interactionMove[1] = currentPickedPoint[1] - m_InitialPickedWorldPoint[1];
   interactionMove[2] = currentPickedPoint[2] - m_InitialPickedWorldPoint[2];
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   mitk::BaseGeometry::Pointer geometry =
     this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
@@ -468,7 +468,7 @@ void mitk::AffineBaseDataInteractor3D::RotateObject(StateMachineAction *, Intera
     // Use center of data bounding box as center of rotation
     Point3D rotationCenter = m_OriginalGeometry->GetCenter();
 
-    int timeStep = 0;
+    TimeStepType timeStep = 0;
     if ((interactionEvent->GetSender()) != nullptr)
       timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 

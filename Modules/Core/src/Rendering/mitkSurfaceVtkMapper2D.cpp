@@ -190,8 +190,8 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   const TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  ScalarType time = renderer->GetTime();
-  int timestep = 0;
+  const TimePointType time = renderer->GetTime();
+  TimeStepType timestep = 0;
 
   if (time > itk::NumericTraits<ScalarType>::NonpositiveMin())
     timestep = dataTimeGeometry->TimePointToTimeStep(time);

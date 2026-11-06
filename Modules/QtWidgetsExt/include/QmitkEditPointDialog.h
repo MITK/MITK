@@ -53,7 +53,7 @@ public:
    * \param[in] _PointId The identifier of the point within the set.
    * \param[in] timestep The time step at which to read/write the point (default 0).
    */
-  void SetPoint(mitk::PointSet *_PointSet, mitk::PointSet::PointIdentifier _PointId, int timestep = 0);
+  void SetPoint(mitk::PointSet *_PointSet, mitk::PointSet::PointIdentifier _PointId, mitk::TimeStepType timestep = 0);
 
 protected slots:
   void OnOkButtonClicked(bool);

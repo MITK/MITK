@@ -76,14 +76,14 @@ namespace
 
   mitk::Surface::Pointer CreateSurface(mitk::TimeGeometry *timeGeometry)
   {
-    const auto timeSteps = static_cast<unsigned int>(timeGeometry->CountTimeSteps());
+    const auto timeSteps = timeGeometry->CountTimeSteps();
 
     auto surface = mitk::Surface::New();
     surface->SetTimeGeometry(timeGeometry);
     surface->Expand(timeSteps);
 
-    for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
-      surface->SetVtkPolyData(CreateTriangle(timeStep), timeStep);
+    for (mitk::TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
+      surface->SetVtkPolyData(CreateTriangle(static_cast<double>(timeStep)), timeStep);
 
     return surface;
   }
@@ -103,8 +103,8 @@ namespace
   double GetWorldMinimumX(const mitk::Surface *surface, mitk::TimeStepType timeStep)
   {
     auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
-    transformFilter->SetInputData(surface->GetVtkPolyData(static_cast<unsigned int>(timeStep)));
-    transformFilter->SetTransform(surface->GetGeometry(static_cast<int>(timeStep))->GetVtkTransform());
+    transformFilter->SetInputData(surface->GetVtkPolyData(timeStep));
+    transformFilter->SetTransform(surface->GetGeometry(timeStep)->GetVtkTransform());
     transformFilter->Update();
 
     return transformFilter->GetPolyDataOutput()->GetBounds()[0];
@@ -202,7 +202,7 @@ public:
     mitk::Point3D origin;
     mitk::FillVector3D(origin, 10.0, 0.0, 0.0);
 
-    for (int timeStep = 0; timeStep < 3; ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < 3; ++timeStep)
       surface->GetGeometry(timeStep)->SetOrigin(origin);
 
     const auto fileName = m_Directory + "/surface.vtkhdf";
@@ -220,7 +220,7 @@ public:
     {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0 + timeStep, GetWorldMinimumX(loadedSurface, timeStep), mitk::eps);
 
-      auto *normals = loadedSurface->GetVtkPolyData(static_cast<unsigned int>(timeStep))->GetPointData()->GetNormals();
+      auto *normals = loadedSurface->GetVtkPolyData(timeStep)->GetPointData()->GetNormals();
       CPPUNIT_ASSERT(normals != nullptr);
       CPPUNIT_ASSERT_EQUAL(vtkIdType(3), normals->GetNumberOfTuples());
     }
@@ -361,8 +361,8 @@ public:
       auto surface = CreateSurface(0.0, 1.0, 3);
       surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), 0);
 
-      for (unsigned int timeStep = 1; timeStep < 3; ++timeStep)
-        surface->SetVtkPolyData(CreateTriangle(timeStep, pointDataType), timeStep);
+      for (mitk::TimeStepType timeStep = 1; timeStep < 3; ++timeStep)
+        surface->SetVtkPolyData(CreateTriangle(static_cast<double>(timeStep), pointDataType), timeStep);
 
       const auto fileName = m_Directory + "/surface.vtkhdf";
       mitk::IOUtil::Save(surface, fileName);

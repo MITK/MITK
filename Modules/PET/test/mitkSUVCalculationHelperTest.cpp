@@ -60,14 +60,14 @@ namespace
   // Build a 1x1xnSlicesxnTimeSteps mitk::Image with float pixels. The data
   // buffer is irrelevant for these tests; only the time geometry / slice
   // count is consulted by DeduceDecayCorrection's iteration loop.
-  mitk::Image::Pointer MakeSyntheticImage(unsigned int nSlices, unsigned int nTimeSteps)
+  mitk::Image::Pointer MakeSyntheticImage(unsigned int nSlices, mitk::TimeStepType nTimeSteps)
   {
     mitk::Image::Pointer image = mitk::Image::New();
     const mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
 
     if (nTimeSteps > 1)
     {
-      const unsigned int dims[4] = { 1u, 1u, nSlices, nTimeSteps };
+      const unsigned int dims[4] = { 1u, 1u, nSlices, static_cast<unsigned int>(nTimeSteps) };
       image->Initialize(pixelType, 4, dims);
     }
     else

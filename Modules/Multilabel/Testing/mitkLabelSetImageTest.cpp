@@ -731,10 +731,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Label mask not correctly created", maskImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 507);
   }
 
-  static mitk::MultiLabelSegmentation::Pointer CreateCenterOfMassTestSegmentation(unsigned int timeSteps)
+  static mitk::MultiLabelSegmentation::Pointer CreateCenterOfMassTestSegmentation(mitk::TimeStepType timeSteps)
   {
     auto referenceImage = mitk::Image::New();
-    unsigned int dimensions[4] = { 96, 128, 52, timeSteps };
+    unsigned int dimensions[4] = { 96, 128, 52, static_cast<unsigned int>(timeSteps) };
     referenceImage->Initialize(mitk::MakeScalarPixelType<char>(), 1 < timeSteps ? 4 : 3, dimensions);
 
     mitk::Vector3D spacing;

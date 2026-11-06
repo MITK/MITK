@@ -178,7 +178,7 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 }
 
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
-  int t, unsigned int /*component*/)
+  TimeStepType t, unsigned int /*component*/)
 {
   mitk::ImageTimeSelector *timeSelector = this->GetTimeSelector();
   if (timeSelector != nullptr)
@@ -195,7 +195,7 @@ const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::G
   return nullptr;
 }
 
-bool mitk::ImageStatisticsHolder::IsValidTimeStep(int t) const
+bool mitk::ImageStatisticsHolder::IsValidTimeStep(TimeStepType t) const
 {
   return m_Image->IsValidTimeStep(t);
 }
@@ -209,7 +209,7 @@ mitk::ImageTimeSelector::Pointer mitk::ImageStatisticsHolder::GetTimeSelector()
   return timeSelector;
 }
 
-void mitk::ImageStatisticsHolder::Expand(unsigned int timeSteps)
+void mitk::ImageStatisticsHolder::Expand(TimeStepType timeSteps)
 {
   if (!m_Image->IsValidTimeStep(timeSteps - 1))
     return;
@@ -238,7 +238,7 @@ void mitk::ImageStatisticsHolder::ResetImageStatistics()
   m_CountOfMaxValuedVoxels.assign(1, 0);
 }
 
-void mitk::ImageStatisticsHolder::ComputeScalarExtrema(int t)
+void mitk::ImageStatisticsHolder::ComputeScalarExtrema(TimeStepType t)
 {
   const auto pixelType = m_Image->GetPixelType(0);
 
@@ -283,7 +283,7 @@ void mitk::ImageStatisticsHolder::ComputeScalarExtrema(int t)
 template <typename ItkImageType>
 void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
                                            mitk::ImageStatisticsHolder *statisticsHolder,
-                                           int t,
+                                           TimeStepType t,
                                            unsigned int component)
 {
   typename ItkImageType::RegionType region;
@@ -358,7 +358,7 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
 }
 /// \endcond SKIP_DOXYGEN
-void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int component)
+void mitk::ImageStatisticsHolder::ComputeImageStatistics(TimeStepType t, unsigned int component)
 {
   // timestep valid?
   if (!m_Image->IsValidTimeStep(t))
@@ -407,42 +407,42 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
   }
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValueMin(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValueMin(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);
   return m_ScalarMin[t];
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValueMax(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValueMax(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);
   return m_ScalarMax[t];
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValue2ndMin(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValue2ndMin(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);
   return m_Scalar2ndMin[t];
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValue2ndMax(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetScalarValue2ndMax(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);
   return m_Scalar2ndMax[t];
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetCountOfMinValuedVoxels(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetCountOfMinValuedVoxels(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);
   return m_CountOfMinValuedVoxels[t];
 }
 
-mitk::ScalarType mitk::ImageStatisticsHolder::GetCountOfMaxValuedVoxels(int t, unsigned int component)
+mitk::ScalarType mitk::ImageStatisticsHolder::GetCountOfMaxValuedVoxels(TimeStepType t, unsigned int component)
 {
   const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
   this->ComputeImageStatistics(t, component);

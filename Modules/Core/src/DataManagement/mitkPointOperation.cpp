@@ -19,7 +19,7 @@ mitk::PointOperation::PointOperation(
 }
 
 mitk::PointOperation::PointOperation(OperationType operationType,
-                                     ScalarType timeInMS,
+                                     TimePointType timeInMS,
                                      Point3D point,
                                      int index,
                                      bool selected,
@@ -57,7 +57,7 @@ mitk::PointSpecificationType mitk::PointOperation::GetPointType()
   return m_Type;
 }
 
-mitk::ScalarType mitk::PointOperation::GetTimeInMS() const
+mitk::TimePointType mitk::PointOperation::GetTimeInMS() const
 {
   return m_TimeInMS;
 }

@@ -253,7 +253,8 @@ void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(con
       //  Need to change properties
       contourPlaneGeometryDataNode->SetProperty("name", mitk::StringProperty::New(contourName) );
       contourPlaneGeometryDataNode->SetProperty("labelID", mitk::UShortProperty::New(contourInfo.LabelValue));
-      contourPlaneGeometryDataNode->SetProperty("timeStep", mitk::IntProperty::New(contourInfo.TimeStep));
+      contourPlaneGeometryDataNode->SetProperty("timeStep",
+                                                mitk::IntProperty::New(static_cast<int>(contourInfo.TimeStep)));
       contourPlaneGeometryDataNode->SetProperty("segmentationRuntimeUID",
           mitk::StringProperty::New(selectedSegmentation->GetRuntimeUID()));
 

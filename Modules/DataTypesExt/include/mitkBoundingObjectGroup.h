@@ -111,7 +111,7 @@ namespace mitk
      * \param[in] t The time step (default is 0).
      * \return The geometry at the given time step.
      */
-    mitk::BaseGeometry *GetGeometry(int t = 0) const;
+    mitk::BaseGeometry *GetGeometry(TimeStepType t = 0) const;
 
     /**
      * \brief Verify that the requested region is valid.

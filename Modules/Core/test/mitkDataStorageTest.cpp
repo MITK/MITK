@@ -855,12 +855,13 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
   mitk::TimeBounds timebounds = geometry->GetTimeBounds();
   MITK_TEST_CONDITION((timebounds[0] == 0) && (timebounds[1] == 4),
                       "Test for timebounds with ComputeBoundingGeometry()");
-  for (unsigned int i = 0; i < geometry->CountTimeSteps(); i++)
+  for (mitk::TimeStepType i = 0; i < geometry->CountTimeSteps(); i++)
   {
     mitk::BaseGeometry::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
     mitk::TimeBounds bounds = geometry->GetTimeBounds(i);
-    MITK_TEST_CONDITION((bounds[0] == i) && (bounds[1] == i + 1),
-                        "Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
+    MITK_TEST_CONDITION(
+      (bounds[0] == static_cast<mitk::TimePointType>(i)) && (bounds[1] == static_cast<mitk::TimePointType>(i + 1)),
+      "Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }
   geometry = ds->ComputeBoundingGeometry3D(all);
   MITK_TEST_CONDITION(geometry->CountTimeSteps() == 4,
@@ -868,12 +869,13 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
   timebounds = geometry->GetTimeBounds();
   MITK_TEST_CONDITION((timebounds[0] == 0) && (timebounds[1] == 4),
                       "Test for timebounds with ComputeBoundingGeometry(allNodes)");
-  for (unsigned int i = 0; i < geometry->CountTimeSteps(); i++)
+  for (mitk::TimeStepType i = 0; i < geometry->CountTimeSteps(); i++)
   {
     mitk::BaseGeometry::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
     mitk::TimeBounds bounds = geometry->GetTimeBounds(i);
-    MITK_TEST_CONDITION((bounds[0] == i) && (bounds[1] == i + 1),
-                        "Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
+    MITK_TEST_CONDITION(
+      (bounds[0] == static_cast<mitk::TimePointType>(i)) && (bounds[1] == static_cast<mitk::TimePointType>(i + 1)),
+      "Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }
 
   // test for thread safety of DataStorage

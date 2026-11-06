@@ -128,7 +128,7 @@ namespace mitk
     }
 
     /** Returns a reference to the pixel at given world coordinate */
-    void SetPixelByWorldCoordinates(const mitk::Point3D &, const TPixel &value, unsigned int timestep = 0);
+    void SetPixelByWorldCoordinates(const mitk::Point3D &, const TPixel &value, mitk::TimeStepType timestep = 0);
 
     /** \brief Destructor informs Image to unlock memory. */
     ~ImagePixelWriteAccessor() override {}

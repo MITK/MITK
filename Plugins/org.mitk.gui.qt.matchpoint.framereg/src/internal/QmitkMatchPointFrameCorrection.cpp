@@ -432,7 +432,7 @@ void QmitkMatchPointFrameCorrection::ConfigureFrameList()
   {
     mitk::TimeGeometry::ConstPointer tg = m_spSelectedTargetData->GetTimeGeometry();
 
-    for (unsigned int i = 1; i < tg->CountTimeSteps(); ++i)
+    for (mitk::TimeStepType i = 1; i < tg->CountTimeSteps(); ++i)
     {
       QString lable = "Timepoint #" + QString::number(i) + QString(" (") + QString::number(
                         tg->GetMinimumTimePoint(i)) + QString(" ms - " + QString::number(tg->GetMaximumTimePoint(
@@ -490,7 +490,7 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
 
     if (item->checkState() == Qt::Unchecked)
     {
-      result.push_back(row + 1);
+      result.push_back(static_cast<mitk::TimeStepType>(row + 1));
     }
   }
 

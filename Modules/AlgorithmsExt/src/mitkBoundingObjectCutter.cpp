@@ -164,7 +164,7 @@ namespace mitk
     m_TimeOfHeaderInitialization.Modified();
   }
 
-  void BoundingObjectCutter::ComputeData(mitk::Image *input3D, int boTimeStep)
+  void BoundingObjectCutter::ComputeData(mitk::Image *input3D, TimeStepType boTimeStep)
   {
     if (input3D != nullptr && input3D->GetPixelType().GetNumberOfComponents() == 1)
     {
@@ -197,12 +197,11 @@ namespace mitk
     const mitk::TimeGeometry *boundingObjectTimeGeometry = m_BoundingObject->GetTimeGeometry();
     TimePointType timeInMS;
 
-    int timestep = 0;
-    int tstart = outputRegion.GetIndex(3);
-    int tmax = tstart + outputRegion.GetSize(3);
+    TimeStepType timestep = 0;
+    const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+    const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
-    int t;
-    for (t = tstart; t < tmax; ++t)
+    for (TimeStepType t = tstart; t < tmax; ++t)
     {
       timeInMS = outputTimeGeometry->TimeStepToTimePoint(t);
       timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);

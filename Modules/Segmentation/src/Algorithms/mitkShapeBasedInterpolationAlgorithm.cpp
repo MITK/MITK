@@ -31,7 +31,7 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   unsigned int requestedIndex,
   unsigned int /*sliceDimension*/, // commented variables are not used
   Image::Pointer resultImage,
-  unsigned int /*timeStep*/,
+  TimeStepType /*timeStep*/,
   Image::ConstPointer /*referenceImage*/)
 {
   auto lowerDistanceImage = this->ComputeDistanceMap(lowerSliceIndex, lowerSlice);

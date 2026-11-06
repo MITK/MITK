@@ -88,14 +88,14 @@ namespace mitk
      *
      * \param timestep The time step index to extract.
      */
-    void SetTimeStep(unsigned int timestep) { m_TimeStep = timestep; }
+    void SetTimeStep(TimeStepType timestep) { m_TimeStep = timestep; }
 
     /**
      * \brief Get the current time step.
      *
      * \return The time step index currently set.
      */
-    unsigned int GetTimeStep() { return m_TimeStep; }
+    TimeStepType GetTimeStep() { return m_TimeStep; }
 
     /**
      * \brief Set the component of a multi-component image to be extracted.
@@ -291,7 +291,7 @@ namespace mitk
     PlaneGeometry::ConstPointer m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
-    unsigned int m_TimeStep;
+    TimeStepType m_TimeStep;
 
     unsigned int m_OutputDimension;
 

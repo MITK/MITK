@@ -57,7 +57,7 @@ void mitk::ForEachVoxelRunInsideSurface(const Surface* surface, TimeStepType sur
   if (!image->GetTimeGeometry()->IsValidTimeStep(imageTimeStep))
     mitkThrow() << "Cannot rasterize surface. The image does not have time step " << imageTimeStep << ".";
 
-  auto* polyData = surface->GetVtkPolyData(static_cast<unsigned int>(surfaceTimeStep));
+  auto* polyData = surface->GetVtkPolyData(surfaceTimeStep);
 
   if (nullptr == polyData || 0 == polyData->GetNumberOfPoints())
     return;
@@ -72,7 +72,7 @@ void mitk::ForEachVoxelRunInsideSurface(const Surface* surface, TimeStepType sur
   auto transform = vtkSmartPointer<vtkTransform>::New();
   transform->PostMultiply();
   transform->Concatenate(surfaceGeometry->GetVtkTransform()->GetMatrix());
-  transform->Concatenate(image->GetGeometry(static_cast<int>(imageTimeStep))->GetVtkTransform()->GetLinearInverse());
+  transform->Concatenate(image->GetGeometry(imageTimeStep)->GetVtkTransform()->GetLinearInverse());
 
   auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
   transformFilter->SetInputData(polyData);
@@ -180,13 +180,12 @@ void mitk::SurfaceToImageFilter::GenerateData()
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
 
-  int tstart = outputRegion.GetIndex(3);
-  int tmax = tstart + outputRegion.GetSize(3);
+  const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+  const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
   if (tmax > 0)
   {
-    int t;
-    for (t = tstart; t < tmax; ++t)
+    for (TimeStepType t = tstart; t < tmax; ++t)
     {
       Stencil3DImage(t);
     }
@@ -197,7 +196,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
   }
 }
 
-void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
+void mitk::SurfaceToImageFilter::Stencil3DImage(TimeStepType time)
 {
   auto* output = this->GetOutput();
   const auto* image = this->GetImage();

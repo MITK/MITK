@@ -50,8 +50,8 @@ static void Valid_AllInputTimesteps_ReturnsTrue()
   timeSelector->SetInput(m_Image);
 
   // test all timesteps
-  const unsigned int maxTimeStep = m_Image->GetTimeSteps();
-  for (unsigned int t = 0; t < maxTimeStep; t++)
+  const mitk::TimeStepType maxTimeStep = m_Image->GetTimeSteps();
+  for (mitk::TimeStepType t = 0; t < maxTimeStep; t++)
   {
     timeSelector->SetTimeNr(t);
     timeSelector->Update();
@@ -71,7 +71,7 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
 
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
 
-  const unsigned int maxTimeStep = m_Image->GetTimeSteps();
+  const mitk::TimeStepType maxTimeStep = m_Image->GetTimeSteps();
   mitk::TimeGeometry *tsg = m_Image->GetTimeGeometry();
   auto *ptg = dynamic_cast<mitk::ProportionalTimeGeometry *>(tsg);
   ptg->Expand(maxTimeStep + 1);
@@ -82,7 +82,7 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
 
   timeSelector->SetInput(expandedImage);
 
-  for (unsigned int t = 0; t < maxTimeStep + 1; t++)
+  for (mitk::TimeStepType t = 0; t < maxTimeStep + 1; t++)
   {
     timeSelector->SetTimeNr(t);
     timeSelector->Update();

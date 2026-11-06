@@ -165,7 +165,7 @@ namespace mitk
     using Superclass::SetClonedGeometry;
 
     /** \brief Takes a copy of a flat plane for time step 0. \throw mitk::Exception for any other geometry or time step. */
-    void SetClonedGeometry(const BaseGeometry *geometry, unsigned int time) override;
+    void SetClonedGeometry(const BaseGeometry *geometry, TimeStepType time) override;
 
     /** \throw mitk::Exception if the time geometry of the data is not one a figure can take. */
     void CopyInformation(const itk::DataObject *data) override;
@@ -289,7 +289,7 @@ namespace mitk
     std::optional<double> GetMeasurement(MeasurementType type) const;
 
     /** \brief A figure without control points is empty; its plane does not count for bounding boxes, for example. */
-    bool IsEmptyTimeStep(unsigned int timeStep) const override;
+    bool IsEmptyTimeStep(TimeStepType timeStep) const override;
 
     void UpdateOutputInformation() override;
     void SetRequestedRegionToLargestPossibleRegion() override;
@@ -325,7 +325,7 @@ namespace mitk
      */
     virtual bool EqualShape(const PlanarFigure &other, ScalarType eps, bool verbose) const;
 
-    void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
+    void InitializeTimeGeometry(TimeStepType timeSteps = 1) override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

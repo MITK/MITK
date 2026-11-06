@@ -369,11 +369,11 @@ namespace
     mitk::Vector3D minSpacing;
     minSpacing.Fill(itk::NumericTraits<mitk::ScalarType>::max());
 
-    const mitk::ScalarType stmax = itk::NumericTraits<mitk::ScalarType>::max();
-    const mitk::ScalarType stmin = itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
+    const mitk::TimePointType stmax = itk::NumericTraits<mitk::TimePointType>::max();
+    const mitk::TimePointType stmin = itk::NumericTraits<mitk::TimePointType>::NonpositiveMin();
 
-    std::set<mitk::ScalarType> existingTimePoints;
-    mitk::ScalarType maximalTime = 0;
+    std::set<mitk::TimePointType> existingTimePoints;
+    mitk::TimePointType maximalTime = 0;
 
     // Needed for check of zero bounding boxes
     mitk::ScalarType nullpoint[] = {0, 0, 0, 0, 0, 0};
@@ -589,10 +589,10 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds(const char *boolPropertyKe
 {
   TimeBounds timeBounds;
 
-  ScalarType stmin, stmax, cur;
+  TimePointType stmin, stmax, cur;
 
-  stmin = itk::NumericTraits<ScalarType>::NonpositiveMin();
-  stmax = itk::NumericTraits<ScalarType>::max();
+  stmin = itk::NumericTraits<TimePointType>::NonpositiveMin();
+  stmax = itk::NumericTraits<TimePointType>::max();
 
   timeBounds[0] = stmax;
   timeBounds[1] = stmin;

@@ -180,8 +180,7 @@ namespace
       const std::string v = lastValue;
       if (v.empty()) return false;
 
-      const unsigned int t =
-        static_cast<unsigned int>(i) / static_cast<unsigned int>(framesPerTimeStep);
+      const mitk::TimeStepType t = i / static_cast<mitk::TimeStepType>(framesPerTimeStep);
       const unsigned int s =
         static_cast<unsigned int>(i) % static_cast<unsigned int>(framesPerTimeStep);
       outTable.SetTableValue(static_cast<int>(i), { t, s, v });

@@ -36,7 +36,7 @@ namespace mitk
     /** \brief Initialize the time geometry with the given number of time steps.
      * \param timeSteps Number of time steps to initialize.
      */
-    void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
+    void InitializeTimeGeometry(TimeStepType timeSteps /* = 1 */) override
     {
       Superclass::InitializeTimeGeometry(timeSteps);
     }

@@ -228,7 +228,7 @@ namespace mitk
      * \param surface The output surface to populate.
      * \param threshold The iso-surface threshold (can differ from the member threshold).
      */
-    void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface *surface, const ScalarType threshold);
+    void CreateSurface(TimeStepType time, vtkImageData *vtkimage, mitk::Surface *surface, const ScalarType threshold);
 
     /** \brief Flag whether the created surface shall be smoothed (default is false). */
     bool m_Smooth;

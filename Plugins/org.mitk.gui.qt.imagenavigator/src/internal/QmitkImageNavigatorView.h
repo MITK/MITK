@@ -80,7 +80,7 @@ private:
   void SetBorderColor(QmitkRenderWindow* renderWindow);
 
   int GetClosestAxisIndex(const mitk::Vector3D& normal);
-  void SetVisibilityOfTimeSlider(size_t timeSteps);
+  void SetVisibilityOfTimeSlider(mitk::TimeStepType timeSteps);
 
   std::unique_ptr<Ui::QmitkImageNavigatorView> m_Ui;
   std::array<AxisUi, 3> m_AxisUi;

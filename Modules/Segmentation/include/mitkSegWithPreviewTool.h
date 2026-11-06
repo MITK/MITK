@@ -479,7 +479,7 @@ namespace mitk
 
     /** Resets only the image content of the specified timeStep of the preview image. If the preview image or the specified
     time step does not exist, nothing happens.*/
-    void ResetPreviewContentAtTimeStep(unsigned int timeStep);
+    void ResetPreviewContentAtTimeStep(TimeStepType timeStep);
 
     /** Removes all labels of the preview image together with their pixel content.
     * For a tool that replaces the labels of the preview on every update, as

@@ -92,7 +92,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   //
   mitk::Image *image = (mitk::Image *)GetInput();
 
-  unsigned int numberOfTimeSteps = image->GetTimeGeometry()->CountTimeSteps();
+  const TimeStepType numberOfTimeSteps = image->GetTimeGeometry()->CountTimeSteps();
 
   //
   // set the number of outputs to the number of labels used.
@@ -143,10 +143,10 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
     mitk::Surface::Pointer surface = this->GetOutput(currentOutputIndex);
     assert(surface.IsNotNull());
 
-    int tstart = outputRegion.GetIndex(3);
-    int tmax = tstart + outputRegion.GetSize(3); // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloet
-    int t;
-    for (t = tstart; t < tmax; ++t)
+    const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+    // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloet
+    const TimeStepType tmax = tstart + outputRegion.GetSize(3);
+    for (TimeStepType t = tstart; t < tmax; ++t)
     {
       vtkImageData *vtkimagedata = image->GetVtkImageData(t);
       CreateSurface(t, vtkimagedata, surface.GetPointer(), it->first);
@@ -156,7 +156,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
   }
 }
 
-void mitk::LabeledImageToSurfaceFilter::CreateSurface(int time,
+void mitk::LabeledImageToSurfaceFilter::CreateSurface(TimeStepType time,
                                                       vtkImageData *vtkimage,
                                                       mitk::Surface *surface,
                                                       mitk::LabeledImageToSurfaceFilter::LabelType label)
@@ -316,7 +316,7 @@ mitk::LabeledImageToSurfaceFilter::LabelMapType mitk::LabeledImageToSurfaceFilte
   return availableLabels;
 }
 
-void mitk::LabeledImageToSurfaceFilter::CreateSurface(int, vtkImageData *, mitk::Surface *, const ScalarType)
+void mitk::LabeledImageToSurfaceFilter::CreateSurface(TimeStepType, vtkImageData *, mitk::Surface *, const ScalarType)
 {
   itkWarningMacro("This function should never be called!");
   assert(false);

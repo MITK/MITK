@@ -1097,8 +1097,10 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       concentrationGen->SetRepetitionTime(m_Controls->TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls->RelaxivitySpinBox->value());
       concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls->PDWImageNodeSelector->GetSelectedNode()->GetData()));
-      concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
-      concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
+      concentrationGen->SetBaselineStartTimeStep(
+        static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStep->value()));
+      concentrationGen->SetBaselineEndTimeStep(
+        static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStep->value()));
       //Convert Flipangle from degree to radiant
       double alpha = m_Controls->FlipangleSpinBox->value()/360*2* std::numbers::pi;
       concentrationGen->SetFlipAngle(alpha);
@@ -1109,8 +1111,10 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   else
   {
     concentrationGen->SetFactor(m_Controls->factorSpinBox->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
+    concentrationGen->SetBaselineStartTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStep->value()));
+    concentrationGen->SetBaselineEndTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStep->value()));
   }
 
 

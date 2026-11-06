@@ -792,7 +792,7 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction*, InteractionEve
   this->GetReferenceDataNode()->GetIntProperty("Image.Displayed Component", displayedComponent);
   const auto component = static_cast<unsigned int>(displayedComponent);
   const auto referenceTimeStep =
-    static_cast<int>(referenceImage->GetTimeGeometry()->TimePointToTimeStep(positionEvent->GetSender()->GetTime()));
+    referenceImage->GetTimeGeometry()->TimePointToTimeStep(positionEvent->GetSender()->GetTime());
   auto* statistics = referenceImage->GetStatistics();
   const double valueRange = statistics->GetScalarValueMax(referenceTimeStep, component) -
                             statistics->GetScalarValueMin(referenceTimeStep, component);

@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkInternalEvent.h>
 #include <mitkPointSetDataInteractor.h>
 
-QmitkPointListModel::QmitkPointListModel(mitk::DataNode *pointSetNode, int t, QObject *parent)
+QmitkPointListModel::QmitkPointListModel(mitk::DataNode *pointSetNode, mitk::TimeStepType t, QObject *parent)
   : QAbstractListModel(parent),
     m_PointSetNode(nullptr),
     m_PointSetModifiedObserverTag(0),
@@ -53,7 +53,7 @@ mitk::PointSet *QmitkPointListModel::GetPointSet() const
   return this->CheckForPointSetInNode(m_PointSetNode);
 }
 
-void QmitkPointListModel::SetTimeStep(int t)
+void QmitkPointListModel::SetTimeStep(mitk::TimeStepType t)
 {
   m_TimeStep = t;
   QAbstractListModel::beginResetModel();
@@ -61,7 +61,7 @@ void QmitkPointListModel::SetTimeStep(int t)
   emit SignalUpdateSelection();
 }
 
-int QmitkPointListModel::GetTimeStep() const
+mitk::TimeStepType QmitkPointListModel::GetTimeStep() const
 {
   return m_TimeStep;
 }
@@ -269,7 +269,7 @@ void QmitkPointListModel::MoveSelectedPointUp()
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
+  const mitk::TimePointType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
   mitk::PointOperation *doOp =
     new mitk::PointOperation(mitk::OpMOVEPOINTUP, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);
@@ -284,7 +284,7 @@ void QmitkPointListModel::MoveSelectedPointDown()
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
+  const mitk::TimePointType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
   mitk::PointOperation *doOp = new mitk::PointOperation(
     mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);
@@ -299,7 +299,7 @@ void QmitkPointListModel::RemoveSelectedPoint()
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
+  const mitk::TimePointType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
   mitk::PointOperation *doOp =
     new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);

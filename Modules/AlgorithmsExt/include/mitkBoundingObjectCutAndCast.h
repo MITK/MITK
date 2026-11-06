@@ -53,7 +53,7 @@ namespace mitk
 
     virtual const std::type_info &GetOutputPixelType();
 
-    virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
+    virtual void ComputeData(mitk::Image *input3D, TimeStepType boTimeStep);
   };
 } // namespace mitk
 

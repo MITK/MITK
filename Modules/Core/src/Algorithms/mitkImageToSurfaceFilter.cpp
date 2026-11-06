@@ -44,7 +44,7 @@ mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
 {
 }
 
-void mitk::ImageToSurfaceFilter::CreateSurface(int time,
+void mitk::ImageToSurfaceFilter::CreateSurface(TimeStepType time,
                                                vtkImageData *vtkimage,
                                                mitk::Surface *surface,
                                                const ScalarType threshold)
@@ -189,20 +189,20 @@ void mitk::ImageToSurfaceFilter::GenerateData()
 
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
-  int tstart = outputRegion.GetIndex(3);
-  int tmax = tstart + outputRegion.GetSize(3); // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
+  const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+  // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
+  const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
   if (nullptr != m_ProgressTask && (tmax - tstart) > 0)
   {
-    m_ProgressTask->AddStepsToDo(4 * (tmax - tstart));
+    m_ProgressTask->AddStepsToDo(static_cast<unsigned int>(4 * (tmax - tstart)));
   }
 
-  int t;
-  for (t = tstart; t < tmax; ++t)
+  for (TimeStepType t = tstart; t < tmax; ++t)
   {
     // A view of its own instead of the representation the mappers share, as this filter may
     // run off the thread that owns the data storage.
-    const ImageVtkReadView view(image, static_cast<TimeStepType>(t));
+    const ImageVtkReadView view(image, t);
     CreateSurface(t, view.GetVtkImageData(), surface, m_Threshold);
 
     if (nullptr != m_ProgressTask)

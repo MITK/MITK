@@ -111,11 +111,11 @@ namespace mitk
   void mitk::MultiComponentImageDataComparisonFilter::CompareMultiComponentImage(const Image *testImage,
                                                                                  const Image *validImage)
   {
-    unsigned int noOfTimes = validImage->GetDimension(3);
+    const TimeStepType noOfTimes = validImage->GetDimension(3);
     unsigned int noOfPixels = validImage->GetDimension(0) * validImage->GetDimension(1) * validImage->GetDimension(2);
     unsigned int noOfComponents = validImage->GetPixelType().GetNumberOfComponents();
 
-    for (unsigned int t = 0; t < noOfTimes; ++t)
+    for (TimeStepType t = 0; t < noOfTimes; ++t)
     {
       ImageReadAccessor readAccTImage(testImage, testImage->GetVolumeData(t));
       ImageReadAccessor readAccVImage(validImage, validImage->GetVolumeData(t));

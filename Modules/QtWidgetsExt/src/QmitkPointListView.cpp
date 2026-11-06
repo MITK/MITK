@@ -110,7 +110,7 @@ void QmitkPointListView::OnPointSetSelectionChanged()
 
   // update this view's selection status as a result to changes in the point set data structure
   m_SelfCall = true;
-  int timeStep = m_PointListModel->GetTimeStep();
+  const mitk::TimeStepType timeStep = m_PointListModel->GetTimeStep();
 
   if (pointSet->GetNumberOfSelected(timeStep) > 1)
   {
@@ -218,27 +218,26 @@ void QmitkPointListView::keyPressEvent(QKeyEvent *e)
 
 void QmitkPointListView::wheelEvent(QWheelEvent *event)
 {
-  if (!m_PointListModel || !m_PointListModel->GetPointSet() ||
-      (int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1)
+  if (!m_PointListModel || !m_PointListModel->GetPointSet() || m_PointListModel->GetPointSet()->GetTimeSteps() == 1)
     return;
 
   int whe = event->angleDelta().y();
   mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet *>(m_PointListModel->GetPointSet());
-  unsigned int numberOfTS = ps->GetTimeSteps();
+  const mitk::TimeStepType numberOfTS = ps->GetTimeSteps();
 
   if (numberOfTS == 1)
     return;
-  int currentTS = this->m_PointListModel->GetTimeStep();
+  mitk::TimeStepType currentTS = this->m_PointListModel->GetTimeStep();
   if (whe > 0)
   {
-    if ((currentTS + 1 >= (int)numberOfTS))
+    if (currentTS + 1 >= numberOfTS)
       return;
 
     this->m_PointListModel->SetTimeStep(++currentTS);
   }
   else
   {
-    if ((currentTS <= 0))
+    if (currentTS == 0)
       return;
     this->m_PointListModel->SetTimeStep(--currentTS);
   }
@@ -248,7 +247,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
                       .arg(currentTS);
   this->setToolTip(tooltip);
 
-  emit SignalTimeStepChanged(currentTS);
+  emit SignalTimeStepChanged(static_cast<int>(currentTS));
 }
 
 void QmitkPointListView::ctxMenu(const QPoint &pos)

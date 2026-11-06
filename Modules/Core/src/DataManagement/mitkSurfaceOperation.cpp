@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkSurfaceOperation.h>
 
-mitk::SurfaceOperation::SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, unsigned int t)
+mitk::SurfaceOperation::SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, TimeStepType t)
   : mitk::Operation(operationType), m_polyData(polyData), m_timeStep(t)
 {
 }
@@ -26,7 +26,7 @@ vtkPolyData *mitk::SurfaceOperation::GetVtkPolyData()
   return m_polyData;
 }
 
-unsigned int mitk::SurfaceOperation::GetTimeStep()
+mitk::TimeStepType mitk::SurfaceOperation::GetTimeStep()
 {
   return m_timeStep;
 }

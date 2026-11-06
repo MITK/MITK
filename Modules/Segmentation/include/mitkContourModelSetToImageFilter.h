@@ -42,7 +42,7 @@ namespace mitk
     virtual void SetMakeOutputBinary(bool makeOutputBinary);
     virtual void SetMakeOutputLabelPixelType(bool makeOutputLabelPixelType);
     itkSetMacro(PaintingPixelValue, int);
-    itkSetMacro(TimeStep, unsigned int);
+    itkSetMacro(TimeStep, TimeStepType);
 
     itkGetMacro(MakeOutputBinary, bool);
     itkGetMacro(MakeOutputLabelPixelType, bool);
@@ -111,7 +111,7 @@ namespace mitk
     bool m_MakeOutputLabelPixelType;
     int m_PaintingPixelValue;
 
-    unsigned int m_TimeStep;
+    TimeStepType m_TimeStep;
 
     const mitk::Image *m_ReferenceImage;
 

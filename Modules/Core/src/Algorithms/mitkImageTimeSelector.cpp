@@ -30,7 +30,7 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
   int dim = (input->GetDimension() < 3 ? input->GetDimension() : 3);
   output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
-  if ((unsigned int)m_TimeNr >= input->GetDimension(3))
+  if (m_TimeNr >= input->GetDimension(3))
   {
     m_TimeNr = input->GetDimension(3) - 1;
   }
@@ -89,7 +89,7 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();
-  requestedRegion.SetIndex(3, m_TimeNr);
+  requestedRegion.SetIndex(3, static_cast<Image::IndexValueType>(m_TimeNr));
   requestedRegion.SetIndex(4, m_ChannelNr);
   requestedRegion.SetSize(3, 1);
   requestedRegion.SetSize(4, 1);
@@ -97,7 +97,7 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
   input->SetRequestedRegion(&requestedRegion);
 }
 
-mitk::Image::ConstPointer mitk::SelectImageByTimeStep(const mitk::Image* image, unsigned int timestep)
+mitk::Image::ConstPointer mitk::SelectImageByTimeStep(const mitk::Image* image, TimeStepType timestep)
 {
   if (nullptr == image)
     return image;
@@ -108,14 +108,14 @@ mitk::Image::ConstPointer mitk::SelectImageByTimeStep(const mitk::Image* image, 
   ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
 
   imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+  imageTimeSelector->SetTimeNr(timestep);
 
   imageTimeSelector->UpdateLargestPossibleRegion();
 
   return imageTimeSelector->GetOutput();
 }
 
-mitk::Image::Pointer mitk::SelectImageByTimeStep(mitk::Image* image, unsigned int timestep)
+mitk::Image::Pointer mitk::SelectImageByTimeStep(mitk::Image* image, TimeStepType timestep)
 {
   if (nullptr == image)
     return image;
@@ -126,7 +126,7 @@ mitk::Image::Pointer mitk::SelectImageByTimeStep(mitk::Image* image, unsigned in
   ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
 
   imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+  imageTimeSelector->SetTimeNr(timestep);
 
   imageTimeSelector->UpdateLargestPossibleRegion();
 

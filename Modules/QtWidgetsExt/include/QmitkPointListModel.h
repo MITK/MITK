@@ -45,7 +45,7 @@ public:
    * \param[in] t The time step to use.
    * \param[in] parent The parent QObject.
    */
-  QmitkPointListModel(mitk::DataNode *pointSetNode = nullptr, int t = 0, QObject *parent = nullptr);
+  QmitkPointListModel(mitk::DataNode *pointSetNode = nullptr, mitk::TimeStepType t = 0, QObject *parent = nullptr);
 
   /** \brief Destructor. Removes observers from the point set. */
   ~QmitkPointListModel() override;
@@ -103,13 +103,13 @@ public:
    * \brief Set the time step to display.
    * \param[in] t The time step index.
    */
-  void SetTimeStep(int t);
+  void SetTimeStep(mitk::TimeStepType t);
 
   /**
    * \brief Get the current time step.
    * \return The time step index.
    */
-  int GetTimeStep() const;
+  mitk::TimeStepType GetTimeStep() const;
 
   /**
    * \brief ITK observer callback for point set modification events.
@@ -183,7 +183,7 @@ protected:
   mitk::DataNode *m_PointSetNode;
   unsigned int m_PointSetModifiedObserverTag;
   unsigned int m_PointSetDeletedObserverTag;
-  int m_TimeStep;
+  mitk::TimeStepType m_TimeStep;
 };
 
 #endif

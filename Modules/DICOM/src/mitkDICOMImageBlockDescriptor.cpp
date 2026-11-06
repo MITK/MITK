@@ -657,17 +657,17 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUIDAsName() const
   }
 }
 
-int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
+mitk::TimeStepType mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
 {
   int result = 1;
   this->m_PropertyList->GetIntProperty("timesteps", result);
 
-  return result;
+  return static_cast<TimeStepType>(result);
 };
 
 int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
 {
-  const int numberOfTimesteps = this->GetNumberOfTimeSteps();
+  const TimeStepType numberOfTimesteps = this->GetNumberOfTimeSteps();
   int numberOfFramesPerTimestep = this->m_ImageFrameList.size() / numberOfTimesteps;
 
   // More than one time step is set only by
@@ -898,11 +898,11 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
       const std::string filename = ( *frameIter )->Filename;
       filenamesForSlices_deprecated.SetTableValue( slice, filename );
-      filenamesForSlices.SetTableValue(slice, { static_cast<unsigned int>(timePoint), zSlice, filename });
+      filenamesForSlices.SetTableValue(slice, { static_cast<TimeStepType>(timePoint), zSlice, filename });
 
       if (blockHasFrameModel)
       {
-        framesForSlices.SetTableValue(slice, { static_cast<unsigned int>(timePoint), zSlice,
+        framesForSlices.SetTableValue(slice, { static_cast<TimeStepType>(timePoint), zSlice,
                                                std::to_string((*frameIter)->FrameNo) });
       }
 
@@ -918,7 +918,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
           if (finding.isValid)
           {
             const std::string propKey = (tag.second.empty()) ? DICOMTagPathToPropertyName(finding.path) : tag.second;
-            const DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
+            const DICOMCachedValueInfo info{ static_cast<TimeStepType>(timePoint), zSlice, finding.value };
 
             if (!blockHasFrameModel)
             {

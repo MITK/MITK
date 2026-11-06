@@ -59,7 +59,7 @@ namespace mitk
      * \param t The time step. Defaults to 0.
      * \return Pointer to the histogram, or nullptr if unavailable.
      */
-    virtual const HistogramType *GetScalarHistogram(int t = 0, unsigned int = 0);
+    virtual const HistogramType *GetScalarHistogram(TimeStepType t = 0, unsigned int = 0);
 
     /**
      * \brief Get the minimum scalar value. Recomputation performed only when necessary.
@@ -68,7 +68,7 @@ namespace mitk
      * \param component The component index for vector images. Defaults to 0.
      * \return The minimum scalar value at the given time step.
      */
-    virtual ScalarType GetScalarValueMin(int t = 0, unsigned int component = 0);
+    virtual ScalarType GetScalarValueMin(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the maximum scalar value. Recomputation performed only when necessary.
@@ -77,7 +77,7 @@ namespace mitk
      * \param component The component index for vector images. Defaults to 0.
      * \return The maximum scalar value at the given time step.
      */
-    virtual ScalarType GetScalarValueMax(int t = 0, unsigned int component = 0);
+    virtual ScalarType GetScalarValueMax(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the second smallest scalar value. Recomputation performed only when necessary.
@@ -87,7 +87,7 @@ namespace mitk
      * \return The second smallest scalar value at the given time step.
      * \post The returned value is always a finite value.
      */
-    virtual ScalarType GetScalarValue2ndMin(int t = 0, unsigned int component = 0);
+    virtual ScalarType GetScalarValue2ndMin(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the smallest scalar value without triggering recomputation.
@@ -95,7 +95,7 @@ namespace mitk
      * \param t The time step. Defaults to 0.
      * \return The cached minimum scalar value, or max numeric limit if unavailable.
      */
-    virtual mitk::ScalarType GetScalarValueMinNoRecompute(unsigned int t = 0) const
+    virtual mitk::ScalarType GetScalarValueMinNoRecompute(TimeStepType t = 0) const
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -112,7 +112,7 @@ namespace mitk
      * \return The cached second minimum scalar value, or max numeric limit if unavailable.
      * \post The returned value is always a finite value.
      */
-    virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute(unsigned int t = 0) const
+    virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute(TimeStepType t = 0) const
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -130,7 +130,7 @@ namespace mitk
      * \return The second largest scalar value at the given time step.
      * \post The returned value is always a finite value.
      */
-    virtual ScalarType GetScalarValue2ndMax(int t = 0, unsigned int component = 0);
+    virtual ScalarType GetScalarValue2ndMax(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the largest scalar value without triggering recomputation.
@@ -139,7 +139,7 @@ namespace mitk
      * \return The cached maximum scalar value, or NonpositiveMin if unavailable.
      * \post The returned value is always a finite value.
      */
-    virtual mitk::ScalarType GetScalarValueMaxNoRecompute(unsigned int t = 0)
+    virtual mitk::ScalarType GetScalarValueMaxNoRecompute(TimeStepType t = 0)
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -155,7 +155,7 @@ namespace mitk
      * \param t The time step. Defaults to 0.
      * \return The cached second maximum scalar value, or NonpositiveMin if unavailable.
      */
-    virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute(unsigned int t = 0)
+    virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute(TimeStepType t = 0)
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -172,7 +172,7 @@ namespace mitk
      * \param component The component index for vector images. Defaults to 0.
      * \return The number of voxels having the minimum scalar value.
      */
-    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component = 0);
+    mitk::ScalarType GetCountOfMinValuedVoxels(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the count of voxels with the largest scalar value. Recomputation performed only when necessary.
@@ -181,7 +181,7 @@ namespace mitk
      * \param component The component index for vector images. Defaults to 0.
      * \return The number of voxels having the maximum scalar value.
      */
-    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component = 0);
+    mitk::ScalarType GetCountOfMaxValuedVoxels(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Get the count of voxels with the largest scalar value without triggering recomputation.
@@ -189,7 +189,7 @@ namespace mitk
      * \param t The time step. Defaults to 0.
      * \return The cached count, or 0 if unavailable.
      */
-    virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute(unsigned int t = 0)
+    virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute(TimeStepType t = 0)
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -205,7 +205,7 @@ namespace mitk
      * \param t The time step. Defaults to 0.
      * \return The cached count, or 0 if unavailable.
      */
-    virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute(unsigned int t = 0) const
+    virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute(TimeStepType t = 0) const
     {
       const std::lock_guard<std::mutex> lock(m_StatisticsMutex);
 
@@ -221,12 +221,12 @@ namespace mitk
      * \param t The time step to check.
      * \return True if the time step is valid.
      */
-    bool IsValidTimeStep(int t) const;
+    bool IsValidTimeStep(TimeStepType t) const;
 
     template <typename ItkImageType>
     friend void _ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
                                                 mitk::ImageStatisticsHolder *statisticsHolder,
-                                                int t,
+                                                TimeStepType t,
                                                 unsigned int component);
 
   protected:
@@ -241,21 +241,21 @@ namespace mitk
      * \pre The caller holds m_StatisticsMutex, and keeps holding it while it
      *      reads the statistics computed.
      */
-    virtual void ComputeImageStatistics(int t = 0, unsigned int component = 0);
+    virtual void ComputeImageStatistics(TimeStepType t = 0, unsigned int component = 0);
 
     /**
      * \brief Compute the extrema of a scalar image's time step, in parallel.
      *
      * \param t The time step, which must be valid and already expanded to.
      */
-    void ComputeScalarExtrema(int t);
+    void ComputeScalarExtrema(TimeStepType t);
 
     /**
      * \brief Expand internal statistics storage to accommodate the given number of time steps.
      *
      * \param timeSteps The number of time steps to support.
      */
-    virtual void Expand(unsigned int timeSteps);
+    virtual void Expand(TimeStepType timeSteps);
 
     /**
      * \brief Get an ImageTimeSelector configured with the associated image as input.

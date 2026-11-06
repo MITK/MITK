@@ -76,7 +76,7 @@ namespace mitk
     Image::Pointer Interpolate(unsigned int sliceDimension,
                                unsigned int sliceIndex,
                                const PlaneGeometry *currentPlane,
-                               unsigned int timeStep);
+                               TimeStepType timeStep);
 
     /**
       \brief Interpolates every slice along an image axis that has something to interpolate.
@@ -95,7 +95,7 @@ namespace mitk
     */
     void InterpolateAll(unsigned int sliceDimension,
                         const PlaneGeometry *plane,
-                        unsigned int timeStep,
+                        TimeStepType timeStep,
                         const std::function<void(unsigned int sliceIndex, const Image *interpolation)> &consumer);
 
   protected:
@@ -118,7 +118,7 @@ namespace mitk
     */
     struct EnclosingSlices
     {
-      unsigned int TimeStep = 0;
+      TimeStepType TimeStep = 0;
       unsigned int SliceDimension = 0;
       unsigned int LowerIndex = 0;
       unsigned int UpperIndex = 0;
@@ -139,25 +139,25 @@ namespace mitk
       ShapeBasedInterpolationAlgorithm::Pointer Algorithm;
     };
 
-    const SliceCountsType &GetSliceCounts(unsigned int timeStep);
+    const SliceCountsType &GetSliceCounts(TimeStepType timeStep);
 
     EnclosingSlices CreateEnclosingSlices(unsigned int sliceDimension,
                                           unsigned int lowerIndex,
                                           unsigned int upperIndex,
                                           const PlaneGeometry *plane,
-                                          unsigned int timeStep) const;
+                                          TimeStepType timeStep) const;
 
     /** Like CreateEnclosingSlices(), but reuses the enclosing slices of the previous call while they are still valid. */
     const EnclosingSlices &GetEnclosingSlices(unsigned int sliceDimension,
                                               unsigned int lowerIndex,
                                               unsigned int upperIndex,
                                               const PlaneGeometry *currentPlane,
-                                              unsigned int timeStep);
+                                              TimeStepType timeStep);
 
     /** Interpolates the crop of the enclosing slices in a slice between them. Its geometry places it in that slice. */
     Image::Pointer InterpolateCrop(const EnclosingSlices &enclosingSlices,
                                    unsigned int sliceIndex,
-                                   unsigned int timeStep) const;
+                                   TimeStepType timeStep) const;
 
     Image::ConstPointer m_Segmentation;
     Label::PixelType m_LabelValue;

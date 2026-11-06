@@ -183,7 +183,7 @@ protected:
   QLabel *m_TimeStepLabel;
 
   mitk::DataInteractor::Pointer m_DataInteractor;
-  int m_TimeStep;
+  mitk::TimeStepType m_TimeStep;
   bool m_EditAllowed;
   unsigned long m_NodeObserverTag;
   unsigned long m_InteractorObserverTag;

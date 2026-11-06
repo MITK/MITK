@@ -139,7 +139,7 @@ namespace mitk
     * Throw an exception for a non valid or missing input.*/
     void CheckValidInputs() const;
 
-    mitk::Image::Pointer GetFrameImage(const mitk::Image* image, mitk::TimePointType timePoint) const;
+    mitk::Image::Pointer GetFrameImage(const mitk::Image *image, mitk::TimeStepType timeStep) const;
 
     RegistrationAlgorithmPointer m_Algorithm;
 

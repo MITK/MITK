@@ -164,7 +164,7 @@ protected:
   bool m_validSelectedPosition;
 
   /** @brief currently selected time step of the selected node for the visualization logic*/
-  unsigned int m_currentSelectedTimeStep;
+  mitk::TimeStepType m_currentSelectedTimeStep;
 
   /** @brief currently selected node for the visualization logic*/
   mitk::DataNode::ConstPointer m_currentSelectedNode;

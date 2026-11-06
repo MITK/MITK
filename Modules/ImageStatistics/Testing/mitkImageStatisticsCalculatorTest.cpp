@@ -1922,7 +1922,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
   CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
   mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
-  for (int i = 0; i < 4; i++)
+  for (mitk::TimeStepType i = 0; i < 4; i++)
   {
     CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple time steps", statisticsContainer->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, i));
   }

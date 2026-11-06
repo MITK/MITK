@@ -84,7 +84,7 @@ void mitk::PlanarFigure::SetTimeGeometry(TimeGeometry *geometry)
   Superclass::SetTimeGeometry(geometry);
 }
 
-void mitk::PlanarFigure::SetClonedGeometry(const BaseGeometry *geometry, unsigned int time)
+void mitk::PlanarFigure::SetClonedGeometry(const BaseGeometry *geometry, TimeStepType time)
 {
   if (0 != time)
     mitkThrow() << "A planar figure has a single time step.";
@@ -347,7 +347,7 @@ std::optional<double> mitk::PlanarFigure::GetMeasurement(MeasurementType type) c
   return std::nullopt;
 }
 
-bool mitk::PlanarFigure::IsEmptyTimeStep(unsigned int) const
+bool mitk::PlanarFigure::IsEmptyTimeStep(TimeStepType) const
 {
   return m_ControlPoints.empty();
 }
@@ -382,7 +382,7 @@ void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject *)
 {
 }
 
-void mitk::PlanarFigure::InitializeTimeGeometry(unsigned int timeSteps)
+void mitk::PlanarFigure::InitializeTimeGeometry(TimeStepType timeSteps)
 {
   auto plane = PlaneGeometry::New();
   plane->Initialize();

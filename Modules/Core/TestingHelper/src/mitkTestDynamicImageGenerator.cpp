@@ -97,7 +97,7 @@ namespace mitk
     return image;
   }
 
-  Image::Pointer GenerateTestFrame(double timePoint)
+  Image::Pointer GenerateTestFrame(TimePointType timePoint)
   {
     FrameITKImageType::Pointer image = FrameITKImageType::New();
 

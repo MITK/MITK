@@ -92,7 +92,7 @@ namespace mitk
     std::string m_RealOffsets;
 
     /// Indices of non-M0 timesteps in the original input image
-    std::vector< unsigned int > m_NonM0Indices;
+    std::vector< TimeStepType > m_NonM0Indices;
 
   };
 

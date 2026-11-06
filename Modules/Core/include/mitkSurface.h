@@ -76,7 +76,7 @@ namespace mitk
      *
      * \param[in] timeSteps The desired number of time steps (default: 1).
      */
-    void Expand(unsigned int timeSteps = 1) override;
+    void Expand(TimeStepType timeSteps = 1) override;
 
     /**
      * \brief Get the largest possible region.
@@ -98,7 +98,7 @@ namespace mitk
      *
      * \return The number of time steps stored.
      */
-    unsigned int GetSizeOfPolyDataSeries() const;
+    TimeStepType GetSizeOfPolyDataSeries() const;
 
     /**
      * \brief Get the vtkPolyData at time step \a t.
@@ -109,7 +109,7 @@ namespace mitk
      * \param[in] t Time step (default: 0).
      * \return Pointer to the vtkPolyData, or nullptr if not available.
      */
-    virtual vtkPolyData *GetVtkPolyData(unsigned int t = 0) const;
+    virtual vtkPolyData *GetVtkPolyData(TimeStepType t = 0) const;
 
     /**
      * \brief Graft data and information from another data object.
@@ -127,7 +127,7 @@ namespace mitk
      * \param[in] t The time step to check.
      * \return True if the vtkPolyData at time step \a t is nullptr.
      */
-    bool IsEmptyTimeStep(unsigned int t) const override;
+    bool IsEmptyTimeStep(TimeStepType t) const override;
 
     void PrebuildVtkRepresentation() const override;
 
@@ -176,7 +176,7 @@ namespace mitk
      * \param[in] polydata The vtkPolyData to set.
      * \param[in] t Time step (default: 0). The surface is expanded if necessary.
      */
-    virtual void SetVtkPolyData(vtkPolyData *polydata, unsigned int t = 0);
+    virtual void SetVtkPolyData(vtkPolyData *polydata, TimeStepType t = 0);
 
     /**
      * \brief Swap the contents of this surface with another surface.

@@ -61,7 +61,7 @@ found in the LICENSE file.
   mitk::Image::Pointer mitk::ImageGenerationHelper::GenerateDynamicImageMITK()
   {
 
-    unsigned int timeSteps = this->m_Grid.GetSize();
+    const TimeStepType timeSteps = this->m_Grid.GetSize();
 
     if(this->m_Curve.GetSize() != this->m_Grid.GetSize())
     {
@@ -123,9 +123,9 @@ found in the LICENSE file.
     timeGeometry->ClearAllGeometries();
 
 
-    for (unsigned int i = 0; i<timeSteps; ++i)
+    for (TimeStepType i = 0; i < timeSteps; ++i)
     {
-      mitk::Image::Pointer frameImage = GenerateTestFrame(i);
+      mitk::Image::Pointer frameImage = GenerateTestFrame(static_cast<unsigned int>(i));
       mitk::ImageReadAccessor readAccess(frameImage, frameImage->GetVolumeData(0));
       dynamicImage->SetVolume(readAccess.GetData(),i);
 

@@ -31,7 +31,7 @@ namespace mitk
      \param timestep The time step to read from.
      \param noThrow If set to false, function will throw exceptions. If set to true, exceptions will be blocked, an MITK_ERROR will be notified and the return is 0.0.*/
   MITKMODELFIT_EXPORT ModelTraitsInterface::ParameterValueType ReadVoxel(const mitk::Image* image,
-      const mitk::Point3D& position, unsigned int timestep = 0, bool noThrow = true);
+      const mitk::Point3D& position, mitk::TimeStepType timestep = 0, bool noThrow = true);
 
     /** Helper function that gets the voxel value (as double) of an image (given an image index and a time step).
     Function is used in different contexts of model fit view.
@@ -40,7 +40,7 @@ namespace mitk
     \param timestep The time step to read from.
     \param noThrow If set to false, function will throw exceptions. If set to true, exceptions will be blocked, an MITK_ERROR will be notified and the return is 0.0. */
   MITKMODELFIT_EXPORT ModelTraitsInterface::ParameterValueType ReadVoxel(const mitk::Image* image,
-      const ::itk::Index<3>& index, unsigned int timestep = 0, bool noThrow = true);
+      const ::itk::Index<3>& index, mitk::TimeStepType timestep = 0, bool noThrow = true);
 
     using ParameterValueMapType = std::map<ModelTraitsInterface::ParameterNameType, double>;
 

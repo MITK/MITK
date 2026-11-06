@@ -95,7 +95,7 @@ namespace
    */
   mitk::Surface::Pointer ExtractTimeStep(const mitk::Surface* surface, mitk::TimeStepType timeStep, bool copy, bool keepTime)
   {
-    vtkSmartPointer<vtkPolyData> polyData = surface->GetVtkPolyData(static_cast<unsigned int>(timeStep));
+    vtkSmartPointer<vtkPolyData> polyData = surface->GetVtkPolyData(timeStep);
 
     if (copy && nullptr != polyData)
     {
@@ -105,7 +105,7 @@ namespace
     }
 
     auto timeGeometry = mitk::ProportionalTimeGeometry::New();
-    timeGeometry->Initialize(surface->GetGeometry(static_cast<int>(timeStep)), 1);
+    timeGeometry->Initialize(surface->GetGeometry(timeStep), 1);
 
     if (keepTime)
     {
@@ -657,7 +657,7 @@ void QmitkRemeshingView::OnRemeshingFinished()
     {
       // The other time steps stay as they are. The remeshed points are in the
       // coordinates of the geometry that the time step keeps.
-      originalSurface->SetVtkPolyData(result.Surface->GetVtkPolyData(), static_cast<unsigned int>(*options.TimeStep));
+      originalSurface->SetVtkPolyData(result.Surface->GetVtkPolyData(), *options.TimeStep);
     }
     else
     {

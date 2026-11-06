@@ -426,7 +426,7 @@ mitk::GenerateImageSamplePlotData(const mitk::Point3D& position, const mitk::Ima
   mitk::PlotDataCurve::ValuesType values;
   values.reserve(timeGrid.size());
 
-  for (unsigned int t = 0; t < timeGrid.size(); ++t)
+  for (mitk::TimeStepType t = 0; t < timeGrid.size(); ++t)
   {
     const double x = timeGrid[t];
     const double y = ReadVoxel(image, position, t);

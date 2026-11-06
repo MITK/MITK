@@ -201,7 +201,7 @@ namespace mitk
 
     /** \brief Return if the contour is closed or not.
     */
-    bool IsClosed(int timestep = 0) const;
+    bool IsClosed(TimeStepType timestep = 0) const;
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
@@ -302,7 +302,7 @@ namespace mitk
      * \param[in] t Time step index.
      * \return True if \p t exceeds the number of available time steps.
      */
-    bool IsEmptyTimeStep(unsigned int t) const override;
+    bool IsEmptyTimeStep(TimeStepType t) const override;
 
     /** \brief Check whether a given point lies near the contour at the specified time step.
      * \param[in] point Query position in 3D space.
@@ -453,7 +453,7 @@ namespace mitk
     /**
     \brief Expand the contour model and its TimeGeometry to given number of timesteps.
     */
-    void Expand(unsigned int timeSteps) override;
+    void Expand(TimeStepType timeSteps) override;
 
     /**
     \brief Update the OutputInformation of a ContourModel object

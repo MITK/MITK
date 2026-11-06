@@ -86,7 +86,7 @@ void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *
   if (positionEvent == nullptr)
     return;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
 
   this->GetDataNode()->SetColor(1.0, 0.0, 0.0);
@@ -103,7 +103,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction
   if (positionEvent == nullptr)
     return;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
 
   this->GetDataNode()->SetColor(1.0, 1.0, 1.0);
@@ -120,7 +120,7 @@ void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
   if (positionEvent == nullptr)
     return;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
 
   // Store current picked point
@@ -143,7 +143,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *
   if (positionEvent == nullptr)
     return;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
   BaseGeometry::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
 
@@ -233,7 +233,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *,
     m_GaussSigma = 128.0;
   }
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  const TimeStepType timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
 
   // Colorize surface / wireframe dependent on sigma and distance from picked point
@@ -243,7 +243,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *,
 }
 
 void mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(
-  vtkPolyData *polyData, int timeStep, const Point3D &pickedPoint, int mode, double scalar)
+  vtkPolyData *polyData, TimeStepType timeStep, const Point3D &pickedPoint, int mode, double scalar)
 {
   if (polyData == nullptr)
     return;

@@ -130,7 +130,7 @@ void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
 {
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
-  unsigned int imageTimeStep = 0;
+  mitk::TimeStepType imageTimeStep = 0;
   if (!resetCamera)
   {
     // store the current position to set it again later, if the camera should not be reset
@@ -150,7 +150,7 @@ void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
-    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(static_cast<unsigned int>(imageTimeStep));
   }
 }
 

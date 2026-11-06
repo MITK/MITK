@@ -507,7 +507,7 @@ void mitk::ExtractSliceFilter::GenerateData()
     {
       // If original image was 2D, the slice might have an y extent of 0.
       // Still i want to ensure here that Image is 2D
-      resultImage->Initialize(reslicedImage, 1, -1, -1, 1);
+      resultImage->Initialize(reslicedImage, 1, TIMESTEP_INVALID, -1, 1);
     }
     else
     {

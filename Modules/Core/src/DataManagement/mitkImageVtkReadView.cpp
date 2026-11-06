@@ -26,7 +26,7 @@ namespace
     if (!image->GetTimeGeometry()->IsValidTimeStep(timeStep))
       mitkThrow() << "Cannot create a VTK view of an image. The image does not have time step " << timeStep << ".";
 
-    return image->GetVolumeData(static_cast<int>(timeStep));
+    return image->GetVolumeData(timeStep);
   }
 }
 

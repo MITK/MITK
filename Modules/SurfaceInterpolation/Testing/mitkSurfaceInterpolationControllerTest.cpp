@@ -548,8 +548,8 @@ public:
     selector2->SetInput(img2->GetGroupImage(0));
     selector2->SetChannelNr(0);
 
-    int numTs1 = img1->GetTimeSteps();
-    int numTs2 = img2->GetTimeSteps();
+    const auto numTs1 = img1->GetTimeSteps();
+    const auto numTs2 = img2->GetTimeSteps();
     if (numTs1 != numTs2)
     {
       return false;
@@ -563,7 +563,7 @@ public:
     ind[3] = 2;
     accessor.SetPixelByIndex( ind, 7 );*/
 
-    for (int ts = 0; ts < numTs1; ++ts)
+    for (mitk::TimeStepType ts = 0; ts < numTs1; ++ts)
     {
       selector1->SetTimeNr(ts);
       selector2->SetTimeNr(ts);

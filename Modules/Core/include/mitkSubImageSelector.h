@@ -60,7 +60,7 @@ namespace mitk
      * \param[in] n the channel number.
      * \return The image data item pointer for the requested slice.
      */
-    mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0);
+    mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Get the data item for the specified volume.
@@ -69,7 +69,7 @@ namespace mitk
      * \param[in] n the channel number.
      * \return The image data item pointer for the requested volume.
      */
-    mitk::Image::ImageDataItemPointer GetVolumeData(int t = 0, int n = 0);
+    mitk::Image::ImageDataItemPointer GetVolumeData(TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Get the data item for the specified channel.
@@ -87,7 +87,7 @@ namespace mitk
      * \param[in] t the time step.
      * \param[in] n the channel number.
      */
-    void SetSliceItem(mitk::Image::ImageDataItemPointer dataItem, int s = 0, int t = 0, int n = 0);
+    void SetSliceItem(mitk::Image::ImageDataItemPointer dataItem, int s = 0, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Set the data item for the specified volume in the output image.
@@ -96,7 +96,7 @@ namespace mitk
      * \param[in] t the time step.
      * \param[in] n the channel number.
      */
-    void SetVolumeItem(mitk::Image::ImageDataItemPointer dataItem, int t = 0, int n = 0);
+    void SetVolumeItem(mitk::Image::ImageDataItemPointer dataItem, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Set the data item for the specified channel in the output image.

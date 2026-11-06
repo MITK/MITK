@@ -330,7 +330,7 @@ void QmitkImageNavigatorView::OnRefetch()
   this->SetBorderColors();
 }
 
-void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
+void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(mitk::TimeStepType timeSteps)
 {
   bool isVisible = timeSteps > 1;
 

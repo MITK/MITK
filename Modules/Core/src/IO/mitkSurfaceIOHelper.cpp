@@ -25,7 +25,7 @@ namespace
 {
   int GetPointDataType(const mitk::Surface *surface)
   {
-    for (unsigned int timeStep = 0; timeStep < surface->GetSizeOfPolyDataSeries(); ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < surface->GetSizeOfPolyDataSeries(); ++timeStep)
     {
       auto *polyData = surface->GetVtkPolyData(timeStep);
 
@@ -82,14 +82,14 @@ namespace
 
 vtkSmartPointer<vtkPolyData> mitk::SurfaceIOHelper::GetWorldPolyData(const Surface *surface, TimeStepType timeStep)
 {
-  auto *polyData = surface->GetVtkPolyData(static_cast<unsigned int>(timeStep));
+  auto *polyData = surface->GetVtkPolyData(timeStep);
 
   if (nullptr == polyData)
     mitkThrow() << "The surface has no polygonal data at time step " << timeStep << ".";
 
   auto transformFilter = vtkSmartPointer<vtkTransformFilter>::New();
   transformFilter->SetInputData(polyData);
-  transformFilter->SetTransform(surface->GetGeometry(static_cast<int>(timeStep))->GetVtkTransform());
+  transformFilter->SetTransform(surface->GetGeometry(timeStep)->GetVtkTransform());
   transformFilter->Update();
 
   auto *worldPolyData = transformFilter->GetPolyDataOutput();
@@ -106,12 +106,12 @@ vtkSmartPointer<vtkPolyData> mitk::SurfaceIOHelper::GetWorldPolyData(const Surfa
 
 bool mitk::SurfaceIOHelper::AreValidTimeBounds(const std::vector<TimeBounds> &timeBounds)
 {
-  for (std::size_t i = 0; i < timeBounds.size(); ++i)
+  for (TimeStepType timeStep = 0; timeStep < timeBounds.size(); ++timeStep)
   {
-    if (!(timeBounds[i][0] < timeBounds[i][1]))
+    if (!(timeBounds[timeStep][0] < timeBounds[timeStep][1]))
       return false;
 
-    if (i > 0 && timeBounds[i][0] < timeBounds[i - 1][1])
+    if (timeStep > 0 && timeBounds[timeStep][0] < timeBounds[timeStep - 1][1])
       return false;
   }
 
@@ -121,13 +121,13 @@ bool mitk::SurfaceIOHelper::AreValidTimeBounds(const std::vector<TimeBounds> &ti
 mitk::Surface::Pointer mitk::SurfaceIOHelper::CreateSurface(const std::vector<vtkSmartPointer<vtkPolyData>> &polyDatas,
                                                             const std::vector<TimeBounds> &timeBounds)
 {
-  const auto timeSteps = static_cast<unsigned int>(polyDatas.size());
+  const TimeStepType timeSteps = polyDatas.size();
 
   auto surface = Surface::New();
   surface->SetTimeGeometry(CreateTimeGeometry(timeSteps, timeBounds));
   surface->Expand(timeSteps);
 
-  for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+  for (TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
     surface->SetVtkPolyData(polyDatas[timeStep], timeStep);
 
   return surface;

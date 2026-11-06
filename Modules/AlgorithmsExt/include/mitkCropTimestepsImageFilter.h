@@ -67,13 +67,13 @@ namespace mitk
      * \param[in] _arg The upper boundary timestep (exclusive).
      * \throw mitk::Exception if LowerBoundaryTimestep > UpperBoundaryTimestep.
      */
-    itkSetMacro(UpperBoundaryTimestep, unsigned int);
+    itkSetMacro(UpperBoundaryTimestep, TimeStepType);
 
     /**
      * \brief Get the upper boundary timestep (exclusive).
      * \return The upper boundary timestep.
      */
-    itkGetConstMacro(UpperBoundaryTimestep, unsigned int);
+    itkGetConstMacro(UpperBoundaryTimestep, TimeStepType);
 
     /**
      * \brief Set the first timestep to retain (inclusive lower bound, default: 0).
@@ -81,13 +81,13 @@ namespace mitk
      * \param[in] _arg The lower boundary timestep (inclusive).
      * \throw mitk::Exception if LowerBoundaryTimestep > UpperBoundaryTimestep.
      */
-    itkSetMacro(LowerBoundaryTimestep, unsigned int);
+    itkSetMacro(LowerBoundaryTimestep, TimeStepType);
 
     /**
      * \brief Get the lower boundary timestep (inclusive).
      * \return The lower boundary timestep.
      */
-    itkGetConstMacro(LowerBoundaryTimestep, unsigned int);
+    itkGetConstMacro(LowerBoundaryTimestep, TimeStepType);
 
   private:
     using Superclass::SetInput;
@@ -100,10 +100,10 @@ namespace mitk
     void VerifyInputImage(const mitk::Image* inputImage) const;
     void GenerateOutputInformation() override;
     mitk::SlicedData::RegionType ComputeDesiredRegion() const;
-    mitk::TimeGeometry::Pointer AdaptTimeGeometry(mitk::TimeGeometry::ConstPointer sourceGeometry, unsigned int startTimestep, unsigned int endTimestep) const;
+    mitk::TimeGeometry::Pointer AdaptTimeGeometry(mitk::TimeGeometry::ConstPointer sourceGeometry, TimeStepType startTimestep, TimeStepType endTimestep) const;
 
-    unsigned int m_UpperBoundaryTimestep = std::numeric_limits<unsigned int>::max();
-    unsigned int m_LowerBoundaryTimestep = 0;
+    TimeStepType m_UpperBoundaryTimestep = std::numeric_limits<TimeStepType>::max();
+    TimeStepType m_LowerBoundaryTimestep = 0;
 
     mitk::SlicedData::RegionType m_DesiredRegion;
   };

@@ -38,7 +38,7 @@ namespace
   // iso-contour filter reads next to a contour (radius 2), so cropping with this margin leaves the result unchanged.
   constexpr std::size_t CROP_MARGIN = 3;
 
-  SliceCounts CountLabelVoxels(const mitk::Image* image, unsigned int timeStep, LabelPixelType labelValue)
+  SliceCounts CountLabelVoxels(const mitk::Image* image, mitk::TimeStepType timeStep, LabelPixelType labelValue)
   {
     mitk::ImagePixelReadAccessor<LabelPixelType, 3> accessor(image, image->GetVolumeData(timeStep));
     const auto* voxels = accessor.GetData();
@@ -116,7 +116,7 @@ namespace
 
   mitk::ExtractSliceFilter::Pointer CreateSliceExtractor(const mitk::Image* image,
                                                          const mitk::PlaneGeometry* plane,
-                                                         unsigned int timeStep)
+                                                         mitk::TimeStepType timeStep)
   {
     auto extractor = mitk::ExtractSliceFilter::New();
     extractor->SetInput(image);
@@ -127,7 +127,9 @@ namespace
     return extractor;
   }
 
-  mitk::Image::Pointer ExtractSlice(const mitk::Image* image, const mitk::PlaneGeometry* plane, unsigned int timeStep)
+  mitk::Image::Pointer ExtractSlice(const mitk::Image* image,
+                                    const mitk::PlaneGeometry* plane,
+                                    mitk::TimeStepType timeStep)
   {
     auto extractor = CreateSliceExtractor(image, plane, timeStep);
     extractor->Update();
@@ -135,7 +137,9 @@ namespace
   }
 
   /** The slice the extractor would produce, with all pixels 0 instead of resampled from the image. */
-  mitk::Image::Pointer CreateEmptySlice(const mitk::Image* image, const mitk::PlaneGeometry* plane, unsigned int timeStep)
+  mitk::Image::Pointer CreateEmptySlice(const mitk::Image* image,
+                                        const mitk::PlaneGeometry* plane,
+                                        mitk::TimeStepType timeStep)
   {
     auto extractor = CreateSliceExtractor(image, plane, timeStep);
     extractor->UpdateOutputInformation();
@@ -306,7 +310,7 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Imag
 }
 
 const mitk::SegmentationInterpolationController::SliceCountsType &mitk::SegmentationInterpolationController::GetSliceCounts(
-  unsigned int timeStep)
+  TimeStepType timeStep)
 {
   auto &sliceCounts = m_SliceCounts[timeStep];
   const auto segmentationMTime = m_Segmentation->GetMTime();
@@ -325,7 +329,7 @@ mitk::SegmentationInterpolationController::EnclosingSlices mitk::SegmentationInt
   unsigned int lowerIndex,
   unsigned int upperIndex,
   const PlaneGeometry *plane,
-  unsigned int timeStep) const
+  TimeStepType timeStep) const
 {
   const auto *imageGeometry = m_Segmentation->GetGeometry(timeStep);
   const auto lowerPlane = MovePlaneToSlice(plane, imageGeometry, sliceDimension, lowerIndex);
@@ -380,7 +384,7 @@ const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::Segmenta
   unsigned int lowerIndex,
   unsigned int upperIndex,
   const PlaneGeometry *currentPlane,
-  unsigned int timeStep)
+  TimeStepType timeStep)
 {
   const auto lowerPlane = MovePlaneToSlice(currentPlane, m_Segmentation->GetGeometry(timeStep), sliceDimension, lowerIndex);
 
@@ -402,7 +406,7 @@ const mitk::SegmentationInterpolationController::EnclosingSlices &mitk::Segmenta
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateCrop(const EnclosingSlices &enclosingSlices,
                                                                                 unsigned int sliceIndex,
-                                                                                unsigned int timeStep) const
+                                                                                TimeStepType timeStep) const
 {
   if (enclosingSlices.LowerCrop.IsNull())
     return nullptr;
@@ -432,7 +436,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::InterpolateCrop(
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
                                                                             unsigned int sliceIndex,
                                                                             const PlaneGeometry *currentPlane,
-                                                                            unsigned int timeStep)
+                                                                            TimeStepType timeStep)
 {
   if (m_Segmentation.IsNull() || nullptr == currentPlane)
     return nullptr;
@@ -477,7 +481,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
 void mitk::SegmentationInterpolationController::InterpolateAll(
   unsigned int sliceDimension,
   const PlaneGeometry *plane,
-  unsigned int timeStep,
+  TimeStepType timeStep,
   const std::function<void(unsigned int sliceIndex, const Image *interpolation)> &consumer)
 {
   if (m_Segmentation.IsNull() || nullptr == plane)

@@ -68,7 +68,7 @@ namespace mitk
         readVolume = InPlaceFixUpTiltedGeometry(reader->GetOutput(), tiltInfo);
       }
 
-      unsigned int volume_count = imageBlocks.size();
+      const TimeStepType volume_count = imageBlocks.size();
       image->InitializeByItk(readVolume.GetPointer(), 1, volume_count);
       image->SetImportVolume(readVolume->GetBufferPointer(), 0u);
 
@@ -95,7 +95,7 @@ namespace mitk
 
     if (preLoadedImageBlock.IsNull())
     {
-      unsigned int act_volume = 1u;
+      TimeStepType act_volume = 1;
       for (auto df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
       {
         reader->SetFileNames(*df_it);

@@ -42,8 +42,9 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   auto *image = (mitk::Image *)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
-  int tstart = outputRegion.GetIndex(3);
-  int tmax = tstart + outputRegion.GetSize(3); // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
+  const auto tstart = static_cast<TimeStepType>(outputRegion.GetIndex(3));
+  // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
+  const TimeStepType tmax = tstart + outputRegion.GetSize(3);
 
   ScalarType thresholdExpanded = this->m_Threshold;
 
@@ -51,10 +52,10 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   // CreateSurface() reports for each of them.
   if (nullptr != m_ProgressTask && (tmax - tstart) > 0)
   {
-    m_ProgressTask->AddStepsToDo(7 * (tmax - tstart));
+    m_ProgressTask->AddStepsToDo(static_cast<unsigned int>(7 * (tmax - tstart)));
   }
 
-  for (int t = tstart; t < tmax; ++t)
+  for (TimeStepType t = tstart; t < tmax; ++t)
   {
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 

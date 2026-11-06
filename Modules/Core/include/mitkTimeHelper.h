@@ -36,19 +36,20 @@ namespace mitk
     assert(inputTimeGeometry != nullptr);
 
     // convert the start-index-time of output in start-index-time of input via millisecond-time
-    mitk::TimePointType timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
+    const auto outputStart = static_cast<mitk::TimeStepType>(outputRegion.GetIndex(3));
+    mitk::TimePointType timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputStart);
     mitk::TimeStepType timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
     if ((timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin()) &&
         (inputTimeGeometry->IsValidTimeStep(timestep)))
-      inputRegion.SetIndex(3, timestep);
+      inputRegion.SetIndex(3, static_cast<typename TInputRegion::IndexValueType>(timestep));
     else
       inputRegion.SetIndex(3, 0);
     // convert the end-index-time of output in end-index-time of input via millisecond-time
-    timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3) + outputRegion.GetSize(3) - 1);
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputStart + outputRegion.GetSize(3) - 1);
     timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
     if ((timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin()) &&
         (outputTimeGeometry->IsValidTimeStep(timestep)))
-      inputRegion.SetSize(3, timestep - inputRegion.GetIndex(3) + 1);
+      inputRegion.SetSize(3, timestep - static_cast<mitk::TimeStepType>(inputRegion.GetIndex(3)) + 1);
     else
       inputRegion.SetSize(3, 1);
   }

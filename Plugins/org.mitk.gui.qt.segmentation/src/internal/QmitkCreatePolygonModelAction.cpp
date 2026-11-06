@@ -72,12 +72,12 @@ namespace
     auto surface = Surface::New();
     surface->SetTimeGeometry(timeGeometry);
 
-    const auto timeSteps = static_cast<unsigned int>(timeGeometry->CountTimeSteps());
+    const auto timeSteps = timeGeometry->CountTimeSteps();
     surface->Expand(timeSteps);
 
     // Time steps without a boundary still get (empty) polydata, as the surface
     // writers reject time steps that have none.
-    for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+    for (TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
       surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), timeStep);
 
     return surface;
@@ -168,10 +168,11 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
   // One step per time step of each group. The conversion runs on the GUI
   // thread, where the progress notification paints itself as it advances.
   const auto steps = nullptr != segmentation
-    ? static_cast<unsigned int>(segmentation->GetNumberOfGroups() * segmentation->GetTimeSteps())
+    ? segmentation->GetNumberOfGroups() * segmentation->GetTimeSteps()
     : imageMask->GetTimeSteps();
 
-  ProgressTask task(m_IsSmoothed ? "Creating smoothed polygon models" : "Creating polygon models", steps);
+  ProgressTask task(m_IsSmoothed ? "Creating smoothed polygon models" : "Creating polygon models",
+                    static_cast<unsigned int>(steps));
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   const std::string parentName = selectedNode->GetName();
@@ -205,7 +206,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
         std::map<MultiLabelSegmentation::LabelValueType, Surface::Pointer> surfaces;
 
         const auto timeSteps = groupImage->GetTimeSteps();
-        for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+        for (TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
         {
           task.SetProgress(static_cast<unsigned int>(groupID * groupTimeSteps + timeStep));
 
@@ -241,9 +242,9 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       Surface::Pointer surface;
 
       const auto timeSteps = imageMask->GetTimeSteps();
-      for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+      for (TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
       {
-        task.SetProgress(timeStep);
+        task.SetProgress(static_cast<unsigned int>(timeStep));
 
         auto binarized = BinarizeMask(imageMask->GetVtkImageData(timeStep));
         auto results = extractor.ExtractPerLabel(binarized, {1});

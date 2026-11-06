@@ -364,8 +364,10 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls->radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls->radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls->radioButtonUsingT1viaVFA->isChecked());
-  concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStepT2->value());
-  concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStepT2->value());
+  concentrationGen->SetBaselineStartTimeStep(
+    static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStepT2->value()));
+  concentrationGen->SetBaselineEndTimeStep(
+    static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStepT2->value()));
 
   concentrationGen->SetisT2weightedImage(false);
 
@@ -374,8 +376,10 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
     concentrationGen->SetRepetitionTime(m_Controls->TRSpinBox->value());
     concentrationGen->SetRelaxivity(m_Controls->RelaxivitySpinBox->value());
     concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls->PDWImageNodeSelector->GetSelectedNode()->GetData()));
-    concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
+    concentrationGen->SetBaselineStartTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStep->value()));
+    concentrationGen->SetBaselineEndTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStep->value()));
     //Convert Flipangle from degree to radiant
     double alpha = m_Controls->FlipangleSpinBox->value()/360*2* std::numbers::pi;
     concentrationGen->SetFlipAngle(alpha);
@@ -386,8 +390,10 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   else
   {
     concentrationGen->SetFactor(m_Controls->factorSpinBox->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
+    concentrationGen->SetBaselineStartTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStep->value()));
+    concentrationGen->SetBaselineEndTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStep->value()));
   }
 
   mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
@@ -412,8 +418,10 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
     concentrationGen->SetT2Factor(m_Controls->T2FactorSpinBox->value());
     concentrationGen->SetT2EchoTime(m_Controls->T2EchoTimeSpinBox->value());
 
-    concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
+    concentrationGen->SetBaselineStartTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineStartTimeStep->value()));
+    concentrationGen->SetBaselineEndTimeStep(
+      static_cast<mitk::TimeStepType>(m_Controls->spinBox_baselineEndTimeStep->value()));
 
     mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
 

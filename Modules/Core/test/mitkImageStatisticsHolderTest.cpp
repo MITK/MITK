@@ -121,7 +121,7 @@ namespace
     return values;
   }
 
-  void AssertExtrema(const ExpectedExtrema &expected, mitk::ImageStatisticsHolder *statistics, int t = 0)
+  void AssertExtrema(const ExpectedExtrema &expected, mitk::ImageStatisticsHolder *statistics, mitk::TimeStepType t = 0)
   {
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong minimum", expected.Min, statistics->GetScalarValueMin(t));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong second minimum", expected.SecondMin, statistics->GetScalarValue2ndMin(t));

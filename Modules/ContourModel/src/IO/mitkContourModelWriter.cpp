@@ -159,9 +159,9 @@ void mitk::ContourModelWriter::WriteXML(const mitk::ContourModel *contourModel, 
   /*++++ <data> ++++*/
   WriteStartElement(XML_DATA, out);
 
-  unsigned int timecount = contourModel->GetTimeSteps();
+  const TimeStepType timecount = contourModel->GetTimeSteps();
 
-  for (unsigned int i = 0; i < timecount; i++)
+  for (TimeStepType i = 0; i < timecount; i++)
   {
     /*++++ <timestep> ++++*/
     std::vector<std::string> at;

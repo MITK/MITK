@@ -156,10 +156,10 @@ namespace mitk
      * \return Pointer to the vtkImageData, or nullptr if the data is unavailable.
      * \sa ImageVtkReadAccessor, ImageVtkWriteAccessor
      */
-    virtual vtkImageData *GetVtkImageData(int t = 0, int n = 0);
+    virtual vtkImageData *GetVtkImageData(TimeStepType t = 0, int n = 0);
 
-    /** \copydoc GetVtkImageData(int, int) */
-    virtual const vtkImageData *GetVtkImageData(int t = 0, int n = 0) const;
+    /** \copydoc GetVtkImageData(TimeStepType, int) */
+    virtual const vtkImageData *GetVtkImageData(TimeStepType t = 0, int n = 0) const;
 
     void PrebuildVtkRepresentation() const override;
 
@@ -171,7 +171,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the slice data is available.
      */
-    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+    bool IsSliceSet(int s = 0, TimeStepType t = 0, int n = 0) const override;
 
     /**
      * \brief Check whether the volume at time \a t in channel \a n is set.
@@ -180,7 +180,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the volume data is available.
      */
-    bool IsVolumeSet(int t = 0, int n = 0) const override;
+    bool IsVolumeSet(TimeStepType t = 0, int n = 0) const override;
 
     /**
      * \brief Check whether channel \a n is set.
@@ -207,7 +207,7 @@ namespace mitk
      * \return True on success.
      * \sa SetImportSlice, SetVolume
      */
-    virtual bool SetSlice(const void *data, int s = 0, int t = 0, int n = 0);
+    virtual bool SetSlice(const void *data, int s = 0, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Set \a data as volume at time \a t in channel \a n.
@@ -225,7 +225,7 @@ namespace mitk
      * \return True on success.
      * \sa SetImportVolume, SetSlice
      */
-    virtual bool SetVolume(const void *data, int t = 0, int n = 0);
+    virtual bool SetVolume(const void *data, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Set \a data as the data for channel \a n.
@@ -260,8 +260,11 @@ namespace mitk
      * \return True on success.
      * \sa SetSlice, ImportMemoryManagementType
      */
-    virtual bool SetImportSlice(
-      void *data, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+    virtual bool SetImportSlice(void *data,
+                                int s = 0,
+                                TimeStepType t = 0,
+                                int n = 0,
+                                ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
     /**
      * \brief Set \a data as volume at time \a t in channel \a n with
@@ -279,7 +282,7 @@ namespace mitk
      * \sa SetVolume, ImportMemoryManagementType
      */
     virtual bool SetImportVolume(void *data,
-                                 int t = 0,
+                                 TimeStepType t = 0,
                                  int n = 0,
                                  ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
@@ -293,7 +296,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True on success.
      */
-    virtual bool SetImportVolume(const void *const_data, int t = 0, int n = 0);
+    virtual bool SetImportVolume(const void *const_data, TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Allocate a zero-initialized volume at time \a t in channel \a n.
@@ -309,7 +312,7 @@ namespace mitk
      * \pre No volume data may already exist at (t, n).
      * \throw mitk::Exception if any precondition is violated.
      */
-    virtual void AllocateZeroedVolume(int t = 0, int n = 0);
+    virtual void AllocateZeroedVolume(TimeStepType t = 0, int n = 0);
 
     /**
      * \brief Set \a data as the data for channel \a n with configurable
@@ -356,7 +359,7 @@ namespace mitk
     virtual void Initialize(const mitk::PixelType &type,
                             const mitk::BaseGeometry &geometry,
                             unsigned int channels = 1,
-                            int tDim = 1);
+                            TimeStepType tDim = 1);
 
     /**
      * \brief Initialize (or re-initialize) image from a TimeGeometry.
@@ -364,13 +367,14 @@ namespace mitk
      * \param[in] type The pixel type for the image.
      * \param[in] geometry The time geometry providing spatial and temporal information.
      * \param[in] channels Number of channels (default: 1).
-     * \param[in] tDim Override the time dimension if the value is > 0 (default: -1,
-     *            meaning use the number of time steps from the TimeGeometry).
+     * \param[in] tDim Override the time dimension if the value is > 0 (default:
+     *            TIMESTEP_INVALID, meaning use the number of time steps from the
+     *            TimeGeometry).
      */
     virtual void Initialize(const mitk::PixelType &type,
                             const mitk::TimeGeometry &geometry,
                             unsigned int channels = 1,
-                            int tDim = -1);
+                            TimeStepType tDim = TIMESTEP_INVALID);
 
     /**
      * \brief Initialize (or re-initialize) image from a PlaneGeometry and number
@@ -391,7 +395,7 @@ namespace mitk
                             int sDim,
                             const mitk::PlaneGeometry &geometry2d,
                             unsigned int channels = 1,
-                            int tDim = 1);
+                            TimeStepType tDim = 1);
 
     /**
      * \brief Initialize (or re-initialize) image from another mitk::Image.
@@ -417,11 +421,12 @@ namespace mitk
      *
      * \param[in] vtkimagedata The VTK image providing header information.
      * \param[in] channels Number of channels (default: 1).
-     * \param[in] tDim Override time dimension (default: -1, use VTK value).
+     * \param[in] tDim Override time dimension (default: TIMESTEP_INVALID, use VTK value).
      * \param[in] sDim Override z-space dimension (default: -1, use VTK value).
      * \param[in] pDim Override y-space dimension (default: -1, use VTK value).
      */
-    virtual void Initialize(vtkImageData *vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1, int pDim = -1);
+    virtual void Initialize(
+      vtkImageData *vtkimagedata, int channels = 1, TimeStepType tDim = TIMESTEP_INVALID, int sDim = -1, int pDim = -1);
 
     /**
      * \brief Initialize (or re-initialize) image from a templated ITK image.
@@ -432,11 +437,14 @@ namespace mitk
      * \tparam itkImageType The ITK image type.
      * \param[in] itkimage The ITK image providing header information.
      * \param[in] channels Number of channels (default: 1).
-     * \param[in] tDim Override time dimension (default: -1, use ITK value).
+     * \param[in] tDim Override time dimension (default: TIMESTEP_INVALID, use ITK value).
      * \param[in] sDim Override z-space dimension (default: -1, use ITK value).
      */
     template <typename itkImageType>
-    void InitializeByItk(const itkImageType *itkimage, int channels = 1, int tDim = -1, int sDim = -1)
+    void InitializeByItk(const itkImageType *itkimage,
+                         int channels = 1,
+                         TimeStepType tDim = TIMESTEP_INVALID,
+                         int sDim = -1)
     {
       if (itkimage == nullptr)
         return;
@@ -458,8 +466,8 @@ namespace mitk
       if ((m_Dimension > 2) && (sDim >= 0))
         tmpDimensions[2] = sDim;
       // overwrite number of time points if tDim is set
-      if ((m_Dimension > 3) && (tDim >= 0))
-        tmpDimensions[3] = tDim;
+      if ((m_Dimension > 3) && (tDim != TIMESTEP_INVALID))
+        tmpDimensions[3] = static_cast<unsigned int>(tDim);
 
       // rough initialization of Image
       // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
@@ -581,7 +589,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the specified slice is within the image bounds.
      */
-    virtual bool IsValidSlice(int s = 0, int t = 0, int n = 0) const;
+    virtual bool IsValidSlice(int s = 0, TimeStepType t = 0, int n = 0) const;
 
     /**
      * \brief Check whether the volume at time \a t in channel \a n is valid.
@@ -592,7 +600,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \return True if the specified volume is within the image bounds.
      */
-    virtual bool IsValidVolume(int t = 0, int n = 0) const;
+    virtual bool IsValidVolume(TimeStepType t = 0, int n = 0) const;
 
     /**
      * \brief Check whether channel \a n is valid.
@@ -664,7 +672,7 @@ namespace mitk
      * \return Smart pointer to the ImageDataItem, or nullptr if invalid.
      */
     virtual ImageDataItemPointer GetSliceData(int s = 0,
-                                              int t = 0,
+                                              TimeStepType t = 0,
                                               int n = 0,
                                               void *data = nullptr,
                                               ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
@@ -681,7 +689,7 @@ namespace mitk
      * \param[in] importMemoryManagement Memory management policy (default: CopyMemory).
      * \return Smart pointer to the ImageDataItem, or nullptr if invalid.
      */
-    virtual ImageDataItemPointer GetVolumeData(int t = 0,
+    virtual ImageDataItemPointer GetVolumeData(TimeStepType t = 0,
                                                int n = 0,
                                                void *data = nullptr,
                                                ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
@@ -719,10 +727,10 @@ namespace mitk
      *         if no volume data is available at (t, n).
      * \sa GetVolumeData, ImageReadAccessor, ImageWriteAccessor
      */
-    void *GetData(int t = 0, int n = 0);
+    void *GetData(TimeStepType t = 0, int n = 0);
 
-    /** \copydoc GetData(int, int) */
-    const void *GetData(int t = 0, int n = 0) const;
+    /** \copydoc GetData(TimeStepType, int) */
+    const void *GetData(TimeStepType t = 0, int n = 0) const;
 
     /**
      * \brief Get the ImageStatisticsHolder that provides statistics for this image.
@@ -740,25 +748,28 @@ namespace mitk
 
     typedef std::lock_guard<std::mutex> MutexHolder;
 
-    int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
+    int GetSliceIndex(int s = 0, TimeStepType t = 0, int n = 0) const;
 
-    int GetVolumeIndex(int t = 0, int n = 0) const;
+    int GetVolumeIndex(TimeStepType t = 0, int n = 0) const;
 
     void ComputeOffsetTable();
 
-    virtual bool IsValidTimeStep(int t) const;
+    virtual bool IsValidTimeStep(TimeStepType t) const;
 
-    void Expand(unsigned int timeSteps) override;
+    void Expand(TimeStepType timeSteps) override;
 
     virtual ImageDataItemPointer AllocateSliceData(
       int s = 0,
-      int t = 0,
+      TimeStepType t = 0,
       int n = 0,
       void *data = nullptr,
       ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     virtual ImageDataItemPointer AllocateVolumeData(
-      int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+      TimeStepType t = 0,
+      int n = 0,
+      void *data = nullptr,
+      ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     virtual ImageDataItemPointer AllocateChannelData(
       int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
@@ -796,8 +807,8 @@ namespace mitk
 
   private:
     ImageDataItemPointer GetSliceData_unlocked(
-      int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
-    ImageDataItemPointer GetVolumeData_unlocked(int t,
+      int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+    ImageDataItemPointer GetVolumeData_unlocked(TimeStepType t,
                                                 int n,
                                                 void *data,
                                                 ImportMemoryManagementType importMemoryManagement) const;
@@ -806,8 +817,8 @@ namespace mitk
                                                  ImportMemoryManagementType importMemoryManagement) const;
 
     ImageDataItemPointer AllocateSliceData_unlocked(
-      int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
-    ImageDataItemPointer AllocateVolumeData_unlocked(int t,
+      int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+    ImageDataItemPointer AllocateVolumeData_unlocked(TimeStepType t,
                                                      int n,
                                                      void *data,
                                                      ImportMemoryManagementType importMemoryManagement) const;
@@ -815,8 +826,8 @@ namespace mitk
                                                       void *data,
                                                       ImportMemoryManagementType importMemoryManagement) const;
 
-    bool IsSliceSet_unlocked(int s, int t, int n) const;
-    bool IsVolumeSet_unlocked(int t, int n) const;
+    bool IsSliceSet_unlocked(int s, TimeStepType t, int n) const;
+    bool IsVolumeSet_unlocked(TimeStepType t, int n) const;
     bool IsChannelSet_unlocked(int n) const;
 
     /** Stores all existing ImageReadAccessors */

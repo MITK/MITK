@@ -167,7 +167,7 @@ mitk::PixelType mitk::MultiLabelSegmentation::GetPixelType()
 };
 
 
-bool mitk::MultiLabelSegmentation::IsSliceSet(int s, int t, int n) const
+bool mitk::MultiLabelSegmentation::IsSliceSet(int s, TimeStepType t, int n) const
 {
   for (const auto& image : m_GroupContainer)
   {
@@ -176,7 +176,7 @@ bool mitk::MultiLabelSegmentation::IsSliceSet(int s, int t, int n) const
   return true;
 }
 
-bool mitk::MultiLabelSegmentation::IsVolumeSet(int t, int n) const
+bool mitk::MultiLabelSegmentation::IsVolumeSet(TimeStepType t, int n) const
 {
   for (const auto& image : m_GroupContainer)
   {
@@ -1201,7 +1201,7 @@ bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepTy
   for (int i = 0; i < 3; ++i)
     numPixels *= static_cast<std::size_t>(image->GetDimension(i));
 
-  ImageReadAccessor accessor(image, image->GetVolumeData(static_cast<int>(timeStep)));
+  ImageReadAccessor accessor(image, image->GetVolumeData(timeStep));
   const auto* pixels = static_cast<const LabelValueType*>(accessor.GetData());
 
   std::atomic<bool> found = false;
@@ -2015,8 +2015,8 @@ void mitk::TransferLabelContentAtTimeStep(
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage does not have the requested time step: " << timeStep;
   }
 
-  const auto* sourceGeometry = sourceImage->GetGeometry(static_cast<int>(sourceTimeStep));
-  const auto* destinationGeometry = destinationImage->GetGeometry(static_cast<int>(destinationTimeStep));
+  const auto* sourceGeometry = sourceImage->GetGeometry(sourceTimeStep);
+  const auto* destinationGeometry = destinationImage->GetGeometry(destinationTimeStep);
 
   using VoxelIndex = std::array<long long, 3>;
 
@@ -2092,7 +2092,7 @@ void mitk::TransferLabelContentAtTimeStep(
   const VoxelIndex processEnd = changesOutside ? destinationSize : coveredEnd;
 
   {
-    ImageWriteAccessor destinationAccessor(destinationImage, destinationImage->GetVolumeData(static_cast<int>(destinationTimeStep)));
+    ImageWriteAccessor destinationAccessor(destinationImage, destinationImage->GetVolumeData(destinationTimeStep));
     auto* destination = static_cast<Label::PixelType*>(destinationAccessor.GetData());
 
     // A read accessor on the destination itself would wait for the write accessor forever.
@@ -2101,7 +2101,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
     if (sourceImage != destinationImage)
     {
-      sourceAccessor.emplace(sourceImage, sourceImage->GetVolumeData(static_cast<int>(sourceTimeStep)));
+      sourceAccessor.emplace(sourceImage, sourceImage->GetVolumeData(sourceTimeStep));
       source = static_cast<const Label::PixelType*>(sourceAccessor->GetData());
     }
 
@@ -2214,7 +2214,7 @@ void mitk::TransferSurfaceContentAtTimeStep(const Surface* surface, Image* desti
   const auto surfaceTimeStep = surface->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
   {
-    ImageWriteAccessor accessor(destinationImage, destinationImage->GetVolumeData(static_cast<int>(timeStep)));
+    ImageWriteAccessor accessor(destinationImage, destinationImage->GetVolumeData(timeStep));
     auto* pixels = static_cast<Label::PixelType*>(accessor.GetData());
 
     const std::size_t sizeX = destinationImage->GetDimension(0);
@@ -2272,7 +2272,7 @@ void mitk::TransferSliceContentAtTimeStep(const Image* slice, Image* destination
   using VoxelIndex = std::array<long long, 3>;
 
   const auto* sliceGeometry = slice->GetGeometry();
-  const auto* destinationGeometry = destinationImage->GetGeometry(static_cast<int>(timeStep));
+  const auto* destinationGeometry = destinationImage->GetGeometry(timeStep);
 
   const auto toVoxel = [&](std::size_t i, std::size_t j) {
     Point3D sliceIndex;
@@ -2339,7 +2339,7 @@ void mitk::TransferSliceContentAtTimeStep(const Image* slice, Image* destination
 
   {
     ImagePixelReadAccessor<Label::PixelType, 2> sliceAccessor(slice);
-    ImageWriteAccessor accessor(destinationImage, destinationImage->GetVolumeData(static_cast<int>(timeStep)));
+    ImageWriteAccessor accessor(destinationImage, destinationImage->GetVolumeData(timeStep));
     auto* voxels = static_cast<Label::PixelType*>(accessor.GetData());
 
     for (std::size_t j = 0; j < sliceSizeY; ++j)

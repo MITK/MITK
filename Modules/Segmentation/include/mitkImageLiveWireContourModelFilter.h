@@ -159,7 +159,7 @@ namespace mitk
     /** \brief Flag to use a dynamic cost map or not*/
     bool m_UseDynamicCostMap;
 
-    unsigned int m_TimeStep;
+    mitk::TimeStepType m_TimeStep;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkPreProcessImage(const itk::Image<TPixel, VImageDimension> *inputImage);

@@ -134,7 +134,7 @@ public:
     mitk::PointSet::Pointer clonePS = pointSet->Clone();
     MITK_TEST_OUTPUT(<< "... clone pointset ts: " << clonePS->GetTimeSteps())
 
-    for (unsigned int t = 0; t < pointSet->GetTimeSteps(); t++)
+    for (mitk::TimeStepType t = 0; t < pointSet->GetTimeSteps(); t++)
     {
       MITK_TEST_OUTPUT(<< "testing timestep: " << t)
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Clone has same size", true, pointSet->GetSize(t) == clonePS->GetSize(t));

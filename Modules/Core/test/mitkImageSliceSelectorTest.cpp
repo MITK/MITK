@@ -96,7 +96,7 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
 
   if (image->GetDimension(3) > 1)
   {
-    int time = image->GetDimension(3) - 1;
+    mitk::TimeStepType time = image->GetDimension(3) - 1;
 
     std::cout << "Testing 3D+t: Setting time to " << time << ": ";
     slice->SetTimeNr(time);

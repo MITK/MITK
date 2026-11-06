@@ -22,7 +22,7 @@ namespace mitk
   template <typename TPixel, unsigned int VImageDimension, typename TOutputPixel>
   void CutImageWithOutputTypeSelect(itk::Image<TPixel, VImageDimension> *inputItkImage,
                                     mitk::BoundingObjectCutter *cutter,
-                                    int /* boTimeStep */,
+                                    TimeStepType /* boTimeStep */,
                                     TOutputPixel * /* dummy */)
   {
     typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
@@ -142,7 +142,7 @@ namespace mitk
   template <typename TPixel, unsigned int VImageDimension, typename TOutputPixel>
   void CutImageWithOutputTypeSelect(itk::VectorImage<TPixel, VImageDimension> *inputItkImage,
                                     mitk::BoundingObjectCutter *cutter,
-                                    int /* boTimeStep */,
+                                    TimeStepType /* boTimeStep */,
                                     TOutputPixel * /* dummy */)
   {
     typedef itk::VectorImage<TPixel, VImageDimension> ItkInputImageType;
@@ -262,7 +262,9 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  void CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, mitk::BoundingObjectCutter *cutter, int boTimeStep)
+  void CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage,
+                mitk::BoundingObjectCutter *cutter,
+                TimeStepType boTimeStep)
   {
     TPixel *dummy = nullptr;
     CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, cutter, boTimeStep, dummy);
@@ -271,7 +273,7 @@ namespace mitk
   template <typename TPixel, unsigned int VImageDimension>
   void CutImage(itk::VectorImage<TPixel, VImageDimension> *inputItkImage,
                 mitk::BoundingObjectCutter *cutter,
-                int boTimeStep)
+                TimeStepType boTimeStep)
   {
     TPixel *dummy = nullptr;
     CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, cutter, boTimeStep, dummy);

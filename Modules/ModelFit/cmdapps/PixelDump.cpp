@@ -254,7 +254,7 @@ InternalImageMapType ConvertImageTimeSteps(mitk::Image* image)
 
   InternalImageType::Pointer internalImage;
 
-  for (unsigned int i = 0; i < image->GetTimeSteps(); ++i)
+  for (mitk::TimeStepType i = 0; i < image->GetTimeSteps(); ++i)
   {
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(image);

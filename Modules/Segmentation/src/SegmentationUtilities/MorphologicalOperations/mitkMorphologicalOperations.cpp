@@ -29,14 +29,14 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Closing...";
 
-  auto timeSteps = static_cast<int>(image->GetTimeSteps());
+  const auto timeSteps = image->GetTimeSteps();
 
   if (timeSteps > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image);
 
-    for (int t = 0; t < timeSteps; ++t)
+    for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
@@ -66,14 +66,14 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Erode...";
 
-  auto timeSteps = static_cast<int>(image->GetTimeSteps());
+  const auto timeSteps = image->GetTimeSteps();
 
   if (timeSteps > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image);
 
-    for (int t = 0; t < timeSteps; ++t)
+    for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
@@ -103,14 +103,14 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Dilate...";
 
-  auto timeSteps = static_cast<int>(image->GetTimeSteps());
+  const auto timeSteps = image->GetTimeSteps();
 
   if (timeSteps > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image);
 
-    for (int t = 0; t < timeSteps; ++t)
+    for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
@@ -140,14 +140,14 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Opening...";
 
-  auto timeSteps = static_cast<int>(image->GetTimeSteps());
+  const auto timeSteps = image->GetTimeSteps();
 
   if (timeSteps > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image);
 
-    for (int t = 0; t < timeSteps; ++t)
+    for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
@@ -175,14 +175,14 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
 {
   MITK_INFO << "Start FillHole...";
 
-  auto timeSteps = static_cast<int>(image->GetTimeSteps());
+  const auto timeSteps = image->GetTimeSteps();
 
   if (timeSteps > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image);
 
-    for (int t = 0; t < timeSteps; ++t)
+    for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 

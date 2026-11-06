@@ -94,11 +94,11 @@ void mitk::MaskedDynamicImageStatisticsGenerator::DoCalculateStatistics(const it
   typename FilterType::Pointer statFilter = FilterType::New();
 
   //add the time frames to the fit filter
-  unsigned int timeSteps = this->m_DynamicImage->GetTimeSteps();
+  const TimeStepType timeSteps = this->m_DynamicImage->GetTimeSteps();
   std::vector<Image::Pointer> frameCache;
   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(this->m_DynamicImage);
-  for (unsigned int i = 0; i < timeSteps; ++i)
+  for (TimeStepType i = 0; i < timeSteps; ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
     imageTimeSelector->SetTimeNr(i);
@@ -107,7 +107,7 @@ void mitk::MaskedDynamicImageStatisticsGenerator::DoCalculateStatistics(const it
     Image::Pointer frameMITKImage = imageTimeSelector->GetOutput();
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
-    statFilter->SetInput(i,frameImage);
+    statFilter->SetInput(static_cast<unsigned int>(i), frameImage);
   }
 
   if (this->m_InternalMask.IsNotNull())
@@ -124,7 +124,7 @@ void mitk::MaskedDynamicImageStatisticsGenerator::DoCalculateStatistics(const it
   m_Variance.SetSize(timeSteps);
   m_Sum.SetSize(timeSteps);
 
-  for (unsigned int i = 0; i < timeSteps; ++i)
+  for (TimeStepType i = 0; i < timeSteps; ++i)
   {
     m_Maximum.SetElement(i,statFilter->GetMaximum()[i]);
     m_Minimum.SetElement(i,statFilter->GetMinimum()[i]);

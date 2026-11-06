@@ -418,7 +418,8 @@ ModelFitInspectorView::GetInputNode(mitk::DataNode::ConstPointer node)
 void ModelFitInspectorView::ValidateAndSetCurrentPosition()
 {
   const mitk::Point3D currentSelectedPosition = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition(nullptr);
-  const unsigned int currentSelectedTimestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
+  const mitk::TimeStepType currentSelectedTimestep =
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
 
   if (m_currentSelectedPosition != currentSelectedPosition
       || m_currentSelectedTimeStep != currentSelectedTimestep

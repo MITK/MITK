@@ -124,7 +124,7 @@ namespace mitk
 
     // Crops the image using the itk::RegionOfInterestImageFilter and creates the new output image
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKCrop3DImage(itk::Image<TPixel, VImageDimension> *inputItkImage, unsigned int timestep);
+    void ITKCrop3DImage(itk::Image<TPixel, VImageDimension> *inputItkImage, TimeStepType timestep);
 
     // Here, the output image is initialized by the input and the newly calculated region
     void GenerateOutputInformation() override;

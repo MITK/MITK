@@ -27,9 +27,9 @@ int mitkRotatedSlice4DTest(int, char *[])
   MITK_TEST_BEGIN("mitkRotatedSlice4DTest");
 
   mitk::Image::Pointer image4D = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(16, 16, 16, 2);
-  const auto numTimeSteps = static_cast<int>(image4D->GetTimeSteps());
+  const auto numTimeSteps = image4D->GetTimeSteps();
 
-  for (int ts = 0; ts < numTimeSteps; ++ts)
+  for (mitk::TimeStepType ts = 0; ts < numTimeSteps; ++ts)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image4D);

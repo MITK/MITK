@@ -236,7 +236,7 @@ namespace
     const auto* current = timeNavigation->GetInputWorldTimeGeometry();
     if (nullptr != current && current->IsValidTimePoint(timePoint))
     {
-      timeNavigation->GetStepper()->SetPos(current->TimePointToTimeStep(timePoint));
+      timeNavigation->GetStepper()->SetPos(static_cast<unsigned int>(current->TimePointToTimeStep(timePoint)));
     }
   }
 
@@ -1317,7 +1317,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
 
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
-  unsigned int imageTimeStep = 0;
+  mitk::TimeStepType imageTimeStep = 0;
   if (!resetCamera)
   {
     // store the current position to set it again later, if the camera should not be reset
@@ -1349,7 +1349,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
-    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(static_cast<unsigned int>(imageTimeStep));
   }
 }
 
@@ -4900,7 +4900,7 @@ void QmitkMxNMultiWidget::SetRenderMode(const QString& windowId, RenderMode mode
     if (referenceGeometry->IsValidTimePoint(timePoint))
     {
       renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
-        referenceGeometry->TimePointToTimeStep(timePoint));
+        static_cast<unsigned int>(referenceGeometry->TimePointToTimeStep(timePoint)));
     }
   }
 
@@ -5728,7 +5728,7 @@ std::vector<QString> QmitkMxNMultiWidget::EnforceComponentGeometry(const QString
       if (referenceGeometry->IsValidTimePoint(timePoint))
       {
         renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(
-          referenceGeometry->TimePointToTimeStep(timePoint));
+          static_cast<unsigned int>(referenceGeometry->TimePointToTimeStep(timePoint)));
       }
     }
     reinitialized.push_back(memberId);

@@ -155,22 +155,22 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension, typename TOutputPixel>
     friend void CutImageWithOutputTypeSelect(itk::Image<TPixel, VImageDimension> *inputItkImage,
                                              mitk::BoundingObjectCutter *cutter,
-                                             int boTimeStep,
+                                             TimeStepType boTimeStep,
                                              TOutputPixel *dummy);
     template <typename TPixel, unsigned int VImageDimension, typename TOutputPixel>
     friend void CutImageWithOutputTypeSelect(itk::VectorImage<TPixel, VImageDimension> *inputItkImage,
                                              mitk::BoundingObjectCutter *cutter,
-                                             int boTimeStep,
+                                             TimeStepType boTimeStep,
                                              TOutputPixel *dummy);
     template <typename TPixel, unsigned int VImageDimension>
     friend void CutImage(itk::Image<TPixel, VImageDimension> *itkImage,
                          mitk::BoundingObjectCutter *cutter,
-                         int boTimeStep);
+                         TimeStepType boTimeStep);
     template <typename TPixel, unsigned int VImageDimension>
     friend void CutImage(itk::VectorImage<TPixel, VImageDimension> *itkImage,
                          mitk::BoundingObjectCutter *cutter,
-                         int boTimeStep);
-    virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
+                         TimeStepType boTimeStep);
+    virtual void ComputeData(mitk::Image *input3D, TimeStepType boTimeStep);
 
     /** \brief BoundingObject that will be cut. */
     mitk::BoundingObject::Pointer m_BoundingObject;

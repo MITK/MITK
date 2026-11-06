@@ -116,7 +116,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(15.0, output->GetTimeGeometry()->GetTimeBounds(1)[0]);
 
     // The spheres are closed, so remeshing hits the vertex count exactly.
-    for (const unsigned int timeStep : { 0u, 2u })
+    for (const auto timeStep : { mitk::TimeStepType(0), mitk::TimeStepType(2) })
     {
       const auto numInputVertices = input->GetVtkPolyData(timeStep)->GetNumberOfPoints();
       CPPUNIT_ASSERT_EQUAL(numInputVertices / 2, output->GetVtkPolyData(timeStep)->GetNumberOfPoints());
@@ -163,7 +163,7 @@ public:
     auto remesher = mitk::RemeshFilter::New();
     remesher->SetInput(MakeTimeResolvedSphere());
 
-    CPPUNIT_ASSERT_EQUAL(1u, remesher->GetOutput()->GetSizeOfPolyDataSeries());
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(1), remesher->GetOutput()->GetSizeOfPolyDataSeries());
   }
 
   void Remesh_CancelRequested_AbortsBeforeTouchingInput()

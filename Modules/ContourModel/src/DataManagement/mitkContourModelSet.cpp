@@ -135,10 +135,10 @@ void mitk::ContourModelSet::UpdateOutputInformation()
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
     typedef BoundingBoxType::PointsContainer PointsContainer;
 
-    int timesteps = this->GetTimeSteps();
+    const TimeStepType timesteps = this->GetTimeSteps();
 
     // iterate over the timesteps
-    for (int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
+    for (TimeStepType currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
     {
       // only update bounds if the contour was modified
       if (this->GetMTime() > this->GetGeometry(currenTimeStep)->GetBoundingBox()->GetMTime())

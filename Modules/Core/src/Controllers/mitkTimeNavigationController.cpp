@@ -78,7 +78,7 @@ void mitk::TimeNavigationController::Update()
 
     TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
     const TimeBounds &timeBounds = m_InputWorldTimeGeometry->GetTimeBounds();
-    m_Stepper->SetSteps(inputTimeSteps);
+    m_Stepper->SetSteps(static_cast<unsigned int>(inputTimeSteps));
     m_Stepper->SetPos(0);
     m_Stepper->SetRange(timeBounds[0], timeBounds[1]);
   }

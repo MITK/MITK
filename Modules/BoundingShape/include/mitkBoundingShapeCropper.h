@@ -93,13 +93,13 @@ namespace mitk
      *
      * \param[in] _arg The zero-based time step index.
      */
-    itkSetMacro(CurrentTimeStep, ScalarType);
+    itkSetMacro(CurrentTimeStep, TimeStepType);
 
     /** \brief Get the current time step index.
      *
      * \return The zero-based time step index.
      */
-    itkGetMacro(CurrentTimeStep, ScalarType);
+    itkGetMacro(CurrentTimeStep, TimeStepType);
 
     /** \brief Set whether to process only a single time step.
      *
@@ -131,12 +131,12 @@ namespace mitk
     * @brief Template Function for cropping and masking images with scalar pixel type
     */
     template <typename TPixel, unsigned int VImageDimension>
-    void CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, int timeStep);
+    void CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, TimeStepType timeStep);
 
     /**
     *@brief Process the image and create the output
      **/
-    virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
+    virtual void ComputeData(mitk::Image *input3D, TimeStepType boTimeStep);
 
     // virtual void ComputeData(mitk::MultiLabelSegmentation* image, int boTimeStep);
 
@@ -159,7 +159,7 @@ namespace mitk
     /**
     * @brief Current time step displayed
     */
-    int m_CurrentTimeStep;
+    TimeStepType m_CurrentTimeStep;
     /**
     * @brief Use m_UseWholeInputRegion for deciding whether a cropping or masking will be performed
     */

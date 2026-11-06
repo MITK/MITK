@@ -66,9 +66,9 @@ mitk::Image::Image(const Image &other)
 
   if (this->GetDimension() > 3)
   {
-    const unsigned int time_steps = this->GetDimension(3);
+    const TimeStepType time_steps = this->GetDimension(3);
 
-    for (unsigned int i = 0u; i < time_steps; ++i)
+    for (TimeStepType i = 0; i < time_steps; ++i)
     {
       ImageDataItemPointer volume = other.GetVolumeData(i);
 
@@ -133,7 +133,7 @@ void AccessPixel(const mitk::PixelType ptype, void *data, const unsigned int off
   }
 }
 
-vtkImageData *mitk::Image::GetVtkImageData(int t, int n)
+vtkImageData *mitk::Image::GetVtkImageData(TimeStepType t, int n)
 {
   if (m_Initialized == false)
   {
@@ -146,7 +146,7 @@ vtkImageData *mitk::Image::GetVtkImageData(int t, int n)
   return volume.GetPointer() == nullptr ? nullptr : volume->GetVtkImageAccessor(this)->GetVtkImageData();
 }
 
-const vtkImageData *mitk::Image::GetVtkImageData(int t, int n) const
+const vtkImageData *mitk::Image::GetVtkImageData(TimeStepType t, int n) const
 {
   if (m_Initialized == false)
   {
@@ -164,20 +164,20 @@ void mitk::Image::PrebuildVtkRepresentation() const
   const auto timeSteps = this->GetTimeSteps();
   const auto channels = this->GetNumberOfChannels();
 
-  for (unsigned int t = 0; t < timeSteps; ++t)
+  for (TimeStepType t = 0; t < timeSteps; ++t)
     for (unsigned int n = 0; n < channels; ++n)
-      static_cast<void>(this->GetVtkImageData(static_cast<int>(t), static_cast<int>(n)));
+      static_cast<void>(this->GetVtkImageData(t, static_cast<int>(n)));
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(
-  int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   MutexHolder lock(m_ImageDataArraysLock);
   return GetSliceData_unlocked(s, t, n, data, importMemoryManagement);
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData_unlocked(
-  int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   if (IsValidSlice(s, t, n) == false)
     return nullptr;
@@ -217,7 +217,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData_unlocked(
                            2,
                            data,
                            importMemoryManagement == ManageMemory,
-                           (((size_t)s) * m_OffsetTable[2] + ((size_t)t) * m_OffsetTable[3]) * (ptypeSize));
+                           (((size_t)s) * m_OffsetTable[2] + t * m_OffsetTable[3]) * (ptypeSize));
     sl->SetComplete(true);
     return m_Slices[pos] = sl;
   }
@@ -229,7 +229,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData_unlocked(
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, s);
-    m_RequestedRegion.SetIndex(3, t);
+    m_RequestedRegion.SetIndex(3, static_cast<IndexValueType>(t));
     m_RequestedRegion.SetIndex(4, n);
     m_RequestedRegion.SetSize(0, m_Dimensions[0]);
     m_RequestedRegion.SetSize(1, m_Dimensions[1]);
@@ -252,7 +252,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData_unlocked(
   }
 }
 
-mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t,
+mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(TimeStepType t,
                                                              int n,
                                                              void *data,
                                                              ImportMemoryManagementType importMemoryManagement) const
@@ -261,7 +261,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t,
   return GetVolumeData_unlocked(t, n, data, importMemoryManagement);
 }
 mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
-  int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   if (IsValidVolume(t, n) == false)
     return nullptr;
@@ -286,7 +286,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
                             3,
                             data,
                             importMemoryManagement == ManageMemory,
-                            (((size_t)t) * m_OffsetTable[3]) * (ptypeSize));
+                            (t * m_OffsetTable[3]) * (ptypeSize));
     vol->SetComplete(true);
     return m_Volumes[pos] = vol;
   }
@@ -355,7 +355,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, 0);
-    m_RequestedRegion.SetIndex(3, t);
+    m_RequestedRegion.SetIndex(3, static_cast<IndexValueType>(t));
     m_RequestedRegion.SetIndex(4, n);
     m_RequestedRegion.SetSize(0, m_Dimensions[0]);
     m_RequestedRegion.SetSize(1, m_Dimensions[1]);
@@ -378,13 +378,13 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
   }
 }
 
-void *mitk::Image::GetData(int t, int n)
+void *mitk::Image::GetData(TimeStepType t, int n)
 {
   auto item = this->GetVolumeData(t, n);
   return item.IsNotNull() ? item->GetData() : nullptr;
 }
 
-const void *mitk::Image::GetData(int t, int n) const
+const void *mitk::Image::GetData(TimeStepType t, int n) const
 {
   auto item = this->GetVolumeData(t, n);
   return item.IsNotNull() ? item->GetData() : nullptr;
@@ -430,12 +430,11 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
       ch = m_Channels[n];
       // ok, let's combine the volumes!
       if (ch.GetPointer() == nullptr)
-        ch = new ImageDataItem(this->m_ImageDescriptor, -1, nullptr, true);
+        ch = new ImageDataItem(this->m_ImageDescriptor, TIMESTEP_INVALID, nullptr, true);
       ch->SetComplete(true);
       size_t size = m_OffsetTable[m_Dimension - 1] * (ptypeSize);
-      unsigned int t;
       auto slicesIt = m_Slices.begin() + n * m_Dimensions[2] * m_Dimensions[3];
-      for (t = 0; t < m_Dimensions[3]; ++t)
+      for (TimeStepType t = 0; t < m_Dimensions[3]; ++t)
       {
         int posVol;
         ImageDataItemPointer vol;
@@ -446,7 +445,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
         if (vol->GetParent() != ch)
         {
           // copy data of volume in channel
-          size_t offset = ((size_t)t) * m_OffsetTable[3] * (ptypeSize);
+          size_t offset = t * m_OffsetTable[3] * (ptypeSize);
           std::memcpy(static_cast<char *>(ch->GetData()) + offset, vol->GetData(), size);
 
           // replace old volume with reference to channel
@@ -499,13 +498,13 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
   }
 }
 
-bool mitk::Image::IsSliceSet(int s, int t, int n) const
+bool mitk::Image::IsSliceSet(int s, TimeStepType t, int n) const
 {
   MutexHolder lock(m_ImageDataArraysLock);
   return IsSliceSet_unlocked(s, t, n);
 }
 
-bool mitk::Image::IsSliceSet_unlocked(int s, int t, int n) const
+bool mitk::Image::IsSliceSet_unlocked(int s, TimeStepType t, int n) const
 {
   if (IsValidSlice(s, t, n) == false)
     return false;
@@ -529,13 +528,13 @@ bool mitk::Image::IsSliceSet_unlocked(int s, int t, int n) const
   return false;
 }
 
-bool mitk::Image::IsVolumeSet(int t, int n) const
+bool mitk::Image::IsVolumeSet(TimeStepType t, int n) const
 {
   MutexHolder lock(m_ImageDataArraysLock);
   return IsVolumeSet_unlocked(t, n);
 }
 
-bool mitk::Image::IsVolumeSet_unlocked(int t, int n) const
+bool mitk::Image::IsVolumeSet_unlocked(TimeStepType t, int n) const
 {
   if (IsValidVolume(t, n) == false)
     return false;
@@ -579,8 +578,7 @@ bool mitk::Image::IsChannelSet_unlocked(int n) const
 
     return true;
   // let's see if all volumes are set, so that we can (could) combine them to a channel
-  unsigned int t;
-  for (t = 0; t < m_Dimensions[3]; ++t)
+  for (TimeStepType t = 0; t < m_Dimensions[3]; ++t)
   {
     if (IsVolumeSet_unlocked(t, n) == false)
     {
@@ -590,13 +588,13 @@ bool mitk::Image::IsChannelSet_unlocked(int n) const
   return true;
 }
 
-bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
+bool mitk::Image::SetSlice(const void *data, int s, TimeStepType t, int n)
 {
   // const_cast is no risk for ImportMemoryManagementType == CopyMemory
   return SetImportSlice(const_cast<void *>(data), s, t, n, CopyMemory);
 }
 
-bool mitk::Image::SetVolume(const void *data, int t, int n)
+bool mitk::Image::SetVolume(const void *data, TimeStepType t, int n)
 {
   // const_cast is no risk for ImportMemoryManagementType == CopyMemory
   return SetImportVolume(const_cast<void *>(data), t, n, CopyMemory);
@@ -608,7 +606,8 @@ bool mitk::Image::SetChannel(const void *data, int n)
   return SetImportChannel(const_cast<void *>(data), n, CopyMemory);
 }
 
-bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryManagementType importMemoryManagement)
+bool mitk::Image::SetImportSlice(
+  void *data, int s, TimeStepType t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if (IsValidSlice(s, t, n) == false)
     return false;
@@ -643,7 +642,7 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
   return true;
 }
 
-bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManagementType importMemoryManagement)
+bool mitk::Image::SetImportVolume(void *data, TimeStepType t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if (IsValidVolume(t, n) == false)
     return false;
@@ -683,12 +682,12 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
   return true;
 }
 
-bool mitk::Image::SetImportVolume(const void *const_data, int t, int n)
+bool mitk::Image::SetImportVolume(const void *const_data, TimeStepType t, int n)
 {
   return this->SetImportVolume(const_cast<void*>(const_data), t, n, CopyMemory);
 }
 
-void mitk::Image::AllocateZeroedVolume(int t, int n)
+void mitk::Image::AllocateZeroedVolume(TimeStepType t, int n)
 {
   if (!this->IsInitialized())
     mitkThrow() << "AllocateZeroedVolume: image is not initialized. "
@@ -874,7 +873,7 @@ void mitk::Image::Initialize(const mitk::PixelType &type,
 void mitk::Image::Initialize(const mitk::PixelType &type,
                              const mitk::BaseGeometry &geometry,
                              unsigned int channels,
-                             int tDim)
+                             TimeStepType tDim)
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(geometry.Clone(), tDim);
@@ -884,13 +883,13 @@ void mitk::Image::Initialize(const mitk::PixelType &type,
 void mitk::Image::Initialize(const mitk::PixelType &type,
                              const mitk::TimeGeometry &geometry,
                              unsigned int channels,
-                             int tDim)
+                             TimeStepType tDim)
 {
   unsigned int dimensions[5];
   dimensions[0] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(0) + 0.5);
   dimensions[1] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(1) + 0.5);
   dimensions[2] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(2) + 0.5);
-  dimensions[3] = (tDim > 0) ? tDim : geometry.CountTimeSteps();
+  dimensions[3] = static_cast<unsigned int>((tDim != TIMESTEP_INVALID && tDim > 0) ? tDim : geometry.CountTimeSteps());
   dimensions[4] = 0;
 
   unsigned int dimension = 2;
@@ -937,7 +936,7 @@ void mitk::Image::Initialize(const mitk::PixelType &type,
                              int sDim,
                              const mitk::PlaneGeometry &geometry2d,
                              unsigned int channels,
-                             int tDim)
+                             TimeStepType tDim)
 {
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializeEvenlySpaced(geometry2d.Clone(), sDim);
@@ -949,7 +948,7 @@ void mitk::Image::Initialize(const mitk::Image *image)
   Initialize(image->GetPixelType(), *image->GetTimeGeometry());
 }
 
-void mitk::Image::Initialize(vtkImageData *vtkimagedata, int channels, int tDim, int sDim, int pDim)
+void mitk::Image::Initialize(vtkImageData *vtkimagedata, int channels, TimeStepType tDim, int sDim, int pDim)
 {
   if (vtkimagedata == nullptr)
     return;
@@ -977,9 +976,9 @@ void mitk::Image::Initialize(vtkImageData *vtkimagedata, int channels, int tDim,
     if (m_Dimension < 3)
       m_Dimension = 3;
   }
-  if (tDim >= 0)
+  if (tDim != TIMESTEP_INVALID)
   {
-    tmpDimensions[3] = tDim;
+    tmpDimensions[3] = static_cast<unsigned int>(tDim);
     if (m_Dimension < 4)
       m_Dimension = 4;
   }
@@ -1022,16 +1021,16 @@ void mitk::Image::Initialize(vtkImageData *vtkimagedata, int channels, int tDim,
   delete[] tmpDimensions;
 }
 
-bool mitk::Image::IsValidSlice(int s, int t, int n) const
+bool mitk::Image::IsValidSlice(int s, TimeStepType t, int n) const
 {
   if (m_Initialized)
-    return ((s >= 0) && (s < (int)m_Dimensions[2]) && (t >= 0) && (t < (int)m_Dimensions[3]) && (n >= 0) &&
+    return ((s >= 0) && (s < (int)m_Dimensions[2]) && (t < m_Dimensions[3]) && (n >= 0) &&
             (n < (int)GetNumberOfChannels()));
   else
     return false;
 }
 
-bool mitk::Image::IsValidVolume(int t, int n) const
+bool mitk::Image::IsValidVolume(TimeStepType t, int n) const
 {
   if (m_Initialized)
     return IsValidSlice(0, t, n);
@@ -1066,41 +1065,41 @@ void mitk::Image::ComputeOffsetTable()
     m_OffsetTable[i + 1] = num;
 }
 
-bool mitk::Image::IsValidTimeStep(int t) const
+bool mitk::Image::IsValidTimeStep(TimeStepType t) const
 {
-  return ((m_Dimension >= 4 && t <= (int)m_Dimensions[3] && t > 0) || (t == 0));
+  return ((m_Dimension >= 4 && t <= m_Dimensions[3]) || (t == 0));
 }
 
-void mitk::Image::Expand(unsigned int timeSteps)
+void mitk::Image::Expand(TimeStepType timeSteps)
 {
   if (timeSteps < 1)
     itkExceptionMacro(<< "Invalid timestep in Image!");
   Superclass::Expand(timeSteps);
 }
 
-int mitk::Image::GetSliceIndex(int s, int t, int n) const
+int mitk::Image::GetSliceIndex(int s, TimeStepType t, int n) const
 {
   if (IsValidSlice(s, t, n) == false)
     return false;
-  return ((size_t)s) + ((size_t)t) * m_Dimensions[2] + ((size_t)n) * m_Dimensions[3] * m_Dimensions[2]; //??
+  return ((size_t)s) + t * m_Dimensions[2] + ((size_t)n) * m_Dimensions[3] * m_Dimensions[2]; //??
 }
 
-int mitk::Image::GetVolumeIndex(int t, int n) const
+int mitk::Image::GetVolumeIndex(TimeStepType t, int n) const
 {
   if (IsValidVolume(t, n) == false)
     return false;
-  return ((size_t)t) + ((size_t)n) * m_Dimensions[3]; //??
+  return t + ((size_t)n) * m_Dimensions[3]; //??
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(
-  int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   MutexHolder lock(m_ImageDataArraysLock);
   return AllocateSliceData_unlocked(s, t, n, data, importMemoryManagement);
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData_unlocked(
-  int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  int s, TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   int pos;
   pos = GetSliceIndex(s, t, n);
@@ -1133,7 +1132,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData_unlocked(
                            2,
                            data,
                            importMemoryManagement == ManageMemory,
-                           (((size_t)s) * m_OffsetTable[2] + ((size_t)t) * m_OffsetTable[3]) * (ptypeSize));
+                           (((size_t)s) * m_OffsetTable[2] + t * m_OffsetTable[3]) * (ptypeSize));
     sl->SetComplete(true);
     return m_Slices[pos] = sl;
   }
@@ -1158,14 +1157,14 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData_unlocked(
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(
-  int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   MutexHolder lock(m_ImageDataArraysLock);
   return AllocateVolumeData_unlocked(t, n, data, importMemoryManagement);
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData_unlocked(
-  int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+  TimeStepType t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   int pos;
   pos = GetVolumeIndex(t, n);
@@ -1183,7 +1182,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData_unlocked(
                             3,
                             data,
                             importMemoryManagement == ManageMemory,
-                            (((size_t)t) * m_OffsetTable[3]) * (ptypeSize));
+                            (t * m_OffsetTable[3]) * (ptypeSize));
     return m_Volumes[pos] = vol;
   }
 
@@ -1220,13 +1219,13 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData_unlocked(
   {
     const size_t ptypeSize = this->m_ImageDescriptor->GetChannelTypeById(n).GetSize();
 
-    ch = new ImageDataItem(this->m_ImageDescriptor, -1, nullptr, true);
+    ch = new ImageDataItem(this->m_ImageDescriptor, TIMESTEP_INVALID, nullptr, true);
     if (data != nullptr)
       std::memcpy(ch->GetData(), data, m_OffsetTable[4] * (ptypeSize));
   }
   else
   {
-    ch = new ImageDataItem(this->m_ImageDescriptor, -1, data, importMemoryManagement == ManageMemory);
+    ch = new ImageDataItem(this->m_ImageDescriptor, TIMESTEP_INVALID, data, importMemoryManagement == ManageMemory);
   }
   m_Channels[n] = ch;
   return ch;
@@ -1326,7 +1325,7 @@ mitk::ImageDimensionVectorType mitk::DetermineImageDimensionsFromTimeGeometry(co
      void mitk::Image::Initialize(const mitk::PixelType &type,
                              const mitk::TimeGeometry &geometry,
                              unsigned int channels,
-                             int tDim)
+                             TimeStepType tDim)
      Via this function it is made generally available.
      To also deduce (image) dimensions purely based on time geometries.
   */

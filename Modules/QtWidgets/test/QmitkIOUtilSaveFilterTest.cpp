@@ -35,12 +35,12 @@ class QmitkIOUtilSaveFilterTestSuite : public mitk::TestFixture
   MITK_TEST(GetDefaultMimeType_Image_Nrrd);
   CPPUNIT_TEST_SUITE_END();
 
-  static mitk::Surface::Pointer CreateSurface(unsigned int timeSteps)
+  static mitk::Surface::Pointer CreateSurface(mitk::TimeStepType timeSteps)
   {
     auto surface = mitk::Surface::New();
     surface->Expand(timeSteps);
 
-    for (unsigned int timeStep = 0; timeStep < timeSteps; ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < timeSteps; ++timeStep)
       surface->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New(), timeStep);
 
     return surface;

@@ -281,7 +281,7 @@ void mitk::ContourModel::SetClosed(bool isClosed, TimeStepType timestep)
   }
 }
 
-bool mitk::ContourModel::IsEmptyTimeStep(unsigned int t) const
+bool mitk::ContourModel::IsEmptyTimeStep(TimeStepType t) const
 {
   return (this->m_ContourSeries.size() <= t);
 }
@@ -372,7 +372,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd(TimeStepType 
   }
 }
 
-bool mitk::ContourModel::IsClosed(int timestep) const
+bool mitk::ContourModel::IsClosed(TimeStepType timestep) const
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -525,16 +525,16 @@ void mitk::ContourModel::Clear(TimeStepType timestep)
   }
 }
 
-void mitk::ContourModel::Expand(unsigned int timeSteps)
+void mitk::ContourModel::Expand(TimeStepType timeSteps)
 {
-  std::size_t oldSize = this->m_ContourSeries.size();
+  const TimeStepType oldSize = this->m_ContourSeries.size();
 
-  if (static_cast<std::size_t>(timeSteps) > oldSize)
+  if (timeSteps > oldSize)
   {
     Superclass::Expand(timeSteps);
 
     // insert contours for each new timestep
-    for (std::size_t i = oldSize; i < static_cast<std::size_t>(timeSteps); i++)
+    for (TimeStepType i = oldSize; i < timeSteps; i++)
     {
       m_ContourSeries.push_back(ContourElement::New());
     }
@@ -667,10 +667,10 @@ void mitk::ContourModel::UpdateOutputInformation()
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
     typedef BoundingBoxType::PointsContainer PointsContainer;
 
-    int timesteps = this->GetTimeSteps();
+    const TimeStepType timesteps = this->GetTimeSteps();
 
     // iterate over the timesteps
-    for (int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
+    for (TimeStepType currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
     {
       if (dynamic_cast<PlaneGeometry *>(this->GetGeometry(currenTimeStep)))
       {

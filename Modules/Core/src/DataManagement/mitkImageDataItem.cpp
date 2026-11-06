@@ -33,7 +33,7 @@ found in the LICENSE file.
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem &aParent,
                                    const mitk::ImageDescriptor::Pointer desc,
-                                   int timestep,
+                                   TimeStepType timestep,
                                    unsigned int dimension,
                                    void *data,
                                    bool manageMemory,
@@ -96,7 +96,7 @@ mitk::ImageDataItem::~ImageDataItem()
 }
 
 mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc,
-                                   int timestep,
+                                   TimeStepType timestep,
                                    void *data,
                                    bool manageMemory)
   : m_Data(static_cast<unsigned char *>(data)),
@@ -130,7 +130,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc,
 }
 
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType &type,
-                                   int timestep,
+                                   TimeStepType timestep,
                                    unsigned int dimension,
                                    unsigned int *dimensions,
                                    void *data,
@@ -219,7 +219,7 @@ vtkSmartPointer<vtkImageData> mitk::ImageDataItem::CreateVtkImageDataView(ImageC
     return nullptr;
   }
 
-  if (m_Timestep >= 0)
+  if (m_Timestep != TIMESTEP_INVALID)
   {
     SlicedGeometry3D *geom3d;
     geom3d = iP->GetSlicedGeometry(m_Timestep);

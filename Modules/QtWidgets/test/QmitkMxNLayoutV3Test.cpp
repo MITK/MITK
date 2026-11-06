@@ -40,6 +40,7 @@ found in the LICENSE file.
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QResizeEvent>
 
@@ -127,6 +128,9 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(AddGridColumn_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(Apply_WhileHidden_EndsAsAppliedWhileShown);
+  MITK_TEST(Apply_WhileHidden_CameraSetBeforeShowIsKept);
+  MITK_TEST(Apply_WhileShowing_LeavesNoStaleFitForReusedIds);
+  MITK_TEST(GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards);
   MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
   MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
   MITK_TEST(Apply_ThreeDWindow_FramesTheData);
@@ -1431,6 +1435,104 @@ public:
         CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera of " + windowId.toStdString() + where, scale,
                                              hidden.at(windowId), 1e-6);
       }
+    }
+  }
+
+  static nlohmann::json TwoAxialWindowsDoc()
+  {
+    return nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global" } }
+      ] }
+    })json");
+  }
+
+  static vtkCamera* CameraOf(const QmitkMxNMultiWidget& editor, const QString& windowId)
+  {
+    return mitk::BaseRenderer::GetInstance(editor.GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow())
+      ->GetVtkRenderer()
+      ->GetActiveCamera();
+  }
+
+  void Apply_WhileHidden_CameraSetBeforeShowIsKept()
+  {
+    // A REST client may apply a layout to an editor whose tab is hidden and
+    // then set a window's camera. The fit the display defers until it is
+    // shown must not replace that camera.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    const double zoomed = 0.5 * fitted.at("mxn__wide");
+    CameraOf(*editor, "mxn__wide")->SetParallelScale(zoomed);
+    editor->DiscardPendingFit("mxn__wide");
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera set while hidden is kept", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The other window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_WhileShowing_LeavesNoStaleFitForReusedIds()
+  {
+    // A layout applied while the fit deferred for showing is still queued
+    // rebuilds the cells under the same ids. The new cells are fitted by the
+    // load; the deferred fit of the old ones must not linger and later reset
+    // the new cells' cameras.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    editor->show();
+    editor->ApplyLayout(doc);
+    Pump();
+
+    const double zoomed = 0.5 * CameraOf(*editor, "mxn__wide")->GetParallelScale();
+    CameraOf(*editor, "mxn__wide")->SetParallelScale(zoomed);
+    editor->hide();
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A zoom set after the load survives hiding and showing", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+  }
+
+  void GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards()
+  {
+    // Cells built while hidden wait for the display to be shown. A grid
+    // operation running when it is shown must not leave them unfitted until
+    // the display is hidden and shown again.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->SetLayout(1, 2);
+    const auto deferred = WindowIds(*editor);
+    editor->show();
+    editor->AddGridColumn();
+    // The deferred fit retries on a timer while the editor is busy.
+    QElapsedTimer waited;
+    waited.start();
+    while (waited.elapsed() < 250)
+    {
+      QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
+    for (const auto& windowId : deferred)
+    {
+      AssertShowsWholePlane(*editor, windowId);
     }
   }
 

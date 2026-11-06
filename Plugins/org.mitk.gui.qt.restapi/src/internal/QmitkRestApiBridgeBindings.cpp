@@ -710,6 +710,9 @@ namespace mitk
       [](const std::string& id, const mitk::CameraPatch& patch)
       {
         ApplyCameraPatchToRenderer(ResolveMxNRenderer(id), patch, id);
+        // The editor's tab may be hidden; the patch outlasts its first show.
+        const auto snap = ResolveMxNRenderWindow(id);
+        snap.multiWidget->DiscardPendingFit(snap.id);
       });
 
     rwb->SetMxNSelectedSliceGetter(

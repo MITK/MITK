@@ -1085,6 +1085,7 @@ void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
   m_FreeCells.erase(widgetName);
   m_SeenRenderModes.erase(widgetName);
   m_TwoDViews.erase(widgetName);
+  std::erase(m_CellsToFitWhenShown, widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
 }
 
@@ -3569,9 +3570,13 @@ void QmitkMxNMultiWidget::showEvent(QShowEvent* event)
 void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
 {
   // A running layout operation fits the cells it builds itself; the cells
-  // deferred before it stay pending for the next show.
+  // deferred before it, if they survive it, are fitted once it has finished.
   if (this->IsApplyingLayout())
   {
+    if (!m_CellsToFitWhenShown.empty())
+    {
+      QTimer::singleShot(50, this, [this]() { this->FitCellsDeferredWhileHidden(); });
+    }
     return;
   }
   std::vector<QString> windowIds;
@@ -3956,6 +3961,11 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
 bool QmitkMxNMultiWidget::IsApplyingLayout() const
 {
   return m_ApplyingLayout || m_LayoutLoadPending;
+}
+
+void QmitkMxNMultiWidget::DiscardPendingFit(const QString& windowId)
+{
+  std::erase(m_CellsToFitWhenShown, windowId);
 }
 
 void QmitkMxNMultiWidget::SetLayoutLocks(QmitkMxNLayoutLocks locks)

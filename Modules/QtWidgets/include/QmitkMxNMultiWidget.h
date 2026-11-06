@@ -1353,6 +1353,17 @@ public:
   bool IsApplyingLayout() const;
 
   /**
+  * \brief Keeps the camera of window 'windowId' as the caller set it.
+  *
+  *   Cells built while the display is hidden are fitted to their size once
+  *   it is shown. A caller that sets a cell's camera explicitly before that
+  *   (e.g. over REST, to an editor whose tab is hidden) calls this, so the
+  *   fit does not replace the camera. Has no effect on a window without a
+  *   pending fit or on an unknown id.
+  */
+  void DiscardPendingFit(const QString& windowId);
+
+  /**
   * \brief Sets the interactions users cannot perform on this widget.
   *
   *   Takes effect at once in every existing cell and in cells created later;
@@ -2296,7 +2307,8 @@ private:
   /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
   bool m_ApplyingLayout = false;
   /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
-  *          hidden; they are fitted once it is shown. */
+  *          hidden; they are fitted once it is shown, unless they are
+  *          removed or their camera was set ('DiscardPendingFit') first. */
   std::vector<QString> m_CellsToFitWhenShown;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
   *          see 'IsApplyingLayout'. */

@@ -260,7 +260,6 @@ public:
 
     mitk::test::FormatCapabilities capabilities;
     capabilities.formatName = "test format";
-    capabilities.options = {};
     capabilities.losses.push_back({ "opacity of label 7", [](mitk::MultiLabelSegmentation& segmentation) {
       segmentation.GetLabel(7)->SetOpacity(0.55f);
     } });
@@ -272,7 +271,6 @@ public:
   {
     mitk::test::FormatCapabilities capabilities;
     capabilities.formatName = "test format";
-    capabilities.options = {};
     capabilities.losses.push_back({ "changes nothing", [](mitk::MultiLabelSegmentation&) {} });
 
     CPPUNIT_ASSERT_THROW(

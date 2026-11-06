@@ -53,7 +53,7 @@ namespace mitk
       // the floating point split of the index-to-world matrix into spacing and direction.
       capabilities.options.geometryTolerance = 1e-9;
       // ArbitraryTimeGeometry time points are written with the stream default of 6 significant
-      // digits (ConvertTimePointListToMetaDataObject); for time points below 10 that bounds the
+      // digits (ConvertTimePointListToMetaDataObject); for time points below 100 that bounds the
       // error by 5e-5.
       capabilities.options.timeTolerance = 1e-4;
 

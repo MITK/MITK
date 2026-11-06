@@ -44,17 +44,17 @@ namespace mitk
     /**
      * Settings that depend on the format under test. Every value in a
      * capability table entry states why it is needed and, for tolerances,
-     * how the bound is derived. A value-initialized instance compares
+     * how the bound is derived. A default-constructed instance compares
      * everything exactly.
      */
     struct SegComparisonOptions
     {
       /** Maximum absolute difference per colour channel, in [0, 1]. */
-      float colorTolerance;
+      float colorTolerance = 0.f;
       /** Maximum absolute difference of origin, spacing and direction components. */
-      ScalarType geometryTolerance;
+      ScalarType geometryTolerance = 0.0;
       /** Maximum absolute difference of time points and time bounds. */
-      ScalarType timeTolerance;
+      ScalarType timeTolerance = 0.0;
       std::set<NotCompared> notCompared;
       /**
        * Property keys excluded on both sides because their reloaded value

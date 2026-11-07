@@ -23,21 +23,19 @@ namespace mitk
   namespace test
   {
     /**
-     * \brief Compare a property's scalar value to an expected string.
+     * \brief Compare a property's scalar value to an expected string, exactly.
      *
      * Handles two property shapes that the DICOM property machinery may
      * produce for the same logical scalar value:
      *   - TemporoSpatialStringProperty: the value lives at slot
      *     (timeStep=0, sliceIndex=0). GetValueAsString() returns a JSON
-     *     serialisation of the full sparse map, not the scalar — so a
-     *     direct string compare against the expected scalar fails on
-     *     this type.
+     *     serialisation of the full sparse map, not the scalar, so that
+     *     slot is compared.
      *   - Plain BaseProperty (StringProperty etc.): GetValueAsString()
-     *     returns the value itself; exact match or substring match
-     *     suffices.
+     *     returns the value itself.
      *
      * Returns true when the property is non-null and its primary scalar
-     * value matches the expected string. Used by the DICOM SEG round-trip
+     * value equals the expected string. Used by the DICOM SEG round-trip
      * tests so the same assertion shape works regardless of which side of
      * MITK's persistence layer the property travelled through.
      */
@@ -48,9 +46,7 @@ namespace mitk
         return false;
       if (const auto *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop))
         return tsProp->GetValue(0, 0) == expected;
-      const auto value = prop->GetValueAsString();
-      return value == expected
-        || value.find(expected) != std::string::npos;
+      return prop->GetValueAsString() == expected;
     }
   }
 }

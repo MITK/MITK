@@ -1160,6 +1160,12 @@ namespace mitk
 
       labelSetImage->SetAllLabelsVisible(true);
 
+      // DICOM SEG carries no opacity. The labels InitializeByLabeledImage made carry the
+      // lookup table's alpha, the others the label default, so every label gets the default.
+      const auto defaultOpacity = Label::New()->GetOpacity();
+      for (const auto& label : labelSetImage->GetLabels())
+        label->SetOpacity(defaultOpacity);
+
       if (labelSetImage->GetTotalNumberOfLabels() > 0)
       {
         labelSetImage->SetActiveLabel(labelSetImage->GetAllLabelValues().front());

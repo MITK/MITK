@@ -27,6 +27,20 @@ else()
     "(dcmqi fixture not found: ${_dicomSegFixture}).")
 endif()
 
+# A binary DICOM SEG that MITK did not write, checked against its own content:
+# five segments with SegmentsOverlap UNDEFINED, so one group per segment.
+set(_dicomSegPartialOverlapsFixture
+  "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/data/segmentations/partial_overlaps.dcm")
+
+if(EXISTS "${_dicomSegPartialOverlapsFixture}")
+  mitkAddCustomModuleTest(mitkDICOMSegmentationIOFileContentTest_PartialOverlaps
+    mitkDICOMSegmentationIOFileContentTest
+    ${_dicomSegPartialOverlapsFixture})
+else()
+  message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationIOFileContentTest_PartialOverlaps "
+    "(dcmqi fixture not found: ${_dicomSegPartialOverlapsFixture}).")
+endif()
+
 # Labelmap (Sup 243) regression test. The labelmap-format DICOM SEG is built
 # from dcmqi's existing inputs at test runtime via the dcmqi
 # Itk2DicomConverter (--segmentationType labelmap equivalent), then read back

@@ -10,12 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkSegIOTestCapabilities.h>
+#include <mitkSegIOTestComparator.h>
+
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
 #include <mitkTestingMacros.h>
 
 #include <itkImageFileReader.h>
 
+#include <dcmqi/ColorUtilities.h>
 #include <dcmqi/Helper.h>
 #include <dcmqi/Itk2DicomConverter.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
@@ -24,16 +28,22 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcuid.h>
 
+#include <nlohmann/json.hpp>
+
 #include <fstream>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
 
 // Regression guard for the labelmap branch of
 // mitk::DICOMSegmentationIO::DoRead. A labelmap-format DICOM SEG (SOP Class
-// UID_LabelMapSegmentationStorage, Sup 243) is read through MITK and
-// compared against a checked-in MITK reference segmentation.
+// UID_LabelMapSegmentationStorage, Sup 243) is read through MITK. The label
+// attributes are checked against the dcmqi metadata the SEG is built from.
+// The voxels are checked against the reference segmentation in MITK-Data,
+// an export of MITK's own reader (MITK-Data a1e677b, updated in 08f86e5),
+// which pins them to what earlier reader versions yielded.
 //
 // dcmqi's labelmap converter is driven inline to produce the SEG fixture
 // from two single-segment input NRRDs plus three source DICOM images
@@ -66,6 +76,63 @@ namespace
         tokens.push_back(token);
     }
     return tokens;
+  }
+
+  mitk::DICOMCodeSequence CodeFromJSON(const nlohmann::json& code)
+  {
+    return mitk::DICOMCodeSequence(code.at("CodeValue").get<std::string>(),
+                                   code.at("CodingSchemeDesignator").get<std::string>(),
+                                   code.at("CodeMeaning").get<std::string>());
+  }
+
+  /**
+   * The label the reader is expected to yield for one segment of the dcmqi metadata. A key
+   * this function does not know fails the test, so that no attribute goes unchecked.
+   */
+  mitk::Label::Pointer LabelFromJSON(const nlohmann::json& segment)
+  {
+    static const std::set<std::string> knownKeys = { "labelID", "SegmentLabel", "SegmentDescription",
+      "SegmentedPropertyCategoryCodeSequence", "SegmentedPropertyTypeCodeSequence", "SegmentAlgorithmType",
+      "SegmentAlgorithmName", "recommendedDisplayRGBValue" };
+    for (const auto& item : segment.items())
+    {
+      if (knownKeys.count(item.key()) == 0)
+        mitkThrow() << "The metadata has the segment attribute " << item.key() << ", which the test does not check.";
+    }
+
+    auto label = mitk::Label::New();
+    label->SetValue(segment.at("labelID").get<mitk::Label::PixelType>());
+    // The format carries no opacity, visibility or lock state; the reader's values are pinned.
+    label->SetOpacity(0.6f);
+    label->SetVisible(true);
+    label->SetLocked(true);
+    label->SetName(segment.at("SegmentLabel").get<std::string>());
+    if (segment.contains("SegmentDescription"))
+      label->SetDescription(segment["SegmentDescription"].get<std::string>());
+    if (segment.contains("SegmentedPropertyCategoryCodeSequence"))
+      label->SetSegmentedPropertyCategory(CodeFromJSON(segment["SegmentedPropertyCategoryCodeSequence"]));
+    if (segment.contains("SegmentedPropertyTypeCodeSequence"))
+    {
+      label->SetSegmentedPropertyType(
+        mitk::DICOMCodeSequenceWithModifiers(CodeFromJSON(segment["SegmentedPropertyTypeCodeSequence"])));
+    }
+    label->SetAlgorithmTypeStr(segment.at("SegmentAlgorithmType").get<std::string>());
+    if (segment.contains("SegmentAlgorithmName"))
+      label->SetAlgorithmName(segment["SegmentAlgorithmName"].get<std::string>());
+
+    // The SEG stores the colour as integer CIELab, which dcmqi converts from sRGB on writing
+    // and back on reading; the reader then divides by 255.
+    const auto rgb = segment.at("recommendedDisplayRGBValue").get<std::vector<int>>();
+    int cielab[3];
+    dcmqi::ColorUtilities::getIntegerScaledCIELabPCSFromSRGB(cielab[0], cielab[1], cielab[2], rgb.at(0), rgb.at(1), rgb.at(2));
+    int roundTrip[3];
+    dcmqi::ColorUtilities::getSRGBFromIntegerScaledCIELabPCS(roundTrip[0], roundTrip[1], roundTrip[2],
+      static_cast<Uint16>(cielab[0]), static_cast<Uint16>(cielab[1]), static_cast<Uint16>(cielab[2]));
+    mitk::Color color;
+    color.Set(roundTrip[0] / 255.f, roundTrip[1] / 255.f, roundTrip[2] / 255.f);
+    label->SetColor(color);
+
+    return label;
   }
 }
 
@@ -190,50 +257,42 @@ int mitkDICOMSegmentationIOLabelmapRegressionTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(referenceSeg != nullptr,
     "Reference is a MultiLabelSegmentation");
 
-  const bool equal = mitk::Equal(*loadedSeg, *referenceSeg, mitk::eps, true);
-  if (!equal)
+  // The attributes, against the metadata the SEG was built from.
+  std::vector<std::string> differences;
+  std::set<mitk::Label::PixelType> segmentValues;
+  const auto losses = mitk::test::DICOMSegReadLabelLosses();
+  const auto metadataJSON = nlohmann::json::parse(metadata);
+  for (const auto& group : metadataJSON.at("segmentAttributes"))
   {
-    // First-run aid: on mismatch, persist what the reader produced next to
-    // the reference so a human can diff the two and decide whether the
-    // reference needs updating or the reader has regressed.
-    const std::string actualOut = referencePath + ".actual.nrrd";
-    try
+    for (const auto& segment : group)
     {
-      mitk::IOUtil::Save(loadedSeg, actualOut);
-      MITK_ERROR << "Labelmap regression mismatch; loaded seg written to "
-                 << actualOut;
-    }
-    catch (const std::exception &e)
-    {
-      MITK_ERROR << "Labelmap regression mismatch; failed to persist loaded "
-                 << "seg for diffing: " << e.what();
-    }
-
-    auto dumpLabel = [](const mitk::Label *label, const std::string &tag) {
-      if (label == nullptr)
+      auto expected = LabelFromJSON(segment);
+      for (const auto& loss : losses)
+        loss.apply(*expected);
+      segmentValues.insert(expected->GetValue());
+      if (!loadedSeg->ExistLabel(expected->GetValue()))
       {
-        MITK_ERROR << tag << ": <null>";
-        return;
+        differences.push_back(mitk::test::detail::DescribeLabel(expected) + ": missing");
+        continue;
       }
-      const auto color = label->GetColor();
-      MITK_ERROR << tag
-                 << " value=" << label->GetValue()
-                 << " name='" << label->GetName()
-                 << "' color=(" << color[0] << "," << color[1] << "," << color[2] << ")"
-                 << " trackingID='" << label->GetTrackingID()
-                 << "' trackingUID='" << label->GetTrackingUID()
-                 << "' algorithmType=" << label->GetAlgorithmTypeStr()
-                 << " algorithmName='" << label->GetAlgorithmName() << "'";
-    };
-    MITK_ERROR << "Groups: loaded=" << loadedSeg->GetNumberOfGroups()
-               << " reference=" << referenceSeg->GetNumberOfGroups();
-    for (const auto value : loadedSeg->GetAllLabelValues())
-      dumpLabel(loadedSeg->GetLabel(value), "  loaded");
-    for (const auto value : referenceSeg->GetAllLabelValues())
-      dumpLabel(referenceSeg->GetLabel(value), "  reference");
+      mitk::test::detail::CompareLabelProperties(*expected, *loadedSeg->GetLabel(expected->GetValue()), 0.f, differences);
+    }
   }
-  MITK_TEST_CONDITION(equal,
-    "Loaded labelmap DICOM SEG matches the reference MultiLabelSegmentation");
+  for (const auto value : loadedSeg->GetAllLabelValues())
+  {
+    if (segmentValues.count(value) == 0)
+      differences.push_back(mitk::test::detail::DescribeLabel(loadedSeg->GetLabel(value)) + ": unexpected");
+  }
+  MITK_TEST_CONDITION(differences.empty(),
+    "Loaded labelmap SEG matches the metadata it was built from" << mitk::test::JoinDifferences(differences));
+
+  // The voxels, against the reference.
+  MITK_TEST_CONDITION_REQUIRED(referenceSeg->GetNumberOfGroups() == 1,
+    "The reference has a single group");
+  MITK_TEST_CONDITION(loadedSeg->GetLabelValuesByGroup(0) == referenceSeg->GetLabelValuesByGroup(0),
+    "Loaded labelmap SEG has the label values of the reference");
+  MITK_TEST_CONDITION(mitk::Equal(*loadedSeg->GetGroupImage(0), *referenceSeg->GetGroupImage(0), mitk::eps, true),
+    "Loaded labelmap SEG matches the reference in geometry and voxels");
 
   MITK_TEST_END();
 }

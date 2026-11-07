@@ -12,13 +12,22 @@ found in the LICENSE file.
 
 #include <mitkDICOMSegFileContentTestHelpers.h>
 #include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
 
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
+#include <mitkPropertyNameHelper.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
+
+#include <itksys/SystemTools.hxx>
+
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -32,12 +41,32 @@ class mitkDICOMSegmentationIOReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadBinary);
   MITK_TEST(TestReadBinaryOverlap);
   MITK_TEST(TestReadLabelmap);
+  MITK_TEST(TestReadFromStream);
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  std::string m_TempPath;
+
+  static const std::string& ReaderDescription()
+  {
+    static const std::string description = "DICOM Segmentation";
+    return description;
+  }
+
+  /** The DICOM SEG mime type is not exported from its autoload module, so its name is spelled out. */
+  static std::string MimeTypeName()
+  {
+    return mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
+  }
+
   static std::string FixturePath(const std::string& fileName)
   {
     return GetTestDataFilePath("Multilabel/DICOMSegmentationIO/ExternalProducer/" + fileName);
+  }
+
+  std::string GetTempFilePath(const std::string& fileName) const
+  {
+    return m_TempPath + mitk::IOUtil::GetDirectorySeparator() + fileName;
   }
 
   static mitk::MultiLabelSegmentation::Pointer LoadSegmentation(const std::string& path)
@@ -68,6 +97,16 @@ private:
   }
 
 public:
+  void setUp() override
+  {
+    m_TempPath = mitk::IOUtil::CreateTemporaryDirectory("mitk-DICOMSegmentationIOReaderTest-XXXXXX");
+  }
+
+  void tearDown() override
+  {
+    itksys::SystemTools::RemoveADirectory(m_TempPath);
+  }
+
   void TestReadBinary()
   {
     const auto path = FixturePath("ct3slice_binary.dcm");
@@ -92,6 +131,30 @@ public:
     // The segment numbers are not consecutive, and the background segment 0 yields no label.
     AssertGroupValues(*segmentation, { { 1, 3, 7 } });
     AssertMatchesFile(*segmentation, path);
+  }
+
+  void TestReadFromStream()
+  {
+    const auto path = FixturePath("ct3slice_binary.dcm");
+    std::ifstream stream(path, std::ios::binary);
+    CPPUNIT_ASSERT_MESSAGE("Cannot open " + path, stream.is_open());
+
+    // A stream comes with a location that need not exist as a file.
+    const auto result = mitk::test::ReadWithReaderOfMimeType(this->GetTempFilePath("stream-only.dcm"), MimeTypeName(),
+                                                             ReaderDescription(), &stream);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Number of data read from the stream", std::size_t{1}, result.size());
+    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(result.front().GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("The stream did not read as a segmentation", nullptr != segmentation);
+    AssertMatchesFile(*segmentation, path);
+
+    DcmFileFormat file;
+    CPPUNIT_ASSERT(file.loadFile(path.c_str()).good());
+    OFString studyInstanceUID;
+    CPPUNIT_ASSERT(file.getDataset()->findAndGetOFString(DCM_StudyInstanceUID, studyInstanceUID).good());
+    std::string readStudyInstanceUID;
+    CPPUNIT_ASSERT_MESSAGE("The DICOM tags of the stream were not read",
+                           mitk::GetDICOMPropertyValue(0x0020, 0x000D, segmentation->GetPropertyList(), readStudyInstanceUID));
+    CPPUNIT_ASSERT_EQUAL(std::string(studyInstanceUID.c_str()), readStudyInstanceUID);
   }
 };
 

@@ -330,6 +330,35 @@ namespace mitk
     }
 
     /**
+     * Like ReadWithReaderIgnoringConfidence, but finds the reader through the name of its
+     * mime type, so the mime type need not apply to the file either. That reaches a reader's
+     * handling of files its mime type rejects, e.g. a file that is no DICOM at all. With a
+     * stream, the reader reads from it, and location is only the name it is given.
+     */
+    inline std::vector<BaseData::Pointer> ReadWithReaderOfMimeType(const std::string& location,
+                                                                   const std::string& mimeTypeName,
+                                                                   const std::string& readerDescription,
+                                                                   std::istream* stream = nullptr)
+    {
+      CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+      FileReaderRegistry registry;
+      for (const auto& reference : FileReaderRegistry::GetReferences(mimeTypeProvider->GetMimeTypeForName(mimeTypeName)))
+      {
+        if (reference.GetProperty(IFileReader::PROP_DESCRIPTION()).ToString() == readerDescription)
+        {
+          auto* reader = registry.GetReader(reference);
+          if (nullptr != stream)
+            reader->SetInput(location, stream);
+          else
+            reader->SetInput(location);
+          return reader->Read();
+        }
+      }
+      CPPUNIT_FAIL("No reader \"" + readerDescription + "\" is registered for the mime type " + mimeTypeName);
+      return {};
+    }
+
+    /**
      * Rewrites the header of the attached NRRD file at path, leaving its data
      * untouched: edit receives the header lines and may change, add or remove
      * any of them. This turns a valid file into a malformed one.

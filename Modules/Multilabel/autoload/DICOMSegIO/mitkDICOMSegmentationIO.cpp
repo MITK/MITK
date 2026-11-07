@@ -1183,8 +1183,10 @@ namespace mitk
         tagsOfInterestList.push_back(tag.first);
       }
 
+      // The scan reads the local file, which differs from the input location when the
+      // input is a stream.
       mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-      scanner->SetInputFiles({ GetInputLocation() });
+      scanner->SetInputFiles({ path });
       scanner->AddTagPaths(tagsOfInterestList);
       scanner->Scan();
 

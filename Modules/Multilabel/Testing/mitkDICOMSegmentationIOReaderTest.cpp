@@ -24,16 +24,20 @@ found in the LICENSE file.
 
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcsequen.h>
+#include <dcmtk/dcmdata/dcuid.h>
 
 #include <itksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <fstream>
+#include <functional>
 #include <string>
 #include <vector>
 
 /**
  * The DICOM SEG reader against files it did not write: SEGs from highdicom, read by value
- * against their own content.
+ * against their own content, and malformed or unsupported files, which the reader refuses.
  */
 class mitkDICOMSegmentationIOReaderTestSuite : public mitk::TestFixture
 {
@@ -42,6 +46,11 @@ class mitkDICOMSegmentationIOReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadBinaryOverlap);
   MITK_TEST(TestReadLabelmap);
   MITK_TEST(TestReadFromStream);
+  MITK_TEST(TestReadNonDICOMFileFails);
+  MITK_TEST(TestReadNonSegmentationSOPClassFails);
+  MITK_TEST(TestReadLabelmapPixelWithoutSegmentFails);
+  MITK_TEST(TestReadLabelmapSegmentWithoutPixelsFails);
+  MITK_TEST(TestReadInvalidAlgorithmTypeFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -93,6 +102,70 @@ private:
     {
       CPPUNIT_ASSERT_MESSAGE("Label values of group " + std::to_string(group),
                              expected[group] == segmentation.GetLabelValuesByGroup(static_cast<mitk::MultiLabelSegmentation::GroupIndexType>(group)));
+    }
+  }
+
+  /** Writes a copy of a fixture into the temporary directory, changed by edit. */
+  std::string WriteEditedCopy(const std::string& fixture,
+                              const std::string& fileName,
+                              const std::function<void(DcmDataset&)>& edit) const
+  {
+    DcmFileFormat file;
+    CPPUNIT_ASSERT_MESSAGE("DCMTK cannot read " + fixture, file.loadFile(FixturePath(fixture).c_str()).good());
+    edit(*file.getDataset());
+    const auto path = this->GetTempFilePath(fileName);
+    CPPUNIT_ASSERT_MESSAGE("DCMTK cannot write " + path, file.saveFile(path.c_str(), EXS_LittleEndianExplicit).good());
+    return path;
+  }
+
+  static DcmItem* FindSegmentItem(DcmDataset& dataset, Uint16 number)
+  {
+    for (auto* item : mitk::test::detail::GetSequenceItems(dataset, DCM_SegmentSequence))
+    {
+      Uint16 itemNumber = 0;
+      if (item->findAndGetUint16(DCM_SegmentNumber, itemNumber).good() && itemNumber == number)
+        return item;
+    }
+    CPPUNIT_FAIL("The fixture has no segment " + std::to_string(number));
+    return nullptr;
+  }
+
+  static void AssertExceptionMentions(const mitk::Exception& exception, const std::vector<std::string>& texts)
+  {
+    const std::string message = exception.GetDescription();
+    for (const auto& text : texts)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The exception should mention \"" + text + "\"; got: " + message,
+                             message.find(text) != std::string::npos);
+    }
+  }
+
+  /** The reader, called directly, must throw mitk::Exception mentioning every text. */
+  static void AssertReaderFails(const std::string& path, const std::vector<std::string>& texts)
+  {
+    try
+    {
+      mitk::test::ReadWithReaderOfMimeType(path, MimeTypeName(), ReaderDescription());
+      CPPUNIT_FAIL("Reading " + path + " did not fail");
+    }
+    catch (const mitk::Exception& e)
+    {
+      AssertExceptionMentions(e, texts);
+    }
+  }
+
+  /** Like AssertReaderFails; IOUtil, which picks the reader for the file, must report the same. */
+  static void AssertReadFails(const std::string& path, const std::vector<std::string>& texts)
+  {
+    AssertReaderFails(path, texts);
+    try
+    {
+      mitk::IOUtil::Load(path);
+      CPPUNIT_FAIL("Loading " + path + " did not fail");
+    }
+    catch (const mitk::Exception& e)
+    {
+      AssertExceptionMentions(e, texts);
     }
   }
 
@@ -155,6 +228,59 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The DICOM tags of the stream were not read",
                            mitk::GetDICOMPropertyValue(0x0020, 0x000D, segmentation->GetPropertyList(), readStudyInstanceUID));
     CPPUNIT_ASSERT_EQUAL(std::string(studyInstanceUID.c_str()), readStudyInstanceUID);
+  }
+
+  void TestReadNonDICOMFileFails()
+  {
+    const auto path = this->GetTempFilePath("not-dicom.dcm");
+    {
+      std::ofstream output(path, std::ios::binary | std::ios::trunc);
+      output << "This is no DICOM file.";
+    }
+    AssertReaderFails(path, { "not-dicom.dcm" });
+    // The mime type rejects the file, so IOUtil finds no reader for it.
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(path), mitk::Exception);
+  }
+
+  void TestReadNonSegmentationSOPClassFails()
+  {
+    // Surface Segmentation Storage shares the modality SEG with the classes the reader reads.
+    const auto path = this->WriteEditedCopy("ct3slice_binary.dcm", "surface-segmentation.dcm", [](DcmDataset& dataset) {
+      dataset.putAndInsertString(DCM_SOPClassUID, UID_SurfaceSegmentationStorage);
+    });
+    // The mime type rejects the SOP class, so only the reader itself sees the file.
+    AssertReaderFails(path, { "surface-segmentation.dcm", UID_SurfaceSegmentationStorage });
+  }
+
+  void TestReadLabelmapPixelWithoutSegmentFails()
+  {
+    const auto path = this->WriteEditedCopy("ct3slice_labelmap.dcm", "pixel-without-segment.dcm", [](DcmDataset& dataset) {
+      DcmSequenceOfItems* segments = nullptr;
+      CPPUNIT_ASSERT(dataset.findAndGetSequence(DCM_SegmentSequence, segments).good());
+      delete segments->remove(FindSegmentItem(dataset, 3));
+    });
+    AssertReadFails(path, { "pixel-without-segment.dcm", "pixel value 3" });
+  }
+
+  void TestReadLabelmapSegmentWithoutPixelsFails()
+  {
+    const auto path = this->WriteEditedCopy("ct3slice_labelmap.dcm", "segment-without-pixels.dcm", [](DcmDataset& dataset) {
+      DcmElement* pixelData = nullptr;
+      Uint8* pixels = nullptr;
+      CPPUNIT_ASSERT(dataset.findAndGetElement(DCM_PixelData, pixelData).good());
+      CPPUNIT_ASSERT(pixelData->getUint8Array(pixels).good());
+      std::replace(pixels, pixels + pixelData->getLength(), Uint8{ 7 }, Uint8{ 0 });
+    });
+    AssertReadFails(path, { "segment-without-pixels.dcm", "segment 7" });
+  }
+
+  void TestReadInvalidAlgorithmTypeFails()
+  {
+    const auto path = this->WriteEditedCopy("ct3slice_binary.dcm", "invalid-algorithm-type.dcm", [](DcmDataset& dataset) {
+      CPPUNIT_ASSERT(FindSegmentItem(dataset, 1)->putAndInsertString(DCM_SegmentAlgorithmType, "GUESSED").good());
+    });
+    // dcmqi throws an int for an algorithm type it does not know.
+    AssertReadFails(path, { "invalid-algorithm-type.dcm", "dcmqi failed" });
   }
 };
 

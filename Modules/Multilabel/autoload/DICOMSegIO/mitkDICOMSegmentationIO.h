@@ -59,9 +59,18 @@ namespace mitk
 
   protected:
     /**
-     * \brief Read DICOM segmentation objects from the file system.
-     * \return A vector of mitk::LabelSetImages.
-     * \throw mitk::Exception if an error occurs during reading.
+     * \brief Read a BINARY or LABELMAP DICOM segmentation.
+     *
+     * A BINARY segmentation yields one group if SegmentsOverlap is NO and one group
+     * per segment otherwise; a LABELMAP yields one group. The format has no
+     * opacity, visibility or lock state, so every label gets the label defaults
+     * and is visible.
+     *
+     * \return A vector with the one mitk::MultiLabelSegmentation read.
+     * \throw mitk::Exception naming the file if it cannot be read: it is no DICOM
+     * file, its SOP class is neither Segmentation Storage nor Label Map
+     * Segmentation Storage, it is a LABELMAP whose pixel values and Segment
+     * Sequence disagree, or dcmqi fails to convert it.
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

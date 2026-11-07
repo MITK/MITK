@@ -1100,14 +1100,13 @@ namespace mitk
     mitk::LocaleSwitch localeSwitch("C");
 
     MultiLabelSegmentation::Pointer labelSetImage;
-    std::vector<BaseData::Pointer> result;
 
     const std::string path = this->GetLocalFileName();
 
     MITK_INFO << "loading " << path << std::endl;
 
     if (path.empty())
-      mitkThrow() << "Empty filename in mitk::ItkImageIO ";
+      mitkThrow() << "The DICOM SEG reader was given no file to read.";
 
     try
     {
@@ -1115,11 +1114,11 @@ namespace mitk
       DcmFileFormat dcmFileFormat;
       OFCondition status = dcmFileFormat.loadFile(path.c_str());
       if (status.bad())
-        mitkThrow() << "Can't read the input file!";
+        mitkThrow() << "DCMTK cannot read the file: " << status.text();
 
       DcmDataset *dataSet = dcmFileFormat.getDataset();
       if (dataSet == nullptr)
-        mitkThrow() << "Can't read data from input file!";
+        mitkThrow() << "DCMTK read no dataset from the file.";
 
       //=============================== dcmqi part ====================================
       // getConverter() is a SOP-Class-specific factory: UID_SegmentationStorage
@@ -1131,7 +1130,11 @@ namespace mitk
       std::unique_ptr<dcmqi::Dicom2ItkConverterBase> converter(
         dcmqi::Dicom2ItkConverter::getConverter(dataSet));
       if (converter == nullptr)
-        mitkThrow() << "Unsupported DICOM SEG SOP Class; cannot read.";
+      {
+        OFString sopClassUID;
+        dataSet->findAndGetOFString(DCM_SOPClassUID, sopClassUID);
+        mitkThrow() << "The SOP class " << sopClassUID << " is no DICOM SEG class the reader supports.";
+      }
 
       std::string metaInfoString;
       auto convertCondition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
@@ -1192,10 +1195,7 @@ namespace mitk
 
       mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
       if (frames.empty())
-      {
-        MITK_ERROR << "Error reading the DICOM Seg file" << std::endl;
-        return result;
-      }
+        mitkThrow() << "The DICOM tag scanner found no frames in the file.";
 
       auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
       DICOMIOHelper::SetProperties(labelSetImage, findings);
@@ -1209,9 +1209,9 @@ namespace mitk
       //
       // Source-image relations are optional provenance (SEG IOD type 1C), so
       // failing to attach them must not fail an otherwise-complete load. The
-      // enclosing catch turns any throw into an empty result, hence the
-      // dedicated guard here (e.g. for DcmSegmentation::loadDataset rejecting
-      // a dataset dcmqi already decoded), which degrades to a warning. Mirrors
+      // enclosing catch fails the whole read, hence the dedicated guard here
+      // (e.g. for DcmSegmentation::loadDataset rejecting a dataset dcmqi
+      // already decoded), which degrades to a warning. Mirrors
       // MigrateLegacyReferenceFilesToRelation.
       try
       {
@@ -1237,19 +1237,21 @@ namespace mitk
                   << "returned without source-image provenance.";
       }
     }
+    catch (const mitk::Exception &e)
+    {
+      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": " << e.GetDescription();
+    }
     catch (const std::exception &e)
     {
-      MITK_ERROR << "An error occurred while reading the DICOM Seg file: " << e.what();
-      return result;
+      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": " << e.what();
     }
     catch (...)
     {
-      MITK_ERROR << "An error occurred in dcmqi while reading the DICOM Seg file";
-      return result;
+      // dcmqi reports some failures by throwing an int.
+      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": dcmqi failed.";
     }
 
-    result.push_back(labelSetImage.GetPointer());
-    return result;
+    return { labelSetImage.GetPointer() };
   }
 
   mitk::MultiLabelSegmentation::Pointer DICOMSegmentationIO::ReadBinarySegmentation(

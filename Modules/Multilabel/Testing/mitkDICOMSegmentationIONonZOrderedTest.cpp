@@ -10,6 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkSegIOTestFixtures.h>
+
 #include <mitkBaseGeometry.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
@@ -28,7 +30,6 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cstdlib>
-#include <filesystem>
 #include <set>
 #include <string>
 #include <vector>
@@ -155,9 +156,8 @@ int mitkDICOMSegmentationIONonZOrderedTest(int argc, char *argv[])
     }
   }
 
-  const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegNonZOrdered";
-  std::filesystem::create_directories(tempDir);
-  const auto reversedPath = (tempDir / "reversed.dcm").string();
+  const mitk::test::ScopedTemporaryDirectory tempDir("mitkDICOMSegmentationIONonZOrderedTest-XXXXXX");
+  const auto reversedPath = tempDir.GetFilePath("reversed.dcm");
   MITK_TEST_CONDITION_REQUIRED(
     ff.saveFile(reversedPath.c_str(), EXS_LittleEndianExplicit).good(),
     "Wrote the reversed temp SEG");

@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileReaderSelector.h>
 #include <mitkIMimeTypeProvider.h>
+#include <mitkIOUtil.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLog.h>
@@ -27,6 +28,8 @@ found in the LICENSE file.
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkSegTestSourceImageFactory.h>
 #include <mitkTestingMacros.h>
+
+#include <itksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
 
@@ -450,6 +453,36 @@ namespace mitk
       }
       return result;
     }
+
+    /**
+     * A temporary directory that is removed with its content when the object goes out of
+     * scope. Tests without a fixture use it, so that a failed required condition, which
+     * throws, still cleans up.
+     */
+    class ScopedTemporaryDirectory
+    {
+    public:
+      explicit ScopedTemporaryDirectory(const std::string& nameTemplate)
+        : m_Path(IOUtil::CreateTemporaryDirectory(nameTemplate))
+      {
+      }
+
+      ~ScopedTemporaryDirectory()
+      {
+        itksys::SystemTools::RemoveADirectory(m_Path);
+      }
+
+      ScopedTemporaryDirectory(const ScopedTemporaryDirectory&) = delete;
+      ScopedTemporaryDirectory& operator=(const ScopedTemporaryDirectory&) = delete;
+
+      std::string GetFilePath(const std::string& fileName) const
+      {
+        return m_Path + IOUtil::GetDirectorySeparator() + fileName;
+      }
+
+    private:
+      std::string m_Path;
+    };
 
     /**
      * Records, while it lives, the warnings whose text contains a fragment. Filtering by a

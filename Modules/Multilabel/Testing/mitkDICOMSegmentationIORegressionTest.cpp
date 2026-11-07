@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkDICOMSegFileContentTestHelpers.h>
 #include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
 
 #include <mitkBaseProperty.h>
 #include <mitkIOUtil.h>
@@ -23,8 +24,6 @@ found in the LICENSE file.
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestingMacros.h>
-
-#include <filesystem>
 
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
@@ -267,12 +266,10 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
   // possible follow-up.) The on-the-wire SOP class on output is the writer's
   // default (legacy binary Segmentation Storage, 1.2.840.10008.5.1.4.1.1.66.4);
   // a dedicated writer-side test pins the SOP class value, so this round
-  // trip is encoding-agnostic. Voxel-level equivalence is pinned by the
-  // per-segment hash baseline above; this assertion only adds the
-  // write+reload survivability that was impossible before this stage.
-  const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegRegressionRoundTrip";
-  std::filesystem::create_directories(tempDir);
-  const auto roundTripPath = (tempDir / "roundtrip.dcm").string();
+  // trip is encoding-agnostic. Attributes and voxels are checked above;
+  // this only adds that a loaded SEG can be written and read again.
+  const mitk::test::ScopedTemporaryDirectory tempDir("mitkDICOMSegmentationIORegressionTest-XXXXXX");
+  const auto roundTripPath = tempDir.GetFilePath("roundtrip.dcm");
   mitk::IFileWriter::Options roundTripOptions;
   roundTripOptions["Strict / synthetic mode"] = std::string("synthetic");
   try

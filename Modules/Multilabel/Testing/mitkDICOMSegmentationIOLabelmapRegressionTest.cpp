@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkSegIOTestCapabilities.h>
 #include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
 
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
@@ -208,8 +209,8 @@ int mitkDICOMSegmentationIOLabelmapRegressionTest(int argc, char* argv[])
   // Persist the labelmap SEG to a temp file so the standard MITK reader
   // exercises the entire DoRead path (including the dcmqi factory call
   // that we want to regression-guard).
-  const std::string tempFile = mitk::IOUtil::CreateTemporaryFile(
-    "mitkDICOMSegmentationIOLabelmapRegressionTest_XXXXXX.dcm");
+  const mitk::test::ScopedTemporaryDirectory tempDir("mitkDICOMSegmentationIOLabelmapRegressionTest-XXXXXX");
+  const std::string tempFile = tempDir.GetFilePath("labelmap.dcm");
   DcmFileFormat fileFormat(labelmapSeg.get());
   const auto saveCondition = fileFormat.saveFile(tempFile.c_str(), EXS_LittleEndianExplicit);
   MITK_TEST_CONDITION_REQUIRED(saveCondition.good(),

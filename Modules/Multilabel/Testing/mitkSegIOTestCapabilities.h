@@ -96,6 +96,62 @@ namespace mitk
 
       return capabilities;
     }
+
+    /** One documented loss on a single label: why it happens, and the edit that reproduces it. */
+    struct DocumentedLabelLoss
+    {
+      std::string description;
+      std::function<void(Label&)> apply;
+    };
+
+    /**
+     * What the DICOM SEG reader cannot take from a segment, although the standard lets the
+     * file carry it: the reader gets the segments from dcmqi, which reads them through
+     * DCMTK's segmentation classes. Both are upstream limits.
+     */
+    inline std::vector<DocumentedLabelLoss> DICOMSegReadLabelLosses()
+    {
+      return {
+        { "anatomic regions beyond the first: DCMTK's segmentation classes keep one item of the Anatomic Region Sequence",
+          [](Label& label) {
+            while (label.GetAnatomicRegionCount() > 1)
+              label.RemoveAnatomicRegion(label.GetAnatomicRegionCount() - 1);
+          } },
+        { "anatomic region modifiers beyond the first: dcmqi reads only the first",
+          [](Label& label) {
+            if (label.GetAnatomicRegionCount() == 0)
+              return;
+            auto region = label.GetAnatomicRegion(0);
+            auto modifiers = region.GetModifiers();
+            if (modifiers.size() > 1)
+            {
+              modifiers.resize(1);
+              region.SetModifiers(modifiers);
+              label.SetAnatomicRegion(region, 0);
+            }
+          } },
+        { "segmented property type modifiers beyond the first: dcmqi reads only the first",
+          [](Label& label) {
+            auto type = label.GetSegmentedPropertyType();
+            if (!type.has_value() || type->GetModifiers().size() <= 1)
+              return;
+            auto modifiers = type->GetModifiers();
+            modifiers.resize(1);
+            type->SetModifiers(modifiers);
+            label.SetSegmentedPropertyType(*type);
+          } },
+        { "primary anatomic structures: dcmqi reads none",
+          [](Label& label) {
+            while (label.GetPrimaryAnatomicStructureCount() > 0)
+              label.RemovePrimaryAnatomicStructure(label.GetPrimaryAnatomicStructureCount() - 1);
+          } },
+        { "the algorithm name of MANUAL segments: dcmqi reads it only for other algorithm types",
+          [](Label& label) {
+            if (label.GetAlgorithmType() == Label::AlgorithmType::MANUAL)
+              label.SetAlgorithmName("");
+          } },
+      };
+    }
   }
 }
 

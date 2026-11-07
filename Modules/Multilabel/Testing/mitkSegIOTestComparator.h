@@ -141,14 +141,23 @@ namespace mitk
         }
       }
 
+      /** Compares the properties of two labels. The label value is no property; callers match labels by value. */
+      inline void CompareLabelProperties(const Label& expected,
+                                         const Label& actual,
+                                         float colorTolerance,
+                                         std::vector<std::string>& differences)
+      {
+        // The JSON writer drops the centre of mass; it is recomputed from the voxels on demand.
+        const auto isIgnored = [](const std::string& key) { return StartsWith(key, "center."); };
+        CompareProperties(*expected.GetMap(), *actual.GetMap(), isIgnored, {}, colorTolerance, DescribeLabel(&expected),
+                          differences);
+      }
+
       inline void CompareLabels(const MultiLabelSegmentation& expected,
                                 const MultiLabelSegmentation& actual,
                                 const SegComparisonOptions& options,
                                 std::vector<std::string>& differences)
       {
-        // The JSON writer drops the centre of mass; it is recomputed from the voxels on demand.
-        const auto isIgnored = [](const std::string& key) { return StartsWith(key, "center."); };
-
         for (const auto value : expected.GetAllLabelValues())
         {
           const auto expectedLabel = expected.GetLabel(value);
@@ -157,9 +166,7 @@ namespace mitk
             differences.push_back(DescribeLabel(expectedLabel) + ": missing");
             continue;
           }
-          const auto actualLabel = actual.GetLabel(value);
-          CompareProperties(*expectedLabel->GetMap(), *actualLabel->GetMap(), isIgnored, {},
-                            options.colorTolerance, DescribeLabel(expectedLabel), differences);
+          CompareLabelProperties(*expectedLabel, *actual.GetLabel(value), options.colorTolerance, differences);
         }
 
         for (const auto value : actual.GetAllLabelValues())

@@ -69,8 +69,8 @@ namespace mitk
      * \return A vector with the one mitk::MultiLabelSegmentation read.
      * \throw mitk::Exception naming the file if it cannot be read: it is no DICOM
      * file, its SOP class is neither Segmentation Storage nor Label Map
-     * Segmentation Storage, it is a LABELMAP whose pixel values and Segment
-     * Sequence disagree, or dcmqi fails to convert it.
+     * Segmentation Storage, it is a FRACTIONAL segmentation, it is a LABELMAP
+     * whose pixel values and Segment Sequence disagree, or dcmqi fails to convert it.
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

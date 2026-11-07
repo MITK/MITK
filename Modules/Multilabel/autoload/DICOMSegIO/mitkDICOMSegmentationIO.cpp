@@ -1120,6 +1120,13 @@ namespace mitk
       if (dataSet == nullptr)
         mitkThrow() << "DCMTK read no dataset from the file.";
 
+      // FRACTIONAL shares the SOP class with BINARY, and dcmqi dispatches on the SOP class
+      // only, so it would pass the fractional values on as if they were label values.
+      OFString segmentationType;
+      dataSet->findAndGetOFString(DCM_SegmentationType, segmentationType);
+      if (segmentationType == "FRACTIONAL")
+        mitkThrow() << "FRACTIONAL segmentations are not supported.";
+
       //=============================== dcmqi part ====================================
       // getConverter() is a SOP-Class-specific factory: UID_SegmentationStorage
       // returns the binary converter, UID_LabelMapSegmentationStorage (Sup 243)

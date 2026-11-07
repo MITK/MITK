@@ -46,6 +46,7 @@ class mitkDICOMSegmentationIOReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadBinaryOverlap);
   MITK_TEST(TestReadLabelmap);
   MITK_TEST(TestReadFromStream);
+  MITK_TEST(TestReadFractionalFails);
   MITK_TEST(TestReadNonDICOMFileFails);
   MITK_TEST(TestReadNonSegmentationSOPClassFails);
   MITK_TEST(TestReadLabelmapPixelWithoutSegmentFails);
@@ -228,6 +229,11 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The DICOM tags of the stream were not read",
                            mitk::GetDICOMPropertyValue(0x0020, 0x000D, segmentation->GetPropertyList(), readStudyInstanceUID));
     CPPUNIT_ASSERT_EQUAL(std::string(studyInstanceUID.c_str()), readStudyInstanceUID);
+  }
+
+  void TestReadFractionalFails()
+  {
+    AssertReadFails(FixturePath("ct3slice_fractional.dcm"), { "ct3slice_fractional.dcm", "FRACTIONAL" });
   }
 
   void TestReadNonDICOMFileFails()

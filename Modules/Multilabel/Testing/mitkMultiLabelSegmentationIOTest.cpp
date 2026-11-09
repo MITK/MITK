@@ -76,20 +76,11 @@ private:
     return (std::filesystem::path(m_TempDir) / fileName).string();
   }
 
-  static mitk::MultiLabelSegmentation::Pointer LoadSingleSegmentation(const std::string& path)
-  {
-    const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Loading " + path + " yields one object", std::size_t(1), loaded.size());
-    auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
-    CPPUNIT_ASSERT_MESSAGE("Loading " + path + " yields a MultiLabelSegmentation", nullptr != segmentation);
-    return segmentation;
-  }
-
   mitk::MultiLabelSegmentation::Pointer SaveAndReload(const mitk::MultiLabelSegmentation* segmentation)
   {
     const auto path = this->TempPath("roundtrip.nrrd");
     mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*segmentation), path);
-    return LoadSingleSegmentation(path);
+    return mitk::test::LoadSingleSegmentation(path);
   }
 
   void AssertRoundTrip(const mitk::MultiLabelSegmentation* original)
@@ -105,22 +96,6 @@ private:
     const auto path = this->TempPath("valid.nrrd");
     mitk::IOUtil::Save(mitk::test::BuildRichSegmentation({ false, false, false, false }), path);
     return path;
-  }
-
-  /** The reader itself must throw mitk::Exception mentioning text; IOUtil must report the failure too. */
-  static void AssertReadFails(const std::string& path, const std::string& text)
-  {
-    try
-    {
-      mitk::test::ReadWithReader(path, ReaderDescription());
-      CPPUNIT_FAIL("Reading " + path + " did not fail");
-    }
-    catch (const mitk::Exception& e)
-    {
-      CPPUNIT_ASSERT_MESSAGE("The reader's exception should mention \"" + text + "\"; got: " + e.GetDescription(),
-                             std::string(e.GetDescription()).find(text) != std::string::npos);
-    }
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(path), mitk::Exception);
   }
 
 public:
@@ -355,7 +330,7 @@ public:
 
   void TestReadVersion1()
   {
-    const auto segmentation = LoadSingleSegmentation(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd"));
+    const auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd"));
 
     CPPUNIT_ASSERT_EQUAL(std::string("39335359-5483-4572-a38a-0d38a068de14"), segmentation->GetUID());
     CPPUNIT_ASSERT_EQUAL(1u, segmentation->GetNumberOfGroups());
@@ -387,7 +362,7 @@ public:
 
   void TestReadVersion2With4D()
   {
-    const auto segmentation = LoadSingleSegmentation(GetTestDataFilePath("Multilabel/MultilabelSegmentation3DplusT.nrrd"));
+    const auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/MultilabelSegmentation3DplusT.nrrd"));
 
     CPPUNIT_ASSERT_EQUAL(std::string("a9e8b2e6-8e63-4eb3-882a-a4e248273b4f"), segmentation->GetUID());
     CPPUNIT_ASSERT_EQUAL(3u, segmentation->GetNumberOfGroups());
@@ -441,7 +416,7 @@ public:
     std::vector<std::string> readWarnings;
     {
       mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
-      segmentation = LoadSingleSegmentation(path);
+      segmentation = mitk::test::LoadSingleSegmentation(path);
       readWarnings = warnings.GetWarnings();
     }
     const auto outdated = mitk::test::FindOutdatedLabelProperties(*segmentation);
@@ -465,7 +440,7 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, "org.mitk.multilabel.segmentation.version", "5");
     });
-    AssertReadFails(path, "unsupported version");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "unsupported version");
   }
 
   void TestReadGroupCountMismatchFails()
@@ -474,7 +449,7 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":[]},{"labels":[]},{"labels":[]}])");
     });
-    AssertReadFails(path, "does not match");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "does not match");
   }
 
   void TestReadMalformedLabelGroupsFails()
@@ -483,7 +458,7 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":)");
     });
-    AssertReadFails(path, LabelGroupsKey());
+    mitk::test::AssertReadFails(path, ReaderDescription(), LabelGroupsKey());
   }
 
   void TestReadWithoutLabelGroupsFails()
@@ -492,7 +467,7 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::RemoveNrrdHeaderKey(lines, LabelGroupsKey());
     });
-    AssertReadFails(path, LabelGroupsKey());
+    mitk::test::AssertReadFails(path, ReaderDescription(), LabelGroupsKey());
   }
 
   void TestReadLabelCustomPropertyOfWrongTypeFails()
@@ -502,7 +477,7 @@ public:
       mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(),
         R"([{"labels":[{"value":7,"name":"Liver","mitk.test.label.custom":{"type":5,"value":70}}]},{"labels":[]}])");
     });
-    AssertReadFails(path, "mitk.test.label.custom");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "mitk.test.label.custom");
   }
 
   void TestWriteWithoutGroupsFails()

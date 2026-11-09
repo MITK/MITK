@@ -88,15 +88,6 @@ private:
     return path;
   }
 
-  static mitk::MultiLabelSegmentation::ConstPointer Load(const std::string& path)
-  {
-    const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Number of data loaded from " + path, std::size_t{ 1 }, loaded.size());
-    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
-    CPPUNIT_ASSERT_MESSAGE(path + " did not load as a segmentation", nullptr != segmentation);
-    return segmentation;
-  }
-
   /** Writes the segmentation and loads the file of every group back. */
   SegmentationVector WriteAndReload(const mitk::MultiLabelSegmentation& segmentation,
                                     const std::string& encoding,
@@ -105,7 +96,7 @@ private:
     const auto path = this->Write(segmentation, encoding, fileName);
     SegmentationVector reloaded;
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < segmentation.GetNumberOfGroups(); ++group)
-      reloaded.push_back(Load(GroupFilePath(path, group)));
+      reloaded.push_back(mitk::test::LoadSingleSegmentation(GroupFilePath(path, group)));
     return reloaded;
   }
 
@@ -142,7 +133,7 @@ private:
                                  bitsAllocated, mitk::test::ReadTag(path, DCM_BitsAllocated));
 
     mitk::test::AssertReloadMatchesCapabilities(
-      { segmentation.GetPointer() }, { Load(path) }, mitk::test::DICOMSegCapabilities(true));
+      { segmentation.GetPointer() }, { mitk::test::LoadSingleSegmentation(path) }, mitk::test::DICOMSegCapabilities(true));
   }
 
 public:
@@ -218,7 +209,7 @@ public:
         }
       } });
 
-    mitk::test::AssertReloadMatchesCapabilities({ group }, { Load(undefinedPath) }, capabilities);
+    mitk::test::AssertReloadMatchesCapabilities({ group }, { mitk::test::LoadSingleSegmentation(undefinedPath) }, capabilities);
   }
 
   void TestLabelmap255Labels()

@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include <mitkDICOMSegFileContentTestHelpers.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
-#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkLabel.h>
@@ -406,12 +405,6 @@ namespace
 
     Rule::Connect(seg, source.GetPointer());
     return seg;
-  }
-
-  // The DICOM SEG mime type is not exported from its autoload module, so its name is spelled out.
-  std::string DICOMSegMimeTypeName()
-  {
-    return mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
   }
 
   bool IsLabelmap(const mitk::IFileWriter::Options& options)
@@ -832,7 +825,7 @@ public:
     itksys::SystemTools::MakeDirectory(directory);
     const auto path = directory + mitk::IOUtil::GetDirectorySeparator() + "seg";
 
-    mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
 
     CPPUNIT_ASSERT_MESSAGE("Nothing is written next to the dotted directory",
                            !FileExists(this->GetTempFilePath("data.dcm")) && !FileExists(this->GetTempFilePath("data_1.dcm")));
@@ -853,7 +846,7 @@ public:
     auto seg = BuildTwoGroupSeg();
     const auto path = this->GetTempFilePath("seg.ima");
 
-    mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
 
     CPPUNIT_ASSERT_MESSAGE("The extension is not replaced",
                            !FileExists(this->GetTempFilePath("seg.dcm")) && !FileExists(this->GetTempFilePath("seg_1.dcm")));
@@ -892,7 +885,7 @@ public:
     fixtureOptions.withEmptyGroup = false;
     const auto seg = mitk::test::BuildRichSegmentation(fixtureOptions);
     CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 4D segmentation as DICOM SEG",
-                                 mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), this->GetTempFilePath("4d.dcm")),
+                                 mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("4d.dcm")),
                                  mitk::Exception);
   }
 
@@ -905,7 +898,7 @@ public:
     seg->Initialize(image);
     seg->AddLabel(mitk::Label::New(1, "L"), 0, true, false);
     CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 2D segmentation as DICOM SEG",
-                                 mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), this->GetTempFilePath("2d.dcm")),
+                                 mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("2d.dcm")),
                                  mitk::Exception);
   }
 
@@ -915,7 +908,7 @@ public:
     unsigned int dim[3] = {4u, 4u, 3u};
     image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
     CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes an image as DICOM SEG",
-                                 mitk::IOUtil::Save(image, DICOMSegMimeTypeName(), this->GetTempFilePath("image.dcm")),
+                                 mitk::IOUtil::Save(image, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("image.dcm")),
                                  mitk::Exception);
   }
 

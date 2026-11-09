@@ -98,24 +98,8 @@ private:
     return path;
   }
 
-  /** The reader itself must throw mitk::Exception mentioning text; IOUtil must report the failure too. */
-  static void AssertReadFails(const std::string& path, const std::string& text)
-  {
-    try
-    {
-      mitk::test::ReadWithReader(path, ReaderDescription());
-      CPPUNIT_FAIL("Reading " + path + " did not fail");
-    }
-    catch (const mitk::Exception& e)
-    {
-      CPPUNIT_ASSERT_MESSAGE("The reader's exception should mention \"" + text + "\"; got: " + e.GetDescription(),
-                             std::string(e.GetDescription()).find(text) != std::string::npos);
-    }
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(path), mitk::Exception);
-  }
-
   /**
-   * Like AssertReadFails for files the reader rates Unsupported (unopenable or not JSON):
+   * Like mitk::test::AssertReadFails for files the reader rates Unsupported (unopenable or not JSON):
    * IOUtil then finds no reader at all, so the reader is called without its confidence check.
    */
   static void AssertReadFailsIgnoringConfidence(const std::string& path, const std::string& text)
@@ -284,7 +268,7 @@ public:
     content["version"] = 5;
     mitk::test::WriteJsonFile(path, content);
 
-    AssertReadFails(path, "unsupported version");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "unsupported version");
   }
 
   void TestReadWrongTypeFindsNoReader()
@@ -310,7 +294,7 @@ public:
     const auto path = this->GetTempFilePath("no-groups.mitklabel.json");
     this->WriteTextFile(path, R"({"version": 4, "type": "org.mitk.multilabel.segmentation.stack"})");
 
-    AssertReadFails(path, "no-groups.mitklabel.json");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "no-groups.mitklabel.json");
   }
 
   void TestReadEmptyGroupsFails()
@@ -318,7 +302,7 @@ public:
     const auto path = this->GetTempFilePath("empty-groups.mitklabel.json");
     this->WriteTextFile(path, R"({"version": 4, "type": "org.mitk.multilabel.segmentation.stack", "groups": []})");
 
-    AssertReadFails(path, "empty-groups.mitklabel.json");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "empty-groups.mitklabel.json");
   }
 
   void TestReadMalformedLabelFails()
@@ -328,7 +312,7 @@ public:
     content["groups"][0]["labels"][0]["value"] = "seven";
     mitk::test::WriteJsonFile(path, content);
 
-    AssertReadFails(path, "malformed-label.mitklabel.json");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "malformed-label.mitklabel.json");
   }
 
   void TestReadUnopenableFileFails()
@@ -341,7 +325,7 @@ public:
     const auto path = this->SaveValidStack("missing-image.mitklabel.json");
     std::filesystem::remove(this->GetTempFilePath("missing-image_group_1.nii.gz"));
 
-    AssertReadFails(path, "missing-image_group_1.nii.gz");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "missing-image_group_1.nii.gz");
   }
 
   void TestReadUnreadableImageFails()
@@ -349,7 +333,7 @@ public:
     const auto path = this->SaveValidStack("unreadable-image.mitklabel.json");
     this->WriteTextFile(this->GetTempFilePath("unreadable-image_group_1.nii.gz"), "not an image");
 
-    AssertReadFails(path, "unreadable-image_group_1.nii.gz");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "unreadable-image_group_1.nii.gz");
   }
 };
 

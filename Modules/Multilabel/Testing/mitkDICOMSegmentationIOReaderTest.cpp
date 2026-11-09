@@ -14,7 +14,6 @@ found in the LICENSE file.
 #include <mitkSegIOTestComparator.h>
 #include <mitkSegIOTestFixtures.h>
 
-#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
 #include <mitkPropertyNameHelper.h>
@@ -63,12 +62,6 @@ private:
     return description;
   }
 
-  /** The DICOM SEG mime type is not exported from its autoload module, so its name is spelled out. */
-  static std::string MimeTypeName()
-  {
-    return mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
-  }
-
   static std::string FixturePath(const std::string& fileName)
   {
     return GetTestDataFilePath("Multilabel/DICOMSegmentationIO/ExternalProducer/" + fileName);
@@ -77,15 +70,6 @@ private:
   std::string GetTempFilePath(const std::string& fileName) const
   {
     return m_TempPath + mitk::IOUtil::GetDirectorySeparator() + fileName;
-  }
-
-  static mitk::MultiLabelSegmentation::Pointer LoadSegmentation(const std::string& path)
-  {
-    const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Number of data loaded from " + path, std::size_t{1}, loaded.size());
-    auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
-    CPPUNIT_ASSERT_MESSAGE(path + " did not load as a segmentation", nullptr != segmentation);
-    return segmentation;
   }
 
   static void AssertMatchesFile(const mitk::MultiLabelSegmentation& segmentation, const std::string& path)
@@ -146,7 +130,7 @@ private:
   {
     try
     {
-      mitk::test::ReadWithReaderOfMimeType(path, MimeTypeName(), ReaderDescription());
+      mitk::test::ReadWithReaderOfMimeType(path, mitk::test::DICOMSegMimeTypeName(), ReaderDescription());
       CPPUNIT_FAIL("Reading " + path + " did not fail");
     }
     catch (const mitk::Exception& e)
@@ -184,7 +168,7 @@ public:
   void TestReadBinary()
   {
     const auto path = FixturePath("ct3slice_binary.dcm");
-    const auto segmentation = LoadSegmentation(path);
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
     // SegmentsOverlap is NO, so the segments share one group, valued by their segment numbers.
     AssertGroupValues(*segmentation, { { 1, 2, 3, 4 } });
     AssertMatchesFile(*segmentation, path);
@@ -193,7 +177,7 @@ public:
   void TestReadBinaryOverlap()
   {
     const auto path = FixturePath("ct3slice_binary_overlap.dcm");
-    const auto segmentation = LoadSegmentation(path);
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
     AssertGroupValues(*segmentation, { { 1 }, { 2 }, { 3 } });
     AssertMatchesFile(*segmentation, path);
   }
@@ -201,7 +185,7 @@ public:
   void TestReadLabelmap()
   {
     const auto path = FixturePath("ct3slice_labelmap.dcm");
-    const auto segmentation = LoadSegmentation(path);
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
     // The segment numbers are not consecutive, and the background segment 0 yields no label.
     AssertGroupValues(*segmentation, { { 1, 3, 7 } });
     AssertMatchesFile(*segmentation, path);
@@ -214,7 +198,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Cannot open " + path, stream.is_open());
 
     // A stream comes with a location that need not exist as a file.
-    const auto result = mitk::test::ReadWithReaderOfMimeType(this->GetTempFilePath("stream-only.dcm"), MimeTypeName(),
+    const auto result = mitk::test::ReadWithReaderOfMimeType(this->GetTempFilePath("stream-only.dcm"), mitk::test::DICOMSegMimeTypeName(),
                                                              ReaderDescription(), &stream);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Number of data read from the stream", std::size_t{1}, result.size());
     const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(result.front().GetPointer());

@@ -120,19 +120,10 @@ private:
     return mitk::test::BuildRichSegmentation({ false, false, false, false });
   }
 
-  mitk::MultiLabelSegmentation::Pointer LoadSingleSegmentation(const std::string& path)
-  {
-    const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Loading " + path + " yields one object", std::size_t(1), loaded.size());
-    auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
-    CPPUNIT_ASSERT_MESSAGE("Loading " + path + " yields a MultiLabelSegmentation", nullptr != segmentation);
-    return segmentation;
-  }
-
   void AssertRoundTrip(const mitk::MultiLabelSegmentation* original, const Strategy& strategy, const std::string& path)
   {
     mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*original), path, strategy.options);
-    const auto reloaded = this->LoadSingleSegmentation(path);
+    const auto reloaded = mitk::test::LoadSingleSegmentation(path);
 
     auto capabilities = mitk::test::StackCapabilities();
     capabilities.formatName += " (" + strategy.name + ")";

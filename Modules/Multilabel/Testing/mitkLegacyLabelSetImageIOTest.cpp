@@ -220,13 +220,10 @@ private:
                            differences.empty());
   }
 
-  static mitk::MultiLabelSegmentation::Pointer LoadSingleSegmentation(const std::string& path)
+  static const std::string& ReaderDescription()
   {
-    const auto loaded = mitk::IOUtil::Load(path);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Loading " + path + " yields one object", std::size_t(1), loaded.size());
-    auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
-    CPPUNIT_ASSERT_MESSAGE("Loading " + path + " yields a MultiLabelSegmentation", nullptr != segmentation);
-    return segmentation;
+    static const std::string description = "MITK LabelSetImage (legacy)";
+    return description;
   }
 
   std::string TempPath(const std::string& fileName) const
@@ -259,22 +256,6 @@ private:
       }
       CPPUNIT_FAIL("Fixture lacks the definition of label 1");
     });
-  }
-
-  /** The reader itself must throw mitk::Exception mentioning text; IOUtil must report the failure too. */
-  static void AssertReadFails(const std::string& path, const std::string& text)
-  {
-    try
-    {
-      mitk::test::ReadWithReader(path, "MITK LabelSetImage (legacy)");
-      CPPUNIT_FAIL("Reading " + path + " did not fail");
-    }
-    catch (const mitk::Exception& e)
-    {
-      CPPUNIT_ASSERT_MESSAGE("The reader's exception should mention \"" + text + "\"; got: " + e.GetDescription(),
-                             std::string(e.GetDescription()).find(text) != std::string::npos);
-    }
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(path), mitk::Exception);
   }
 
 public:
@@ -384,7 +365,7 @@ public:
 
   void TestLegacyToStackCarriesNoLegacyKeys()
   {
-    auto segmentation = LoadSingleSegmentation(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3D.nrrd"));
+    auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3D.nrrd"));
     // Set, so that the stack's documented loss of the lock has something to change.
     segmentation->SetUnlabeledLabelLock(true);
 
@@ -406,7 +387,7 @@ public:
         CPPUNIT_ASSERT_MESSAGE("The legacy layer index reached the stack: " + label.dump(), !label.contains("layer"));
     }
 
-    const auto reloaded = LoadSingleSegmentation(path);
+    const auto reloaded = mitk::test::LoadSingleSegmentation(path);
     mitk::test::AssertReloadMatchesCapabilities({ segmentation.GetPointer() }, { reloaded.GetPointer() },
                                                 mitk::test::StackCapabilities());
   }
@@ -425,7 +406,7 @@ public:
       m_AddedModalityPersistence = true;
     }
 
-    auto segmentation = LoadSingleSegmentation(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3D.nrrd"));
+    auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/LegacyLabelSetTestImage3D.nrrd"));
     // A typed custom property, so that the native format's documented loss has something to change.
     auto customInfo = mitk::PropertyPersistenceInfo::New();
     customInfo->SetNameAndKey(mitk::test::RichFixtureCustomPropertyName(), "mitk_test_custom");
@@ -434,7 +415,7 @@ public:
 
     const auto path = this->TempPath("legacy.nrrd");
     mitk::IOUtil::Save(segmentation, path);
-    const auto reloaded = LoadSingleSegmentation(path);
+    const auto reloaded = mitk::test::LoadSingleSegmentation(path);
 
     const auto readerDescription = reloaded->GetConstProperty(
       mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()));
@@ -468,7 +449,7 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::SetNrrdHeaderValue(lines, "layers", "2");
     });
-    AssertReadFails(path, "does not match");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "does not match");
   }
 
   void TestReadMissingLabelDefinitionFails()
@@ -477,28 +458,28 @@ public:
     mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
       mitk::test::RemoveNrrdHeaderKey(lines, "org.mitk.label_000_00002");
     });
-    AssertReadFails(path, "label_000_00002");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "label_000_00002");
   }
 
   void TestReadLabelValueWithoutValueFails()
   {
     const auto path = this->CopyValidLegacyFile();
     EditLabelDefinition(path, R"(<unsigned value="1" />)", "<unsigned />");
-    AssertReadFails(path, "'value'");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "'value'");
   }
 
   void TestReadMalformedLabelValueFails()
   {
     const auto path = this->CopyValidLegacyFile();
     EditLabelDefinition(path, R"(<unsigned value="1" />)", R"(<unsigned value="one" />)");
-    AssertReadFails(path, "'value'");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "'value'");
   }
 
   void TestReadLabelValueOfWrongTypeFails()
   {
     const auto path = this->CopyValidLegacyFile();
     EditLabelDefinition(path, R"(type="UShortProperty"><unsigned value="1" />)", R"(type="StringProperty"><string value="1" />)");
-    AssertReadFails(path, "wrong property type");
+    mitk::test::AssertReadFails(path, ReaderDescription(), "wrong property type");
   }
 
   void TestReadOutdatedLabelPropertiesAreDiscarded()

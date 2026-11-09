@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkFileReaderSelector.h>
 #include <mitkFileWriterSelector.h>
 #include <mitkIMimeTypeProvider.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
@@ -437,6 +438,44 @@ namespace mitk
       }
       CPPUNIT_FAIL("No reader \"" + readerDescription + "\" is registered for the mime type " + mimeTypeName);
       return {};
+    }
+
+    /** Loads path through IOUtil, which must yield exactly one MultiLabelSegmentation. */
+    inline MultiLabelSegmentation::Pointer LoadSingleSegmentation(const std::string& path)
+    {
+      const auto loaded = IOUtil::Load(path);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Loading " + path + " yields one object", std::size_t(1), loaded.size());
+      auto segmentation = dynamic_cast<MultiLabelSegmentation*>(loaded.front().GetPointer());
+      CPPUNIT_ASSERT_MESSAGE("Loading " + path + " yields a MultiLabelSegmentation", nullptr != segmentation);
+      return segmentation;
+    }
+
+    /**
+     * The reader of the given description must throw mitk::Exception mentioning text when it
+     * reads path, and IOUtil must report the failure too.
+     */
+    inline void AssertReadFails(const std::string& path, const std::string& readerDescription, const std::string& text)
+    {
+      try
+      {
+        ReadWithReader(path, readerDescription);
+        CPPUNIT_FAIL("Reading " + path + " did not fail");
+      }
+      catch (const Exception& e)
+      {
+        CPPUNIT_ASSERT_MESSAGE("The reader's exception should mention \"" + text + "\"; got: " + e.GetDescription(),
+                               std::string(e.GetDescription()).find(text) != std::string::npos);
+      }
+      CPPUNIT_ASSERT_THROW(IOUtil::Load(path), Exception);
+    }
+
+    /**
+     * The name of the DICOM SEG mime type. It is spelled out because the test driver does not
+     * link the autoload module that defines it.
+     */
+    inline std::string DICOMSegMimeTypeName()
+    {
+      return IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
     }
 
     /**

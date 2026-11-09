@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include <tinyxml2.h>
 
+#include <fstream>
 #include <sstream>
 
 namespace CppUnit
@@ -49,6 +50,7 @@ class mitkMultiLabelIOHelperTestSuite : public mitk::TestFixture
 
   MITK_TEST(TestSaveAndLoadJSONPreset);
   MITK_TEST(TestLoadLegacyXMLPreset);
+  MITK_TEST(TestLoadLegacyPresetWithUnreadableLabelReturnsFalse);
   MITK_TEST(TestLoadJSONPreset);
   MITK_TEST(TestLabelJSONTrackingRoundTrip);
   MITK_TEST(TestDeserializeLabelColorAsColorProperty);
@@ -173,6 +175,28 @@ public:
     labels = m_Segmentation->GetLabelValuesByName(1, "Label 4");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label 4\" in group 1",
       mitk::MultiLabelSegmentation::LabelValueVectorType({ 4 }), labels);
+  }
+
+  // The value of the last label lacks its number, so the loader fails after it applied the groups and earlier labels.
+  void TestLoadLegacyPresetWithUnreadableLabelReturnsFalse()
+  {
+    std::string content;
+    {
+      std::ifstream input(m_TestLegacyFile, std::ios::binary);
+      content.assign(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+    }
+    const std::string valueOfLabel4 = R"(<unsigned value="4"/>)";
+    const auto position = content.find(valueOfLabel4);
+    CPPUNIT_ASSERT_MESSAGE("Fixture lacks the value of label 4", position != std::string::npos);
+    content.replace(position, valueOfLabel4.size(), "<unsigned/>");
+    {
+      std::ofstream output(m_TempPresetFile, std::ios::binary);
+      output << content;
+    }
+
+    bool loadOK = true;
+    CPPUNIT_ASSERT_NO_THROW(loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TempPresetFile, m_EmptySegmentation));
+    CPPUNIT_ASSERT_MESSAGE("Loading a legacy preset with an unreadable label should fail", !loadOK);
   }
 
   void TestLoadJSONPreset()

@@ -285,7 +285,15 @@ bool mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(const std::strin
   if (!result)
   { // try to load with legacy format
     MITK_INFO << "Try to load as legacy xml preset.";
-    return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
+    try
+    {
+      return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
+    }
+    catch (const Exception& e)
+    {
+      MITK_WARN << "Cannot load label set preset \"" << presetFilename << "\": " << e.what();
+      return false;
+    }
   }
 
   return true;

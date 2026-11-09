@@ -65,7 +65,8 @@ namespace mitk
      * This functions supports the new format (.multilabel.json) and the legacy format (*.lpset)
      * \param presetFilename the filename of the preset including the file system path
      * \param inputSegmentation the image to which the loaded preset will be applied
-     * \return true if the deserilization was successful and false otherwise
+     * \return true if the preset was loaded and applied, false otherwise. If a legacy preset fails
+     *         partway, the groups and labels applied up to the failure stay in inputSegmentation.
      */
     static bool LoadMultiLabelSegmentationPreset(const std::string &presetFilename,
                                         mitk::MultiLabelSegmentation *inputSegmentation);

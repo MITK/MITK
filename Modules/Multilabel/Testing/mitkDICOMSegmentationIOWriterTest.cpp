@@ -663,6 +663,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
   MITK_TEST(WriteFailureInLaterGroupKeepsEarlierFiles);
+  MITK_TEST(WriteReferencesSourcesWhenPlanesDisagreeWithTransform);
+  MITK_TEST(WriteRefusesSourceReferencesThatMapToNoFrame);
   MITK_TEST(WriteRefusesInvalidTrackingUID);
   CPPUNIT_TEST_SUITE_END();
 
@@ -1088,6 +1090,46 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The file of the first group stays", FileExists(path));
     CPPUNIT_ASSERT_MESSAGE("The second group has no file", !FileExists(GroupFilePath(path, 1)));
     AssertWrittenSegments(path, *seg, 0, false);
+  }
+
+  // Setting the index-to-world transform of a sliced geometry leaves its slice planes where they
+  // were. dcmqi places the frames by the transform and maps the source images to them by position,
+  // so positions taken from the planes map to no frame.
+  void WriteReferencesSourcesWhenPlanesDisagreeWithTransform()
+  {
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    auto shifted = mitk::AffineTransform3D::New();
+    shifted->SetMatrix(source->GetGeometry()->GetIndexToWorldTransform()->GetMatrix());
+    mitk::Vector3D offset;
+    mitk::FillVector3D(offset, 5.0, -3.0, 10.0);
+    shifted->SetOffset(offset);
+    source->GetGeometry()->SetIndexToWorldTransform(shifted);
+
+    auto seg = InitializeSegFromSourceImage(source);
+    Rule::Connect(seg, source.GetPointer());
+    const auto* groupGeometry = seg->GetGroupImage(0)->GetSlicedGeometry();
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the slice planes disagree with the index-to-world transform",
+                           groupGeometry->GetPlaneGeometry(0)->GetOrigin() != groupGeometry->GetOrigin());
+
+    const auto path = this->WriteSegToTempFile(seg, {}, "stale-planes");
+    AssertSourceReferencesAreExactly(path, source, "Strict");
+  }
+
+  // dcmqi skips source images it cannot place on a frame without failing. A relation whose slices
+  // all lie outside the segmentation would leave a SEG that names no source.
+  void WriteRefusesSourceReferencesThatMapToNoFrame()
+  {
+    auto seg = BuildBaseSeg(/*stampIdentity=*/true);
+    auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
+    auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
+    for (int sliceIndex = 10; sliceIndex < 13; ++sliceIndex)
+    {
+      perSliceInstance->SetValue(0, sliceIndex, "1.2.826.0.1.3680043.10.999.12.1." + std::to_string(sliceIndex));
+      perSliceClass->SetValue(0, sliceIndex, "1.2.840.10008.5.1.4.1.1.2");
+    }
+    Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "1.2.826.0.1.3680043.10.999.12.2");
+
+    this->AssertWriteRefused(seg, {}, "unmapped-sources", false, {"group 0"});
   }
 
   // Tracking UID is UI. DCMTK rejects other values inside dcmqi, which then leaves the tag out.

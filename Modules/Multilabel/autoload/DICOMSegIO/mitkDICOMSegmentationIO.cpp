@@ -39,6 +39,7 @@ found in the LICENSE file.
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcsequen.h>
 #include <dcmtk/dcmdata/dcvrui.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
@@ -276,28 +277,26 @@ namespace
     dst.putAndInsertString(DCM_ImageOrientationPatient, iop.c_str());
   }
 
-  // Format an IPP value for one slice of a group image from the slice plane's
-  // origin. The group geometry is an image geometry, whose plane origins are
-  // centre-based and therefore coincide with DICOM's ImagePositionPatient
-  // convention (the centre of the upper-left voxel). The -0.5 voxel adjustments
-  // in mitkBaseGeometry apply only to corner / bounding-box queries
-  // (GetCornerPoint), not to the plane origin or to WorldToIndex, so no
-  // half-voxel correction is applied here. dcmqi parses the formatted IPP back
-  // into a Point3D and resolves the matching slice via the seg's own geometry
-  // (TransformPhysicalPointToIndex on the ITK image it builds), so the
-  // requirement on this string is "round-trips through the seg's geometry," not
-  // exact string equality.
+  // Format an IPP value for one slice of a group image: the centre of its first
+  // voxel, which is DICOM's ImagePositionPatient convention. dcmqi places the
+  // frames of the SEG through the index-to-world transform of the ITK image it
+  // builds from the group image, and maps each source item to the slice its IPP
+  // falls into (TransformPhysicalPointToIndex). The position therefore comes
+  // from the same transform, not from the slice planes, which setting the
+  // transform of a sliced geometry leaves unchanged. The requirement on this
+  // string is "round-trips through the seg's geometry," not exact string
+  // equality. A slice outside the image yields a position dcmqi maps to no frame.
   std::string FormatIPPForSlice(const mitk::Image *groupImage,
                                 mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex)
   {
-    const auto *slicedGeometry = groupImage->GetSlicedGeometry();
-    if (slicedGeometry == nullptr)
+    const auto *geometry = groupImage->GetGeometry();
+    if (geometry == nullptr)
       return {};
-    const auto *plane = slicedGeometry->GetPlaneGeometry(static_cast<int>(sliceIndex));
-    if (plane == nullptr)
-      return {};
-    const auto origin = plane->GetOrigin();
-    return JoinDicomDS({origin[0], origin[1], origin[2]});
+    mitk::Point3D index;
+    mitk::FillVector3D(index, 0.0, 0.0, static_cast<mitk::ScalarType>(sliceIndex));
+    mitk::Point3D position;
+    geometry->IndexToWorld(index, position);
+    return JoinDicomDS({position[0], position[1], position[2]});
   }
 
   // Read SegmentsOverlap (0062,0013) and decide if the reader must assume
@@ -1080,6 +1079,15 @@ namespace mitk
 
         if (result == nullptr)
           mitkThrow() << "dcmqi failed to convert the segmentation to DICOM SEG for group " << layer << ".";
+
+        // dcmqi skips source items whose position falls on no frame without failing, and lists
+        // only the instances it placed. A SEG naming no source would misstate its provenance.
+        DcmSequenceOfItems *referencedSeries = nullptr;
+        if (result->findAndGetSequence(DCM_ReferencedSeriesSequence, referencedSeries).bad() ||
+            referencedSeries == nullptr || referencedSeries->card() == 0)
+          mitkThrow() << "None of the " << sourceItems.size() << " source-image references of DICOM SEG group "
+                      << layer << " lies on a slice of the segmentation, so the SEG would name no source. "
+                      << "The source-image relations do not match the segmentation's geometry.";
 
         // Within one MITK group labels are non-overlapping by construction,
         // so the SEG-level SegmentsOverlap tag is "NO" regardless of

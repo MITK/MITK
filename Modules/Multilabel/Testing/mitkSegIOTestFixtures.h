@@ -191,8 +191,10 @@ namespace mitk
 
       /**
        * Rotated, anisotropic and shifted, so a reader that drops any part of
-       * the index-to-world transform is caught. The DICOM identity tags and
-       * per-slice source UIDs are those of BuildSourceImageWithDICOMIdentity.
+       * the index-to-world transform is caught. The geometry is built the way
+       * ItkImageIO builds that of a loaded image, so its slice planes agree with
+       * the transform. The DICOM identity tags and per-slice source UIDs are
+       * those of BuildSourceImageWithDICOMIdentity.
        */
       inline Image::Pointer BuildRichSourceImage(bool dynamic)
       {
@@ -203,16 +205,19 @@ namespace mitk
         Vector3D axis;
         FillVector3D(axis, 1.0, 2.0, 3.0);
         axis.Normalize();
+        auto rotation = AffineTransform3D::New();
+        rotation->Rotate3D(axis, 0.3);
+        Point3D origin;
+        FillVector3D(origin, -12.5, 30.25, 7.0);
         Vector3D spacing;
         FillVector3D(spacing, 0.8, 1.3, 2.5);
-        Vector3D origin;
-        FillVector3D(origin, -12.5, 30.25, 7.0);
 
-        auto indexToWorld = AffineTransform3D::New();
-        indexToWorld->Rotate3D(axis, 0.3);
-        indexToWorld->Scale(spacing, true);
-        indexToWorld->SetOffset(origin);
-        image3D->GetGeometry()->SetIndexToWorldTransform(indexToWorld);
+        auto* planeGeometry = image3D->GetSlicedGeometry(0)->GetPlaneGeometry(0);
+        planeGeometry->SetOrigin(origin);
+        planeGeometry->GetIndexToWorldTransform()->SetMatrix(rotation->GetMatrix());
+        auto* slicedGeometry = image3D->GetSlicedGeometry(0);
+        slicedGeometry->InitializeEvenlySpaced(planeGeometry, RichSizeZ);
+        slicedGeometry->SetSpacing(spacing);
 
         Image::Pointer image = image3D;
         if (dynamic)

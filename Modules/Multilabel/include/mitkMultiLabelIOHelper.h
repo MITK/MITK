@@ -119,13 +119,15 @@ namespace mitk
     static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
 
     /**
-     * \brief Structure to hold label group metadata including labels and group properties
+     * \brief Name, labels and remaining keys of a label group in the JSON format
      */
     struct MITKMULTILABEL_EXPORT LabelGroupMetaData
     {
       std::string name;
       LabelVector labels;
-      PropertyList::Pointer properties; // For custom group properties
+      /** The group's keys other than "name" and "labels". Groups have no custom properties; these
+       * are meta keys such as "_file", the group image of a segmentation stack. */
+      PropertyList::Pointer properties;
 
       LabelGroupMetaData();
       LabelGroupMetaData(const std::string& groupName, const LabelVector& groupLabels);
@@ -178,9 +180,9 @@ namespace mitk
      *
      * Label properties whose keys start with "DICOM.0062.0002." are outdated and ignored.
      * MITK versions before 2025.12 stamped them on every label, and later versions wrote
-     * them back when such a file was saved again. Ignoring them is deprecated: readers
-     * report them so that users save their files again, and a future version may stop
-     * ignoring them.
+     * them back when such a file was saved again. Ignoring them is deprecated: the
+     * segmentation readers report them so that users save their files again, and a
+     * future version may stop ignoring them.
      * \param labelJson JSON representation of the label
      * \param hadOutdatedProperties Optional. If provided, it is set to whether labelJson
      * carried outdated label properties.

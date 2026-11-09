@@ -51,7 +51,7 @@ Each entry in `"groups"` defines a group of labels:
 |----------|----------|-------------------------------------------|
 | `name`   | ❌        | Optional group name                       |
 | `_file`  | ❌        | Path to the group image file (only use case 1) |
-| `labels` | ✅        | Array of labels in the group              |
+| `labels` | ❌        | Array of labels in the group. MITK writes it only for a group that has labels. |
 
 Groups have no custom properties. Any other key with a string, number or boolean value is ignored; any other key with an object, array or `null` value makes reading fail.
 
@@ -98,7 +98,7 @@ Each label includes visual and semantic metadata, and optionally its own image f
 
 Legend: ✅: required | ⭕: optional | `empty cell`: not supported/ignored
 
-Label properties under `DICOM.0062.0002.`, which MITK up to version 2025.08 stamped on every label, are discarded on reading, with one warning per file. If such a version imported the segmentation from DICOM SEG, these properties may hold codes of that file (segment category, type, modifier, anatomic region) that the label now lacks; to keep them, import the original DICOM SEG again. Otherwise, save the segmentation again to remove the properties from the file.
+Label properties under `DICOM.0062.0002.`, which MITK up to version 2025.08 stamped on every label, are discarded on reading in all three use cases. Reading a segmentation logs one warning per file; presets and label suggestions discard them without a warning. If such a version imported the segmentation from DICOM SEG, these properties may hold codes of that file (segment category, type, modifier, anatomic region) that the label now lacks; to keep them, import the original DICOM SEG again. Otherwise, save the segmentation again to remove the properties from the file.
 ### Meta keys/properties
 Some keys on group and label level are not supposed to be converted into regular properties, but the are supposed as meta information that control the way labels are processed/handled.
 Those meta keys will not be "imported", thus transformed into properties of the label data structure. Those keys are indicated by a "_" prefix. The most regular seen keys of that type are `_file` and `_file_value`.

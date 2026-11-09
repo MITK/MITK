@@ -608,8 +608,8 @@ std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelp
         }
         else
         {
-          MITK_ERROR << "Unable to read custom group property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
-          mitkThrow() << "Unable to read custom group property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
+          MITK_ERROR << "Unable to read group key from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
+          mitkThrow() << "Unable to read group key from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
         }
       }
     }

@@ -45,13 +45,14 @@ namespace mitk
      * Settings that depend on the format under test. Every value in a
      * capability table entry states why it is needed and, for tolerances,
      * how the bound is derived. A default-constructed instance compares
-     * everything exactly.
+     * colours and time points exactly and geometries within mitk::eps,
+     * because mitk::Equal rejects a difference equal to its tolerance.
      */
     struct SegComparisonOptions
     {
       /** Maximum absolute difference per colour channel, in [0, 1]. */
       float colorTolerance = 0.f;
-      /** Maximum absolute difference of origin, spacing and direction components. */
+      /** Maximum absolute difference of origin, spacing and direction components; values below mitk::eps act as mitk::eps. */
       ScalarType geometryTolerance = 0.0;
       /** Maximum absolute difference of time points and time bounds. */
       ScalarType timeTolerance = 0.0;
@@ -147,7 +148,8 @@ namespace mitk
                                          float colorTolerance,
                                          std::vector<std::string>& differences)
       {
-        // The JSON writer drops the centre of mass; it is recomputed from the voxels on demand.
+        // The centre of mass is no label attribute but a cache that the segmentation recomputes
+        // from the voxels; the JSON writer drops it.
         const auto isIgnored = [](const std::string& key) { return StartsWith(key, "center."); };
         CompareProperties(*expected.GetMap(), *actual.GetMap(), isIgnored, {}, colorTolerance, DescribeLabel(&expected),
                           differences);
@@ -414,8 +416,9 @@ namespace mitk
                                                 const SegComparisonOptions& options,
                                                 std::vector<std::string>& differences)
       {
-        // Relations are compared through the relation rule, so their storage keys stay out of
-        // the generic comparison. "path" and "MITK.IO." are stamped by IOUtil and the readers.
+        // Relations are compared as the relation rule reports them; the rest of their storage,
+        // the Purpose of Reference code included, stays out of the generic comparison.
+        // "path" and "MITK.IO." are stamped by IOUtil and the readers.
         const auto relationRoot = PropertyKeyPathToPropertyName(PropertyRelationRuleBase::GetRootKeyPath()) + ".";
         const std::vector<std::string> ignoredPrefixes = { relationRoot, "DICOM.0008.2112.", "MITK.IO." };
 
@@ -441,15 +444,27 @@ namespace mitk
      * anatomic regions and primary anatomic structures with all modifiers,
      * and custom label properties; presence is compared as well, so a lost
      * tracking ID or algorithm name shows up even where the getter would
-     * fall back to a default.
+     * fall back to a default. The centre of mass ("center." keys) is not
+     * compared: it is a cache that the segmentation recomputes from the
+     * voxels.
      * Per group: name, member label values in order, and every voxel in
      * every time step, with differing time steps broken down per label.
      * Per segmentation: UID, unlabeled lock, the property list by key, type
-     * and value, source-image relations, the geometry of every time step,
-     * and the time bounds of every time step.
-     * The key "path" and the prefix "MITK.IO." are never compared: IOUtil
-     * and the readers stamp them on load.
-     * The active label is not compared; no format promises to keep it.
+     * and value, the geometry and the time bounds of every time step, and
+     * the source-image relations as SegSourceImageRelationRule reports
+     * them: relation UID, source series UID, and the per-slice SOP instance
+     * and SOP class UIDs.
+     * Never compared:
+     * - the key "path" and the prefix "MITK.IO.": IOUtil and the readers
+     *   stamp them on load;
+     * - the rest of the relation storage under "MITK.Relations." and
+     *   "DICOM.0008.2112." (Source Image Sequence): instance IDs, item
+     *   indices and the destination UID are set on connect, which the
+     *   DICOM SEG reader does anew without the source image. This includes
+     *   the Purpose of Reference code, which
+     *   mitkSegSourceImageRelationRoundTripTest and
+     *   mitkDICOMSegmentationIORegressionTest check;
+     * - the active label: no format promises to keep it.
      */
     inline std::vector<std::string> CompareSegmentations(const MultiLabelSegmentation& expected,
                                                          const MultiLabelSegmentation& actual,

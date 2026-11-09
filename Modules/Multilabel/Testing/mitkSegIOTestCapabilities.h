@@ -89,9 +89,13 @@ namespace mitk
 
       // The label colours travel as JSON floats, which round trip exactly.
       capabilities.options.colorTolerance = 0.f;
-      // NIfTI stores origin, spacing and orientation as float32, which rounds to 2^-24 relative.
-      // At the largest coordinate of the fixtures, 30.25 mm, that bounds the error by 1.8e-6.
-      capabilities.options.geometryTolerance = 2e-6;
+      // NIfTI stores origin, spacing and directions as float32, 2^-24 relative per rounding. The
+      // origin is the only stored position: 1.8e-6 at the fixtures' largest component, 30.25 mm.
+      // The axis vectors mitk::Equal compares (direction x spacing x size, at most 8 x 1.3 mm =
+      // 10.4 mm) carry six roundings: ITK's float cast of the direction, nifti's row
+      // normalisation, inverse and averaging in its orthogonalisation, the sform product, and
+      // the spacing in pixdim; 6 x 2^-24 x 10.4 mm = 3.7e-6.
+      capabilities.options.geometryTolerance = 4e-6;
       // The writer refuses dynamic segmentations, and the reload rebuilds the same single
       // time step, so its bounds come back exactly.
       capabilities.options.timeTolerance = 0.0;
@@ -126,7 +130,11 @@ namespace mitk
         return indices;
       }
 
-      /** Keys of the label attributes DICOM SEG carries, and the prefixes of their codes. */
+      /**
+       * The label keys the DICOM SEG custom-property loss keeps: the attributes the format carries
+       * and the prefixes of their codes, and opacity, visible and locked, which the format has no
+       * field for but which the sibling loss pins to the reader's values.
+       */
       inline bool IsDICOMSegLabelAttribute(const std::string& key)
       {
         static const std::set<std::string> keys = { "name", "color", "opacity", "visible", "locked", "description",
@@ -224,17 +232,18 @@ namespace mitk
 
     /**
      * What DICOM SEG loses of a label through its upstream libraries, although the standard lets
-     * the file carry it. The writer hands the segments to dcmqi, whose segment attributes hold
-     * one anatomic region with one modifier, one type modifier and no primary anatomic structure,
-     * and which drops the algorithm name of MANUAL segments. The reader gets the segments from
-     * dcmqi as well, which reads them through DCMTK's segmentation classes; those keep one
-     * anatomic region. Files of other producers lose the same on read.
+     * the file carry it. Both directions go through dcmqi's segment attributes, which hold one
+     * anatomic region with one modifier, one type modifier, no primary anatomic structure, and an
+     * algorithm name only for segments that are not MANUAL. Below dcmqi, DCMTK's segment classes
+     * hold one anatomic region and one primary anatomic structure, and set no algorithm name on a
+     * MANUAL segment, though they read one. Files of other producers lose the same on read.
      */
     inline std::vector<DocumentedLabelLoss> DICOMSegLabelLosses()
     {
       return {
-        { "anatomic regions beyond the first: dcmqi writes one, and DCMTK's segmentation classes read one item of"
-          " the Anatomic Region Sequence, which comes back at index 0",
+        { "anatomic regions beyond the first: DCMTK's segment classes hold one item of the Anatomic Region"
+          " Sequence, on write and on read, and so do dcmqi's segment attributes; the writer passes the region"
+          " with the lowest index, which comes back at index 0",
           [](Label& label) {
             const auto indices =
               detail::FindLabelCodeIndices(label, LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
@@ -270,13 +279,15 @@ namespace mitk
             type->SetModifiers(modifiers);
             label.SetSegmentedPropertyType(*type);
           } },
-        { "primary anatomic structures: dcmqi writes and reads none",
+        { "primary anatomic structures: dcmqi writes and reads none, and DCMTK's segment classes would hold"
+          " only the first",
           [](Label& label) {
             for (const auto index :
                  detail::FindLabelCodeIndices(label, LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName()))
               label.RemovePrimaryAnatomicStructure(index);
           } },
-        { "the algorithm name of MANUAL segments: dcmqi writes and reads it only for other algorithm types",
+        { "the algorithm name of MANUAL segments: dcmqi writes and reads it only for other algorithm types, and"
+          " DCMTK's DcmSegment::setSegmentAlgorithm sets none for MANUAL (DCMTK reads it)",
           [](Label& label) {
             if (label.GetAlgorithmType() == Label::AlgorithmType::MANUAL)
               label.SetAlgorithmName("");
@@ -298,6 +309,8 @@ namespace mitk
           [](Label& label) {
             for (const auto& key : label.GetPropertyKeys())
             {
+              // The centre of mass is no custom property but a cache that the segmentation
+              // recomputes from the voxels.
               if (!detail::IsDICOMSegLabelAttribute(key) && !detail::StartsWith(key, "center."))
                 label.RemoveProperty(key);
             }
@@ -357,9 +370,13 @@ namespace mitk
       capabilities.options.notCompared = { NotCompared::SegmentationUID, NotCompared::RelationUIDs };
       // The colour loss reproduces the CIELab round trip exactly.
       capabilities.options.colorTolerance = 0.f;
-      // dcmqi writes Image Position and Orientation (Patient) as float32 (Helper::floatToStr), which
-      // rounds to 2^-24 relative; at the largest coordinate of the fixtures, 30.25 mm, that bounds
-      // the error by 1.8e-6. Pixel Spacing carries 7 significant digits, 1.3e-6 at 2.5 mm.
+      // dcmqi writes Image Position and Orientation (Patient) as float32 with 9 significant
+      // digits (Helper::floatToStr), 2^-24 relative. The reader's origin is the first frame's
+      // position: 1.8e-6 at the fixtures' largest component, 30.25 mm, which no later frame
+      // exceeds. Its slice direction is the normalised cross product of the two orientation
+      // vectors, 2 x 2^-24 per component: 1.2e-6 on the 4 x 2.5 mm = 10 mm slice axis vector.
+      // The slice spacing comes from Spacing Between Slices, not from the positions; it and
+      // Pixel Spacing carry 7 significant digits, which hold the fixtures' spacings exactly.
       capabilities.options.geometryTolerance = 2e-6;
       // The format has no time; the reload has the same single, unbounded time step.
       capabilities.options.timeTolerance = 0.0;

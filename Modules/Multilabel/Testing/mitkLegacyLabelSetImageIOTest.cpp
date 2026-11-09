@@ -352,8 +352,10 @@ public:
   void TestReadFileWithoutUID()
   {
     // The file also defines a label for unlabeled pixels ("Exterior", value 0); the reader drops it.
-    // Four voxels hold values no label defines (54, 344, 733, 19520). The reader keeps them,
-    // which is a known defect: such values are invalid and should be cleared on read.
+    // Four voxels hold values no label defines (54, 344, 733, 19520). Such values are invalid and
+    // should be cleared on read; the reader keeps them, a known defect, which the last argument of
+    // BuildExpected (keepValuesOutsideLabels) pins. Once the reader clears them, this test fails:
+    // drop the argument, and the parameter with it, since this test is its only user.
     const auto path = GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd");
     const auto expected = BuildExpected(path, BuildTimeGeometry({ 50, 50, 50 }, { 1, 1, 1 }),
       { { 0, { { 1, "Label1", 0.f, 0.f, 0.f }, { 2, "Label2", 0.f, 0.f, 0.f } } } }, { 0 }, {}, "", true);

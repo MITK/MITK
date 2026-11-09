@@ -529,7 +529,10 @@ namespace
     const auto notHelper = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     const auto timePoint = renderer->GetTime();
 
-    for (const auto& node : *dataStorage->GetSubset(notHelper))
+    // Held in a variable: the set that a range-for over *GetSubset() walks would die with the temporary pointer.
+    const auto nodes = dataStorage->GetSubset(notHelper);
+
+    for (const auto& node : *nodes)
     {
       if (!node->IsVisible(renderer))
         continue;

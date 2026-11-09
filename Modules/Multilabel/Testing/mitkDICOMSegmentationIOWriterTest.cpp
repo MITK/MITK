@@ -634,6 +634,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet);
   MITK_TEST(WriteNumbersSegmentsByLabelValueInBinary);
   MITK_TEST(WriteNumbersSegmentsByLabelValueInLabelmap);
+  MITK_TEST(WriteRoundsColours);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -759,6 +760,25 @@ public:
 
     const auto segments = mitk::test::ReadSegmentSequence(path);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Segment 1 is the label with the lowest value", std::string("Three"), segments.at(1)->GetName());
+  }
+
+  // Recommended Display CIELab Value is computed from 8 bit sRGB, rounded, not truncated.
+  void WriteRoundsColours()
+  {
+    mitk::Color color;
+    color.Set(0.999f, 0.5f, 0.2f);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: truncating and rounding differ for the red channel",
+                           static_cast<long>(color[0] * 255.f) != std::lround(color[0] * 255.f));
+
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetColor(color);
+    const auto path = this->WriteSegToTempFile(seg, {}, "colour");
+
+    int lab[3];
+    dcmqi::ColorUtilities::getIntegerScaledCIELabPCSFromSRGB(lab[0], lab[1], lab[2], 255, 128, 51);
+    const auto written = mitk::test::ReadRecommendedDisplayCIELab(path).at(1);
+    for (unsigned int i = 0; i < 3; ++i)
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("CIELab component " + std::to_string(i), lab[i], static_cast<int>(written[i]));
   }
 
   void WriteRefuses4D()

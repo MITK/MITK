@@ -44,6 +44,7 @@ found in the LICENSE file.
 #include <dcmtk/dcmfg/fgtypes.h>
 #include <dcmtk/dcmseg/segdoc.h>
 
+#include <cmath>
 #include <initializer_list>
 #include <iomanip>
 #include <limits>
@@ -110,6 +111,12 @@ namespace
         return false;
     }
     return true;
+  }
+
+  // dcmqi computes the CIELab value from 8 bit sRGB.
+  unsigned int ToEightBit(float colorComponent)
+  {
+    return static_cast<unsigned int>(std::lround(colorComponent * 255.f));
   }
 
   // Copy one top-level DICOM tag from seg's property list into dst if the
@@ -1685,7 +1692,7 @@ namespace mitk
           }
 
           Color color = label->GetColor();
-          segmentAttribute->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
+          segmentAttribute->setRecommendedDisplayRGBValue(ToEightBit(color[0]), ToEightBit(color[1]), ToEightBit(color[2]));
 
           if (!label->GetTrackingID().empty())
             segmentAttribute->setTrackingIdentifier(label->GetTrackingID());

@@ -18,10 +18,33 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 
 // STL
+#include <charconv>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
 #include <tinyxml2.h>
+
+namespace
+{
+  mitk::TimeStepType ReadTimeStep(const tinyxml2::XMLElement *timeSeries)
+  {
+    const auto *idElement = timeSeries->FirstChildElement("time_series_id");
+    const char *text = idElement != nullptr ? idElement->GetText() : nullptr;
+
+    if (text == nullptr)
+      mitkThrow() << "Time series without time_series_id.";
+
+    const char *end = text + std::strlen(text);
+    mitk::TimeStepType timeStep = 0;
+    const auto [last, error] = std::from_chars(text, end, timeStep);
+
+    if (error != std::errc() || last != end || timeStep == mitk::TIMESTEP_INVALID)
+      mitkThrow() << "Invalid time_series_id \"" << text << "\".";
+
+    return timeStep;
+  }
+}
 
 mitk::PointSetReaderService::PointSetReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()), "MITK Point Set Reader")
@@ -64,12 +87,9 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
       {
         for (auto *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
              currentTimeSeries != nullptr;
-             currentTimeSeries = currentTimeSeries->NextSiblingElement())
+             currentTimeSeries = currentTimeSeries->NextSiblingElement("time_series"))
         {
-          mitk::TimeStepType currentTimeStep(0);
-          auto *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
-
-          currentTimeStep = atoi(currentTimeSeriesID->GetText());
+          const mitk::TimeStepType currentTimeStep = ReadTimeStep(currentTimeSeries);
 
           timeGeometry->Expand(currentTimeStep + 1); // expand (default to identity) in any case
           auto *geometryElem = currentTimeSeries->FirstChildElement("Geometry3D");

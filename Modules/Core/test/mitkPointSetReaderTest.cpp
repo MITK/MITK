@@ -15,6 +15,30 @@ found in the LICENSE file.
 #include <mitkPointSet.h>
 #include <mitkTestingMacros.h>
 
+#include <sstream>
+#include <string>
+
+namespace
+{
+  /** A point set file with one time series that starts with the given elements and holds one point. */
+  std::string CreatePointSetFile(const std::string &timeSeriesStart, const std::string &afterTimeSeries = "")
+  {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+           "<point_set_file><file_version>0.1</file_version><point_set><time_series>" +
+           timeSeriesStart +
+           "<point><id>0</id><specification>0</specification><x>10</x><y>20</y><z>30</z></point>"
+           "</time_series>" +
+           afterTimeSeries + "</point_set></point_set_file>";
+  }
+
+  std::vector<mitk::BaseData::Pointer> Read(mitk::IFileReader *reader, const std::string &content)
+  {
+    std::istringstream stream(content);
+    reader->SetInput("test.mps", &stream);
+    return reader->Read();
+  }
+}
+
 /**
  *  Test for the class "mitkPointSetReader".
  *
@@ -64,6 +88,19 @@ int mitkPointSetReaderTest(int argc, char *argv[])
     MITK_TEST_CONDITION_REQUIRED(
       resultPS->GetPointSet(resultPS->GetTimeSteps() - 1)->GetNumberOfPoints() == 0,
       "Testing output time step generation with empty time step!"); // CAVE: Only valid with the specified test data!
+
+    // Broken time series ids are rejected instead of being guessed or crashing.
+    for (const char *id : {"two", "3abc", "-1", "", "18446744073709551615"})
+      CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile(std::string("<time_series_id>") + id + "</time_series_id>")),
+                           mitk::Exception);
+
+    CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile("")), mitk::Exception);
+
+    // Unknown elements next to the time series are ignored.
+    data = Read(reader, CreatePointSetFile("<time_series_id>0</time_series_id>", "<comment>edited by hand</comment>"));
+    resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(resultPS.IsNotNull() && resultPS->GetTimeSteps() == 1 && resultPS->GetSize(0) == 1,
+                                 "Testing unknown element next to the time series");
   }
 
   // always end with this!

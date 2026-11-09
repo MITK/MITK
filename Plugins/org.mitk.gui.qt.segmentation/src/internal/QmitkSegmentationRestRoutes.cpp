@@ -53,6 +53,7 @@ found in the LICENSE file.
 #include <QTimer>
 
 #include <algorithm>
+#include <array>
 #include <map>
 #include <set>
 #include <cctype>
@@ -151,32 +152,60 @@ namespace
     return selection;
   }
 
-  /** Voxels per label value in a group image, empty while a tool writes into it. */
-  std::vector<std::uint64_t> CountVoxels(const mitk::Image* groupImage, mitk::TimeStepType timeStep)
+  /** The voxels of each label value in a group image, empty while a tool writes into it. */
+  struct LabelVoxels
   {
-    std::vector<std::uint64_t> counts;
+    std::vector<std::uint64_t> Counts;
+
+    /** The sums of the indices of the voxels of each value, for the center of a label. */
+    std::vector<std::array<double, 3>> IndexSums;
+  };
+
+  LabelVoxels CountVoxels(const mitk::Image* groupImage, mitk::TimeStepType timeStep)
+  {
+    LabelVoxels voxels;
 
     if (groupImage == nullptr || groupImage->GetPixelType().GetComponentType() != itk::IOComponentEnum::USHORT)
-      return counts;
+      return voxels;
 
     try
     {
       // Never wait in the GUI thread for a tool that writes into the segmentation.
       mitk::ImageReadAccessor accessor(mitk::Image::ConstPointer(groupImage), groupImage->GetVolumeData(timeStep), mitk::ImageAccessorBase::ExceptionIfLocked);
       const auto* pixels = static_cast<const mitk::Label::PixelType*>(accessor.GetData());
-      const auto size = static_cast<std::size_t>(groupImage->GetDimension(0)) * groupImage->GetDimension(1) * groupImage->GetDimension(2);
+      const std::array<unsigned int, 3> size = { groupImage->GetDimension(0), groupImage->GetDimension(1), groupImage->GetDimension(2) };
 
-      counts.assign(std::numeric_limits<mitk::Label::PixelType>::max() + 1, 0);
+      voxels.Counts.assign(std::numeric_limits<mitk::Label::PixelType>::max() + 1, 0);
+      voxels.IndexSums.assign(voxels.Counts.size(), { 0.0, 0.0, 0.0 });
 
-      for (std::size_t i = 0; i < size; ++i)
-        ++counts[pixels[i]];
+      for (unsigned int z = 0; z < size[2]; ++z)
+      {
+        for (unsigned int y = 0; y < size[1]; ++y)
+        {
+          const auto* row = pixels + (static_cast<std::size_t>(z) * size[1] + y) * size[0];
+
+          for (unsigned int x = 0; x < size[0]; ++x)
+          {
+            const auto value = row[x];
+            ++voxels.Counts[value];
+
+            if (value != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
+            {
+              auto& sum = voxels.IndexSums[value];
+              sum[0] += x;
+              sum[1] += y;
+              sum[2] += z;
+            }
+          }
+        }
+      }
     }
     catch (const mitk::Exception&)
     {
-      counts.clear();
+      voxels = LabelVoxels();
     }
 
-    return counts;
+    return voxels;
   }
 
   nlohmann::json DescribeLabel(const mitk::Label* label, mitk::MultiLabelSegmentation::GroupIndexType group)
@@ -206,20 +235,42 @@ namespace
       const auto spacing = groupImage->GetGeometry()->GetSpacing();
       const auto voxelMilliliters = spacing[0] * spacing[1] * spacing[2] / 1000.0;
 
-      std::vector<std::vector<std::uint64_t>> counts;
+      struct StepVoxels
+      {
+        LabelVoxels Voxels;
+        const mitk::BaseGeometry* Geometry;
+      };
+
+      std::vector<StepVoxels> stepVoxels;
 
       for (const auto timeStep : timeSteps)
-        counts.push_back(CountVoxels(groupImage, timeStep));
+        stepVoxels.push_back({ CountVoxels(groupImage, timeStep), groupImage->GetGeometry(timeStep) });
 
-      const auto addVolume = [voxelMilliliters](nlohmann::json& json, const std::vector<std::uint64_t>* stepCounts, mitk::MultiLabelSegmentation::LabelValueType value) {
-        if (stepCounts == nullptr || stepCounts->empty())
+      const auto addVolume = [voxelMilliliters](nlohmann::json& json, const StepVoxels* step, mitk::MultiLabelSegmentation::LabelValueType value) {
+        if (step == nullptr || step->Voxels.Counts.empty())
         {
           json["voxels"] = nullptr;
           return;
         }
 
-        json["voxels"] = (*stepCounts)[value];
-        json["volume_ml"] = std::round((*stepCounts)[value] * voxelMilliliters * 100.0) / 100.0;
+        const auto count = step->Voxels.Counts[value];
+        json["voxels"] = count;
+        json["volume_ml"] = std::round(count * voxelMilliliters * 100.0) / 100.0;
+
+        if (count == 0)
+        {
+          json["center"] = nullptr;
+          return;
+        }
+
+        mitk::Point3D index;
+
+        for (int axis = 0; axis < 3; ++axis)
+          index[axis] = step->Voxels.IndexSums[value][axis] / count;
+
+        mitk::Point3D center;
+        step->Geometry->IndexToWorld(index, center);
+        json["center"] = mitk::ToRestJson(center);
       };
 
       for (const auto value : segmentation->GetLabelValuesByGroup(group))
@@ -238,7 +289,7 @@ namespace
           for (std::size_t i = 0; i < timeSteps.size(); ++i)
           {
             auto step = mitk::DescribeRestTimeStep(segmentation, timeSteps[i]);
-            addVolume(step, &counts[i], value);
+            addVolume(step, &stepVoxels[i], value);
             steps.push_back(std::move(step));
           }
 
@@ -246,7 +297,7 @@ namespace
         }
         else
         {
-          addVolume(json, counts.empty() ? nullptr : &counts.front(), value);
+          addVolume(json, stepVoxels.empty() ? nullptr : &stepVoxels.front(), value);
         }
 
         labels.push_back(std::move(json));
@@ -581,7 +632,7 @@ namespace
 
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < preview->GetNumberOfGroups(); ++group)
     {
-      const auto counts = CountVoxels(preview->GetGroupImage(group), timeSteps.front());
+      const auto counts = CountVoxels(preview->GetGroupImage(group), timeSteps.front()).Counts;
 
       for (std::size_t value = 1; value < counts.size(); ++value)
         count += counts[value];
@@ -1079,10 +1130,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   labels.Description =
     "Query parameter: timepoint_ms (optional), a time point in milliseconds, or all for each time step of the "
     "segmentation; the selected time point without it. Returns {data: [{value, name, color, visible, locked, "
-    "group, voxels, volume_ml}]}, the voxels and volumes at the time point; with all, each label has time_steps: "
-    "[{min_timepoint_ms, max_timepoint_ms, voxels, volume_ml}] instead. voxels is null while a tool writes into "
-    "the segmentation, "
-    "and when the segmentation has no data at the time point.";
+    "group, voxels, volume_ml, center}]}, the voxels and volumes at the time point, and center, the center of the "
+    "voxels in millimeters, null for an empty label; with all, each label has time_steps: [{min_timepoint_ms, "
+    "max_timepoint_ms, voxels, volume_ml, center}] instead. Centers tell which labels or instances of two "
+    "segmentations mark the same finding. voxels is null while a tool writes into the segmentation, and when the "
+    "segmentation has no data at the time point.";
   labels.Handler = [server](const RestRequest& request) {
     const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
 

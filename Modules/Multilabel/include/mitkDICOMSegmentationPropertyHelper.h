@@ -150,8 +150,12 @@ namespace mitk
      * \brief Reports what is missing from the seg's DICOM SEG contract
      *        without mutating it.
      *
-     * Empty result means the seg is writable in strict mode without
-     * further synthesis.
+     * An empty result means the DICOM SEG property contract is complete,
+     * so a strict-mode write needs no synthesis. The write can still be
+     * refused: strict mode also requires a source-image relation with
+     * per-slice source UIDs, and DICOMSegmentationIO::Write refuses, in
+     * either mode, labels and source-image relations that DICOM SEG cannot
+     * represent.
      *
      * \pre seg must be a valid pointer.
      */

@@ -88,10 +88,11 @@ namespace
   }
 
   // The labels of a group in the order the writer hands them to dcmqi. dcmqi numbers the segments
-  // 1..N in that order and the reader takes the segment number as label value, so ascending value
-  // order gives every label its rank within the group: labels with values 1..N keep them, in both
-  // encodings. The segment images and the segment metadata are paired by position, so both are
-  // built from this one order.
+  // 1..N in that order, skipping a label without voxels because it creates segments only for values
+  // present in the image, and the reader takes the segment number as label value. Ascending value
+  // order thus gives every label with voxels its rank among them: if these have values 1..N, they
+  // keep them, in both encodings. The segment images and the segment metadata are paired by
+  // position, so both are built from this one order.
   mitk::MultiLabelSegmentation::LabelValueVectorType GetLabelValuesInSegmentOrder(
     const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
@@ -100,9 +101,9 @@ namespace
     return labelValues;
   }
 
-  // Whether the label values of a group are 1..N, which a round trip keeps. The labelmap encoding
-  // then lets dcmqi take the values as segment numbers directly (useLabelIDAsSegmentNumber), which
-  // dcmqi allows only for 1..N.
+  // Whether the label values of a group are 1..N, which a round trip keeps if every label has
+  // voxels. The labelmap encoding then lets dcmqi take the values as segment numbers directly
+  // (useLabelIDAsSegmentNumber), which dcmqi allows only if the values present in the image are 1..N.
   bool LabelsAreMonotonicOneToN(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
     const auto labelValues = GetLabelValuesInSegmentOrder(seg, layer);
@@ -1047,14 +1048,12 @@ namespace mitk
                   << "and will not survive a round trip.";
 
       // Per-layer output path, also used by the log line so the message
-      // names the file actually being written. Follows the MITK
-      // multi-output naming convention (see the MitkFileConverter app): the
-      // first group writes the requested path, and additional groups insert
-      // "_<groupIndex>" before the extension of the file name, or append it
-      // if the file name has none. Every file thus has the form the caller
-      // chose; whether an extension is added is IOUtil's decision. Only a dot
-      // in the file name starts the extension; a dot in a directory name
-      // belongs to the stem.
+      // names the file actually being written. The first group writes the
+      // requested path; additional groups insert "_<groupIndex>" before the
+      // last dot of the file name, or append it if the file name has none.
+      // Every file thus has the form the caller chose; whether an extension
+      // is added is IOUtil's decision. A dot in a directory name belongs to
+      // the stem, and dotted stems such as UIDs stay intact.
       std::string filePath = path;
       if (layer != 0)
       {

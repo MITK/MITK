@@ -58,6 +58,8 @@ private:
     mitk::test::RichSegmentationOptions options;
     options.dynamic = false;
     options.dicomLegalNames = true;
+    // dcmqi writes no segment for a label without voxels and no SEG for a group without voxels;
+    // DICOMSegCapabilities models neither.
     options.withEmptyLabel = false;
     options.withEmptyGroup = false;
     return mitk::test::BuildRichSegmentation(options);

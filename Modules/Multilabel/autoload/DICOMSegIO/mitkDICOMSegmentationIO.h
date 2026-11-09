@@ -55,16 +55,20 @@ namespace mitk
      * \brief Write the MultiLabelSegmentation as DICOM Segmentation files, one per group.
      *
      * Group 0 is written to the output location; the file of group g inserts "_<g>" before the
-     * extension of the file name, or appends it if the file name has none. The writer adds no
+     * last dot of the file name, or appends it if the file name has none. The writer adds no
      * extension of its own. Group names are not kept: DICOM SEG has no field meant for them.
      * Native NRRD and the segmentation stack keep them.
      *
-     * The segments of a group are numbered 1..N in ascending label value order, so the labels of a
-     * group keep their values only if these are 1..N; otherwise each label gets its rank. A Segment
-     * Label or Segment Algorithm Name longer than the 64 characters of VR LO is cut and marked with
-     * "[...]", with a warning. BodyPartExamined is taken only from the segmentation's property
-     * DICOM.0018.0015, which a segmentation inherits from the image it is created from, and left
-     * out without it; SeriesDescription is taken from DICOM.0008.103E.
+     * The segments of a group are numbered 1..N in ascending label value order. dcmqi writes no
+     * segment for a label without voxels: such a label is lost, and only the labels with voxels
+     * count. These keep their values if they are 1..N; otherwise each gets its rank among them. In
+     * the labelmap encoding with values 1..N, a label without voxels below one with voxels makes
+     * dcmqi fail.
+     *
+     * A Segment Label or Segment Algorithm Name longer than the 64 characters of VR LO is cut and
+     * marked with "[...]", with a warning. BodyPartExamined is taken only from the segmentation's
+     * property DICOM.0018.0015, which a segmentation inherits from the image it is created from, and
+     * left out without it; SeriesDescription is taken from DICOM.0008.103E.
      *
      * \throw DICOMSegStrictModeException in strict mode if the segmentation lacks a contract item
      * (DICOMSegmentationPropertyHelper::Validate) or a source-image relation with per-slice UIDs;

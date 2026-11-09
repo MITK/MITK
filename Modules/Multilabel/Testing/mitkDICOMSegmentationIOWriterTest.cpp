@@ -414,8 +414,7 @@ namespace
     return finding != options.end() && finding->second.ToString() == "labelmap";
   }
 
-  // The writer names the file of group 0 as requested and appends "_<group>" for the others.
-  // The writer writes group 0 to the requested path and inserts "_<group>" before the extension of
+  // The writer writes group 0 to the requested path and inserts "_<group>" before the last dot of
   // the file name for the others, or appends it if the file name has none.
   std::string GroupFilePath(const std::string& path, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
@@ -644,8 +643,8 @@ public:
   }
 
   // The writer hands the labels of a group to dcmqi in ascending value order, which numbers the
-  // segments in that order, so the segment number is the label's rank. Labels inserted as B=2,
-  // A=1 were written as segment 1 = B before.
+  // segments in that order, so the segment number is the label's rank. B=2 is inserted before A=1
+  // so that insertion order and value order differ.
   void WriteNumbersSegmentsByLabelValueInBinary()
   {
     auto seg = BuildSegWithLabels({{2, "B"}, {1, "A"}});
@@ -788,7 +787,7 @@ public:
     this->AssertWriteRefused(seg, {}, "backslash", Refusal::UnrepresentableValue, {"Left\\Right"});
   }
 
-  // The writer writes no Specific Character Set, so names are limited to ASCII (owner decision).
+  // The writer writes no Specific Character Set, so names are limited to ASCII.
   void WriteRefusesNonASCIILabelNames()
   {
     auto seg = BuildSegWithRule();
@@ -1684,12 +1683,6 @@ public:
     mitk::IFileWriter::Options options;
     const auto basePath = this->WriteSegToTempFile(seg, options, "wf-multigroup");
 
-    // WriteSegToTempFile returns "<tempDir>/wf-multigroup.dcm". The writer
-    // follows the MITK multi-output naming convention (see MitkFileConverter):
-    // the first group writes that requested path verbatim and each additional
-    // group appends "_<groupIndex>", so the files that exist are
-    // "...wf-multigroup.dcm" and "...wf-multigroup_1.dcm"; basePath itself is
-    // the first group's file.
     // Assert existence before reading: ReadTopLevelString returns "" for a
     // missing file, which would otherwise mask a wrong-path bug as a
     // propagation bug.

@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkPixelTypeMultiplex.h>
+#include <mitkPlanarFigure.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
@@ -655,7 +656,8 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   focus.Summary = "Frame labels or data in a render window";
   focus.Description =
     "Path parameter: id, one of axial, sagittal, coronal, 3d. Body: {segmentation: uid, labels: [value]} to frame "
-    "labels of a segmentation, or {uids: [uid]} to frame data; margin (optional, default 0.2), the space around "
+    "labels of a segmentation, or {uids: [uid]} to frame data, a planar figure by its outline in its own slice; "
+    "margin (optional, default 0.2), the space around "
     "them as a share of their size. A 2D window shows the slice through their center and zooms so that they fill "
     "it. The 3D window keeps its direction, which the camera endpoint's standard_view sets, and moves so that they "
     "fill it. Returns {data: window} as GET /api/v1/rendering/windows describes it.";
@@ -747,6 +749,25 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
 
           if (data == nullptr)
             continue;
+
+          // The geometry of a planar figure is the whole plane it lies on, and its center is
+          // half a slice off that plane. The outline frames the figure itself, in its slice.
+          if (const auto* figure = dynamic_cast<const PlanarFigure*>(data); figure != nullptr)
+          {
+            const auto* plane = figure->GetPlaneGeometry();
+
+            for (const auto& contour : figure->GetContours())
+            {
+              for (const auto& point : contour.Points)
+              {
+                Point3D corner;
+                plane->Map(point, corner);
+                corners.push_back(corner);
+              }
+            }
+
+            continue;
+          }
 
           const auto* geometry = data->GetGeometry(GetSelectedTimeStep(node, request.Path));
 

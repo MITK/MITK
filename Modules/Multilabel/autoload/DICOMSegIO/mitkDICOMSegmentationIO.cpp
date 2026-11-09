@@ -1610,6 +1610,13 @@ namespace mitk
       this->SetLabelProperties(label, segmentAttribute);
     }
 
+    // InitializeByLabeledImage adds the labels in the order their values first occur in the
+    // voxels. Like the binary branch, the group lists them by segment number.
+    MultiLabelSegmentation::LabelVectorType labelsBySegmentNumber;
+    for (const auto &entry : attributesByLabelValue)
+      labelsBySegmentNumber.push_back(labelSetImage->GetLabel(entry.first));
+    labelSetImage->ReplaceGroupLabels(0, labelsBySegmentNumber);
+
     return labelSetImage;
   }
 

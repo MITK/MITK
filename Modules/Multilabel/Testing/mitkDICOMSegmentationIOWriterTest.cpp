@@ -665,6 +665,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteFailureInLaterGroupKeepsEarlierFiles);
   MITK_TEST(WriteReferencesSourcesWhenPlanesDisagreeWithTransform);
   MITK_TEST(WriteRefusesSourceReferencesThatMapToNoFrame);
+  MITK_TEST(LabelmapReloadOrdersLabelsBySegmentNumber);
   MITK_TEST(WriteRefusesInvalidTrackingUID);
   CPPUNIT_TEST_SUITE_END();
 
@@ -1130,6 +1131,23 @@ public:
     Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "1.2.826.0.1.3680043.10.999.12.2");
 
     this->AssertWriteRefused(seg, {}, "unmapped-sources", false, {"group 0"});
+  }
+
+  // The reader adds the labels of a labelmap in segment order, as it does for a binary SEG. Label 2
+  // covers the first voxel here, so the order in which values first occur differs.
+  void LabelmapReloadOrdersLabelsBySegmentNumber()
+  {
+    auto seg = BuildSegWithLabels({{2, "B"}, {1, "A"}});
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
+    const auto path = this->WriteSegToTempFile(seg, options, "labelmap-order");
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    const auto* loadedSeg = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("The labelmap reloads as a segmentation", nullptr != loadedSeg);
+    const auto differences = mitk::test::CompareWithDICOMSegFile(*loadedSeg, path);
+    CPPUNIT_ASSERT_MESSAGE(path + " was read with differences to its content:" + mitk::test::JoinDifferences(differences),
+                           differences.empty());
   }
 
   // Tracking UID is UI. DCMTK rejects other values inside dcmqi, which then leaves the tag out.

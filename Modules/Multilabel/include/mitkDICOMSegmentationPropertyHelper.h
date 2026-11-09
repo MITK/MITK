@@ -66,6 +66,7 @@ namespace mitk
    *   copies Patient + Study UIDs + StudyID + FrameOfReferenceUID from
    *   the source. This function is shared with parametric maps via
    *   ModelFitResultHelper, which is why it lives in MitkDICOMQI.
+   *   \c InheritBodyPartExaminedFromSource then adds Body Part Examined.
    * - <b>Setup-time, explicit.</b>
    *   \c mitkLabelSetImageHelper::SetupDerivedSegmentation calls
    *   \c SegSourceImageRelationRule::Connect plus the InheritXxxFromSource
@@ -75,8 +76,9 @@ namespace mitk
    *   \c StampSegIdentityOnSourceItem to copy the seg's identity onto
    *   dcmqi's synthetic source DcmItem so dcmqi can produce a valid SEG
    *   file. The tag list mirrors what DeriveDICOMSourceProperties
-   *   produces, but the direction is opposite (seg -> source-item, not
-   *   source -> seg). Not a duplicated responsibility.
+   *   produces, plus Body Part Examined (0018,0015), but the direction is
+   *   opposite (seg -> source-item, not source -> seg). Not a duplicated
+   *   responsibility.
    *
    * \sa SegSourceImageRelationRule
    * \sa MultiLabelSegmentation
@@ -220,6 +222,24 @@ namespace mitk
      * \pre source must be a valid pointer.
      */
     static void InheritFrameOfReferenceFromSource(MultiLabelSegmentation* seg,
+                                                  const IPropertyProvider* source,
+                                                  bool overwrite = true);
+
+    /**
+     * \brief Copy Body Part Examined (0018,0015) from source to seg, if the
+     *        source carries it.
+     *
+     * The attribute describes the examination of the series. A segmentation
+     * examines nothing of its own; its series covers the body part of the
+     * series it is derived from. The DICOM SEG writer takes BodyPartExamined
+     * only from this property.
+     *
+     * Default semantics: overwrite. See InheritPatientFromSource.
+     *
+     * \pre seg must be a valid pointer.
+     * \pre source must be a valid pointer.
+     */
+    static void InheritBodyPartExaminedFromSource(MultiLabelSegmentation* seg,
                                                   const IPropertyProvider* source,
                                                   bool overwrite = true);
 

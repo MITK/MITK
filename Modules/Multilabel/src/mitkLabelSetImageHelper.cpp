@@ -177,6 +177,7 @@ void mitk::LabelSetImageHelper::SetupDerivedSegmentation(MultiLabelSegmentation*
     DICOMSegmentationPropertyHelper::InheritPatientFromSource(seg, source);
     DICOMSegmentationPropertyHelper::InheritStudyFromSource(seg, source);
     DICOMSegmentationPropertyHelper::InheritFrameOfReferenceFromSource(seg, source);
+    DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource(seg, source);
   }
   catch (const mitk::Exception& e)
   {

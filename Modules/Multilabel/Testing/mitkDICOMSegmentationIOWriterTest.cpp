@@ -642,6 +642,10 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteNumbersSegmentsByLabelValueInLabelmap);
   MITK_TEST(WriteAcceptsLabelValue32767);
   MITK_TEST(WriteRefusesLabelValuesAbove32767);
+  MITK_TEST(WriteTakesBodyPartExaminedFromProperty);
+  MITK_TEST(WriteTakesBodyPartExaminedFromTheSourceImage);
+  MITK_TEST(WriteLeavesBodyPartExaminedEmptyWithoutProperty);
+  MITK_TEST(WriteTakesSeriesDescriptionFromProperty);
   MITK_TEST(WriteKeepsLabelNamesOf64Characters);
   MITK_TEST(WriteTruncatesLongLabelNames);
   MITK_TEST(WriteTruncatesLongAlgorithmNames);
@@ -796,6 +800,52 @@ public:
       CPPUNIT_ASSERT_MESSAGE("The refusal is not reported as an ITK error: " + message,
                              message.find("ITK error") == std::string::npos);
     }
+  }
+
+  // BodyPartExamined is a property of the series. The writer takes it from the segmentation's
+  // DICOM.0018.0015, never from the codes of a label.
+  void WriteTakesBodyPartExaminedFromProperty()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("T-62000", "SRT", "Liver"));
+    seg->SetProperty(DICOMKey(0x0018, 0x0015), mitk::TemporoSpatialStringProperty::New("ABDOMEN"));
+    const auto path = this->WriteSegToTempFile(seg, {}, "body-part");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("BodyPartExamined of the written SEG",
+                                 std::string("ABDOMEN"), ReadTopLevelString(path, DCM_BodyPartExamined));
+  }
+
+  // A segmentation created from an image inherits the body part examined of the image's series.
+  void WriteTakesBodyPartExaminedFromTheSourceImage()
+  {
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    source->SetProperty(DICOMKey(0x0018, 0x0015), mitk::TemporoSpatialStringProperty::New("ABDOMEN"));
+    auto seg = InitializeSegFromSourceImage(source);
+    Rule::Connect(seg, source.GetPointer());
+    const auto path = this->WriteSegToTempFile(seg, {}, "body-part-from-source");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("BodyPartExamined of the written SEG",
+                                 std::string("ABDOMEN"), ReadTopLevelString(path, DCM_BodyPartExamined));
+  }
+
+  void WriteLeavesBodyPartExaminedEmptyWithoutProperty()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("T-62000", "SRT", "Liver"));
+    const auto path = this->WriteSegToTempFile(seg, {}, "no-body-part");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("BodyPartExamined of the written SEG",
+                                 std::string(), ReadTopLevelString(path, DCM_BodyPartExamined));
+  }
+
+  // StampIdentityTags sets a SeriesDescription other than the default "MITK Segmentation".
+  void WriteTakesSeriesDescriptionFromProperty()
+  {
+    auto seg = BuildSegWithRule();
+    const auto path = this->WriteSegToTempFile(seg, {}, "series-description");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("SeriesDescription of the written SEG",
+                                 ReadStringProp(seg, 0x0008, 0x103E), ReadTopLevelString(path, DCM_SeriesDescription));
   }
 
   void WriteKeepsLabelNamesOf64Characters()

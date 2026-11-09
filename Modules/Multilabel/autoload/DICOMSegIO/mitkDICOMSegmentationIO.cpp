@@ -190,10 +190,12 @@ namespace
   }
 
   // Stamp the Patient / Study / Frame-of-Reference identifying tags from
-  // the seg onto the source DcmItem dcmqi treats as dcmDatasets[0].
-  // The tag set mirrors what DICOMQIPropertyHelper::DeriveDICOMSourceProperties
-  // historically copied from the source image, so a round trip preserves
-  // the same identifying information that the legacy path would have.
+  // the seg onto the source DcmItem dcmqi treats as dcmDatasets[0], plus
+  // the body part examined, which dcmqi inherits from that item. Apart from
+  // the body part, the tag set mirrors what
+  // DICOMQIPropertyHelper::DeriveDICOMSourceProperties historically copied
+  // from the source image, so a round trip preserves the same identifying
+  // information that the legacy path would have.
   void StampSegIdentityOnSourceItem(const mitk::MultiLabelSegmentation *seg, DcmItem &dst)
   {
     // Patient module
@@ -212,6 +214,9 @@ namespace
     // Frame of Reference module
     CopyTopLevelDICOMTagToItem(seg, 0x0020, 0x0052, DCM_FrameOfReferenceUID, dst);
     CopyTopLevelDICOMTagToItem(seg, 0x0020, 0x1040, DCM_PositionReferenceIndicator, dst);
+    // Body part examined describes the series, so dcmqi inherits it from the source; the
+    // segmentation's own property is its only source. The codes of a label describe one segment.
+    CopyTopLevelDICOMTagToItem(seg, 0x0018, 0x0015, DCM_BodyPartExamined, dst);
   }
 
   // Format a double as a DICOM Decimal String (DS). DS is capped at 16
@@ -1618,10 +1623,12 @@ namespace mitk
     if (GetDICOMPropertyValue(0x0012, 0x0060, image->GetPropertyList(), clinicalTrialCoordinatingCenterName))
       handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
-    std::string seriesDescription;
-    if (!image->GetPropertyList()->GetStringProperty("name", seriesDescription))
-      seriesDescription = "MITK Segmentation";
-    handler.setSeriesDescription(seriesDescription);
+    // Validate requires (0008,103E) in strict mode, and Complete stamps it in synthetic mode. Like
+    // Validate, an intentionally empty value counts as present.
+    const auto seriesDescription = image->GetConstProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x103E));
+    if (seriesDescription.IsNull())
+      mitkThrow() << "BuildMetaInfoHandler: the segmentation has no Series Description (0008,103E).";
+    handler.setSeriesDescription(seriesDescription->GetValueAsString());
 
     // All per-group SEG files of one seg form a single DICOM series (shared
     // SeriesInstanceUID stamped at the write loop), so SeriesNumber is
@@ -1630,7 +1637,6 @@ namespace mitk
     // group its own series with a colliding InstanceNumber.
     handler.setSeriesNumber("1");
     handler.setInstanceNumber(std::to_string(layer + 1));
-    handler.setBodyPartExamined("");
 
     // The segment metadata must pair with the segment images in Write by position.
     auto labelSet = image->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(image, layer));
@@ -1674,7 +1680,6 @@ namespace mitk
             {
               segmentAttribute->setAnatomicRegionSequence(anatomicRegion.GetValue(),
                 anatomicRegion.GetScheme(), anatomicRegion.GetMeaning());
-              handler.setBodyPartExamined(anatomicRegion.GetMeaning());
             }
 
             if (anatomicRegion.GetModifierCount() > 0)
@@ -1698,7 +1703,6 @@ namespace mitk
             {
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(segCat->GetValue(),
                 segCat->GetScheme(), segCat->GetMeaning());
-              handler.setBodyPartExamined(segCat->GetMeaning());
             }
             else
             {
@@ -1707,9 +1711,7 @@ namespace mitk
               // semantics. The same SCT base code is intentionally reused as
               // the Type fallback below (paired there with an "Unknown"
               // modifier); Category and Type sharing one base code is accepted
-              // for the no-real-semantics case. BodyPartExamined is
-              // deliberately not stamped here; an "Unknown" body part is worse
-              // than the field staying empty.
+              // for the no-real-semantics case.
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
                 "49755003", "SCT", "Morphologically altered structure");
             }

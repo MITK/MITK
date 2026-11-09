@@ -189,6 +189,17 @@ void mitk::DICOMSegmentationPropertyHelper::InheritFrameOfReferenceFromSource(Mu
   CopyIfPresent(seg, source, 0x0020, 0x0052, overwrite);
 }
 
+void mitk::DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource(MultiLabelSegmentation* seg,
+                                                                              const IPropertyProvider* source,
+                                                                              bool overwrite)
+{
+  if (seg == nullptr)
+    mitkThrow() << "DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource: seg must not be nullptr.";
+  if (source == nullptr)
+    mitkThrow() << "DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource: source must not be nullptr.";
+  CopyIfPresent(seg, source, 0x0018, 0x0015, overwrite);
+}
+
 std::vector<mitk::DICOMSegmentationPropertyHelper::MissingItem>
 mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* seg)
 {

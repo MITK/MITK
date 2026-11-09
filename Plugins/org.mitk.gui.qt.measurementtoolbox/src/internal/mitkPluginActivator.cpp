@@ -49,12 +49,14 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
 
   if (m_RestServer != nullptr)
   {
+    m_RestRouteParent = std::make_unique<QObject>();
+
     try
     {
       for (const auto& route : CreateImageStatisticsRoutes(m_RestServer))
         m_RestRoutes.push_back(m_RestServer->AddRoute(route));
 
-      for (const auto& route : CreatePlanarFigureRoutes(m_RestServer))
+      for (const auto& route : CreatePlanarFigureRoutes(m_RestServer, m_RestRouteParent.get()))
         m_RestRoutes.push_back(m_RestServer->AddRoute(route));
     }
     catch (const mitk::Exception& e)
@@ -77,6 +79,7 @@ void mitk::PluginActivator::stop(ctkPluginContext* context)
   }
 
   m_RestRoutes.clear();
+  m_RestRouteParent.reset();
   m_RestServer = nullptr;
 #endif
 

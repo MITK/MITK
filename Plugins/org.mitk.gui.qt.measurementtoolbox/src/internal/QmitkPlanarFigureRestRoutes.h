@@ -17,14 +17,21 @@ found in the LICENSE file.
 
 #include <vector>
 
+class QObject;
+
 namespace mitk
 {
   struct IRestServerService;
 }
 
 /**
- * \brief REST endpoints that draw and list planar figures, the figures of the Measurement view.
+ * \brief REST endpoints that draw, list and restyle planar figures, the figures of the Measurement view.
+ *
+ * \param[in] server The server that offers the endpoints.
+ * \param[in] owner A QObject of the GUI thread, the parent of the timers that
+ *            end pulses after a given duration. Destroy it after the routes
+ *            are removed; the pulses that it still times end with it.
  */
-std::vector<mitk::RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server);
+std::vector<mitk::RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server, QObject* owner);
 
 #endif

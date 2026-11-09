@@ -25,6 +25,11 @@ class mitkProportionalTimeGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestProportionalTimeGeometryCloning);
   MITK_TEST(Expand_SingleTimeStepValidAtEveryTimePoint_ConsecutiveTimeSteps);
   MITK_TEST(IsValidAtEveryTimePoint_OnlySingleTimeStepWithoutTime);
+  MITK_TEST(TimePointToClampedTimeStep_BeforeFirst_IsFirstStep);
+  MITK_TEST(TimePointToClampedTimeStep_Inside_IsContainingStep);
+  MITK_TEST(TimePointToClampedTimeStep_StepStart_IsThatStep);
+  MITK_TEST(TimePointToClampedTimeStep_PastLast_IsLastStep);
+  MITK_TEST(TimePointToClampedTimeStep_NoTimeSteps_Throws);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -92,8 +97,44 @@ public:
     CPPUNIT_ASSERT(!geometry->IsValidAtEveryTimePoint());
   }
 
+  void TimePointToClampedTimeStep_BeforeFirst_IsFirstStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(0), CreateThreeTimeStepsFrom10()->TimePointToClampedTimeStep(5.0));
+  }
+
+  void TimePointToClampedTimeStep_Inside_IsContainingStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(1), CreateThreeTimeStepsFrom10()->TimePointToClampedTimeStep(17.0));
+  }
+
+  void TimePointToClampedTimeStep_StepStart_IsThatStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(2), CreateThreeTimeStepsFrom10()->TimePointToClampedTimeStep(20.0));
+  }
+
+  void TimePointToClampedTimeStep_PastLast_IsLastStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(2), CreateThreeTimeStepsFrom10()->TimePointToClampedTimeStep(100.0));
+  }
+
+  void TimePointToClampedTimeStep_NoTimeSteps_Throws()
+  {
+    auto geometry = mitk::ProportionalTimeGeometry::New();
+    CPPUNIT_ASSERT_THROW(geometry->TimePointToClampedTimeStep(0.0), mitk::Exception);
+  }
+
 private:
   // helper Methods for the Tests
+
+  /** Time steps [10, 15), [15, 20) and [20, 25). */
+  static mitk::ProportionalTimeGeometry::Pointer CreateThreeTimeStepsFrom10()
+  {
+    auto geometry = mitk::ProportionalTimeGeometry::New();
+    geometry->Initialize(mitk::Geometry3D::New(), 3);
+    geometry->SetFirstTimePoint(10.0);
+    geometry->SetStepDuration(5.0);
+    return geometry;
+  }
 
   mitk::ProportionalTimeGeometry::Pointer CreateProportionalTimeGeometry()
   {

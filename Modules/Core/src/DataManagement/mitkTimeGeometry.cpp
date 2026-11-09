@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkGeometry3D.h>
 
+#include <algorithm>
 #include <limits>
 
 mitk::TimeGeometry::TimeGeometry() : m_BoundingBox(BoundingBox::New())
@@ -130,6 +131,24 @@ bool mitk::TimeGeometry::IsValidAtEveryTimePoint() const
   // it is clamped to that.
   const auto timeBounds = this->GetTimeBounds(0);
   return timeBounds[0] <= Limits::lowest() && timeBounds[1] >= Limits::max();
+}
+
+mitk::TimeStepType mitk::TimeGeometry::TimePointToClampedTimeStep(TimePointType timePoint) const
+{
+  const auto timeSteps = this->CountTimeSteps();
+
+  if (0 == timeSteps)
+  {
+    mitkThrow() << "Cannot convert time point " << timePoint
+                << " into a time step: the time geometry has no time steps.";
+  }
+
+  if (timePoint < this->GetMinimumTimePoint())
+  {
+    return 0;
+  }
+
+  return std::min(this->TimePointToTimeStep(timePoint), timeSteps - 1);
 }
 
 void mitk::TimeGeometry::UpdateBoundingBox()

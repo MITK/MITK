@@ -147,10 +147,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
     return;
   }
 
-  const auto* worldGeometry = renderer->GetWorldTimeGeometry();
-  const auto timeBounds = worldGeometry->GetTimeBounds(renderer->GetTimeStep());
-
-  if (!surface->GetTimeGeometry()->IsValidTimePoint(timeBounds[0]))
+  if (!surface->GetTimeGeometry()->IsValidTimePoint(renderer->GetTime()))
   {
     this->ResetMapper(renderer);
     return;

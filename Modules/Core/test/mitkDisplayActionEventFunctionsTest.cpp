@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkInteractionEvent.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSliceNavigationHelper.h>
@@ -270,23 +271,32 @@ public:
     ~ScopedWindow() { DestroyWindow(window); }
   };
 
-  /** RAII backup of the global time stepper so tests can arm it with a
-   *  multi-step range and always restore the previous state. */
+  /** RAII backup of the global time navigation so tests can give it a time
+   *  geometry with several time steps and always restore the previous state.
+   *  Arming its stepper alone would select time steps its time geometry does
+   *  not cover, and renderers read the selected time point on every step. */
   struct ScopedTimeStepper
   {
+    mitk::TimeNavigationController* timeNavigation;
     mitk::Stepper* stepper;
-    unsigned int steps;
+    mitk::TimeGeometry::ConstPointer timeGeometry;
     unsigned int pos;
 
-    ScopedTimeStepper()
-      : stepper(mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper())
-      , steps(stepper->GetSteps())
+    ScopedTimeStepper(const mitk::BaseGeometry* geometry, mitk::TimeStepType timeSteps)
+      : timeNavigation(mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+      , stepper(timeNavigation->GetStepper())
+      , timeGeometry(timeNavigation->GetInputWorldTimeGeometry())
       , pos(stepper->GetPos())
     {
+      auto multiStepGeometry = mitk::ProportionalTimeGeometry::New();
+      multiStepGeometry->Initialize(geometry, timeSteps);
+      timeNavigation->SetInputWorldTimeGeometry(multiStepGeometry);
+      timeNavigation->Update();
     }
     ~ScopedTimeStepper()
     {
-      stepper->SetSteps(steps);
+      timeNavigation->SetInputWorldTimeGeometry(timeGeometry);
+      timeNavigation->Update();
       stepper->SetPos(pos);
     }
   };
@@ -296,8 +306,7 @@ public:
     const auto singleSliceImage = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 1, 1.0f, 1.0f, 1.0f);
     const ScopedWindow a2(this, "editorA__w2", singleSliceImage);
 
-    const ScopedTimeStepper timeStepper;
-    timeStepper.stepper->SetSteps(5);
+    const ScopedTimeStepper timeStepper(m_Image->GetGeometry(), 5);
     timeStepper.stepper->SetPos(2);
 
     auto action = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(
@@ -321,8 +330,7 @@ public:
     const auto singleSliceImage = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 1, 1.0f, 1.0f, 1.0f);
     const ScopedWindow a2(this, "editorA__w2", singleSliceImage);
 
-    const ScopedTimeStepper timeStepper;
-    timeStepper.stepper->SetSteps(5);
+    const ScopedTimeStepper timeStepper(m_Image->GetGeometry(), 5);
     timeStepper.stepper->SetPos(2);
 
     auto action = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(

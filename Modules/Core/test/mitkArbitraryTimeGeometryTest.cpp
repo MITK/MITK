@@ -37,6 +37,12 @@ class mitkArbitraryTimeGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(ClearAllGeometries);
   MITK_TEST(AppendNewTimeStep);
   MITK_TEST(HasCollapsedFinalTimeStep);
+  MITK_TEST(TimePointToClampedTimeStep_BeforeFirst_IsFirstStep);
+  MITK_TEST(TimePointToClampedTimeStep_Inside_IsContainingStep);
+  MITK_TEST(TimePointToClampedTimeStep_StepStart_IsThatStep);
+  MITK_TEST(TimePointToClampedTimeStep_PastLast_IsLastStep);
+  MITK_TEST(TimePointToClampedTimeStep_CollapsedFinalStep_IsLastStep);
+  MITK_TEST(TimePointToClampedTimeStep_NoTimeSteps_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -524,6 +530,37 @@ public:
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_12345TimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->HasCollapsedFinalTimeStep() == true, "Testing HasCollapsedFinalTimeStep() with m_123TimeGeometryWithCollapsedEnd");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_123TimeGeometryWithCollapsedInterim");
+  }
+
+  void TimePointToClampedTimeStep_BeforeFirst_IsFirstStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(0), m_12345TimeGeometry->TimePointToClampedTimeStep(0.5));
+  }
+
+  void TimePointToClampedTimeStep_Inside_IsContainingStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(1), m_12345TimeGeometry->TimePointToClampedTimeStep(2.5));
+  }
+
+  void TimePointToClampedTimeStep_StepStart_IsThatStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(2), m_12345TimeGeometry->TimePointToClampedTimeStep(3.0));
+  }
+
+  void TimePointToClampedTimeStep_PastLast_IsLastStep()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(4), m_12345TimeGeometry->TimePointToClampedTimeStep(10.0));
+  }
+
+  void TimePointToClampedTimeStep_CollapsedFinalStep_IsLastStep()
+  {
+    const auto maximumTimePoint = m_123TimeGeometryWithCollapsedEnd->GetMaximumTimePoint();
+    CPPUNIT_ASSERT_EQUAL(mitk::TimeStepType(2), m_123TimeGeometryWithCollapsedEnd->TimePointToClampedTimeStep(maximumTimePoint));
+  }
+
+  void TimePointToClampedTimeStep_NoTimeSteps_Throws()
+  {
+    CPPUNIT_ASSERT_THROW(m_emptyTimeGeometry->TimePointToClampedTimeStep(0.0), mitk::Exception);
   }
 
 };

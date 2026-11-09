@@ -36,6 +36,9 @@ namespace mitk
    * The timestep controls the selection of a specific time point from the TimeGeometry.
    * The TimeNavigationController generates ITK events to tell observers,
    * like a BaseRenderer, when the selected timestep changes.
+   * Observers read the selected time point (GetSelectedTimePoint()) and resolve
+   * it against their own time geometry; a BaseRenderer does that for its world
+   * time geometry.
    *
    * Example:
    * \code
@@ -118,7 +121,12 @@ namespace mitk
       bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
       ::itk::EventObject *MakeObject() const override { return new Self(m_TimeStep); }
 
-      /** \brief Return the time step carried by this event. */
+      /**
+       * \brief Return the time step carried by this event.
+       *
+       * It is a time step of the controller's input world time geometry;
+       * receivers with other time grids read GetSelectedTimePoint() instead.
+       */
       TimeStepType GetTimeStep() const { return m_TimeStep; }
     private:
 

@@ -185,10 +185,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   //
   mitk::Surface::ConstPointer input = this->GetInput();
 
-  const auto* worldGeometry = renderer->GetWorldTimeGeometry();
-  const auto timeBounds = worldGeometry->GetTimeBounds(renderer->GetTimeStep());
-
-  if (!input->GetTimeGeometry()->IsValidTimePoint(timeBounds[0]))
+  if (!input->GetTimeGeometry()->IsValidTimePoint(renderer->GetTime()))
   {
     ls->m_Actor->VisibilityOff();
     return;

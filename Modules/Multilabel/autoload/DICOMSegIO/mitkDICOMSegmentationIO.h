@@ -51,7 +51,30 @@ namespace mitk
 
     // -------------- AbstractFileWriter -------------
 
-    /** \brief Write the MultiLabelSegmentation as a DICOM Segmentation file. */
+    /**
+     * \brief Write the MultiLabelSegmentation as DICOM Segmentation files, one per group.
+     *
+     * Group 0 is written to the output location; the file of group g inserts "_<g>" before the
+     * extension of the file name, or appends it if the file name has none. The writer adds no
+     * extension of its own. Group names are not kept: DICOM SEG has no field meant for them.
+     * Native NRRD and the segmentation stack keep them.
+     *
+     * The segments of a group are numbered 1..N in ascending label value order, so the labels of a
+     * group keep their values only if these are 1..N; otherwise each label gets its rank. A Segment
+     * Label or Segment Algorithm Name longer than the 64 characters of VR LO is cut and marked with
+     * "[...]", with a warning. BodyPartExamined is taken only from the segmentation's property
+     * DICOM.0018.0015, which a segmentation inherits from the image it is created from, and left
+     * out without it; SeriesDescription is taken from DICOM.0008.103E.
+     *
+     * \throw DICOMSegStrictModeException in strict mode if the segmentation lacks a contract item
+     * (DICOMSegmentationPropertyHelper::Validate) or a source-image relation with per-slice UIDs;
+     * a retry in synthetic mode can succeed.
+     * \throw mitk::Exception naming the label for a label value above 32767, a label name with a
+     * backslash or with non-ASCII characters, or a Tracking UID that is no valid UID; naming the
+     * relation for a source-image relation without source series; and if synthetic mode cannot
+     * fill a contract item, if no source-image reference lies on a slice of the segmentation, or if
+     * dcmqi fails. A failure in a later group leaves the files of the earlier groups.
+     */
     void Write() override;
 
     /** \brief Return the confidence level for writing the given data as a DICOM segmentation. */

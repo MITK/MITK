@@ -262,6 +262,32 @@ namespace
     return DescribeLabels(segmentation, GetSelectedTime());
   }
 
+  /**
+   * The labels of the preview of a tool that adds labels, as the confirm adds them: to the group of the active
+   * label, with values that only the confirm gives them. The preview's own groups and values mean nothing there.
+   */
+  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool)
+  {
+    auto* preview = tool->GetPreviewSegmentation();
+
+    if (preview == nullptr)
+      return nlohmann::json::array();
+
+    const auto* working = GetToolManager()->GetWorkingData(0);
+    const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
+    const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
+
+    auto labels = DescribeLabels(preview);
+
+    for (auto& label : labels)
+    {
+      label.erase("value");
+      label["group"] = group;
+    }
+
+    return labels;
+  }
+
   nlohmann::json DescribeGroup(mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
     auto labels = nlohmann::json::array();
@@ -644,15 +670,13 @@ namespace
 
   nlohmann::json DescribeVoxTell(mitk::VoxTellTool* tool)
   {
-    auto* preview = tool->GetPreviewSegmentation();
-
     return {
       { "installed", IsInstalled(tool).value_or(false) },
       { "model_loaded", tool->IsModelLoaded() },
       { "prompts", tool->GetPrompts() },
       { "prompts_without_result", tool->GetPromptsWithoutResult() },
       { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", preview != nullptr ? DescribeLabels(preview) : nlohmann::json::array() }
+      { "preview_labels", DescribePreviewLabels(tool) }
     };
   }
 
@@ -750,8 +774,6 @@ namespace
   /** \param withTasks Whether to list the tasks, which only GET does, as there are many. */
   nlohmann::json DescribeTotalSegmentator(mitk::TotalSegmentatorTool* tool, bool withTasks)
   {
-    auto* preview = tool->GetPreviewSegmentation();
-
     nlohmann::json state = {
       { "installed", mitk::TotalSegmentatorTool::IsInstalled() },
       { "initialized", tool->IsInitialized() },
@@ -762,7 +784,7 @@ namespace
       { "roi_subset", tool->GetRoiSubset() },
       { "running", tool->IsUpdating() },
       { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", preview != nullptr ? DescribeLabels(preview) : nlohmann::json::array() }
+      { "preview_labels", DescribePreviewLabels(tool) }
     };
 
     if (withTasks && tool->IsInitialized())
@@ -1697,7 +1719,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   voxTell.Summary = "Get the state of VoxTell, which segments structures named in text";
   voxTell.Description =
     "Needs VoxTell as active tool. Returns {data: {installed, model_loaded, prompts, prompts_without_result, "
-    "error, preview_labels: [label]}}, preview_labels being the unconfirmed result, one label per prompt.";
+    "error, preview_labels: [label]}}, preview_labels being the unconfirmed result, one label per prompt, as GET "
+    ".../labels describes labels but without value: group is the group of the active label, where the confirm adds "
+    "them, and they get their values with the confirm.";
   voxTell.Handler = [server](const RestRequest& request) {
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeVoxTell(GetVoxTell(request.Path)); }));
   };
@@ -1998,7 +2022,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "available, speeds: [{name: standard | fast | fastest, resolution_mm}], roi_subset, class_count}]}}. task, speed "
     "and roi_subset are what the next run segments; an empty roi_subset means all classes of the task. available is "
     "false for licensed tasks without a license. The tasks are there once TotalSegmentator has started (initialized). "
-    "preview_labels are the unconfirmed result of the last run. Device and license are settings of the user.";
+    "preview_labels are the unconfirmed result of the last run, as GET .../labels describes labels but without "
+    "value: group is the group of the active label, where the confirm adds them, and they get their values with the "
+    "confirm. Device and license are settings of the user.";
   totalSegmentator.Handler = [server](const RestRequest& request) {
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeTotalSegmentator(GetTotalSegmentator(request.Path), true); }));
   };

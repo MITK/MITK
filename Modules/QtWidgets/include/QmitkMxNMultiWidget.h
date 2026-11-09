@@ -1357,15 +1357,19 @@ public:
   bool IsApplyingLayout() const;
 
   /**
-  * \brief Keeps the camera of window 'windowId' as the caller set it.
+  * \brief Changes the camera of window 'windowId' by running 'change' on its
+  *        renderer.
   *
-  *   Cells built while the display is hidden are fitted to their size once
-  *   it is shown. A caller that sets a cell's camera explicitly before that
-  *   (e.g. over REST, to an editor whose tab is hidden) calls this, so the
-  *   fit does not replace the camera. Has no effect on a window without a
-  *   pending fit or on an unknown id.
+  *   Callers that set a cell's camera explicitly (e.g. over REST) go through
+  *   this, because the display may be hidden: cells built while it is hidden
+  *   are fitted to their size once it is shown, and such a cell runs 'change'
+  *   again after that fit. What 'change' sets outlasts the fit; what it
+  *   leaves alone is fitted.
+  *
+  * \throws mitk::Exception if 'windowId' names no window with a renderer.
+  *         Whatever 'change' throws on its first run reaches the caller.
   */
-  void DiscardPendingFit(const QString& windowId);
+  void SetCamera(const QString& windowId, const std::function<void(mitk::BaseRenderer*)>& change);
 
   /**
   * \brief Sets the interactions users cannot perform on this widget.
@@ -2297,8 +2301,11 @@ private:
   bool m_ApplyingLayout = false;
   /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
   *          hidden; they are fitted once it is shown, unless they are
-  *          removed or their camera was set ('DiscardPendingFit') first. */
+  *          removed first. */
   std::vector<QString> m_CellsToFitWhenShown;
+  /** \brief The 'SetCamera' changes of cells in 'm_CellsToFitWhenShown', in
+  *          call order; they run again after the cell's fit. */
+  std::map<QString, std::vector<std::function<void(mitk::BaseRenderer*)>>> m_CameraChangesAfterFit;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
   *          see 'IsApplyingLayout'. */
   bool m_LayoutLoadPending = false;

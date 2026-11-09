@@ -129,6 +129,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(Apply_WhileHidden_EndsAsAppliedWhileShown);
   MITK_TEST(Apply_WhileHidden_CameraSetBeforeShowIsKept);
+  MITK_TEST(Apply_WhileHidden_PartialCameraChange_KeepsTheFit);
+  MITK_TEST(Apply_WhileHidden_PartialCameraChangeOnThreeDWindow_KeepsTheViewInitialization);
   MITK_TEST(Apply_WhileShowing_LeavesNoStaleFitForReusedIds);
   MITK_TEST(GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards);
   MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
@@ -1472,8 +1474,8 @@ public:
     const VtkSizeFollowsWidget vtkSizes;
     editor->ApplyLayout(doc);
     const double zoomed = 0.5 * fitted.at("mxn__wide");
-    CameraOf(*editor, "mxn__wide")->SetParallelScale(zoomed);
-    editor->DiscardPendingFit("mxn__wide");
+    editor->SetCamera("mxn__wide", [zoomed](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoomed); });
     editor->show();
     Pump();
 
@@ -1481,6 +1483,70 @@ public:
                                          CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The other window is fitted to its size", fitted.at("mxn__narrow"),
                                          CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_WhileHidden_PartialCameraChange_KeepsTheFit()
+  {
+    // A camera change that leaves the zoom alone, such as a pan over REST,
+    // must not cost a window built while hidden the fit to its size.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    double focalPoint[3];
+    double position[3];
+    CameraOf(*editor, "mxn__narrow")->GetFocalPoint(focalPoint);
+    CameraOf(*editor, "mxn__narrow")->GetPosition(position);
+    focalPoint[0] += 3.0;
+    position[0] += 3.0;
+    editor->SetCamera("mxn__narrow", [focalPoint, position](mitk::BaseRenderer* renderer)
+                      {
+                        auto* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+                        camera->SetFocalPoint(focalPoint);
+                        camera->SetPosition(position);
+                      });
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+    double shownFocalPoint[3];
+    CameraOf(*editor, "mxn__narrow")->GetFocalPoint(shownFocalPoint);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The pan is kept", focalPoint[0], shownFocalPoint[0], 1e-6);
+  }
+
+  void Apply_WhileHidden_PartialCameraChangeOnThreeDWindow_KeepsTheViewInitialization()
+  {
+    // A 3D window built while hidden is initialized as a 3D view once shown;
+    // until then it has the camera of its 2D construction, which shows
+    // nothing. Changing only the view angle must not keep that camera.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
+          "links": { "selection": "main", "time": "global" } }
+      ] }
+    })json"));
+    editor->SetCamera("mxn__volume", [](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(20.0); });
+    editor->show();
+    Pump();
+
+    auto* camera = CameraOf(*editor, "mxn__volume");
+    const double halfHeight = QmitkMxN3DCamera::VisibleHalfHeight(camera);
+    CPPUNIT_ASSERT_MESSAGE("The 3D window frames the 16 mm image; it shows a half-height of "
+                             + std::to_string(halfHeight) + " mm",
+                           halfHeight < 100.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The view angle is kept", 20.0, camera->GetViewAngle(), 1e-6);
   }
 
   void Apply_WhileShowing_LeavesNoStaleFitForReusedIds()

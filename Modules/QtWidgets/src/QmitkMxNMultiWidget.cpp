@@ -1189,6 +1189,7 @@ void QmitkMxNMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
   m_SeenRenderModes.erase(widgetName);
   m_TwoDViews.erase(widgetName);
   std::erase(m_CellsToFitWhenShown, widgetName);
+  m_CameraChangesAfterFit.erase(widgetName);
   QmitkAbstractMultiWidget::RemoveRenderWindowWidget(widgetName);
 }
 
@@ -3615,12 +3616,39 @@ void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
   {
     return;  // Hidden again: deferred once more.
   }
+  // A cell whose camera was set while it waited keeps that camera, so it is
+  // not among the cells that adapt below.
+  std::vector<QString> adapting;
+  for (const auto& windowId : windowIds)
+  {
+    const auto changes = m_CameraChangesAfterFit.find(windowId);
+    if (changes == m_CameraChangesAfterFit.end())
+    {
+      adapting.push_back(windowId);
+      continue;
+    }
+    const auto cell = this->GetRenderWindowWidget(windowId);
+    for (const auto& change : changes->second)
+    {
+      try
+      {
+        change(RendererOf(cell.get()));
+      }
+      catch (const std::exception& e)
+      {
+        MITK_WARN << "MxN display: re-applying a camera change to '" << windowId.toStdString()
+                  << "' after its deferred fit failed: " << e.what();
+      }
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
+  }
+  m_CameraChangesAfterFit.clear();
   // The links converged while the cells still had their construction camera;
   // the deferred cells adapt to the members that kept theirs, and a group
   // made only of them to its seed - as after a fit while shown.
   try
   {
-    this->ReconvergeGeometryRelativeGroups(windowIds);
+    this->ReconvergeGeometryRelativeGroups(adapting);
   }
   catch (const mitk::Exception& e)
   {
@@ -3941,9 +3969,20 @@ bool QmitkMxNMultiWidget::IsApplyingLayout() const
   return m_ApplyingLayout || m_LayoutLoadPending;
 }
 
-void QmitkMxNMultiWidget::DiscardPendingFit(const QString& windowId)
+void QmitkMxNMultiWidget::SetCamera(const QString& windowId, const std::function<void(mitk::BaseRenderer*)>& change)
 {
-  std::erase(m_CellsToFitWhenShown, windowId);
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  auto* renderer = RendererOf(cell.get());
+  if (nullptr == renderer)
+  {
+    mitkThrow() << "SetCamera: '" << windowId.toStdString() << "' names no window with a renderer.";
+  }
+  change(renderer);
+  if (std::find(m_CellsToFitWhenShown.begin(), m_CellsToFitWhenShown.end(), windowId) != m_CellsToFitWhenShown.end())
+  {
+    m_CameraChangesAfterFit[windowId].push_back(change);
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
 }
 
 void QmitkMxNMultiWidget::SetLayoutLocks(QmitkMxNLayoutLocks locks)

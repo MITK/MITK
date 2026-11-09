@@ -709,10 +709,13 @@ namespace mitk
     rwb->SetMxNCameraSetter(
       [](const std::string& id, const mitk::CameraPatch& patch)
       {
-        ApplyCameraPatchToRenderer(ResolveMxNRenderer(id), patch, id);
-        // The editor's tab may be hidden; the patch outlasts its first show.
+        // Resolved first for the bridge's typed errors.
+        ResolveMxNRenderer(id);
+        // The editor's tab may be hidden; the editor applies the patch again
+        // after the fit it defers until the tab is shown.
         const auto snap = ResolveMxNRenderWindow(id);
-        snap.multiWidget->DiscardPendingFit(snap.id);
+        snap.multiWidget->SetCamera(snap.id, [patch, id](mitk::BaseRenderer* renderer)
+                                    { ApplyCameraPatchToRenderer(renderer, patch, id); });
       });
 
     rwb->SetMxNSelectedSliceGetter(

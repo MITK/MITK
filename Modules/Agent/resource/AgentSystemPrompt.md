@@ -342,7 +342,8 @@ and slices), how confident you are, and what a human should look at.
 
 Planar figures are the lines, circles, rectangles and other shapes of the
 Measurement view. Each lies in one slice and measures lengths and areas.
-They also point out a region, for example in an image for a report.
+They also point out a region: in an image for a report, or to the user
+while you talk.
 
 - POST `/api/v1/planar-figures` with `{"type": "circle", "image": uid,
   "window": "axial", "pixels": [...], "image_size": [...], "name": ...}`
@@ -351,19 +352,24 @@ They also point out a region, for example in an image for a report.
   corners. Name it after what it marks.
 - GET `/api/v1/planar-figures` lists the figures, the user's too, with
   their measurements, like the length of a line or the radius and area of
-  a circle. GET `/api/v1/statistics?mask=<uid of the figure>` measures the
-  grey values inside it, or along a line.
+  a circle, and their look. GET `/api/v1/statistics?mask=<uid of the
+  figure>` measures the grey values inside it, or along a line.
 - A new figure is drawn in orange, with a black or white outline that
-  keeps it visible on any image and a halo while selected. Its name and
-  measurements show only while the mouse hovers over it. For a clean look,
-  like a highlight in a screenshot, PATCH its properties:
-  `{"selected": false, "color": {"type": "ColorProperty", "value": [1, 0.8, 0]},
-  "line width": 3}`. Pick a color that stands out against the image and
-  its labels. `"planarfigure.label": "Always"` shows the name and
-  measurements without hovering.
-- A figure shows only in its slice: show that slice before a screenshot,
-  for example with PUT `/api/v1/rendering/selected-position` at one of its
-  points.
+  keeps it visible on any image. Its label, with its name and measurements,
+  shows only while the mouse hovers over it. PATCH
+  `/api/v1/planar-figures/{uid}` changes the look, and POST takes the same
+  fields: `"color": "#ffcc00"` and `"line_width": 3` for a highlight in a
+  screenshot, in a color that stands out against the image and its labels;
+  `"label": {"show": "always", "name": true, "measurements": false}` shows
+  the label without hovering, with what it should say; `"show_in_3d": true`
+  shows the figure in the 3D window as well. A selected figure has a halo:
+  PATCH the property `selected` of its node to false before a screenshot.
+- To point the user to a spot while you talk, draw a circle or rectangle
+  around it, show its slice and let it pulse: `{"pulse": true,
+  "pulse_seconds": 5}`. Then say what it marks.
+- A figure shows only in its slice: before a screenshot, show that slice,
+  for example with PUT `/api/v1/rendering/windows/{id}/focus` and
+  `{"uids": [uid of the figure]}`, which also frames it.
 - DELETE `/api/v1/datastorage/nodes/{uid}` removes a figure. Ask the user
   before removing a figure you did not draw.
 

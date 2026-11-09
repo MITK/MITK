@@ -42,6 +42,11 @@ class mitkMultiLabelSegmentationStackReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadWithoutGroupsFails);
   MITK_TEST(TestReadEmptyGroupsFails);
   MITK_TEST(TestReadMalformedLabelFails);
+  MITK_TEST(TestReadNonIntegerVersionFails);
+  MITK_TEST(TestReadMalformedPropertiesFails);
+  MITK_TEST(TestReadNonStringUidFails);
+  MITK_TEST(TestReadNonStringFileFails);
+  MITK_TEST(TestReadNumberOverflowFails);
   MITK_TEST(TestReadUnopenableFileFails);
   MITK_TEST(TestReadMissingImageFails);
   MITK_TEST(TestReadUnreadableImageFails);
@@ -313,6 +318,57 @@ public:
     mitk::test::WriteJsonFile(path, content);
 
     mitk::test::AssertReadFails(path, ReaderDescription(), "malformed-label.mitklabel.json");
+  }
+
+  void TestReadNonIntegerVersionFails()
+  {
+    const auto path = this->SaveValidStack("string-version.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["version"] = "four";
+    mitk::test::WriteJsonFile(path, content);
+
+    mitk::test::AssertReadFails(path, ReaderDescription(), "string-version.mitklabel.json");
+  }
+
+  void TestReadMalformedPropertiesFails()
+  {
+    const auto path = this->SaveValidStack("malformed-properties.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["properties"] = 42;
+    mitk::test::WriteJsonFile(path, content);
+
+    mitk::test::AssertReadFails(path, ReaderDescription(), "malformed-properties.mitklabel.json");
+  }
+
+  void TestReadNonStringUidFails()
+  {
+    const auto path = this->SaveValidStack("numeric-uid.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["uid"] = 42;
+    mitk::test::WriteJsonFile(path, content);
+
+    mitk::test::AssertReadFails(path, ReaderDescription(), "numeric-uid.mitklabel.json");
+  }
+
+  // A number is read as an IntProperty, so no group image is found and the reader looks for the
+  // first "_file" anywhere in the groups to initialize the segmentation.
+  void TestReadNonStringFileFails()
+  {
+    const auto path = this->SaveValidStack("numeric-file.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["groups"][0]["_file"] = 1;
+    mitk::test::WriteJsonFile(path, content);
+
+    mitk::test::AssertReadFails(path, ReaderDescription(), "numeric-file.mitklabel.json");
+  }
+
+  // nlohmann reports a number out of range as out_of_range, not as parse_error.
+  void TestReadNumberOverflowFails()
+  {
+    const auto path = this->GetTempFilePath("overflow.mitklabel.json");
+    this->WriteTextFile(path, R"({"version": 4, "type": "org.mitk.multilabel.segmentation.stack", "groups": [], "x": 1e999})");
+
+    AssertReadFailsIgnoringConfidence(path, "overflow.mitklabel.json");
   }
 
   void TestReadUnopenableFileFails()

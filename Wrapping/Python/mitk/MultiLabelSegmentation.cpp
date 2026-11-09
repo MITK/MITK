@@ -979,7 +979,7 @@ The same surface is reachable via :py:meth:`load` and
       "* establishes a source-image relation via\n"
       "  :py:func:`mitk.relations.segmentation.connect_source_image`, and\n"
       "* transfers the reference image's patient identity, study identity,\n"
-      "  and frame-of-reference UID via the corresponding\n"
+      "  frame-of-reference UID and body part examined via the corresponding\n"
       "  :py:mod:`mitk.dicom.segmentation` ``inherit_*`` functions.\n"
       "\n"
       "These steps are the common-case expectation when creating a derived\n"

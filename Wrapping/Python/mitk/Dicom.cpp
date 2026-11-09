@@ -38,9 +38,10 @@ void InitDicom(py::module_& m)
     "\n"
     "Concerned with the segmentation as a DICOM SEG instance: validating\n"
     "the property set required for export, synthesizing missing items, and\n"
-    "transferring patient/study/frame-of-reference identity from a source\n"
-    "image when the typical-case inheritance is wanted. Source-image\n"
-    "relations themselves live in :py:mod:`mitk.relations.segmentation`.\n");
+    "transferring patient/study/frame-of-reference identity and the body\n"
+    "part examined from a source image when the typical-case inheritance is\n"
+    "wanted. Source-image relations themselves live in\n"
+    ":py:mod:`mitk.relations.segmentation`.\n");
 
   py::class_<DICOMSegmentationPropertyHelper::MissingItem> missingItem(
     segmentation, "MissingItem",
@@ -171,5 +172,21 @@ void InitDicom(py::module_& m)
     "\n"
     ":param seg: The segmentation to mutate.\n"
     ":param source: Image to read the frame-of-reference identity from.\n"
+    ":param overwrite: See :py:func:`inherit_patient_from_source`.\n");
+
+  segmentation.def("inherit_body_part_examined_from_source",
+    [](MultiLabelSegmentation* seg, const Image* source, bool overwrite) {
+      DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource(seg, source, overwrite);
+    },
+    py::arg("seg"), py::arg("source"), py::arg("overwrite") = true,
+    "Copy BodyPartExamined (0018,0015) from ``source`` onto ``seg``, if the\n"
+    "source carries it.\n"
+    "\n"
+    "A segmentation examines nothing of its own; its series covers the body\n"
+    "part of the series it is derived from. The DICOM SEG writer takes\n"
+    "BodyPartExamined only from this property.\n"
+    "\n"
+    ":param seg: The segmentation to mutate.\n"
+    ":param source: Image to read the body part examined from.\n"
     ":param overwrite: See :py:func:`inherit_patient_from_source`.\n");
 }

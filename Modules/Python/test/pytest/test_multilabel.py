@@ -1613,3 +1613,22 @@ class TestHtmlRepr:
         assert "Organs" in html
         assert "Liver" in html
         assert "Kidney" in html
+
+
+# ---------------------------------------------------------------------------
+# DICOM identity inheritance
+# ---------------------------------------------------------------------------
+
+class TestInheritBodyPartExamined:
+
+    def test_copies_body_part_examined(self, seg, ref_image):
+        # Set after the seg exists, so only the call under test can copy it.
+        ref_image.set_property("DICOM.0018.0015", "CHEST")
+        mitk.dicom.segmentation.inherit_body_part_examined_from_source(seg, ref_image)
+        assert seg.get_property("DICOM.0018.0015") == "CHEST"
+
+    def test_keeps_existing_value_without_overwrite(self, seg, ref_image):
+        ref_image.set_property("DICOM.0018.0015", "CHEST")
+        seg.set_property("DICOM.0018.0015", "HEAD")
+        mitk.dicom.segmentation.inherit_body_part_examined_from_source(seg, ref_image, overwrite=False)
+        assert seg.get_property("DICOM.0018.0015") == "HEAD"

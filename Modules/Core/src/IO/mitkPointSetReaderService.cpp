@@ -19,28 +19,42 @@ found in the LICENSE file.
 
 // STL
 #include <charconv>
-#include <cstring>
 #include <fstream>
 #include <iostream>
+#include <string_view>
 
 #include <tinyxml2.h>
 
 namespace
 {
+  template <typename T>
+  T ParseNumber(const tinyxml2::XMLElement *parent, const char *name)
+  {
+    const auto *child = parent->FirstChildElement(name);
+    const std::string_view text = child != nullptr && child->GetText() != nullptr ? child->GetText() : "";
+
+    const auto first = text.find_first_not_of(" \t\r\n");
+    if (first == std::string_view::npos)
+      mitkThrow() << "Missing or empty <" << name << "> element.";
+
+    const auto number = text.substr(first, text.find_last_not_of(" \t\r\n") - first + 1);
+    const char *end = number.data() + number.size();
+
+    T value{};
+    const auto [last, error] = std::from_chars(number.data(), end, value);
+
+    if (error != std::errc() || last != end)
+      mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+
+    return value;
+  }
+
   mitk::TimeStepType ReadTimeStep(const tinyxml2::XMLElement *timeSeries)
   {
-    const auto *idElement = timeSeries->FirstChildElement("time_series_id");
-    const char *text = idElement != nullptr ? idElement->GetText() : nullptr;
+    const auto timeStep = ParseNumber<mitk::TimeStepType>(timeSeries, "time_series_id");
 
-    if (text == nullptr)
-      mitkThrow() << "Time series without time_series_id.";
-
-    const char *end = text + std::strlen(text);
-    mitk::TimeStepType timeStep = 0;
-    const auto [last, error] = std::from_chars(text, end, timeStep);
-
-    if (error != std::errc() || last != end || timeStep == mitk::TIMESTEP_INVALID)
-      mitkThrow() << "Invalid time_series_id \"" << text << "\".";
+    if (timeStep == mitk::TIMESTEP_INVALID)
+      mitkThrow() << "Invalid <time_series_id> \"" << timeStep << "\".";
 
     return timeStep;
   }
@@ -75,7 +89,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
     for (auto *currentPointSetElement =
            docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
          currentPointSetElement != nullptr;
-         currentPointSetElement = currentPointSetElement->NextSiblingElement())
+         currentPointSetElement = currentPointSetElement->NextSiblingElement("point_set"))
     {
       mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
 
@@ -139,22 +153,16 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
   if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {
     for (auto *currentPoint = currentTimeSeries->FirstChildElement("point"); currentPoint != nullptr;
-         currentPoint = currentPoint->NextSiblingElement())
+         currentPoint = currentPoint->NextSiblingElement("point"))
     {
-      unsigned int id(0);
-      auto spec((mitk::PointSpecificationType)0);
-      double x(0.0);
-      double y(0.0);
-      double z(0.0);
+      const auto id = ParseNumber<mitk::PointSet::PointIdentifier>(currentPoint, "id");
 
-      id = atoi(currentPoint->FirstChildElement("id")->GetText());
+      auto spec = mitk::PTUNDEFINED;
       if (currentPoint->FirstChildElement("specification") != nullptr)
-      {
-        spec = (mitk::PointSpecificationType)atoi(currentPoint->FirstChildElement("specification")->GetText());
-      }
-      x = atof(currentPoint->FirstChildElement("x")->GetText());
-      y = atof(currentPoint->FirstChildElement("y")->GetText());
-      z = atof(currentPoint->FirstChildElement("z")->GetText());
+        spec = static_cast<mitk::PointSpecificationType>(ParseNumber<int>(currentPoint, "specification"));
+      const auto x = ParseNumber<double>(currentPoint, "x");
+      const auto y = ParseNumber<double>(currentPoint, "y");
+      const auto z = ParseNumber<double>(currentPoint, "z");
 
       mitk::Point3D point;
       mitk::FillVector3D(point, x, y, z);

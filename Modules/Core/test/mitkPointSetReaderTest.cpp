@@ -20,15 +20,19 @@ found in the LICENSE file.
 
 namespace
 {
-  /** A point set file with one time series that starts with the given elements and holds one point. */
-  std::string CreatePointSetFile(const std::string &timeSeriesStart, const std::string &afterTimeSeries = "")
+  const std::string DefaultPoint =
+    "<point><id>0</id><specification>0</specification><x>10</x><y>20</y><z>30</z></point>";
+
+  /** A point set file with one time series that starts with the given elements and holds the given points. */
+  std::string CreatePointSetFile(const std::string &timeSeriesStart,
+                                 const std::string &afterTimeSeries = "",
+                                 const std::string &points = DefaultPoint,
+                                 const std::string &afterPointSet = "")
   {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
            "<point_set_file><file_version>0.1</file_version><point_set><time_series>" +
-           timeSeriesStart +
-           "<point><id>0</id><specification>0</specification><x>10</x><y>20</y><z>30</z></point>"
-           "</time_series>" +
-           afterTimeSeries + "</point_set></point_set_file>";
+           timeSeriesStart + points + "</time_series>" + afterTimeSeries + "</point_set>" + afterPointSet +
+           "</point_set_file>";
   }
 
   std::vector<mitk::BaseData::Pointer> Read(mitk::IFileReader *reader, const std::string &content)
@@ -101,6 +105,31 @@ int mitkPointSetReaderTest(int argc, char *argv[])
     resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());
     MITK_TEST_CONDITION_REQUIRED(resultPS.IsNotNull() && resultPS->GetTimeSteps() == 1 && resultPS->GetSize(0) == 1,
                                  "Testing unknown element next to the time series");
+
+    // Broken points are rejected instead of being guessed or crashing.
+    const std::string timeStep0 = "<time_series_id>0</time_series_id>";
+    for (const char *point : {"<point><id>0</id><x>ten</x><y>20</y><z>30</z></point>",
+                              "<point><id>0</id><x></x><y>20</y><z>30</z></point>",
+                              "<point><x>10</x><y>20</y><z>30</z></point>",
+                              "<point><id>0</id><y>20</y><z>30</z></point>",
+                              "<point><id>-1</id><x>10</x><y>20</y><z>30</z></point>"})
+      CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile(timeStep0, "", point)), mitk::Exception);
+
+    // Spaces around numbers are tolerated, as atoi and atof did.
+    data = Read(reader, CreatePointSetFile("<time_series_id> 0 </time_series_id>", "",
+                                           "<point><id> 0 </id><x> 10 </x><y>20</y><z>30</z></point>"));
+    resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(resultPS.IsNotNull() && resultPS->GetSize(0) == 1 && resultPS->GetPoint(0, 0)[0] == 10.0,
+                                 "Testing spaces around numbers");
+
+    // Unknown elements between points and after the point set are ignored.
+    data = Read(reader, CreatePointSetFile(timeStep0, "",
+                                           DefaultPoint + "<comment>edited by hand</comment>" +
+                                             "<point><id>1</id><x>40</x><y>50</y><z>60</z></point>",
+                                           "<comment>edited by hand</comment>"));
+    resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(data.size() == 1 && resultPS.IsNotNull() && resultPS->GetSize(0) == 2,
+                                 "Testing unknown elements between points and after the point set");
   }
 
   // always end with this!

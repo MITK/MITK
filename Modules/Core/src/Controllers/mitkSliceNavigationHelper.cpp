@@ -37,13 +37,8 @@ unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry*
 
   // get the BaseGeometry of the selected time point
   const auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  const auto currentGeometry = timeGeometry->GetGeometryForTimePoint(selectedTimePoint);
-  if (nullptr == currentGeometry)
-  {
-    // time point not valid for the ime geometry
-    mitkThrow() << "Cannot extract a base geometry. A time point is selected that is not covered by"
-                << "the given time geometry. Selected time point: " << selectedTimePoint;
-  }
+  const auto currentGeometry =
+    timeGeometry->GetGeometryForTimeStep(timeGeometry->TimePointToClampedTimeStep(selectedTimePoint));
 
   const auto* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(currentGeometry.GetPointer());
   if (nullptr == slicedGeometry)
@@ -110,13 +105,7 @@ mitk::TimeGeometry::Pointer mitk::SliceNavigationHelper::CreateOrientedTimeGeome
 
   // get the BaseGeometry of the selected time point
   const auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  currentGeometry = timeGeometry->GetGeometryForTimePoint(selectedTimePoint);
-  if(nullptr == currentGeometry)
-  {
-    // time point not valid for the time geometry
-    mitkThrow() << "Cannot extract a base geometry. A time point is selected that is not covered by"
-                << "the given time geometry. Selected time point: " << selectedTimePoint;
-  }
+  currentGeometry = timeGeometry->GetGeometryForTimeStep(timeGeometry->TimePointToClampedTimeStep(selectedTimePoint));
 
   slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializePlanes(currentGeometry, orientation, top, frontside, rotated);
@@ -209,16 +198,14 @@ bool mitk::SliceNavigationHelper::IsDisplayedSliceInverted(BaseRenderer* rendere
 
   const auto* inputTimeGeometry = sliceNavigation->GetInputWorldTimeGeometry();
   const auto* timeNavigation = RenderingManager::GetInstance()->GetTimeNavigationController();
-  if (nullptr == inputTimeGeometry || nullptr == timeNavigation)
+  if (nullptr == inputTimeGeometry || nullptr == timeNavigation || 0 == inputTimeGeometry->CountTimeSteps())
   {
     return false;
   }
 
-  // The same time step fallback CreateWorldGeometry uses to build the
-  // renderer planes.
-  const auto selectedTimeStep = timeNavigation->GetSelectedTimeStep();
+  // The same time step CreateWorldGeometry uses to build the renderer planes.
   const BaseGeometry::ConstPointer referenceGeometry = inputTimeGeometry->GetGeometryForTimeStep(
-    inputTimeGeometry->IsValidTimeStep(selectedTimeStep) ? selectedTimeStep : 0);
+    inputTimeGeometry->TimePointToClampedTimeStep(timeNavigation->GetSelectedTimePoint()));
   const auto* rendererGeometry = renderer->GetCurrentWorldGeometry();
   if (referenceGeometry.IsNull() || nullptr == rendererGeometry)
   {

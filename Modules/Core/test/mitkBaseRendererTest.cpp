@@ -44,6 +44,7 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
   MITK_TEST(New_SelectedTimeStepPastGlobalGrid_ThrowsAndAcquiresNothing);
   MITK_TEST(SetTimeStep_OwnStep_ShowsItsTimePoint);
   MITK_TEST(SetTimeStep_NoWorldTimeGeometry_Throws);
+  MITK_TEST(SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow);
   CPPUNIT_TEST_SUITE_END();
 
   vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
@@ -310,6 +311,28 @@ public:
     auto renderer = mitk::VtkPropRenderer::New("mitkBaseRendererTest.NoWorldTimeGeometry", renderWindow);
 
     CPPUNIT_ASSERT_THROW(renderer->SetTimeStep(1), mitk::Exception);
+  }
+
+  void SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow()
+  {
+    this->SetWorldInput(CreateTimeGeometry(3, 1.0));
+    SetGlobalTimeGeometry(CreateTimeGeometry(3, 1.0));
+    SelectGlobalTimeStep(1);
+
+    // Spatially equal to the world geometry; time steps [0, 1) and [1, 2).
+    const auto referenceGeometry = CreateTimeGeometry(2, 1.0);
+    m_Renderer->SetInteractionReferenceGeometry(referenceGeometry);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: aligned inside the reference's time steps",
+                           m_Renderer->GetReferenceGeometryAligned());
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Stepping past the reference's time steps", SelectGlobalTimeStep(2));
+    CPPUNIT_ASSERT_MESSAGE("Aligned past the reference's time steps", m_Renderer->GetReferenceGeometryAligned());
+
+    m_Renderer->SetInteractionReferenceGeometry(nullptr);
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Setting the reference past its time steps",
+                                    m_Renderer->SetInteractionReferenceGeometry(referenceGeometry));
+    CPPUNIT_ASSERT_MESSAGE("Aligned after setting the reference past its time steps",
+                           m_Renderer->GetReferenceGeometryAligned());
   }
 };
 

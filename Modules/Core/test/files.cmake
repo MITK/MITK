@@ -87,6 +87,7 @@ set(MODULE_TESTS
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   mitkStepperTest.cpp
+  mitkTimeNavigationControllerTest.cpp
   mitkRenderingManagerTest.cpp
   mitkRenderingManagerSuspendTest.cpp
   mitkRenderingManagerAnimationTest.cpp

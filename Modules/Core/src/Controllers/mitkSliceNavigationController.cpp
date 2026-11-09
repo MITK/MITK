@@ -286,8 +286,9 @@ namespace mitk
       return nullptr;
     }
 
-    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
-    return m_CreatedWorldGeometry->GetGeometryForTimeStep(selectedTimestep);
+    const auto selectedTimePoint = timeNavigationController->GetSelectedTimePoint();
+    return m_CreatedWorldGeometry->GetGeometryForTimeStep(
+      m_CreatedWorldGeometry->TimePointToClampedTimeStep(selectedTimePoint));
   }
 
   const PlaneGeometry* SliceNavigationController::GetCurrentPlaneGeometry()
@@ -401,21 +402,15 @@ namespace mitk
     SlicedGeometry3D::Pointer slicedWorldGeometry;
     BaseGeometry::ConstPointer currentGeometry;
 
-    // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the current time step
-    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
-    if (m_InputWorldTimeGeometry->IsValidTimeStep(selectedTimestep))
-    {
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep);
-    }
-    else
-    {
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
-    }
+    // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the selected time point
+    const auto selectedTimeStep =
+      m_InputWorldTimeGeometry->TimePointToClampedTimeStep(timeNavigationController->GetSelectedTimePoint());
+    currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimeStep);
 
     if (AnatomicalPlane::Original == m_ViewDirection)
     {
       slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
-        m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep).GetPointer());
+        m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimeStep).GetPointer());
       if (slicedWorldGeometry.IsNull())
       {
         slicedWorldGeometry = SlicedGeometry3D::New();

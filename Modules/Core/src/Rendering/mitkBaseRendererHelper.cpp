@@ -71,14 +71,8 @@ bool mitk::BaseRendererHelper::IsRendererGeometryAlignedWithGeometry(BaseRendere
     return false;
   }
 
-  auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  const BaseGeometry* workingImageBaseGeometry = orientedTimeGeometry->GetGeometryForTimePoint(selectedTimePoint);
-  if (nullptr == workingImageBaseGeometry)
-  {
-    // time point not valid for the time geometry
-    mitkThrow() << "Cannot extract a base geometry. A time point is selected that is not covered by"
-                << "the given time geometry. Selected time point: " << selectedTimePoint;
-  }
+  const BaseGeometry* workingImageBaseGeometry = orientedTimeGeometry->GetGeometryForTimeStep(
+    orientedTimeGeometry->TimePointToClampedTimeStep(renderer->GetTime()));
 
   bool geometryIsEqual =
     Equal(*workingImageBaseGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), eps, true);

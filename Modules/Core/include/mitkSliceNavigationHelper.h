@@ -28,8 +28,8 @@ namespace mitk
     /**
     * \brief Select a specific slice from the given time geometry given a 3D point.
     *
-    * The function uses the currently selected time point to retrieve the current base geometry from
-    * the given time geometry.
+    * The function uses the time step of the given time geometry for the selected time point,
+    * clamped to its valid time steps, to retrieve the current base geometry.
     * If this base geometry is a SlicedGeometry3D, the best fitting slice is computed by projecting
     * the point onto the plane geometry of this SlicedGeometry.
     * The slice with the shortest distance to the point is returned as the selected slice.
@@ -37,19 +37,20 @@ namespace mitk
     * \param timeGeometry  The TimeGeometry of which the slice should be selected.
     * \param point         The Point3D which is used to select the specific slice.
     *
-    * \pre The given TimeGeometry must cover the currently selected time point. If not, an exception is thrown.
-    *      If the given TimeGeomety is a nullptr, -1 is returned.
+    * If the given TimeGeometry is a nullptr, -1 is returned.
     *
     * \return The selected slice as unsigned int. If the computed slice is negative, "0" (zero) is
     *         returned as the selected slice.
+    *
+    * \throws mitk::Exception if the given TimeGeometry has no time steps.
     */
     MITKCORE_EXPORT unsigned int SelectSliceByPoint(const TimeGeometry* timeGeometry, const Point3D& point);
 
     /**
     * \brief Create a new time geometry, which is oriented with the given plane orientation.
     *
-    * The function uses the currently selected time point to retrieve the current base geometry from
-    * the given time geometry.
+    * The function uses the time step of the given time geometry for the selected time point,
+    * clamped to its valid time steps, to retrieve the current base geometry.
     * A new SlicedGeometry3D is created and initialized with the given parameters and the extracted base geometry.
     * This new SlicedGeometry3D is then used to replace the geometries of each time step of a cloned version
     * of the given TimeGeometry. This allows to only replace the contained geometries for each time step,
@@ -62,10 +63,11 @@ namespace mitk
     * \param rotated            Rotates the plane by 180 degree around its normal.
     *                           s.a. PlaneGeometry::InitializeStandardPlane
     *
-    * \pre The given TimeGeometry must cover the currently selected time point. If not, an exception is thrown.
-    *      If the given TimeGeomety is a nullptr, a nullptr is returned immediately.
+    * If the given TimeGeometry is a nullptr, a nullptr is returned immediately.
     *
     * \return The created geometry as TimeGeometry.
+    *
+    * \throws mitk::Exception if the given TimeGeometry has no time steps.
     */
     MITKCORE_EXPORT TimeGeometry::Pointer CreateOrientedTimeGeometry(const TimeGeometry* timeGeometry,
                                                                      AnatomicalPlane orientation,
@@ -134,10 +136,11 @@ namespace mitk
     * Code that relates slice positions across renderers (slice offsets, relayed slice steps)
     * must use this one definition so that every renderer agrees on which way is "next".
     *
-    * The reference geometry is the renderer's slice navigation input geometry at the selected
-    * time step (falling back to the first one, as the renderer planes do). A renderer that is
-    * not set up yet (no input or world geometry) or shows an 'Original' view has no slice axis
-    * to follow; its displayed index is the stepper position, and the function returns false.
+    * The reference geometry is the renderer's slice navigation input geometry at its time step
+    * for the selected time point, clamped to its valid time steps, as the renderer planes use it.
+    * A renderer that is not set up yet (no input geometry with time steps or no world geometry)
+    * or shows an 'Original' view has no slice axis to follow; its displayed index is the stepper
+    * position, and the function returns false.
     *
     * \param renderer The renderer to query.
     *

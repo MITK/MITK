@@ -290,6 +290,51 @@ namespace mitk
     }
 
     /**
+     * Builds a single-group segmentation with labelCount labels, for the limits of formats that
+     * count labels. The values run from labelCount down to 1 in insertion order; every label is
+     * attributed like those of BuildRichSegmentation (with DICOM-legal names) and covers one
+     * voxel, and some voxels stay unlabeled. The group is named, and the segmentation carries
+     * DICOM identity tags, a source-image relation, a typed custom property and the unlabeled
+     * lock.
+     */
+    inline MultiLabelSegmentation::Pointer BuildManyLabelSegmentation(unsigned int labelCount)
+    {
+      // 16 voxels per slice of BuildSourceImageWithDICOMIdentity; at least one stays unlabeled.
+      const auto source = BuildSourceImageWithDICOMIdentity("Many^Labels", "MANY-PID-001", "MANY-Study-001",
+        "1.2.826.0.1.3680043.10.999.42.1", "1.2.826.0.1.3680043.10.999.42.2", "1.2.826.0.1.3680043.10.999.42.3",
+        labelCount / 16 + 1);
+
+      auto segmentation = MultiLabelSegmentation::New();
+      segmentation->Initialize(source);
+      SegSourceImageRelationRule::Connect(segmentation, source);
+      segmentation->SetProperty(RichFixtureCustomPropertyName(), IntProperty::New(42));
+      segmentation->SetUnlabeledLabelLock(true);
+      segmentation->SetGroupName(0, "Many labels");
+
+      // Every channel stays at 0.3 or above: dcmqi converts some dark saturated colours from CIELab
+      // to sRGB values below 0, and then cannot read its own metadata of the file.
+      using AT = Label::AlgorithmType;
+      const AT algorithmTypes[] = { AT::MANUAL, AT::AUTOMATIC, AT::SEMIAUTOMATIC };
+      for (auto value = labelCount; value > 0; --value)
+      {
+        const auto name = "Label " + std::to_string(value);
+        const detail::RichLabelSpec spec = { static_cast<Label::PixelType>(value), 0, name, name,
+          { 0.3f + 0.7f * (value % 7) / 6.f, 0.3f + 0.7f * (value % 11) / 10.f, 0.3f + 0.7f * (value % 13) / 12.f },
+          0.1f + (value % 8) / 10.f, value % 2 == 0, value % 3 == 0, algorithmTypes[value % 3], {} };
+        segmentation->AddLabel(detail::BuildRichLabel(spec, true), 0, true, false);
+      }
+
+      {
+        ImageWriteAccessor accessor(segmentation->GetGroupImage(0));
+        auto* voxels = static_cast<Label::PixelType*>(accessor.GetData());
+        for (unsigned int value = 1; value <= labelCount; ++value)
+          voxels[value - 1] = static_cast<Label::PixelType>(value);
+      }
+
+      return segmentation;
+    }
+
+    /**
      * Reads path with the registered reader of the given description. Unlike
      * IOUtil::Load, which turns every exception into a plain mitk::Exception,
      * this lets the reader's own exception through, so tests can assert its

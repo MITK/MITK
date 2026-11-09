@@ -3404,7 +3404,6 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
     }
   }
 
-  const auto groups = layout.document.value("groups", nlohmann::json::object());
   const auto* dataStorage = this->GetDataStorage();
   const auto checkNode = [dataStorage](const mitk::DataNode::Pointer& node, const std::string& where)
   {
@@ -3426,10 +3425,10 @@ void QmitkMxNMultiWidget::ValidateDynamicLayout(const QmitkMxNDynamicLayout& lay
 
   for (const auto& [group, nodes] : layout.groupNodes)
   {
-    if (!groups.contains(group) || 0 == prewalk.selectionGroups.count(group))
+    if (0 == prewalk.selectionGroups.count(group))
     {
       mitkThrow() << "ApplyDynamicLayout: the data of group '" << group
-                  << "' is bound to no selection group the document declares.";
+                  << "' is bound to no group a window of the document links on 'selection'.";
     }
     for (const auto& node : nodes)
     {

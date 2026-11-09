@@ -1205,8 +1205,8 @@ public:
   *   Validates the whole layout first, against the document and the data
   *   storage, and throws before anything changes:
   *   - the document passes the structural checks 'ApplyLayout' runs;
-  *   - every 'groupNodes' entry names a selection group the document
-  *     declares;
+  *   - every 'groupNodes' entry names a group a window of the document
+  *     links on selection;
   *   - every assignment and fit names a window of the document;
   *   - lookup tables only go to windows the document links on LUT;
   *   - volume renderings only go to 3D windows;

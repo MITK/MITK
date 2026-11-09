@@ -99,6 +99,9 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_DynamicSeriesOnDifferentGrids_EveryWindowShowsTheSelectedTime);
   MITK_TEST(Apply_ObjectFormSelectionLinks_Accepted);
   MITK_TEST(Apply_MalformedSelectionLinks_ReportTheLoadersMessage);
+  MITK_TEST(Apply_NonObjectGroups_ReportsTheLoadersMessage);
+  MITK_TEST(Apply_UndeclaredSelectionGroup_ReportsTheLoadersMessage);
+  MITK_TEST(Apply_LazyModeDocument_BindsItsGroups);
   MITK_TEST(Apply_ValidationFailuresChangeNothing);
   MITK_TEST(Cleanup_ReusedIdInheritsNoRendererState);
   MITK_TEST(Cleanup_UnlinkKeepsTheCellsOtherRendererState);
@@ -1377,6 +1380,74 @@ public:
     }
     CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
                            std::string::npos != message.find("without the required 'target' string"));
+  }
+
+  /** The message 'ApplyDynamicLayout' rejects 'layout' with; empty if it
+   *  accepts it. */
+  std::string RejectionOf(const QmitkMxNDynamicLayout& layout)
+  {
+    try
+    {
+      m_Editor->ApplyDynamicLayout(layout);
+    }
+    catch (const mitk::Exception& e)
+    {
+      return e.GetDescription();
+    }
+    return {};
+  }
+
+  void Apply_NonObjectGroups_ReportsTheLoadersMessage()
+  {
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    layout.document["groups"] = nlohmann::json::array();
+
+    const auto message = this->RejectionOf(layout);
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("'groups' field must be a JSON object"));
+  }
+
+  void Apply_UndeclaredSelectionGroup_ReportsTheLoadersMessage()
+  {
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    layout.document.at("groups").erase("anat");
+
+    const auto message = this->RejectionOf(layout);
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("not declared in the 'groups' dict"));
+  }
+
+  void Apply_LazyModeDocument_BindsItsGroups()
+  {
+    // Without 'groups' the layout format registers every group a window
+    // links on selection, so the data bound to those groups has a place.
+    const auto base = this->AddImage("base");
+    const auto first = this->AddMask(base, "first", 5);
+    const auto other = this->AddImage("other");
+    this->ShowEditor();
+    auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Segmentations, { first } } },
+                                 QmitkMxNSharedBaseOptions{ false, true });
+    layout.document.erase("groups");
+
+    CPPUNIT_ASSERT_NO_THROW(m_Editor->ApplyDynamicLayout(layout));
+    Pump();
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      auto* renderer = this->Renderer(descriptor.id);
+      const auto& shown = layout.groupNodes.at(descriptor.selectionGroup.toStdString());
+      for (const auto& node : { base, first, other })
+      {
+        const bool expected = std::find(shown.begin(), shown.end(), node) != shown.end();
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(node->GetName() + " in " + descriptor.id.toStdString(), expected,
+                                     node->IsVisible(renderer));
+      }
+    }
   }
 
   void Apply_ValidationFailuresChangeNothing()

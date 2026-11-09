@@ -1067,7 +1067,7 @@ void mitk::Image::ComputeOffsetTable()
 
 bool mitk::Image::IsValidTimeStep(TimeStepType t) const
 {
-  return ((m_Dimension >= 4 && t <= m_Dimensions[3]) || (t == 0));
+  return ((m_Dimension >= 4 && t < m_Dimensions[3]) || (t == 0));
 }
 
 void mitk::Image::Expand(TimeStepType timeSteps)

@@ -996,27 +996,17 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     return;
   }
 
-  // remove all possible contour markers of the segmentation
+  // Remove all contour markers of the segmentation, but keep their plane positions in the
+  // PlanePositionManagerService: markers address positions by list index, so removing one
+  // would shift the positions of all later markers. Markers of different segmentations can
+  // also share a position.
   mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(
     node, mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
 
-  ctkPluginContext* context = mitk::PluginActivator::getContext();
-  ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
-  mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
-
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
   {
-    std::string nodeName = node->GetName();
-    unsigned int t = nodeName.find_last_of(" ");
-    unsigned int id = atof(nodeName.substr(t + 1).c_str()) - 1;
-
-    service->RemovePlanePosition(id);
-
     this->GetDataStorage()->Remove(it->Value());
   }
-
-  context->ungetService(ppmRef);
-  service = nullptr;
 
   auto image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);

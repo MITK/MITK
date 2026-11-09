@@ -38,12 +38,14 @@ found in the LICENSE file.
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcvrui.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
 #include <dcmtk/dcmfg/fgplanpo.h>
 #include <dcmtk/dcmfg/fgtypes.h>
 #include <dcmtk/dcmseg/segdoc.h>
 
+#include <algorithm>
 #include <cmath>
 #include <initializer_list>
 #include <iomanip>
@@ -111,6 +113,54 @@ namespace
         return false;
     }
     return true;
+  }
+
+  // dcmqi takes label values as short (Itk2DicomConverter), and so does the writer's internal
+  // image type; a larger value would turn negative and its segment would be dropped silently.
+  constexpr auto MAX_WRITABLE_LABEL_VALUE =
+    std::numeric_limits<mitk::DICOMSegmentationIO::itkInternalImageType::PixelType>::max();
+
+  // Segment Label (0062,0005) is LO. The writer writes no Specific Character Set, so the default
+  // repertoire applies: non-ASCII characters are invalid, and a backslash would separate two
+  // values. DCMTK rejects both inside dcmqi; refusing them here names the label.
+  void CheckWritableLabelName(const mitk::Label &label)
+  {
+    const std::string name = label.GetName();
+    if (name.find('\\') != std::string::npos)
+      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
+                  << "a Segment Label must not contain a backslash.";
+    if (std::any_of(name.begin(), name.end(), [](char c) { return static_cast<unsigned char>(c) > 0x7F; }))
+      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
+                  << "a Segment Label must consist of ASCII characters.";
+  }
+
+  // Tracking UID (0062,0021) is UI. dcmqi sets it without checking the result, so DCMTK's
+  // refusal of an invalid value would leave the tag out silently.
+  void CheckWritableTrackingUID(const mitk::Label &label)
+  {
+    const std::string trackingUID = label.GetTrackingUID();
+    if (!trackingUID.empty() && DcmUniqueIdentifier::checkStringValue(trackingUID.c_str(), "1").bad())
+      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: "
+                  << "its Tracking UID \"" << trackingUID << "\" is no valid DICOM UID.";
+  }
+
+  // A value of VR LO has at most 64 characters, which DCMTK does not check on write. Longer values
+  // are cut and marked, so the exported value shows that it is incomplete. The cut never splits a
+  // UTF-8 sequence.
+  std::string FitIntoLO(const std::string &value, const std::string &description)
+  {
+    constexpr std::string::size_type maxLOLength = 64;
+    if (value.length() <= maxLOLength)
+      return value;
+
+    const std::string truncationIndicator = "[...]";
+    auto cut = maxLOLength - truncationIndicator.length();
+    while (cut > 0 && (static_cast<unsigned char>(value[cut]) & 0xC0) == 0x80)
+      --cut;
+
+    MITK_WARN << description << " exceeds the DICOM LO limit of " << maxLOLength
+              << " characters and is truncated for export. Full value: " << value;
+    return value.substr(0, cut) + truncationIndicator;
   }
 
   // dcmqi computes the CIELab value from 8 bit sRGB.
@@ -624,6 +674,11 @@ namespace
       if (relation.instanceUIDsPerSlice.IsNull() || relation.classUIDsPerSlice.IsNull())
         continue;
 
+      // The Referenced Series Sequence needs the series of the source images.
+      if (relation.sourceSeriesInstanceUID.empty())
+        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID
+                    << " as DICOM SEG: it names no source series (0020,000E).";
+
       const auto slices = relation.instanceUIDsPerSlice->GetAvailableSlices(0);
       for (const auto slice : slices)
       {
@@ -643,8 +698,7 @@ namespace
 
         if (isFirst)
         {
-          if (!relation.sourceSeriesInstanceUID.empty())
-            item->putAndInsertString(DCM_SeriesInstanceUID, relation.sourceSeriesInstanceUID.c_str());
+          item->putAndInsertString(DCM_SeriesInstanceUID, relation.sourceSeriesInstanceUID.c_str());
           StampSegIdentityOnSourceItem(seg, *item);
           StampImageOrientationOnSourceItem(groupImage, *item);
           isFirst = false;
@@ -873,6 +927,14 @@ namespace mitk
       std::vector<itkInternalImageType::ConstPointer> segmentations;
       const auto labelSet = input->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(input, layer));
 
+      for (const auto &label : labelSet)
+      {
+        if (label->GetValue() > MAX_WRITABLE_LABEL_VALUE)
+          mitkThrow() << "Cannot write label " << label->GetValue() << " (\"" << label->GetName()
+                      << "\") of group " << layer << " as DICOM SEG: label values above "
+                      << MAX_WRITABLE_LABEL_VALUE << " are not supported.";
+      }
+
       try
       {
         auto mitkLayerImage = input->GetGroupImage(layer);
@@ -1068,6 +1130,12 @@ namespace mitk
       {
         mitkThrow() << "Error while writing DICOM SEG group " << layer
                     << ": " << e.what();
+      }
+      catch (...)
+      {
+        // dcmqi reports some failures, e.g. a value DCMTK's checks reject, by throwing an int.
+        mitkThrow() << "dcmqi failed to write DICOM SEG group " << layer << " to " << filePath
+                    << "; its console output names the cause.";
       }
     }
   }
@@ -1574,11 +1642,14 @@ namespace mitk
       ++segmentNumber;
       if (label != nullptr)
       {
+        CheckWritableLabelName(*label);
+        CheckWritableTrackingUID(*label);
         auto segmentAttribute = handler.createOrGetSegment(segmentNumber, label->GetValue());
 
         if (segmentAttribute != nullptr)
         {
-          segmentAttribute->setSegmentLabel(label->GetName());
+          const auto labelDescription = "of label " + std::to_string(label->GetValue());
+          segmentAttribute->setSegmentLabel(FitIntoLO(label->GetName(), "Segment Label (0062,0005) " + labelDescription));
           segmentAttribute->setSegmentDescription(label->GetDescription());
           std::string algorithmType = label->GetAlgorithmTypeStr();
           if (algorithmType.empty())
@@ -1588,21 +1659,11 @@ namespace mitk
           // Only emit (0062,0009) when the label actually carries a recorded name. GetAlgorithmName()
           // would otherwise fall back to the bare "MITK Segmentation" prefix and fabricate a name for a
           // segment MITK never generated (e.g. a vendor SEG loaded without an algorithm name).
+          // The provenance chain can exceed the LO limit in routine AI-then-correct sessions.
           if (label->HasAlgorithmName())
           {
-            std::string algorithmName = label->GetAlgorithmName();
-            // Segment Algorithm Name has VR LO (max 64 chars). DCMTK does not enforce the limit on write,
-            // so bound it here; the growing provenance chain can exceed 64 in routine AI-then-correct
-            // sessions. The indicator marks that the recorded chain was longer than the exported value.
-            constexpr std::string::size_type maxLOLength = 64;
-            const std::string truncationIndicator = "[...]";
-            if (algorithmName.length() > maxLOLength)
-            {
-              MITK_WARN << "Segment Algorithm Name (0062,0009) exceeds the DICOM LO limit (" << maxLOLength
-                        << " chars) and is truncated for export. Full provenance: " << algorithmName;
-              algorithmName = algorithmName.substr(0, maxLOLength - truncationIndicator.length()) + truncationIndicator;
-            }
-            segmentAttribute->setSegmentAlgorithmName(algorithmName);
+            segmentAttribute->setSegmentAlgorithmName(
+              FitIntoLO(label->GetAlgorithmName(), "Segment Algorithm Name (0062,0009) " + labelDescription));
           }
 
           if (label->GetAnatomicRegionCount()>0)

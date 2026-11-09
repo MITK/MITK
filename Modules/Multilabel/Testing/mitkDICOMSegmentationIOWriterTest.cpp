@@ -588,6 +588,12 @@ namespace
     return path.substr(0, path.size() - extension.size()) + "_" + std::to_string(group) + extension;
   }
 
+  void AssertSegmentSequence(const std::string& path, const mitk::test::DICOMSegSegmentMap& expected)
+  {
+    const auto differences = mitk::test::CompareSegmentSequences(expected, mitk::test::ReadSegmentSequence(path));
+    CPPUNIT_ASSERT_MESSAGE(path + " differs on the wire:" + mitk::test::JoinDifferences(differences), differences.empty());
+  }
+
   void AssertWrittenSegments(const std::string& path,
                              const mitk::MultiLabelSegmentation& seg,
                              mitk::MultiLabelSegmentation::GroupIndexType group,
@@ -634,10 +640,21 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet);
   MITK_TEST(WriteNumbersSegmentsByLabelValueInBinary);
   MITK_TEST(WriteNumbersSegmentsByLabelValueInLabelmap);
+  MITK_TEST(WriteAcceptsLabelValue32767);
+  MITK_TEST(WriteRefusesLabelValuesAbove32767);
+  MITK_TEST(WriteKeepsLabelNamesOf64Characters);
+  MITK_TEST(WriteTruncatesLongLabelNames);
+  MITK_TEST(WriteTruncatesLongAlgorithmNames);
+  MITK_TEST(WriteRefusesLabelNamesWithBackslash);
+  MITK_TEST(WriteRefusesNonASCIILabelNames);
+  MITK_TEST(WriteRefusesRelationWithoutSourceSeriesUID);
+  MITK_TEST(WriteTurnsDcmqiFailuresIntoExceptions);
   MITK_TEST(WriteRoundsColours);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
+  MITK_TEST(WriteFailureInLaterGroupKeepsEarlierFiles);
+  MITK_TEST(WriteRefusesInvalidTrackingUID);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -762,6 +779,107 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Segment 1 is the label with the lowest value", std::string("Three"), segments.at(1)->GetName());
   }
 
+  // dcmqi takes label values as short, so 32767 is the largest value it can write.
+  void WriteAcceptsLabelValue32767()
+  {
+    auto seg = BuildSegWithLabels({{1, "Low"}, {32767, "Highest"}});
+    this->WriteSegToTempFile(seg, {}, "value-32767");
+  }
+
+  void WriteRefusesLabelValuesAbove32767()
+  {
+    for (const mitk::Label::PixelType value : {mitk::Label::PixelType(32768), mitk::Label::PixelType(40000)})
+    {
+      auto seg = BuildSegWithLabels({{1, "Low"}, {value, "Too high"}});
+      const auto message =
+        this->AssertWriteRefused(seg, {}, "value-" + std::to_string(value), false, {"Too high", std::to_string(value)});
+      CPPUNIT_ASSERT_MESSAGE("The refusal is not reported as an ITK error: " + message,
+                             message.find("ITK error") == std::string::npos);
+    }
+  }
+
+  void WriteKeepsLabelNamesOf64Characters()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName(std::string(64, 'n'));
+    this->WriteSegToTempFile(seg, {}, "name-64");
+  }
+
+  // Segment Label is LO, at most 64 characters; DCMTK does not check the length. The name is cut
+  // and marked, as the algorithm name is.
+  void WriteTruncatesLongLabelNames()
+  {
+    const std::string name = "A label name that is deliberately longer than the sixty-four characters DICOM allows";
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName(name);
+
+    mitk::test::WarningRecorder warnings("(0062,0005)");
+    const auto path = this->WriteSegToTempFileUnchecked(seg, {}, "long-name");
+
+    auto expected = mitk::test::ExpectedSegmentSequence(*seg, 0, false);
+    expected.at(1)->SetName(name.substr(0, 59) + "[...]");
+    AssertSegmentSequence(path, expected);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Warnings about the truncated Segment Label", std::size_t{1}, warnings.GetWarnings().size());
+  }
+
+  void WriteTruncatesLongAlgorithmNames()
+  {
+    const std::string algorithmName = "An algorithm name that is deliberately longer than the sixty-four characters DICOM allows";
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
+    seg->GetLabel(1)->SetAlgorithmName(algorithmName);
+
+    mitk::test::WarningRecorder warnings("(0062,0009)");
+    const auto path = this->WriteSegToTempFileUnchecked(seg, {}, "long-algorithm-name");
+
+    auto expected = mitk::test::ExpectedSegmentSequence(*seg, 0, false);
+    expected.at(1)->SetAlgorithmName(algorithmName.substr(0, 59) + "[...]");
+    AssertSegmentSequence(path, expected);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Warnings about the truncated Segment Algorithm Name",
+                                 std::size_t{1}, warnings.GetWarnings().size());
+  }
+
+  // A backslash separates values in DICOM, so a name containing one cannot be written.
+  void WriteRefusesLabelNamesWithBackslash()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName("Left\\Right");
+    this->AssertWriteRefused(seg, {}, "backslash", false, {"Left\\Right"});
+  }
+
+  // The writer writes no Specific Character Set, so names are limited to ASCII (owner decision).
+  void WriteRefusesNonASCIILabelNames()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName("L\xC3\xA4sion");
+    this->AssertWriteRefused(seg, {}, "non-ascii", false, {"L\xC3\xA4sion"});
+  }
+
+  // dcmqi needs the series of the source images for the Referenced Series Sequence.
+  void WriteRefusesRelationWithoutSourceSeriesUID()
+  {
+    auto seg = BuildBaseSeg(/*stampIdentity=*/true);
+    auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
+    auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
+    for (int sliceIndex = 0; sliceIndex < 3; ++sliceIndex)
+    {
+      perSliceInstance->SetValue(0, sliceIndex, "1.2.826.0.1.3680043.10.999.9.1." + std::to_string(sliceIndex));
+      perSliceClass->SetValue(0, sliceIndex, "1.2.840.10008.5.1.4.1.1.2");
+    }
+    const auto relationUID = Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "");
+
+    this->AssertWriteRefused(seg, {}, "no-source-series", false, {relationUID});
+  }
+
+  // dcmqi reports some failures by throwing an int, here DCMTK's check of the algorithm name.
+  void WriteTurnsDcmqiFailuresIntoExceptions()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
+    seg->GetLabel(1)->SetAlgorithmName("Tool \xC3\xA4");
+    this->AssertWriteRefused(seg, {}, "dcmqi-failure", false, {"group 0"});
+  }
+
   // Recommended Display CIELab Value is computed from 8 bit sRGB, rounded, not truncated.
   void WriteRoundsColours()
   {
@@ -815,6 +933,28 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes an image as DICOM SEG",
                                  mitk::IOUtil::Save(image, DICOMSegMimeTypeName(), this->GetTempFilePath("image.dcm")),
                                  mitk::Exception);
+  }
+
+  // Groups are written one after the other; a refusal in a later group leaves the files of the
+  // earlier ones.
+  void WriteFailureInLaterGroupKeepsEarlierFiles()
+  {
+    auto seg = BuildTwoGroupSeg();
+    seg->GetLabel(2)->SetName("Left\\Right");
+    const auto path = this->GetTempFilePath("later-group.dcm");
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("The second group is refused", mitk::IOUtil::Save(seg, path), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("The file of the first group stays", FileExists(path));
+    CPPUNIT_ASSERT_MESSAGE("The second group has no file", !FileExists(GroupFilePath(path, 1)));
+    AssertWrittenSegments(path, *seg, 0, false);
+  }
+
+  // Tracking UID is UI. DCMTK rejects other values inside dcmqi, which then leaves the tag out.
+  void WriteRefusesInvalidTrackingUID()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetTrackingUID("track-uid");
+    this->AssertWriteRefused(seg, {}, "invalid-tracking-uid", false, {"track-uid"});
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

@@ -160,14 +160,7 @@ namespace mitk
 
     auto props = ExtractSegmentationPropertiesFromNrrdHeader(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
 
-    const Options userOptions = this->GetOptions();
-
-    const auto multiLayerStrategy = IFileIO::ResolveEnumOption(userOptions, OPTION_NAME_MULTI_LAYER);
-    if (multiLayerStrategy != OPTION_NAME_MULTI_LAYER_ADAPT && multiLayerStrategy != OPTION_NAME_MULTI_LAYER_SPLIT)
-    {
-      mitkThrow() << "Unknown value \"" << multiLayerStrategy << "\" of the option \"" << OPTION_NAME_MULTI_LAYER
-                  << "\". Valid values: " << OPTION_NAME_MULTI_LAYER_ADAPT << ", " << OPTION_NAME_MULTI_LAYER_SPLIT << ".";
-    }
+    const auto multiLayerStrategy = this->GetChoiceOption(OPTION_NAME_MULTI_LAYER);
 
     if (multiLayerStrategy == OPTION_NAME_MULTI_LAYER_SPLIT)
     { //just split layers in different multi label images

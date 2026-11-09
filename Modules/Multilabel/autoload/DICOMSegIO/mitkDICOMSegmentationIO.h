@@ -74,9 +74,10 @@ namespace mitk
      * UID; only changing the label lets the write succeed. The labels of all groups are checked
      * before any file is written.
      * \throw mitk::Exception naming the relation for a source-image relation without source series;
-     * and if synthetic mode cannot fill a contract item, if no source-image reference lies on a
-     * slice of the segmentation, or if dcmqi fails. A failure of ITK, of dcmqi or of saving in a
-     * later group leaves the files of the earlier groups.
+     * naming the option for an option value outside its choices; and if synthetic mode cannot fill
+     * a contract item, if no source-image reference lies on a slice of the segmentation, or if
+     * dcmqi fails. A failure of ITK, of dcmqi or of saving in a later group leaves the files of
+     * the earlier groups.
      */
     void Write() override;
 

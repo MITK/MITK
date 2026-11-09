@@ -501,6 +501,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesSourceReferencesThatMapToNoFrame);
   MITK_TEST(LabelmapReloadOrdersLabelsBySegmentNumber);
   MITK_TEST(WriteRefusesInvalidTrackingUID);
+  MITK_TEST(WriteRefusesUnknownOptionValues);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1039,6 +1040,20 @@ public:
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetTrackingUID("track-uid");
     this->AssertWriteRefused(seg, {}, "invalid-tracking-uid", Refusal::UnrepresentableValue, {"track-uid"});
+  }
+
+  // A value outside the choices is refused rather than taken for one of them. The segmentation is
+  // complete for strict mode, so only the options can refuse it.
+  void WriteRefusesUnknownOptionValues()
+  {
+    const std::vector<std::pair<std::string, std::string>> unknownValues = {
+      { "Strict / synthetic mode", "Synthetic" }, { "Segmentation encoding", "Labelmap" } };
+    for (const auto& [name, value] : unknownValues)
+    {
+      mitk::IFileWriter::Options options;
+      options[name] = value;
+      this->AssertWriteRefused(BuildSegWithRule(), options, "unknown-" + value, Refusal::Plain, {name, value});
+    }
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

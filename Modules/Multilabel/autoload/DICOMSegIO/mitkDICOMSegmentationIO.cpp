@@ -896,9 +896,8 @@ namespace mitk
       mitkThrow() << "Cannot write non-MultiLabelSegmentation data via DICOM SEG.";
     auto *input = const_cast<MultiLabelSegmentation *>(constInput);
 
-    const auto options = this->AbstractFileWriter::GetOptions();
-    const std::string synthesisMode = IFileIO::ResolveEnumOption(options, OPTION_SYNTHESIS_MODE);
-    const std::string encoding = IFileIO::ResolveEnumOption(options, OPTION_ENCODING);
+    const std::string synthesisMode = this->GetWriterChoiceOption(OPTION_SYNTHESIS_MODE);
+    const std::string encoding = this->GetWriterChoiceOption(OPTION_ENCODING);
 
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
 

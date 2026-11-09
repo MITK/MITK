@@ -78,29 +78,11 @@ namespace mitk
      * in a corresponding \c std::vector<std::string> value. The same option key
      * without the "enum" segment is considered to hold the current selection from
      * the enumeration. An option whose default value is a \c std::vector<std::string>
-     * is a choice from that list as well; see ResolveEnumOption().
+     * is a choice from that list as well: a choice sets the chosen \c std::string, and
+     * the first entry is the default. Readers and writers get the selection through
+     * AbstractFileReader::GetChoiceOption() and AbstractFileWriter::GetChoiceOption().
      */
     typedef std::map<std::string, us::Any> Options;
-
-    /**
-     * \brief Get the selected value of an option that is a choice from a list of strings.
-     *
-     * Such an option is registered with the \c std::vector<std::string> of its choices
-     * as default value, and the option dialogs present it as a selection from that
-     * list. Once a choice is made, the option holds the chosen \c std::string. Without
-     * one, e.g. when IOUtil is called without options, it still holds the list, and its
-     * first entry is the default.
-     *
-     * The chosen string is returned as is; checking it against the choices is up to
-     * the caller, because the list is no longer part of the options once a choice is made.
-     *
-     * \param[in] options The options of a reader or writer, including its defaults.
-     * \param[in] name The name of the option.
-     * \return The chosen value, or the first entry of the list.
-     * \throw mitk::Exception if the option is missing, its list is empty, or it holds
-     *        neither a \c std::string nor a \c std::vector<std::string>.
-     */
-    static std::string ResolveEnumOption(const Options &options, const std::string &name);
 
     /**
      * \brief Callback delegate type for progress reporting.

@@ -42,18 +42,6 @@ namespace
     return result;
   }
 
-  /** A value outside the choices is refused rather than taken for one of them. */
-  std::string ResolveChoice(const mitk::IFileIO::Options& options, const std::string& name, const std::vector<std::string>& choices)
-  {
-    auto value = mitk::IFileIO::ResolveEnumOption(options, name);
-    if (std::find(choices.begin(), choices.end(), value) == choices.end())
-    {
-      mitkThrow() << "Unknown value \"" << value << "\" of the option \"" << name << "\". Valid values: "
-                  << JoinWithCommas(choices, "") << ".";
-    }
-    return value;
-  }
-
   std::string DescribeExtensions(const mitk::CustomMimeType& mimeType)
   {
     return JoinWithCommas(mimeType.GetExtensions(), ".");
@@ -122,12 +110,8 @@ namespace mitk
       mitkThrow() << "Cannot write the segmentation: it has no groups.";
     }
 
-    const auto options = this->GetOptions();
-
-    const auto groupSaveStrategy = ResolveChoice(options, OPTION_SAVE_STRATEGY,
-      { OPTION_SAVE_STRATEGY_GROUP, OPTION_SAVE_STRATEGY_INSTANCE }) == OPTION_SAVE_STRATEGY_GROUP;
-    const auto binaryValueMapping = ResolveChoice(options, OPTION_INSTANCE_VALUE,
-      { OPTION_INSTANCE_VALUE_ORIGINAL, OPTION_INSTANCE_VALUE_BINARY }) == OPTION_INSTANCE_VALUE_BINARY;
+    const auto groupSaveStrategy = this->GetChoiceOption(OPTION_SAVE_STRATEGY) == OPTION_SAVE_STRATEGY_GROUP;
+    const auto binaryValueMapping = this->GetChoiceOption(OPTION_INSTANCE_VALUE) == OPTION_INSTANCE_VALUE_BINARY;
 
     LocalFile localFile(this);
     const auto path = localFile.GetFileName();

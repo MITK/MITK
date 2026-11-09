@@ -1035,13 +1035,22 @@ namespace mitk
       // Per-layer output path, also used by the log line so the message
       // names the file actually being written. Follows the MITK
       // multi-output naming convention (see the MitkFileConverter app): the
-      // first group writes the requested "<stem>.dcm" so the caller's path
-      // always exists, and additional groups append "_<groupIndex>"
-      // ("<stem>_1.dcm", "<stem>_2.dcm", ...).
-      const std::string stem = path.substr(0, path.find_last_of("."));
-      std::string filePath = stem + ".dcm";
+      // first group writes the requested path, and additional groups insert
+      // "_<groupIndex>" before the extension of the file name, or append it
+      // if the file name has none. Every file thus has the form the caller
+      // chose; whether an extension is added is IOUtil's decision. Only a dot
+      // in the file name starts the extension; a dot in a directory name
+      // belongs to the stem.
+      std::string filePath = path;
       if (layer != 0)
-        filePath = stem + "_" + std::to_string(layer) + ".dcm";
+      {
+        const auto fileNameStart = path.find_last_of("/\\");
+        const auto extensionStart = path.find_last_of('.');
+        const bool hasExtension = extensionStart != std::string::npos &&
+                                  (fileNameStart == std::string::npos || extensionStart > fileNameStart);
+        const auto stemLength = hasExtension ? extensionStart : path.size();
+        filePath = path.substr(0, stemLength) + "_" + std::to_string(layer) + path.substr(stemLength);
+      }
 
       MITK_INFO << "Writing DICOM SEG group " << layer << " to " << filePath;
       try

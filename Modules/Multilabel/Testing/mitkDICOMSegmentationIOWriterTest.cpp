@@ -656,6 +656,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRoundsColours);
   MITK_TEST(StrictModeRefusalsAreStrictModeExceptions);
   MITK_TEST(SyntheticModeRefusalIsPlainException);
+  MITK_TEST(WriteKeepsDottedDirectoryOfPathWithoutExtension);
+  MITK_TEST(WriteKeepsTheExtensionOfTheRequestedPath);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -974,6 +976,49 @@ public:
       this->AssertWriteRefused(seg, options, "synthetic-refusal", false, {"[label 1]", "Algorithm Name"});
     CPPUNIT_ASSERT_MESSAGE("The synthetic-mode refusal suggests no mode switch: " + message,
                            message.find("Strict / synthetic mode") == std::string::npos);
+  }
+
+  // The file name, not the directory, decides the extension of the per-group files. IOUtil hands a
+  // path without extension to the writer when the mime type is explicit and no extension is added;
+  // every group file then has none either.
+  void WriteKeepsDottedDirectoryOfPathWithoutExtension()
+  {
+    auto seg = BuildTwoGroupSeg();
+    const auto directory = this->GetTempFilePath("data.v2");
+    itksys::SystemTools::MakeDirectory(directory);
+    const auto path = directory + mitk::IOUtil::GetDirectorySeparator() + "seg";
+
+    mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+
+    CPPUNIT_ASSERT_MESSAGE("Nothing is written next to the dotted directory",
+                           !FileExists(this->GetTempFilePath("data.dcm")) && !FileExists(this->GetTempFilePath("data_1.dcm")));
+    CPPUNIT_ASSERT_MESSAGE("No extension is added",
+                           !FileExists(path + ".dcm") && !FileExists(path + "_1.dcm"));
+    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < 2; ++group)
+    {
+      const auto file = GroupFilePath(path, group);
+      CPPUNIT_ASSERT_MESSAGE(file + " exists", FileExists(file));
+      AssertWrittenSegments(file, *seg, group, false);
+    }
+  }
+
+  // The writer keeps the extension it is given rather than replacing it by ".dcm"; IOUtil decides
+  // whether an extension is added.
+  void WriteKeepsTheExtensionOfTheRequestedPath()
+  {
+    auto seg = BuildTwoGroupSeg();
+    const auto path = this->GetTempFilePath("seg.ima");
+
+    mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+
+    CPPUNIT_ASSERT_MESSAGE("The extension is not replaced",
+                           !FileExists(this->GetTempFilePath("seg.dcm")) && !FileExists(this->GetTempFilePath("seg_1.dcm")));
+    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < 2; ++group)
+    {
+      const auto file = GroupFilePath(path, group);
+      CPPUNIT_ASSERT_MESSAGE(file + " exists", FileExists(file));
+      AssertWrittenSegments(file, *seg, group, false);
+    }
   }
 
   void WriteRefuses4D()

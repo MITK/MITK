@@ -42,6 +42,20 @@ namespace mitk
   };
 
   /**
+   * \brief Thrown when a DICOM SEG write is rejected because a label cannot be represented
+   *        in the format: a Segment Label with a backslash or non-ASCII characters, an invalid
+   *        Tracking UID, or a label value above 32767.
+   *
+   * Only changing the label lets the write succeed; unlike after a
+   * DICOMSegStrictModeException, a retry in synthetic mode does not.
+   */
+  class MITKMULTILABEL_EXPORT DICOMSegUnrepresentableValueException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(DICOMSegUnrepresentableValueException, mitk::Exception);
+  };
+
+  /**
    * \brief Helpers around the DICOM SEG property contract on MultiLabelSegmentation.
    *
    * Validate and Complete are deliberately split into a pure-inspection and

@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include <cmath>
+#include <functional>
 #include <set>
 #include <sstream>
 #include <string>
@@ -495,7 +496,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
-  MITK_TEST(WriteFailureInLaterGroupKeepsEarlierFiles);
+  MITK_TEST(WriteRefusesUnwritableLabelOfLaterGroupBeforeAnyFile);
   MITK_TEST(WriteReferencesSourcesWhenPlanesDisagreeWithTransform);
   MITK_TEST(WriteRefusesSourceReferencesThatMapToNoFrame);
   MITK_TEST(LabelmapReloadOrdersLabelsBySegmentNumber);
@@ -533,19 +534,40 @@ private:
     return path;
   }
 
+  // The exception type by which a write refusal tells callers what can make the write succeed.
+  enum class Refusal
+  {
+    Plain,
+    StrictMode,
+    UnrepresentableValue
+  };
+
+  static std::string ToString(Refusal refusal)
+  {
+    switch (refusal)
+    {
+      case Refusal::StrictMode:
+        return "a DICOMSegStrictModeException";
+      case Refusal::UnrepresentableValue:
+        return "a DICOMSegUnrepresentableValueException";
+      default:
+        return "a plain mitk::Exception";
+    }
+  }
+
   // Asserts that the writer refuses a clone of seg, called directly and through IOUtil. Called
-  // directly, it must throw a mitk::Exception whose message contains every fragment; only a
-  // refusal of the strict-mode contract may be, and must be, a DICOMSegStrictModeException.
-  // Returns the message of the direct call.
+  // directly, it must throw an exception of the expected type whose message contains every
+  // fragment. Returns the message of the direct call.
   std::string AssertWriteRefused(const mitk::MultiLabelSegmentation* seg,
                                  const mitk::IFileWriter::Options& options,
                                  const std::string& nameHint,
-                                 bool strictModeRefusal,
+                                 Refusal expected,
                                  const std::vector<std::string>& fragments) const
   {
     const auto path = this->GetTempFilePath(nameHint + ".dcm");
     std::string message;
     bool refused = false;
+    auto refusal = Refusal::Plain;
     try
     {
       mitk::test::WriteWithWriter(mitk::test::CloneKeepingUID(*seg), path, "DICOM Segmentation", options);
@@ -554,16 +576,26 @@ private:
     {
       refused = true;
       message = e.GetDescription();
-      CPPUNIT_ASSERT_MESSAGE(nameHint + ": a refusal outside the strict-mode contract is a DICOMSegStrictModeException: " + message,
-                             strictModeRefusal);
+      refusal = Refusal::StrictMode;
+    }
+    catch (const mitk::DICOMSegUnrepresentableValueException& e)
+    {
+      refused = true;
+      message = e.GetDescription();
+      refusal = Refusal::UnrepresentableValue;
     }
     catch (const mitk::Exception& e)
     {
       refused = true;
       message = e.GetDescription();
-      CPPUNIT_ASSERT_MESSAGE(nameHint + ": a strict-mode refusal is a plain mitk::Exception: " + message, !strictModeRefusal);
     }
-    if (!refused)
+    if (refused)
+    {
+      CPPUNIT_ASSERT_MESSAGE(nameHint + ": the refusal is " + ToString(refusal) + " instead of " + ToString(expected) +
+                               ": " + message,
+                             refusal == expected);
+    }
+    else
     {
       std::string written;
       for (const auto& [number, label] : mitk::test::ReadSegmentSequence(path))
@@ -637,7 +669,7 @@ public:
     {
       auto seg = BuildSegWithLabels({{1, "Low"}, {value, "Too high"}});
       const auto message =
-        this->AssertWriteRefused(seg, {}, "value-" + std::to_string(value), false, {"Too high", std::to_string(value)});
+        this->AssertWriteRefused(seg, {}, "value-" + std::to_string(value), Refusal::UnrepresentableValue, {"Too high", std::to_string(value)});
       CPPUNIT_ASSERT_MESSAGE("The refusal is not reported as an ITK error: " + message,
                              message.find("ITK error") == std::string::npos);
     }
@@ -735,7 +767,7 @@ public:
   {
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetName("Left\\Right");
-    this->AssertWriteRefused(seg, {}, "backslash", false, {"Left\\Right"});
+    this->AssertWriteRefused(seg, {}, "backslash", Refusal::UnrepresentableValue, {"Left\\Right"});
   }
 
   // The writer writes no Specific Character Set, so names are limited to ASCII (owner decision).
@@ -743,7 +775,7 @@ public:
   {
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetName("L\xC3\xA4sion");
-    this->AssertWriteRefused(seg, {}, "non-ascii", false, {"L\xC3\xA4sion"});
+    this->AssertWriteRefused(seg, {}, "non-ascii", Refusal::UnrepresentableValue, {"L\xC3\xA4sion"});
   }
 
   // dcmqi needs the series of the source images for the Referenced Series Sequence.
@@ -759,7 +791,7 @@ public:
     }
     const auto relationUID = Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "");
 
-    this->AssertWriteRefused(seg, {}, "no-source-series", false, {relationUID});
+    this->AssertWriteRefused(seg, {}, "no-source-series", Refusal::Plain, {relationUID});
   }
 
   // dcmqi reports some failures by throwing an int, here DCMTK's check of the algorithm name.
@@ -768,7 +800,7 @@ public:
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
     seg->GetLabel(1)->SetAlgorithmName("Tool \xC3\xA4");
-    this->AssertWriteRefused(seg, {}, "dcmqi-failure", false, {"group 0"});
+    this->AssertWriteRefused(seg, {}, "dcmqi-failure", Refusal::Plain, {"group 0"});
   }
 
   // Recommended Display CIELab Value is computed from 8 bit sRGB, rounded, not truncated.
@@ -793,12 +825,12 @@ public:
   // DICOMSegStrictModeException tells callers that a retry in synthetic mode can succeed.
   void StrictModeRefusalsAreStrictModeExceptions()
   {
-    this->AssertWriteRefused(BuildSegWithRule(/*stampIdentity=*/false), {}, "strict-incomplete", true, {"PatientID"});
-    this->AssertWriteRefused(BuildBaseSeg(/*stampIdentity=*/true), {}, "strict-no-relation", true, {"group 0"});
+    this->AssertWriteRefused(BuildSegWithRule(/*stampIdentity=*/false), {}, "strict-incomplete", Refusal::StrictMode, {"PatientID"});
+    this->AssertWriteRefused(BuildBaseSeg(/*stampIdentity=*/true), {}, "strict-no-relation", Refusal::StrictMode, {"group 0"});
 
     auto idLayerOnly = BuildBaseSeg(/*stampIdentity=*/true);
     AttachIDLayerOnlyRelation(idLayerOnly);
-    this->AssertWriteRefused(idLayerOnly, {}, "strict-id-layer", true, {"group 0"});
+    this->AssertWriteRefused(idLayerOnly, {}, "strict-id-layer", Refusal::StrictMode, {"group 0"});
   }
 
   // A refusal in synthetic mode names what synthesis cannot fill and suggests no mode switch.
@@ -810,7 +842,7 @@ public:
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
     const auto message =
-      this->AssertWriteRefused(seg, options, "synthetic-refusal", false, {"[label 1]", "Algorithm Name"});
+      this->AssertWriteRefused(seg, options, "synthetic-refusal", Refusal::Plain, {"[label 1]", "Algorithm Name"});
     CPPUNIT_ASSERT_MESSAGE("The synthetic-mode refusal suggests no mode switch: " + message,
                            message.find("Strict / synthetic mode") == std::string::npos);
   }
@@ -914,16 +946,34 @@ public:
 
   // Groups are written one after the other; a refusal in a later group leaves the files of the
   // earlier ones.
-  void WriteFailureInLaterGroupKeepsEarlierFiles()
+  // The labels of all groups are checked before the first file is written.
+  void WriteRefusesUnwritableLabelOfLaterGroupBeforeAnyFile()
   {
-    auto seg = BuildTwoGroupSeg();
-    seg->GetLabel(2)->SetName("Left\\Right");
-    const auto path = this->GetTempFilePath("later-group.dcm");
+    const std::vector<std::pair<std::string, std::function<void(mitk::MultiLabelSegmentation*)>>> edits = {
+      { "backslash", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetName("Left\\Right"); } },
+      { "non-ascii", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetName("L\xC3\xA4sion"); } },
+      { "tracking-uid", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingUID("track-uid"); } },
+      { "value",
+        [](mitk::MultiLabelSegmentation* seg) {
+          auto label = mitk::Label::New();
+          label->SetName("Too high");
+          label->SetValue(32768);
+          label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+          label->SetAlgorithmName("WorkflowTest");
+          seg->AddLabel(label, 1, true, false);
+        } },
+    };
+    for (const auto& [name, edit] : edits)
+    {
+      auto seg = BuildTwoGroupSeg();
+      edit(seg);
+      const auto path = this->GetTempFilePath("later-group-" + name + ".dcm");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("The second group is refused", mitk::IOUtil::Save(seg, path), mitk::Exception);
-    CPPUNIT_ASSERT_MESSAGE("The file of the first group stays", FileExists(path));
-    CPPUNIT_ASSERT_MESSAGE("The second group has no file", !FileExists(GroupFilePath(path, 1)));
-    AssertWrittenSegments(path, *seg, 0, false);
+      CPPUNIT_ASSERT_THROW_MESSAGE(name + ": the label of the second group is refused", mitk::IOUtil::Save(seg, path),
+                                   mitk::Exception);
+      CPPUNIT_ASSERT_MESSAGE(name + ": the first group has no file", !FileExists(path));
+      CPPUNIT_ASSERT_MESSAGE(name + ": the second group has no file", !FileExists(GroupFilePath(path, 1)));
+    }
   }
 
   // Setting the index-to-world transform of a sliced geometry leaves its slice planes where they
@@ -963,7 +1013,7 @@ public:
     }
     Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "1.2.826.0.1.3680043.10.999.12.2");
 
-    this->AssertWriteRefused(seg, {}, "unmapped-sources", false, {"group 0"});
+    this->AssertWriteRefused(seg, {}, "unmapped-sources", Refusal::Plain, {"group 0"});
   }
 
   // The reader adds the labels of a labelmap in segment order, as it does for a binary SEG. Label 2
@@ -988,7 +1038,7 @@ public:
   {
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetTrackingUID("track-uid");
-    this->AssertWriteRefused(seg, {}, "invalid-tracking-uid", false, {"track-uid"});
+    this->AssertWriteRefused(seg, {}, "invalid-tracking-uid", Refusal::UnrepresentableValue, {"track-uid"});
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

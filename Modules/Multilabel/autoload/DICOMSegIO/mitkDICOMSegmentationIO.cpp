@@ -129,11 +129,13 @@ namespace
   {
     const std::string name = label.GetName();
     if (name.find('\\') != std::string::npos)
-      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
-                  << "a Segment Label must not contain a backslash.";
+      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
+        << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
+        << "a Segment Label must not contain a backslash.";
     if (std::any_of(name.begin(), name.end(), [](char c) { return static_cast<unsigned char>(c) > 0x7F; }))
-      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
-                  << "a Segment Label must consist of ASCII characters.";
+      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
+        << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
+        << "a Segment Label must consist of ASCII characters.";
   }
 
   // Tracking UID (0062,0021) is UI. dcmqi sets it without checking the result, so DCMTK's
@@ -142,8 +144,27 @@ namespace
   {
     const std::string trackingUID = label.GetTrackingUID();
     if (!trackingUID.empty() && DcmUniqueIdentifier::checkStringValue(trackingUID.c_str(), "1").bad())
-      mitkThrow() << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: "
-                  << "its Tracking UID \"" << trackingUID << "\" is no valid DICOM UID.";
+      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
+        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: "
+        << "its Tracking UID \"" << trackingUID << "\" is no valid DICOM UID.";
+  }
+
+  // These refusals depend on the labels alone, so they are checked for all groups before the first
+  // file is written.
+  void CheckWritableLabels(const mitk::MultiLabelSegmentation &seg)
+  {
+    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg.GetNumberOfGroups(); ++group)
+    {
+      for (const auto &label : seg.GetConstLabelsByValue(seg.GetLabelValuesByGroup(group)))
+      {
+        if (label->GetValue() > MAX_WRITABLE_LABEL_VALUE)
+          mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
+            << "Cannot write label " << label->GetValue() << " (\"" << label->GetName() << "\") of group " << group
+            << " as DICOM SEG: label values above " << MAX_WRITABLE_LABEL_VALUE << " are not supported.";
+        CheckWritableLabelName(*label);
+        CheckWritableTrackingUID(*label);
+      }
+    }
   }
 
   // A value of VR LO has at most 64 characters, which DCMTK does not check on write. Longer values
@@ -918,6 +939,8 @@ namespace mitk
         << "Missing items:" << items.str();
     }
 
+    CheckWritableLabels(*input);
+
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
 
     // The first written group's SeriesDate/SeriesTime are reused for the
@@ -929,24 +952,16 @@ namespace mitk
     std::string sharedSeriesTime;
 
     // Multi-group segs are written one file per group below. There is no
-    // cross-group rollback: if a later group throws (e.g. no usable source
-    // image, or a dcmqi/DCMTK failure), files already written for earlier
-    // groups stay on disk. Confined to the multi-group case; a subsequent
-    // successful write overwrites them. Kept simple deliberately - a
-    // temp-then-rename or cleanup-on-failure scheme is not warranted for
-    // this rare path.
+    // cross-group rollback: the labels of all groups were checked above, so
+    // what can still fail in a later group is ITK, dcmqi or DCMTK, or saving
+    // the file, and the files already written for earlier groups then stay
+    // on disk. Confined to the multi-group case; a subsequent successful
+    // write overwrites them. Kept simple deliberately - a temp-then-rename
+    // or cleanup-on-failure scheme is not warranted for these rare failures.
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       std::vector<itkInternalImageType::ConstPointer> segmentations;
       const auto labelSet = input->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(input, layer));
-
-      for (const auto &label : labelSet)
-      {
-        if (label->GetValue() > MAX_WRITABLE_LABEL_VALUE)
-          mitkThrow() << "Cannot write label " << label->GetValue() << " (\"" << label->GetName()
-                      << "\") of group " << layer << " as DICOM SEG: label values above "
-                      << MAX_WRITABLE_LABEL_VALUE << " are not supported.";
-      }
 
       try
       {
@@ -1346,9 +1361,11 @@ namespace mitk
                   << "returned without source-image provenance.";
       }
     }
-    catch (const mitk::Exception &e)
+    catch (mitk::Exception &e)
     {
-      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": " << e.GetDescription();
+      // throw; keeps a subclass of mitk::Exception, which mitkReThrow would slice to its static type.
+      e.SetDescription("Cannot read the DICOM SEG file \"" + this->GetInputLocation() + "\": " + e.GetDescription());
+      throw;
     }
     catch (const std::exception &e)
     {
@@ -1683,8 +1700,6 @@ namespace mitk
       ++segmentNumber;
       if (label != nullptr)
       {
-        CheckWritableLabelName(*label);
-        CheckWritableTrackingUID(*label);
         auto segmentAttribute = handler.createOrGetSegment(segmentNumber, label->GetValue());
 
         if (segmentAttribute != nullptr)

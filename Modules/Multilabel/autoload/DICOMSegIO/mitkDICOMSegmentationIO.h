@@ -69,11 +69,14 @@ namespace mitk
      * \throw DICOMSegStrictModeException in strict mode if the segmentation lacks a contract item
      * (DICOMSegmentationPropertyHelper::Validate) or a source-image relation with per-slice UIDs;
      * a retry in synthetic mode can succeed.
-     * \throw mitk::Exception naming the label for a label value above 32767, a label name with a
-     * backslash or with non-ASCII characters, or a Tracking UID that is no valid UID; naming the
-     * relation for a source-image relation without source series; and if synthetic mode cannot
-     * fill a contract item, if no source-image reference lies on a slice of the segmentation, or if
-     * dcmqi fails. A failure in a later group leaves the files of the earlier groups.
+     * \throw DICOMSegUnrepresentableValueException naming the label for a label value above 32767,
+     * a label name with a backslash or with non-ASCII characters, or a Tracking UID that is no valid
+     * UID; only changing the label lets the write succeed. The labels of all groups are checked
+     * before any file is written.
+     * \throw mitk::Exception naming the relation for a source-image relation without source series;
+     * and if synthetic mode cannot fill a contract item, if no source-image reference lies on a
+     * slice of the segmentation, or if dcmqi fails. A failure of ITK, of dcmqi or of saving in a
+     * later group leaves the files of the earlier groups.
      */
     void Write() override;
 

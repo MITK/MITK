@@ -4,6 +4,7 @@ set(MODULE_TESTS
     mitkDICOMSegmentationPropertyHelperTest.cpp
     mitkLabelTest.cpp
     mitkLabelSetImageTest.cpp
+    mitkLabelSetImageVtkMapper2DTimeStepTest.cpp
     mitkLabelSuggestionHelperTest.cpp
     mitkLegacyLabelSetImageIOTest.cpp
     mitkMultiLabelIOHelperTest.cpp

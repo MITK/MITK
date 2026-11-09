@@ -703,6 +703,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
+    localStorage->m_LastUpdateTimeStep = TIMESTEP_INVALID;
     this->SetToInvalidState(localStorage);
     return;
   }
@@ -717,7 +718,8 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
-      (localStorage->m_LastUpdateTime < data->GetPropertyList()->GetMTime()))
+      (localStorage->m_LastUpdateTime < data->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastUpdateTimeStep != this->GetTimestep()))
   {
     this->GenerateDataForRenderer(renderer);
   }
@@ -725,6 +727,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTimeStep = this->GetTimestep();
 }
 
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)

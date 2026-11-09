@@ -96,6 +96,11 @@ namespace mitk
     public:
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
+
+      /** \brief Time step of the data at the last update. TIMESTEP_INVALID after a time step
+       *         that is invalid for the data, so that coming back to the time step shown before
+       *         regenerates. */
+      TimeStepType m_LastUpdateTimeStep = TIMESTEP_INVALID;
       /**
          * @brief m_PropAssembly Contains all vtkProps for the final rendering.
          *

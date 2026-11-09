@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPointSet.h>
+#include <mitkExceptionMacro.h>
 #include <mitkInteractionConst.h>
 #include <mitkPointOperation.h>
 
@@ -25,6 +26,16 @@ namespace mitk
   itkEventMacroDefinition(PointSetAddEvent, PointSetSizeChangeEvent);
   itkEventMacroDefinition(PointSetRemoveEvent, PointSetSizeChangeEvent);
   itkEventMacroDefinition(PointSetExtendTimeRangeEvent, PointSetEvent);
+}
+
+namespace
+{
+  void ThrowIfInvalidTimeStep(mitk::TimeStepType t)
+  {
+    // Expand(t + 1) would wrap around to Expand(0) and leave t out of range.
+    if (t == mitk::TIMESTEP_INVALID)
+      mitkThrow() << "Cannot write a point to an invalid time step.";
+  }
 }
 
 mitk::PointSet::PointSet() : m_CalculateBoundingBox(true)
@@ -293,6 +304,8 @@ bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType *point, Time
 
 void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, TimeStepType t)
 {
+  ThrowIfInvalidTimeStep(t);
+
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
 
@@ -312,6 +325,8 @@ void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, TimeStepType 
 
 void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t)
 {
+  ThrowIfInvalidTimeStep(t);
+
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
 
@@ -359,6 +374,8 @@ void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpeci
 
 mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, TimeStepType t)
 {
+  ThrowIfInvalidTimeStep(t);
+
   // Adapt the size of the data vector if necessary
   this->Expand(t + 1);
 

@@ -175,6 +175,7 @@ namespace mitk
      *
      * \param[in] polydata The vtkPolyData to set.
      * \param[in] t Time step (default: 0). The surface is expanded if necessary.
+     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
      */
     virtual void SetVtkPolyData(vtkPolyData *polydata, TimeStepType t = 0);
 

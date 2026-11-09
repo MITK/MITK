@@ -654,6 +654,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesRelationWithoutSourceSeriesUID);
   MITK_TEST(WriteTurnsDcmqiFailuresIntoExceptions);
   MITK_TEST(WriteRoundsColours);
+  MITK_TEST(StrictModeRefusalsAreStrictModeExceptions);
+  MITK_TEST(SyntheticModeRefusalIsPlainException);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -947,6 +949,31 @@ public:
     const auto written = mitk::test::ReadRecommendedDisplayCIELab(path).at(1);
     for (unsigned int i = 0; i < 3; ++i)
       CPPUNIT_ASSERT_EQUAL_MESSAGE("CIELab component " + std::to_string(i), lab[i], static_cast<int>(written[i]));
+  }
+
+  // DICOMSegStrictModeException tells callers that a retry in synthetic mode can succeed.
+  void StrictModeRefusalsAreStrictModeExceptions()
+  {
+    this->AssertWriteRefused(BuildSegWithRule(/*stampIdentity=*/false), {}, "strict-incomplete", true, {"PatientID"});
+    this->AssertWriteRefused(BuildBaseSeg(/*stampIdentity=*/true), {}, "strict-no-relation", true, {"group 0"});
+
+    auto idLayerOnly = BuildBaseSeg(/*stampIdentity=*/true);
+    AttachIDLayerOnlyRelation(idLayerOnly);
+    this->AssertWriteRefused(idLayerOnly, {}, "strict-id-layer", true, {"group 0"});
+  }
+
+  // A refusal in synthetic mode names what synthesis cannot fill and suggests no mode switch.
+  void SyntheticModeRefusalIsPlainException()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
+    seg->GetLabel(1)->SetAlgorithmName("");
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    const auto message =
+      this->AssertWriteRefused(seg, options, "synthetic-refusal", false, {"[label 1]", "Algorithm Name"});
+    CPPUNIT_ASSERT_MESSAGE("The synthetic-mode refusal suggests no mode switch: " + message,
+                           message.find("Strict / synthetic mode") == std::string::npos);
   }
 
   void WriteRefuses4D()

@@ -898,16 +898,24 @@ namespace mitk
     }();
     if (!missing.empty())
     {
-      std::ostringstream msg;
-      msg << "DICOM SEG write blocked by strict mode: the segmentation is "
-          << "missing " << missing.size() << " contract item(s) required to "
-          << "produce a valid SEG. Set the writer option \""
-          << OPTION_SYNTHESIS_MODE << "\" to \"" << OPTION_SYNTHESIS_MODE_SYNTHETIC
-          << "\" to fill these automatically, or populate them explicitly. "
-          << "Missing items:";
+      std::ostringstream items;
       for (const auto &m : missing)
-        msg << "\n  - " << FormatMissingItem(m);
-      mitkThrowException(DICOMSegStrictModeException) << msg.str();
+        items << "\n  - " << FormatMissingItem(m);
+
+      // Synthesis has already run, so switching modes cannot help. Only the strict-mode
+      // refusal is a DICOMSegStrictModeException, which tells callers that a retry in
+      // synthetic mode can succeed.
+      if (isSynthetic)
+        mitkThrow() << "DICOM SEG write failed: synthetic mode cannot fill " << missing.size()
+                    << " contract item(s) required to produce a valid SEG. Missing items:" << items.str();
+
+      mitkThrowException(DICOMSegStrictModeException)
+        << "DICOM SEG write blocked by strict mode: the segmentation is "
+        << "missing " << missing.size() << " contract item(s) required to "
+        << "produce a valid SEG. Set the writer option \""
+        << OPTION_SYNTHESIS_MODE << "\" to \"" << OPTION_SYNTHESIS_MODE_SYNTHETIC
+        << "\" to fill these automatically, or populate them explicitly. "
+        << "Missing items:" << items.str();
     }
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
@@ -980,30 +988,32 @@ namespace mitk
       auto sourceItems = BuildSourceItemsFromProperties(input, layer);
       if (sourceItems.empty())
       {
-        if (isSynthetic)
+        if (!isSynthetic)
         {
-          // Synthetic mode safety net: no real source-image relation is
-          // attached, so emit a minimal phantom-source set so dcmqi's
-          // dcmDatasets[0] anchor is well-formed. The resulting SEG's
-          // ReferencedSeriesSequence points at a synthesised series in
-          // the seg's own FoR; downstream tooling that recognises
-          // MITK-minted UIDs can treat them as such.
-          sourceItems = BuildSyntheticSourceItems(input, layer);
+          mitkThrowException(DICOMSegStrictModeException)
+            << "DICOM SEG write requires at least one source-image"
+            << " reference for group " << layer << ", but the"
+            << " segmentation carries no SegSourceImageRelationRule"
+            << " connection with usable per-slice SOPInstance UIDs."
+            << " Attach a real source via"
+            << " LabelSetImageHelper::SetupDerivedSegmentation"
+            << " (or SegSourceImageRelationRule::Connect directly),"
+            << " or set the writer option \""
+            << OPTION_SYNTHESIS_MODE << "\" to \""
+            << OPTION_SYNTHESIS_MODE_SYNTHETIC
+            << "\" to synthesise a placeholder source series.";
         }
+
+        // Synthetic mode safety net: no real source-image relation is
+        // attached, so emit a minimal phantom-source set so dcmqi's
+        // dcmDatasets[0] anchor is well-formed. The resulting SEG's
+        // ReferencedSeriesSequence points at a synthesised series in
+        // the seg's own FoR; downstream tooling that recognises
+        // MITK-minted UIDs can treat them as such.
+        sourceItems = BuildSyntheticSourceItems(input, layer);
         if (sourceItems.empty())
-        {
-          mitkThrow() << "DICOM SEG write requires at least one source-image"
-                      << " reference for group " << layer << ", but the"
-                      << " segmentation carries no SegSourceImageRelationRule"
-                      << " connection with usable per-slice SOPInstance UIDs."
-                      << " Attach a real source via"
-                      << " LabelSetImageHelper::SetupDerivedSegmentation"
-                      << " (or SegSourceImageRelationRule::Connect directly),"
-                      << " or set the writer option \""
-                      << OPTION_SYNTHESIS_MODE << "\" to \""
-                      << OPTION_SYNTHESIS_MODE_SYNTHETIC
-                      << "\" to synthesise a placeholder source series.";
-        }
+          mitkThrow() << "DICOM SEG write failed: synthetic mode cannot build source-image"
+                      << " references for group " << layer << ", because its group image has no slices.";
       }
       // dcmqi's API takes a raw pointer vector; unique_ptr ownership stays
       // on the stack in sourceItems and outlives the converter call.

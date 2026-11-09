@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+    mitkDICOMSegFileContentTestHelpersTest.cpp
     mitkDICOMSegPerFrameSliceKeyingTest.cpp
     mitkDICOMSegmentationIOReaderTest.cpp
     mitkDICOMSegmentationIORoundTripTest.cpp

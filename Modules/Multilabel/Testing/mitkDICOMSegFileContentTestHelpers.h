@@ -27,8 +27,11 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcitem.h>
 #include <dcmtk/dcmdata/dcsequen.h>
 
+#include <itkMath.h>
+
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <map>
 #include <set>
 #include <string>
@@ -187,6 +190,14 @@ namespace mitk
         return value;
       }
 
+      // Each frame carries its own Image Position (Patient), written with at least 7 significant
+      // digits by the producers of the fixtures (dcmqi's float32 strings, highdicom copying the
+      // 6-decimal strings of its source), so at most 5e-7 relative. A frame can thus lie off the
+      // grid that starts at the first frame by twice that: 2 x 5e-7 x 235.2 mm / 0.81 mm = 2.9e-4
+      // voxel for the largest fixture coordinate. The 7 digits of the slice spacing and the float32
+      // orientation vectors add less than 5e-5. A reader that places the voxels off by more is wrong.
+      constexpr double VOXEL_CENTRE_TOLERANCE = 1e-3;
+
       inline void CompareSegmentVoxels(const MultiLabelSegmentation& actual,
                                        const DICOMSegFileSegment& segment,
                                        std::vector<std::string>& differences)
@@ -205,10 +216,24 @@ namespace mitk
         std::set<std::size_t> offsets;
         std::size_t outside = 0;
         std::size_t otherValue = 0;
+        std::size_t offCentre = 0;
+        double largestDistance = 0.0;
         for (const auto& point : segment.voxels)
         {
+          Point3D continuousIndex;
+          geometry->WorldToIndex(point, continuousIndex);
           itk::Index<3> index;
-          geometry->WorldToIndex(point, index);
+          double distance = 0.0;
+          for (unsigned int axis = 0; axis < 3; ++axis)
+          {
+            index[axis] = itk::Math::RoundHalfIntegerUp<itk::IndexValueType>(continuousIndex[axis]);
+            distance = std::max(distance, std::abs(continuousIndex[axis] - static_cast<double>(index[axis])));
+          }
+          if (distance > VOXEL_CENTRE_TOLERANCE)
+          {
+            ++offCentre;
+            largestDistance = std::max(largestDistance, distance);
+          }
           if (!geometry->IsIndexInside(index))
           {
             ++outside;
@@ -224,6 +249,12 @@ namespace mitk
         const auto ofFileVoxels = " of " + std::to_string(segment.voxels.size()) + " file voxels";
         if (outside > 0)
           differences.push_back(context + ": " + std::to_string(outside) + ofFileVoxels + " lie outside the group image");
+        if (offCentre > 0)
+        {
+          differences.push_back(context + ": " + std::to_string(offCentre) + ofFileVoxels +
+                                " lie off the voxel centres of the group image, by up to " +
+                                std::to_string(largestDistance) + " voxel");
+        }
         if (otherValue > 0)
           differences.push_back(context + ": " + std::to_string(otherValue) + ofFileVoxels + " carry another value");
         if (offsets.size() + outside != segment.voxels.size())
@@ -234,6 +265,37 @@ namespace mitk
         {
           differences.push_back(context + ": the group image has " + std::to_string(labelled) +
                                 " voxels with the value, the file " + std::to_string(segment.voxels.size()));
+        }
+      }
+
+      // CompareSegmentVoxels finds the voxels of each segment; this finds every other value.
+      inline void CompareVoxelsOutsideSegments(const MultiLabelSegmentation& actual,
+                                               MultiLabelSegmentation::GroupIndexType group,
+                                               MultiLabelSegmentation::LabelValueVectorType segmentValues,
+                                               std::vector<std::string>& differences)
+      {
+        std::sort(segmentValues.begin(), segmentValues.end());
+        const auto* image = actual.GetGroupImage(group);
+        const std::size_t voxelCount =
+          static_cast<std::size_t>(image->GetDimension(0)) * image->GetDimension(1) * image->GetDimension(2);
+
+        ImageReadAccessor accessor(image);
+        const auto* voxels = static_cast<const Label::PixelType*>(accessor.GetData());
+
+        std::map<Label::PixelType, std::size_t> strayCounts;
+        for (std::size_t offset = 0; offset < voxelCount; ++offset)
+        {
+          const auto value = voxels[offset];
+          if (value != MultiLabelSegmentation::UNLABELED_VALUE &&
+              !std::binary_search(segmentValues.begin(), segmentValues.end(), value))
+            ++strayCounts[value];
+        }
+
+        for (const auto& [value, count] : strayCounts)
+        {
+          differences.push_back("group " + std::to_string(group) + ": " + std::to_string(count) + " of " +
+                                std::to_string(voxelCount) + " voxels carry the value " + std::to_string(value) +
+                                ", which no segment of the group has");
         }
       }
     }
@@ -391,8 +453,10 @@ namespace mitk
      * Per segment: the label with the segment number as value lies in the expected group,
      * its properties equal the segment's attributes after the documented read losses
      * (DICOMSegLabelLosses), compared by key, type and value, and its voxels are exactly
-     * the segment's. The group count, the label values of each group in segment order, and
-     * labels without a segment are checked too.
+     * the segment's, each file voxel centre on a voxel centre of the group image within the
+     * rounding of the file's positions. The group count, the label values of each group in
+     * segment order, labels without a segment, and voxels of a group image that no segment of
+     * the group has are checked too.
      */
     inline std::vector<std::string> CompareWithDICOMSegFileContent(const MultiLabelSegmentation& actual,
                                                                    const DICOMSegFileContent& content)
@@ -418,6 +482,8 @@ namespace mitk
                                 detail::DescribeValues(expectedValuesByGroup[group]) + ", actual " +
                                 detail::DescribeValues(actualValues));
         }
+        detail::CompareVoxelsOutsideSegments(actual, static_cast<MultiLabelSegmentation::GroupIndexType>(group),
+                                             expectedValuesByGroup[group], differences);
       }
 
       const auto losses = DICOMSegLabelLosses();

@@ -444,6 +444,23 @@ namespace
   {
     return itksys::SystemTools::FileExists(path, true);
   }
+
+  // IOUtil names a missing writer only in its message; a writer that refuses reads "Exception
+  // occurred when writing" instead.
+  static void AssertNoWriterFound(const mitk::BaseData* data, const std::string& path)
+  {
+    try
+    {
+      mitk::IOUtil::Save(data, mitk::test::DICOMSegMimeTypeName(), path);
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string message = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("No writer is selected: " + message, message.find("No suitable writer") != std::string::npos);
+      return;
+    }
+    CPPUNIT_FAIL("The data was written as DICOM SEG");
+  }
 }
 
 class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
@@ -917,9 +934,7 @@ public:
     fixtureOptions.withEmptyLabel = false;
     fixtureOptions.withEmptyGroup = false;
     const auto seg = mitk::test::BuildRichSegmentation(fixtureOptions);
-    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 4D segmentation as DICOM SEG",
-                                 mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("4d.dcm")),
-                                 mitk::Exception);
+    AssertNoWriterFound(seg, this->GetTempFilePath("4d.dcm"));
   }
 
   void WriteRefuses2D()
@@ -930,9 +945,7 @@ public:
     auto seg = mitk::MultiLabelSegmentation::New();
     seg->Initialize(image);
     seg->AddLabel(mitk::Label::New(1, "L"), 0, true, false);
-    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 2D segmentation as DICOM SEG",
-                                 mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("2d.dcm")),
-                                 mitk::Exception);
+    AssertNoWriterFound(seg, this->GetTempFilePath("2d.dcm"));
   }
 
   void WriteRefusesDataThatIsNoSegmentation()
@@ -940,9 +953,7 @@ public:
     auto image = mitk::Image::New();
     unsigned int dim[3] = {4u, 4u, 3u};
     image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
-    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes an image as DICOM SEG",
-                                 mitk::IOUtil::Save(image, mitk::test::DICOMSegMimeTypeName(), this->GetTempFilePath("image.dcm")),
-                                 mitk::Exception);
+    AssertNoWriterFound(image, this->GetTempFilePath("image.dcm"));
   }
 
   // Groups are written one after the other; a refusal in a later group leaves the files of the
@@ -1456,10 +1467,12 @@ public:
       seg->GetProperty("referenceFiles").IsNotNull());
   }
 
-  // Tracking ID/UID are DICOM Type 3. A label with no tracking properties
-  // must write successfully in strict mode and the resulting SEG must not
-  // carry (0062,0020)/(0062,0021) for that segment; reloading the SEG must
-  // leave HasTrackingID/UID false on the label.
+  // Tracking ID/UID are DICOM Type 1C: optional, but never present without
+  // a value. A label with no tracking properties must write successfully in
+  // strict mode and the resulting SEG must not carry (0062,0020)/(0062,0021)
+  // for that segment; reloading the SEG must leave HasTrackingID/UID false on
+  // the label. The by-value check reads an empty element as absent, so
+  // absence is asserted on the raw items.
   //
   // Default encoding is binary Segmentation Storage; segment 1 is the
   // user's label "L" (no auto-inserted Background segment, unlike dcmqi's
@@ -1477,11 +1490,15 @@ public:
     mitk::IFileWriter::Options options;
     const auto path = this->WriteSegToTempFile(seg, options, "no-tracking");
 
-    const auto segment = mitk::test::ReadSegmentSequence(path).at(1);
-    CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0020) when source label had no tracking",
-                           !segment->HasTrackingID());
-    CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0021) when source label had no tracking",
-                           !segment->HasTrackingUID());
+    DcmFileFormat file;
+    CPPUNIT_ASSERT_MESSAGE("DCMTK reads the written SEG", file.loadFile(path.c_str()).good());
+    for (auto* segment : mitk::test::detail::GetSequenceItems(*file.getDataset(), DCM_SegmentSequence))
+    {
+      CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0020) when source label had no tracking",
+                             !segment->tagExists(DCM_TrackingID));
+      CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0021) when source label had no tracking",
+                             !segment->tagExists(DCM_TrackingUID));
+    }
 
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData",

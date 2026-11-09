@@ -82,29 +82,31 @@ namespace
     return out.str();
   }
 
-  // Decide whether the writer can apply dcmqi's useLabelIDAsSegmentNumber.
-  // dcmqi requires the label values within one group to be a monotonic
-  // 1..N with no gaps; the writer mirrors that precondition rather than
-  // letting dcmqi fail late. When the labels satisfy it, the labelmap pixel
-  // values (= MITK label values) are written as the DICOM segment numbers,
-  // so the values survive a round trip. Otherwise the writer falls back to
-  // dcmqi's default 1..N-in-encounter-order segment numbering: on read dcmqi
-  // sets each segment's labelID to its DICOM segment number, so MITK label
-  // values are renumbered to 1..N and the original values are NOT preserved.
-  // Segment name, tracking ID/UID and the property codes do round-trip; the
-  // numeric label value does not.
+  // The labels of a group in the order the writer hands them to dcmqi. dcmqi numbers the segments
+  // 1..N in that order and the reader takes the segment number as label value, so ascending value
+  // order gives every label its rank within the group: labels with values 1..N keep them, in both
+  // encodings. The segment images and the segment metadata are paired by position, so both are
+  // built from this one order.
+  mitk::MultiLabelSegmentation::LabelValueVectorType GetLabelValuesInSegmentOrder(
+    const mitk::MultiLabelSegmentation *seg, unsigned int layer)
+  {
+    auto labelValues = seg->GetLabelValuesByGroup(layer);
+    std::sort(labelValues.begin(), labelValues.end());
+    return labelValues;
+  }
+
+  // Whether the label values of a group are 1..N, which a round trip keeps. The labelmap encoding
+  // then lets dcmqi take the values as segment numbers directly (useLabelIDAsSegmentNumber), which
+  // dcmqi allows only for 1..N.
   bool LabelsAreMonotonicOneToN(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
-    const auto labelValues = seg->GetLabelValuesByGroup(layer);
+    const auto labelValues = GetLabelValuesInSegmentOrder(seg, layer);
     if (labelValues.empty())
       return false;
 
-    std::vector<mitk::MultiLabelSegmentation::LabelValueType> sorted(labelValues.begin(), labelValues.end());
-    std::sort(sorted.begin(), sorted.end());
-
-    for (size_t i = 0; i < sorted.size(); ++i)
+    for (size_t i = 0; i < labelValues.size(); ++i)
     {
-      if (sorted[i] != static_cast<mitk::MultiLabelSegmentation::LabelValueType>(i + 1))
+      if (labelValues[i] != static_cast<mitk::MultiLabelSegmentation::LabelValueType>(i + 1))
         return false;
     }
     return true;
@@ -862,6 +864,7 @@ namespace mitk
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       std::vector<itkInternalImageType::ConstPointer> segmentations;
+      const auto labelSet = input->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(input, layer));
 
       try
       {
@@ -876,8 +879,6 @@ namespace mitk
 
         itkInternalImageType::Pointer itkLabelImage = castFilter->GetOutput();
         itkLabelImage->DisconnectPipeline();
-
-        auto labelSet = input->GetConstLabelsByValue(input->GetLabelValuesByGroup(layer));
 
         for (const auto &label : labelSet)
         {
@@ -940,19 +941,12 @@ namespace mitk
       const bool labelsAreMonotonicOneToN = LabelsAreMonotonicOneToN(input, layer);
       const bool useLabelIDAsSegmentNumber = wantLabelmap && labelsAreMonotonicOneToN;
 
-      // Warn when the written segment numbers will not preserve the MITK
-      // label values. dcmqi only keeps label values as segment numbers in
-      // the labelmap encoding with a monotonic 1..N label set; otherwise
-      // (the default binary encoding, or a non-1..N labelmap) it assigns
-      // segment numbers 1..N in encounter order and the values are lost on
-      // round trip. Suppressed when the labels already are 1..N (the
-      // renumbering is then a no-op).
-      if (!useLabelIDAsSegmentNumber && !labelsAreMonotonicOneToN)
+      // Segment numbers run 1..N in ascending value order, so values other
+      // than 1..N become their rank within the group.
+      if (!labelsAreMonotonicOneToN)
         MITK_WARN << "DICOM SEG group " << layer << ": label values will be "
-                  << "renumbered to 1..N in the written SEG and will not "
-                  << "survive a round trip. Use the \"" << OPTION_ENCODING
-                  << "\" option \"" << OPTION_ENCODING_LABELMAP << "\" with a "
-                  << "monotonic 1..N label set to preserve label values.";
+                  << "renumbered to 1..N in ascending order in the written SEG "
+                  << "and will not survive a round trip.";
 
       // Per-layer output path, also used by the log line so the message
       // names the file actually being written. Follows the MITK
@@ -1563,7 +1557,8 @@ namespace mitk
     handler.setInstanceNumber(std::to_string(layer + 1));
     handler.setBodyPartExamined("");
 
-    auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
+    // The segment metadata must pair with the segment images in Write by position.
+    auto labelSet = image->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(image, layer));
 
     unsigned int segmentNumber = 0;
 

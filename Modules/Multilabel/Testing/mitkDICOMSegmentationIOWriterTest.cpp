@@ -342,6 +342,42 @@ namespace
     return seg;
   }
 
+  // A seg that strict mode writes, with one MANUAL label per entry, inserted in the given order.
+  // Label i covers voxel i of every slice, so every label becomes a segment with frames, and the
+  // last voxels of a slice stay unlabeled.
+  mitk::MultiLabelSegmentation::Pointer BuildSegWithLabels(
+    const std::vector<std::pair<mitk::Label::PixelType, std::string>>& labels)
+  {
+    auto geometryImage = mitk::Image::New();
+    unsigned int dim[3] = {4u, 4u, 3u};
+    geometryImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
+
+    auto seg = mitk::MultiLabelSegmentation::New();
+    seg->Initialize(geometryImage);
+    for (const auto& [value, name] : labels)
+    {
+      auto label = mitk::Label::New(value, name);
+      label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+      label->SetSegmentedPropertyCategory(mitk::DICOMCodeSequence("T-D0050", "SRT", "Tissue"));
+      label->SetSegmentedPropertyType(mitk::DICOMCodeSequenceWithModifiers("T-D0050", "SRT", "Tissue"));
+      seg->AddLabel(label, 0, false, false);
+    }
+
+    {
+      mitk::ImageWriteAccessor writeAccessor(seg->GetGroupImage(0));
+      auto* pixels = static_cast<mitk::Label::PixelType*>(writeAccessor.GetData());
+      for (unsigned int z = 0; z < dim[2]; ++z)
+      {
+        for (std::size_t i = 0; i < labels.size(); ++i)
+          pixels[z * dim[0] * dim[1] + i] = labels[i].first;
+      }
+    }
+
+    StampIdentityTags(seg);
+    AttachDicomSourceRelation(seg);
+    return seg;
+  }
+
   // A label carrying every per-segment attribute the writer emits, each one
   // derived from the label value so that a reader restoring one label's
   // attributes onto another, or onto the first label only, is caught. The
@@ -596,6 +632,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(StrictReSaveAfterDICOMSegRoundTripPreservesIdentity);
   MITK_TEST(MultiGroupWriteFormsOneCoherentSeries);
   MITK_TEST(WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet);
+  MITK_TEST(WriteNumbersSegmentsByLabelValueInBinary);
+  MITK_TEST(WriteNumbersSegmentsByLabelValueInLabelmap);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -690,6 +728,37 @@ public:
   void tearDown() override
   {
     itksys::SystemTools::RemoveADirectory(m_TempPath);
+  }
+
+  // The writer hands the labels of a group to dcmqi in ascending value order, which numbers the
+  // segments in that order, so the segment number is the label's rank. Labels inserted as B=2,
+  // A=1 were written as segment 1 = B before.
+  void WriteNumbersSegmentsByLabelValueInBinary()
+  {
+    auto seg = BuildSegWithLabels({{2, "B"}, {1, "A"}});
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("binary");
+    const auto path = this->WriteSegToTempFile(seg, options, "order-binary");
+
+    const auto segments = mitk::test::ReadSegmentSequence(path);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Segment 1 is the label with the lowest value", std::string("A"), segments.at(1)->GetName());
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    const auto* loadedSeg = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Label value 1 is reloaded with its own name", std::string("A"), loadedSeg->GetLabel(1)->GetName());
+  }
+
+  // Without values 1..N, the labelmap encoding numbers the segments in the order the writer hands
+  // them over, too.
+  void WriteNumbersSegmentsByLabelValueInLabelmap()
+  {
+    auto seg = BuildSegWithLabels({{7, "Seven"}, {3, "Three"}});
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
+    const auto path = this->WriteSegToTempFile(seg, options, "order-labelmap");
+
+    const auto segments = mitk::test::ReadSegmentSequence(path);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Segment 1 is the label with the lowest value", std::string("Three"), segments.at(1)->GetName());
   }
 
   void WriteRefuses4D()

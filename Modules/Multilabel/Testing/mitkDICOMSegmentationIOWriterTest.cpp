@@ -658,6 +658,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(SyntheticModeRefusalIsPlainException);
   MITK_TEST(WriteKeepsDottedDirectoryOfPathWithoutExtension);
   MITK_TEST(WriteKeepsTheExtensionOfTheRequestedPath);
+  MITK_TEST(WriteUsesLowestExistingAnatomicRegion);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -1019,6 +1020,24 @@ public:
       CPPUNIT_ASSERT_MESSAGE(file + " exists", FileExists(file));
       AssertWrittenSegments(file, *seg, group, false);
     }
+  }
+
+  // RemoveAnatomicRegion leaves the indices sparse; the writer takes the region with the lowest
+  // existing index.
+  void WriteUsesLowestExistingAnatomicRegion()
+  {
+    auto seg = BuildSegWithRule();
+    auto label = seg->GetLabel(1);
+    label->SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("R0", "99MITK", "Region zero"), 0);
+    mitk::DICOMCodeSequenceWithModifiers second("R1", "99MITK", "Region one");
+    second.AddModifier(mitk::DICOMCodeSequence("R1M", "99MITK", "Region one modifier"));
+    label->SetAnatomicRegion(second, 1);
+    label->RemoveAnatomicRegion(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition: one region left, at index 1", std::size_t{1}, label->GetAnatomicRegionCount());
+
+    const auto path = this->WriteSegToTempFile(seg, {}, "sparse-region");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The written region", std::string("Region one"),
+                                 mitk::test::ReadSegmentSequence(path).at(1)->GetAnatomicRegion(0).GetMeaning());
   }
 
   void WriteRefuses4D()

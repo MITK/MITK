@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkPlaneGeometry.h>
+#include <mitkPropertyKeyPath.h>
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
@@ -1691,9 +1692,14 @@ namespace mitk
               FitIntoLO(label->GetAlgorithmName(), "Segment Algorithm Name (0062,0009) " + labelDescription));
           }
 
-          if (label->GetAnatomicRegionCount()>0)
+          // dcmqi takes one anatomic region; the indices of a label's regions can be sparse.
+          PropertyKeyPath regionPath;
+          regionPath.AddAnySelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
+          regionPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+          const auto regionNames = FindIndexedPropertyNames(label.GetPointer(), regionPath);
+          if (!regionNames.empty())
           { //Anatomic region
-            auto anatomicRegion = label->GetAnatomicRegion(0); //currently DCMQI only supports one anatomic region code
+            auto anatomicRegion = label->GetAnatomicRegion(regionNames.begin()->first);
 
             if (!anatomicRegion.GetValue().empty() && !anatomicRegion.GetScheme().empty() && !anatomicRegion.GetMeaning().empty())
             {

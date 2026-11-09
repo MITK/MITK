@@ -261,7 +261,7 @@ int mitkDICOMSegmentationIOLabelmapRegressionTest(int argc, char* argv[])
   // The attributes, against the metadata the SEG was built from.
   std::vector<std::string> differences;
   std::set<mitk::Label::PixelType> segmentValues;
-  const auto losses = mitk::test::DICOMSegReadLabelLosses();
+  const auto losses = mitk::test::DICOMSegLabelLosses();
   const auto metadataJSON = nlohmann::json::parse(metadata);
   for (const auto& group : metadataJSON.at("segmentAttributes"))
   {

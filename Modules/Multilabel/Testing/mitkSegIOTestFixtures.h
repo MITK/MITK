@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDICOMCodeSequenceWithModifiers.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileReaderSelector.h>
+#include <mitkFileWriterSelector.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkIOUtil.h>
 #include <mitkImageWriteAccessor.h>
@@ -303,6 +304,33 @@ namespace mitk
       }
       CPPUNIT_FAIL("No reader \"" + readerDescription + "\" accepts " + path);
       return {};
+    }
+
+    /**
+     * Writes data to path with the registered writer of the given description. Unlike
+     * IOUtil::Save, which turns every exception into a plain mitk::Exception, this lets the
+     * writer's own exception through, so tests can assert its type. The writer must accept
+     * the data, as with IOUtil::Save.
+     */
+    inline void WriteWithWriter(const BaseData* data,
+                                const std::string& path,
+                                const std::string& writerDescription,
+                                const IFileWriter::Options& options = {})
+    {
+      FileWriterSelector selector(data, std::string(), path);
+      for (const auto& item : selector.Get())
+      {
+        if (item.GetDescription() == writerDescription)
+        {
+          auto* writer = item.GetWriter();
+          writer->SetInput(data);
+          writer->SetOutputLocation(path);
+          writer->SetOptions(options);
+          writer->Write();
+          return;
+        }
+      }
+      CPPUNIT_FAIL("No writer \"" + writerDescription + "\" accepts the data for " + path);
     }
 
     /**

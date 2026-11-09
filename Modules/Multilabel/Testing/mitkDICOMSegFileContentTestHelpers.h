@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcsequen.h>
 
 #include <algorithm>
+#include <array>
 #include <map>
 #include <set>
 #include <string>
@@ -389,7 +390,7 @@ namespace mitk
      * own content and returns one readable line per difference; an empty result means equal.
      * Per segment: the label with the segment number as value lies in the expected group,
      * its properties equal the segment's attributes after the documented read losses
-     * (DICOMSegReadLabelLosses), compared by key, type and value, and its voxels are exactly
+     * (DICOMSegLabelLosses), compared by key, type and value, and its voxels are exactly
      * the segment's. The group count, the label values of each group in segment order, and
      * labels without a segment are checked too.
      */
@@ -419,7 +420,7 @@ namespace mitk
         }
       }
 
-      const auto losses = DICOMSegReadLabelLosses();
+      const auto losses = DICOMSegLabelLosses();
       std::set<Label::PixelType> segmentValues;
       for (const auto& segment : content.segments)
       {
@@ -458,6 +459,157 @@ namespace mitk
     inline std::vector<std::string> CompareWithDICOMSegFile(const MultiLabelSegmentation& actual, const std::string& path)
     {
       return CompareWithDICOMSegFileContent(actual, ReadDICOMSegFileContent(path));
+    }
+
+    /** The items of a Segment Sequence, keyed by Segment Number. */
+    using DICOMSegSegmentMap = std::map<Uint16, Label::Pointer>;
+
+    /**
+     * Reads every item of the Segment Sequence of a DICOM SEG file, as a label like
+     * ReadDICOMSegFileContent does, but without voxels and including the background segment 0
+     * of a LABELMAP. Throws mitk::Exception for an item without or with a repeated Segment Number.
+     */
+    inline DICOMSegSegmentMap ReadSegmentSequence(const std::string& path)
+    {
+      DcmFileFormat file;
+      if (file.loadFile(path.c_str()).bad())
+        mitkThrow() << "DCMTK cannot read " << path << ".";
+
+      DICOMSegSegmentMap segments;
+      for (auto* item : detail::GetSequenceItems(*file.getDataset(), DCM_SegmentSequence))
+      {
+        Uint16 number = 0;
+        if (item->findAndGetUint16(DCM_SegmentNumber, number).bad())
+          mitkThrow() << path << " has a segment without Segment Number.";
+        if (!segments.emplace(number, detail::ReadSegmentAsLabel(*item, number)).second)
+          mitkThrow() << path << " has two segments with the Segment Number " << number << ".";
+      }
+      return segments;
+    }
+
+    /** The Recommended Display CIELab Value of every segment of a DICOM SEG file that has one, keyed by Segment Number. */
+    inline std::map<Uint16, std::array<Uint16, 3>> ReadRecommendedDisplayCIELab(const std::string& path)
+    {
+      DcmFileFormat file;
+      if (file.loadFile(path.c_str()).bad())
+        mitkThrow() << "DCMTK cannot read " << path << ".";
+
+      std::map<Uint16, std::array<Uint16, 3>> result;
+      for (auto* item : detail::GetSequenceItems(*file.getDataset(), DCM_SegmentSequence))
+      {
+        Uint16 number = 0;
+        item->findAndGetUint16(DCM_SegmentNumber, number);
+        if (!item->tagExistsWithValue(DCM_RecommendedDisplayCIELabValue))
+          continue;
+        std::array<Uint16, 3> lab = { 0, 0, 0 };
+        for (unsigned long i = 0; i < 3; ++i)
+          item->findAndGetUint16(DCM_RecommendedDisplayCIELabValue, lab[i], i);
+        result[number] = lab;
+      }
+      return result;
+    }
+
+    /**
+     * The Segment Sequence the DICOM SEG writer is expected to write for one group of a
+     * segmentation, as ReadSegmentSequence reads it: the labels in ascending value order, each
+     * numbered by its rank, with the writer's defaults for required attributes the label lacks
+     * and after the documented label losses. A LABELMAP has the background segment 0 that dcmqi
+     * adds when the group image has unlabeled voxels.
+     */
+    inline DICOMSegSegmentMap ExpectedSegmentSequence(const MultiLabelSegmentation& segmentation,
+                                                      MultiLabelSegmentation::GroupIndexType group,
+                                                      bool labelmap)
+    {
+      auto values = segmentation.GetLabelValuesByGroup(group);
+      std::sort(values.begin(), values.end());
+
+      DICOMSegSegmentMap segments;
+      for (const auto value : values)
+      {
+        auto label = segmentation.GetLabel(value)->Clone();
+        ApplyDICOMSegWriterDefaults(*label);
+        for (const auto& loss : DICOMSegLabelLosses())
+          loss.apply(*label);
+        for (const auto& loss : DICOMSegLabelFormatLosses())
+          loss.apply(*label);
+        const auto number = static_cast<Uint16>(segments.size() + 1);
+        label->SetValue(number);
+        segments[number] = label;
+      }
+
+      if (labelmap)
+      {
+        const auto* image = segmentation.GetGroupImage(group);
+        ImageReadAccessor accessor(image);
+        const auto* voxels = static_cast<const Label::PixelType*>(accessor.GetData());
+        const auto voxelCount = static_cast<std::size_t>(image->GetDimension(0)) * image->GetDimension(1) * image->GetDimension(2);
+        if (std::find(voxels, voxels + voxelCount, MultiLabelSegmentation::UNLABELED_VALUE) != voxels + voxelCount)
+        {
+          auto background = Label::New(0, "Background");
+          background->SetOpacity(0.6f);
+          background->SetVisible(true);
+          background->SetLocked(true);
+          int rgb[3] = { 0, 0, 0 };
+          dcmqi::ColorUtilities::getSRGBFromIntegerScaledCIELabPCS(rgb[0], rgb[1], rgb[2], 0, 32768, 32768);
+          Color color;
+          color.Set(rgb[0] / 255.f, rgb[1] / 255.f, rgb[2] / 255.f);
+          background->SetColor(color);
+          background->SetAlgorithmType(Label::AlgorithmType::AUTOMATIC);
+          background->SetAlgorithmName("dcmqi");
+          background->SetSegmentedPropertyCategory(DICOMCodeSequence("125040", "DCM", "Background"));
+          background->SetSegmentedPropertyType(DICOMCodeSequenceWithModifiers("125040", "DCM", "Background"));
+          segments[0] = background;
+        }
+      }
+
+      return segments;
+    }
+
+    /** Compares two Segment Sequences segment by segment, by number, and returns one readable line per difference. */
+    inline std::vector<std::string> CompareSegmentSequences(const DICOMSegSegmentMap& expected, const DICOMSegSegmentMap& actual)
+    {
+      std::vector<std::string> differences;
+      for (const auto& [number, label] : expected)
+      {
+        const auto finding = actual.find(number);
+        if (finding == actual.end())
+        {
+          differences.push_back("segment " + std::to_string(number) + " ('" + label->GetName() + "'): missing");
+          continue;
+        }
+        std::vector<std::string> labelDifferences;
+        detail::CompareLabelProperties(*label, *finding->second, 0.f, labelDifferences);
+        for (const auto& difference : labelDifferences)
+          differences.push_back("segment " + std::to_string(number) + ", " + difference);
+      }
+      for (const auto& [number, label] : actual)
+      {
+        if (expected.count(number) == 0)
+          differences.push_back("segment " + std::to_string(number) + " ('" + label->GetName() + "'): unexpected");
+      }
+      return differences;
+    }
+
+    /**
+     * Checks the file the DICOM SEG writer wrote for one group of a segmentation: every item of
+     * its Segment Sequence against ExpectedSegmentSequence, and SegmentsOverlap NO, since the
+     * labels of a group never overlap.
+     */
+    inline std::vector<std::string> CompareWrittenSegments(const std::string& path,
+                                                           const MultiLabelSegmentation& segmentation,
+                                                           MultiLabelSegmentation::GroupIndexType group,
+                                                           bool labelmap)
+    {
+      auto differences = CompareSegmentSequences(ExpectedSegmentSequence(segmentation, group, labelmap), ReadSegmentSequence(path));
+
+      DcmFileFormat file;
+      if (file.loadFile(path.c_str()).bad())
+        mitkThrow() << "DCMTK cannot read " << path << ".";
+      const auto overlap = detail::GetDICOMString(*file.getDataset(), DCM_SegmentsOverlap);
+      if (overlap != "NO")
+        differences.push_back("SegmentsOverlap: expected 'NO', actual '" + overlap + "'");
+
+      return differences;
     }
   }
 }

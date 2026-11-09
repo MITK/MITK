@@ -10,7 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkDICOMSegFileContentTestHelpers.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkLabel.h>
@@ -20,24 +22,30 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
+#include <mitkSegIOTestFixtures.h>
 #include <mitkSegSourceReferenceTestHelpers.h>
 #include <mitkSegTestSourceImageFactory.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <dcmqi/ColorUtilities.h>
+
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcitem.h>
 #include <dcmtk/ofstd/ofstring.h>
 
+#include <itksys/SystemTools.hxx>
+
 #include <algorithm>
-#include <filesystem>
-#include <fstream>
+#include <cmath>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 // Tests for the property-driven DICOM SEG writer. There is no legacy
 // referenceFiles fallback inside the writer; legacy segs are translated
@@ -45,7 +53,9 @@ found in the LICENSE file.
 // separately by DICOMSegmentationPropertyHelper::
 // MigrateLegacyReferenceFilesToRelation, exercised below). Every test
 // here builds the segmentation programmatically so no external DICOM
-// SEG fixture is required.
+// SEG fixture is required. Every test that writes through
+// WriteSegToTempFile checks each item of the Segment Sequence of every
+// file written.
 
 namespace
 {
@@ -123,7 +133,7 @@ namespace
     if (withTracking)
     {
       label->SetTrackingID("track-id");
-      label->SetTrackingUID("track-uid");
+      label->SetTrackingUID("1.2.826.0.1.3680043.10.999.11.1");
     }
     seg->AddLabel(label, 0, true, true);
 
@@ -242,18 +252,6 @@ namespace
     if (ff.getDataset()->findAndGetOFString(DCM_PatientID, tmp).bad())
       return false;
     return tmp == Helper::UnknownPatientID().c_str();
-  }
-
-  // Write the seg via mitk::IOUtil through the configured writer options.
-  std::string WriteSegToTempFile(mitk::MultiLabelSegmentation* seg,
-                                 const mitk::IFileWriter::Options& options,
-                                 const std::string& nameHint)
-  {
-    const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegWriterTest";
-    std::filesystem::create_directories(tempDir);
-    const std::string path = (tempDir / (nameHint + ".dcm")).string();
-    mitk::IOUtil::Save(seg, path, options);
-    return path;
   }
 
   // Read a DICOM-tag-keyed string property from the seg's property list.
@@ -500,105 +498,72 @@ namespace
     return copyPath;
   }
 
-  // Snapshot of one SegmentSequence item as read directly via DCMTK. Code-
-  // triple fields are empty strings when the surrounding sequence is absent;
-  // hasTrackingID / hasTrackingUID separate "absent" from "present but empty".
-  struct SegmentItemView
+  // Two groups with one label each, values 1 and 2, derived from a DICOM source and connected to it.
+  mitk::MultiLabelSegmentation::Pointer BuildTwoGroupSeg()
   {
-    bool hasTrackingID = false;
-    std::string trackingID;
-    bool hasTrackingUID = false;
-    std::string trackingUID;
-    std::string categoryCodeValue, categoryCodeScheme, categoryCodeMeaning;
-    std::string typeCodeValue, typeCodeScheme, typeCodeMeaning;
-    std::string typeModifierCodeValue, typeModifierCodeScheme, typeModifierCodeMeaning;
-  };
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    auto seg = InitializeSegFromSourceImage(source);
+    const auto g1 = seg->AddGroup();
+    auto label2 = mitk::Label::New();
+    label2->SetName("L2");
+    label2->SetValue(2);
+    label2->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label2->SetAlgorithmName("WorkflowTest");
+    seg->AddLabel(label2, g1, true, true);
 
-  void ReadCodeTriple(DcmItem* parent, const DcmTagKey& seqTag,
-                      std::string& outValue, std::string& outScheme, std::string& outMeaning)
-  {
-    DcmSequenceOfItems* seq = nullptr;
-    if (parent->findAndGetSequence(seqTag, seq).bad() || seq == nullptr)
-      return;
-    DcmItem* item = seq->getItem(0);
-    if (item == nullptr)
-      return;
-    OFString tmp;
-    if (item->findAndGetOFString(DCM_CodeValue, tmp).good())
-      outValue = tmp.c_str();
-    if (item->findAndGetOFString(DCM_CodingSchemeDesignator, tmp).good())
-      outScheme = tmp.c_str();
-    if (item->findAndGetOFString(DCM_CodeMeaning, tmp).good())
-      outMeaning = tmp.c_str();
-  }
-
-  // Navigate (0062,0002) SegmentSequence -> item[segmentNumber-1] and read
-  // the per-segment code triples + Tracking ID/UID presence. The plan's
-  // assertions about DICOM-level absence (Tracking ID/UID omitted) and the
-  // unknown-code fallback cannot be made through dcmqi without descending
-  // into the file, so this helper does that walk directly.
-  SegmentItemView ReadSegmentItem(const std::string& segPath, unsigned int segmentNumber)
-  {
-    SegmentItemView view;
-    DcmFileFormat ff;
-    if (ff.loadFile(segPath.c_str()).bad())
-      return view;
-    auto* dataset = ff.getDataset();
-    DcmSequenceOfItems* segmentSeq = nullptr;
-    if (dataset->findAndGetSequence(DCM_SegmentSequence, segmentSeq).bad() || segmentSeq == nullptr)
-      return view;
-    DcmItem* item = segmentSeq->getItem(segmentNumber - 1);
-    if (item == nullptr)
-      return view;
-
-    OFString tmp;
-    if (item->findAndGetOFString(DCM_TrackingID, tmp).good())
+    // The writer encodes every slice, and a group without voxels makes dcmqi produce no SEG.
     {
-      view.hasTrackingID = true;
-      view.trackingID = tmp.c_str();
-    }
-    if (item->findAndGetOFString(DCM_TrackingUID, tmp).good())
-    {
-      view.hasTrackingUID = true;
-      view.trackingUID = tmp.c_str();
-    }
-
-    ReadCodeTriple(item, DCM_SegmentedPropertyCategoryCodeSequence,
-                   view.categoryCodeValue, view.categoryCodeScheme, view.categoryCodeMeaning);
-    ReadCodeTriple(item, DCM_SegmentedPropertyTypeCodeSequence,
-                   view.typeCodeValue, view.typeCodeScheme, view.typeCodeMeaning);
-
-    // SegmentedPropertyTypeModifierCodeSequence nests inside the Type code
-    // sequence's item per PS3.3 Segment Description Macro, not at the
-    // segment-item level.
-    DcmSequenceOfItems* typeSeq = nullptr;
-    if (item->findAndGetSequence(DCM_SegmentedPropertyTypeCodeSequence, typeSeq).good()
-        && typeSeq != nullptr)
-    {
-      if (DcmItem* typeItem = typeSeq->getItem(0); typeItem != nullptr)
+      auto *g1Image = seg->GetGroupImage(g1);
+      mitk::ImageWriteAccessor writeAccessor(g1Image);
+      auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
+      const auto dims = g1Image->GetDimensions();
+      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+      for (unsigned int z = 0; z < dims[2]; ++z)
       {
-        ReadCodeTriple(typeItem, DCM_SegmentedPropertyTypeModifierCodeSequence,
-                       view.typeModifierCodeValue,
-                       view.typeModifierCodeScheme,
-                       view.typeModifierCodeMeaning);
+        pixels[z * sliceSize + 0] = 2;
+        pixels[z * sliceSize + 1] = 2;
       }
     }
-    return view;
+
+    Rule::Connect(seg, source.GetPointer());
+    return seg;
   }
 
-  // Count the items in a written SEG's (0062,0002) SegmentSequence. Used to
-  // pin "labelmap encoding produces N+1 segments (Background + N user labels)"
-  // vs "binary encoding produces N segments (no auto-Background)".
-  unsigned int CountSegmentSequenceItems(const std::string& segPath)
+  // The DICOM SEG mime type is not exported from its autoload module, so its name is spelled out.
+  std::string DICOMSegMimeTypeName()
   {
-    DcmFileFormat ff;
-    if (ff.loadFile(segPath.c_str()).bad())
-      return 0u;
-    DcmSequenceOfItems* segmentSeq = nullptr;
-    if (ff.getDataset()->findAndGetSequence(DCM_SegmentSequence, segmentSeq).bad()
-        || segmentSeq == nullptr)
-      return 0u;
-    return static_cast<unsigned int>(segmentSeq->card());
+    return mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
+  }
+
+  bool IsLabelmap(const mitk::IFileWriter::Options& options)
+  {
+    const auto finding = options.find("Segmentation encoding");
+    return finding != options.end() && finding->second.ToString() == "labelmap";
+  }
+
+  // The writer names the file of group 0 as requested and appends "_<group>" for the others.
+  // The writer writes group 0 to the requested path and inserts "_<group>" before the extension of
+  // the file name for the others, or appends it if the file name has none.
+  std::string GroupFilePath(const std::string& path, mitk::MultiLabelSegmentation::GroupIndexType group)
+  {
+    if (0 == group)
+      return path;
+    const auto extension = itksys::SystemTools::GetFilenameLastExtension(path);
+    return path.substr(0, path.size() - extension.size()) + "_" + std::to_string(group) + extension;
+  }
+
+  void AssertWrittenSegments(const std::string& path,
+                             const mitk::MultiLabelSegmentation& seg,
+                             mitk::MultiLabelSegmentation::GroupIndexType group,
+                             bool labelmap)
+  {
+    const auto differences = mitk::test::CompareWrittenSegments(path, seg, group, labelmap);
+    CPPUNIT_ASSERT_MESSAGE(path + " differs on the wire:" + mitk::test::JoinDifferences(differences), differences.empty());
+  }
+
+  bool FileExists(const std::string& path)
+  {
+    return itksys::SystemTools::FileExists(path, true);
   }
 }
 
@@ -631,15 +596,136 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(StrictReSaveAfterDICOMSegRoundTripPreservesIdentity);
   MITK_TEST(MultiGroupWriteFormsOneCoherentSeries);
   MITK_TEST(WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet);
+  MITK_TEST(WriteRefuses4D);
+  MITK_TEST(WriteRefuses2D);
+  MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
   CPPUNIT_TEST_SUITE_END();
 
+private:
+  std::string m_TempPath;
+
+  std::string GetTempFilePath(const std::string& fileName) const
+  {
+    return m_TempPath + mitk::IOUtil::GetDirectorySeparator() + fileName;
+  }
+
+  // Writes seg through IOUtil, as a user does, and leaves checking the files to the caller.
+  std::string WriteSegToTempFileUnchecked(mitk::MultiLabelSegmentation* seg,
+                                          const mitk::IFileWriter::Options& options,
+                                          const std::string& nameHint) const
+  {
+    const auto path = this->GetTempFilePath(nameHint + ".dcm");
+    mitk::IOUtil::Save(seg, path, options);
+    return path;
+  }
+
+  // Writes seg through IOUtil, as a user does, and checks every item of the Segment Sequence of
+  // every file written, keyed by Segment Number. Synthetic mode stamps seg before it is written,
+  // so the check runs against the stamped seg.
+  std::string WriteSegToTempFile(mitk::MultiLabelSegmentation* seg,
+                                 const mitk::IFileWriter::Options& options,
+                                 const std::string& nameHint) const
+  {
+    const auto path = this->WriteSegToTempFileUnchecked(seg, options, nameHint);
+    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg->GetNumberOfGroups(); ++group)
+      AssertWrittenSegments(GroupFilePath(path, group), *seg, group, IsLabelmap(options));
+    return path;
+  }
+
+  // Asserts that the writer refuses a clone of seg, called directly and through IOUtil. Called
+  // directly, it must throw a mitk::Exception whose message contains every fragment; only a
+  // refusal of the strict-mode contract may be, and must be, a DICOMSegStrictModeException.
+  // Returns the message of the direct call.
+  std::string AssertWriteRefused(const mitk::MultiLabelSegmentation* seg,
+                                 const mitk::IFileWriter::Options& options,
+                                 const std::string& nameHint,
+                                 bool strictModeRefusal,
+                                 const std::vector<std::string>& fragments) const
+  {
+    const auto path = this->GetTempFilePath(nameHint + ".dcm");
+    std::string message;
+    bool refused = false;
+    try
+    {
+      mitk::test::WriteWithWriter(mitk::test::CloneKeepingUID(*seg), path, "DICOM Segmentation", options);
+    }
+    catch (const mitk::DICOMSegStrictModeException& e)
+    {
+      refused = true;
+      message = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE(nameHint + ": a refusal outside the strict-mode contract is a DICOMSegStrictModeException: " + message,
+                             strictModeRefusal);
+    }
+    catch (const mitk::Exception& e)
+    {
+      refused = true;
+      message = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE(nameHint + ": a strict-mode refusal is a plain mitk::Exception: " + message, !strictModeRefusal);
+    }
+    if (!refused)
+    {
+      std::string written;
+      for (const auto& [number, label] : mitk::test::ReadSegmentSequence(path))
+        written += " segment " + std::to_string(number) + " '" + label->GetName() + "';";
+      CPPUNIT_FAIL(nameHint + ": the writer wrote instead of refusing:" + written);
+    }
+    for (const auto& fragment : fragments)
+    {
+      CPPUNIT_ASSERT_MESSAGE(nameHint + ": the message does not contain '" + fragment + "': " + message,
+                             message.find(fragment) != std::string::npos);
+    }
+
+    CPPUNIT_ASSERT_THROW_MESSAGE(nameHint + ": IOUtil::Save refuses as well",
+                                 mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*seg), path, options),
+                                 mitk::Exception);
+    return message;
+  }
+
 public:
-  // The write helpers drop files under a shared temp directory; remove it
-  // after each test so the suite does not leave artefacts behind.
+  void setUp() override
+  {
+    m_TempPath = mitk::IOUtil::CreateTemporaryDirectory("mitkDICOMSegWriterTest_XXXXXX");
+  }
+
   void tearDown() override
   {
-    std::error_code ec;
-    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "mitkDICOMSegWriterTest", ec);
+    itksys::SystemTools::RemoveADirectory(m_TempPath);
+  }
+
+  void WriteRefuses4D()
+  {
+    mitk::test::RichSegmentationOptions fixtureOptions;
+    fixtureOptions.dynamic = true;
+    fixtureOptions.dicomLegalNames = true;
+    fixtureOptions.withEmptyLabel = false;
+    fixtureOptions.withEmptyGroup = false;
+    const auto seg = mitk::test::BuildRichSegmentation(fixtureOptions);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 4D segmentation as DICOM SEG",
+                                 mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), this->GetTempFilePath("4d.dcm")),
+                                 mitk::Exception);
+  }
+
+  void WriteRefuses2D()
+  {
+    auto image = mitk::Image::New();
+    unsigned int dim[2] = {4u, 4u};
+    image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 2, dim);
+    auto seg = mitk::MultiLabelSegmentation::New();
+    seg->Initialize(image);
+    seg->AddLabel(mitk::Label::New(1, "L"), 0, true, false);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes a 2D segmentation as DICOM SEG",
+                                 mitk::IOUtil::Save(seg, DICOMSegMimeTypeName(), this->GetTempFilePath("2d.dcm")),
+                                 mitk::Exception);
+  }
+
+  void WriteRefusesDataThatIsNoSegmentation()
+  {
+    auto image = mitk::Image::New();
+    unsigned int dim[3] = {4u, 4u, 3u};
+    image->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
+    CPPUNIT_ASSERT_THROW_MESSAGE("No writer takes an image as DICOM SEG",
+                                 mitk::IOUtil::Save(image, DICOMSegMimeTypeName(), this->GetTempFilePath("image.dcm")),
+                                 mitk::Exception);
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()
@@ -649,7 +735,7 @@ public:
                            Helper::Validate(seg).empty());
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "property-driven");
+    const auto path = this->WriteSegToTempFile(seg, options, "property-driven");
 
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData",
@@ -692,7 +778,7 @@ public:
     // behavior is what is exercised.
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
-    const auto path = WriteSegToTempFile(seg, options, "empty-slice-preservation");
+    const auto path = this->WriteSegToTempFile(seg, options, "empty-slice-preservation");
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Writer must encode every source slice (skipEmptySlices=false): all 3 slices, not just the "
@@ -708,7 +794,7 @@ public:
 
     mitk::IFileWriter::Options options;  // strict by default
     CPPUNIT_ASSERT_THROW_MESSAGE("Strict mode must refuse an incomplete seg",
-                                 WriteSegToTempFile(seg, options, "strict-fail"),
+                                 this->WriteSegToTempFile(seg, options, "strict-fail"),
                                  mitk::Exception);
   }
 
@@ -726,7 +812,7 @@ public:
 
     mitk::IFileWriter::Options options;  // strict by default
     CPPUNIT_ASSERT_THROW_MESSAGE("Strict mode must refuse a seg without source-image relation",
-                                 WriteSegToTempFile(seg, options, "strict-no-relation"),
+                                 this->WriteSegToTempFile(seg, options, "strict-no-relation"),
                                  mitk::Exception);
   }
 
@@ -750,7 +836,7 @@ public:
     mitk::IFileWriter::Options options;  // strict by default
     CPPUNIT_ASSERT_THROW_MESSAGE(
       "Strict mode must refuse an ID-layer-only relation the same as a relation-less seg",
-      WriteSegToTempFile(seg, options, "strict-id-layer"),
+      this->WriteSegToTempFile(seg, options, "strict-id-layer"),
       mitk::Exception);
   }
 
@@ -760,7 +846,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
-    const auto path = WriteSegToTempFile(seg, options, "synthetic");
+    const auto path = this->WriteSegToTempFile(seg, options, "synthetic");
 
     CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write must stamp the UNKNOWN PatientID placeholder",
                            SEGCarriesUnknownPatientID(path));
@@ -781,7 +867,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
-    const auto path = WriteSegToTempFile(seg, options, "synthetic-stub");
+    const auto path = this->WriteSegToTempFile(seg, options, "synthetic-stub");
 
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write of relation-less seg reloads as exactly one BaseData",
@@ -820,7 +906,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
-    const auto path = WriteSegToTempFile(seg, options, "synthetic-id-layer");
+    const auto path = this->WriteSegToTempFile(seg, options, "synthetic-id-layer");
 
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write reloads as exactly one BaseData",
@@ -858,7 +944,7 @@ public:
     options["Strict / synthetic mode"] = std::string("synthetic");
     CPPUNIT_ASSERT_NO_THROW_MESSAGE(
       "Synthetic mode must produce DICOM-VR-valid output under dcmqi's default value checks",
-      WriteSegToTempFile(seg, options, "vrcheck"));
+      this->WriteSegToTempFile(seg, options, "vrcheck"));
   }
 
   void DefaultEncodingProducesLegacySOPClass()
@@ -866,7 +952,7 @@ public:
     auto seg = BuildSegWithRule();
 
     mitk::IFileWriter::Options options;  // no encoding option set
-    const auto path = WriteSegToTempFile(seg, options, "default");
+    const auto path = this->WriteSegToTempFile(seg, options, "default");
 
     // 1.2.840.10008.5.1.4.1.1.66.4 = Segmentation Storage (legacy binary).
     // Binary is the writer's default because the Sup 243 labelmap SOP class
@@ -882,7 +968,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("labelmap");
-    const auto path = WriteSegToTempFile(seg, options, "labelmap");
+    const auto path = this->WriteSegToTempFile(seg, options, "labelmap");
 
     // 1.2.840.10008.5.1.4.1.1.66.7 = Label Map Segmentation Storage (Sup 243)
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Explicit labelmap opt-in must emit the Sup 243 SOP class",
@@ -904,19 +990,22 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("labelmap");
-    const auto path = WriteSegToTempFile(seg, options, "labelmap-bg-roundtrip");
+    const auto path = this->WriteSegToTempFile(seg, options, "labelmap-bg-roundtrip");
 
-    // Write side: dcmqi must add Background as SegmentSequence item 1.
+    // Write side: WriteSegToTempFile has checked every segment; dcmqi must have added Background
+    // as segment 0.
+    const auto segments = mitk::test::ReadSegmentSequence(path);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Labelmap SEG must carry the auto-added Background segment plus the user's one label",
-      2u, CountSegmentSequenceItems(path));
-    const auto bgItem = ReadSegmentItem(path, 1);
+      std::size_t{2}, segments.size());
+    const auto category = segments.at(0)->GetSegmentedPropertyCategory();
+    CPPUNIT_ASSERT_MESSAGE("Auto-added Background segment must carry a category", category.has_value());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must carry DCM code value 125040",
-                                 std::string("125040"), bgItem.categoryCodeValue);
+                                 std::string("125040"), category->GetValue());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must use the DCM coding scheme",
-                                 std::string("DCM"), bgItem.categoryCodeScheme);
+                                 std::string("DCM"), category->GetScheme());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must be named 'Background'",
-                                 std::string("Background"), bgItem.categoryCodeMeaning);
+                                 std::string("Background"), category->GetMeaning());
 
     // Read side: MITK must strip the Background segment.
     const auto loaded = mitk::IOUtil::Load(path);
@@ -951,7 +1040,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("binary");
-    const auto path = WriteSegToTempFile(seg, options, "all-attributes-binary");
+    const auto path = this->WriteSegToTempFile(seg, options, "all-attributes-binary");
 
     AssertReloadRestoresAttributesOfEveryLabel(seg, path, "binary");
   }
@@ -963,7 +1052,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("binary");
-    const auto path = CopyWithSegmentsOverlapUndefined(WriteSegToTempFile(seg, options, "all-attributes-overlap"));
+    const auto path = CopyWithSegmentsOverlapUndefined(this->WriteSegToTempFile(seg, options, "all-attributes-overlap"));
 
     const auto loadedSeg = AssertReloadRestoresAttributesOfEveryLabel(seg, path, "binary, overlap undefined");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The overlap-safe path gives every segment a group of its own",
@@ -977,7 +1066,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("labelmap");
-    const auto path = WriteSegToTempFile(seg, options, "all-attributes-labelmap");
+    const auto path = this->WriteSegToTempFile(seg, options, "all-attributes-labelmap");
 
     AssertReloadRestoresAttributesOfEveryLabel(seg, path, "labelmap");
   }
@@ -988,7 +1077,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Segmentation encoding"] = std::string("binary");
-    const auto path = WriteSegToTempFile(seg, options, "binary");
+    const auto path = this->WriteSegToTempFile(seg, options, "binary");
 
     // 1.2.840.10008.5.1.4.1.1.66.4 = Segmentation Storage (legacy binary)
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Binary opt-out must emit the legacy SOP class",
@@ -1016,7 +1105,7 @@ public:
     rule->Connect(seg, providerB.GetPointer());
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "multisource");
+    const auto path = this->WriteSegToTempFile(seg, options, "multisource");
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Multi-source seg reloads as exactly one BaseData",
                            loaded.size() == 1);
@@ -1085,9 +1174,9 @@ public:
   // carry (0062,0020)/(0062,0021) for that segment; reloading the SEG must
   // leave HasTrackingID/UID false on the label.
   //
-  // Default encoding is binary Segmentation Storage; SegmentSequence item 1
-  // is the user's label "L" (no auto-inserted Background segment, unlike
-  // dcmqi's labelmap path).
+  // Default encoding is binary Segmentation Storage; segment 1 is the
+  // user's label "L" (no auto-inserted Background segment, unlike dcmqi's
+  // labelmap path).
   void WriteSucceedsWithoutTrackingFields()
   {
     auto seg = BuildSegWithRule(/*stampIdentity=*/true,
@@ -1099,13 +1188,13 @@ public:
                            Helper::Validate(seg).empty());
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "no-tracking");
+    const auto path = this->WriteSegToTempFile(seg, options, "no-tracking");
 
-    const auto view = ReadSegmentItem(path, 1);
+    const auto segment = mitk::test::ReadSegmentSequence(path).at(1);
     CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0020) when source label had no tracking",
-                           !view.hasTrackingID);
+                           !segment->HasTrackingID());
     CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0021) when source label had no tracking",
-                           !view.hasTrackingUID);
+                           !segment->HasTrackingUID());
 
     const auto loaded = mitk::IOUtil::Load(path);
     CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData",
@@ -1153,7 +1242,7 @@ public:
                            segSeriesUID != sourceSeriesUID);
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "wf-strict");
+    const auto path = this->WriteSegToTempFile(seg, options, "wf-strict");
 
     // Strict mode only guarantees the write found source items at all. That
     // they are the source's own instances is what makes the written
@@ -1190,7 +1279,7 @@ public:
     // SeriesInstanceUID: the writer copies (0020,000E) verbatim, it is not
     // re-minted per write. Pins the construction-time mint; it is not an
     // endorsement of re-writing into the same series as a workflow.
-    const auto secondPath = WriteSegToTempFile(seg, options, "wf-strict-2");
+    const auto secondPath = this->WriteSegToTempFile(seg, options, "wf-strict-2");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-writing the same in-memory seg reproduces the SeriesInstanceUID",
                                  writtenSeriesUID, ReadTopLevelString(secondPath, DCM_SeriesInstanceUID));
   }
@@ -1209,7 +1298,7 @@ public:
 
     mitk::IFileWriter::Options options;
     options["Strict / synthetic mode"] = std::string("synthetic");
-    const auto path = WriteSegToTempFile(seg, options, "wf-synth");
+    const auto path = this->WriteSegToTempFile(seg, options, "wf-synth");
 
     // Synthetic is a fallback, not an override: with a real relation attached
     // the writer must not reach BuildSyntheticSourceItems, so the references
@@ -1243,7 +1332,7 @@ public:
     Rule::Connect(seg, source.GetPointer());
 
     mitk::IFileWriter::Options options;
-    const auto firstPath = WriteSegToTempFile(seg, options, "wf-roundtrip-1");
+    const auto firstPath = this->WriteSegToTempFile(seg, options, "wf-roundtrip-1");
     const auto firstSeriesUID = ReadTopLevelString(firstPath, DCM_SeriesInstanceUID);
 
     const auto loaded = mitk::IOUtil::Load(firstPath);
@@ -1268,7 +1357,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Reloaded seg carries the first file's SeriesInstanceUID",
                                  firstSeriesUID, ReadStringProp(reloadedSeg, 0x0020, 0x000E));
 
-    const auto secondPath = WriteSegToTempFile(reloadedSeg, options, "wf-roundtrip-2");
+    const auto secondPath = this->WriteSegToTempFile(reloadedSeg, options, "wf-roundtrip-2");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("SeriesInstanceUID stable across persist -> reload -> re-persist",
                                  firstSeriesUID, ReadTopLevelString(secondPath, DCM_SeriesInstanceUID));
   }
@@ -1279,42 +1368,17 @@ public:
   // writer-side groundwork for representing a multi-group seg on the wire.
   // Reader-side reassembly into one MultiLabelSegmentation is NOT asserted
   // (tracked separately); we read the two files back as DcmDatasets and
-  // compare tags directly.
+  // compare tags directly. WriteSegToTempFile checks the segments of each
+  // file.
   void MultiGroupWriteFormsOneCoherentSeries()
   {
-    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
-    auto seg = InitializeSegFromSourceImage(source); // group 0, label 1, voxels
-    const auto g1 = seg->AddGroup();
-    auto label2 = mitk::Label::New();
-    label2->SetName("L2");
-    label2->SetValue(2);
-    label2->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
-    label2->SetAlgorithmName("WorkflowTest");
-    seg->AddLabel(label2, g1, true, true);
-
-    // Group 1 needs foreground voxels: the writer runs with
-    // skipEmptySlices=false and an all-empty group risks a degenerate SEG.
-    // Mirror the voxel write InitializeSegFromSourceImage uses for group 0.
-    {
-      auto *g1Image = seg->GetGroupImage(g1);
-      mitk::ImageWriteAccessor writeAccessor(g1Image);
-      auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
-      const auto dims = g1Image->GetDimensions();
-      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
-      for (unsigned int z = 0; z < dims[2]; ++z)
-      {
-        pixels[z * sliceSize + 0] = 2;
-        pixels[z * sliceSize + 1] = 2;
-      }
-    }
-
-    Rule::Connect(seg, source.GetPointer());
+    auto seg = BuildTwoGroupSeg();
     CPPUNIT_ASSERT_MESSAGE("Seg is multi-group for this test", seg->GetNumberOfGroups() == 2);
 
     const auto segSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
 
     mitk::IFileWriter::Options options;
-    const auto basePath = WriteSegToTempFile(seg, options, "wf-multigroup");
+    const auto basePath = this->WriteSegToTempFile(seg, options, "wf-multigroup");
 
     // WriteSegToTempFile returns "<tempDir>/wf-multigroup.dcm". The writer
     // follows the MITK multi-output naming convention (see MitkFileConverter):
@@ -1325,11 +1389,9 @@ public:
     // Assert existence before reading: ReadTopLevelString returns "" for a
     // missing file, which would otherwise mask a wrong-path bug as a
     // propagation bug.
-    const auto stem = basePath.substr(0, basePath.find_last_of('.'));
-    const auto file0 = stem + ".dcm";   // == basePath; first group keeps the requested name
-    const auto file1 = stem + "_1.dcm"; // additional groups get the "_<index>" suffix
-    CPPUNIT_ASSERT_MESSAGE("Both per-group SEG files exist",
-                           std::filesystem::exists(file0) && std::filesystem::exists(file1));
+    const auto file0 = GroupFilePath(basePath, 0); // == basePath; first group keeps the requested name
+    const auto file1 = GroupFilePath(basePath, 1); // additional groups get the "_<index>" suffix
+    CPPUNIT_ASSERT_MESSAGE("Both per-group SEG files exist", FileExists(file0) && FileExists(file1));
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 0 file SeriesInstanceUID == seg's own",
                                  segSeriesUID, ReadTopLevelString(file0, DCM_SeriesInstanceUID));
@@ -1382,7 +1444,7 @@ public:
                      mitk::TemporoSpatialStringProperty::New("Test^Creator"));
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "wf-clinicaltrial");
+    const auto path = this->WriteSegToTempFile(seg, options, "wf-clinicaltrial");
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Non-default ContentCreatorName must survive into the written SEG",
                                  std::string("Test^Creator"), ReadTopLevelString(path, DCM_ContentCreatorName));
@@ -1411,25 +1473,30 @@ public:
                            Helper::Validate(seg).empty());
 
     mitk::IFileWriter::Options options;
-    const auto path = WriteSegToTempFile(seg, options, "no-segproperty");
+    const auto path = this->WriteSegToTempFile(seg, options, "no-segproperty");
 
-    // Default encoding is binary; the user's label "L" is segment item 1
-    // (binary has no auto-inserted Background segment).
-    const auto view = ReadSegmentItem(path, 1);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code value", std::string("49755003"), view.categoryCodeValue);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category coding scheme", std::string("SCT"), view.categoryCodeScheme);
+    // Default encoding is binary; the user's label "L" is segment 1 (binary
+    // has no auto-inserted Background segment). The literal codes pin the
+    // stand-ins independently of the expectation WriteSegToTempFile derives.
+    const auto segment = mitk::test::ReadSegmentSequence(path).at(1);
+    const auto category = segment->GetSegmentedPropertyCategory();
+    const auto type = segment->GetSegmentedPropertyType();
+    CPPUNIT_ASSERT_MESSAGE("The written segment has a category and a type", category.has_value() && type.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code value", std::string("49755003"), category->GetValue());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category coding scheme", std::string("SCT"), category->GetScheme());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code meaning",
-                                 std::string("Morphologically altered structure"), view.categoryCodeMeaning);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type code value", std::string("49755003"), view.typeCodeValue);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type coding scheme", std::string("SCT"), view.typeCodeScheme);
+                                 std::string("Morphologically altered structure"), category->GetMeaning());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type code value", std::string("49755003"), type->GetValue());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type coding scheme", std::string("SCT"), type->GetScheme());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type code meaning",
-                                 std::string("Morphologically altered structure"), view.typeCodeMeaning);
+                                 std::string("Morphologically altered structure"), type->GetMeaning());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One fallback Type modifier", std::size_t{1}, type->GetModifierCount());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code value",
-                                 std::string("261665006"), view.typeModifierCodeValue);
+                                 std::string("261665006"), type->GetModifier(0).GetValue());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier coding scheme",
-                                 std::string("SCT"), view.typeModifierCodeScheme);
+                                 std::string("SCT"), type->GetModifier(0).GetScheme());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code meaning",
-                                 std::string("Unknown (qualifier value)"), view.typeModifierCodeMeaning);
+                                 std::string("Unknown (qualifier value)"), type->GetModifier(0).GetMeaning());
   }
 };
 

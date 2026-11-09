@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkLevelWindow.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkPointSet.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkRenderingManager.h>
 #include <mitkRotationOperation.h>
@@ -93,6 +94,8 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_FrameOfReferenceAlignedDatasets_FitTheirJointExtent);
   MITK_TEST(Apply_MixedTimeData_GlobalTimeCoversAll);
   MITK_TEST(Apply_WhileHidden_GlobalTimeStillCoversAllOnceShown);
+  MITK_TEST(Apply_AlignedStaticFirst_DynamicWindowsStepThroughTime);
+  MITK_TEST(Apply_DynamicSeriesOnDifferentGrids_EveryWindowShowsTheSelectedTime);
   MITK_TEST(Apply_ObjectFormSelectionLinks_Accepted);
   MITK_TEST(Apply_ValidationFailuresChangeNothing);
   MITK_TEST(Cleanup_ReusedIdInheritsNoRendererState);
@@ -118,6 +121,12 @@ public:
   {
     m_Editor.reset();
     m_DataStorage = nullptr;
+    // The time navigation is a process-wide singleton: renderers read its time
+    // point when they are constructed, and slice navigations read its time
+    // step. Removing its input does not reset that step.
+    auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    timeNavigationController->SetInputWorldTimeGeometry(nullptr);
+    timeNavigationController->GetStepper()->SetPos(0);
   }
 
   static void Pump()
@@ -1100,6 +1109,163 @@ public:
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Shown, it still does", mitk::TimeStepType(3),
                                  timeNavigation->GetInputWorldTimeGeometry()->CountTimeSteps());
+  }
+
+  void Apply_AlignedStaticFirst_DynamicWindowsStepThroughTime()
+  {
+    // Aligned datasets share the first one's fit geometry; with a static
+    // dataset first, its time grid has a single step. The windows of the
+    // dynamic series must still step through it with the time navigation.
+    const auto still = this->AddImage("static", 16, 16, 8);
+    const auto dynamic = this->AddImage("dynamic", 16, 16, 8, 3);
+    this->ShowEditor();
+
+    const std::vector<std::pair<std::string, QmitkMxNDynamicOptions>> variants = {
+      { "datasets x planes", QmitkMxNDatasetsByPlanesOptions{ true } },
+      { "one view per dataset", QmitkMxNOneViewPerDatasetOptions{ true } } };
+
+    auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    for (const auto& [variant, options] : variants)
+    {
+      timeNavigation->GetStepper()->SetPos(0);
+      const auto layout = this->Generate({ { QmitkMxNSlot::Datasets, { still, dynamic } } }, options);
+      m_Editor->ApplyDynamicLayout(layout);
+      Pump();
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the time navigation covers the dynamic series (" + variant + ")",
+                                   mitk::TimeStepType(3), timeNavigation->GetInputWorldTimeGeometry()->CountTimeSteps());
+
+      timeNavigation->GetStepper()->SetPos(2);
+      Pump();
+
+      int checkedWindows = 0;
+      for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+      {
+        const auto& shown = layout.groupNodes.at(descriptor.selectionGroup.toStdString());
+        if (std::find(shown.begin(), shown.end(), dynamic) == shown.end())
+        {
+          continue;
+        }
+        ++checkedWindows;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("The time step of the dynamic series in " + descriptor.id.toStdString() + " (" +
+                                       variant + ")",
+                                     mitk::TimeStepType(2), this->Renderer(descriptor.id)->GetTimeStep(dynamic->GetData()));
+      }
+      CPPUNIT_ASSERT_MESSAGE("Fixture: windows show the dynamic series (" + variant + ")", 0 < checkedWindows);
+    }
+  }
+
+  /** A dynamic series of 16 x 16 x 8 voxels with the given time steps and step duration in ms. */
+  mitk::DataNode::Pointer AddSeries(const std::string& name, unsigned int timeSteps, mitk::TimePointType stepDuration)
+  {
+    auto image = mitk::ImageGenerator::GenerateRandomImage<unsigned short>(16, 16, 8, timeSteps);
+    auto timeGeometry = image->GetTimeGeometry()->Clone();
+    auto* proportionalTimeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry*>(timeGeometry.GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Fixture: a proportional time geometry", nullptr != proportionalTimeGeometry);
+    proportionalTimeGeometry->SetStepDuration(stepDuration);
+    proportionalTimeGeometry->Update();
+    image->SetTimeGeometry(proportionalTimeGeometry);
+
+    auto node = mitk::DataNode::New();
+    node->SetName(name);
+    node->SetData(image);
+    m_DataStorage->Add(node);
+    return node;
+  }
+
+  static bool HaveSameTimeGrid(const mitk::TimeGeometry& lhs, const mitk::TimeGeometry& rhs)
+  {
+    if (lhs.CountTimeSteps() != rhs.CountTimeSteps())
+    {
+      return false;
+    }
+    for (mitk::TimeStepType timeStep = 0; timeStep < lhs.CountTimeSteps(); ++timeStep)
+    {
+      const auto lhsBounds = lhs.GetTimeBounds(timeStep);
+      const auto rhsBounds = rhs.GetTimeBounds(timeStep);
+      if (!mitk::Equal(lhsBounds[0], rhsBounds[0]) || !mitk::Equal(lhsBounds[1], rhsBounds[1]))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void Apply_DynamicSeriesOnDifferentGrids_EveryWindowShowsTheSelectedTime()
+  {
+    // Windows fitted without a geometry frame the data they show, time steps
+    // included, so their time grid can differ from the time navigation's.
+    // Every window must show the moment the time navigation selects.
+    const auto fine = this->AddImage("fine", 16, 16, 8, 3);
+    const auto coarse = this->AddSeries("coarse", 2, 2.0);
+    // The 3D view of "one view per dataset" needs a 3D representation for
+    // every dataset. A segmentation takes its image's time geometry, so it
+    // leaves the time grids of the windows as they are.
+    this->AddSegmentation(fine, "fine segmentation", 1);
+    this->AddSegmentation(coarse, "coarse segmentation", 1);
+
+    struct Variant
+    {
+      std::string name;
+      QmitkMxNSlotBindings bindings;
+      QmitkMxNDynamicOptions options;
+    };
+    const QmitkMxNSlotBindings datasets = { { QmitkMxNSlot::Datasets, { fine, coarse } } };
+    // The editor is shown after the first variant is applied.
+    const std::vector<Variant> variants = {
+      { "datasets x planes with the 3D column, applied while hidden", datasets,
+        QmitkMxNDatasetsByPlanesOptions{ false, true, false } },
+      { "datasets x planes with the 3D column", datasets, QmitkMxNDatasetsByPlanesOptions{ false, true, false } },
+      { "one view per dataset with the 3D view", datasets,
+        QmitkMxNOneViewPerDatasetOptions{ false, QmitkMxNDatasetView::ThreeD } },
+      { "fusion pair with the MIP window",
+        { { QmitkMxNSlot::Anatomy, { fine } }, { QmitkMxNSlot::FusedImage, { coarse } } },
+        QmitkMxNFusionPairOptions{} } };
+
+    auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    for (const auto& variant : variants)
+    {
+      timeNavigation->GetStepper()->SetPos(0);
+      const auto layout = this->Generate(variant.bindings, variant.options);
+      m_Editor->ApplyDynamicLayout(layout);
+      Pump();
+      if (!m_Editor->isVisible())
+      {
+        this->ShowEditor();
+      }
+
+      timeNavigation->GetStepper()->SetPos(1);
+      Pump();
+
+      // The windows to check: those that show a dynamic series.
+      std::vector<std::pair<QString, mitk::DataNode::Pointer>> checks;
+      for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+      {
+        const auto& shown = layout.groupNodes.at(descriptor.selectionGroup.toStdString());
+        for (const auto& node : { fine, coarse })
+        {
+          if (std::find(shown.begin(), shown.end(), node) != shown.end())
+          {
+            checks.emplace_back(descriptor.id, node);
+          }
+        }
+      }
+
+      const bool anyOtherGrid = std::any_of(checks.begin(), checks.end(), [this, timeNavigation](const auto& check) {
+        const auto* worldTimeGeometry = this->Renderer(check.first)->GetWorldTimeGeometry();
+        return nullptr != worldTimeGeometry &&
+               !HaveSameTimeGrid(*worldTimeGeometry, *timeNavigation->GetInputWorldTimeGeometry());
+      });
+      CPPUNIT_ASSERT_MESSAGE("Fixture: a window has a time grid other than the time navigation's (" + variant.name + ")",
+                             anyOtherGrid);
+
+      const auto selectedTimePoint = timeNavigation->GetSelectedTimePoint();
+      for (const auto& [windowId, node] : checks)
+      {
+        const auto* renderer = this->Renderer(windowId);
+        const auto where = node->GetName() + " in " + windowId.toStdString() + " (" + variant.name + ")";
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point of " + where, selectedTimePoint, renderer->GetTime());
+      }
+    }
   }
 
   /** Every window's selection link 's' rewritten as '{"target": s}'. */

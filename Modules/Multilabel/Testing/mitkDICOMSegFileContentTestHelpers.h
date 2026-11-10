@@ -264,7 +264,8 @@ namespace mitk
         if (labelled != offsets.size())
         {
           differences.push_back(context + ": the group image has " + std::to_string(labelled) +
-                                " voxels with the value, the file " + std::to_string(segment.voxels.size()));
+                                " voxels with the value, the file " + std::to_string(offsets.size()) +
+                                " distinct voxels inside it");
         }
       }
 
@@ -580,7 +581,8 @@ namespace mitk
      * segmentation, as ReadSegmentSequence reads it: the labels in ascending value order, each
      * numbered by its rank, with the writer's defaults for required attributes the label lacks
      * and after the documented label losses. A LABELMAP has the background segment 0 that dcmqi
-     * adds when the group image has unlabeled voxels.
+     * adds when the group image has unlabeled voxels. Throws mitk::Exception for a label without
+     * voxels: dcmqi writes no segment for it, which shifts the numbers of the labels above it.
      */
     inline DICOMSegSegmentMap ExpectedSegmentSequence(const MultiLabelSegmentation& segmentation,
                                                       MultiLabelSegmentation::GroupIndexType group,
@@ -592,6 +594,9 @@ namespace mitk
       DICOMSegSegmentMap segments;
       for (const auto value : values)
       {
+        if (segmentation.IsEmpty(value))
+          mitkThrow() << "Label " << value << " of group " << group << " has no voxels, which this oracle does not model.";
+
         auto label = segmentation.GetLabel(value)->Clone();
         ApplyDICOMSegWriterDefaults(*label);
         for (const auto& loss : DICOMSegLabelLosses())

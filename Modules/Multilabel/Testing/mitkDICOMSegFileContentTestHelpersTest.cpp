@@ -25,13 +25,17 @@ found in the LICENSE file.
 #include <string>
 #include <vector>
 
-/** Self-test of the DICOM SEG file-content oracle: it must report readers that get a file wrong. */
+/**
+ * Self-test of the DICOM SEG file-content oracles: they must report readers that get a file
+ * wrong, and refuse input they do not model.
+ */
 class mitkDICOMSegFileContentTestHelpersTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkDICOMSegFileContentTestHelpersTestSuite);
   MITK_TEST(StrayValueIsDetected);
   MITK_TEST(SegmentInOtherGroupIsDetected);
   MITK_TEST(SubVoxelShiftIsDetected);
+  MITK_TEST(ExpectedSegmentSequenceRefusesLabelWithoutVoxels);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -134,6 +138,22 @@ public:
     geometry->SetOrigin(geometry->GetOrigin() + worldShift);
 
     AssertDetected(*segmentation, path, "off the voxel centres");
+  }
+
+  // dcmqi writes no segment for a label without voxels, so the writer oracle must not predict one.
+  void ExpectedSegmentSequenceRefusesLabelWithoutVoxels()
+  {
+    const auto segmentation = mitk::test::BuildRichSegmentation({ false, true, true, false });
+    const auto hasEmptyLabel = [&segmentation](mitk::MultiLabelSegmentation::GroupIndexType group) {
+      const auto values = segmentation->GetLabelValuesByGroup(group);
+      return std::any_of(values.begin(), values.end(), [&segmentation](auto value) { return segmentation->IsEmpty(value); });
+    };
+    CPPUNIT_ASSERT_MESSAGE("Precondition: group 0 has a label without voxels", hasEmptyLabel(0));
+    CPPUNIT_ASSERT_MESSAGE("Precondition: group 1 has none", !hasEmptyLabel(1));
+
+    CPPUNIT_ASSERT_THROW(mitk::test::ExpectedSegmentSequence(*segmentation, 0, false), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::test::ExpectedSegmentSequence(*segmentation, 0, true), mitk::Exception);
+    CPPUNIT_ASSERT_NO_THROW(mitk::test::ExpectedSegmentSequence(*segmentation, 1, false));
   }
 };
 

@@ -29,9 +29,9 @@ found in the LICENSE file.
  * The capability table of the segmentation file formats: per format, what
  * a round trip loses (as the edit that reproduces the loss on the expected
  * side) and how exactly it reproduces what it keeps. A loss is only listed
- * when the format cannot carry the attribute, the upstream library cannot
- * carry it (with an upstream ticket), or the owner decided so; anything else
- * MITK drops is a defect.
+ * when the format cannot carry the attribute, an upstream library cannot
+ * carry it (a defect to be fixed upstream, never worked around in MITK), or
+ * the owner decided so; anything else MITK drops is a defect.
  */
 namespace mitk
 {

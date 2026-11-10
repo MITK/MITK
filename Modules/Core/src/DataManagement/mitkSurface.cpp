@@ -495,13 +495,11 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
 {
   bool noDifferenceFound = true;
 
-  if (!mitk::Equal(static_cast<ScalarType>(leftHandSide.GetSizeOfPolyDataSeries()),
-                   static_cast<ScalarType>(rightHandSide.GetSizeOfPolyDataSeries()),
-                   eps,
-                   verbose))
+  if (leftHandSide.GetSizeOfPolyDataSeries() != rightHandSide.GetSizeOfPolyDataSeries())
   {
     if (verbose)
-      MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Size of PolyData series not equal.";
+      MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Size of PolyData series not equal: "
+                << leftHandSide.GetSizeOfPolyDataSeries() << " vs. " << rightHandSide.GetSizeOfPolyDataSeries() << ".";
     return false;
   }
 
@@ -515,7 +513,19 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
 
   for (TimeStepType i(0); i < rightHandSide.GetSizeOfPolyDataSeries(); i++)
   {
-    if (!mitk::Equal(*leftHandSide.GetVtkPolyData(i), *rightHandSide.GetVtkPolyData(i), eps, verbose))
+    vtkPolyData *const leftPolyData = leftHandSide.GetVtkPolyData(i);
+    vtkPolyData *const rightPolyData = rightHandSide.GetVtkPolyData(i);
+
+    if (leftPolyData == nullptr || rightPolyData == nullptr)
+    {
+      if (leftPolyData != rightPolyData)
+      {
+        if (verbose)
+          MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Time step " << i << " is empty on one side only.";
+        noDifferenceFound = false;
+      }
+    }
+    else if (!mitk::Equal(*leftPolyData, *rightPolyData, eps, verbose))
     {
       if (verbose)
         MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Poly datas not equal.";

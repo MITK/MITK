@@ -38,6 +38,17 @@ mitk.IOUtil.save(img, "output.nrrd")
 The output format is inferred from the file extension. To control it
 explicitly, pick a path with the desired extension.
 
+Writers take options as a dict, for example the segmentation stack
+(`.mitklabel.json`, `.nii`, `.nii.gz`), which writes one image per
+group by default:
+
+```python
+seg.save("seg.mitklabel.json", writer_options={"Save strategy": "instance"})
+```
+
+The docstring of `MultiLabelSegmentation.save` lists the options of
+the segmentation writers.
+
 ## Supported formats
 
 Out of the box, the wheel supports the formats MITK supports natively:

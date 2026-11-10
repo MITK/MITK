@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "GeometryHelpers.h"
+#include "IOHelpers.h"
 #include "SmartPointer.h"
 #include "PropertyOwnerBindings.h"
 
@@ -1068,18 +1069,39 @@ Returns:
 )")
 
     .def("save",
-      [](const MultiLabelSegmentation& seg, const std::string& path) {
-        IOUtil::Save(&seg, path);
+      [](const MultiLabelSegmentation& seg, const std::string& path, std::optional<py::dict> writer_options) {
+        IOUtil::Save(&seg, path, ToWriterOptions(writer_options));
       },
-      py::arg("path"),
+      py::arg("path"), py::arg("writer_options") = py::none(),
       R"(Save the segmentation to a file.
 
 The output format is inferred from the file extension. MITK ships with
-writers for the segmentation file format (``.nrrd`` with auxiliary
-metadata) and for DICOM SEG (``.dcm``).
+writers for these formats:
+
+- ``.nrrd``: the segmentation file format, one file with all groups and
+  the label metadata.
+- ``.dcm``: DICOM SEG, one file per group.
+- ``.mitklabel.json``, ``.nii`` or ``.nii.gz``: a segmentation stack, a
+  ``<stem>.mitklabel.json`` meta file next to NIfTI images. By default it
+  writes one image per group, ``<stem>_group_<n>.nii.gz``.
 
 Args:
     path: Output file path.
+    writer_options: Optional dict of options for the writer, with ``str``,
+        ``bool``, ``int`` or ``float`` values. The segmentation stack takes
+        ``"Save strategy"``: ``"group"`` (default) or ``"instance"``, one
+        image per label, ``<stem>_label_<value>.nii.gz``; and
+        ``"Instance value"``: ``"original"`` (default) or ``"binary"``, the
+        voxel value of an instance image. DICOM SEG takes
+        ``"Strict / synthetic mode"``: ``"strict"`` (default) or
+        ``"synthetic"``; and ``"Segmentation encoding"``: ``"binary"``
+        (default) or ``"labelmap"``. A name the writer does not know is
+        ignored with a warning.
+
+Raises:
+    TypeError: If a writer option has an unsupported type.
+    mitk.Exception: If a writer option has a value the writer does not
+        know, or writing fails.
 )")
     .def("initialize",
       [](MultiLabelSegmentation& seg, const Image* ref, bool resetLabels) {

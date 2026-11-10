@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "GeometryHelpers.h"
+#include "IOHelpers.h"
 #include "PixelType.h"
 #include "SmartPointer.h"
 #include "PropertyOwnerBindings.h"
@@ -286,13 +287,13 @@ Image::Pointer LoadImage(const std::string& path)
   return img;
 }
 
-void SaveImage(const Image* img, const std::string& path)
+void SaveImage(const Image* img, const std::string& path, const mitk::IFileWriter::Options& writerOptions)
 {
   if (img == nullptr)
     throw py::value_error("Cannot save a null image");
 
   py::gil_scoped_release release;
-  mitk::IOUtil::Save(img, path);
+  mitk::IOUtil::Save(img, path, writerOptions);
 }
 
 // ---------------------------------------------------------------------------
@@ -576,8 +577,10 @@ Raises:
     ValueError: If the file cannot be loaded.
 )")
     .def("save",
-      [](const Image* img, const std::filesystem::path& path) { SaveImage(img, path.string()); },
-      py::arg("path"),
+      [](const Image* img, const std::filesystem::path& path, std::optional<py::dict> writer_options) {
+        SaveImage(img, path.string(), ToWriterOptions(writer_options));
+      },
+      py::arg("path"), py::arg("writer_options") = py::none(),
       R"(Save the image to a file.
 
 The output format is inferred from the file extension. Common formats:
@@ -586,9 +589,15 @@ The output format is inferred from the file extension. Common formats:
 Args:
     path: Output file path. Accepts ``str``, ``pathlib.Path``, or any
         object with a ``__fspath__`` method.
+    writer_options: Optional dict of options for the writer, with ``str``,
+        ``bool``, ``int`` or ``float`` values. A name the writer does not
+        know is ignored with a warning.
 
 Raises:
     ValueError: If the image is null or the format is not writable.
+    TypeError: If a writer option has an unsupported type.
+    mitk.Exception: If a writer option has a value the writer does not
+        know.
 )");
 
   // IPropertyOwner methods.

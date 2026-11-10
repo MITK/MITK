@@ -217,6 +217,9 @@ protected:
     */
   void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+  /** \brief Calculates the time step of the target image, which defines the time steps shown. */
+  void CalculateTimeStep(mitk::BaseRenderer* renderer) override;
+
   void PrepareContour( mitk::DataNode* datanode, LocalStorage * localStorage );
 
   void PrepareDifference( LocalStorage * localStorage );

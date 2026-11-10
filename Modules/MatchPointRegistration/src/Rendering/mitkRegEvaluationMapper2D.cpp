@@ -787,6 +787,18 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
   localStorage->m_LastUpdateTimeStep = this->GetTimestep();
 }
 
+void mitk::RegEvaluationMapper2D::CalculateTimeStep(mitk::BaseRenderer* renderer)
+{
+  if (nullptr == renderer || nullptr == this->GetDataNode())
+  {
+    this->SetTimestep(0);
+    return;
+  }
+
+  // The evaluation object has no time geometry of its own.
+  this->SetTimestep(renderer->GetTimeStep(this->GetTargetImage()));
+}
+
 void mitk::RegEvaluationMapper2D::SetToInvalidState(LocalStorage* localStorage)
 {
   // set image to nullptr, to clear the texture in 3D, because

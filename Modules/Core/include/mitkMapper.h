@@ -146,6 +146,14 @@ namespace mitk
     /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep(BaseRenderer *renderer);
 
+    /**
+     * \brief Set the time step that GetTimestep() returns.
+     *
+     * For CalculateTimeStep() overrides whose time steps come from another
+     * object than the node's data.
+     */
+    void SetTimestep(TimeStepType timeStep) { m_TimeStep = timeStep; }
+
     /** \brief Reset the mapper (i.e., make sure that nothing is displayed) if no
     * valid data is present. In most cases the reimplemented function
     * disables the according actors (toggling visibility off)

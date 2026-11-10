@@ -81,6 +81,7 @@ namespace mitk
    *   the source. This function is shared with parametric maps via
    *   ModelFitResultHelper, which is why it lives in MitkDICOMQI.
    *   \c InheritBodyPartExaminedFromSource then adds Body Part Examined.
+   *   Both keep the values the seg already carries.
    * - <b>Setup-time, explicit.</b>
    *   \c mitkLabelSetImageHelper::SetupDerivedSegmentation calls
    *   \c SegSourceImageRelationRule::Connect plus the InheritXxxFromSource

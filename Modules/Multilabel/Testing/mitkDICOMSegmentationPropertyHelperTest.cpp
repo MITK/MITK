@@ -89,6 +89,7 @@ class mitkDICOMSegmentationPropertyHelperTestSuite : public mitk::TestFixture
   MITK_TEST(InheritFrameOfReferenceFromSourceOverwritesByDefault);
   MITK_TEST(InheritFromSourceLeavesSeriesInstanceUIDUntouched);
   MITK_TEST(SetupDerivedSegmentationInheritsBodyPartExamined);
+  MITK_TEST(InitializeKeepsExistingBodyPartExamined);
 
   MITK_TEST(ValidateThrowsOnNullSeg);
   MITK_TEST(CompleteThrowsOnNullSeg);
@@ -234,6 +235,24 @@ public:
     mitk::LabelSetImageHelper::SetupDerivedSegmentation(seg, source);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("SetupDerivedSegmentation takes the body part of the source",
                                  std::string("ABDOMEN"), ReadStringProp(seg, 0x0018, 0x0015));
+  }
+
+  // Like the other DICOM information Initialize derives from the template, the body part only
+  // fills a gap.
+  void InitializeKeepsExistingBodyPartExamined()
+  {
+    const auto seg = MakeFreshSeg();
+    seg->SetProperty(DICOMKey(0x0018, 0x0015).c_str(), mitk::TemporoSpatialStringProperty::New("HEAD"));
+    seg->SetProperty(DICOMKey(0x0010, 0x0020).c_str(), mitk::TemporoSpatialStringProperty::New("seg-pid"));
+    auto templateImage = MakeFakeSourceImage();
+    templateImage->SetProperty(DICOMKey(0x0018, 0x0015).c_str(), mitk::TemporoSpatialStringProperty::New("CHEST"));
+
+    seg->Initialize(templateImage);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Initialize keeps the Patient ID of the segmentation",
+                                 std::string("seg-pid"), ReadStringProp(seg, 0x0010, 0x0020));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Initialize keeps the body part of the segmentation",
+                                 std::string("HEAD"), ReadStringProp(seg, 0x0018, 0x0015));
   }
 
   void ValidateThrowsOnNullSeg()

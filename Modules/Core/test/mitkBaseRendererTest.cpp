@@ -45,6 +45,7 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
   MITK_TEST(SetTimeStep_OwnStep_ShowsItsTimePoint);
   MITK_TEST(SetTimeStep_NoWorldTimeGeometry_Throws);
   MITK_TEST(SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow);
+  MITK_TEST(SetTimeStep_ReferenceVariesOverTime_AlignmentFollowsOwnTimePoint);
   CPPUNIT_TEST_SUITE_END();
 
   vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
@@ -348,6 +349,26 @@ public:
                                     m_Renderer->SetInteractionReferenceGeometry(referenceGeometry));
     CPPUNIT_ASSERT_MESSAGE("Aligned after setting the reference past its time steps",
                            m_Renderer->GetReferenceGeometryAligned());
+  }
+
+  void SetTimeStep_ReferenceVariesOverTime_AlignmentFollowsOwnTimePoint()
+  {
+    // Time step 0 is spatially equal to the world geometry, time step 1 has half its depth.
+    // The alignment check compares bounding boxes, so the extent differs, not the origin.
+    auto referenceGeometry = CreateTimeGeometry(2, 1.0);
+    const double shallowBounds[6] = { 0.0, 20.0, 0.0, 20.0, 0.0, 10.0 };
+    auto shallowGeometry = mitk::Geometry3D::New();
+    shallowGeometry->SetFloatBounds(shallowBounds);
+    referenceGeometry->SetTimeStepGeometry(shallowGeometry, 1);
+    referenceGeometry->Update();
+
+    m_Renderer->SetInteractionReferenceGeometry(referenceGeometry);
+    CPPUNIT_ASSERT_MESSAGE("Fixture: aligned at the global time point",
+                           m_Renderer->GetReferenceGeometryAligned());
+
+    m_Renderer->SetTimeStep(1);
+    CPPUNIT_ASSERT_MESSAGE("Not aligned at the renderer's own time point",
+                           !m_Renderer->GetReferenceGeometryAligned());
   }
 };
 

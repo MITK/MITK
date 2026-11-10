@@ -100,6 +100,21 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
     GetTimeNavigationController()->GetStepper()->SetPos(position);
   }
 
+  /** The time step of the world time geometry whose geometry the renderer slices. Each time step
+   *  has a geometry of its own, so the current world geometry identifies it. */
+  mitk::TimeStepType GetOwnTimeStep() const
+  {
+    const auto* worldTimeGeometry = m_Renderer->GetWorldTimeGeometry();
+    for (mitk::TimeStepType timeStep = 0; timeStep < worldTimeGeometry->CountTimeSteps(); ++timeStep)
+    {
+      if (worldTimeGeometry->GetGeometryForTimeStep(timeStep).GetPointer() == m_Renderer->GetCurrentWorldGeometry())
+      {
+        return timeStep;
+      }
+    }
+    return mitk::TIMESTEP_INVALID;
+  }
+
 public:
   void setUp() override
   {
@@ -187,7 +202,7 @@ public:
       const auto where = " at position " + std::to_string(position);
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point" + where, static_cast<mitk::TimePointType>(position),
                                    m_Renderer->GetTime());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step" + where, coarseTimeSteps[position], m_Renderer->GetTimeStep());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step" + where, coarseTimeSteps[position], this->GetOwnTimeStep());
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The time step of the fine series" + where, mitk::TimeStepType(position),
                                    m_Renderer->GetTimeStep(fineData));
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The time step of the coarse series" + where, coarseTimeSteps[position],
@@ -206,7 +221,7 @@ public:
 
     SelectGlobalTimeStep(1);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the own time step stays", mitk::TimeStepType(0), m_Renderer->GetTimeStep());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the own time step stays", mitk::TimeStepType(0), this->GetOwnTimeStep());
     CPPUNIT_ASSERT_MESSAGE("The time point update time moves",
                            timePointUpdateTime < m_Renderer->GetTimePointUpdateTime());
     CPPUNIT_ASSERT_MESSAGE("The plane update time moves",
@@ -223,7 +238,7 @@ public:
       SelectGlobalTimeStep(position);
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step at position " + std::to_string(position),
-                                   mitk::TimeStepType(position), m_Renderer->GetTimeStep());
+                                   mitk::TimeStepType(position), this->GetOwnTimeStep());
     }
   }
 
@@ -235,12 +250,12 @@ public:
 
     SelectGlobalTimeStep(2);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step past the own grid's end", mitk::TimeStepType(1),
-                                 m_Renderer->GetTimeStep());
+                                 this->GetOwnTimeStep());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point past the own grid's end", 20.0, m_Renderer->GetTime());
 
     SelectGlobalTimeStep(0);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step before the own grid's start", mitk::TimeStepType(0),
-                                 m_Renderer->GetTimeStep());
+                                 this->GetOwnTimeStep());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point before the own grid's start", 0.0, m_Renderer->GetTime());
   }
 
@@ -297,12 +312,12 @@ public:
 
     m_Renderer->SetTimeStep(1);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point of time step 1", 2.0, m_Renderer->GetTime());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Time step 1", mitk::TimeStepType(1), m_Renderer->GetTimeStep());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Time step 1", mitk::TimeStepType(1), this->GetOwnTimeStep());
 
     m_Renderer->SetTimeStep(0);
     m_Renderer->SetTimeStep(5);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The time point of a time step past the last one", 2.0, m_Renderer->GetTime());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("A time step past the last one", mitk::TimeStepType(1), m_Renderer->GetTimeStep());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A time step past the last one", mitk::TimeStepType(1), this->GetOwnTimeStep());
   }
 
   void SetTimeStep_NoWorldTimeGeometry_Throws()

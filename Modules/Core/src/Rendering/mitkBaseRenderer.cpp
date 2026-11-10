@@ -398,6 +398,11 @@ void mitk::BaseRenderer::SetTimeStep(TimeStepType timeStep)
   this->SetTimePoint(m_WorldTimeGeometry->TimeStepToTimePoint(std::min(timeStep, lastTimeStep)));
 }
 
+mitk::TimeStepType mitk::BaseRenderer::GetTimeStep() const
+{
+  return m_TimeStep;
+}
+
 mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const
 {
   if ((data == nullptr) || (data->IsInitialized() == false))

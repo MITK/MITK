@@ -310,13 +310,18 @@ namespace mitk
     /**
      * \brief Show the time point of the given time step of the world time geometry.
      *
-     * A time step past the last one selects the last one. The renderer then shows
-     * that time point until the global time navigation selects another one.
+     * A time step past the last one selects the last one. The renderer shows that
+     * time point only until the next TimeNavigationController::TimeEvent, which
+     * sets the global time point again. The time navigation sends that event on
+     * every Update(), e.g. on each reinit, also when its selection did not change.
+     *
+     * It is final: the time navigation does not call it, and subclasses follow
+     * time changes by overriding SetGeometryTime().
      *
      * \throws mitk::Exception if the renderer has no world time geometry or it has
      *         no time steps.
      */
-    virtual void SetTimeStep(TimeStepType timeStep);
+    virtual void SetTimeStep(TimeStepType timeStep) final;
 
     /**
      * \brief Get the time step of the world time geometry that contains the
@@ -325,8 +330,12 @@ namespace mitk
      * It selects the current time-extracted 3D-geometry (CurrentWorldGeometry).
      * It is not the time step of the data shown; use GetTimeStep(const BaseData*)
      * for that.
+     *
+     * \deprecated Selects only the world geometry frame; its time point is not the
+     *             time shown. Use GetTime() or GetTimeStep(const BaseData*).
      */
-    itkGetConstMacro(TimeStep, TimeStepType);
+    [[deprecated("Selects only the world geometry frame. Use GetTime() or GetTimeStep(const BaseData*).")]]
+    virtual TimeStepType GetTimeStep() const;
 
     /**
      * \brief Get the timestep of a BaseData object which
@@ -342,9 +351,10 @@ namespace mitk
     /**
      * \brief Get the time point in ms this renderer shows.
      *
-     * It is the time point the global time navigation selects, or the one set
-     * by SetTimeStep() since. It may lie outside the time range of the world
-     * time geometry.
+     * It is the global time point (TimeNavigationController::GetSelectedTimePoint())
+     * as of construction or the last TimeNavigationController::TimeEvent, or the
+     * one set by SetTimeStep() after that. It may lie outside the time range of
+     * the world time geometry.
      */
     TimePointType GetTime() const;
 

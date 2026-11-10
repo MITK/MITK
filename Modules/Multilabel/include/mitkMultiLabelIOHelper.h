@@ -75,6 +75,9 @@ namespace mitk
      * \brief Creates a mitk::Label from an XML element
      *
      * Outdated label properties are ignored, as described for DeserializeLabelFromJSON().
+     * The property "layer", the layer index of the XML format, is dropped too: the group of the
+     * label holds it now. The JSON formats keep a "layer" property, which is an ordinary custom
+     * property there.
      * \param labelElem the xml element from which a mitk::Label will be created
      * \param hadOutdatedProperties Optional. If provided, it is set to whether the element
      * carried outdated label properties.
@@ -170,6 +173,9 @@ namespace mitk
 
     /**
      * \brief Serialize a single label to JSON
+     *
+     * Outdated label properties (see DeserializeLabelFromJSON()) are not written, with one
+     * warning each, since readers would ignore them.
      * \param label the label to serialize
      * \return JSON representation of the label
      */
@@ -179,8 +185,8 @@ namespace mitk
      * \brief Deserialize a single label from JSON
      *
      * Label properties whose keys start with "DICOM.0062.0002." are outdated and ignored.
-     * MITK versions before 2025.12 stamped them on every label, and later versions wrote
-     * them back when such a file was saved again. Ignoring them is deprecated: the
+     * MITK versions before 2025.12 stamped them on every label, and versions 2025.12 to
+     * 2026.06 kept them when such a file was saved again. Ignoring them is deprecated: the
      * segmentation readers report them so that users save their files again, and a
      * future version may stop ignoring them.
      * \param labelJson JSON representation of the label

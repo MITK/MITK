@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkNodePredicateGeometry.h>
 #include <mitkIOUtil.h>
+#include <mitkSegIOTestFixtures.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 #include <tinyxml2.h>
 
@@ -58,6 +60,8 @@ class mitkMultiLabelIOHelperTestSuite : public mitk::TestFixture
   MITK_TEST(TestDeserializeLabelDiscardsOutdatedKeys);
   MITK_TEST(TestDeserializeGroupsReportsLabelsWithOutdatedKeys);
   MITK_TEST(TestLoadLabelFromXMLDiscardsOutdatedKeys);
+  MITK_TEST(TestLoadLabelFromXMLDiscardsLegacyLayer);
+  MITK_TEST(TestSerializeLabelSkipsOutdatedKeys);
   MITK_TEST(TestDeserializeLabelIndexlessCodeNames);
 
   CPPUNIT_TEST_SUITE_END();
@@ -426,6 +430,44 @@ public:
     AssertNoOutdatedKeys(label);
     CPPUNIT_ASSERT(hadOutdatedProperties);
     CPPUNIT_ASSERT_EQUAL(mitk::Label::PixelType(3), label->GetValue());
+  }
+
+  // The layer of the XML format is the group of the label now. Kept as a property, every later
+  // save would write it back.
+  void TestLoadLabelFromXMLDiscardsLegacyLayer()
+  {
+    tinyxml2::XMLDocument document;
+    document.Parse(R"(<Label>)"
+                   R"(<property key="value" type="UShortProperty"><unsigned value="3" /></property>)"
+                   R"(<property key="layer" type="UIntProperty"><unsigned value="1" /></property>)"
+                   R"(</Label>)");
+
+    bool hadOutdatedProperties = false;
+    const auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(document.FirstChildElement("Label"),
+                                                                          &hadOutdatedProperties);
+
+    CPPUNIT_ASSERT_MESSAGE("The legacy layer index is dropped", label->GetConstProperty("layer").IsNull());
+    CPPUNIT_ASSERT_MESSAGE("The layer index is no outdated DICOM property", !hadOutdatedProperties);
+    CPPUNIT_ASSERT_EQUAL(mitk::Label::PixelType(3), label->GetValue());
+  }
+
+  // Readers ignore label properties under DICOM.0062.0002., so the writer leaves them out, and says
+  // so, since such a property was set deliberately.
+  void TestSerializeLabelSkipsOutdatedKeys()
+  {
+    auto label = mitk::Label::New(3, "Liver");
+    label->SetProperty("DICOM.0062.0002.0062.0008", mitk::TemporoSpatialStringProperty::New("SEMIAUTOMATIC"));
+    label->SetProperty("DICOM.0062.0002.0062.000F.0008.0104", mitk::TemporoSpatialStringProperty::New("Liver"));
+    label->SetProperty("my.key", mitk::StringProperty::New("kept"));
+
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    const auto json = mitk::MultiLabelIOHelper::SerializeLabelToJSON(label);
+
+    const std::string prefix = "DICOM.0062.0002.";
+    for (const auto& [key, value] : json.items())
+      CPPUNIT_ASSERT_MESSAGE("An outdated key was written: " + key, key.compare(0, prefix.size(), prefix) != 0);
+    CPPUNIT_ASSERT_MESSAGE("Other custom properties are written", json.contains("my.key"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per property left out", std::size_t(2), warnings.GetWarnings().size());
   }
 
   // Hand-written label definitions may omit the index when there is only one region or structure.

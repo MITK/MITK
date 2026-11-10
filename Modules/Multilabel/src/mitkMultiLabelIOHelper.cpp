@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include <tinyxml2.h>
 
+#include <string_view>
+
 namespace
 {
   /**
@@ -342,6 +344,14 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(const ti
       continue;
     }
 
+    // The layer of the XML format is the group of the label now. Kept as a property, every later
+    // save would write it back, and after splitting the layers it would be stale.
+    if (nullptr != key && std::string_view(key) == "layer")
+    {
+      propElem = propElem->NextSiblingElement("property");
+      continue;
+    }
+
     std::string name;
     mitk::BaseProperty::Pointer prop;
     if (!MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem))
@@ -631,9 +641,7 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
     "name", "locked", "opacity", "visible", "color", "value",
     "tracking_id", "tracking_uid", "description",
     //the following keys will be ignored on purpose
-    "center.coordinates", "center.index",
-    "DICOM.0062.0002.0062.0005", //covered by "name"
-    "DICOM.0062.0002.0062.0004" //set automatically
+    "center.coordinates", "center.index"
   };
 
   for (const auto& [key, property] : *propMap)
@@ -641,6 +649,15 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
     // Skip reserved keys
     if (reservedKeys.find(key) != reservedKeys.end())
       continue;
+
+    // Readers ignore these, so writing them would only defer the loss; such a property was set
+    // deliberately, since loaded labels never carry one.
+    if (IsOutdatedLabelProperty(key))
+    {
+      MITK_WARN << "The property \"" << key << "\" of label " << label->GetValue() << " is not written: readers ignore"
+                << " label properties under \"" << GetOutdatedLabelPropertyPrefix() << "\" as outdated.";
+      continue;
+    }
 
     // Try to serialize the property to JSON
     j[key] = mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(property);
@@ -731,9 +748,10 @@ void mitk::MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(const std::strin
 
   MITK_WARN << "The segmentation \"" << location << "\" carries outdated label properties (keys starting with \""
             << GetOutdatedLabelPropertyPrefix() << "\"; labels affected: " << numberOfLabels
-            << "). They were ignored. Mostly they are defaults that MITK 2025.08 and older stamped on every"
-               " label. If such a version imported the segmentation from DICOM SEG, they may hold codes of that"
-               " file (segment category, type, modifier, anatomic region) that the label now lacks; to keep them,"
+            << "). They were ignored. Mostly they are defaults that MITK versions before 2025.12 stamped on"
+               " every label, and that MITK 2025.12 to 2026.06 kept when saving the file again. If a version"
+               " before 2025.12 imported the segmentation from DICOM SEG, they may hold codes of that file"
+               " (segment category, type, modifier, anatomic region) that the label now lacks; to keep them,"
                " import the original DICOM SEG again, because saving this segmentation removes them for good."
                " Ignoring these properties is deprecated and may be removed in a future version.";
 }

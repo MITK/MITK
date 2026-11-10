@@ -113,9 +113,6 @@ namespace mitk
 
         bool hadOutdatedProperties = false;
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem, &hadOutdatedProperties);
-        // The layer index is the group membership now. Kept as a property, every later save
-        // would write it back, and after "Split layers" it would be stale.
-        label->RemoveProperty("layer");
 
         if (label->GetValue() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {

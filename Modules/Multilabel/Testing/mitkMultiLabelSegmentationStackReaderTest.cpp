@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkLabelSetImage.h>
+#include <mitkMultiLabelIOHelper.h>
 #include <mitkSegIOTestCapabilities.h>
 #include <mitkSegIOTestComparator.h>
 #include <mitkSegIOTestFixtures.h>
@@ -224,14 +225,14 @@ public:
 
   void Test3D_Outdated_label_properties_are_discarded()
   {
-    // A label loaded from a file of MITK before 2025.12 carried this stamp, and later
-    // versions wrote it into stacks too.
-    auto segmentation = this->LoadSegmentation("Multilabel/MultilabelSegmentation.nrrd");
-    const auto value = segmentation->GetAllLabelValues().front();
-    segmentation->GetLabel(value)->SetProperty("DICOM.0062.0002.0062.0008",
-                                               mitk::TemporoSpatialStringProperty::New("SEMIAUTOMATIC"));
-    const auto path = this->GetTempFilePath("outdated.mitklabel.json");
-    mitk::IOUtil::Save(segmentation, path, GroupStrategy());
+    // A label loaded from a file of MITK before 2025.12 carried this stamp, and MITK 2025.12 to
+    // 2026.06 wrote it into stacks, too. The writer leaves it out now, so the test puts it into the
+    // file.
+    const auto path = this->SaveValidStack("outdated.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["groups"][0]["labels"][0]["DICOM.0062.0002.0062.0008"] =
+      mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(mitk::TemporoSpatialStringProperty::New("SEMIAUTOMATIC"));
+    mitk::test::WriteJsonFile(path, content);
 
     mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
     const auto loaded = mitk::IOUtil::Load(path);

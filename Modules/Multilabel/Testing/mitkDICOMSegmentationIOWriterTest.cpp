@@ -212,6 +212,19 @@ namespace
     Rule::Connect(seg, nonDicomSource);
   }
 
+  // Attach a relation with per-slice source UIDs but without source series, and return its UID.
+  std::string ConnectRelationWithoutSourceSeries(mitk::MultiLabelSegmentation* seg)
+  {
+    auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
+    auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
+    for (int sliceIndex = 0; sliceIndex < 3; ++sliceIndex)
+    {
+      perSliceInstance->SetValue(0, sliceIndex, "1.2.826.0.1.3680043.10.999.9.1." + std::to_string(sliceIndex));
+      perSliceClass->SetValue(0, sliceIndex, "1.2.840.10008.5.1.4.1.1.2");
+    }
+    return Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "");
+  }
+
   // Open a SEG written by the writer and return its SOP Class UID. Empty
   // string on read failure; the caller asserts on the expected value.
   std::string GetWrittenSEGSOPClassUID(const std::string& path)
@@ -415,12 +428,16 @@ namespace
   }
 
   // The writer writes group 0 to the requested path and inserts "_<group>" before the last dot of
-  // the file name for the others, or appends it if the file name has none.
+  // the file name for the others, or appends it if the file name has none or consists of digits and
+  // dots only.
   std::string GroupFilePath(const std::string& path, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
     if (0 == group)
       return path;
-    const auto extension = itksys::SystemTools::GetFilenameLastExtension(path);
+    const auto fileName = itksys::SystemTools::GetFilenameName(path);
+    const auto extension = fileName.find_first_not_of("0123456789.") == std::string::npos
+                             ? std::string()
+                             : itksys::SystemTools::GetFilenameLastExtension(path);
     return path.substr(0, path.size() - extension.size()) + "_" + std::to_string(group) + extension;
   }
 
@@ -501,13 +518,18 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteTruncatesLongAlgorithmNames);
   MITK_TEST(WriteRefusesLabelNamesWithBackslash);
   MITK_TEST(WriteRefusesNonASCIILabelNames);
+  MITK_TEST(WriteRefusesLabelNamesWithControlCharacters);
+  MITK_TEST(WriteRefusesInvalidAlgorithmNames);
+  MITK_TEST(WriteIgnoresAlgorithmNamesItDoesNotWrite);
   MITK_TEST(WriteRefusesRelationWithoutSourceSeriesUID);
+  MITK_TEST(WriteRefusesSeriesLessRelationBeforeContractCheck);
   MITK_TEST(WriteTurnsDcmqiFailuresIntoExceptions);
   MITK_TEST(WriteRoundsColours);
   MITK_TEST(StrictModeRefusalsAreStrictModeExceptions);
   MITK_TEST(SyntheticModeRefusalIsPlainException);
   MITK_TEST(WriteKeepsDottedDirectoryOfPathWithoutExtension);
   MITK_TEST(WriteKeepsTheExtensionOfTheRequestedPath);
+  MITK_TEST(WriteKeepsDottedStemOfPathWithoutExtension);
   MITK_TEST(WriteUsesLowestExistingAnatomicRegion);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
@@ -518,6 +540,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(LabelmapReloadOrdersLabelsBySegmentNumber);
   MITK_TEST(WriteRefusesInvalidTrackingUID);
   MITK_TEST(WriteRefusesUnknownOptionValues);
+  MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -795,28 +818,90 @@ public:
     this->AssertWriteRefused(seg, {}, "non-ascii", Refusal::UnrepresentableValue, {"L\xC3\xA4sion"});
   }
 
+  // DCMTK checks the Segment Label as LO, which admits neither control characters nor DEL.
+  void WriteRefusesLabelNamesWithControlCharacters()
+  {
+    const std::vector<std::string> names = { "Left\tRight", "Left\nRight", "Left\x7F" "Right" };
+    for (std::size_t i = 0; i < names.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName(names[i]);
+      this->AssertWriteRefused(seg, {}, "control-character-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"Left", "Segment Label"});
+    }
+  }
+
+  // dcmqi hands the algorithm name of an AUTOMATIC or SEMIAUTOMATIC label to DCMTK, which checks
+  // it as LO without a Specific Character Set.
+  void WriteRefusesInvalidAlgorithmNames()
+  {
+    const std::vector<std::string> names = { "Tool \xC3\xA4", "Tool\tA", "Tool\\A" };
+    const std::vector<mitk::Label::AlgorithmType> types = { mitk::Label::AlgorithmType::AUTOMATIC,
+                                                            mitk::Label::AlgorithmType::SEMIAUTOMATIC };
+    for (std::size_t i = 0; i < names.size(); ++i)
+    {
+      for (std::size_t t = 0; t < types.size(); ++t)
+      {
+        auto seg = BuildSegWithRule();
+        seg->GetLabel(1)->SetAlgorithmType(types[t]);
+        seg->GetLabel(1)->SetAlgorithmName(names[i]);
+        this->AssertWriteRefused(seg, {}, "algorithm-name-" + std::to_string(i) + "-" + std::to_string(t),
+                                 Refusal::UnrepresentableValue, {"Segment Algorithm Name"});
+      }
+    }
+  }
+
+  // dcmqi writes no algorithm name for a MANUAL label, and the writer writes an undefined algorithm
+  // type as MANUAL, so a name that DCMTK would refuse does not stop these writes.
+  void WriteIgnoresAlgorithmNamesItDoesNotWrite()
+  {
+    auto manual = BuildSegWithRule();
+    manual->GetLabel(1)->SetAlgorithmName("Tool \xC3\xA4");
+    this->WriteSegToTempFile(manual, {}, "manual-algorithm-name");
+
+    auto undefined = BuildSegWithRule();
+    undefined->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
+    undefined->GetLabel(1)->SetAlgorithmName("Tool \xC3\xA4");
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    this->WriteSegToTempFile(undefined, options, "undefined-algorithm-name");
+  }
+
   // dcmqi needs the series of the source images for the Referenced Series Sequence.
   void WriteRefusesRelationWithoutSourceSeriesUID()
   {
     auto seg = BuildBaseSeg(/*stampIdentity=*/true);
-    auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
-    auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
-    for (int sliceIndex = 0; sliceIndex < 3; ++sliceIndex)
-    {
-      perSliceInstance->SetValue(0, sliceIndex, "1.2.826.0.1.3680043.10.999.9.1." + std::to_string(sliceIndex));
-      perSliceClass->SetValue(0, sliceIndex, "1.2.840.10008.5.1.4.1.1.2");
-    }
-    const auto relationUID = Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "");
+    const auto relationUID = ConnectRelationWithoutSourceSeries(seg);
 
     this->AssertWriteRefused(seg, {}, "no-source-series", Refusal::Plain, {relationUID});
   }
 
-  // dcmqi reports some failures by throwing an int, here DCMTK's check of the algorithm name.
+  // No mode can write a relation without source series. So the refusal comes before the strict-mode
+  // refusal of an incomplete contract, which promises that synthetic mode can succeed, and before
+  // synthetic mode stamps the segmentation.
+  void WriteRefusesSeriesLessRelationBeforeContractCheck()
+  {
+    auto strict = BuildBaseSeg(/*stampIdentity=*/false);
+    const auto strictRelationUID = ConnectRelationWithoutSourceSeries(strict);
+    this->AssertWriteRefused(strict, {}, "no-source-series-strict", Refusal::Plain, {strictRelationUID});
+
+    auto synthetic = BuildBaseSeg(/*stampIdentity=*/false);
+    ConnectRelationWithoutSourceSeries(synthetic);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Patient ID", ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    CPPUNIT_ASSERT_THROW_MESSAGE("Synthetic mode refuses the relation",
+                                 mitk::test::WriteWithWriter(synthetic, this->GetTempFilePath("no-source-series-synthetic.dcm"),
+                                                             "DICOM Segmentation", options),
+                                 mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped",
+                           ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+  }
+
+  // dcmqi reports some failures by throwing an int, here DCMTK's check of the source series UID.
   void WriteTurnsDcmqiFailuresIntoExceptions()
   {
-    auto seg = BuildSegWithRule();
-    seg->GetLabel(1)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
-    seg->GetLabel(1)->SetAlgorithmName("Tool \xC3\xA4");
+    auto seg = BuildSegWithRule(/*stampIdentity=*/true, "not-a-uid");
     this->AssertWriteRefused(seg, {}, "dcmqi-failure", Refusal::Plain, {"group 0"});
   }
 
@@ -907,6 +992,23 @@ public:
     }
   }
 
+  // A file name of digits and dots only, such as a UID, has no extension, so the group number is
+  // appended to it. IOUtil adds no extension to such a name, since it takes everything from the
+  // first dot for one.
+  void WriteKeepsDottedStemOfPathWithoutExtension()
+  {
+    auto seg = BuildTwoGroupSeg();
+    const auto path = this->GetTempFilePath("1.2.840.113");
+
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/true);
+
+    CPPUNIT_ASSERT_MESSAGE("The first group is written to the requested path", FileExists(path));
+    CPPUNIT_ASSERT_MESSAGE("The stem is not split", !FileExists(this->GetTempFilePath("1.2.840_1.113")));
+    CPPUNIT_ASSERT_MESSAGE("The group number is appended", FileExists(path + "_1"));
+    AssertWrittenSegments(path, *seg, 0, false);
+    AssertWrittenSegments(path + "_1", *seg, 1, false);
+  }
+
   // RemoveAnatomicRegion leaves the indices sparse; the writer takes the region with the lowest
   // existing index.
   void WriteUsesLowestExistingAnatomicRegion()
@@ -955,14 +1057,18 @@ public:
     AssertNoWriterFound(image, this->GetTempFilePath("image.dcm"));
   }
 
-  // Groups are written one after the other; a refusal in a later group leaves the files of the
-  // earlier ones.
   // The labels of all groups are checked before the first file is written.
   void WriteRefusesUnwritableLabelOfLaterGroupBeforeAnyFile()
   {
     const std::vector<std::pair<std::string, std::function<void(mitk::MultiLabelSegmentation*)>>> edits = {
       { "backslash", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetName("Left\\Right"); } },
       { "non-ascii", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetName("L\xC3\xA4sion"); } },
+      { "control-character", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetName("Left\tRight"); } },
+      { "algorithm-name",
+        [](mitk::MultiLabelSegmentation* seg) {
+          seg->GetLabel(2)->SetAlgorithmType(mitk::Label::AlgorithmType::AUTOMATIC);
+          seg->GetLabel(2)->SetAlgorithmName("Tool \xC3\xA4");
+        } },
       { "tracking-uid", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingUID("track-uid"); } },
       { "value",
         [](mitk::MultiLabelSegmentation* seg) {
@@ -1064,6 +1170,31 @@ public:
       options[name] = value;
       this->AssertWriteRefused(BuildSegWithRule(), options, "unknown-" + value, Refusal::Plain, {name, value});
     }
+  }
+
+  // Only changing the label lets such a write succeed. So the labels are checked before the
+  // strict-mode refusal of an incomplete contract, which promises that synthetic mode can succeed,
+  // and before synthetic mode stamps the segmentation.
+  void WriteRefusesUnwritableLabelBeforeTheContractCheck()
+  {
+    auto synthetic = BuildSegWithRule(/*stampIdentity=*/false);
+    synthetic->GetLabel(1)->SetName("Left\\Right");
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Patient ID", ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Study Instance UID",
+                           ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    CPPUNIT_ASSERT_THROW_MESSAGE("Synthetic mode refuses the label",
+                                 mitk::test::WriteWithWriter(synthetic, this->GetTempFilePath("unwritable-synthetic.dcm"),
+                                                             "DICOM Segmentation", options),
+                                 mitk::DICOMSegUnrepresentableValueException);
+    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped",
+                           ReadStringProp(synthetic, 0x0010, 0x0020).empty() &&
+                             ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+
+    auto strict = BuildSegWithRule(/*stampIdentity=*/false);
+    strict->GetLabel(1)->SetName("Left\\Right");
+    this->AssertWriteRefused(strict, {}, "unwritable-strict", Refusal::UnrepresentableValue, {"Left\\Right"});
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

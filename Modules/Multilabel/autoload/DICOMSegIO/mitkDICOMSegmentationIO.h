@@ -55,8 +55,9 @@ namespace mitk
      * \brief Write the MultiLabelSegmentation as DICOM Segmentation files, one per group.
      *
      * Group 0 is written to the output location; the file of group g inserts "_<g>" before the
-     * last dot of the file name, or appends it if the file name has none. The writer adds no
-     * extension of its own. Group names are not kept: DICOM SEG has no field meant for them.
+     * last dot of the file name, or appends it if the file name has none or consists of digits and
+     * dots only, such as a UID. The writer adds no extension of its own. Group names are not kept:
+     * DICOM SEG has no field meant for them.
      * Native NRRD and the segmentation stack keep them.
      *
      * The segments of a group are numbered 1..N in ascending label value order. dcmqi writes no
@@ -74,14 +75,19 @@ namespace mitk
      * (DICOMSegmentationPropertyHelper::Validate) or a source-image relation with per-slice UIDs;
      * a retry in synthetic mode can succeed.
      * \throw DICOMSegUnrepresentableValueException naming the label for a label value above 32767,
-     * a label name with a backslash or with non-ASCII characters, or a Tracking UID that is no valid
-     * UID; only changing the label lets the write succeed. The labels of all groups are checked
-     * before any file is written.
-     * \throw mitk::Exception naming the relation for a source-image relation without source series;
-     * naming the option for an option value outside its choices; and if synthetic mode cannot fill
+     * a label name or, for an AUTOMATIC or SEMIAUTOMATIC label, an algorithm name that is no valid
+     * LO value without Specific Character Set (a backslash, non-ASCII or control characters), or a
+     * Tracking UID that is no valid UID; only changing the label lets the write succeed.
+     * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs but
+     * without source series; naming the option for an option value outside its choices; and if
+     * synthetic mode cannot fill
      * a contract item, if no source-image reference lies on a slice of the segmentation, or if
      * dcmqi fails. A failure of ITK, of dcmqi or of saving in a later group leaves the files of
      * the earlier groups.
+     *
+     * The labels and the source series of the relations are checked first: before the
+     * strict-mode refusal, before synthetic mode changes the segmentation, and before any file is
+     * written.
      */
     void Write() override;
 

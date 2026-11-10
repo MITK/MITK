@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcsequen.h>
+#include <dcmtk/dcmdata/dcvrlo.h>
 #include <dcmtk/dcmdata/dcvrui.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
@@ -123,20 +124,16 @@ namespace
   constexpr auto MAX_WRITABLE_LABEL_VALUE =
     std::numeric_limits<mitk::DICOMSegmentationIO::itkInternalImageType::PixelType>::max();
 
-  // Segment Label (0062,0005) is LO. The writer writes no Specific Character Set, so the default
-  // repertoire applies: non-ASCII characters are invalid, and a backslash would separate two
-  // values. DCMTK rejects both inside dcmqi; refusing them here names the label.
-  void CheckWritableLabelName(const mitk::Label &label)
+  // Segment Label (0062,0005) and Segment Algorithm Name (0062,0009) are LO. The writer writes no
+  // Specific Character Set, so the default repertoire applies, and a backslash would separate two
+  // values. DCMTK rejects other values inside dcmqi; checking them with its own rule here names the
+  // label.
+  void CheckWritableLO(const mitk::Label &label, const std::string &value, const std::string &attribute)
   {
-    const std::string name = label.GetName();
-    if (name.find('\\') != std::string::npos)
+    if (DcmLongString::checkStringValue(value.c_str(), "1").bad())
       mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
-        << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
-        << "a Segment Label must not contain a backslash.";
-    if (std::any_of(name.begin(), name.end(), [](char c) { return static_cast<unsigned char>(c) > 0x7F; }))
-      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
-        << "Cannot write label " << label.GetValue() << " (\"" << name << "\") as DICOM SEG: "
-        << "a Segment Label must consist of ASCII characters.";
+        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: its "
+        << attribute << " \"" << value << "\" may hold only printable ASCII characters and no backslash.";
   }
 
   // Tracking UID (0062,0021) is UI. dcmqi sets it without checking the result, so DCMTK's
@@ -150,8 +147,9 @@ namespace
         << "its Tracking UID \"" << trackingUID << "\" is no valid DICOM UID.";
   }
 
-  // These refusals depend on the labels alone, so they are checked for all groups before the first
-  // file is written.
+  // These refusals depend on the labels alone and no mode avoids them, so they are checked for all
+  // groups before anything else: the strict-mode refusal promises that synthetic mode can succeed,
+  // synthetic mode changes the segmentation, and the groups are written one after the other.
   void CheckWritableLabels(const mitk::MultiLabelSegmentation &seg)
   {
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg.GetNumberOfGroups(); ++group)
@@ -162,9 +160,31 @@ namespace
           mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
             << "Cannot write label " << label->GetValue() << " (\"" << label->GetName() << "\") of group " << group
             << " as DICOM SEG: label values above " << MAX_WRITABLE_LABEL_VALUE << " are not supported.";
-        CheckWritableLabelName(*label);
+        CheckWritableLO(*label, label->GetName(), "Segment Label");
+        // dcmqi writes the algorithm name of these types only; the writer writes an undefined type
+        // as MANUAL.
+        const auto algorithmType = label->GetAlgorithmType();
+        if (algorithmType == mitk::Label::AlgorithmType::AUTOMATIC ||
+            algorithmType == mitk::Label::AlgorithmType::SEMIAUTOMATIC)
+          CheckWritableLO(*label, label->GetAlgorithmName(), "Segment Algorithm Name");
         CheckWritableTrackingUID(*label);
       }
+    }
+  }
+
+  // Every relation with per-slice source references must name its source series: each item of the
+  // Referenced Series Sequence requires one, and no mode can make it up. Relations without per-slice
+  // UIDs, such as those to images without DICOM tags, contribute no references. Checked before
+  // anything else, for the reasons given at CheckWritableLabels.
+  void CheckSourceRelationsHaveSeries(const mitk::MultiLabelSegmentation &seg)
+  {
+    for (const auto &relation : mitk::SegSourceImageRelationRule::GetSourceImageRelations(&seg))
+    {
+      if (relation.instanceUIDsPerSlice.IsNull() || relation.classUIDsPerSlice.IsNull())
+        continue;
+      if (relation.sourceSeriesInstanceUID.empty())
+        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID
+                    << " as DICOM SEG: it names no source series (0020,000E).";
     }
   }
 
@@ -672,6 +692,7 @@ namespace
   //
   // \pre seg must be a valid pointer.
   // \pre layer must be a valid group index of seg.
+  // \pre CheckSourceRelationsHaveSeries(*seg) passed.
   std::vector<std::unique_ptr<DcmItem>>
   BuildSourceItemsFromProperties(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
@@ -700,11 +721,6 @@ namespace
     {
       if (relation.instanceUIDsPerSlice.IsNull() || relation.classUIDsPerSlice.IsNull())
         continue;
-
-      // The Referenced Series Sequence needs the series of the source images.
-      if (relation.sourceSeriesInstanceUID.empty())
-        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID
-                    << " as DICOM SEG: it names no source series (0020,000E).";
 
       const auto slices = relation.instanceUIDsPerSlice->GetAvailableSlices(0);
       for (const auto slice : slices)
@@ -902,6 +918,9 @@ namespace mitk
 
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
 
+    CheckWritableLabels(*input);
+    CheckSourceRelationsHaveSeries(*input);
+
     // Synthesis runs once before the per-group loop. The alternative
     // (per-group) would invite divergence across groups when the
     // synthesised top-level identity tags are minted with random UIDs.
@@ -938,8 +957,6 @@ namespace mitk
         << "\" to fill these automatically, or populate them explicitly. "
         << "Missing items:" << items.str();
     }
-
-    CheckWritableLabels(*input);
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
 
@@ -1053,13 +1070,17 @@ namespace mitk
       // last dot of the file name, or append it if the file name has none.
       // Every file thus has the form the caller chose; whether an extension
       // is added is IOUtil's decision. A dot in a directory name belongs to
-      // the stem, and dotted stems such as UIDs stay intact.
+      // the stem. A file name of digits and dots only is taken for a UID,
+      // which has no extension; IOUtil adds none to it either, since it takes
+      // everything from the first dot for one.
       std::string filePath = path;
       if (layer != 0)
       {
         const auto fileNameStart = path.find_last_of("/\\");
+        const auto fileName = fileNameStart == std::string::npos ? path : path.substr(fileNameStart + 1);
+        const bool isUID = fileName.find_first_not_of("0123456789.") == std::string::npos;
         const auto extensionStart = path.find_last_of('.');
-        const bool hasExtension = extensionStart != std::string::npos &&
+        const bool hasExtension = !isUID && extensionStart != std::string::npos &&
                                   (fileNameStart == std::string::npos || extensionStart > fileNameStart);
         const auto stemLength = hasExtension ? extensionStart : path.size();
         filePath = path.substr(0, stemLength) + "_" + std::to_string(layer) + path.substr(stemLength);

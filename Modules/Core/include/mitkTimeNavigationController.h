@@ -34,8 +34,9 @@ namespace mitk
    *  - range: the time bounds for the slider (minimum, maximum)
    *
    * The timestep controls the selection of a specific time point from the TimeGeometry.
-   * The TimeNavigationController generates ITK events to tell observers,
-   * like a BaseRenderer, when the selected timestep changes.
+   * The TimeNavigationController sends a TimeEvent to tell observers, like a
+   * BaseRenderer, about the selected time: on every change of the stepper and
+   * on every Update().
    * Observers read the selected time point (GetSelectedTimePoint()) and resolve
    * it against their own time geometry; a BaseRenderer does that for its world
    * time geometry.
@@ -88,25 +89,22 @@ namespace mitk
 
     /**
      * \brief Do the actual time-related properties extraction
-              and send the currently selected time step to the connected
-              observers (renderers).
+     *        and send the selected time to the connected observers (SendTime()).
      */
     virtual void Update();
 
     /**
-     * \brief Send the currently selected time step to the connected
-     *        observers (renderers).
+     * \brief Send the selected time to the connected observers with a TimeEvent.
      *
-     * Called by Update().
+     * Called on every change of the stepper and at the end of every Update(),
+     * also when the update changed nothing.
      */
     virtual void SendTime();
 
     /**
-     * \brief ITK event that carries the currently selected time step.
+     * \brief ITK event that notifies observers of the selected time.
      *
-     * This event is invoked by the TimeNavigationController whenever the
-     * selected time step changes. Observers (e.g. BaseRenderer) can listen
-     * for this event to update their rendering accordingly.
+     * Invoked by SendTime(), also when the selection did not change.
      */
     class MITKCORE_EXPORT TimeEvent : public itk::AnyEvent
     {

@@ -80,9 +80,9 @@ public:
 
   void tearDown() override
   {
-    // The time navigation is a process-wide singleton: renderers read its time
-    // point when they are constructed, and slice navigations read its time
-    // step. Removing its input does not reset that step.
+    // The time navigation is a process-wide singleton. Renderers and slice
+    // navigations read its selected time point, which derives from the
+    // stepper position; removing the input does not reset that position.
     auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
     timeNavigationController->SetInputWorldTimeGeometry(nullptr);
     timeNavigationController->GetStepper()->SetPos(0);

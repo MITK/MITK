@@ -199,7 +199,8 @@ namespace mitk
        * \brief Check whether GenerateDataForRenderer() needs to be called.
        *
        * Compares the last generate-data timestamp against the modification times
-       * of the mapper, data node, underlying data, and renderer time step.
+       * of the mapper, data node, underlying data, and the renderer's time point
+       * (BaseRenderer::GetTimePointUpdateTime()).
        *
        * \param[in] renderer The renderer to check against.
        * \param[in] mapper The mapper to check against.

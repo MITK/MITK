@@ -112,8 +112,11 @@ namespace mitk
       itk::EncapsulateMetaData<std::string>(
         nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY), std::to_string(input->GetUnlabeledLabelLock()));
 
-      // Handle properties
-      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), input->GetPropertyList(), this->GetMimeType()->GetName());
+      // Handle properties. A property named like a key of the format, e.g. "modality" from a
+      // stack, would overwrite that key, and the file would read back as another type of data.
+      auto properties = input->GetPropertyList()->Clone();
+      RemoveReservedProperties(properties, GetMultiLabelReservedKeys());
+      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), properties, this->GetMimeType()->GetName());
 
       // Handle UID
       itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), PROPERTY_KEY_UID, input->GetUID());
@@ -252,7 +255,7 @@ namespace mitk
 
   void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys = GetMultiLabelNrrdMetaDataKeys();
+    this->m_DefaultMetaDataKeys = GetMultiLabelReservedKeys();
   }
 
 } // namespace

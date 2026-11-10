@@ -45,6 +45,8 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestRoundTripWithEmptyGroup);
   MITK_TEST(TestRoundTripMaxLabelValue);
   MITK_TEST(TestCustomPropertyWithoutPersistenceInfoIsDropped);
+  MITK_TEST(TestReadKeepsNamesakesOfFormatKeys);
+  MITK_TEST(TestWriteLeavesOutPropertiesNamedLikeFormatKeys);
   MITK_TEST(TestReadVersion1);
   MITK_TEST(TestReadVersion2With4D);
   MITK_TEST(TestReadOutdatedLabelPropertiesAreDiscarded);
@@ -58,6 +60,7 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
 
 private:
   std::string m_TempDir;
+  bool m_AddedModalityPersistence = false;
 
   static const std::string& ReaderDescription()
   {
@@ -116,6 +119,12 @@ public:
   {
     mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
     persistence->RemoveInfo(mitk::test::RichFixtureCustomPropertyName());
+    persistence->RemoveInfo("modality.source");
+    if (m_AddedModalityPersistence)
+    {
+      persistence->RemoveInfo("modality");
+      m_AddedModalityPersistence = false;
+    }
 
     std::error_code ec;
     std::filesystem::remove_all(m_TempDir, ec);
@@ -326,6 +335,52 @@ public:
     const auto reloaded = this->SaveAndReload(mitk::test::BuildRichSegmentation({ false, false, false, false }));
     CPPUNIT_ASSERT_MESSAGE("A custom property without persistence info is not written to the NRRD header",
                            reloaded->GetConstProperty(mitk::test::RichFixtureCustomPropertyName()).IsNull());
+  }
+
+  // "modality" is a key of the format; a key merely starting with it is user content, which the
+  // next save keeps, too.
+  void TestReadKeepsNamesakesOfFormatKeys()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    persistence->RemoveInfo("modality.source");
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) { lines.push_back("modality_source:=CT"); });
+
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
+    const auto read = segmentation->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("The read keeps modality.source", read.IsNotNull() && read->GetValueAsString() == "CT");
+    CPPUNIT_ASSERT_MESSAGE("The format key is no property", segmentation->GetConstProperty("modality").IsNull());
+
+    const auto saved = this->SaveAndReload(segmentation)->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("The next save keeps modality.source", saved.IsNotNull() && saved->GetValueAsString() == "CT");
+  }
+
+  // A property named like a key of the format, e.g. "modality" from a stack, reaches the header
+  // through a persistence info, such as the one a plain NRRD read registers. It must not overwrite
+  // the writer's own key, or the file reads back as a plain image.
+  void TestWriteLeavesOutPropertiesNamedLikeFormatKeys()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    if (persistence->GetInfo("modality", false).empty())
+    {
+      auto info = mitk::PropertyPersistenceInfo::New();
+      info->SetNameAndKey("modality", "modality");
+      persistence->AddInfo(info);
+      m_AddedModalityPersistence = true;
+    }
+
+    auto segmentation = mitk::test::BuildRichSegmentation({ false, false, false, false });
+    segmentation->SetProperty("modality", mitk::StringProperty::New("CT"));
+    const auto path = this->TempPath("format-key.nrrd");
+    mitk::IOUtil::Save(segmentation, path);
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), loaded.size());
+    const auto readerDescription = loaded.front()->GetConstProperty(
+      mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()));
+    CPPUNIT_ASSERT(readerDescription.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The saved file is read as a native one", ReaderDescription(),
+                                 readerDescription->GetValueAsString());
   }
 
   void TestReadVersion1()

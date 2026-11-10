@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -210,11 +211,6 @@ namespace
       nlohmann::json fileContent;
       input >> fileContent;
 
-      if (!fileContent.contains("groups") || !fileContent["groups"].is_array() || fileContent["groups"].empty())
-      {
-        mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" defines no groups.";
-      }
-
       //check version
       int version = 0;
 
@@ -226,6 +222,11 @@ namespace
       if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
       {
         mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
+      }
+
+      if (!fileContent.contains("groups") || !fileContent["groups"].is_array() || fileContent["groups"].empty())
+      {
+        mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" defines no groups.";
       }
 
       bool segInitialized = false;
@@ -308,6 +309,7 @@ namespace
       {
         auto loadedProperties = mitk::PropertyList::New();
         loadedProperties->FromJSON(fileContent["properties"]);
+        RemoveReservedProperties(loadedProperties, GetMultiLabelReservedKeys());
 
         EnsurePropertyPersistance(loadedProperties);
 

@@ -35,8 +35,10 @@ class mitkMultiLabelSegmentationStackReaderTestSuite : public mitk::TestFixture
   MITK_TEST(Test3D_mixed);
   MITK_TEST(Test3D_Custom_prop_roundtrip);
   MITK_TEST(Test3D_Outdated_label_properties_are_discarded);
+  MITK_TEST(TestReadDropsFormatKeysAndKeepsNamesakes);
   MITK_TEST(TestReadAbsoluteFilePath);
   MITK_TEST(TestReadVersionAbove4Fails);
+  MITK_TEST(TestReadVersionAbove4WithoutGroupsFails);
   MITK_TEST(TestReadWrongTypeFindsNoReader);
   MITK_TEST(TestReadMalformedJsonFails);
   MITK_TEST(TestReadWithoutGroupsFails);
@@ -244,6 +246,28 @@ public:
                            warnings.GetWarnings().front().find("outdated.mitklabel.json") != std::string::npos);
   }
 
+  // "modality" names the format of a native file, so a stack property of that name is dropped; a
+  // native save would write it over the format's own key. Keys merely starting with it are user
+  // content, which a native save keeps.
+  void TestReadDropsFormatKeysAndKeepsNamesakes()
+  {
+    const auto path = this->SaveValidStack("format-keys.mitklabel.json");
+    auto content = mitk::test::ReadJsonFile(path);
+    content["properties"]["StringProperty"]["modality"] = "CT";
+    content["properties"]["StringProperty"]["modality.source"] = "CT";
+    mitk::test::WriteJsonFile(path, content);
+
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
+    CPPUNIT_ASSERT_MESSAGE("The format key is no property", segmentation->GetConstProperty("modality").IsNull());
+    const auto read = segmentation->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("The read keeps modality.source", read.IsNotNull() && read->GetValueAsString() == "CT");
+
+    const auto nativePath = this->GetTempFilePath("format-keys.nrrd");
+    mitk::IOUtil::Save(segmentation, nativePath);
+    const auto saved = mitk::test::LoadSingleSegmentation(nativePath)->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("A native save keeps modality.source", saved.IsNotNull() && saved->GetValueAsString() == "CT");
+  }
+
   void TestReadAbsoluteFilePath()
   {
     const auto original = mitk::test::BuildRichSegmentation({ false, false, false, false });
@@ -272,6 +296,15 @@ public:
     auto content = mitk::test::ReadJsonFile(path);
     content["version"] = 5;
     mitk::test::WriteJsonFile(path, content);
+
+    mitk::test::AssertReadFails(path, ReaderDescription(), "unsupported version");
+  }
+
+  // A later format version need not have the groups of version 4.
+  void TestReadVersionAbove4WithoutGroupsFails()
+  {
+    const auto path = this->GetTempFilePath("future-no-groups.mitklabel.json");
+    this->WriteTextFile(path, R"({"version": 5, "type": "org.mitk.multilabel.segmentation.stack"})");
 
     mitk::test::AssertReadFails(path, ReaderDescription(), "unsupported version");
   }

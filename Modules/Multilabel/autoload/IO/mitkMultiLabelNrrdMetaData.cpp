@@ -12,37 +12,80 @@ found in the LICENSE file.
 
 #include <mitkMultiLabelNrrdMetaData.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPropertyPersistence.h>
 #include <mitkItkImageIO.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkPropertyPersistenceInfo.h>
 
 #include <algorithm>
 
-std::vector<std::string> mitk::GetMultiLabelNrrdMetaDataKeys()
+bool mitk::MultiLabelReservedKeys::Matches(const std::string& name) const
 {
-  return { "org.mitk.uid", "NRRD.space", "NRRD.kinds", PROPERTY_NAME_TIMEGEOMETRY_TYPE,
-           PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS, "ITK.InputFilterName", "org.mitk.multilabel.", "MITK.IO.",
-           "modality" };
+  if (exact.count(name) > 0)
+    return true;
+
+  return std::any_of(prefixes.begin(), prefixes.end(),
+    [&name](const std::string& prefix) { return name.compare(0, prefix.size(), prefix) == 0; });
 }
 
-std::vector<std::string> mitk::GetLegacyLabelSetNrrdMetaDataKeys()
+std::vector<std::string> mitk::MultiLabelReservedKeys::GetAll() const
 {
-  auto keys = GetMultiLabelNrrdMetaDataKeys();
-  keys.insert(keys.end(), { "layers", "layer.", "label.", "org.mitk.label." });
+  std::vector<std::string> result(exact.begin(), exact.end());
+  result.insert(result.end(), prefixes.begin(), prefixes.end());
+  return result;
+}
+
+const mitk::MultiLabelReservedKeys& mitk::GetMultiLabelReservedKeys()
+{
+  static const MultiLabelReservedKeys keys = {
+    { "org.mitk.uid", "modality", "path", PROPERTY_NAME_TIMEGEOMETRY_TYPE, PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS },
+    { "NRRD.", "ITK.", "MITK.IO.", "org.mitk.multilabel." } };
+  return keys;
+}
+
+const mitk::MultiLabelReservedKeys& mitk::GetLegacyLabelSetReservedKeys()
+{
+  static const MultiLabelReservedKeys keys = [] {
+    auto result = GetMultiLabelReservedKeys();
+    result.exact.insert("layers");
+    result.prefixes.insert(result.prefixes.end(), { "layer.", "label.", "org.mitk.label." });
+    return result;
+  }();
   return keys;
 }
 
 mitk::PropertyList::Pointer mitk::ExtractSegmentationPropertiesFromNrrdHeader(const itk::MetaDataDictionary& dictionary,
                                                                               const std::string& mimeTypeName,
-                                                                              const std::vector<std::string>& metaDataKeys)
+                                                                              const MultiLabelReservedKeys& reservedKeys)
 {
-  auto properties = ItkImageIO::ExtractMetaDataAsPropertyList(dictionary, mimeTypeName, metaDataKeys);
+  auto properties = ItkImageIO::ExtractMetaDataAsPropertyList(dictionary, mimeTypeName, reservedKeys.GetAll());
+  RemoveReservedProperties(properties, reservedKeys);
 
-  for (const auto& name : properties->GetPropertyKeys())
+  // ItkImageIO matches its default keys as prefixes, so it registers no persistence info for a
+  // name that merely starts with an exact one; without an info, the next save would drop it.
+  CoreServicePointer<IPropertyPersistence> persistence(CoreServices::GetPropertyPersistence());
+  for (const auto& key : dictionary.GetKeys())
   {
-    const auto isMetaData = [&name](const std::string& key) { return name.compare(0, key.size(), key) == 0; };
-    if (std::any_of(metaDataKeys.begin(), metaDataKeys.end(), isMetaData))
-      properties->RemoveProperty(name);
+    auto name = key;
+    std::replace(name.begin(), name.end(), '_', '.');
+    if (properties->GetConstProperty(name).IsNull() || !persistence->GetInfo(name, mimeTypeName, true).empty())
+      continue;
+
+    auto info = PropertyPersistenceInfo::New();
+    info->SetNameAndKey(name, key);
+    info->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
+    persistence->AddInfo(info);
   }
 
   return properties;
+}
+
+void mitk::RemoveReservedProperties(PropertyList* properties, const MultiLabelReservedKeys& reservedKeys)
+{
+  for (const auto& name : properties->GetPropertyKeys())
+  {
+    if (reservedKeys.Matches(name))
+      properties->RemoveProperty(name);
+  }
 }

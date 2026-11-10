@@ -14,15 +14,13 @@ found in the LICENSE file.
 #include <mitkCustomMimeType.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkItkImageIO.h>
 
 // itk
 #include <itksys/SystemTools.hxx>
-
-#include <algorithm>
-#include <set>
 
 namespace
 {
@@ -207,19 +205,7 @@ namespace mitk
     {
       //clone properties to sort out the ones that should not be seriealized
       auto cleanedProps = properties->Clone();
-      // Single keys are matched exactly, so that e.g. "pathology.grade" is not taken for "path".
-      const std::set<std::string> unwantedPropNames = { "modality", "org.mitk.uid", "path" };
-      const std::vector<std::string> unwantedPropPrefixes = { "NRRD.", "MITK.IO.", "org.mitk.multilabel.segmentation." };
-
-      for (const auto& propName : cleanedProps->GetPropertyKeys())
-      {
-        const auto isUnwantedPrefix = [&propName](const std::string& prefix) { return propName.compare(0, prefix.size(), prefix) == 0; };
-        if (unwantedPropNames.count(propName) > 0 ||
-            std::any_of(unwantedPropPrefixes.begin(), unwantedPropPrefixes.end(), isUnwantedPrefix))
-        {
-          cleanedProps->RemoveProperty(propName);
-        }
-      }
+      RemoveReservedProperties(cleanedProps, GetMultiLabelReservedKeys());
       cleanedProps->ToJSON(stackContent["properties"]);
 
     }

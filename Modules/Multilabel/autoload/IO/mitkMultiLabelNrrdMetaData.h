@@ -17,36 +17,57 @@ found in the LICENSE file.
 
 #include <itkMetaDataDictionary.h>
 
+#include <set>
 #include <string>
 #include <vector>
 
 namespace mitk
 {
   /**
-   * \brief Keys of the native multi-label NRRD header that are not segmentation properties.
+   * \brief Names that a multi-label format writes or interprets itself, so that a property of
+   * such a name is no segmentation property.
    *
-   * These are the fields the reader interprets itself, those ITK adds on reading, and the IO
-   * meta information of an earlier read. Each key matches every property name it is a prefix
-   * of; property names are the header keys with '_' read as '.'.
+   * A name matches an exact name, or a prefix ending in '.' that it starts with; a name that
+   * merely starts with an exact name, such as "modality.source" for "modality", is user content.
+   * Property names are the NRRD header keys with '_' read as '.'.
    */
-  std::vector<std::string> GetMultiLabelNrrdMetaDataKeys();
+  struct MultiLabelReservedKeys
+  {
+    std::set<std::string> exact;
+    std::vector<std::string> prefixes;
+
+    bool Matches(const std::string& name) const;
+
+    /** Exact names and prefixes in one list, as ItkImageIO takes its default meta data keys. */
+    std::vector<std::string> GetAll() const;
+  };
 
   /**
-   * \brief GetMultiLabelNrrdMetaDataKeys() plus the keys of the layer and label definitions
-   * of the legacy LabelSetImage NRRD format.
+   * \brief The names reserved by the native multi-label NRRD format and the segmentation stack:
+   * the fields their readers interpret themselves, those ITK adds on reading, the IO meta
+   * information of an earlier read, and the location IOUtil records.
    */
-  std::vector<std::string> GetLegacyLabelSetNrrdMetaDataKeys();
+  const MultiLabelReservedKeys& GetMultiLabelReservedKeys();
 
   /**
-   * \brief Extracts the segmentation properties of a multi-label NRRD header: every field that
-   * matches none of metaDataKeys.
+   * \brief GetMultiLabelReservedKeys() plus the keys of the layer and label definitions of the
+   * legacy LabelSetImage NRRD format.
+   */
+  const MultiLabelReservedKeys& GetLegacyLabelSetReservedKeys();
+
+  /**
+   * \brief Extracts the segmentation properties of a multi-label NRRD header: every field whose
+   * name reservedKeys does not match.
    *
-   * Like ItkImageIO::ExtractMetaDataAsPropertyList, which it calls, it registers a persistence
-   * info for every property it returns.
+   * Like ItkImageIO::ExtractMetaDataAsPropertyList, which it calls, it ensures a persistence info
+   * for every property it returns, so that the next save writes it.
    */
   PropertyList::Pointer ExtractSegmentationPropertiesFromNrrdHeader(const itk::MetaDataDictionary& dictionary,
                                                                     const std::string& mimeTypeName,
-                                                                    const std::vector<std::string>& metaDataKeys);
+                                                                    const MultiLabelReservedKeys& reservedKeys);
+
+  /** \brief Removes every property whose name reservedKeys matches. */
+  void RemoveReservedProperties(PropertyList* properties, const MultiLabelReservedKeys& reservedKeys);
 }
 
 #endif

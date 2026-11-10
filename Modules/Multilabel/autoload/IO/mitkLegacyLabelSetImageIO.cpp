@@ -262,7 +262,7 @@ namespace mitk
 
   void LegacyLabelSetImageIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys = GetLegacyLabelSetNrrdMetaDataKeys();
+    this->m_DefaultMetaDataKeys = GetLegacyLabelSetReservedKeys();
   }
 
 } // namespace

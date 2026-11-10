@@ -44,6 +44,7 @@ class mitkLegacyLabelSetImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadFileWithoutUID);
   MITK_TEST(TestLegacyToStackCarriesNoLegacyKeys);
   MITK_TEST(TestLegacyToNativeCarriesNoLegacyKeys);
+  MITK_TEST(TestReadKeepsNamesakesOfFormatKeys);
   MITK_TEST(TestReadUnknownMultiLayerHandlingFails);
   MITK_TEST(TestReadLayerCountMismatchFails);
   MITK_TEST(TestReadMissingLabelDefinitionFails);
@@ -268,6 +269,8 @@ public:
   {
     mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
     persistence->RemoveInfo(mitk::test::RichFixtureCustomPropertyName());
+    persistence->RemoveInfo("modality.source");
+    persistence->RemoveInfo("layers.origin");
     if (m_AddedModalityPersistence)
     {
       persistence->RemoveInfo("modality");
@@ -426,6 +429,39 @@ public:
                                  readerDescription->GetValueAsString());
     mitk::test::AssertReloadMatchesCapabilities({ segmentation.GetPointer() }, { reloaded.GetPointer() },
                                                 mitk::test::NativeNrrdCapabilities());
+  }
+
+  // "modality" and "layers" are keys of the format; keys merely starting with them are user
+  // content, which a native save keeps, too.
+  void TestReadKeepsNamesakesOfFormatKeys()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    persistence->RemoveInfo("modality.source");
+    persistence->RemoveInfo("layers.origin");
+    const auto path = this->CopyValidLegacyFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      lines.push_back("modality_source:=CT");
+      lines.push_back("layers_origin:=import");
+    });
+
+    const auto assertNamesakes = [](const mitk::MultiLabelSegmentation& segmentation, const std::string& context) {
+      const auto modalitySource = segmentation.GetConstProperty("modality.source");
+      CPPUNIT_ASSERT_MESSAGE(context + " keeps modality.source",
+                             modalitySource.IsNotNull() && modalitySource->GetValueAsString() == "CT");
+      const auto layersOrigin = segmentation.GetConstProperty("layers.origin");
+      CPPUNIT_ASSERT_MESSAGE(context + " keeps layers.origin",
+                             layersOrigin.IsNotNull() && layersOrigin->GetValueAsString() == "import");
+    };
+
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
+    assertNamesakes(*segmentation, "The legacy read");
+    CPPUNIT_ASSERT_MESSAGE("The format keys are no properties",
+                           segmentation->GetConstProperty("modality").IsNull() &&
+                             segmentation->GetConstProperty("layers").IsNull());
+
+    const auto nativePath = this->TempPath("namesakes.nrrd");
+    mitk::IOUtil::Save(segmentation, nativePath);
+    assertNamesakes(*mitk::test::LoadSingleSegmentation(nativePath), "The native save");
   }
 
   void TestReadUnknownMultiLayerHandlingFails()

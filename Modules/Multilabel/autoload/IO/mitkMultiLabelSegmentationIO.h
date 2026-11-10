@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 
 namespace mitk
 {
@@ -62,7 +63,7 @@ namespace mitk
   private:
     MultiLabelSegmentationIO *IOClone() const override;
 
-    std::vector<std::string> m_DefaultMetaDataKeys;
+    MultiLabelReservedKeys m_DefaultMetaDataKeys;
   };
 } // end of namespace mitk
 

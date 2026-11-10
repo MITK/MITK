@@ -48,7 +48,7 @@ namespace mitk
     timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputStart + outputRegion.GetSize(3) - 1);
     timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
     if ((timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin()) &&
-        (outputTimeGeometry->IsValidTimeStep(timestep)))
+        (inputTimeGeometry->IsValidTimeStep(timestep)))
       inputRegion.SetSize(3, timestep - static_cast<mitk::TimeStepType>(inputRegion.GetIndex(3)) + 1);
     else
       inputRegion.SetSize(3, 1);

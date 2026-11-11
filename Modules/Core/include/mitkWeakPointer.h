@@ -139,6 +139,7 @@ namespace mitk
 
       this->RemoveDeleteEventObserver();
       m_RawPointer = other.m_RawPointer;
+      other.RemoveDeleteEventObserver();
       other.m_RawPointer = nullptr;
       this->AddDeleteEventObserver();
 

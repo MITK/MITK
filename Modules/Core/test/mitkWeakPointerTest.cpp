@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 // std includes
 #include <string>
+#include <utility>
 
 // MITK includes
 #include <mitkWeakPointer.h>
@@ -33,6 +34,7 @@ class mitkWeakPointerTestSuite : public mitk::TestFixture
   MITK_TEST(ExpiredWeakPointerWithSmartPointerConstructor_Success);
   MITK_TEST(ExpiredWeakPointerWithWeakPointerConstructor_Success);
   MITK_TEST(DeleteEventCall_Success);
+  MITK_TEST(MoveAssignmentLeavesNoObserverOfSource_Success);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -102,6 +104,21 @@ public:
     m_WeakPointer = m_SmartPointer;
     m_SmartPointer = nullptr;
     CPPUNIT_ASSERT_MESSAGE("Testing call of delete event callback", 1 == deleteEventCallbackCalled);
+  }
+
+  void MoveAssignmentLeavesNoObserverOfSource_Success()
+  {
+    auto object = itk::Object::New();
+    mitk::WeakPointer<itk::Object> source(object);
+    mitk::WeakPointer<itk::Object> target;
+
+    target = std::move(source);
+    CPPUNIT_ASSERT_MESSAGE("Testing target of move assignment", target.Lock() == object);
+
+    // An observer left behind by the source would call a dead weak pointer
+    // when the object is deleted after the source.
+    target = nullptr;
+    CPPUNIT_ASSERT_MESSAGE("Testing observers after move assignment", !object->HasObserver(itk::DeleteEvent()));
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkWeakPointer)

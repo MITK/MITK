@@ -101,7 +101,7 @@ bool mitk::AnnotationProperty::ToJSON(nlohmann::json& j) const
 
 bool mitk::AnnotationProperty::FromJSON(const nlohmann::json& j)
 {
-  this->SetLabel(j["Label"].get<std::string>());
-  this->SetPosition(j["Position"].get<Point3D>());
+  this->SetLabel(j.at("Label").get<std::string>());
+  this->SetPosition(j.at("Position").get<Point3D>());
   return true;
 }

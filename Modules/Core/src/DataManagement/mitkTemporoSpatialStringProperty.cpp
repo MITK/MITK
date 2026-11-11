@@ -371,7 +371,7 @@ bool mitk::TemporoSpatialStringProperty::ToJSON(nlohmann::json& j) const
 
 bool mitk::TemporoSpatialStringProperty::FromJSON(const nlohmann::json& j)
 {
-  for (const auto& element : j["values"])
+  for (const auto& element : j.at("values"))
   {
     auto value = element.value("value", "");
     auto z = element.value<TemporoSpatialStringProperty::IndexValueType>("z", 0);

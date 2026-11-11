@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkIRestServerService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestJob.h>
@@ -947,8 +948,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Body, all optional and applied in this order: {reference: uid of an image, segmentation: uid of a "
     "segmentation of that image or null, active_label: value, tool: name or null}. Opens the Segmentation "
     "view if needed and selects there as the user would. A tool needs an image and a segmentation; "
-    "changing them ends the active tool, as in the view, and discards results it did not confirm. Returns "
-    "{data: session} as GET does.";
+    "changing them ends the active tool, as in the view, and discards results it did not confirm. A node that "
+    "the view does not take is answered with 422 NOT_ACCEPTED and changes nothing. After segmentation: null, "
+    "the view selects another segmentation of the image if there is one. Returns {data: session} as GET does.";
   patchSession.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -966,28 +968,55 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       ShowView(request.Path);
       auto* toolManager = GetToolManager();
 
+      // A node that a selector of the view refuses must not reach it: the
+      // selector would drop its selection and select another node on its own,
+      // which ends the active tool. Hence the checks with the predicates of
+      // the selectors before, and those after only as a safeguard.
+      const auto throwReferenceNotAccepted = [&]() {
+        Throw("NOT_ACCEPTED", "Unprocessable Content",
+          "The Segmentation view does not take \"" + reference->GetName() + "\" as image to segment.", 422, request.Path);
+      };
+
+      const auto throwSegmentationNotAccepted = [&]() {
+        Throw("NOT_ACCEPTED", "Unprocessable Content",
+          "The Segmentation view does not take \"" + segmentation->GetName() + "\" as segmentation of the image. "
+          "A segmentation needs the geometry of the image.", 422, request.Path);
+      };
+
       if (reference.IsNotNull())
       {
+        if (!GetSegmentationReferenceImagePredicate()->CheckNode(reference))
+          throwReferenceNotAccepted();
+
+        // The segmentation has to fit the new image, which is checked before the image changes.
+        if (segmentation.IsNotNull() && !GetMultiLabelSegmentationPredicate(reference->GetData()->GetGeometry())->CheckNode(segmentation))
+          throwSegmentationNotAccepted();
+
         SelectInView("referenceNode", reference);
 
         if (toolManager->GetReferenceData(0) != reference)
-        {
-          Throw("NOT_ACCEPTED", "Unprocessable Content",
-            "The Segmentation view does not take \"" + reference->GetName() + "\" as image to segment.", 422, request.Path);
-        }
+          throwReferenceNotAccepted();
       }
 
-      if (body.contains("segmentation"))
+      if (segmentation.IsNotNull())
       {
+        const auto* currentReference = toolManager->GetReferenceData(0);
+        const auto* geometry = currentReference != nullptr && currentReference->GetData() != nullptr
+          ? currentReference->GetData()->GetGeometry()
+          : nullptr;
+
+        if (!GetMultiLabelSegmentationPredicate(geometry)->CheckNode(segmentation))
+          throwSegmentationNotAccepted();
+
         SelectInView("workingNode", segmentation);
 
         if (toolManager->GetWorkingData(0) != segmentation.GetPointer())
-        {
-          Throw("NOT_ACCEPTED", "Unprocessable Content", segmentation.IsNotNull()
-            ? "The Segmentation view does not take \"" + segmentation->GetName() + "\" as segmentation of the image. "
-              "A segmentation needs the geometry of the image."
-            : std::string("The Segmentation view keeps its segmentation."), 422, request.Path);
-        }
+          throwSegmentationNotAccepted();
+      }
+      else if (body.contains("segmentation"))
+      {
+        // The view may select another segmentation of the image on its own, which the returned session shows.
+        SelectInView("workingNode", nullptr);
       }
 
       if (body.contains("active_label"))

@@ -504,6 +504,7 @@ bool RestServer::Start(const RestServerConfig& config, const std::string& starte
     {
       m_Running = false;
       m_RunningConfig = std::nullopt;
+      m_StartedBy.clear();
       m_StartTime = std::nullopt;
 
       // The server thread is exiting -- join it before returning.
@@ -1908,6 +1909,7 @@ void RestServer::ServerThreadFunc()
     // This ensures IsRunning() returns the correct state.
     m_Running = false;
     m_RunningConfig = std::nullopt;
+    m_StartedBy.clear();
   }
 }
 

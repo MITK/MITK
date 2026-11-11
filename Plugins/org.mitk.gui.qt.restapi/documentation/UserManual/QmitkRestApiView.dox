@@ -49,6 +49,8 @@ Shows the current host and port configuration (e.g., <tt>:::8080</tt> for the de
 
 Click the <b>Start Server</b> / <b>Stop Server</b> button to control the server lifecycle. The button text changes based on the current server state.
 
+A server that another view started for itself, like the Agent view, runs with that view's own settings and is stopped by closing that view. The button is disabled meanwhile.
+
 \section org_mitk_views_restapi_activity Request Activity
 
 The Request Activity section provides information about client connections and requests:

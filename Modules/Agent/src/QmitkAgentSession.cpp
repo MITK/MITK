@@ -287,6 +287,13 @@ bool QmitkAgentSession::Send(const QString& text)
     return false;
   }
 
+  if (m_ToolServer->HasLostServer())
+  {
+    emit NoteAdded("The REST API server that the agent works through was stopped or restarted with other settings. "
+      "Reopen the Agent view to continue.");
+    return false;
+  }
+
   emit UserMessageAdded(text);
 
   if (!m_Process->IsRunning())
@@ -394,7 +401,7 @@ QmitkClaudeCodeProcess::Options QmitkAgentSession::GetBaseOptions() const
 
 void QmitkAgentSession::StartProcess()
 {
-  if (!m_ToolServer->IsOffered())
+  if (!m_ToolServer->IsOffered() || m_ToolServer->HasLostServer())
     return;
 
   const QJsonObject server = {

@@ -149,7 +149,9 @@ void QmitkRestApiView::OnStartStopClicked()
 
   if (service->IsRunning())
   {
-    service->Stop();
+    // The status may be older than the server of another component, which is not this view's to stop.
+    if (service->GetStartedBy().empty())
+      service->Stop();
   }
   else
   {
@@ -203,6 +205,12 @@ void QmitkRestApiView::UpdateServerStatus()
       : QString("Running, started by the %1 with its own settings").arg(QString::fromStdString(startedBy)));
     m_Controls->m_StartStopButton->setText("Stop Server");
 
+    // A server of another component is that component's to stop, which relies on it.
+    m_Controls->m_StartStopButton->setEnabled(startedBy.empty());
+    m_Controls->m_StartStopButton->setToolTip(startedBy.empty()
+      ? QString()
+      : QString("Close the %1 to stop its server.").arg(QString::fromStdString(startedBy)));
+
     auto url = service->GetServerUrl();
     if (url)
     {
@@ -219,6 +227,7 @@ void QmitkRestApiView::UpdateServerStatus()
     m_Controls->m_StatusIndicator->setStyleSheet("background-color: #F44336; border-radius: 8px;");
     m_Controls->m_StatusLabel->setText("Stopped");
     m_Controls->m_StartStopButton->setText("Start Server");
+    m_Controls->m_StartStopButton->setToolTip(QString());
     m_Controls->m_ServerUrlLabel->setText("-");
 
     // Check for error

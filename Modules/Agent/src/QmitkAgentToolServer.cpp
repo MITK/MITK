@@ -29,6 +29,7 @@ found in the LICENSE file.
 namespace
 {
   const std::string McpPath = "/mcp";
+  const std::string StartedBy = "Agent view";
 
   mitk::IRestServerService* GetRestServer()
   {
@@ -55,6 +56,11 @@ namespace
     }
 
     return QString("%1://%2:%3").arg(config.httpsEnabled ? "https" : "http").arg(host).arg(config.port);
+  }
+
+  QString GetMcpUrl(const mitk::RestServerConfig& config)
+  {
+    return GetLocalUrl(config) + "/api/v1" + QString::fromStdString(McpPath);
   }
 }
 
@@ -117,7 +123,7 @@ QString QmitkAgentToolServer::Offer()
     config.allowedFileDirectories.clear();
     config.httpsEnabled = false;
 
-    if (!m_RestServer->Start(config, "Agent view"))
+    if (!m_RestServer->Start(config, StartedBy))
     {
       const auto error = QString::fromStdString(m_RestServer->GetLastError().value_or("unknown error"));
 
@@ -144,7 +150,7 @@ QString QmitkAgentToolServer::Offer()
     return QString("The Workbench tools are not available: %1").arg(e.GetDescription());
   }
 
-  m_Url = GetLocalUrl(m_RestServer->GetRunningConfig().value()) + "/api/v1" + QString::fromStdString(McpPath);
+  m_Url = GetMcpUrl(m_RestServer->GetRunningConfig().value());
   return QString();
 }
 
@@ -172,16 +178,26 @@ void QmitkAgentToolServer::Withdraw()
     m_Token.clear();
   }
 
-  if (m_StartedRestServer)
-  {
+  // The server that runs now may be one that the user started after this one.
+  if (m_StartedRestServer && m_RestServer->GetStartedBy() == StartedBy)
     m_RestServer->Stop();
-    m_StartedRestServer = false;
-  }
+
+  m_StartedRestServer = false;
 }
 
 bool QmitkAgentToolServer::IsOffered() const
 {
   return !m_Url.isEmpty();
+}
+
+bool QmitkAgentToolServer::HasLostServer() const
+{
+  if (!this->IsOffered())
+    return false;
+
+  const auto config = m_RestServer->IsRunning() ? m_RestServer->GetRunningConfig() : std::nullopt;
+
+  return !config.has_value() || GetMcpUrl(*config) != m_Url;
 }
 
 QString QmitkAgentToolServer::GetUrl() const

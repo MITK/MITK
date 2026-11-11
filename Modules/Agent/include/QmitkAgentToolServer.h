@@ -76,6 +76,15 @@ public:
 
   bool IsOffered() const;
 
+  /**
+   * \brief Whether the tools are offered on a server that no longer runs
+   *        where the agent was told to reach it.
+   *
+   * The user can stop or restart a server of their own that the tools were
+   * offered on. Withdraw() and Offer() make the tools reachable again.
+   */
+  bool HasLostServer() const;
+
   /** \brief Where the agent reaches the tools; empty unless they are offered. */
   QString GetUrl() const;
 

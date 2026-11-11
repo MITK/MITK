@@ -39,6 +39,7 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
   MITK_TEST(GetTime_OwnGridDiffersFromGlobal_IsSelectedTimePoint);
   MITK_TEST(SetPos_OwnStepUnchanged_TimePointAndPlaneUpdateTimesMove);
   MITK_TEST(SetPos_OwnGridEqualsGlobal_OwnStepIsPosition);
+  MITK_TEST(SetPos_NonRepresentableGrid_OwnAndDataStepAreThePosition);
   MITK_TEST(GetTimeStep_TimePointOutsideOwnGrid_Clamps);
   MITK_TEST(New_GlobalTimeAtNonZeroPoint_StartsAtSelectedTimePoint);
   MITK_TEST(New_SelectedTimeStepPastGlobalGrid_ThrowsAndAcquiresNothing);
@@ -240,6 +241,25 @@ public:
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step at position " + std::to_string(position),
                                    mitk::TimeStepType(position), this->GetOwnTimeStep());
+    }
+  }
+
+  void SetPos_NonRepresentableGrid_OwnAndDataStepAreThePosition()
+  {
+    // World, global time and data share a grid whose step duration is not exactly representable.
+    const auto timeGeometry = CreateTimeGeometry(50, 0.05, 10.0);
+    this->SetWorldInput(timeGeometry);
+    SetGlobalTimeGeometry(timeGeometry);
+    const auto data = CreateData(timeGeometry);
+
+    for (unsigned int position = 0; position < 50; ++position)
+    {
+      SelectGlobalTimeStep(position);
+
+      const auto where = " at position " + std::to_string(position);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The own time step" + where, mitk::TimeStepType(position), this->GetOwnTimeStep());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The time step of the data" + where, mitk::TimeStepType(position),
+                                   m_Renderer->GetTimeStep(data));
     }
   }
 

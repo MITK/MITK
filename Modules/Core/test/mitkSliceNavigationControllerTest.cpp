@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <string>
+
 // T22254
 
 class mitkSliceNavigationControllerTestSuite : public mitk::TestFixture
@@ -37,6 +39,8 @@ class mitkSliceNavigationControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST(GetCurrentGeometry3D_GlobalTimePastOwnGrid_IsLastStepGeometry);
   CPPUNIT_TEST(SelectSliceByPoint_GlobalTimePastOwnGrid_SelectsSlice);
   CPPUNIT_TEST(Update_GlobalTimePastOwnGrid_Succeeds);
+  CPPUNIT_TEST(CreateWorldGeometry_ProportionalInput_KeepsTimeGrid);
+  CPPUNIT_TEST(CreateWorldGeometry_StaticInput_StaysStatic);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::Geometry3D::Pointer m_Geometry3D;
@@ -209,7 +213,7 @@ public:
 
   void GetCurrentGeometry3D_GlobalTimePastOwnGrid_IsLastStepGeometry()
   {
-    auto sliceNavigationController = this->createSliceNavigationController(this->createStaticTimeGeometry(), mitk::AnatomicalPlane::Axial);
+    auto sliceNavigationController = this->createSliceNavigationController(this->createOneStepTimeGeometry(), mitk::AnatomicalPlane::Axial);
     const auto* lastStepGeometry = sliceNavigationController->GetCurrentGeometry3D();
 
     this->selectGlobalTimeStep(2);
@@ -221,7 +225,7 @@ public:
 
   void SelectSliceByPoint_GlobalTimePastOwnGrid_SelectsSlice()
   {
-    auto sliceNavigationController = this->createSliceNavigationController(this->createStaticTimeGeometry(), mitk::AnatomicalPlane::Axial);
+    auto sliceNavigationController = this->createSliceNavigationController(this->createOneStepTimeGeometry(), mitk::AnatomicalPlane::Axial);
     const auto* slicedGeometry = dynamic_cast<const mitk::SlicedGeometry3D*>(sliceNavigationController->GetCurrentGeometry3D());
     CPPUNIT_ASSERT(nullptr != slicedGeometry);
     const auto point = slicedGeometry->GetPlaneGeometry(5)->GetOrigin();
@@ -234,7 +238,7 @@ public:
 
   void Update_GlobalTimePastOwnGrid_Succeeds()
   {
-    auto sliceNavigationController = this->createSliceNavigationController(this->createStaticTimeGeometry(), mitk::AnatomicalPlane::Axial);
+    auto sliceNavigationController = this->createSliceNavigationController(this->createOneStepTimeGeometry(), mitk::AnatomicalPlane::Axial);
 
     this->selectGlobalTimeStep(2);
     sliceNavigationController->Update();
@@ -242,12 +246,52 @@ public:
     CPPUNIT_ASSERT(nullptr != sliceNavigationController->GetCurrentGeometry3D());
   }
 
+  void CreateWorldGeometry_ProportionalInput_KeepsTimeGrid()
+  {
+    // A step duration that is not exactly representable.
+    auto inputTimeGeometry = mitk::ProportionalTimeGeometry::New();
+    inputTimeGeometry->Initialize(m_Geometry3D, 50);
+    inputTimeGeometry->SetFirstTimePoint(10.0);
+    inputTimeGeometry->SetStepDuration(0.05);
+    inputTimeGeometry->Update();
+
+    auto sliceNavigationController =
+      this->createSliceNavigationController(inputTimeGeometry, mitk::AnatomicalPlane::Axial);
+    const auto* createdTimeGeometry = sliceNavigationController->GetCreatedWorldGeometry();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the time steps", inputTimeGeometry->CountTimeSteps(),
+                                 createdTimeGeometry->CountTimeSteps());
+    for (mitk::TimeStepType timeStep = 0; timeStep < inputTimeGeometry->CountTimeSteps(); ++timeStep)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The start of time step " + std::to_string(timeStep),
+                                   inputTimeGeometry->GetMinimumTimePoint(timeStep),
+                                   createdTimeGeometry->GetMinimumTimePoint(timeStep));
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The end of the last time step", inputTimeGeometry->GetMaximumTimePoint(),
+                                 createdTimeGeometry->GetMaximumTimePoint());
+  }
+
+  void CreateWorldGeometry_StaticInput_StaysStatic()
+  {
+    auto inputTimeGeometry = mitk::ProportionalTimeGeometry::New();
+    inputTimeGeometry->Initialize(m_Geometry3D, 1);
+
+    auto sliceNavigationController =
+      this->createSliceNavigationController(inputTimeGeometry, mitk::AnatomicalPlane::Axial);
+
+    CPPUNIT_ASSERT_MESSAGE("Valid far past its time step's start",
+                           sliceNavigationController->GetCreatedWorldGeometry()->IsValidTimePoint(1000.0));
+  }
+
 private:
-  /** Its created world time geometry covers only [0, 1). */
-  mitk::TimeGeometry::Pointer createStaticTimeGeometry() const
+  /** The one time step [0, 1), which the global time grid 0, 1, 2 runs past. */
+  mitk::TimeGeometry::Pointer createOneStepTimeGeometry() const
   {
     auto timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(m_Geometry3D, 1);
+    timeGeometry->SetFirstTimePoint(0.0);
+    timeGeometry->SetStepDuration(1.0);
+    timeGeometry->Update();
     return timeGeometry.GetPointer();
   }
 

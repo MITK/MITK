@@ -139,8 +139,8 @@ mitk::TimeStepType mitk::TimeGeometry::TimePointToClampedTimeStep(TimePointType 
 
   if (0 == timeSteps)
   {
-    mitkThrow() << "Cannot convert time point " << timePoint
-                << " into a time step: the time geometry has no time steps.";
+    mitkThrowException(mitk::NoTimeStepsException)
+      << "Cannot convert time point " << timePoint << " into a time step: the time geometry has no time steps.";
   }
 
   if (timePoint < this->GetMinimumTimePoint())

@@ -560,7 +560,7 @@ public:
 
   void TimePointToClampedTimeStep_NoTimeSteps_Throws()
   {
-    CPPUNIT_ASSERT_THROW(m_emptyTimeGeometry->TimePointToClampedTimeStep(0.0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_emptyTimeGeometry->TimePointToClampedTimeStep(0.0), mitk::NoTimeStepsException);
   }
 
 };

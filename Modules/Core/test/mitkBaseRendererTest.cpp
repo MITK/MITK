@@ -326,7 +326,7 @@ public:
     auto renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     auto renderer = mitk::VtkPropRenderer::New("mitkBaseRendererTest.NoWorldTimeGeometry", renderWindow);
 
-    CPPUNIT_ASSERT_THROW(renderer->SetTimeStep(1), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(renderer->SetTimeStep(1), mitk::NoTimeStepsException);
   }
 
   void SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow()

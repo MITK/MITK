@@ -42,7 +42,7 @@ namespace mitk
     * \return The selected slice as unsigned int. If the computed slice is negative, "0" (zero) is
     *         returned as the selected slice.
     *
-    * \throws mitk::Exception if the given TimeGeometry has no time steps.
+    * \throws mitk::NoTimeStepsException if the given TimeGeometry has no time steps.
     */
     MITKCORE_EXPORT unsigned int SelectSliceByPoint(const TimeGeometry* timeGeometry, const Point3D& point);
 
@@ -67,7 +67,7 @@ namespace mitk
     *
     * \return The created geometry as TimeGeometry.
     *
-    * \throws mitk::Exception if the given TimeGeometry has no time steps.
+    * \throws mitk::NoTimeStepsException if the given TimeGeometry has no time steps.
     */
     MITKCORE_EXPORT TimeGeometry::Pointer CreateOrientedTimeGeometry(const TimeGeometry* timeGeometry,
                                                                      AnatomicalPlane orientation,

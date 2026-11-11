@@ -390,8 +390,9 @@ void mitk::BaseRenderer::SetTimeStep(TimeStepType timeStep)
 {
   if (m_WorldTimeGeometry.IsNull() || 0 == m_WorldTimeGeometry->CountTimeSteps())
   {
-    mitkThrow() << "Cannot select time step " << timeStep << " in renderer " << m_Name
-                << ": it has no world time geometry with time steps.";
+    mitkThrowException(mitk::NoTimeStepsException)
+      << "Cannot select time step " << timeStep << " in renderer " << m_Name
+      << ": it has no world time geometry with time steps.";
   }
 
   const auto lastTimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;

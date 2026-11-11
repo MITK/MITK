@@ -39,7 +39,7 @@ namespace mitk
      * \param[in] renderer      The base renderer whose world geometry is compared.
      * \param[in] timeGeometry  The time geometry to compare against. May be nullptr.
      * \return True if the geometries are aligned or if timeGeometry is nullptr, false otherwise.
-     * \throw mitk::Exception  If the time geometry has no time steps.
+     * \throw mitk::NoTimeStepsException  If the time geometry has no time steps.
      */
     MITKCORE_EXPORT bool IsRendererGeometryAlignedWithGeometry(BaseRenderer* renderer, const TimeGeometry* timeGeometry);
 

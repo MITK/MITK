@@ -318,8 +318,8 @@ namespace mitk
      * It is final: the time navigation does not call it, and subclasses follow
      * time changes by overriding SetGeometryTime().
      *
-     * \throws mitk::Exception if the renderer has no world time geometry or it has
-     *         no time steps.
+     * \throws mitk::NoTimeStepsException if the renderer has no world time geometry
+     *         or it has no time steps.
      */
     virtual void SetTimeStep(TimeStepType timeStep) final;
 

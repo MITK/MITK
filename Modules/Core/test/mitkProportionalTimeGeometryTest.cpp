@@ -120,7 +120,7 @@ public:
   void TimePointToClampedTimeStep_NoTimeSteps_Throws()
   {
     auto geometry = mitk::ProportionalTimeGeometry::New();
-    CPPUNIT_ASSERT_THROW(geometry->TimePointToClampedTimeStep(0.0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(geometry->TimePointToClampedTimeStep(0.0), mitk::NoTimeStepsException);
   }
 
 private:

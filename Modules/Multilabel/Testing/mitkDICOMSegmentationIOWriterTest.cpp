@@ -212,8 +212,37 @@ namespace
     Rule::Connect(seg, nonDicomSource);
   }
 
-  // Attach a relation with per-slice source UIDs but without source series, and return its UID.
-  std::string ConnectRelationWithoutSourceSeries(mitk::MultiLabelSegmentation* seg)
+  // A source-image relation the writer cannot write: the UIDs of slice 1 and the source series are
+  // given, those of the other slices are valid. The fragments are what the refusal must name besides
+  // the relation.
+  struct UnwritableRelation
+  {
+    std::string name;
+    std::string seriesUID;
+    std::string instanceUIDOfSlice1;
+    std::string classUIDOfSlice1;
+    std::vector<std::string> fragments;
+  };
+
+  std::vector<UnwritableRelation> UnwritableRelations()
+  {
+    const std::string series = "1.2.826.0.1.3680043.10.999.9.2";
+    const std::string instance = "1.2.826.0.1.3680043.10.999.9.1.1";
+    const std::string ctImageStorage = "1.2.840.10008.5.1.4.1.1.2";
+    // DICOM UIDs admit no component with a leading zero.
+    return {
+      { "no-series", "", instance, ctImageStorage, {"(0020,000E)"} },
+      { "invalid-series", "1.2.826.0.1.3680043.10.999.09.2", instance, ctImageStorage,
+        {"(0020,000E)", "1.2.826.0.1.3680043.10.999.09.2"} },
+      { "invalid-instance", series, "1.2.826.0.1.3680043.10.999.9.1.01", ctImageStorage,
+        {"(0008,0018)", "1.2.826.0.1.3680043.10.999.9.1.01", "slice 1"} },
+      { "invalid-class", series, instance, "CT Image Storage", {"(0008,0016)", "CT Image Storage", "slice 1"} },
+      { "no-class", series, instance, "", {"(0008,0016)", "slice 1"} },
+    };
+  }
+
+  // Attach a relation with per-slice source UIDs and return its UID.
+  std::string ConnectRelation(mitk::MultiLabelSegmentation* seg, const UnwritableRelation& relation)
   {
     auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
     auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
@@ -222,7 +251,9 @@ namespace
       perSliceInstance->SetValue(0, sliceIndex, "1.2.826.0.1.3680043.10.999.9.1." + std::to_string(sliceIndex));
       perSliceClass->SetValue(0, sliceIndex, "1.2.840.10008.5.1.4.1.1.2");
     }
-    return Rule::New()->Connect(seg, perSliceInstance, perSliceClass, "");
+    perSliceInstance->SetValue(0, 1, relation.instanceUIDOfSlice1);
+    perSliceClass->SetValue(0, 1, relation.classUIDOfSlice1);
+    return Rule::New()->Connect(seg, perSliceInstance, perSliceClass, relation.seriesUID);
   }
 
   // Open a SEG written by the writer and return its SOP Class UID. Empty
@@ -521,8 +552,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesLabelNamesWithControlCharacters);
   MITK_TEST(WriteRefusesInvalidAlgorithmNames);
   MITK_TEST(WriteIgnoresAlgorithmNamesItDoesNotWrite);
-  MITK_TEST(WriteRefusesRelationWithoutSourceSeriesUID);
-  MITK_TEST(WriteRefusesSeriesLessRelationBeforeContractCheck);
+  MITK_TEST(WriteRefusesUnwritableRelations);
+  MITK_TEST(WriteRefusesUnwritableRelationBeforeContractCheck);
   MITK_TEST(WriteTurnsDcmqiFailuresIntoExceptions);
   MITK_TEST(WriteRoundsColours);
   MITK_TEST(StrictModeRefusalsAreStrictModeExceptions);
@@ -539,6 +570,9 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesSourceReferencesThatMapToNoFrame);
   MITK_TEST(LabelmapReloadOrdersLabelsBySegmentNumber);
   MITK_TEST(WriteRefusesInvalidTrackingUID);
+  MITK_TEST(WriteRefusesInvalidSegmentDescriptions);
+  MITK_TEST(WriteRefusesInvalidTrackingIDs);
+  MITK_TEST(WriteKeepsTextWithBackslashAndLineBreaks);
   MITK_TEST(WriteRefusesUnknownOptionValues);
   MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
   CPPUNIT_TEST_SUITE_END();
@@ -867,42 +901,65 @@ public:
     this->WriteSegToTempFile(undefined, options, "undefined-algorithm-name");
   }
 
-  // dcmqi needs the series of the source images for the Referenced Series Sequence.
-  void WriteRefusesRelationWithoutSourceSeriesUID()
+  // dcmqi needs the series of the source images for the Referenced Series Sequence, and the SOP
+  // Instance and SOP Class UIDs of every source image it references; DCMTK checks each as UI.
+  void WriteRefusesUnwritableRelations()
   {
-    auto seg = BuildBaseSeg(/*stampIdentity=*/true);
-    const auto relationUID = ConnectRelationWithoutSourceSeries(seg);
-
-    this->AssertWriteRefused(seg, {}, "no-source-series", Refusal::Plain, {relationUID});
+    for (const auto& relation : UnwritableRelations())
+    {
+      auto seg = BuildBaseSeg(/*stampIdentity=*/true);
+      auto fragments = relation.fragments;
+      fragments.push_back(ConnectRelation(seg, relation));
+      this->AssertWriteRefused(seg, {}, relation.name, Refusal::Plain, fragments);
+    }
   }
 
-  // No mode can write a relation without source series. So the refusal comes before the strict-mode
-  // refusal of an incomplete contract, which promises that synthetic mode can succeed, and before
-  // synthetic mode stamps the segmentation.
-  void WriteRefusesSeriesLessRelationBeforeContractCheck()
+  // No mode can write such a relation. So the refusal comes before the strict-mode refusal of an
+  // incomplete contract, which promises that synthetic mode can succeed, and before synthetic mode
+  // stamps the segmentation.
+  void WriteRefusesUnwritableRelationBeforeContractCheck()
   {
-    auto strict = BuildBaseSeg(/*stampIdentity=*/false);
-    const auto strictRelationUID = ConnectRelationWithoutSourceSeries(strict);
-    this->AssertWriteRefused(strict, {}, "no-source-series-strict", Refusal::Plain, {strictRelationUID});
+    for (const auto& relation : UnwritableRelations())
+    {
+      auto strict = BuildBaseSeg(/*stampIdentity=*/false);
+      const auto strictRelationUID = ConnectRelation(strict, relation);
+      this->AssertWriteRefused(strict, {}, relation.name + "-strict", Refusal::Plain, {strictRelationUID});
 
-    auto synthetic = BuildBaseSeg(/*stampIdentity=*/false);
-    ConnectRelationWithoutSourceSeries(synthetic);
-    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Patient ID", ReadStringProp(synthetic, 0x0010, 0x0020).empty());
-    mitk::IFileWriter::Options options;
-    options["Strict / synthetic mode"] = std::string("synthetic");
-    CPPUNIT_ASSERT_THROW_MESSAGE("Synthetic mode refuses the relation",
-                                 mitk::test::WriteWithWriter(synthetic, this->GetTempFilePath("no-source-series-synthetic.dcm"),
-                                                             "DICOM Segmentation", options),
-                                 mitk::Exception);
-    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped",
-                           ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+      auto synthetic = BuildBaseSeg(/*stampIdentity=*/false);
+      ConnectRelation(synthetic, relation);
+      CPPUNIT_ASSERT_MESSAGE(relation.name + ": precondition: the segmentation has no Patient ID",
+                             ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+      CPPUNIT_ASSERT_MESSAGE(relation.name + ": precondition: the segmentation has no Study Instance UID",
+                             ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+      mitk::IFileWriter::Options options;
+      options["Strict / synthetic mode"] = std::string("synthetic");
+      CPPUNIT_ASSERT_THROW_MESSAGE(relation.name + ": synthetic mode refuses the relation",
+                                   mitk::test::WriteWithWriter(synthetic,
+                                                               this->GetTempFilePath(relation.name + "-synthetic.dcm"),
+                                                               "DICOM Segmentation", options),
+                                   mitk::Exception);
+      CPPUNIT_ASSERT_MESSAGE(relation.name + ": the refused write leaves the segmentation unstamped",
+                             ReadStringProp(synthetic, 0x0010, 0x0020).empty() &&
+                               ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+    }
   }
 
-  // dcmqi reports some failures by throwing an int, here DCMTK's check of the source series UID.
+  // dcmqi reports some failures by returning no SEG, here the documented one of the labelmap
+  // encoding with values 1..N: a label without voxels below one with voxels.
   void WriteTurnsDcmqiFailuresIntoExceptions()
   {
-    auto seg = BuildSegWithRule(/*stampIdentity=*/true, "not-a-uid");
-    this->AssertWriteRefused(seg, {}, "dcmqi-failure", Refusal::Plain, {"group 0"});
+    auto seg = BuildSegWithLabels({{1, "Without voxels"}, {2, "With voxels"}});
+    {
+      mitk::ImageWriteAccessor writeAccessor(seg->GetGroupImage(0));
+      auto* pixels = static_cast<mitk::Label::PixelType*>(writeAccessor.GetData());
+      const auto dims = seg->GetGroupImage(0)->GetDimensions();
+      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+      for (unsigned int z = 0; z < dims[2]; ++z)
+        pixels[z * sliceSize] = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
+    }
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
+    this->AssertWriteRefused(seg, options, "dcmqi-failure", Refusal::Plain, {"dcmqi", "group 0"});
   }
 
   // Recommended Display CIELab Value is computed from 8 bit sRGB, rounded, not truncated.
@@ -1070,6 +1127,8 @@ public:
           seg->GetLabel(2)->SetAlgorithmName("Tool \xC3\xA4");
         } },
       { "tracking-uid", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingUID("track-uid"); } },
+      { "description", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetDescription("L\xC3\xA4sion links"); } },
+      { "tracking-id", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingID("Tr\xC3\xA4" "ck"); } },
       { "value",
         [](mitk::MultiLabelSegmentation* seg) {
           auto label = mitk::Label::New();
@@ -1156,6 +1215,43 @@ public:
     auto seg = BuildSegWithRule();
     seg->GetLabel(1)->SetTrackingUID("track-uid");
     this->AssertWriteRefused(seg, {}, "invalid-tracking-uid", Refusal::UnrepresentableValue, {"track-uid"});
+  }
+
+  // Segment Description is ST. Without Specific Character Set it admits ASCII only and, of the
+  // control characters, TAB, LF, FF, CR and ESC. DCMTK checks it only when dcmqi writes the file.
+  void WriteRefusesInvalidSegmentDescriptions()
+  {
+    const std::vector<std::string> descriptions = { "L\xC3\xA4sion links", "Left\x01Right", "Left\x7F" "Right" };
+    for (std::size_t i = 0; i < descriptions.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetDescription(descriptions[i]);
+      this->AssertWriteRefused(seg, {}, "description-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"label 1", "Segment Description"});
+    }
+  }
+
+  // Tracking ID is UT, which DCMTK checks like ST.
+  void WriteRefusesInvalidTrackingIDs()
+  {
+    const std::vector<std::string> trackingIDs = { "Tr\xC3\xA4" "ck", "Track\x01", "Track\x7F" };
+    for (std::size_t i = 0; i < trackingIDs.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetTrackingID(trackingIDs[i]);
+      this->AssertWriteRefused(seg, {}, "tracking-id-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"label 1", "Tracking ID"});
+    }
+  }
+
+  // Unlike LO, ST and UT hold a single value, so a backslash separates nothing, and they admit
+  // line breaks and tabs.
+  void WriteKeepsTextWithBackslashAndLineBreaks()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetDescription("Left\\Right\tA\r\nB");
+    seg->GetLabel(1)->SetTrackingID("TID\\1");
+    this->WriteSegToTempFile(seg, {}, "text-with-backslash-and-line-breaks");
   }
 
   // A value outside the choices is refused rather than taken for one of them. The segmentation is

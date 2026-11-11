@@ -44,7 +44,9 @@ namespace mitk
   /**
    * \brief Thrown when a DICOM SEG write is rejected because a label cannot be represented
    *        in the format: a Segment Label or Segment Algorithm Name with a backslash, non-ASCII
-   *        or control characters, an invalid Tracking UID, or a label value above 32767.
+   *        or control characters, a Segment Description or Tracking ID with non-ASCII characters
+   *        or control characters other than TAB, LF, FF, CR and ESC, an invalid Tracking UID, or
+   *        a label value above 32767.
    *
    * Only changing the label lets the write succeed; unlike after a
    * DICOMSegStrictModeException, a retry in synthetic mode does not.

@@ -76,18 +76,20 @@ namespace mitk
      * a retry in synthetic mode can succeed.
      * \throw DICOMSegUnrepresentableValueException naming the label for a label value above 32767,
      * a label name or, for an AUTOMATIC or SEMIAUTOMATIC label, an algorithm name that is no valid
-     * LO value without Specific Character Set (a backslash, non-ASCII or control characters), or a
-     * Tracking UID that is no valid UID; only changing the label lets the write succeed.
-     * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs but
-     * without source series; naming the option for an option value outside its choices; and if
+     * LO value without Specific Character Set (a backslash, non-ASCII or control characters), a
+     * description or Tracking ID that is no valid ST or UT value without it (non-ASCII characters,
+     * or control characters other than TAB, LF, FF, CR and ESC), or a Tracking UID that is no valid
+     * UID; only changing the label lets the write succeed.
+     * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs
+     * whose source series UID, or the SOP Instance or SOP Class UID of a slice, is missing or no
+     * valid UID; naming the option for an option value outside its choices; and if
      * synthetic mode cannot fill
      * a contract item, if no source-image reference lies on a slice of the segmentation, or if
      * dcmqi fails. A failure of ITK, of dcmqi or of saving in a later group leaves the files of
      * the earlier groups.
      *
-     * The labels and the source series of the relations are checked first: before the
-     * strict-mode refusal, before synthetic mode changes the segmentation, and before any file is
-     * written.
+     * The labels and the UIDs of the relations are checked first: before the strict-mode refusal,
+     * before synthetic mode changes the segmentation, and before any file is written.
      */
     void Write() override;
 

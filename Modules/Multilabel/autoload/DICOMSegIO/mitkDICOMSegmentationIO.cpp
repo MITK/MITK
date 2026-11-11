@@ -41,7 +41,9 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcsequen.h>
 #include <dcmtk/dcmdata/dcvrlo.h>
+#include <dcmtk/dcmdata/dcvrst.h>
 #include <dcmtk/dcmdata/dcvrui.h>
+#include <dcmtk/dcmdata/dcvrut.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
 #include <dcmtk/dcmfg/fgplanpo.h>
@@ -124,27 +126,54 @@ namespace
   constexpr auto MAX_WRITABLE_LABEL_VALUE =
     std::numeric_limits<mitk::DICOMSegmentationIO::itkInternalImageType::PixelType>::max();
 
-  // Segment Label (0062,0005) and Segment Algorithm Name (0062,0009) are LO. The writer writes no
-  // Specific Character Set, so the default repertoire applies, and a backslash would separate two
-  // values. DCMTK rejects other values inside dcmqi; checking them with its own rule here names the
-  // label.
-  void CheckWritableLO(const mitk::Label &label, const std::string &value, const std::string &attribute)
+  // The writer writes no Specific Character Set, so the default repertoire applies to the text dcmqi
+  // takes from a label, and DCMTK refuses other values inside dcmqi: the Segment Label (0062,0005)
+  // and the Segment Algorithm Name (0062,0009), which are LO and in which a backslash would separate
+  // two values, when dcmqi sets them; the Segment Description (0062,0006, ST) and the Tracking ID
+  // (0062,0020, UT) only when dcmqi writes the file of the group. An invalid Tracking UID (0062,0021)
+  // dcmqi leaves out silently. Checking each value with DCMTK's own rule names label and attribute.
+  void CheckWritableLabel(const mitk::Label &label, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
-    if (DcmLongString::checkStringValue(value.c_str(), "1").bad())
+    const auto refuse = [&label, group](const std::string &reason) {
       mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
-        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: its "
-        << attribute << " \"" << value << "\" may hold only printable ASCII characters and no backslash.";
-  }
+        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") of group " << group
+        << " as DICOM SEG: " << reason;
+    };
+    const std::string loRule = "\" may hold only printable ASCII characters and no backslash.";
+    const std::string textRule = "\" may hold only ASCII characters and no control characters other than tab, "
+                                 "line feed, form feed, carriage return and escape.";
 
-  // Tracking UID (0062,0021) is UI. dcmqi sets it without checking the result, so DCMTK's
-  // refusal of an invalid value would leave the tag out silently.
-  void CheckWritableTrackingUID(const mitk::Label &label)
-  {
+    if (label.GetValue() > MAX_WRITABLE_LABEL_VALUE)
+      refuse("label values above " + std::to_string(MAX_WRITABLE_LABEL_VALUE) + " are not supported.");
+
+    const std::string name = label.GetName();
+    if (DcmLongString::checkStringValue(name.c_str(), "1").bad())
+      refuse("its Segment Label \"" + name + loRule);
+
+    // dcmqi writes the algorithm name of these types only; the writer writes an undefined type as
+    // MANUAL.
+    const auto algorithmType = label.GetAlgorithmType();
+    if (algorithmType == mitk::Label::AlgorithmType::AUTOMATIC ||
+        algorithmType == mitk::Label::AlgorithmType::SEMIAUTOMATIC)
+    {
+      const std::string algorithmName = label.GetAlgorithmName();
+      if (DcmLongString::checkStringValue(algorithmName.c_str(), "1").bad())
+        refuse("its Segment Algorithm Name \"" + algorithmName + loRule);
+    }
+
+    // For ST and UT the second argument of checkStringValue is the character set, not the value
+    // multiplicity; passing one would switch the check off.
+    const std::string description = label.GetDescription();
+    if (DcmShortText::checkStringValue(description.c_str()).bad())
+      refuse("its Segment Description \"" + description + textRule);
+
+    const std::string trackingID = label.GetTrackingID();
+    if (DcmUnlimitedText::checkStringValue(trackingID.c_str()).bad())
+      refuse("its Tracking ID \"" + trackingID + textRule);
+
     const std::string trackingUID = label.GetTrackingUID();
     if (!trackingUID.empty() && DcmUniqueIdentifier::checkStringValue(trackingUID.c_str(), "1").bad())
-      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
-        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") as DICOM SEG: "
-        << "its Tracking UID \"" << trackingUID << "\" is no valid DICOM UID.";
+      refuse("its Tracking UID \"" + trackingUID + "\" is no valid DICOM UID.");
   }
 
   // These refusals depend on the labels alone and no mode avoids them, so they are checked for all
@@ -155,36 +184,49 @@ namespace
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg.GetNumberOfGroups(); ++group)
     {
       for (const auto &label : seg.GetConstLabelsByValue(seg.GetLabelValuesByGroup(group)))
-      {
-        if (label->GetValue() > MAX_WRITABLE_LABEL_VALUE)
-          mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
-            << "Cannot write label " << label->GetValue() << " (\"" << label->GetName() << "\") of group " << group
-            << " as DICOM SEG: label values above " << MAX_WRITABLE_LABEL_VALUE << " are not supported.";
-        CheckWritableLO(*label, label->GetName(), "Segment Label");
-        // dcmqi writes the algorithm name of these types only; the writer writes an undefined type
-        // as MANUAL.
-        const auto algorithmType = label->GetAlgorithmType();
-        if (algorithmType == mitk::Label::AlgorithmType::AUTOMATIC ||
-            algorithmType == mitk::Label::AlgorithmType::SEMIAUTOMATIC)
-          CheckWritableLO(*label, label->GetAlgorithmName(), "Segment Algorithm Name");
-        CheckWritableTrackingUID(*label);
-      }
+        CheckWritableLabel(*label, group);
     }
   }
 
-  // Every relation with per-slice source references must name its source series: each item of the
-  // Referenced Series Sequence requires one, and no mode can make it up. Relations without per-slice
-  // UIDs, such as those to images without DICOM tags, contribute no references. Checked before
-  // anything else, for the reasons given at CheckWritableLabels.
-  void CheckSourceRelationsHaveSeries(const mitk::MultiLabelSegmentation &seg)
+  // dcmqi needs the source series of every relation with per-slice source references for the
+  // Referenced Series Sequence, and the SOP Instance and SOP Class UIDs of each source image it
+  // references; DCMTK refuses an invalid one inside dcmqi. Relations without per-slice UIDs, such as
+  // those to images without DICOM tags, contribute no references. No mode can make these UIDs up,
+  // so they are checked before anything else, for the reasons given at CheckWritableLabels.
+  void CheckWritableSourceRelations(const mitk::MultiLabelSegmentation &seg)
   {
     for (const auto &relation : mitk::SegSourceImageRelationRule::GetSourceImageRelations(&seg))
     {
       if (relation.instanceUIDsPerSlice.IsNull() || relation.classUIDsPerSlice.IsNull())
         continue;
-      if (relation.sourceSeriesInstanceUID.empty())
-        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID
-                    << " as DICOM SEG: it names no source series (0020,000E).";
+
+      const auto refuse = [&relation](const std::string &reason) {
+        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID << " as DICOM SEG: " << reason;
+      };
+
+      const auto &seriesUID = relation.sourceSeriesInstanceUID;
+      if (seriesUID.empty())
+        refuse("it names no source series (0020,000E).");
+      if (DcmUniqueIdentifier::checkStringValue(seriesUID.c_str(), "1").bad())
+        refuse("its source series UID \"" + seriesUID + "\" (0020,000E) is no valid DICOM UID.");
+
+      // The slices BuildSourceItemsFromProperties takes references from.
+      for (const auto slice : relation.instanceUIDsPerSlice->GetAvailableSlices(0))
+      {
+        const auto instanceUID = relation.instanceUIDsPerSlice->GetValue(0, slice);
+        if (instanceUID.empty())
+          continue;
+        if (DcmUniqueIdentifier::checkStringValue(instanceUID.c_str(), "1").bad())
+          refuse("the SOP Instance UID \"" + instanceUID + "\" (0008,0018) of slice " + std::to_string(slice) +
+                 " is no valid DICOM UID.");
+
+        const auto classUID = relation.classUIDsPerSlice->GetValue(0, slice);
+        if (classUID.empty())
+          refuse("slice " + std::to_string(slice) + " names no SOP Class UID (0008,0016).");
+        if (DcmUniqueIdentifier::checkStringValue(classUID.c_str(), "1").bad())
+          refuse("the SOP Class UID \"" + classUID + "\" (0008,0016) of slice " + std::to_string(slice) +
+                 " is no valid DICOM UID.");
+      }
     }
   }
 
@@ -692,7 +734,7 @@ namespace
   //
   // \pre seg must be a valid pointer.
   // \pre layer must be a valid group index of seg.
-  // \pre CheckSourceRelationsHaveSeries(*seg) passed.
+  // \pre CheckWritableSourceRelations(*seg) passed.
   std::vector<std::unique_ptr<DcmItem>>
   BuildSourceItemsFromProperties(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
@@ -735,8 +777,7 @@ namespace
 
         auto item = std::make_unique<DcmItem>();
         item->putAndInsertString(DCM_SOPInstanceUID, sopInstance.c_str());
-        if (!sopClass.empty())
-          item->putAndInsertString(DCM_SOPClassUID, sopClass.c_str());
+        item->putAndInsertString(DCM_SOPClassUID, sopClass.c_str());
         item->putAndInsertString(DCM_ImagePositionPatient, ipp.c_str());
 
         if (isFirst)
@@ -919,7 +960,7 @@ namespace mitk
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
 
     CheckWritableLabels(*input);
-    CheckSourceRelationsHaveSeries(*input);
+    CheckWritableSourceRelations(*input);
 
     // Synthesis runs once before the per-group loop. The alternative
     // (per-group) would invite divergence across groups when the

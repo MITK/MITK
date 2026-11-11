@@ -1304,13 +1304,15 @@ namespace mitk
       if (labelSetImage.IsNull())
         mitkThrow() << "No valid segments found in DICOM SEG file.";
 
-      labelSetImage->SetAllLabelsVisible(true);
-
       // DICOM SEG carries no opacity. The labels InitializeByLabeledImage made carry the
       // lookup table's alpha, the others the label default, so every label gets the default.
+      // This precedes SetAllLabelsVisible, which writes the labels into the lookup table that
+      // the mappers render.
       const auto defaultOpacity = Label::New()->GetOpacity();
       for (const auto& label : labelSetImage->GetLabels())
         label->SetOpacity(defaultOpacity);
+
+      labelSetImage->SetAllLabelsVisible(true);
 
       if (labelSetImage->GetTotalNumberOfLabels() > 0)
       {

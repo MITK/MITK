@@ -28,6 +28,8 @@ found in the LICENSE file.
 
 #include <itksys/SystemTools.hxx>
 
+#include <vtkLookupTable.h>
+
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -72,11 +74,33 @@ private:
     return m_TempPath + mitk::IOUtil::GetDirectorySeparator() + fileName;
   }
 
+  // The mappers render the lookup table, not the labels, so the table must show what the labels say.
+  static void AssertLookupTableMatchesLabels(const mitk::MultiLabelSegmentation& segmentation)
+  {
+    const auto table = segmentation.GetLookupTable()->GetVtkLookupTable();
+    // The table holds 8 bit per channel.
+    const double tolerance = 1.0 / 255.0;
+    for (const auto& label : segmentation.GetLabels())
+    {
+      double rgba[4];
+      table->GetTableValue(label->GetValue(), rgba);
+      const auto context = "Lookup table entry of label " + std::to_string(label->GetValue());
+      const auto& color = label->GetColor();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(context + ", red", color.GetRed(), rgba[0], tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(context + ", green", color.GetGreen(), rgba[1], tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(context + ", blue", color.GetBlue(), rgba[2], tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(context + ", alpha",
+                                           label->GetVisible() ? static_cast<double>(label->GetOpacity()) : 0.0,
+                                           rgba[3], tolerance);
+    }
+  }
+
   static void AssertMatchesFile(const mitk::MultiLabelSegmentation& segmentation, const std::string& path)
   {
     const auto differences = mitk::test::CompareWithDICOMSegFile(segmentation, path);
     CPPUNIT_ASSERT_MESSAGE(path + " was read with differences to its content:" + mitk::test::JoinDifferences(differences),
                            differences.empty());
+    AssertLookupTableMatchesLabels(segmentation);
   }
 
   static void AssertGroupValues(const mitk::MultiLabelSegmentation& segmentation,

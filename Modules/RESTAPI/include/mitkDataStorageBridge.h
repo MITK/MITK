@@ -167,7 +167,9 @@ namespace mitk
     /**
      * \brief Get the UID for a DataNode.
      *
-     * Creates a UID if the node doesn't have one yet.
+     * Creates a UID if the node doesn't have one yet. That changes the node,
+     * so it happens on the dispatcher's thread, for which this call waits
+     * then. Can be called from any thread.
      *
      * \param[in] node The node to get the UID for. Must not be \c nullptr.
      * \return The UID string for this node.

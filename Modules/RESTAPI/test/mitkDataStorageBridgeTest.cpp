@@ -22,9 +22,58 @@ found in the LICENSE file.
 #include <mitkColorProperty.h>
 #include <mitkImage.h>
 #include <mitkImageGenerator.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkSurface.h>
 
+#include <future>
 #include <set>
+#include <thread>
+#include <vector>
+
+namespace
+{
+  /** A dispatcher with a thread of its own for each task, which tells where the tasks ran. */
+  class ThreadDispatcher : public mitk::StorageThreadDispatcherBase
+  {
+  public:
+    mitkClassMacro(ThreadDispatcher, mitk::StorageThreadDispatcherBase);
+    itkFactorylessNewMacro(Self);
+
+    bool IsDispatchThread() const override
+    {
+      return false;
+    }
+
+    void Post(std::function<void()> task) override
+    {
+      m_Tasks.push_back(std::async(std::launch::async, [this, task = std::move(task)]() {
+        m_TaskThreads.push_back(std::this_thread::get_id());
+        task();
+      }));
+    }
+
+    /** The threads of the tasks so far. Waits for the tasks, which run one at a time in the tests. */
+    std::vector<std::thread::id> GetTaskThreads()
+    {
+      for (auto& task : m_Tasks)
+        task.wait();
+
+      return m_TaskThreads;
+    }
+
+  protected:
+    bool ExecuteDispatched(std::function<void()> task) override
+    {
+      this->Post(std::move(task));
+      m_Tasks.back().wait();
+      return true;
+    }
+
+  private:
+    std::vector<std::future<void>> m_Tasks;
+    std::vector<std::thread::id> m_TaskThreads;
+  };
+}
 
 /**
  * @brief Test fixture for DataStorageBridge with a complex default node hierarchy.
@@ -95,6 +144,8 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodePropertyKeepsTypeOfSimpleValue);
   MITK_TEST(SetNodePropertyRefusesOtherType);
   MITK_TEST(SetNodePropertyRefusesUnfittingValue);
+  MITK_TEST(SetNodePropertyRefusesIncompleteObject);
+  MITK_TEST(NewUidIsGivenOnTheDispatchThread);
   MITK_TEST(DeleteNodeProperty);
   MITK_TEST(DeleteNodePropertyNotFound);
   MITK_TEST(DeleteNodePropertyWithScope);
@@ -1348,6 +1399,61 @@ public:
     bool flag = false;
     CPPUNIT_ASSERT(m_Root1->GetBoolProperty("flag", flag));
     CPPUNIT_ASSERT(flag);
+  }
+
+  void NewUidIsGivenOnTheDispatchThread()
+  {
+    auto dispatcher = ThreadDispatcher::New();
+    m_Bridge->SetDispatcher(dispatcher);
+
+    auto node = mitk::DataNode::New();
+    m_DataStorage->Add(node);
+
+    // The property of the UID tells the thread that gave it.
+    std::thread::id propertyThread;
+    struct Listener
+    {
+      std::thread::id* Thread;
+      void OnModified() { *Thread = std::this_thread::get_id(); }
+    } onModified{ &propertyThread };
+    auto modified = itk::SimpleMemberCommand<Listener>::New();
+    modified->SetCallbackFunction(&onModified, &Listener::OnModified);
+    const auto tag = node->GetPropertyList()->AddObserver(itk::ModifiedEvent(), modified);
+
+    const auto uid = m_Bridge->GetNodeUid(node);
+    const auto taskThreads = dispatcher->GetTaskThreads();
+
+    CPPUNIT_ASSERT(!uid.empty());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), taskThreads.size());
+    CPPUNIT_ASSERT(propertyThread == taskThreads.front());
+    CPPUNIT_ASSERT(propertyThread != std::this_thread::get_id());
+
+    // A known UID needs no thread.
+    CPPUNIT_ASSERT_EQUAL(uid, m_Bridge->GetNodeUid(node));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), dispatcher->GetTaskThreads().size());
+
+    node->GetPropertyList()->RemoveObserver(tag);
+    m_Bridge->SetDispatcher(nullptr);
+  }
+
+  void SetNodePropertyRefusesIncompleteObject()
+  {
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetLevelWindow(100.0, 50.0);
+    m_Root1->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow));
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    const nlohmann::json incomplete = { { "CurrentSettings", { { "Level", 40 }, { "Window", 400 } } } };
+    const nlohmann::json typed = { { "type", "LevelWindowProperty" }, { "value", incomplete } };
+
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", incomplete, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", typed, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    mitk::LevelWindow unchanged;
+    CPPUNIT_ASSERT(m_Root1->GetLevelWindow(unchanged));
+    CPPUNIT_ASSERT(unchanged == levelWindow);
   }
 
   void DeleteNodeProperty()

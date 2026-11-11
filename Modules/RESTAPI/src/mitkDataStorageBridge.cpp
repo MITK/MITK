@@ -391,7 +391,12 @@ namespace mitk
 
   std::string DataStorageBridge::GetNodeUid(DataNode* node) const
   {
-    return m_UidMapper->GetOrCreateUid(node);
+    if (const auto uid = m_UidMapper->GetUid(node); uid.has_value())
+      return *uid;
+
+    // A new UID changes the node: it gets a property and an observer. That
+    // belongs to the dispatch thread like any other change of a node.
+    return this->DispatchTask<std::string>([this, node]() { return m_UidMapper->GetOrCreateUid(node); });
   }
 
   DataNode::Pointer DataStorageBridge::FindNode(const std::string& uid) const

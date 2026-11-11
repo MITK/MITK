@@ -232,7 +232,9 @@ namespace mitk
     /**
      * \brief The UID of a node, as the API names it.
      *
-     * Can be called from any thread.
+     * Can be called from any thread. A node without a UID gets one in the
+     * thread that owns the data storage, for which the call waits then like
+     * Dispatch() does.
      */
     virtual std::string GetNodeUid(DataNode* node) const = 0;
 

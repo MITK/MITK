@@ -1016,7 +1016,7 @@ public:
     itksys::SystemTools::MakeDirectory(directory);
     const auto path = directory + mitk::IOUtil::GetDirectorySeparator() + "seg";
 
-    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, /*addExtension=*/false);
 
     CPPUNIT_ASSERT_MESSAGE("Nothing is written next to the dotted directory",
                            !FileExists(this->GetTempFilePath("data.dcm")) && !FileExists(this->GetTempFilePath("data_1.dcm")));
@@ -1037,7 +1037,7 @@ public:
     auto seg = BuildTwoGroupSeg();
     const auto path = this->GetTempFilePath("seg.ima");
 
-    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/false);
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, /*addExtension=*/false);
 
     CPPUNIT_ASSERT_MESSAGE("The extension is not replaced",
                            !FileExists(this->GetTempFilePath("seg.dcm")) && !FileExists(this->GetTempFilePath("seg_1.dcm")));
@@ -1057,7 +1057,7 @@ public:
     auto seg = BuildTwoGroupSeg();
     const auto path = this->GetTempFilePath("1.2.840.113");
 
-    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, {}, /*addExtension=*/true);
+    mitk::IOUtil::Save(seg, mitk::test::DICOMSegMimeTypeName(), path, /*addExtension=*/true);
 
     CPPUNIT_ASSERT_MESSAGE("The first group is written to the requested path", FileExists(path));
     CPPUNIT_ASSERT_MESSAGE("The stem is not split", !FileExists(this->GetTempFilePath("1.2.840_1.113")));

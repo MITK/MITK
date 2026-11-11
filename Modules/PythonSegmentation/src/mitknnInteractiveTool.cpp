@@ -422,6 +422,10 @@ void mitk::nnInteractiveTool::ResetInteractions()
   if (this->IsUpdating())
     return;
 
+  // An interactor that stays enabled would have the preview update below
+  // read its last prompt, which no longer exists.
+  this->DisableInteractor();
+
   m_Impl->ClearInteractions();
 
   if (this->IsSessionRunning())

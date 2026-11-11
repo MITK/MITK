@@ -192,7 +192,8 @@ namespace mitk
      *
      * All interaction data (points, boxes, scribbles, contours) is removed
      * and the Python session's interaction state is reset. Also clears any
-     * initial segmentation mask.
+     * initial segmentation mask. The enabled interactor, if any, is
+     * disabled.
      */
     void ResetInteractions();
 

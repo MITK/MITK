@@ -1422,6 +1422,17 @@ void QmitknnInteractiveToolGUI::OnInteractionsChanged()
   this->UpdateUndoButtonState();
 
   auto* tool = this->GetTool();
+
+  // The tool disables the interactor on a reset, also on one by a program.
+  if (tool != nullptr)
+  {
+    for (const auto& [interactionType, button] : m_InteractorButtons)
+    {
+      if (button->isChecked() && !tool->GetInteractor(interactionType)->IsEnabled())
+        button->setChecked(false);
+    }
+  }
+
   const auto prompt = tool != nullptr ? tool->GetLastProgramPrompt() : std::nullopt;
 
   if (prompt.has_value())

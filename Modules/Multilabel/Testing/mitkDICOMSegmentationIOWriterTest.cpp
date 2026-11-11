@@ -256,6 +256,40 @@ namespace
     return Rule::New()->Connect(seg, perSliceInstance, perSliceClass, relation.seriesUID);
   }
 
+  // A value of the segmentation's patient, study or frame of reference that DCMTK refuses for its VR
+  // without Specific Character Set: characters outside the default repertoire or outside the syntax
+  // of the VR, or a UID longer than 64 characters. DCMTK checks no other lengths. The writer hands
+  // these values to dcmqi on the first source item. The fragments are what the refusal must name.
+  struct UnwritableIdentityValue
+  {
+    std::string name;
+    unsigned int group;
+    unsigned int element;
+    std::string value;
+    std::vector<std::string> fragments;
+  };
+
+  std::vector<UnwritableIdentityValue> UnwritableIdentityValues()
+  {
+    return {
+      { "patient-name", 0x0010, 0x0010, "M\xC3\xBCller^Hans", {"(0010,0010)"} },
+      { "patient-sex", 0x0010, 0x0040, "male", {"(0010,0040)", "male"} },
+      { "patient-birth-date", 0x0010, 0x0030, "1980-01-01", {"(0010,0030)", "1980-01-01"} },
+      { "study-description", 0x0008, 0x1030, "Kn\xC3\xB6" "chel", {"(0008,1030)"} },
+      { "study-uid", 0x0020, 0x000D, "1.2.826.0.1.3680043.10.999.01.1", {"(0020,000D)", "1.2.826.0.1.3680043.10.999.01.1"} },
+      { "frame-of-reference-uid", 0x0020, 0x0052, "1.2.826.0.1.3680043.10.999.01.3",
+        {"(0020,0052)", "1.2.826.0.1.3680043.10.999.01.3"} },
+      // 66 characters; a UID has at most 64.
+      { "study-uid-too-long", 0x0020, 0x000D, "1.2.826.0.1.3680043.10.999.1.1234567890.1234567890.1234567890.1234",
+        {"(0020,000D)", "1.2.826.0.1.3680043.10.999.1.1234567890.1234567890.1234567890.1234"} },
+    };
+  }
+
+  void SetIdentityValue(mitk::MultiLabelSegmentation* seg, const UnwritableIdentityValue& value)
+  {
+    seg->SetProperty(DICOMKey(value.group, value.element).c_str(), mitk::TemporoSpatialStringProperty::New(value.value));
+  }
+
   // Open a SEG written by the writer and return its SOP Class UID. Empty
   // string on read failure; the caller asserts on the expected value.
   std::string GetWrittenSEGSOPClassUID(const std::string& path)
@@ -554,6 +588,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteIgnoresAlgorithmNamesItDoesNotWrite);
   MITK_TEST(WriteRefusesUnwritableRelations);
   MITK_TEST(WriteRefusesUnwritableRelationBeforeContractCheck);
+  MITK_TEST(WriteRefusesUnwritableIdentityValues);
+  MITK_TEST(WriteRefusesUnwritableIdentityValueBeforeContractCheck);
   MITK_TEST(WriteTurnsDcmqiFailuresIntoExceptions);
   MITK_TEST(WriteRoundsColours);
   MITK_TEST(StrictModeRefusalsAreStrictModeExceptions);
@@ -941,6 +977,45 @@ public:
       CPPUNIT_ASSERT_MESSAGE(relation.name + ": the refused write leaves the segmentation unstamped",
                              ReadStringProp(synthetic, 0x0010, 0x0020).empty() &&
                                ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+    }
+  }
+
+  // The writer writes no Specific Character Set, and DCMTK checks the identity values dcmqi takes
+  // over from the first source item against their VRs when it writes the SEG.
+  void WriteRefusesUnwritableIdentityValues()
+  {
+    for (const auto& value : UnwritableIdentityValues())
+    {
+      auto seg = BuildSegWithRule(/*stampIdentity=*/true);
+      SetIdentityValue(seg, value);
+      this->AssertWriteRefused(seg, {}, value.name, Refusal::Plain, value.fragments);
+    }
+  }
+
+  // Synthetic mode keeps a value that is present, so no mode can write such a value. The refusal
+  // comes before the strict-mode refusal of an incomplete contract and before synthetic mode stamps
+  // the segmentation.
+  void WriteRefusesUnwritableIdentityValueBeforeContractCheck()
+  {
+    for (const auto& value : UnwritableIdentityValues())
+    {
+      auto strict = BuildSegWithRule(/*stampIdentity=*/false);
+      SetIdentityValue(strict, value);
+      this->AssertWriteRefused(strict, {}, value.name + "-strict", Refusal::Plain, value.fragments);
+
+      auto synthetic = BuildSegWithRule(/*stampIdentity=*/false);
+      SetIdentityValue(synthetic, value);
+      CPPUNIT_ASSERT_MESSAGE(value.name + ": precondition: the segmentation has no Patient ID",
+                             ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+      mitk::IFileWriter::Options options;
+      options["Strict / synthetic mode"] = std::string("synthetic");
+      CPPUNIT_ASSERT_THROW_MESSAGE(value.name + ": synthetic mode refuses the value",
+                                   mitk::test::WriteWithWriter(synthetic,
+                                                               this->GetTempFilePath(value.name + "-synthetic.dcm"),
+                                                               "DICOM Segmentation", options),
+                                   mitk::Exception);
+      CPPUNIT_ASSERT_MESSAGE(value.name + ": the refused write leaves the segmentation unstamped",
+                             ReadStringProp(synthetic, 0x0010, 0x0020).empty());
     }
   }
 

@@ -82,14 +82,19 @@ namespace mitk
      * UID; only changing the label lets the write succeed.
      * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs
      * whose source series UID, or the SOP Instance or SOP Class UID of a slice, is missing or no
-     * valid UID; naming the option for an option value outside its choices; and if
+     * valid UID; naming the attribute for a patient, study or frame of reference value that is no
+     * valid value of its VR without Specific Character Set (non-ASCII characters, a value outside
+     * the syntax of the VR, such as an invalid date, or an invalid or over-long UID); naming the
+     * option for an option value
+     * outside its choices; and if
      * synthetic mode cannot fill
      * a contract item, if no source-image reference lies on a slice of the segmentation, or if
      * dcmqi fails. A failure of ITK, of dcmqi or of saving in a later group leaves the files of
      * the earlier groups.
      *
-     * The labels and the UIDs of the relations are checked first: before the strict-mode refusal,
-     * before synthetic mode changes the segmentation, and before any file is written.
+     * The labels, the UIDs of the relations and the patient, study and frame of reference values are
+     * checked first: before the strict-mode refusal, before synthetic mode changes the segmentation,
+     * and before any file is written.
      */
     void Write() override;
 

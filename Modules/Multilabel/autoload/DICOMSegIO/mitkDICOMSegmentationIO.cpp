@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <dcmqi/Itk2DicomConverter.h>
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
+#include <dcmtk/dcmdata/dcdatset.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcsequen.h>
 #include <dcmtk/dcmdata/dcvrlo.h>
@@ -303,6 +304,43 @@ namespace
     // Body part examined describes the series, so dcmqi inherits it from the source; the
     // segmentation's own property is its only source. The codes of a label describe one segment.
     CopyTopLevelDICOMTagToItem(seg, 0x0018, 0x0015, DCM_BodyPartExamined, dst);
+  }
+
+  // dcmqi takes the patient, study and frame of reference over from the first source item, and
+  // DCMTK checks them when it writes the SEG, which then fails without naming the value. The item
+  // checked is the one the writer hands to dcmqi, with the rule DCMTK applies; of the lengths, it
+  // checks only that of a UID. Body Part Examined is left out: dcmqi copies it into the SEG after
+  // that check. Synthetic mode keeps a value that is present, so no mode avoids these refusals, and
+  // they are checked before anything else, for the reasons given at CheckWritableLabels.
+  void CheckWritableIdentity(const mitk::MultiLabelSegmentation &seg)
+  {
+    // DCMTK looks the character set of a value up in the surrounding dataset. The writer writes
+    // none, so the default repertoire applies, which DCMTK also takes from "ISO_IR 6".
+    DcmDataset item;
+    item.putAndInsertString(DCM_SpecificCharacterSet, "ISO_IR 6");
+    StampSegIdentityOnSourceItem(&seg, item);
+    for (unsigned long i = 0; i < item.card(); ++i)
+    {
+      auto *element = item.getElement(i);
+      DcmTag tag = element->getTag();
+      if (tag == DCM_SpecificCharacterSet || tag == DCM_BodyPartExamined)
+        continue;
+
+      // DCMTK's write treats only these results as errors.
+      const auto check = element->checkValue("1", OFTrue);
+      if (check != EC_InvalidCharacter && check != EC_ValueRepresentationViolated &&
+          check != EC_ValueMultiplicityViolated && check != EC_MaximumLengthViolated)
+        continue;
+
+      OFString value;
+      element->getOFStringArray(value);
+      std::ostringstream tagText;
+      tagText << '(' << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << tag.getGroup() << ','
+              << std::setw(4) << tag.getElement() << ')';
+      mitkThrow() << "Cannot write the segmentation as DICOM SEG: its " << tag.getTagName() << " " << tagText.str()
+                  << " \"" << value.c_str() << "\" is no valid " << DcmVR(element->getVR()).getVRName()
+                  << " value without Specific Character Set (" << check.text() << ").";
+    }
   }
 
   // Format a double as a DICOM Decimal String (DS). DS is capped at 16
@@ -961,6 +999,7 @@ namespace mitk
 
     CheckWritableLabels(*input);
     CheckWritableSourceRelations(*input);
+    CheckWritableIdentity(*input);
 
     // Synthesis runs once before the per-group loop. The alternative
     // (per-group) would invite divergence across groups when the

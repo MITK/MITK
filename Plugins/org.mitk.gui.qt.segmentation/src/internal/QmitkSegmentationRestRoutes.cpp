@@ -313,32 +313,6 @@ namespace
     return DescribeLabels(segmentation, GetSelectedTime());
   }
 
-  /**
-   * The labels of the preview of a tool that adds labels, as the confirm adds them: to the group of the active
-   * label, with values that only the confirm gives them. The preview's own groups and values mean nothing there.
-   */
-  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool)
-  {
-    auto* preview = tool->GetPreviewSegmentation();
-
-    if (preview == nullptr)
-      return nlohmann::json::array();
-
-    const auto* working = GetToolManager()->GetWorkingData(0);
-    const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
-    const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
-
-    auto labels = DescribeLabels(preview);
-
-    for (auto& label : labels)
-    {
-      label.erase("value");
-      label["group"] = group;
-    }
-
-    return labels;
-  }
-
   nlohmann::json DescribeGroup(mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
     auto labels = nlohmann::json::array();
@@ -538,19 +512,6 @@ namespace
     }
   }
 
-  /** Returns an mitk::Exception with the given message, for a callback. */
-  std::exception_ptr MakeError(const std::string& message)
-  {
-    try
-    {
-      mitkThrow() << message;
-    }
-    catch (...)
-    {
-      return std::current_exception();
-    }
-  }
-
   /** Ends a job with what an operation threw. */
   void FailJob(mitk::RestJob& job, std::exception_ptr error)
   {
@@ -603,6 +564,45 @@ namespace
   }
 
 #if MITK_HAS_PYTHON
+  /**
+   * The labels of the preview of a tool that adds labels, as the confirm adds them: to the group of the active
+   * label, with values that only the confirm gives them. The preview's own groups and values mean nothing there.
+   */
+  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool)
+  {
+    auto* preview = tool->GetPreviewSegmentation();
+
+    if (preview == nullptr)
+      return nlohmann::json::array();
+
+    const auto* working = GetToolManager()->GetWorkingData(0);
+    const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
+    const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
+
+    auto labels = DescribeLabels(preview);
+
+    for (auto& label : labels)
+    {
+      label.erase("value");
+      label["group"] = group;
+    }
+
+    return labels;
+  }
+
+  /** Returns an mitk::Exception with the given message, for a callback. */
+  std::exception_ptr MakeError(const std::string& message)
+  {
+    try
+    {
+      mitkThrow() << message;
+    }
+    catch (...)
+    {
+      return std::current_exception();
+    }
+  }
+
   mitk::nnInteractiveTool* GetNNInteractive(const std::string& path)
   {
     auto* tool = dynamic_cast<mitk::nnInteractiveTool*>(GetToolManager()->GetActiveTool());

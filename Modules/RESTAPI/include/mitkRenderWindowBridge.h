@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <stdexcept>
@@ -30,6 +31,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class RestStopGate;
+
   /**
    * \brief Format for screenshot capture.
    */
@@ -459,6 +462,14 @@ namespace mitk
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     /**
+     * \brief Set the gate that ends waits for the dispatcher when the server stops.
+     *
+     * To be called before requests arrive. Callbacks that wait for the
+     * dispatcher then throw a RestException (503) instead.
+     */
+    void SetStopGate(std::shared_ptr<RestStopGate> gate);
+
+    /**
      * \brief Set or clear the screenshot provider callback.
      *
      * \param provider The callback to use, or an empty function to clear.
@@ -805,6 +816,7 @@ namespace mitk
     MxNLayoutSetter m_MxNLayoutSetter;
     mutable std::mutex m_Mutex;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+    std::shared_ptr<RestStopGate> m_StopGate;
   };
 }
 

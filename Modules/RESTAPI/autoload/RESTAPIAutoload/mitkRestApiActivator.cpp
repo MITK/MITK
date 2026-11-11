@@ -75,12 +75,14 @@ public:
 
   void Unload(us::ModuleContext* /*context*/) override
   {
-    this->StopServiceTracking();
-
+    // Stopped before the dispatcher goes: a request in flight would run its
+    // work for the GUI thread on its own thread without one.
     if (m_RestServer)
     {
       m_RestServer->Stop();
     }
+
+    this->StopServiceTracking();
 
     if (m_RestServerRegistration)
     {

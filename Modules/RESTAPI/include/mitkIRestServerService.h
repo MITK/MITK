@@ -244,6 +244,9 @@ namespace mitk
      * dispatcher, the task runs right away. The task must not throw; see
      * mitk::CallInGuiThread() for a variant that passes results and
      * exceptions on.
+     *
+     * \throw RestException (503) if the server stops before the task has
+     *        started. The task does not run then.
      */
     virtual void Dispatch(const std::function<void()>& task) const = 0;
 

@@ -44,6 +44,7 @@ mitk::RestJob::RestJob(const std::string& id, const std::string& description)
     m_Description(description),
     m_Start(std::chrono::steady_clock::now()),
     m_State(State::Running),
+    m_WaitsInterrupted(false),
     m_Progress(-1.0)
 {
 }
@@ -114,7 +115,18 @@ bool mitk::RestJob::Cancel()
 bool mitk::RestJob::WaitUntilEnded(std::chrono::milliseconds timeout) const
 {
   std::unique_lock<std::mutex> lock(m_Mutex);
-  return m_Ended.wait_for(lock, timeout, [this]() { return m_State != State::Running; });
+  m_Ended.wait_for(lock, timeout, [this]() { return m_State != State::Running || m_WaitsInterrupted; });
+  return m_State != State::Running;
+}
+
+void mitk::RestJob::SetWaitsInterrupted(bool interrupted)
+{
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    m_WaitsInterrupted = interrupted;
+  }
+
+  m_Ended.notify_all();
 }
 
 nlohmann::json mitk::RestJob::ToJson() const

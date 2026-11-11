@@ -23,11 +23,78 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <future>
+#include <mutex>
 #include <thread>
+#include <vector>
 
 namespace
 {
   constexpr int TestPort = 59101;
+
+  /** A dispatcher whose thread is busy: it keeps the tasks until Run(). */
+  class BusyDispatcher : public mitk::StorageThreadDispatcherBase
+  {
+  public:
+    mitkClassMacro(BusyDispatcher, mitk::StorageThreadDispatcherBase);
+    itkFactorylessNewMacro(Self);
+
+    bool IsDispatchThread() const override
+    {
+      return false;
+    }
+
+    void Post(std::function<void()> task) override
+    {
+      {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        m_Tasks.push_back(std::move(task));
+      }
+
+      m_Posted.notify_all();
+    }
+
+    bool WaitForTask(std::chrono::seconds timeout)
+    {
+      std::unique_lock<std::mutex> lock(m_Mutex);
+      return m_Posted.wait_for(lock, timeout, [this]() { return !m_Tasks.empty(); });
+    }
+
+    void Run()
+    {
+      std::vector<std::function<void()>> tasks;
+
+      {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        tasks.swap(m_Tasks);
+      }
+
+      for (const auto& task : tasks)
+        task();
+    }
+
+  protected:
+    bool ExecuteDispatched(std::function<void()> task) override
+    {
+      std::promise<void> done;
+
+      this->Post([&task, &done]() {
+        task();
+        done.set_value();
+      });
+
+      done.get_future().wait();
+      return true;
+    }
+
+  private:
+    std::mutex m_Mutex;
+    std::condition_variable m_Posted;
+    std::vector<std::function<void()>> m_Tasks;
+  };
 
   mitk::RestServerConfig MakeConfig()
   {
@@ -90,6 +157,9 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(EndpointsListsBuiltInAndAddedRoutes);
   MITK_TEST(JobsCanBeAwaited);
   MITK_TEST(JobsCanBeCancelled);
+  MITK_TEST(StopEndsWaitsForJobs);
+  MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
+  MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(ServerForOneClient);
   CPPUNIT_TEST_SUITE_END();
@@ -457,6 +527,107 @@ public:
     CPPUNIT_ASSERT_EQUAL(409, refused.Status);
     CPPUNIT_ASSERT(!stubborn->HasEnded());
   }
+
+  void StopEndsWaitsForJobs()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto job = server.CreateJob("Never ends");
+
+    CPPUNIT_ASSERT(server.Start());
+
+    auto waiting = std::async(std::launch::async, [&job]() {
+      httplib::Client client("127.0.0.1", TestPort);
+      return client.Get("/api/v1/jobs/" + job->GetId() + "?wait=20");
+    });
+
+    // Lets the request arrive; Stop() refuses those that come later.
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    const auto start = std::chrono::steady_clock::now();
+    server.Stop();
+    const auto duration = std::chrono::steady_clock::now() - start;
+
+    const auto res = waiting.get();
+
+    CPPUNIT_ASSERT(duration < std::chrono::seconds(10));
+    CPPUNIT_ASSERT(res);
+    CPPUNIT_ASSERT_EQUAL(200, res->status);
+    CPPUNIT_ASSERT_EQUAL(std::string("running"), nlohmann::json::parse(res->body)["data"]["state"].get<std::string>());
+  }
+
+  void StopEndsCallsThatWaitForTheDispatchThread()
+  {
+    auto dispatcher = BusyDispatcher::New();
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+    server.SetDispatcher(dispatcher);
+
+    std::atomic<bool> ran = false;
+
+    mitk::RestRoute route;
+    route.Method = "GET";
+    route.Path = "/dispatched";
+    route.Handler = [&server, &ran](const mitk::RestRequest&) {
+      server.Dispatch([&ran]() { ran = true; });
+      return mitk::RestResponse::FromData("done");
+    };
+    server.AddRoute(route);
+
+    CPPUNIT_ASSERT_EQUAL(503, this->StopDuringRequest(server, dispatcher, "/api/v1/dispatched"));
+    CPPUNIT_ASSERT(!ran);
+  }
+
+  void StopEndsBuiltInRequestsThatWaitForTheDispatchThread()
+  {
+    auto dispatcher = BusyDispatcher::New();
+    auto dataStorage = mitk::StandaloneDataStorage::New();
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+    server.SetDataStorage(dataStorage);
+    server.SetDispatcher(dispatcher);
+
+    CPPUNIT_ASSERT(this->StopDuringRequest(server, dispatcher, "/api/v1/datastorage/nodes") >= 500);
+  }
+
+private:
+  /**
+   * Stops the server while a request waits for the dispatch thread, as the
+   * thread that stops the server is that thread in the Workbench.
+   *
+   * \return The status of the request.
+   */
+  int StopDuringRequest(mitk::RestServer& server, BusyDispatcher* dispatcher, const std::string& path)
+  {
+    CPPUNIT_ASSERT(server.Start());
+
+    auto waiting = std::async(std::launch::async, [path]() {
+      httplib::Client client("127.0.0.1", TestPort);
+      return client.Get(path);
+    });
+
+    const bool dispatched = dispatcher->WaitForTask(std::chrono::seconds(10));
+
+    auto stopping = std::async(std::launch::async, [&server]() { server.Stop(); });
+    const bool stopped = stopping.wait_for(std::chrono::seconds(10)) == std::future_status::ready;
+
+    // Runs what the dispatcher still holds: nothing that does anything, if the request has ended.
+    dispatcher->Run();
+    stopping.wait();
+
+    const auto res = waiting.get();
+
+    CPPUNIT_ASSERT(dispatched);
+    CPPUNIT_ASSERT(stopped);
+    CPPUNIT_ASSERT(res);
+
+    return res->status;
+  }
+
+public:
 
   void WorldPointsAreParsed()
   {

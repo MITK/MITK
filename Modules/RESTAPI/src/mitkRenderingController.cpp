@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRenderingController.h>
+#include "mitkRestStopGate.h"
 #include <mitkRenderWindowBridge.h>
 #include <mitkErrorResponse.h>
 #include <mitkDataStorage.h>
@@ -2298,14 +2299,12 @@ void RenderingController::Dispatch(std::function<void()> task) const
     std::lock_guard<std::mutex> lock(m_DispatcherMutex);
     dispatcher = m_Dispatcher.Lock();
   }
-  if (dispatcher.IsNull())
-  {
-    task();
-  }
-  else
-  {
-    dispatcher->Execute(std::move(task));
-  }
+  RestStopGate::Run(m_StopGate, dispatcher, task);
+}
+
+void RenderingController::SetStopGate(std::shared_ptr<RestStopGate> gate)
+{
+  m_StopGate = std::move(gate);
 }
 
 void RenderingController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const

@@ -33,6 +33,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class RestStopGate;
+
   /**
    * \brief Thread-safe bridge between the REST API layer and MITK DataStorage.
    *
@@ -113,6 +115,14 @@ namespace mitk
      * \param[in] dispatcher The dispatcher, or \c nullptr to clear.
      */
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
+
+    /**
+     * \brief Set the gate that ends waits for the dispatcher when the server stops.
+     *
+     * To be called before requests arrive. Operations that wait for the
+     * dispatcher then throw a RestException (503) instead.
+     */
+    void SetStopGate(std::shared_ptr<RestStopGate> gate);
 
     /**
      * \brief Set the DataStorage to operate on.
@@ -446,6 +456,7 @@ namespace mitk
 
     WeakPointer<DataStorage> m_DataStorage;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+    std::shared_ptr<RestStopGate> m_StopGate;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
     /** Remark: Important to ensure that this mutex is always acquired before interacting with m_UidMapper

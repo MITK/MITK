@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkDataStorageBridge.h>
+#include "mitkRestStopGate.h"
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
 #include <mitkNodePredicateAnd.h>
@@ -353,31 +354,20 @@ namespace mitk
 
   void DataStorageBridge::DispatchTask(std::function<void()> task) const
   {
-    auto dispatcher = m_Dispatcher.Lock();
+    RestStopGate::Run(m_StopGate, m_Dispatcher.Lock(), task);
+  }
 
-    if (dispatcher.IsNotNull() && !dispatcher->IsDispatchThread())
-    {
-      dispatcher->Execute(std::move(task));
-    }
-    else
-    {
-      task();
-    }
+  void DataStorageBridge::SetStopGate(std::shared_ptr<RestStopGate> gate)
+  {
+    m_StopGate = std::move(gate);
   }
 
   template <typename R>
   R DataStorageBridge::DispatchTask(std::function<R()> task) const
   {
-    auto dispatcher = m_Dispatcher.Lock();
-
-    if (dispatcher.IsNotNull() && !dispatcher->IsDispatchThread())
-    {
-      return dispatcher->ExecuteWithResult<R>(std::move(task));
-    }
-    else
-    {
-      return task();
-    }
+    std::optional<R> result;
+    this->DispatchTask(std::function<void()>([&result, &task]() { result.emplace(task()); }));
+    return std::move(*result);
   }
 
   void DataStorageBridge::SetDataStorage(DataStorage* dataStorage)

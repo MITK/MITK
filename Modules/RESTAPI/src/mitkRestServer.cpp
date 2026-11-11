@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkRenderWindowBridge.h>
 #include <mitkErrorResponse.h>
 #include "mitkRestRouter.h"
+#include "mitkRestStopGate.h"
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
@@ -248,7 +249,11 @@ RestServer::RestServer()
   , m_RenderWindowBridge(std::make_unique<RenderWindowBridge>())
   , m_Router(std::make_unique<RestRouter>())
   , m_BuiltInRouter(std::make_unique<RestRouter>())
+  , m_StopGate(std::make_shared<RestStopGate>())
 {
+  m_Bridge->SetStopGate(m_StopGate);
+  m_RenderWindowBridge->SetStopGate(m_StopGate);
+
   RestRoute endpoints;
   endpoints.Method = "GET";
   endpoints.Path = ApiV1 + "/endpoints";
@@ -401,6 +406,7 @@ bool RestServer::Start(const RestServerConfig& config, const std::string& starte
     m_SwaggerController = std::make_unique<SwaggerController>();
     m_RenderingController = std::make_unique<RenderingController>(*m_Bridge);
     m_RenderingController->SetRenderWindowBridge(m_RenderWindowBridge.get());
+    m_RenderingController->SetStopGate(m_StopGate);
     this->SyncDispatcherToController();
 
     // Pass file access config to controllers
@@ -546,6 +552,10 @@ void RestServer::Stop()
   bool wasRunning = false;
   std::string tempDirToCleanup;
 
+  // The join below waits for every request in flight. Those that wait
+  // themselves, for this thread or for a job, give up now.
+  this->SetStopping(true);
+
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -569,6 +579,8 @@ void RestServer::Stop()
   {
     threadToJoin->join();
   }
+
+  this->SetStopping(false);
 
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -729,6 +741,8 @@ std::shared_ptr<RestJob> RestServer::CreateJob(const std::string& description)
   auto job = std::make_shared<RestJob>("job_" + std::to_string(m_NextJobNumber++), description);
   m_Jobs.push_back(job);
 
+  job->SetWaitsInterrupted(m_StopGate->IsStopping());
+
   const auto endedCount = static_cast<std::size_t>(std::count_if(m_Jobs.begin(), m_Jobs.end(),
     [](const std::shared_ptr<RestJob>& item) { return item->HasEnded(); }));
 
@@ -760,14 +774,17 @@ void RestServer::Dispatch(const std::function<void()>& task) const
     dispatcher = m_Dispatcher.Lock();
   }
 
-  if (dispatcher.IsNotNull())
-  {
-    dispatcher->Execute(task);
-  }
-  else
-  {
-    task();
-  }
+  RestStopGate::Run(m_StopGate, dispatcher, task);
+}
+
+void RestServer::SetStopping(bool stopping)
+{
+  m_StopGate->SetStopping(stopping);
+
+  std::lock_guard<std::mutex> lock(m_JobMutex);
+
+  for (const auto& job : m_Jobs)
+    job->SetWaitsInterrupted(stopping);
 }
 
 void RestServer::Post(std::function<void()> task) const

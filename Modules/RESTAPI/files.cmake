@@ -17,6 +17,7 @@ set(CPP_FILES
   mitkRestRouter.cpp
   mitkRestTime.cpp
   mitkRestServer.cpp
+  mitkRestStopGate.cpp
   mitkDataStorageBridge.cpp
   mitkNodeUidMapper.cpp
   mitkErrorResponse.cpp

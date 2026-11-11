@@ -82,8 +82,20 @@ namespace mitk
      */
     bool Cancel();
 
-    /** \return Whether the job has ended within the timeout. */
+    /**
+     * \return Whether the job has ended within the timeout. The wait also
+     *         ends early while waits are interrupted.
+     */
     bool WaitUntilEnded(std::chrono::milliseconds timeout) const;
+
+    /**
+     * \brief End the waits for the job that run, and keep later ones from
+     *        waiting, until this is switched off again.
+     *
+     * For the server while it stops: it waits for the requests in flight,
+     * which must not wait for a job in turn.
+     */
+    void SetWaitsInterrupted(bool interrupted);
 
     /**
      * \brief The job as clients see it: {id, description, state, progress,
@@ -110,6 +122,7 @@ namespace mitk
     mutable std::mutex m_Mutex;
     mutable std::condition_variable m_Ended;
     State m_State;
+    bool m_WaitsInterrupted;
     double m_Progress;
     std::string m_Message;
     nlohmann::json m_Result;

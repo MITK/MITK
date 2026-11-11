@@ -59,6 +59,13 @@ namespace mitk
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     /**
+     * \brief Set the gate that ends waits for the dispatcher when the server stops.
+     *
+     * To be called before requests arrive.
+     */
+    void SetStopGate(std::shared_ptr<RestStopGate> gate);
+
+    /**
      * \brief Set or clear the RenderWindowBridge for interactions with the rendering stack of
      * the application.
      *
@@ -416,6 +423,7 @@ namespace mitk
     DataStorageBridge& m_Bridge;
     RenderWindowBridge* m_RenderWindowBridge = nullptr;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+    std::shared_ptr<RestStopGate> m_StopGate;
     mutable std::mutex m_DispatcherMutex;
   };
 }

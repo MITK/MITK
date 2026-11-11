@@ -46,6 +46,7 @@ namespace mitk
   class RenderingController;
   class RenderWindowBridge;
   class RestRouter;
+  class RestStopGate;
 
   /**
    * \brief HTTP REST server implementation.
@@ -218,6 +219,14 @@ namespace mitk
     mutable std::mutex m_JobMutex;
     std::deque<std::shared_ptr<RestJob>> m_Jobs;
     uint64_t m_NextJobNumber{1};
+
+    /**
+     * \brief Tells the requests that wait, in Dispatch() or for a job, that
+     *        the server stops, so that Stop() can wait for them on the very
+     *        thread they wait for.
+     */
+    std::shared_ptr<RestStopGate> m_StopGate;
+    void SetStopping(bool stopping);
 
     // State
     mutable std::mutex m_Mutex;

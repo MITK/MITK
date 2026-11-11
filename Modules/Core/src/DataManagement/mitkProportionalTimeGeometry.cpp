@@ -120,10 +120,25 @@ mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint(TimeStep
 
 mitk::TimeStepType mitk::ProportionalTimeGeometry::TimePointToTimeStep(TimePointType timePoint) const
 {
-  if (m_FirstTimePoint <= timePoint)
-    return static_cast<TimeStepType>((timePoint - m_FirstTimePoint) / m_StepDuration);
-  else
+  if (timePoint < m_FirstTimePoint)
+  {
     return 0;
+  }
+
+  auto timeStep = static_cast<TimeStepType>((timePoint - m_FirstTimePoint) / m_StepDuration);
+
+  // The division is not the exact inverse of GetMinimumTimePoint(); the step
+  // starts decide, so that the start of a time step resolves to that step.
+  if (timePoint < this->GetMinimumTimePoint(timeStep))
+  {
+    --timeStep;
+  }
+  else if (this->GetMinimumTimePoint(timeStep + 1) <= timePoint)
+  {
+    ++timeStep;
+  }
+
+  return timeStep;
 }
 
 mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimeStep(TimeStepType timeStep) const

@@ -126,7 +126,9 @@ namespace mitk
   * the new time step indicates the same geometry as the time point.
   * If a negative invalid time point is given always time step 0 is
   * returned. If an positive invalid time step is given an invalid
-  * time step will be returned.
+  * time step will be returned. The start of a time step
+  * (GetMinimumTimePoint(step), TimeStepToTimePoint(step)) resolves to
+  * that time step.
   */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**

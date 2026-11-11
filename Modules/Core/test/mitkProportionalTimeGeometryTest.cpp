@@ -18,6 +18,15 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <array>
+#include <cmath>
+#include <iomanip>
+#include <limits>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 class mitkProportionalTimeGeometryTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkProportionalTimeGeometryTestSuite);
@@ -30,6 +39,8 @@ class mitkProportionalTimeGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TimePointToClampedTimeStep_StepStart_IsThatStep);
   MITK_TEST(TimePointToClampedTimeStep_PastLast_IsLastStep);
   MITK_TEST(TimePointToClampedTimeStep_NoTimeSteps_Throws);
+  MITK_TEST(TimePointToTimeStep_StepStart_IsThatStep);
+  MITK_TEST(TimePointToTimeStep_JustBeforeStepStart_IsPreviousStep);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -123,8 +134,60 @@ public:
     CPPUNIT_ASSERT_THROW(geometry->TimePointToClampedTimeStep(0.0), mitk::NoTimeStepsException);
   }
 
+  void TimePointToTimeStep_StepStart_IsThatStep()
+  {
+    for (const auto& geometry : CreateNonRepresentableGrids())
+    {
+      for (mitk::TimeStepType timeStep = 0; timeStep < geometry->CountTimeSteps(); ++timeStep)
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(Where(*geometry, timeStep), timeStep,
+                                     geometry->TimePointToTimeStep(geometry->TimeStepToTimePoint(timeStep)));
+      }
+    }
+  }
+
+  void TimePointToTimeStep_JustBeforeStepStart_IsPreviousStep()
+  {
+    for (const auto& geometry : CreateNonRepresentableGrids())
+    {
+      for (mitk::TimeStepType timeStep = 1; timeStep < geometry->CountTimeSteps(); ++timeStep)
+      {
+        const auto justBefore = std::nextafter(geometry->TimeStepToTimePoint(timeStep),
+                                               -std::numeric_limits<mitk::TimePointType>::infinity());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(Where(*geometry, timeStep), timeStep - 1,
+                                     geometry->TimePointToTimeStep(justBefore));
+      }
+    }
+  }
+
 private:
   // helper Methods for the Tests
+
+  /** Grids of 50 time steps whose step durations are not exactly representable. */
+  static std::vector<mitk::ProportionalTimeGeometry::Pointer> CreateNonRepresentableGrids()
+  {
+    const std::array<std::pair<mitk::TimePointType, mitk::TimePointType>, 3> grids = {
+      {{0.0, 0.003}, {10.0, 0.05}, {1000.0, 33.3}}};
+
+    std::vector<mitk::ProportionalTimeGeometry::Pointer> geometries;
+    for (const auto& [firstTimePoint, stepDuration] : grids)
+    {
+      auto geometry = mitk::ProportionalTimeGeometry::New();
+      geometry->Initialize(mitk::Geometry3D::New(), 50);
+      geometry->SetFirstTimePoint(firstTimePoint);
+      geometry->SetStepDuration(stepDuration);
+      geometries.push_back(geometry);
+    }
+    return geometries;
+  }
+
+  static std::string Where(const mitk::ProportionalTimeGeometry& geometry, mitk::TimeStepType timeStep)
+  {
+    std::ostringstream where;
+    where << std::setprecision(17) << "Time step " << timeStep << " of the grid starting at "
+          << geometry.GetFirstTimePoint() << " with duration " << geometry.GetStepDuration();
+    return where.str();
+  }
 
   /** Time steps [10, 15), [15, 20) and [20, 25). */
   static mitk::ProportionalTimeGeometry::Pointer CreateThreeTimeStepsFrom10()

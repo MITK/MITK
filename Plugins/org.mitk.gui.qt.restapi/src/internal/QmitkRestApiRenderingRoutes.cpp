@@ -874,7 +874,8 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   changeLayout.Summary = "Show one render window alone, or all of them again, as the full screen button does";
   changeLayout.Description =
     "Body: {maximized}, the id of a window (axial, sagittal, coronal, 3d) to show it alone, or null to bring "
-    "back the layout the windows had before. Returns {data: {maximized}} as GET does.";
+    "back the layout the windows had before. Returns {data: {maximized}} as GET does. Answers 409 "
+    "LAYOUT_NOT_AVAILABLE while the editor of the windows is hidden, for example behind a report.";
   changeLayout.Handler = [server, describeLayout](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 

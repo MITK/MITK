@@ -277,6 +277,10 @@ void QmitkRenderWindow::SetFullScreen(bool fullScreen)
   if (nullptr == m_MenuWidget)
     mitkThrow() << "The render window has no menu to toggle full screen with.";
 
+  // A deactivated menu reaches no layout: it would only remember a full screen that never happened.
+  if (!m_MenuWidgetActivated)
+    mitkThrow() << "The layout cannot change while the editor of the render window is hidden. Bring the editor to the front first.";
+
   m_MenuWidget->SetFullScreen(fullScreen);
 }
 

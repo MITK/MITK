@@ -117,7 +117,8 @@ public:
    * \brief Shows the window alone, or brings back the layout it was shown in
    *        before, as the full screen button of its menu does.
    *
-   * \throw mitk::Exception if the window has no menu.
+   * \throw mitk::Exception if the window has no menu or the menu is
+   *        deactivated, as while the window's editor is hidden.
    */
   void SetFullScreen(bool fullScreen);
 

@@ -824,12 +824,19 @@ void QmitkSegmentationView::OnActiveToolChanged()
 void QmitkSegmentationView::ShowActiveToolTab()
 {
   const auto id = m_ToolManager->GetActiveToolID();
+  const bool is2D = m_Controls->toolSelectionBox2D->HasTool(id);
+  const bool is3D = m_Controls->toolSelectionBox3D->HasTool(id);
+  const bool isCurrent2D = m_Controls->tabWidgetSegmentationTools->currentWidget() == m_Controls->tab2DTools;
 
-  if (m_Controls->toolSelectionBox2D->HasTool(id))
+  // A tool of both tabs, like Selection, stays where the user activated it.
+  if (isCurrent2D ? is2D : is3D)
+    return;
+
+  if (is2D)
   {
     m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab2DTools);
   }
-  else if (m_Controls->toolSelectionBox3D->HasTool(id))
+  else if (is3D)
   {
     m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab3DTools);
   }

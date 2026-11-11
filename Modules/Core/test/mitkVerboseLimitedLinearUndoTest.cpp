@@ -107,6 +107,17 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
   myUndoController->Clear();
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0, "checking deleting all operations in UndoModel");
 
+  // An undo that empties the undo list is an undo all the same.
+  myUndoController->SetOperationEvent(
+    new mitk::OperationEvent(nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+  mitk::OperationEvent::IncCurrObjectEventId();
+
+  MITK_TEST_CONDITION_REQUIRED(myUndoController->Undo(), "checking that undoing the only operation is reported");
+  MITK_TEST_CONDITION_REQUIRED(!myUndoController->Undo(), "checking that nothing is left to undo");
+
+  myUndoController->Clear();
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0, "checking deleting all operations in UndoModel");
+
   // sending two new OperationEvents
   for (int i = 0; i < 2; i++)
   {

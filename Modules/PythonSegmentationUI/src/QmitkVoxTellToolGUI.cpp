@@ -163,12 +163,7 @@ QmitkVoxTellToolGUI::QmitkVoxTellToolGUI()
   {
     auto* tool = this->GetTool();
 
-    if (tool == nullptr)
-      return false;
-
-    const auto* preview = tool->GetPreviewSegmentation();
-
-    if (preview == nullptr || preview->GetAllLabelValues().empty())
+    if (tool == nullptr || !tool->HasResultToConfirm())
       return false;
 
     return scopeFunction(enabled);

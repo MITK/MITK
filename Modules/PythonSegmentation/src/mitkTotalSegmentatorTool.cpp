@@ -190,6 +190,12 @@ bool mitk::TotalSegmentatorTool::IsCancelable() const
   return true;
 }
 
+bool mitk::TotalSegmentatorTool::HasResultToConfirm() const
+{
+  const auto* preview = this->GetPreviewSegmentation();
+  return preview != nullptr && !preview->GetAllLabelValues().empty();
+}
+
 us::ModuleResource mitk::TotalSegmentatorTool::GetIconResource() const
 {
   // The shared segmentation icon lives in MitkSegmentation, not in this module.

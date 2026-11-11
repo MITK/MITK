@@ -207,6 +207,9 @@ namespace mitk
      */
     bool HasInteractions() const;
 
+    /** \brief Tells that a session runs and has interactions, whose result can be confirmed. */
+    bool HasResultToConfirm() const override;
+
     /** \brief Reverts the most recent interaction (single-level undo).
      *
      * Calls the nnInteractive session's \c undo(), which restores the

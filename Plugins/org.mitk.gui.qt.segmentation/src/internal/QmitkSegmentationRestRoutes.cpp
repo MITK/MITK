@@ -1467,7 +1467,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   confirm.Description =
     "Writes the preview of the active tool into the segmentation, like its Confirm button. Body, all "
     "optional: {merge: false, ignore_locks: false, all_time_steps: false}, the options under the button. "
-    "Undoable. Returns {data: {segmentation: {uid, name}, labels: [label]}} as GET .../labels gives them; "
+    "Undoable. Answers 409 NOTHING_TO_CONFIRM if the tool has no result, as after a confirm. "
+    "Returns {data: {segmentation: {uid, name}, labels: [label]}} as GET .../labels gives them; "
     "check there that the label is filled. If the tool has to compute the result first, for all_time_steps "
     "with a tool that previews only the time step on display, or for an active label that changed since the "
     "result was computed, which takes as long as that many runs, the confirm runs as a job: query parameter "
@@ -1486,6 +1487,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       ShowView(request.Path);
       SegWithPreviewTool::Pointer tool = GetPreviewTool(request.Path);
       ThrowIfBusy(tool, request.Path);
+
+      // An empty preview would erase the label it is transferred to, for example on a repeated confirm.
+      if (!tool->HasResultToConfirm())
+      {
+        Throw("NOTHING_TO_CONFIRM", "Conflict",
+          std::string(tool->GetName()) + " has no result to confirm. A confirmed result is not confirmed again.", 409, request.Path);
+      }
 
       tool->SetMergeStyle(body.value("merge", false) ? MultiLabelSegmentation::MergeStyle::Merge : MultiLabelSegmentation::MergeStyle::Replace);
       tool->SetOverwriteStyle(body.value("ignore_locks", false) ? MultiLabelSegmentation::OverwriteStyle::IgnoreLocks : MultiLabelSegmentation::OverwriteStyle::RegardLocks);

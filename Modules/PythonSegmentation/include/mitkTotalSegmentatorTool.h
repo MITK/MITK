@@ -149,6 +149,9 @@ namespace mitk
     /** \brief Tells that a run can be cancelled. */
     bool IsCancelable() const override;
 
+    /** \brief Tells that the preview has labels, which a cancelled or empty run does not leave. */
+    bool HasResultToConfirm() const override;
+
     /**
      * \brief Starts the worker and learns the tasks of TotalSegmentator.
      *

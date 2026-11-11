@@ -153,6 +153,9 @@ namespace mitk
     /** \brief Tells that the computation of a preview can be cancelled. */
     bool IsCancelable() const override;
 
+    /** \brief Tells that the preview has labels, which a cancelled or failed run does not leave. */
+    bool HasResultToConfirm() const override;
+
     /** \brief Returns Label::AlgorithmType::AUTOMATIC.
      *
      * A prompt names the structure to segment, like the task of

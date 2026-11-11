@@ -1209,6 +1209,11 @@ bool mitk::SegWithPreviewTool::IsCancelable() const
   return false;
 }
 
+bool mitk::SegWithPreviewTool::HasResultToConfirm() const
+{
+  return true;
+}
+
 bool mitk::SegWithPreviewTool::IsUpdating() const
 {
   return m_IsUpdating;

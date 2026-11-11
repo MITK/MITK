@@ -450,6 +450,11 @@ void mitk::nnInteractiveTool::ResetInteractions()
   this->InteractionsChangedEvent.Send();
 }
 
+bool mitk::nnInteractiveTool::HasResultToConfirm() const
+{
+  return this->IsSessionRunning() && this->HasInteractions();
+}
+
 bool mitk::nnInteractiveTool::HasInteractions() const
 {
   // Check if any interactor has interactions.

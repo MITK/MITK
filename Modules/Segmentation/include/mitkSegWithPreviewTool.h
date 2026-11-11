@@ -72,6 +72,15 @@ namespace mitk
      */
     void ConfirmSegmentation();
 
+    /** \brief Tells whether the tool has a result that ConfirmSegmentation() would transfer.
+     *
+     * For whoever offers the confirmation, like the tool's GUI or a program:
+     * confirming without a result transfers an empty preview, which can
+     * erase the label it is transferred to. The default is true; tools that
+     * know when they have no result override it.
+     */
+    virtual bool HasResultToConfirm() const;
+
     /** \brief Posts a function to the GUI thread, to run there after the current event.
      *
      * Must be callable from any thread.

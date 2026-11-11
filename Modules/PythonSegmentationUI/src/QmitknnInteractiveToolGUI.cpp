@@ -153,11 +153,8 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
-    if (auto tool = this->GetTool(); tool != nullptr)
-    {
-      if (!tool->IsSessionRunning() || !tool->HasInteractions())
-        return false;
-    }
+    if (auto tool = this->GetTool(); tool != nullptr && !tool->HasResultToConfirm())
+      return false;
 
     return enabled;
   };

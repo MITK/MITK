@@ -301,6 +301,12 @@ bool mitk::VoxTellTool::IsCancelable() const
   return true;
 }
 
+bool mitk::VoxTellTool::HasResultToConfirm() const
+{
+  const auto* preview = this->GetPreviewSegmentation();
+  return preview != nullptr && !preview->GetAllLabelValues().empty();
+}
+
 mitk::Label::AlgorithmType mitk::VoxTellTool::GetAlgorithmType() const
 {
   return Label::AlgorithmType::AUTOMATIC;

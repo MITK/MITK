@@ -152,7 +152,13 @@ namespace mitk
    */
   struct MITKRESTAPI_EXPORT RestTokenRights
   {
-    /** \brief Whether requests may name files on the server's file system, to load data from or to get data as. */
+    /**
+     * \brief Whether requests may name files on the server's file system, to load data from or to get data as.
+     *
+     * Also covers uploaded data that refers to other files, like a detached
+     * NRRD or MetaImage header. Formats whose reader opens other files in a
+     * way the server does not know are not recognized as such.
+     */
     bool FileAccess = false;
   };
 

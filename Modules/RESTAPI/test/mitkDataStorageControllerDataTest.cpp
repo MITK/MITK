@@ -55,6 +55,8 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   MITK_TEST(PutDataWithoutDataStorage);
   MITK_TEST(PutDataNodeNotFound);
   MITK_TEST(PutDataEmptyBody);
+  MITK_TEST(PutDataFormatHeaderMustBeAnExtension);
+  MITK_TEST(PutDataThatRefersToFilesNeedsFileAccess);
   MITK_TEST(PutDataUnsupportedContentType);
   MITK_TEST(PutDataMissingContentType);
   MITK_TEST(PutDataInvalidJson);
@@ -330,6 +332,78 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutDataFormatHeaderMustBeAnExtension()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("TestNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    for (const std::string format : { "x/../../outside.nrrd", "x\\..\\outside.nrrd", "..", "nrrd " })
+    {
+      const httplib::Headers headers = {{"Content-Type", "application/octet-stream"}, {"X-MITK-Data-Format", format}};
+      auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", "data", {{"uid", uid}}, {}, headers);
+      httplib::Response res;
+
+      m_Controller->HandlePUT_nodes_uid_data(req, res);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(format, 400, res.status);
+      const auto json = nlohmann::json::parse(res.body);
+      CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+    }
+  }
+
+  int PutData(const std::string& uid, const std::string& format, const std::string& body)
+  {
+    const httplib::Headers headers = {{"Content-Type", "application/octet-stream"}, {"X-MITK-Data-Format", format}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body, {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+
+    return res.status;
+  }
+
+  void PutDataThatRefersToFilesNeedsFileAccess()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("TestNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    const std::string nrrdHeader = "NRRD0004\ntype: unsigned char\ndimension: 2\nsizes: 2 2\nencoding: raw\n";
+    const std::string detachedNrrd = nrrdHeader + "Data File: ../secret.raw\n\n";
+    const std::string completeNrrd = nrrdHeader + "\n" + std::string(4, '\1');
+
+    const std::string metaHeader = "ObjectType = Image\nNDims = 2\nDimSize = 2 2\nElementType = MET_UCHAR\n";
+    const std::string detachedMeta = metaHeader + "ElementDataFile = ../secret.raw\n";
+    const std::string completeMeta = metaHeader + "ElementDataFile = LOCAL\n" + std::string(4, '\1');
+
+    // Without restrictions, the readers decide.
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", detachedNrrd));
+
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, {}, m_TempDirectory);
+
+    // The extension does not matter to the NRRD reader, so it does not matter here.
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", detachedNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nhdr", detachedNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mhd", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "pvti", "<VTKFile/>"));
+
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", completeNrrd));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "mha", completeMeta));
+
+    // A client without the right to name files, on a server without restrictions.
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::Unrestricted, {}, m_TempDirectory);
+    m_Controller->SetFileAccessCheck([](const httplib::Request&) { return false; });
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", detachedNrrd));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", completeNrrd));
   }
 
   void PutDataUnsupportedContentType()

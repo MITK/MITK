@@ -260,6 +260,82 @@ namespace
    * @param allowedDirs The list of allowed directories.
    * @return Empty string on success, or error message on failure.
    */
+  std::string ToLower(std::string text)
+  {
+    std::transform(text.begin(), text.end(), text.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    return text;
+  }
+
+  /**
+   * @brief Tell whether uploaded data makes its reader open other files.
+   *
+   * Such an upload names files on the server's file system like a file
+   * reference does, just out of sight of the checks for those: a detached
+   * NRRD or MetaImage header, whatever the extension is, and the parallel
+   * VTK formats, which list their pieces.
+   *
+   * @param body The uploaded data.
+   * @param extension The extension that selects the reader, with its dot.
+   * @return What refers to other files, or an empty string.
+   */
+  std::string FindFileReference(const std::string& body, const std::string& extension)
+  {
+    const auto lowerExtension = ToLower(extension);
+
+    if (lowerExtension == ".pvti" || lowerExtension == ".pvtp")
+      return "Parallel VTK files refer to their pieces by file name.";
+
+    const bool isNrrd = body.compare(0, 4, "NRRD") == 0;
+    const bool isMetaImage = lowerExtension == ".mha" || lowerExtension == ".mhd";
+
+    if (!isNrrd && !isMetaImage)
+      return "";
+
+    // Both headers are lines of text. The NRRD header ends with an empty line,
+    // the MetaImage header with the line looked for.
+    std::istringstream lines(body);
+    std::string line;
+
+    while (std::getline(lines, line))
+    {
+      if (!line.empty() && line.back() == '\r')
+        line.pop_back();
+
+      if (isNrrd)
+      {
+        if (line.empty())
+          break;
+
+        const auto field = ToLower(line);
+
+        if (field.rfind("data file:", 0) == 0 || field.rfind("datafile:", 0) == 0)
+          return "The NRRD header refers to a data file.";
+      }
+      else
+      {
+        const auto separator = line.find('=');
+
+        if (separator == std::string::npos)
+          continue;
+
+        const auto trim = [](const std::string& text) {
+          const auto first = text.find_first_not_of(" \t");
+          const auto last = text.find_last_not_of(" \t");
+          return first == std::string::npos ? std::string() : text.substr(first, last - first + 1);
+        };
+
+        if (ToLower(trim(line.substr(0, separator))) != "elementdatafile")
+          continue;
+
+        return ToLower(trim(line.substr(separator + 1))) == "local"
+          ? ""
+          : "The MetaImage header refers to a data file.";
+      }
+    }
+
+    return "";
+  }
+
   std::string ValidateFilePath(const std::string& filePath,
                                FileAccessMode mode,
                                const std::vector<std::string>& allowedDirs)
@@ -821,7 +897,21 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
 
     if (extension.empty() && req.has_header(HEADER_DATA_FORMAT))
     {
-      extension = "." + req.get_header_value(HEADER_DATA_FORMAT);
+      const auto format = req.get_header_value(HEADER_DATA_FORMAT);
+
+      // The format becomes part of a file name: anything like a path separator would lead out of the temp directory.
+      const bool isExtension = !format.empty() && std::all_of(format.begin(), format.end(),
+        [](unsigned char c) { return std::isalnum(c) != 0 || c == '.'; });
+
+      if (!isExtension || format.find("..") != std::string::npos)
+      {
+        result.errorStatus = 400;
+        result.errorResponse = ErrorResponse::InvalidRequest(
+          "The X-MITK-Data-Format header must be a file extension like nrrd or nii.gz.", req.path);
+        return result;
+      }
+
+      extension = "." + format;
     }
 
     if (extension.empty())
@@ -831,6 +921,23 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
         "Cannot determine file format. Provide filename in Content-Disposition header "
         "or use X-MITK-Data-Format header.", req.path);
       return result;
+    }
+
+    // An upload that makes its reader open other files names files as a file
+    // reference does, so it needs the same rights. Under allowed directories
+    // it is refused for everyone: what it refers to is not known here.
+    const bool mayNameFiles = m_FileAccessMode == FileAccessMode::Unrestricted &&
+      (!m_FileAccessCheck || m_FileAccessCheck(req));
+
+    if (!mayNameFiles)
+    {
+      if (const auto reference = FindFileReference(req.body, extension); !reference.empty())
+      {
+        result.errorStatus = 403;
+        result.errorResponse = ErrorResponse::FileAccessDenied(
+          reference + " This client may not load data from files. Send data that is complete in one file.", req.path);
+        return result;
+      }
     }
 
     // Create temp file

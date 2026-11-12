@@ -283,6 +283,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   ScalarType maxValue = 0.0;
   ScalarType min2ndValue = 0.0;
   ScalarType max2ndValue = 0.0;
+  TimeStepType firstCountedTimeStep = 0;
+  TimeStepType countedTimeSteps = 1;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   if (guessByCentralSlice)
   {
@@ -321,6 +323,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
             maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
             min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
             max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+            firstCountedTimeStep = t;
 
             if (minValue != maxValue)
               break; // We found a time step with valid data
@@ -332,6 +335,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   else
   {
     const_cast<Image *>(image)->Update();
+    countedTimeSteps = image->GetDimension(3);
     minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
@@ -348,9 +352,19 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       if (min2ndValue > min2ndValueTemp)
         min2ndValue = min2ndValueTemp;
       ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
-      if (max2ndValue > max2ndValueTemp)
+      if (max2ndValue < max2ndValueTemp)
         max2ndValue = max2ndValueTemp;
     }
+  }
+
+  std::size_t minCount = 0;
+  std::size_t maxCount = 0;
+  for (auto t = firstCountedTimeStep; t < firstCountedTimeStep + countedTimeSteps; ++t)
+  {
+    if (image->GetStatistics()->GetScalarValueMinNoRecompute(t) == minValue)
+      minCount += image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute(t);
+    if (image->GetStatistics()->GetScalarValueMaxNoRecompute(t) == maxValue)
+      maxCount += image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute(t);
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
@@ -393,13 +407,10 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
 
-  size_t numPixelsInDataset = image->GetDimensions()[0];
-  for (decltype(image->GetDimension()) k = 1; k < image->GetDimension(); ++k)
-    numPixelsInDataset *= image->GetDimensions()[k];
-  const auto minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
-  const auto maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  const auto minCountFraction = minCount / static_cast<ScalarType>(numPixelsInDataset);
-  const auto maxCountFraction = maxCount / static_cast<ScalarType>(numPixelsInDataset);
+  const auto numCountedPixels = static_cast<ScalarType>(image->GetDimension(0)) * image->GetDimension(1) *
+                                image->GetDimension(2) * countedTimeSteps;
+  const auto minCountFraction = minCount / numCountedPixels;
+  const auto maxCountFraction = maxCount / numCountedPixels;
 
   //// binary image
   if (min2ndValue == maxValue)

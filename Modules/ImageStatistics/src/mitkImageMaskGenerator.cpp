@@ -18,7 +18,7 @@ namespace mitk {
 
 void ImageMaskGenerator::UpdateInternalMask()
 {
-  if (this->m_ImageMask.IsNull())
+  if (this->m_InputImage.IsNull())
   {
     mitkThrow() << "Cannot update internal mask. Input image is not set.";
   }

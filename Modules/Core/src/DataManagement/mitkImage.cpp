@@ -697,6 +697,10 @@ void mitk::Image::AllocateZeroedVolume(TimeStepType t, int n)
     mitkThrow() << "AllocateZeroedVolume: unsupported image dimension " << m_Dimension
                 << " (expected 1 to 3).";
 
+  if (!this->IsValidVolume(t, n))
+    mitkThrow() << "AllocateZeroedVolume: volume at t=" << t << ", n=" << n
+                << " is outside the image.";
+
   if (this->IsVolumeSet(t, n))
     mitkThrow() << "AllocateZeroedVolume: volume at t=" << t << ", n=" << n
                 << " is already allocated.";

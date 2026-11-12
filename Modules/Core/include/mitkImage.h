@@ -309,6 +309,7 @@ namespace mitk
      * \param[in] n Channel number (default: 0).
      * \pre Image must be initialized (IsInitialized() == true).
      * \pre Image dimension must be between 1 and 3.
+     * \pre (t, n) must be a valid volume of the image (IsValidVolume(t, n) == true).
      * \pre No volume data may already exist at (t, n).
      * \throw mitk::Exception if any precondition is violated.
      */

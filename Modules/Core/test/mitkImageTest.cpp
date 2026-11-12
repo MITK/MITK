@@ -209,6 +209,21 @@ public:
     MITK_TEST_CONDITION(!image->RequestedRegionIsOutsideOfTheBufferedRegion(),
                         "Complete requested slices are not reported as missing");
   }
+
+  void AllocateZeroedVolume_PositionOutsideImage_Throws()
+  {
+    unsigned int dimensions[] = {2, 2, 2};
+    auto image = mitk::Image::New();
+    image->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
+    image->AllocateZeroedVolume(1);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
+    image->AllocateZeroedVolume(0, 1);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
+  }
 };
 
 int mitkImageTest(int argc, char *argv[])
@@ -219,6 +234,7 @@ int mitkImageTest(int argc, char *argv[])
   tester.SetClonedGeometry_None_ClonedEqualInput();
   tester.RequestedRegion_VolumeMissingInSecondChannel_IsOutside();
   tester.RequestedRegion_SliceMissingInSecondTimeStep_IsOutside();
+  tester.AllocateZeroedVolume_PositionOutsideImage_Throws();
 
   // Create Image out of nowhere
   mitk::Image::Pointer imgMem = mitk::Image::New();

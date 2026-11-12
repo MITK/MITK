@@ -17,6 +17,23 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <nlohmann/json.hpp>
+#include <utility>
+
+namespace
+{
+  std::pair<mitk::ScalarType, mitk::ScalarType> GetFiniteMinMax(const mitk::Image *image, mitk::TimeStepType t)
+  {
+    auto minValue = image->GetStatistics()->GetScalarValueMin(t);
+    if (!std::isfinite(minValue))
+      minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
+
+    auto maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
+    if (!std::isfinite(maxValue))
+      maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+
+    return {minValue, maxValue};
+  }
+}
 
 void mitk::LevelWindow::EnsureConsistency()
 {
@@ -463,15 +480,12 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);
-  if (!std::isfinite(minValue))
+  auto [minValue, maxValue] = GetFiniteMinMax(image, 0);
+  for (TimeStepType t = 1; t < image->GetDimension(3); ++t)
   {
-    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-  }
-  ScalarType maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
-  if (!std::isfinite(maxValue))
-  {
-    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+    const auto [stepMinValue, stepMaxValue] = GetFiniteMinMax(image, t);
+    minValue = std::min(minValue, stepMinValue);
+    maxValue = std::max(maxValue, stepMaxValue);
   }
 
   SetRangeMinMax(minValue, maxValue);

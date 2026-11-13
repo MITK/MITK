@@ -1423,11 +1423,30 @@ bool WorkbenchPage::CloseEditors(
       partsToClose.push_back(refPart);
     }
   }
+  if (save)
+  {
+    QList<IWorkbenchPart::Pointer> partsToSave;
+    for (const auto& part : partsToClose)
+    {
+      const auto saveable = part.Cast<ISaveablePart>();
+      if (saveable.IsNotNull() && saveable->IsDirty() && saveable->IsSaveOnCloseNeeded())
+      {
+        partsToSave.push_back(part);
+      }
+    }
+
+    if (!partsToSave.empty() &&
+        !EditorManager::SaveAll(partsToSave, true, true, false, this->GetWorkbenchWindow()))
+    {
+      return false;
+    }
+  }
+
   SaveablesList::Pointer modelManager;
   SaveablesList::PostCloseInfo::Pointer postCloseInfo;
   if (partsToClose.size() > 0)
   {
-    modelManager = dynamic_cast<SaveablesList*>(
+    modelManager =dynamic_cast<SaveablesList*>(
           this->GetWorkbenchWindow()->GetService<ISaveablesLifecycleListener>());
     // this may prompt for saving and return 0 if the user canceled:
     postCloseInfo = modelManager->PreCloseParts(partsToClose, save,
@@ -2831,6 +2850,23 @@ void WorkbenchPage::RequestActivation(IWorkbenchPart::Pointer part)
  */
 void WorkbenchPage::ResetPerspective()
 {
+  QList<IWorkbenchPart::Pointer> viewsToSave;
+  for (const auto& viewReference : this->GetViewReferences())
+  {
+    const auto view = viewReference->GetView(false);
+    const auto saveable = view.Cast<ISaveablePart>();
+    if (saveable.IsNotNull() && saveable->IsDirty() && saveable->IsSaveOnCloseNeeded())
+    {
+      viewsToSave.push_back(view);
+    }
+  }
+
+  if (!viewsToSave.empty() &&
+      !EditorManager::SaveAll(viewsToSave, true, true, false, this->GetWorkbenchWindow()))
+  {
+    return;
+  }
+
   // Run op in busy cursor.
   // Use set redraw to eliminate the "flash" that can occur in the
   // coolbar as the perspective is reset.

@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QDesktopServices>
 #include <QDir>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QScrollBar>
 #include <QToolBar>
 #include <QUrl>
@@ -143,6 +144,47 @@ void QmitkReportEditor::OnLinkClicked(const QUrl& url)
   {
     QDesktopServices::openUrl(url);
   }
+}
+
+void QmitkReportEditor::DoSave()
+{
+  this->SaveAsHtml();
+}
+
+bool QmitkReportEditor::IsDirty() const
+{
+  const auto* store = QmitkReportsPluginActivator::GetStore();
+  const auto* report = store != nullptr ? store->Get(m_ReportId) : nullptr;
+
+  return report != nullptr && !report->Saved && !report->LossAccepted;
+}
+
+berry::ISaveablePart::CloseAnswer QmitkReportEditor::PromptToSaveOnClose()
+{
+  auto* store = QmitkReportsPluginActivator::GetStore();
+  const auto* report = store != nullptr ? store->Get(m_ReportId) : nullptr;
+
+  if (report == nullptr)
+    return CloseAnswer::Discard;
+
+  QMessageBox question(QMessageBox::Question, "Report Not Saved", QString(), QMessageBox::NoButton, m_View->window());
+  question.setTextFormat(Qt::PlainText);
+  question.setText(QStringLiteral("The report \"%1\" was not saved.").arg(report->Title));
+  auto* save = question.addButton("Save as HTML...", QMessageBox::AcceptRole);
+  question.addButton("Discard", QMessageBox::DestructiveRole);
+  auto* cancel = question.addButton(QMessageBox::Cancel);
+  question.setDefaultButton(save);
+  question.setEscapeButton(cancel);
+  question.exec();
+
+  if (question.clickedButton() == save)
+    return CloseAnswer::Save;
+
+  if (question.clickedButton() == cancel)
+    return CloseAnswer::Cancel;
+
+  store->AcceptLoss(m_ReportId);
+  return CloseAnswer::Discard;
 }
 
 void QmitkReportEditor::SaveAsHtml()

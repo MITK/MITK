@@ -27,9 +27,11 @@ A report exists only as long as its editor, and reports are not restored when th
 starts again. A report that was not saved, or that changed since you saved it, is not lost
 without asking:
 
-- When you close the editor's tab, the tab closes and a question follows: "Save as HTML..."
-  saves the report and discards it afterwards; "Discard" discards it. If you cancel the file
-  dialog, the question comes again.
+- When you close the editor's tab, the editor asks before it closes:
+  "Save as HTML..." saves the report and closes the editor, "Discard" closes it without saving,
+  and "Cancel" keeps it open. If you cancel the file dialog, the editor stays open. Where an
+  editor closes without asking, the question follows the close instead and has the same two
+  choices; if you cancel the file dialog there, the question comes again.
 - When you close the Workbench while reports are unsaved, the Workbench asks once for all of
   them: "Save as HTML..." saves each one, "Discard" discards them, and "Cancel" keeps the
   Workbench open.

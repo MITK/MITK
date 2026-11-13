@@ -107,11 +107,20 @@ public:
   bool SaveReport(int id, QWidget* parent);
 
   /**
+   * \brief Record that the user chose to give up the report without saving it.
+   *
+   * No question follows when its editor closes or the Workbench shuts down,
+   * until the report changes.
+   */
+  void AcceptLoss(int id);
+
+  /**
    * \brief Tell the store that the report's editor was closed.
    *
-   * A saved report is removed at once. For an unsaved one, the user is asked
-   * once the close has completed whether to save or discard it; the report is
-   * removed afterwards.
+   * A saved report, or one the user gave up, is removed at once. For any other,
+   * the user is asked once the close has completed whether to save or discard
+   * it, as editors do not always ask before they close; the report is removed
+   * afterwards.
    */
   void CloseReport(int id);
 
@@ -156,7 +165,6 @@ private:
 
   QMap<QString, QByteArray> CollectImages(const QString& html, const Report* report) const;
   void MarkSaved(int id);
-  void AcceptLoss(int id);
   void AskAboutClosedReports();
   bool ConfirmShutdown(bool forced);
   void ListenToWorkbench();

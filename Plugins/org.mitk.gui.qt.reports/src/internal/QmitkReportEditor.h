@@ -22,9 +22,11 @@ class QUrl;
  * \brief Shows a report of the QmitkReportStore, which the user can save as
  *        HTML or open in the web browser.
  *
- * The report lives as long as its editor: closing the editor removes it, after
- * asking the user whether to save it if it is unsaved. The question follows the
- * close, because a part cannot veto the closing of its tab.
+ * The report lives as long as its editor: closing the editor removes it. An
+ * unsaved report counts as dirty, and the editor asks the user before it is
+ * closed whether to save the report, discard it or keep the editor open. The
+ * store asks after the close if the editor was closed in a way that did not
+ * ask.
  */
 class QmitkReportEditor : public berry::QtEditorPart
 {
@@ -41,10 +43,16 @@ public:
   void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
   void SetFocus() override;
 
-  void DoSave() override {}
+  /** \brief Runs "Save as HTML...". */
+  void DoSave() override;
   void DoSaveAs() override {}
-  bool IsDirty() const override { return false; }
+
+  /** \brief Whether the report is neither saved nor given up. */
+  bool IsDirty() const override;
   bool IsSaveAsAllowed() const override { return false; }
+
+  /** \brief Asks whether to save the report as HTML, discard it or keep the editor open. */
+  CloseAnswer PromptToSaveOnClose() override;
 
 protected:
   void CreateQtPartControl(QWidget* parent) override;

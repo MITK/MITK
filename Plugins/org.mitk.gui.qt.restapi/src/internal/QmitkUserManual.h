@@ -45,6 +45,9 @@ public:
 
   struct SearchResult
   {
+    /** \brief The words of the query that count; without any, nothing can match. */
+    std::size_t WordCount = 0;
+
     std::size_t MatchCount = 0;
 
     /** \brief The best matches, with their text. */
@@ -66,6 +69,9 @@ public:
   QString Load(ctkPluginContext* context);
 
   bool IsLoaded() const;
+
+  /** \brief Whether the manual has no sections, as in a build without help files. */
+  bool IsEmpty() const;
 
   /**
    * \brief The sections that match the words of the query best.

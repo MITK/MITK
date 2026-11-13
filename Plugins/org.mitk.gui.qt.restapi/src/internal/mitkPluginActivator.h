@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <usServiceEvent.h>
 #include <usServiceReference.h>
 
+#include <vector>
+
 namespace mitk
 {
   struct IRestServerService;

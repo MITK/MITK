@@ -182,6 +182,49 @@ namespace
     return json;
   }
 
+  /**
+   * A query parameter that switches something on or off.
+   *
+   * \throw RestException with status 400 for a value other than true or false.
+   */
+  bool GetQueryFlag(const mitk::RestRequest& request, const std::string& name, bool defaultValue)
+  {
+    const auto value = request.GetQueryParam(name);
+
+    if (!value.has_value())
+      return defaultValue;
+
+    if (*value != "true" && *value != "false")
+      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(name + " must be true or false.", request.Path));
+
+    return *value == "true";
+  }
+
+  /**
+   * A query parameter that counts pixels.
+   *
+   * \throw RestException with status 400 unless the whole value is a number.
+   */
+  int ParsePixelCount(const std::string& name, const std::string& value, const std::string& path)
+  {
+    std::size_t used = 0;
+    int count = 0;
+
+    try
+    {
+      count = std::stoi(value, &used);
+    }
+    catch (const std::exception&)
+    {
+      used = std::string::npos;
+    }
+
+    if (used != value.size())
+      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(name + " must be a number of pixels.", path));
+
+    return count;
+  }
+
   /** The capture options that the query asks for. */
   QmitkRenderWindowScreenshot::Options GetScreenshotOptions(const mitk::RestRequest& request)
   {
@@ -189,16 +232,7 @@ namespace
     options.MaxSize = DefaultMaxScreenshotSize;
 
     if (const auto value = request.GetQueryParam("max_size"); value.has_value())
-    {
-      try
-      {
-        options.MaxSize = static_cast<unsigned int>(std::clamp(std::stoi(*value), 100, 4000));
-      }
-      catch (const std::exception&)
-      {
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("max_size must be a number of pixels.", request.Path));
-      }
-    }
+      options.MaxSize = static_cast<unsigned int>(std::clamp(ParsePixelCount("max_size", *value, request.Path), 100, 4000));
 
     if (const auto background = request.GetQueryParam("background"); background.has_value())
     {
@@ -220,8 +254,7 @@ namespace
       }
     }
 
-    if (const auto decorations = request.GetQueryParam("decorations"); decorations.has_value())
-      options.Decorations = *decorations != "false";
+    options.Decorations = GetQueryFlag(request, "decorations", options.Decorations);
 
     if (const auto scale = request.GetQueryParam("scale"); scale.has_value())
     {
@@ -231,23 +264,14 @@ namespace
       options.Magnification = static_cast<unsigned int>(std::stoi(*scale));
     }
 
-    options.CropToContent = request.GetQueryParam("crop").value_or("") == "true";
+    options.CropToContent = GetQueryFlag(request, "crop", false);
 
     if (const auto padding = request.GetQueryParam("padding"); padding.has_value())
     {
       if (!options.CropToContent)
         throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding needs crop=true.", request.Path));
 
-      int value = 0;
-
-      try
-      {
-        value = std::stoi(*padding);
-      }
-      catch (const std::exception&)
-      {
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding must be a number of pixels.", request.Path));
-      }
+      const auto value = ParsePixelCount("padding", *padding, request.Path);
 
       if (value < 0 || 2 * value >= static_cast<int>(options.MaxSize))
         throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding must be 0 or more and less than half of max_size.", request.Path));
@@ -438,7 +462,11 @@ namespace
     center[0] = (lower[0] + upper[0]) / 2.0;
     center[1] = (lower[1] + upper[1]) / 2.0;
 
-    renderer->GetCameraController()->SetScaleFactorInMMPerDisplayUnit(millimetersPerPixel);
+    // Corners that coincide in the plane, like those of a line that runs through it, give no
+    // zoom: a scale of zero would blank the window and leave its mouse zoom without effect.
+    if (millimetersPerPixel > 0.0)
+      renderer->GetCameraController()->SetScaleFactorInMMPerDisplayUnit(millimetersPerPixel);
+
     renderer->GetCameraController()->MoveCameraToPoint(center);
   }
 
@@ -483,11 +511,12 @@ namespace
       distance = std::max({ distance, depth + y / tanVertical, depth + x / tanHorizontal });
     }
 
-    if (camera->GetParallelProjection())
-    {
+    // Corners that coincide give neither a scale nor a distance, so the camera keeps its own.
+    if (camera->GetParallelProjection() && extent > 0.0)
       camera->SetParallelScale(extent);
+
+    if (camera->GetParallelProjection() || distance <= 0.0)
       distance = camera->GetDistance();
-    }
 
     camera->SetFocalPoint(center[0], center[1], center[2]);
     camera->SetPosition(center[0] - direction[0] * distance, center[1] - direction[1] * distance, center[2] - direction[2] * distance);
@@ -495,7 +524,7 @@ namespace
     renderer->ResetCameraClippingRange();
   }
 
-  std::optional<double> GetImageValue(mitk::Image* image, const mitk::Point3D& point, mitk::TimePointType timePoint)
+  std::optional<double> GetImageValue(const mitk::Image* image, const mitk::Point3D& point, mitk::TimePointType timePoint)
   {
     const auto* timeGeometry = image->GetTimeGeometry();
 
@@ -513,14 +542,14 @@ namespace
 
     mitk::ScalarType value = 0;
     mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess, image->GetChannelDescriptor().GetPixelType(),
-      mitk::Image::Pointer(image), image->GetVolumeData(timeStep), index, value, 0);
+      mitk::Image::ConstPointer(image), image->GetVolumeData(timeStep), index, value, 0);
 
     return value;
   }
 
-  /** The grey values and labels under a point, in the data that a window shows. */
+  /** The gray values and labels under a point, in the data that a window shows. */
   nlohmann::json DescribeData(const mitk::Point3D& point, mitk::BaseRenderer* renderer,
-    const mitk::DataStorage* dataStorage, mitk::IRestServerService* server)
+    const mitk::DataStorage* dataStorage, const mitk::IRestServerService* server)
   {
     auto values = nlohmann::json::array();
 
@@ -540,7 +569,7 @@ namespace
 
       nlohmann::json entry = { { "uid", server->GetNodeUid(node) }, { "name", node->GetName() } };
 
-      if (auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData()); segmentation != nullptr)
+      if (const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()); segmentation != nullptr)
       {
         auto labels = nlohmann::json::array();
 
@@ -558,7 +587,7 @@ namespace
 
         entry["labels"] = labels;
       }
-      else if (auto* image = dynamic_cast<mitk::Image*>(node->GetData()); image != nullptr)
+      else if (const auto* image = dynamic_cast<const mitk::Image*>(node->GetData()); image != nullptr)
       {
         const auto value = GetImageValue(image, point, timePoint);
 
@@ -617,7 +646,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     const auto body = request.GetJsonBody();
 
     if (!body.contains("index") || !body["index"].is_number_integer())
-      throw RestException(ErrorResponse::InvalidRequest("\"index\", the number of a slice, is missing.", request.Path));
+      throw RestException(ErrorResponse::InvalidRequest("\"index\", the number of a slice, is missing or no integer.", request.Path));
 
     const auto index = body["index"].get<std::int64_t>();
     const auto& id = request.PathParams.at("id");
@@ -660,7 +689,8 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     "margin (optional, default 0.2), the space around "
     "them as a share of their size. A 2D window shows the slice through their center and zooms so that they fill "
     "it. The 3D window keeps its direction, which the camera endpoint's standard_view sets, and moves so that they "
-    "fill it. Returns {data: window} as GET /api/v1/rendering/windows describes it.";
+    "fill it. A window in which they have no extent keeps its zoom and only centers on them. Returns {data: "
+    "window} as GET /api/v1/rendering/windows describes it.";
   focus.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     const auto margin = body.value("margin", 0.2);
@@ -680,6 +710,11 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       return node;
     };
 
+    const auto labelNotFound = [&request](std::uint64_t value) {
+      return RestException(ErrorResponse::Create("LABEL_NOT_FOUND", "Not Found",
+        "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path));
+    };
+
     DataNode::Pointer segmentationNode;
     std::vector<MultiLabelSegmentation::LabelValueType> labels;
     std::vector<DataNode::Pointer> nodes;
@@ -693,7 +728,13 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
         if (!value.is_number_unsigned())
           throw RestException(ErrorResponse::InvalidRequest("labels are label values, numbers.", request.Path));
 
-        labels.push_back(value.get<MultiLabelSegmentation::LabelValueType>());
+        // No label has a value beyond the range of its type, which the conversion would wrap into.
+        const auto label = value.get<std::uint64_t>();
+
+        if (label > std::numeric_limits<MultiLabelSegmentation::LabelValueType>::max())
+          throw labelNotFound(label);
+
+        labels.push_back(static_cast<MultiLabelSegmentation::LabelValueType>(label));
       }
 
       if (labels.empty())
@@ -727,10 +768,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
         for (const auto value : labels)
         {
           if (!segmentation->ExistLabel(value))
-          {
-            throw RestException(ErrorResponse::Create("LABEL_NOT_FOUND", "Not Found",
-              "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path));
-          }
+            throw labelNotFound(value);
         }
 
         corners = GetLabelCorners(segmentation, labels, GetSelectedTimeStep(segmentationNode, request.Path));
@@ -745,7 +783,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       {
         for (const auto& node : nodes)
         {
-          const auto* data = node->GetData();
+          auto* data = node->GetData();
 
           if (data == nullptr)
             continue;
@@ -755,6 +793,10 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
           if (const auto* figure = dynamic_cast<const PlanarFigure*>(data); figure != nullptr)
           {
             const auto* plane = figure->GetPlaneGeometry();
+
+            // A figure has no plane until its placement reaches a render window.
+            if (plane == nullptr)
+              continue;
 
             for (const auto& contour : figure->GetContours())
             {
@@ -769,7 +811,13 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
             continue;
           }
 
-          const auto* geometry = data->GetGeometry(GetSelectedTimeStep(node, request.Path));
+          const auto timeStep = GetSelectedTimeStep(node, request.Path);
+
+          // Point sets compute their bounds only on request, and one without points keeps its initial ones.
+          if (data->IsEmptyTimeStep(timeStep))
+            continue;
+
+          const auto* geometry = data->GetUpdatedGeometry(timeStep);
 
           for (int corner = 0; corner < 8; ++corner)
             corners.push_back(geometry->GetCornerPoint(corner));
@@ -882,10 +930,10 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     if (!body.contains("maximized") || !(body["maximized"].is_null() || body["maximized"].is_string()))
       throw RestException(ErrorResponse::InvalidRequest("\"maximized\" must be the id of a window or null.", request.Path));
 
-    const auto target = body["maximized"].is_null() ? std::string() : body["maximized"].get<std::string>();
+    const auto target = body["maximized"].is_null() ? std::optional<std::string>() : body["maximized"].get<std::string>();
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      auto* targetWindow = target.empty() ? nullptr : FindRenderWindow(target, request.Path);
+      auto* targetWindow = target.has_value() ? FindRenderWindow(*target, request.Path) : nullptr;
 
       try
       {
@@ -918,9 +966,10 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   screenshot.Summary = "Take a screenshot of a render window that points can be read off";
   screenshot.Description =
     "Path parameter: id, one of axial, sagittal, coronal, 3d. Query parameters, all optional: max_size (default "
-    "1000), the longest side in pixels; grid=true draws faint lines every 50 pixels, labeled every 100; "
+    "1000, clamped to 100 to 4000), the longest side in pixels; grid=true draws faint lines every 50 pixels, "
+    "labeled every 100; "
     "background, transparent or a color like #ffffff instead of the window's; decorations=false leaves out "
-    "the corner texts, logo and border; scale, 2 to 4, renders that many pixels per window pixel, without "
+    "the corner texts, logo, border and the gradient of the background; scale, 2 to 4, renders that many pixels per window pixel, without "
     "decorations, for sharper images (raise max_size with it); crop=true cuts the image down to the part of the "
     "scene that is not background, without decorations, and padding keeps that many pixels of background "
     "around it. As the Screenshot Maker view takes them; transparent is transparent where "
@@ -929,7 +978,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     "[width, height]. Endpoints that take points accept pixels of the screenshot with that window and image_size, "
     "unless it is cropped: its pixels no longer map onto the window, so crop does not go with grid either.";
   screenshot.Handler = [server](const RestRequest& request) {
-    const bool grid = request.GetQueryParam("grid").value_or("") == "true";
+    const bool grid = GetQueryFlag(request, "grid", false);
     const auto options = GetScreenshotOptions(request);
     const auto& id = request.PathParams.at("id");
 
@@ -941,7 +990,8 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
 
     return CallInGuiThread(*server, [&request, &id, &options, grid]() {
       auto* window = FindRenderWindow(id, request.Path);
-      auto* renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(FindStdMultiWidgetEditor().GetPointer());
+      const auto editor = FindStdMultiWidgetEditor();
+      auto* renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
 
       auto image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
 
@@ -957,8 +1007,9 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
 
       QByteArray png;
       QBuffer buffer(&png);
-      buffer.open(QIODevice::WriteOnly);
-      image.save(&buffer, "PNG");
+
+      if (!buffer.open(QIODevice::WriteOnly) || !image.save(&buffer, "PNG"))
+        throw RestException(ErrorResponse::InternalError("The screenshot could not be encoded.", request.Path));
 
       auto info = DescribeWindow(id, window);
       info["image_size"] = { image.width(), image.height() };
@@ -975,8 +1026,9 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   pick.Path = "/rendering/windows/:id/pick";
   pick.Summary = "Find the world coordinates and data values under pixels of a screenshot";
   pick.Description =
-    "Path parameter: id of a 2D window. Body: {pixels: [[x, y], ...], image_size: [width, height]} of a "
-    "screenshot of that window. Returns {data: [{position: [x, y, z] in millimeters, data: [{uid, name, "
+    "Path parameter: id of a window. Body: {pixels: [[x, y], ...], image_size: [width, height]} of a "
+    "screenshot of that window, which must be a 2D window, or {points: [[x, y, z], ...]} in millimeters. "
+    "Returns {data: [{position: [x, y, z] in millimeters, data: [{uid, name, "
     "value} for images, {uid, name, labels: [{value, name}]} for segmentations]}]}, for the data the window "
     "shows at each point.";
   pick.Handler = [server](const RestRequest& request) {

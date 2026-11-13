@@ -31,7 +31,7 @@ namespace mitk
    * \param context The plugin context, whose data directory holds a copy of
    *        the help files. Must outlive the routes.
    */
-  std::vector<RestRoute> CreateManualRoutes(IRestServerService* server, ctkPluginContext* context);
+  std::vector<RestRoute> CreateManualRoutes(const IRestServerService* server, ctkPluginContext* context);
 }
 
 #endif

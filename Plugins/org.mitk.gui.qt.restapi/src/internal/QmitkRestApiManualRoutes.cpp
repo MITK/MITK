@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkRestGuiThread.h>
 
+#include <charconv>
 #include <memory>
 
 namespace
@@ -48,12 +49,19 @@ namespace
       if (!error.isEmpty())
         throw mitk::RestException(mitk::ErrorResponse::InternalError(error.toStdString(), path));
 
+      // Without this, every search would look like one that found nothing.
+      if (manual->IsEmpty())
+      {
+        throw mitk::RestException(mitk::ErrorResponse::Create("MANUAL_NOT_AVAILABLE", "Service Unavailable",
+          "This build of the application has no user manual.", 503, path));
+      }
+
       return function(*manual);
     });
   }
 }
 
-std::vector<mitk::RestRoute> mitk::CreateManualRoutes(IRestServerService* server, ctkPluginContext* context)
+std::vector<mitk::RestRoute> mitk::CreateManualRoutes(const IRestServerService* server, ctkPluginContext* context)
 {
   auto manual = std::make_shared<QmitkUserManual>();
 
@@ -76,6 +84,9 @@ std::vector<mitk::RestRoute> mitk::CreateManualRoutes(IRestServerService* server
     const auto result = UseManual(*server, manual, context, request.Path, [&query](const QmitkUserManual& userManual) {
       return userManual.Search(QString::fromStdString(*query));
     });
+
+    if (result.WordCount == 0)
+      throw RestException(ErrorResponse::InvalidRequest("The query needs a word of at least three letters.", request.Path));
 
     auto sections = nlohmann::json::array();
     auto otherSections = nlohmann::json::array();
@@ -101,16 +112,12 @@ std::vector<mitk::RestRoute> mitk::CreateManualRoutes(IRestServerService* server
     "Path parameter: id, from a search. Returns {data: {id, page, title, text, cut_off}}; very long "
     "sections are cut off.";
   section.Handler = [server, manual, context](const RestRequest& request) {
+    const auto& text = request.PathParams.at("id");
+    const auto* textEnd = text.data() + text.size();
     std::size_t id = 0;
 
-    try
-    {
-      id = std::stoull(request.PathParams.at("id"));
-    }
-    catch (const std::exception&)
-    {
+    if (const auto [end, error] = std::from_chars(text.data(), textEnd, id); error != std::errc() || end != textEnd)
       throw RestException(ErrorResponse::InvalidRequest("The section id must be a number.", request.Path));
-    }
 
     const auto result = UseManual(*server, manual, context, request.Path, [id](const QmitkUserManual& userManual) {
       return userManual.GetSection(id);

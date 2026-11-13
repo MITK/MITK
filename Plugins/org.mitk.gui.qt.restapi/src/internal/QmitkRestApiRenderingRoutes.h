@@ -22,11 +22,13 @@ namespace mitk
   struct IRestServerService;
 
   /**
-   * \brief The endpoints below /api/v1/rendering/windows: the render windows
-   *        of the standard display and their slices, screenshots that clients
-   *        can point into, and what lies under such points.
+   * \brief The endpoints below /api/v1/rendering: the render windows of the
+   *        standard display and their slices, crosshair and layout,
+   *        screenshots that clients can point into, and what lies under such
+   *        points.
    *
-   * \param server Resolves the UIDs of nodes. Must outlive the routes.
+   * \param server Resolves the UIDs of nodes, gives the data storage and
+   *        runs the work in the GUI thread. Must outlive the routes.
    */
   std::vector<RestRoute> CreateRenderingRoutes(IRestServerService* server);
 }

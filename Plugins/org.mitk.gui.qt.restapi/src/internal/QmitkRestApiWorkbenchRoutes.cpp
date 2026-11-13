@@ -32,6 +32,7 @@ found in the LICENSE file.
 
 #include <QItemSelectionModel>
 
+#include <charconv>
 #include <chrono>
 #include <cmath>
 #include <optional>
@@ -99,7 +100,7 @@ namespace
     return { nodes.begin(), nodes.end() };
   }
 
-  nlohmann::json ToJson(const std::vector<mitk::DataNode::Pointer>& nodes, mitk::IRestServerService* server)
+  nlohmann::json ToJson(const std::vector<mitk::DataNode::Pointer>& nodes, const mitk::IRestServerService* server)
   {
     auto json = nlohmann::json::array();
 
@@ -144,16 +145,12 @@ namespace
 
   std::optional<mitk::ProgressTaskInfo> FindTask(const mitk::RestRequest& request)
   {
+    const auto& text = request.PathParams.at("id");
+    const auto* textEnd = text.data() + text.size();
     mitk::ProgressTaskId id = 0;
 
-    try
-    {
-      id = std::stoull(request.PathParams.at("id"));
-    }
-    catch (const std::exception&)
-    {
+    if (const auto [end, error] = std::from_chars(text.data(), textEnd, id); error != std::errc() || end != textEnd)
       throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The task id must be a number.", request.Path));
-    }
 
     for (const auto& task : mitk::CoreServices::GetProgressService()->GetActiveTasks())
     {
@@ -188,7 +185,7 @@ namespace
   }
 }
 
-std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(IRestServerService* server)
+std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerService* server)
 {
   std::vector<RestRoute> routes;
 
@@ -200,7 +197,12 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(IRestServerService* ser
     "Query parameter: open=true (optional) lists only open views. Returns {data: [{id, label, category, "
     "description, open, visible}]}; visible means the view is open and not covered by another one.";
   views.Handler = [server](const RestRequest& request) {
-    const auto onlyOpen = request.GetQueryParam("open").value_or("") == "true";
+    const auto open = request.GetQueryParam("open").value_or("false");
+
+    if (open != "true" && open != "false")
+      throw RestException(ErrorResponse::InvalidRequest("open must be true or false.", request.Path));
+
+    const bool onlyOpen = open == "true";
 
     return RestResponse::FromData(CallInGuiThread(*server, [&request, onlyOpen]() {
       const auto page = GetWindow(request.Path)->GetActivePage();
@@ -240,7 +242,8 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(IRestServerService* ser
   openView.Summary = "Open or close a view of the Workbench";
   openView.Description =
     "Body: {open: true|false}. Opening shows the view in front of the others of its tab group, without "
-    "taking the keyboard focus from the user. Returns {data: view}, as GET does.";
+    "taking the keyboard focus from the user; but if the active view is in that tab group, the active view "
+    "stays in front and visible stays false. Returns {data: view}, as GET does.";
   openView.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -296,10 +299,13 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(IRestServerService* ser
 
     for (const auto& uid : body["uids"])
     {
-      auto node = uid.is_string() ? server->FindNode(uid.get<std::string>()) : nullptr;
+      if (!uid.is_string())
+        throw RestException(ErrorResponse::InvalidRequest("Each entry of \"uids\" must be a node UID, a string.", request.Path));
+
+      auto node = server->FindNode(uid.get<std::string>());
 
       if (node.IsNull())
-        throw RestException(ErrorResponse::NodeNotFound(uid.is_string() ? uid.get<std::string>() : uid.dump(), request.Path));
+        throw RestException(ErrorResponse::NodeNotFound(uid.get<std::string>(), request.Path));
 
       nodes.push_back(node);
     }
@@ -323,11 +329,17 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(IRestServerService* ser
 
       // The Data Manager derives the "selected" properties from the
       // selection service, which lags behind when the selection is set from
-      // outside, so they are set again afterwards.
-      for (const auto& node : nodes)
-        node->SetSelected(true);
+      // outside, so they are set again afterwards, for the nodes it took.
+      const auto taken = GetDataManagerSelection(request.Path);
 
-      return GetDataManagerSelection(request.Path);
+      for (const auto& node : taken)
+      {
+        if (node.IsNotNull())
+          node->SetSelected(true);
+      }
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      return taken;
     });
 
     return RestResponse::FromData(ToJson(selected, server));

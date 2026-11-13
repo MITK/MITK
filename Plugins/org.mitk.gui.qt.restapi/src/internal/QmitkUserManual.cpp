@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkUserManual.h"
 
+#include <mitkLog.h>
+
 #include <ctkPlugin.h>
 #include <ctkPluginContext.h>
 
@@ -30,6 +32,12 @@ namespace
   constexpr std::size_t MaxListedSections = 15;
   constexpr qsizetype MaxSearchSectionLength = 6000;
   constexpr qsizetype MaxReadSectionLength = 20000;
+
+  /** Pages that Doxygen generates for navigation; they hold no part of the manual. */
+  bool IsNavigationPage(const QString& fileName)
+  {
+    return fileName == "index.html" || fileName == "pages.html" || fileName == "doxygen_crawl.html" || fileName.startsWith("dir_");
+  }
 }
 
 QString QmitkUserManual::Load(ctkPluginContext* context)
@@ -44,14 +52,22 @@ QString QmitkUserManual::Load(ctkPluginContext* context)
   QDir directory(context->getDataFile("manual").absoluteFilePath());
   directory.removeRecursively();
 
+  // The path names the user's profile, so it goes to the log and not into
+  // the returned message, which a client may pass on.
   if (!directory.mkpath("."))
-    return QString("Cannot create %1.").arg(directory.absolutePath());
+  {
+    MITK_ERROR << "Cannot create " << directory.absolutePath().toStdString() << " for the user manual.";
+    return "Cannot create the directory for the copy of the help files.";
+  }
 
   QHelpEngineCore engine(directory.filePath("manual.qhc"));
   engine.setReadOnly(false);
 
   if (!engine.setupData())
-    return QString("Cannot open the help collection: %1").arg(engine.error());
+  {
+    MITK_ERROR << "Cannot open the help collection of the user manual: " << engine.error().toStdString();
+    return "Cannot open the help collection.";
+  }
 
   constexpr auto ReadableStates = ctkPlugin::RESOLVED | ctkPlugin::STARTING | ctkPlugin::ACTIVE | ctkPlugin::STOPPING;
 
@@ -80,7 +96,10 @@ QString QmitkUserManual::Load(ctkPluginContext* context)
   for (const auto& namespaceName : engine.registeredDocumentations())
   {
     for (const auto& url : engine.files(namespaceName, QString(), "html"))
-      this->AddPage(QString::fromUtf8(engine.fileData(url)));
+    {
+      if (!IsNavigationPage(url.fileName()))
+        this->AddPage(QString::fromUtf8(engine.fileData(url)));
+    }
   }
 
   m_Loaded = true;
@@ -90,6 +109,11 @@ QString QmitkUserManual::Load(ctkPluginContext* context)
 bool QmitkUserManual::IsLoaded() const
 {
   return m_Loaded;
+}
+
+bool QmitkUserManual::IsEmpty() const
+{
+  return m_Entries.empty();
 }
 
 void QmitkUserManual::AddPage(const QString& html)
@@ -137,7 +161,10 @@ QmitkUserManual::Section QmitkUserManual::MakeSection(std::size_t id, qsizetype 
   if (maxLength > 0)
   {
     section.IsCut = entry.Text.size() > maxLength;
-    section.Text = entry.Text.left(maxLength);
+
+    // A cut between the halves of a surrogate pair would leave half a character.
+    const auto length = section.IsCut && entry.Text.at(maxLength - 1).isHighSurrogate() ? maxLength - 1 : maxLength;
+    section.Text = entry.Text.left(length);
   }
 
   return section;
@@ -145,7 +172,7 @@ QmitkUserManual::Section QmitkUserManual::MakeSection(std::size_t id, qsizetype 
 
 QmitkUserManual::SearchResult QmitkUserManual::Search(const QString& query) const
 {
-  static const QRegularExpression separators("[^\\w]+");
+  static const QRegularExpression separators("[^\\w]+", QRegularExpression::UseUnicodePropertiesOption);
 
   std::set<QString> words;
 
@@ -159,7 +186,9 @@ QmitkUserManual::SearchResult QmitkUserManual::Search(const QString& query) cons
 
   for (std::size_t i = 0; i < m_Entries.size() && !words.empty(); ++i)
   {
-    const auto title = (m_Entries[i].Page + ' ' + m_Entries[i].Title).toLower();
+    // The first section of a page is titled like the page, whose name counts once.
+    const auto& entry = m_Entries[i];
+    const auto title = (entry.Title == entry.Page ? entry.Page : entry.Page + ' ' + entry.Title).toLower();
     const auto text = m_Entries[i].Text.toLower();
     int score = 0;
 
@@ -168,7 +197,8 @@ QmitkUserManual::SearchResult QmitkUserManual::Search(const QString& query) cons
       const auto inTitle = title.count(word);
       const auto inText = std::min<qsizetype>(text.count(word), 10);
 
-      // Sections that contain more of the words come first.
+      // A word that occurs at all outweighs most repetitions of another one,
+      // so sections that contain more of the words tend to come first.
       if (inTitle + inText > 0)
         score += 20;
 
@@ -182,6 +212,7 @@ QmitkUserManual::SearchResult QmitkUserManual::Search(const QString& query) cons
   std::stable_sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) { return a.first > b.first; });
 
   SearchResult result;
+  result.WordCount = words.size();
   result.MatchCount = scores.size();
 
   for (std::size_t i = 0; i < std::min(MaxFullSections + MaxListedSections, scores.size()); ++i)

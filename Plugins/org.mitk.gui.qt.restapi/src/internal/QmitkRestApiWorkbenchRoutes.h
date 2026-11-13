@@ -27,7 +27,7 @@ namespace mitk
    *
    * \param server Resolves the UIDs of nodes. Must outlive the routes.
    */
-  std::vector<RestRoute> CreateWorkbenchRoutes(IRestServerService* server);
+  std::vector<RestRoute> CreateWorkbenchRoutes(const IRestServerService* server);
 }
 
 #endif

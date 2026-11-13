@@ -221,6 +221,9 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     auto calculator = mitk::ImageStatisticsCalculator::New();
     calculator->SetInputImage(image);
 
+    if (!selection.All)
+      calculator->SetTimeSteps({ timeSteps.front() });
+
     if (segmentation.IsNotNull())
     {
       auto maskGenerator = mitk::MultiLabelMaskGenerator::New();

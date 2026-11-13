@@ -529,7 +529,8 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
   create.Path = "/planar-figures";
   create.Summary = "Draw a line, circle or rectangle in a 2D window, as the Measurement view does";
   create.Description =
-    "The figure lies in the plane of the slice that the window shows now, as if drawn there with the mouse. Body: "
+    "The figure lies in the plane of the slice that the window shows now. The points must lie in that plane and "
+    "are taken as given, also beyond the extent of the plane. Body: "
     "{type: line, circle or rectangle; image: the uid of the image the figure marks, which becomes its parent in "
     "the Data Manager; window: axial, sagittal or coronal; two points, either pixels: [[x, y], [x, y]] of a "
     "screenshot of the window with image_size, as GET /api/v1/rendering/windows/{id}/screenshot describes it, "

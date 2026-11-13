@@ -169,7 +169,11 @@ signals:
   /** \brief One event of the conversation, as Claude Code reported it. */
   void MessageReceived(const QJsonObject& message);
 
-  /** \brief Claude Code is ready for messages, and lists the models the account can use. */
+  /**
+   * \brief Claude Code is ready for messages, and lists the models the account can use.
+   *
+   * Not emitted if it lists no model.
+   */
   void Initialized(const QList<QmitkClaudeCodeProcess::ModelInfo>& models);
 
   /** \brief The process ended. \p errorOutput is the end of what it wrote to stderr. */

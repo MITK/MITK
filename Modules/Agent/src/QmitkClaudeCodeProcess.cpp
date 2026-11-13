@@ -89,20 +89,22 @@ QmitkClaudeCodeProcess::~QmitkClaudeCodeProcess()
 
 QString QmitkClaudeCodeProcess::FindExecutable()
 {
-  const auto onPath = QStandardPaths::findExecutable("claude");
+#ifdef Q_OS_WIN
+  // With the extension, as the search would otherwise end at the .cmd
+  // wrapper of an npm install that comes first on the PATH.
+  const QString name = "claude.exe";
+#else
+  const QString name = "claude";
+#endif
+
+  const auto onPath = QStandardPaths::findExecutable(name);
 
   if (IsUsableExecutable(onPath))
     return onPath;
 
   // Where the native installer puts it, in case the PATH of the application
   // differs from the one of the user's shell.
-  const QDir localBin(QDir::home().filePath(".local/bin"));
-
-#ifdef Q_OS_WIN
-  const auto installed = localBin.filePath("claude.exe");
-#else
-  const auto installed = localBin.filePath("claude");
-#endif
+  const auto installed = QDir::home().filePath(".local/bin/" + name);
 
   return IsUsableExecutable(installed) ? installed : QString();
 }
@@ -179,8 +181,18 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(bool ignoreApiKeyVari
   // The MCP server listens on 127.0.0.1, which a configured HTTP proxy would
   // look for on its own host. Which spelling Claude Code reads first is not
   // known, so both get the combined list.
-  auto noProxy = environment.value("no_proxy", environment.value("NO_PROXY"));
-  noProxy = noProxy.isEmpty() ? QString("127.0.0.1") : noProxy + ",127.0.0.1";
+  QStringList exempt;
+
+  for (const auto& name : { QString("no_proxy"), QString("NO_PROXY") })
+  {
+    // One variable on Windows, where names ignore the case.
+    if (const auto value = environment.value(name); !value.isEmpty() && !exempt.contains(value))
+      exempt << value;
+  }
+
+  exempt << "127.0.0.1";
+
+  const auto noProxy = exempt.join(',');
   environment.insert("no_proxy", noProxy);
   environment.insert("NO_PROXY", noProxy);
 
@@ -329,6 +341,14 @@ void QmitkClaudeCodeProcess::OnControlResponse(const QJsonObject& message)
 
     if (!model.Value.isEmpty())
       models << model;
+  }
+
+  // Listeners take the list for what the account can use and would drop the
+  // user's choice of a model over an answer that could not be read.
+  if (models.isEmpty())
+  {
+    MITK_WARN << "Claude Code did not list any models.";
+    return;
   }
 
   emit Initialized(models);

@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QFutureWatcher>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QSaveFile>
 #include <QStandardPaths>
 #include <QTimer>
 #include <QtConcurrent>
@@ -294,13 +295,13 @@ bool QmitkAgentSession::Send(const QString& text)
     return false;
   }
 
-  emit UserMessageAdded(text);
-
   if (!m_Process->IsRunning())
     this->StartProcess();
 
   if (!m_Process->IsRunning())
-    return true;
+    return false;
+
+  emit UserMessageAdded(text);
 
   if (m_Stopping)
   {
@@ -411,16 +412,21 @@ void QmitkAgentSession::StartProcess()
   };
 
   const auto configPath = m_Directory.filePath("mcp.json");
-  QFile config(configPath);
+  QSaveFile config(configPath);
 
-  if (!config.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  if (!config.open(QIODevice::WriteOnly))
   {
     emit ErrorAdded(QString("Cannot write %1.").arg(configPath));
     return;
   }
 
   config.write(QJsonDocument(QJsonObject{ { "mcpServers", QJsonObject{ { McpServerName, server } } } }).toJson());
-  config.close();
+
+  if (!config.commit())
+  {
+    emit ErrorAdded(QString("Cannot write %1.").arg(configPath));
+    return;
+  }
 
   QFile promptResource(":/Agent/AgentSystemPrompt.md");
 
@@ -431,13 +437,9 @@ void QmitkAgentSession::StartProcess()
   }
 
   const auto promptPath = m_Directory.filePath("system-prompt.md");
-  QFile prompt(promptPath);
+  QSaveFile prompt(promptPath);
 
-  // Earlier versions copied the resource, which left a read-only file.
-  if (prompt.exists())
-    prompt.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-
-  if (!prompt.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  if (!prompt.open(QIODevice::WriteOnly))
   {
     emit ErrorAdded(QString("Cannot write %1.").arg(promptPath));
     return;
@@ -445,7 +447,12 @@ void QmitkAgentSession::StartProcess()
 
   prompt.write(promptResource.readAll());
   prompt.write(m_Memory->Describe().toUtf8());
-  prompt.close();
+
+  if (!prompt.commit())
+  {
+    emit ErrorAdded(QString("Cannot write %1.").arg(promptPath));
+    return;
+  }
 
   auto options = this->GetBaseOptions();
   options.McpConfigFile = configPath;
@@ -478,6 +485,11 @@ void QmitkAgentSession::SetActivity(const QString& activity)
 
 void QmitkAgentSession::OnMessageReceived(const QJsonObject& message)
 {
+  // Killing the process delivers what it still had to say, which is no
+  // longer part of the conversation.
+  if (m_Killing)
+    return;
+
   const auto type = message.value("type").toString();
 
   if (type == "system")
@@ -515,31 +527,57 @@ void QmitkAgentSession::OnSystemMessage(const QJsonObject& message)
 
   m_SessionId = message.value("session_id").toString();
 
+  bool serverListed = false;
+
   for (const auto& server : message.value("mcp_servers").toArray())
   {
     const auto object = server.toObject();
 
-    if (object.value("name").toString() == McpServerName && object.value("status").toString() != "connected")
+    if (object.value("name").toString() != McpServerName)
+      continue;
+
+    serverListed = true;
+
+    if (object.value("status").toString() != "connected")
       emit ErrorAdded(QString("Claude Code could not connect to the Workbench tools (%1).").arg(object.value("status").toString()));
   }
 
-  // Built-in tools would give the agent the user's files and a shell.
-  for (const auto& tool : message.value("tools").toArray())
+  if (!serverListed)
+    emit ErrorAdded("Claude Code does not list the Workbench tools.");
+
+  // Built-in tools would give the agent the user's files and a shell. A list
+  // that cannot be read is no proof that there are none.
+  const auto tools = message.value("tools");
+  QString error;
+
+  if (!tools.isArray())
   {
-    if (!tool.toString().startsWith(ToolPrefix))
+    error = "Claude Code does not report its tools, which the Agent view has to check. Stopping.";
+  }
+  else
+  {
+    for (const auto& tool : tools.toArray())
     {
-      emit ErrorAdded(QString("Claude Code offers the tool \"%1\", which the Agent view does not allow. Stopping.").arg(tool.toString()));
-      this->KillProcess();
-      m_PendingTurns = 0;
-      emit TurnStateChanged();
-      return;
+      if (!tool.toString().startsWith(ToolPrefix))
+      {
+        error = QString("Claude Code offers the tool \"%1\", which the Agent view does not allow. Stopping.").arg(tool.toString());
+        break;
+      }
     }
   }
+
+  if (error.isEmpty())
+    return;
+
+  emit ErrorAdded(error);
+  this->KillProcess();
+  m_PendingTurns = 0;
+  emit TurnStateChanged();
 }
 
 void QmitkAgentSession::OnStreamEvent(const QJsonObject& message)
 {
-  if (!message.value("parent_tool_use_id").isNull())
+  if (message.value("parent_tool_use_id").isString())
     return;
 
   const auto event = message.value("event").toObject();
@@ -572,7 +610,7 @@ void QmitkAgentSession::OnStreamEvent(const QJsonObject& message)
 void QmitkAgentSession::OnAssistantMessage(const QJsonObject& message)
 {
   // Messages of subagents are not part of the conversation shown.
-  if (!message.value("parent_tool_use_id").isNull())
+  if (message.value("parent_tool_use_id").isString())
     return;
 
   for (const auto& block : message.value("message").toObject().value("content").toArray())
@@ -687,21 +725,30 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
 
 void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutput)
 {
+  const bool turnWasRunning = this->IsTurnRunning();
+
   m_PendingTurns = 0;
   emit TurnStateChanged();
 
   if (m_Killing)
     return;
 
-  emit TurnsFinished();
+  if (turnWasRunning)
+    emit TurnsFinished();
 
   if (m_CheckPending)
     QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
 
   auto text = QString("Claude Code ended (exit code %1).").arg(exitCode);
 
-  if (!errorOutput.isEmpty())
-    text += " " + Abbreviate(errorOutput, 500);
+  if (auto output = errorOutput.simplified(); !output.isEmpty())
+  {
+    // The end, where a process says why it ends.
+    if (output.size() > 500)
+      output = "..." + output.right(500);
+
+    text += " " + output;
+  }
 
   emit ErrorAdded(text + " The next message continues the conversation.");
 }

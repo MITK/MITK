@@ -115,8 +115,9 @@ public:
   /**
    * \brief Sends a message of the user, which starts a turn or follows the running one.
    *
-   * \return Whether the message was taken. It is not without Claude Code or
-   *         without the tools, which a note explains in the second case.
+   * \return Whether the message was taken. It is not without Claude Code,
+   *         which an error explains if it cannot be started, or without the
+   *         tools, which a note explains.
    */
   bool Send(const QString& text);
 

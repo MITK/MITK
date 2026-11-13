@@ -53,6 +53,9 @@ private:
   /** \brief The executable that the settings on the page lead to; empty if none is found. */
   QString GetExecutable() const;
 
+  /** \brief How Claude Code runs for the check and the sign-in, with the settings on the page, which may not be applied yet. */
+  QmitkClaudeCodeProcess::Options GetOptions() const;
+
   /** \brief Shows how Claude Code signs in with the settings on the page, which may not be applied yet. */
   void UpdateStatus();
 

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QAbstractTextDocumentLayout>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QHelpEvent>
 #include <QImage>
 #include <QLabel>
 #include <QPainter>
@@ -29,6 +30,7 @@ found in the LICENSE file.
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextList>
+#include <QToolTip>
 #include <QVBoxLayout>
 
 namespace
@@ -385,6 +387,24 @@ void QmitkAgentConversationWidget::paintEvent(QPaintEvent* event)
   }
 
   QTextBrowser::paintEvent(event);
+}
+
+bool QmitkAgentConversationWidget::viewportEvent(QEvent* event)
+{
+  if (event->type() == QEvent::ToolTip)
+  {
+    const auto* helpEvent = static_cast<QHelpEvent*>(event);
+    const QUrl url(this->anchorAt(helpEvent->pos()));
+
+    if (url.scheme() == "https" || url.scheme() == "http")
+    {
+      // Encoded, so that a look-alike host shows as what it is.
+      QToolTip::showText(helpEvent->globalPos(), QString::fromUtf8(url.toEncoded()), this->viewport());
+      return true;
+    }
+  }
+
+  return QTextBrowser::viewportEvent(event);
 }
 
 QTextCursor QmitkAgentConversationWidget::AppendBlock()

@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <berryIWorkbenchListener.h>
+
 #include <memory>
 
 class QmitkAgentSession;
@@ -25,9 +27,11 @@ class QTimer;
  * \brief Chat with an agent that operates the Workbench.
  *
  * Shows a QmitkAgentWidget for a QmitkAgentSession, which lasts as long as
- * the view. Locks the other views and the editors while the agent works.
+ * the view. Locks the other views and the editors while the agent works,
+ * and asks before the Workbench closes meanwhile. Closing the view itself
+ * ends a working agent without a question, as a view cannot refuse it.
  */
-class QmitkAgentView : public QmitkAbstractView
+class QmitkAgentView : public QmitkAbstractView, public berry::IWorkbenchListener
 {
   Q_OBJECT
 
@@ -39,6 +43,9 @@ public:
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
+
+  /** \brief Asks whether to stop a working agent; a no keeps the Workbench open. */
+  bool PreShutdown(berry::IWorkbench* workbench, bool forced) override;
 
 protected:
   void OnPreferencesChanged(const mitk::IPreferences* preferences) override;

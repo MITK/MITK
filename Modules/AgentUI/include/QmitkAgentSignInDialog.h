@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <MitkAgentUIExports.h>
 
+#include <QmitkClaudeCodeProcess.h>
+
 #include <QDialog>
 #include <QProcess>
 
@@ -45,7 +47,8 @@ public:
     Console
   };
 
-  QmitkAgentSignInDialog(const QString& executable, Account account, QWidget* parent);
+  /** \param options How Claude Code runs, as for the check of the sign-in, so that signing in applies to what the agent runs. */
+  QmitkAgentSignInDialog(const QmitkClaudeCodeProcess::Options& options, Account account, QWidget* parent);
   ~QmitkAgentSignInDialog() override;
 
 private:

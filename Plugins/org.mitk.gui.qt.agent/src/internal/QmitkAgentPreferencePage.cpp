@@ -121,6 +121,15 @@ QString QmitkAgentPreferencePage::GetExecutable() const
     : executable;
 }
 
+QmitkClaudeCodeProcess::Options QmitkAgentPreferencePage::GetOptions() const
+{
+  QmitkClaudeCodeProcess::Options options;
+  options.Executable = this->GetExecutable();
+  options.WorkingDirectory = QmitkAgentSession::GetWorkspaceDirectory();
+  options.IgnoreApiKeyVariable = m_Ui->ignoreApiKeyCheckBox->isChecked();
+  return options;
+}
+
 void QmitkAgentPreferencePage::UpdateStatus()
 {
   const auto query = ++m_StatusQueries;
@@ -145,10 +154,7 @@ void QmitkAgentPreferencePage::UpdateStatus()
 
   m_Ui->statusCard->SetMessage("Checking how Claude Code signs in...");
 
-  QmitkClaudeCodeProcess::Options options;
-  options.Executable = executable;
-  options.WorkingDirectory = QmitkAgentSession::GetWorkspaceDirectory();
-  options.IgnoreApiKeyVariable = m_Ui->ignoreApiKeyCheckBox->isChecked();
+  const auto options = this->GetOptions();
 
   // With the control, which ends with the preferences dialog, unlike the page.
   auto* watcher = new QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>(m_Control);
@@ -199,7 +205,7 @@ void QmitkAgentPreferencePage::BrowseExecutable()
 
 void QmitkAgentPreferencePage::SignIn(QmitkAgentSignInDialog::Account account)
 {
-  QmitkAgentSignInDialog dialog(this->GetExecutable(), account, m_Control);
+  QmitkAgentSignInDialog dialog(this->GetOptions(), account, m_Control);
 
   if (dialog.exec() != QDialog::Accepted)
     return;

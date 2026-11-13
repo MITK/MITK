@@ -78,6 +78,9 @@ public:
 protected:
   void paintEvent(QPaintEvent* event) override;
 
+  /** \brief Shows the real target of an http or https link as the tool tip, whatever title the Markdown gave the link. */
+  bool viewportEvent(QEvent* event) override;
+
 private:
   /** \brief Consecutive steps, shown as a list or as one summary line. */
   struct StepGroup

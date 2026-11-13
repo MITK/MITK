@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QmitkSpeechBubbleFrame.h>
 
 #include <QAbstractTextDocumentLayout>
+#include <QDir>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPainter>
@@ -207,6 +208,9 @@ QmitkAgentMemoryDialog::QmitkAgentMemoryDialog(QmitkAgentMemory& memory, qreal f
   if (fontSize > 0)
     list->setStyleSheet(QString("QListWidget, QTextEdit { font-size: %1pt; }").arg(fontSize));
 
+  // First, as it reads the file again if it could not be read, which the notes follow.
+  const bool readable = m_Memory->IsReadable();
+
   for (const auto& note : m_Memory->GetNotes())
   {
     auto* item = new QListWidgetItem(note.Text, list);
@@ -224,6 +228,15 @@ QmitkAgentMemoryDialog::QmitkAgentMemoryDialog(QmitkAgentMemory& memory, qreal f
   connect(list, &QListWidget::itemChanged, this, &QmitkAgentMemoryDialog::OnItemChanged);
   connect(m_DeleteButton, &QPushButton::clicked, this, &QmitkAgentMemoryDialog::DeleteSelected);
   connect(m_Ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+  if (!readable)
+  {
+    m_Ui->descriptionLabel->setTextFormat(Qt::PlainText);
+    m_Ui->descriptionLabel->setText(QString("The memory file cannot be read, so the memory is not changed: %1")
+      .arg(QDir::toNativeSeparators(m_Memory->GetFilePath())));
+
+    list->setEnabled(false);
+  }
 }
 
 QmitkAgentMemoryDialog::~QmitkAgentMemoryDialog() = default;

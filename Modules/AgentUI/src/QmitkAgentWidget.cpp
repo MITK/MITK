@@ -145,19 +145,31 @@ QmitkAgentWidget::QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreference
 
   this->UpdateCostLabel();
   this->UpdateControls();
+
+  // Later, as offering the tools may ask the user, which a widget should not
+  // do while it is being created, at startup for example.
+  QTimer::singleShot(0, this, &QmitkAgentWidget::PrepareAgent);
 }
 
 QmitkAgentWidget::~QmitkAgentWidget() = default;
+
+void QmitkAgentWidget::AddNote(const QString& text)
+{
+  m_Ui->conversation->AppendNote(text);
+}
 
 bool QmitkAgentWidget::OfferTools()
 {
   auto& toolServer = m_Session->GetToolServer();
 
+  if (toolServer.IsOffered())
+    return true;
+
   if (const auto risks = toolServer.GetRunningServerRisks(); !risks.isEmpty() && !this->AcceptRunningServer(risks))
   {
     m_Ui->conversation->AppendNote("The agent does not work in the Workbench for now. To let the Agent view start a REST API "
-      "server of its own, which only the agent can use, stop the running server in the REST API view and reopen "
-      "the Agent view. Or require a token in Preferences > REST API.");
+      "server of its own, which only the agent can use, stop the running server in the REST API view (or let it "
+      "require a token and restart it), then start a new conversation.");
     return false;
   }
 
@@ -167,7 +179,14 @@ bool QmitkAgentWidget::OfferTools()
     return false;
   }
 
+  emit this->ToolsOffered();
   return true;
+}
+
+void QmitkAgentWidget::PrepareAgent()
+{
+  if (this->OfferTools())
+    m_Session->PrepareForMessages();
 }
 
 void QmitkAgentWidget::OnPreferencesChanged()
@@ -203,7 +222,14 @@ bool QmitkAgentWidget::eventFilter(QObject* watched, QEvent* event)
 
 bool QmitkAgentWidget::AcceptRunningServer(const QStringList& risks)
 {
-  if (!m_Preferences->GetBool("warnAboutOpenRestServer", true))
+  // The texts of the risks that the user accepted without being asked again.
+  const auto acceptedRisks = QString::fromStdString(m_Preferences->Get("acceptedServerRisks", "")).split('\n', Qt::SkipEmptyParts);
+
+  const bool allAccepted = std::all_of(risks.begin(), risks.end(), [&acceptedRisks](const QString& risk) {
+    return acceptedRisks.contains(risk);
+  });
+
+  if (allAccepted)
     return true;
 
   QMessageBox box(QMessageBox::Warning, "Agent", QString(
@@ -214,17 +240,28 @@ bool QmitkAgentWidget::AcceptRunningServer(const QStringList& risks)
     .arg(risks.join("</li><li>")), QMessageBox::NoButton, this->window());
 
   auto* continueButton = box.addButton("Continue", QMessageBox::AcceptRole);
-  box.addButton(QMessageBox::Cancel);
-  box.setDefaultButton(continueButton);
+  auto* cancelButton = box.addButton(QMessageBox::Cancel);
+  box.setDefaultButton(cancelButton);
+  box.setEscapeButton(cancelButton);
 
-  auto* doNotShowAgain = new QCheckBox("Do not show again", &box);
+  auto* doNotShowAgain = new QCheckBox("Do not show again for these risks", &box);
   box.setCheckBox(doNotShowAgain);
   box.exec();
 
   const bool accepted = box.clickedButton() == continueButton;
 
   if (accepted && doNotShowAgain->isChecked())
-    m_Preferences->PutBool("warnAboutOpenRestServer", false);
+  {
+    auto stored = acceptedRisks;
+
+    for (const auto& risk : risks)
+    {
+      if (!stored.contains(risk))
+        stored << risk;
+    }
+
+    m_Preferences->Put("acceptedServerRisks", stored.join('\n').toStdString());
+  }
 
   return accepted;
 }
@@ -281,7 +318,17 @@ void QmitkAgentWidget::OpenSettings()
 
 void QmitkAgentWidget::Send()
 {
-  if (m_Session->Send(m_Ui->messageInput->toPlainText().trimmed()))
+  const auto text = m_Ui->messageInput->toPlainText().trimmed();
+
+  if (text.isEmpty())
+    return;
+
+  // Asks again if the tools were not offered, for example after the question
+  // about a running server was canceled.
+  if (!this->OfferTools())
+    return;
+
+  if (m_Session->Send(text))
     m_Ui->messageInput->clear();
 }
 
@@ -289,6 +336,7 @@ void QmitkAgentWidget::StartNewConversation()
 {
   m_Ui->conversation->Clear();
   m_Session->StartNewConversation();
+  this->PrepareAgent();
 }
 
 void QmitkAgentWidget::ShowMemory()
@@ -333,7 +381,8 @@ void QmitkAgentWidget::UpdateControls()
 {
   const bool turnRunning = m_Session->IsTurnRunning();
 
-  m_Ui->stopButton->setEnabled(turnRunning && !m_Session->IsStopping());
+  // Also while the agent stops: a second Stop ends Claude Code if the turn does not end.
+  m_Ui->stopButton->setEnabled(turnRunning);
   m_Ui->memoryButton->setEnabled(!turnRunning);
   m_Ui->modelBox->setEnabled(!turnRunning && m_Ui->modelBox->count() > 0);
   m_Ui->effortBox->setEnabled(!turnRunning && m_Ui->effortBox->count() > 1);

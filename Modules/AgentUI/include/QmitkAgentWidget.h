@@ -53,25 +53,45 @@ public:
   QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreferences* preferences, QWidget* parent = nullptr);
   ~QmitkAgentWidget() override;
 
-  /**
-   * \brief Offers the Workbench tools to the agent.
-   *
-   * Asks the user first if a REST server runs already that lets others in
-   * as well, unless the user chose not to be asked again. Explains in the
-   * conversation why the tools are not offered.
-   *
-   * \return Whether the tools are offered.
-   */
-  bool OfferTools();
-
   /** \brief Applies the settings of Claude Code after a change of the preferences. */
   void OnPreferencesChanged();
+
+  /** \brief Adds a note to the conversation. */
+  void AddNote(const QString& text);
+
+signals:
+  /**
+   * \brief The Workbench tools were offered to the agent just now.
+   *
+   * Happens right after the widget was created, and again when a message or
+   * a new conversation finds the tools withdrawn or not yet offered.
+   */
+  void ToolsOffered();
 
 protected:
   bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
-  /** \brief Whether the agent may use a REST server that runs already and lets others in as well. */
+  /**
+   * \brief Makes sure the Workbench tools are offered to the agent.
+   *
+   * Asks the user first if a REST server runs already with a risk that the
+   * user did not accept yet. Explains in the conversation why the tools are
+   * not offered.
+   *
+   * \return Whether the tools are offered.
+   */
+  bool OfferTools();
+
+  /** \brief Offers the tools and lets the session start Claude Code ahead of the first message. */
+  void PrepareAgent();
+
+  /**
+   * \brief Whether the agent may use a REST server that runs already with these risks.
+   *
+   * Asks, unless the user accepted all of them before and chose not to be
+   * asked again.
+   */
   bool AcceptRunningServer(const QStringList& risks);
 
   void OnStatusChanged(const QmitkAgentSession::Status& status);

@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QPushButton>
 #include <QRegularExpression>
 
-QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Account account, QWidget* parent)
+QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QmitkClaudeCodeProcess::Options& options, Account account, QWidget* parent)
   : QDialog(parent),
     m_Ui(std::make_unique<Ui::QmitkAgentSignInDialog>()),
     m_Process(new QProcess(this))
@@ -52,8 +52,8 @@ QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Accoun
       this->ShowEnd(QString("Claude Code cannot be started: %1").arg(m_Process->errorString()));
   });
 
-  m_Process->setProcessEnvironment(QmitkClaudeCodeProcess::GetEnvironment());
-  m_Process->start(executable, { "auth", "login", subscription ? "--claudeai" : "--console" });
+  QmitkClaudeCodeProcess::SetUpAuthCommand(*m_Process, options, { "login", subscription ? "--claudeai" : "--console" });
+  m_Process->start();
 }
 
 QmitkAgentSignInDialog::~QmitkAgentSignInDialog()

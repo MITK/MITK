@@ -21,6 +21,8 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.pharmacokinetics.curvedescriptor
   org.mitk.gui.qt.pet.suvcalculation
   org.mitk.gui.qt.restapi
+  org.mitk.gui.qt.reports
+  org.mitk.gui.qt.agent
 )
 
 if(NOT MITK_USE_SUPERBUILD)

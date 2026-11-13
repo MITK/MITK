@@ -59,6 +59,9 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
   if (helpIndexHost.IsNotNull() && mitk::WorkbenchUtil::IsViewAvailable("org.blueberry.views.helpindex"))
     helpIndexHost->AddPlaceholder("org.blueberry.views.helpindex");
 
+  if (leftFolder.IsNotNull() && mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.agent"))
+    leftFolder->AddPlaceholder("org.mitk.views.agent");
+
   if (mitk::WorkbenchUtil::IsViewAvailable("org.mitk.views.viewnavigator"))
     layout->AddView("org.mitk.views.viewnavigator", berry::IPageLayout::RIGHT, 0.62f, editorArea);
 

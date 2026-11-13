@@ -140,8 +140,8 @@ public:
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Clone has same size", true, pointSet->GetSize(t) == clonePS->GetSize(t));
 
       // test for equal point coordinates
-      for (mitk::PointSet::PointsConstIterator i = pointSet->Begin(), j = clonePS->Begin();
-           i != pointSet->End() && j != clonePS->End();
+      for (mitk::PointSet::PointsConstIterator i = pointSet->Begin(t), j = clonePS->Begin(t);
+           i != pointSet->End(t) && j != clonePS->End(t);
            ++i, ++j)
       {
         CPPUNIT_ASSERT_EQUAL_MESSAGE(

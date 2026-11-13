@@ -81,6 +81,13 @@ namespace
     for (auto *value : values)
       *value = std::max<litehtml::pixel_t>(0, *value);
 
+    // A corner with one radius of zero is square, as in CSS.
+    for (std::size_t i = 0; i < values.size(); i += 2)
+    {
+      if (*values[i] <= 0 || *values[i + 1] <= 0)
+        *values[i] = *values[i + 1] = 0;
+    }
+
     qreal factor = 1.0;
 
     const auto limit = [&factor](qreal length, qreal sum) {
@@ -243,8 +250,9 @@ namespace
    */
   QString replaceInlineSvg(const QString &html)
   {
-    // Case-sensitive like the XML that the markup becomes.
-    static const QRegularExpression svgTag(QStringLiteral("<(/?)svg\\b[^>]*>"));
+    // Case-sensitive like the XML that the markup becomes. A quoted attribute
+    // value may contain '>', and a name like svg-icon is another element.
+    static const QRegularExpression svgTag(QStringLiteral("<(/?)svg(?=[\\s/>])(?:[^>\"']|\"[^\"]*\"|'[^']*')*>"));
 
     QString result;
     qsizetype copied = 0;
@@ -470,6 +478,7 @@ public:
     m_VisibleArea = toRectF(clip);
 
     m_Painter = &painter;
+    m_ClipDepth = 0;
     m_Document->draw(reinterpret_cast<litehtml::uint_ptr>(&painter), 0, 0, &clip);
     m_Painter = nullptr;
 
@@ -904,6 +913,7 @@ public:
       return;
 
     m_Painter->save();
+    ++m_ClipDepth;
     const QRectF rect = toRectF(pos);
 
     if (hasRadius(radius))
@@ -914,8 +924,13 @@ public:
 
   void del_clip() override
   {
-    if (m_Painter != nullptr)
-      m_Painter->restore();
+    // litehtml removes the clip of an inline element with overflow without
+    // having set one; restoring for it would take the state of Paint() away.
+    if (m_Painter == nullptr || m_ClipDepth == 0)
+      return;
+
+    --m_ClipDepth;
+    m_Painter->restore();
   }
 
   void get_viewport(litehtml::position &viewport) const override
@@ -1056,6 +1071,8 @@ private:
       // Fall back to raster handling if the SVG cannot be parsed.
       if (renderer->isValid())
       {
+        // As browsers fit a viewBox into a box of another ratio, instead of stretching it.
+        renderer->setAspectRatioMode(Qt::KeepAspectRatio);
         m_SvgImages.insert(key, renderer);
         return;
       }
@@ -1123,6 +1140,9 @@ private:
   QHash<QString, AnimatedImage> m_Animations;
   QHash<QString, QSvgRenderer *> m_SvgImages;
   QPainter *m_Painter = nullptr;
+
+  /** \brief The clips that set_clip() has pushed onto the painter and del_clip() has not removed yet. */
+  int m_ClipDepth = 0;
 
   /** \brief The part of the document the current paint shows, in document coordinates. */
   QRectF m_VisibleArea;

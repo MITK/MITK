@@ -131,7 +131,8 @@ h2 .num {
   font-size: 13px;
   font-weight: 700;
   line-height: 20px;
-  vertical-align: 3px;
+  position: relative;
+  top: -3px;
 }
 
 h3 {
@@ -165,7 +166,7 @@ a {
 }
 
 code {
-  font-family: Consolas, "DejaVu Sans Mono", monospace;
+  font-family: Consolas, Menlo, "DejaVu Sans Mono", monospace;
   font-size: 13px;
 }
 
@@ -190,7 +191,7 @@ img, svg {
 
 .kicker {
   color: var(--accent);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -289,7 +290,7 @@ img, svg {
 .label {
   margin-top: 2px;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -361,7 +362,7 @@ img, svg {
 .panel-title {
   margin-bottom: 12px;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -415,7 +416,7 @@ img, svg {
   margin-right: 16px;
   border-radius: 16px;
   background: var(--c, var(--accent));
-  color: var(--on-c, #ffffff);
+  color: var(--on-c, var(--on-accent));
   font-size: 34px;
   font-weight: 700;
   line-height: 64px;
@@ -455,7 +456,7 @@ img, svg {
 .card-footer p {
   flex: 1 1 0;
   margin: 0 0 0 18px;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 .flags {
@@ -568,18 +569,18 @@ img, svg {
   padding: 10px 12px;
   border-radius: 12px;
   background: var(--c, var(--accent));
-  color: var(--on-c, #ffffff);
+  color: var(--on-c, var(--on-accent));
   font-weight: 700;
 }
 
 .tile .value {
-  color: var(--on-c, #ffffff);
+  color: var(--on-c, var(--on-accent));
   font-size: 26px;
   line-height: 1.1;
 }
 
 .tile .label {
-  color: var(--on-c, #ffffff);
+  color: var(--on-c, var(--on-accent));
 }
 
 /* Equal columns side by side: any number of children. */

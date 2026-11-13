@@ -333,6 +333,8 @@ namespace mitk
         type.AddModifier(DICOMCodeSequence("261665006", "SCT", "Unknown (qualifier value)"));
         label.SetSegmentedPropertyType(type);
       }
+      if (label.GetName().empty())
+        label.SetName(label.GetDescription().empty() ? label.GetSegmentedPropertyType()->GetMeaning() : label.GetDescription());
     }
 
     /**

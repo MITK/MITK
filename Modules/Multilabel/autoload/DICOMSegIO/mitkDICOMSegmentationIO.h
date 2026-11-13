@@ -66,18 +66,20 @@ namespace mitk
      * the labelmap encoding with values 1..N, a label without voxels below one with voxels makes
      * dcmqi fail.
      *
-     * A Segment Label or Segment Algorithm Name longer than the 64 characters of VR LO is cut and
-     * marked with "[...]", with a warning. BodyPartExamined is taken only from the segmentation's
-     * property DICOM.0018.0015, which a segmentation inherits from the image it is created from, and
-     * left out without it; SeriesDescription is taken from DICOM.0008.103E.
+     * The Segment Label is the label's name; for a label without a name it is the description, and
+     * without either the meaning of the Segmented Property Type written. A Segment Label or Segment
+     * Algorithm Name longer than the 64 characters of VR LO is cut and marked with "[...]", with a
+     * warning. BodyPartExamined is taken only from the segmentation's property DICOM.0018.0015,
+     * which a segmentation inherits from the image it is created from, and left out without it;
+     * SeriesDescription is taken from DICOM.0008.103E.
      *
      * \throw DICOMSegStrictModeException in strict mode if the segmentation lacks a contract item
      * (DICOMSegmentationPropertyHelper::Validate) or a source-image relation with per-slice UIDs;
      * a retry in synthetic mode can succeed.
      * \throw DICOMSegUnrepresentableValueException naming the label for a label value above 32767,
-     * a label name or, for an AUTOMATIC or SEMIAUTOMATIC label, an algorithm name that is no valid
-     * LO value without Specific Character Set (a backslash, non-ASCII or control characters), a
-     * description or Tracking ID that is no valid ST or UT value without it (non-ASCII characters,
+     * a Segment Label or, for an AUTOMATIC or SEMIAUTOMATIC label, an algorithm name that is no
+     * valid LO value without Specific Character Set (a backslash, non-ASCII or control characters),
+     * a description or Tracking ID that is no valid ST or UT value without it (non-ASCII characters,
      * or control characters other than TAB, LF, FF, CR and ESC), or a Tracking UID that is no valid
      * UID; only changing the label lets the write succeed.
      * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs

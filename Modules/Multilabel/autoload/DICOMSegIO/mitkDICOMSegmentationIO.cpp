@@ -127,6 +127,29 @@ namespace
   constexpr auto MAX_WRITABLE_LABEL_VALUE =
     std::numeric_limits<mitk::DICOMSegmentationIO::itkInternalImageType::PixelType>::max();
 
+  // SEG requires a Segmented Property Type (0062,000F). The writer writes the label's own if it is
+  // complete, else a stand-in with this meaning.
+  constexpr const char *STAND_IN_TYPE_MEANING = "Morphologically altered structure";
+
+  bool HasCompleteSegmentedPropertyType(const mitk::Label &label)
+  {
+    const auto type = label.GetSegmentedPropertyType();
+    return type.has_value() && !type->GetValue().empty() && !type->GetScheme().empty() && !type->GetMeaning().empty();
+  }
+
+  // Segment Label (0062,0005) is Type 1. For a label without a name dcmqi takes the description,
+  // else the meaning of the Segmented Property Type, past the writer's checks and uncut. The writer
+  // makes that choice itself, so that the value written is the one checked and fitted into LO.
+  std::string SegmentLabelOf(const mitk::Label &label)
+  {
+    if (auto name = label.GetName(); !name.empty())
+      return name;
+    if (auto description = label.GetDescription(); !description.empty())
+      return description;
+    return HasCompleteSegmentedPropertyType(label) ? label.GetSegmentedPropertyType()->GetMeaning()
+                                                   : std::string(STAND_IN_TYPE_MEANING);
+  }
+
   // The writer writes no Specific Character Set, so the default repertoire applies to the text dcmqi
   // takes from a label, and DCMTK refuses other values inside dcmqi: the Segment Label (0062,0005)
   // and the Segment Algorithm Name (0062,0009), which are LO and in which a backslash would separate
@@ -147,9 +170,16 @@ namespace
     if (label.GetValue() > MAX_WRITABLE_LABEL_VALUE)
       refuse("label values above " + std::to_string(MAX_WRITABLE_LABEL_VALUE) + " are not supported.");
 
-    const std::string name = label.GetName();
-    if (DcmLongString::checkStringValue(name.c_str(), "1").bad())
-      refuse("its Segment Label \"" + name + loRule);
+    const std::string segmentLabel = SegmentLabelOf(label);
+    if (DcmLongString::checkStringValue(segmentLabel.c_str(), "1").bad())
+    {
+      std::string origin;
+      if (label.GetName().empty())
+        origin = label.GetDescription().empty()
+                   ? " It is the meaning of its Segmented Property Type, as the label has neither name nor description."
+                   : " It is its description, as the label has no name.";
+      refuse("its Segment Label \"" + segmentLabel + loRule + origin);
+    }
 
     // dcmqi writes the algorithm name of these types only; the writer writes an undefined type as
     // MANUAL.
@@ -1806,7 +1836,7 @@ namespace mitk
         if (segmentAttribute != nullptr)
         {
           const auto labelDescription = "of label " + std::to_string(label->GetValue());
-          segmentAttribute->setSegmentLabel(FitIntoLO(label->GetName(), "Segment Label (0062,0005) " + labelDescription));
+          segmentAttribute->setSegmentLabel(FitIntoLO(SegmentLabelOf(*label), "Segment Label (0062,0005) " + labelDescription));
           segmentAttribute->setSegmentDescription(label->GetDescription());
           std::string algorithmType = label->GetAlgorithmTypeStr();
           if (algorithmType.empty())
@@ -1876,7 +1906,7 @@ namespace mitk
           {
             auto segType = label->GetSegmentedPropertyType();
 
-            if (segType.has_value() && !segType->GetValue().empty() && !segType->GetScheme().empty() && !segType->GetMeaning().empty())
+            if (HasCompleteSegmentedPropertyType(*label))
             {
               segmentAttribute->setSegmentedPropertyTypeCodeSequence(segType->GetValue(),
                 segType->GetScheme(), segType->GetMeaning());
@@ -1892,7 +1922,7 @@ namespace mitk
               // intent wins), so the fallback modifier here is only the final
               // value when the label has no modifier of its own.
               segmentAttribute->setSegmentedPropertyTypeCodeSequence(
-                "49755003", "SCT", "Morphologically altered structure");
+                "49755003", "SCT", STAND_IN_TYPE_MEANING);
               segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
                 "261665006", "SCT", "Unknown (qualifier value)");
             }

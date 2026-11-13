@@ -581,6 +581,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteKeepsLabelNamesOf64Characters);
   MITK_TEST(WriteTruncatesLongLabelNames);
   MITK_TEST(WriteTruncatesLongAlgorithmNames);
+  MITK_TEST(WriteTruncatesLongDescriptionsOfUnnamedLabels);
   MITK_TEST(WriteRefusesLabelNamesWithBackslash);
   MITK_TEST(WriteRefusesNonASCIILabelNames);
   MITK_TEST(WriteRefusesLabelNamesWithControlCharacters);
@@ -609,6 +610,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesInvalidSegmentDescriptions);
   MITK_TEST(WriteRefusesInvalidTrackingIDs);
   MITK_TEST(WriteKeepsTextWithBackslashAndLineBreaks);
+  MITK_TEST(WriteNamesUnnamedLabelsByTheirDescription);
+  MITK_TEST(WriteRefusesUnnamedLabelsWhoseSegmentLabelIsNoLOValue);
   MITK_TEST(WriteRefusesUnknownOptionValues);
   MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
   CPPUNIT_TEST_SUITE_END();
@@ -870,6 +873,24 @@ public:
     AssertSegmentSequence(path, expected);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Warnings about the truncated Segment Algorithm Name",
                                  std::size_t{1}, warnings.GetWarnings().size());
+  }
+
+  // The description of a label without a name is its Segment Label, which is cut like a name. The
+  // Segment Description is ST and keeps the description whole.
+  void WriteTruncatesLongDescriptionsOfUnnamedLabels()
+  {
+    const std::string description = "A label description that is deliberately longer than the sixty-four characters of LO";
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName("");
+    seg->GetLabel(1)->SetDescription(description);
+
+    mitk::test::WarningRecorder warnings("(0062,0005)");
+    const auto path = this->WriteSegToTempFileUnchecked(seg, {}, "long-description-of-unnamed");
+
+    auto expected = mitk::test::ExpectedSegmentSequence(*seg, 0, false);
+    expected.at(1)->SetName(description.substr(0, 59) + "[...]");
+    AssertSegmentSequence(path, expected);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Warnings about the truncated Segment Label", std::size_t{1}, warnings.GetWarnings().size());
   }
 
   // A backslash separates values in DICOM, so a name containing one cannot be written.
@@ -1204,6 +1225,11 @@ public:
       { "tracking-uid", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingUID("track-uid"); } },
       { "description", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetDescription("L\xC3\xA4sion links"); } },
       { "tracking-id", [](mitk::MultiLabelSegmentation* seg) { seg->GetLabel(2)->SetTrackingID("Tr\xC3\xA4" "ck"); } },
+      { "description-of-unnamed",
+        [](mitk::MultiLabelSegmentation* seg) {
+          seg->GetLabel(2)->SetName("");
+          seg->GetLabel(2)->SetDescription("Left\\Right");
+        } },
       { "value",
         [](mitk::MultiLabelSegmentation* seg) {
           auto label = mitk::Label::New();
@@ -1327,6 +1353,47 @@ public:
     seg->GetLabel(1)->SetDescription("Left\\Right\tA\r\nB");
     seg->GetLabel(1)->SetTrackingID("TID\\1");
     this->WriteSegToTempFile(seg, {}, "text-with-backslash-and-line-breaks");
+  }
+
+  // Segment Label is Type 1, so a label without a name is written with its description as Segment
+  // Label and reloads under that name.
+  void WriteNamesUnnamedLabelsByTheirDescription()
+  {
+    auto seg = BuildSegWithRule();
+    seg->GetLabel(1)->SetName("");
+    seg->GetLabel(1)->SetDescription("Liver lesion");
+    const auto path = this->WriteSegToTempFile(seg, {}, "unnamed");
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    const auto* loadedSeg = dynamic_cast<const mitk::MultiLabelSegmentation*>(loaded.front().GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("The file reloads as a segmentation", nullptr != loadedSeg);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The name of the reloaded label", std::string("Liver lesion"), loadedSeg->GetLabel(1)->GetName());
+  }
+
+  // The Segment Label of a label without a name is its description, else the meaning of its type, and
+  // it is LO: unlike the description (ST), it admits no backslash and no control characters, and
+  // unlike a code meaning elsewhere, DCMTK checks it.
+  void WriteRefusesUnnamedLabelsWhoseSegmentLabelIsNoLOValue()
+  {
+    const std::vector<std::string> descriptions = { "Left\\Right", "Left\nRight", "Left\tRight" };
+    for (std::size_t i = 0; i < descriptions.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName("");
+      seg->GetLabel(1)->SetDescription(descriptions[i]);
+      this->AssertWriteRefused(seg, {}, "unnamed-description-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"label 1", "Segment Label", "description"});
+    }
+
+    const std::vector<std::string> typeMeanings = { "Gew\xC3\xA4" "be", "Left\\Right" };
+    for (std::size_t i = 0; i < typeMeanings.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName("");
+      seg->GetLabel(1)->SetSegmentedPropertyType(mitk::DICOMCodeSequenceWithModifiers("T-D0050", "SRT", typeMeanings[i]));
+      this->AssertWriteRefused(seg, {}, "unnamed-type-meaning-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"label 1", "Segment Label", "Segmented Property Type"});
+    }
   }
 
   // A value outside the choices is refused rather than taken for one of them. The segmentation is

@@ -46,6 +46,9 @@ using namespace mitk::nnInteractive;
 
 namespace
 {
+  // Every point of a scribble is stamped into the slice on the GUI thread.
+  constexpr std::size_t MAX_STROKE_PROMPT_POINTS = 100;
+
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -1305,17 +1308,24 @@ void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
     case InteractionType::Scribble:
       isSupported = supported.Scribble;
       minCount = 2;
-      maxCount = std::numeric_limits<std::size_t>::max();
+      maxCount = MAX_STROKE_PROMPT_POINTS;
       break;
     case InteractionType::Lasso:
       isSupported = supported.Lasso;
       minCount = 3;
-      maxCount = std::numeric_limits<std::size_t>::max();
+      maxCount = MAX_STROKE_PROMPT_POINTS;
       break;
   }
 
   if (!isSupported)
     mitkThrow() << "The model of this session does not support " << GetInteractionTypeAsString(interactionType) << " prompts.";
+
+  if ((InteractionType::Scribble == interactionType || InteractionType::Lasso == interactionType)
+      && points.size() > maxCount)
+  {
+    mitkThrow() << "A " << GetInteractionTypeAsString(interactionType) << " prompt takes at most "
+      << MAX_STROKE_PROMPT_POINTS << " points. A few points along the structure are enough.";
+  }
 
   if (points.size() < minCount || points.size() > maxCount)
   {

@@ -487,10 +487,10 @@ namespace mitk
      * \param[in] interactionType What the points describe:
      *            - Point: one point, in or outside the structure;
      *            - Box: two opposite corners of a box around the structure;
-     *            - Scribble: a line of at least two points, painted with the
-     *              brush of the scribble interactor;
-     *            - Lasso: a closed contour of at least three points, whose
-     *              inside is the prompt.
+     *            - Scribble: a line of at least two and at most 100 points,
+     *              painted with the brush of the scribble interactor;
+     *            - Lasso: a closed contour of at least three and at most 100
+     *              points, whose inside is the prompt.
      * \param[in] points In world coordinates, inside the reference image.
      * \param[in] promptType Whether the prompt marks the structure or what
      *            does not belong to it.

@@ -964,14 +964,22 @@ void QmitkVoxTellToolGUI::BusyStateChanged(bool isBusy)
       this->PrepareNextRun();
     });
   }
-  else if (m_RunPending)
+  else
   {
-    m_RunPending = false;
-    QTimer::singleShot(0, this, &Self::ShowRunResult);
+    const bool isOwnRun = std::exchange(m_RunPending, false);
+    const auto* tool = this->GetTool();
+
+    // An update without prompts only clears the preview. The Initialize button
+    // tells whether the model is loaded, also if its worker has stopped
+    // meanwhile, which ShowRunResult() notices.
+    const bool isRunOfPrompts = tool != nullptr && m_Ui->initializeButton->isChecked() && !tool->GetPrompts().empty();
+
+    if (isOwnRun || isRunOfPrompts)
+      QTimer::singleShot(0, this, [this, isOwnRun]() { this->ShowRunResult(isOwnRun); });
   }
 }
 
-void QmitkVoxTellToolGUI::ShowRunResult()
+void QmitkVoxTellToolGUI::ShowRunResult(bool confirmAutomatically)
 {
   QPointer<QmitkVoxTellToolGUI> self(this);
   auto* tool = this->GetTool();
@@ -992,7 +1000,7 @@ void QmitkVoxTellToolGUI::ShowRunResult()
 
     // Only what the Confirm button would transfer: with "Transfer selected
     // labels", the user picks the labels first.
-    if (m_Ui->autoConfirmCheckBox->isChecked() && m_EnableConfirmSegBtnFnc(true))
+    if (confirmAutomatically && m_Ui->autoConfirmCheckBox->isChecked() && m_EnableConfirmSegBtnFnc(true))
     {
       try
       {

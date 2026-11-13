@@ -77,8 +77,8 @@ protected:
    */
   void EnableWidgets(bool enabled) override;
 
-  /** \brief Shows the result of a run that this GUI started once the tool is
-   *         no longer busy, or the outcome of its auto-confirmation. */
+  /** \brief Shows the result of a run of prompts, whoever started it, once the
+   *         tool is no longer busy, or the outcome of an auto-confirmation. */
   void BusyStateChanged(bool isBusy) override;
 
   void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
@@ -132,8 +132,12 @@ private:
   /** \brief Segments the prompts; BusyStateChanged() shows the result. */
   void StartRun(const std::vector<std::string>& prompts);
 
-  /** \brief Shows the result of the run, and confirms it if the user chose auto-confirm. */
-  void ShowRunResult();
+  /** \brief Shows the result of a run, whoever started it.
+   *
+   * \param confirmAutomatically Whether the result is confirmed if the user
+   *        chose auto-confirm, which holds for the runs of this GUI only.
+   */
+  void ShowRunResult(bool confirmAutomatically);
 
   /** \brief Applies settings that changed during the run, notices a stopped
    *         worker, and prepares the prompts for the next run. */
@@ -197,7 +201,8 @@ private:
   /** Whether settings that the loaded model depends on changed while it was in use. */
   bool m_SettingsChanged = false;
 
-  /** Whether a run that this GUI started has not ended yet. */
+  /** Whether a run that this GUI started has not ended yet, which decides
+      about the auto-confirmation. */
   bool m_RunPending = false;
 
   /** The status to show once an auto-confirmation that has to update the

@@ -406,35 +406,35 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
 {
   bool noDifferenceFound = true;
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfCells(), rightHandSide.GetNumberOfCells(), eps, verbose))
+  if (leftHandSide.GetNumberOfCells() != rightHandSide.GetNumberOfCells())
   {
     if (verbose)
       MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of cells not equal";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfVerts(), rightHandSide.GetNumberOfVerts(), eps, verbose))
+  if (leftHandSide.GetNumberOfVerts() != rightHandSide.GetNumberOfVerts())
   {
     if (verbose)
       MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of vertices not equal";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfLines(), rightHandSide.GetNumberOfLines(), eps, verbose))
+  if (leftHandSide.GetNumberOfLines() != rightHandSide.GetNumberOfLines())
   {
     if (verbose)
       MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of lines not equal";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfPolys(), rightHandSide.GetNumberOfPolys(), eps, verbose))
+  if (leftHandSide.GetNumberOfPolys() != rightHandSide.GetNumberOfPolys())
   {
     if (verbose)
       MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of polys not equal";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfStrips(), rightHandSide.GetNumberOfStrips(), eps, verbose))
+  if (leftHandSide.GetNumberOfStrips() != rightHandSide.GetNumberOfStrips())
   {
     if (verbose)
       MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of strips not equal";
@@ -442,9 +442,11 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
   }
 
   {
-    unsigned int numberOfPointsRight = rightHandSide.GetPoints()->GetNumberOfPoints();
-    unsigned int numberOfPointsLeft = leftHandSide.GetPoints()->GetNumberOfPoints();
-    if (!mitk::Equal(numberOfPointsLeft, numberOfPointsRight, eps, verbose))
+    const vtkPoints *pointsRight = rightHandSide.GetPoints();
+    const vtkPoints *pointsLeft = leftHandSide.GetPoints();
+    unsigned int numberOfPointsRight = nullptr != pointsRight ? pointsRight->GetNumberOfPoints() : 0;
+    unsigned int numberOfPointsLeft = nullptr != pointsLeft ? pointsLeft->GetNumberOfPoints() : 0;
+    if (numberOfPointsLeft != numberOfPointsRight)
     {
       if (verbose)
         MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of points not equal";

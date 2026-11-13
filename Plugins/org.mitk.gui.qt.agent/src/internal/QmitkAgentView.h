@@ -65,6 +65,9 @@ private:
 
   /** \brief Looks again whether the views can be unlocked while tool calls run after the turns ended. */
   QTimer* m_UnlockTimer;
+
+  /** \brief Whether this view locked the parts, as only then it may unlock them. */
+  bool m_HoldsLock;
 };
 
 #endif

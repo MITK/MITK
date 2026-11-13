@@ -36,6 +36,17 @@ namespace
   {
     return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/" + QmitkAgentView::VIEW_ID);
   }
+
+  /** The path in a text, which may come in quotes, as "Copy as path" of the Windows Explorer puts it. */
+  QString GetPath(const QString& text)
+  {
+    auto path = text.trimmed();
+
+    if (path.size() >= 2 && path.startsWith('"') && path.endsWith('"'))
+      path = path.mid(1, path.size() - 2).trimmed();
+
+    return QDir::fromNativeSeparators(path);
+  }
 }
 
 QmitkAgentPreferencePage::QmitkAgentPreferencePage()
@@ -82,7 +93,7 @@ QWidget* QmitkAgentPreferencePage::GetQtControl() const
 bool QmitkAgentPreferencePage::PerformOk()
 {
   auto* preferences = GetPreferences();
-  preferences->Put("executable", QDir::fromNativeSeparators(m_Ui->executableEdit->text().trimmed()).toStdString());
+  preferences->Put("executable", GetPath(m_Ui->executableEdit->text()).toStdString());
   preferences->PutBool("ignoreApiKeyVariable", m_Ui->ignoreApiKeyCheckBox->isChecked());
 
   return true;
@@ -103,7 +114,7 @@ void QmitkAgentPreferencePage::Update()
 
 QString QmitkAgentPreferencePage::GetExecutable() const
 {
-  const auto executable = QDir::fromNativeSeparators(m_Ui->executableEdit->text().trimmed());
+  const auto executable = GetPath(m_Ui->executableEdit->text());
 
   return executable.isEmpty()
     ? QmitkClaudeCodeProcess::FindExecutable()
@@ -139,7 +150,7 @@ void QmitkAgentPreferencePage::UpdateStatus()
   options.WorkingDirectory = QmitkAgentSession::GetWorkspaceDirectory();
   options.IgnoreApiKeyVariable = m_Ui->ignoreApiKeyCheckBox->isChecked();
 
-  // With the control, which the preferences dialog deletes before the page.
+  // With the control, which ends with the preferences dialog, unlike the page.
   auto* watcher = new QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>(m_Control);
 
   connect(watcher, &QFutureWatcher<QmitkClaudeCodeProcess::AuthStatus>::finished, m_Control, [this, watcher, query]() {

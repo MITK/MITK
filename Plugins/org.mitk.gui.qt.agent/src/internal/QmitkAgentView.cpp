@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <QmitkAgentToolServer.h>
 #include <QmitkAgentWidget.h>
 
+#include <ctkException.h>
 #include <ctkPlugin.h>
 #include <ctkPluginContext.h>
-#include <ctkPluginException.h>
 
 #include <mitkLog.h>
 
@@ -51,7 +51,9 @@ namespace
       {
         plugin->start(ctkPlugin::START_TRANSIENT);
       }
-      catch (const ctkPluginException& e)
+      // A failed activation arrives as a ctkRuntimeException, not as a
+      // ctkPluginException.
+      catch (const ctkException& e)
       {
         MITK_WARN << "Cannot start " << symbolicName.toStdString() << ": " << e.what();
       }
@@ -61,19 +63,26 @@ namespace
 
 QmitkAgentView::QmitkAgentView()
   : m_Widget(nullptr),
-    m_UnlockTimer(nullptr)
+    m_UnlockTimer(nullptr),
+    m_HoldsLock(false)
 {
 }
 
 QmitkAgentView::~QmitkAgentView()
 {
   // Ending the session withdraws the tools, which runs the event loop, in
-  // which the timer must not lock again.
+  // which neither the timer nor a signal of the session must reach this view:
+  // m_Session is null by then.
   if (m_UnlockTimer != nullptr)
     m_UnlockTimer->stop();
 
+  if (m_Session != nullptr)
+    m_Session->disconnect(this);
+
   m_Session.reset();
-  QmitkPartLock::GetInstance()->Unlock();
+
+  if (m_HoldsLock)
+    QmitkPartLock::GetInstance()->Unlock();
 }
 
 void QmitkAgentView::CreateQtPartControl(QWidget* parent)
@@ -137,11 +146,18 @@ void QmitkAgentView::UpdateLock()
   if (!turnRunning && !callsRunning)
   {
     m_UnlockTimer->stop();
-    lock->Unlock();
+
+    if (m_HoldsLock)
+    {
+      m_HoldsLock = false;
+      lock->Unlock();
+    }
+
     return;
   }
 
   lock->Lock(QString::fromStdString(VIEW_ID), "Locked while the agent works. You can stop it in the Agent view.");
+  m_HoldsLock = true;
 
   if (!turnRunning)
     m_UnlockTimer->start();

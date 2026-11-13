@@ -438,10 +438,12 @@ void ModelFitInspectorView::ValidateAndSetCurrentPosition()
       return;
     }
 
-    mitk::BaseGeometry::ConstPointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(
-      m_currentSelectedTimeStep).GetPointer();
+    const auto currentSelectedTimePoint =
+      mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    mitk::BaseGeometry::ConstPointer geometry =
+      inputImage->GetTimeGeometry()->GetGeometryForTimePoint(currentSelectedTimePoint).GetPointer();
 
-    // check for invalid time step
+    // check for invalid time point
     if (geometry.IsNull())
     {
       geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);

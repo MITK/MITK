@@ -56,6 +56,10 @@ namespace
 
     QImage image(dimensions[0], dimensions[1], QImage::Format_RGB32);
 
+    // A magnified image may not fit into memory.
+    if (image.isNull() || pixels == nullptr)
+      return QImage();
+
     for (int y = 0; y < dimensions[1]; ++y)
     {
       // VTK stores the bottom row first.
@@ -86,6 +90,9 @@ namespace
 
     SetBackground(renderer, Qt::white);
     const auto overWhite = Capture(window, renderer, magnification);
+
+    if (overBlack.isNull() || overWhite.isNull())
+      return QImage();
 
     QImage image(overBlack.size(), QImage::Format_ARGB32);
 
@@ -220,32 +227,45 @@ QImage QmitkRenderWindowScreenshot::Take(mitk::IRenderWindowPart* renderWindowPa
   double background[3];
   renderer->GetBackground(background);
 
+  const auto restore = [&]() {
+    renderer->SetBackground(background);
+    renderWindow->SetDoubleBuffer(doubleBuffering);
+
+    if (!decorationsToRestore.isEmpty())
+      renderWindowPart->EnableDecorations(true, decorationsToRestore);
+
+    // Tiling moves the camera of 2D windows; rendering again restores it, the
+    // background and the decorations.
+    if (!decorations.isEmpty() || options.BackgroundMode != Background::AsShown)
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  };
+
   QImage image;
 
-  switch (options.BackgroundMode)
+  // Rendering may throw, for example when a magnified image does not fit into memory.
+  try
   {
-    case Background::AsShown:
-      image = Capture(window, renderer, magnification);
-      break;
-    case Background::Color:
-      SetBackground(renderer, options.BackgroundColor);
-      image = Capture(window, renderer, magnification);
-      break;
-    case Background::Transparent:
-      image = CaptureTransparent(window, renderer, magnification);
-      break;
+    switch (options.BackgroundMode)
+    {
+      case Background::AsShown:
+        image = Capture(window, renderer, magnification);
+        break;
+      case Background::Color:
+        SetBackground(renderer, options.BackgroundColor);
+        image = Capture(window, renderer, magnification);
+        break;
+      case Background::Transparent:
+        image = CaptureTransparent(window, renderer, magnification);
+        break;
+    }
+  }
+  catch (...)
+  {
+    restore();
+    throw;
   }
 
-  renderer->SetBackground(background);
-  renderWindow->SetDoubleBuffer(doubleBuffering);
-
-  if (!decorationsToRestore.isEmpty())
-    renderWindowPart->EnableDecorations(true, decorationsToRestore);
-
-  // Tiling moves the camera of 2D windows; rendering again restores it, the
-  // background and the decorations.
-  if (!decorations.isEmpty() || options.BackgroundMode != Background::AsShown)
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  restore();
 
   // Without the gradient, which cropping leaves out, the window shows the renderer's own background.
   const auto shownBackground = options.BackgroundMode == Background::Transparent ? QColor(Qt::transparent)

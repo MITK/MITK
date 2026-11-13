@@ -59,7 +59,12 @@ public:
     /** \brief For Background::Color. */
     QColor BackgroundColor = Qt::black;
 
-    /** \brief Whether the logo, corner annotation and border of the window are part of the image. */
+    /**
+     * \brief Whether the logo, corner annotation and border of the window are part of the image.
+     *
+     * The gradient of the background counts as a decoration: without
+     * decorations, the background is flat for Background::AsShown as well.
+     */
     bool Decorations = true;
 
     /** \brief Whether the image is cut down to the part of the scene that is not background. */

@@ -94,6 +94,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestUpdateCenterOfMass_ReusedUntilGroupImageChanges);
   MITK_TEST(TestUpdateCenterOfMass_EmptyLabel_ResetsCenter);
   MITK_TEST(TestUpdateCenterOfMass_Dynamic);
+  MITK_TEST(TestMeasureLabels);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -886,6 +887,42 @@ public:
       mitk::Equal(label->GetCenterOfMassIndex(), expectedIndex0, mitk::eps, true));
 
     CPPUNIT_ASSERT_THROW(segmentation->UpdateCenterOfMass(5, 2), mitk::Exception);
+  }
+
+  void TestMeasureLabels()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(2);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);  // 2000 voxels around (14.5, 24.5, 14.5)
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 6); // 1000 voxels around (64.5, 24.5, 39.5)
+    PaintBox(groupImage, 0, { 1, 1, 1 }, { 1, 1, 1 }, 7);       // a value without a label
+    PaintBox(groupImage, 1, { 95, 127, 51 }, { 95, 127, 51 }, 5);
+
+    const auto first = segmentation->MeasureLabels(0, 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Only labels with pixels are measured", std::size_t(2), first.size());
+    CPPUNIT_ASSERT_EQUAL(std::uint64_t(2000), first.at(5).VoxelCount);
+    CPPUNIT_ASSERT_EQUAL(std::uint64_t(1000), first.at(6).VoxelCount);
+
+    mitk::Point3D expected;
+    mitk::FillVector3D(expected, 14.5, 24.5, 14.5);
+    CPPUNIT_ASSERT_MESSAGE("Wrong centroid of label 5", mitk::Equal(first.at(5).CentroidIndex, expected, mitk::eps, true));
+    mitk::FillVector3D(expected, 64.5, 24.5, 39.5);
+    CPPUNIT_ASSERT_MESSAGE("Wrong centroid of label 6", mitk::Equal(first.at(6).CentroidIndex, expected, mitk::eps, true));
+
+    const auto second = segmentation->MeasureLabels(0, 1);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong labels at time step 1", std::size_t(1), second.size());
+    CPPUNIT_ASSERT_EQUAL(std::uint64_t(1), second.at(5).VoxelCount);
+    mitk::FillVector3D(expected, 95.0, 127.0, 51.0);
+    CPPUNIT_ASSERT_MESSAGE("Wrong centroid of the last voxel", mitk::Equal(second.at(5).CentroidIndex, expected, mitk::eps, true));
+
+    CPPUNIT_ASSERT_THROW(segmentation->MeasureLabels(0, 2), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(segmentation->MeasureLabels(1, 0), mitk::Exception);
+
+    mitk::ImageWriteAccessor writer(groupImage);
+    CPPUNIT_ASSERT_THROW(segmentation->MeasureLabels(0, 0), mitk::MemoryIsLockedException);
   }
 
   void TestEraseLabel_Dynamic()

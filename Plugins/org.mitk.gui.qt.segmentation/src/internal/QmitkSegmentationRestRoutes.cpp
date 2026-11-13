@@ -16,7 +16,6 @@ found in the LICENSE file.
 
 #include <mitkCoreServices.h>
 #include <mitkErrorResponse.h>
-#include <mitkImageReadAccessor.h>
 #include <mitkINodeSelectionService.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
@@ -165,60 +164,21 @@ namespace
     return selection;
   }
 
-  /** The voxels of each label value in a group image, empty while a tool writes into it. */
-  struct LabelVoxels
+  /**
+   * Whether the request asks for the voxels, volumes and centers of labels, which take a pass over the
+   * segmentation.
+   */
+  bool IsMeasureRequested(const mitk::RestRequest& request)
   {
-    std::vector<std::uint64_t> Counts;
+    const auto value = request.GetQueryParam("measure");
 
-    /** The sums of the indices of the voxels of each value, for the center of a label. */
-    std::vector<std::array<double, 3>> IndexSums;
-  };
+    if (!value.has_value() || *value == "false")
+      return false;
 
-  LabelVoxels CountVoxels(const mitk::Image* groupImage, mitk::TimeStepType timeStep)
-  {
-    LabelVoxels voxels;
+    if (*value == "true")
+      return true;
 
-    if (groupImage == nullptr || groupImage->GetPixelType().GetComponentType() != itk::IOComponentEnum::USHORT)
-      return voxels;
-
-    try
-    {
-      // Never wait in the GUI thread for a tool that writes into the segmentation.
-      mitk::ImageReadAccessor accessor(mitk::Image::ConstPointer(groupImage), groupImage->GetVolumeData(timeStep), mitk::ImageAccessorBase::ExceptionIfLocked);
-      const auto* pixels = static_cast<const mitk::Label::PixelType*>(accessor.GetData());
-      const std::array<unsigned int, 3> size = { groupImage->GetDimension(0), groupImage->GetDimension(1), groupImage->GetDimension(2) };
-
-      voxels.Counts.assign(std::numeric_limits<mitk::Label::PixelType>::max() + 1, 0);
-      voxels.IndexSums.assign(voxels.Counts.size(), { 0.0, 0.0, 0.0 });
-
-      for (unsigned int z = 0; z < size[2]; ++z)
-      {
-        for (unsigned int y = 0; y < size[1]; ++y)
-        {
-          const auto* row = pixels + (static_cast<std::size_t>(z) * size[1] + y) * size[0];
-
-          for (unsigned int x = 0; x < size[0]; ++x)
-          {
-            const auto value = row[x];
-            ++voxels.Counts[value];
-
-            if (value != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
-            {
-              auto& sum = voxels.IndexSums[value];
-              sum[0] += x;
-              sum[1] += y;
-              sum[2] += z;
-            }
-          }
-        }
-      }
-    }
-    catch (const mitk::Exception&)
-    {
-      voxels = LabelVoxels();
-    }
-
-    return voxels;
+    throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"measure\" must be true or false.", request.Path));
   }
 
   nlohmann::json DescribeLabel(const mitk::Label* label, mitk::MultiLabelSegmentation::GroupIndexType group)
@@ -234,13 +194,13 @@ namespace
   }
 
   /**
-   * The labels with their voxels and volumes at the time point of the
-   * selection, or with time_steps for all of them.
+   * The labels of the segmentation. With a selection, each also has voxels, volume_ml and center at the time
+   * point of the selection, or time_steps with them for all time steps; that takes a pass over the segmentation.
    */
-  nlohmann::json DescribeLabels(mitk::MultiLabelSegmentation* segmentation, const mitk::RestTimeSelection& selection)
+  nlohmann::json DescribeLabels(mitk::MultiLabelSegmentation* segmentation, const std::optional<mitk::RestTimeSelection>& measureAt = std::nullopt)
   {
     auto labels = nlohmann::json::array();
-    const auto timeSteps = selection.GetTimeSteps(segmentation);
+    const auto timeSteps = measureAt.has_value() ? measureAt->GetTimeSteps(segmentation) : std::vector<mitk::TimeStepType>();
 
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < segmentation->GetNumberOfGroups(); ++group)
     {
@@ -248,41 +208,41 @@ namespace
       const auto spacing = groupImage->GetGeometry()->GetSpacing();
       const auto voxelMilliliters = spacing[0] * spacing[1] * spacing[2] / 1000.0;
 
-      struct StepVoxels
-      {
-        LabelVoxels Voxels;
-        const mitk::BaseGeometry* Geometry;
-      };
-
-      std::vector<StepVoxels> stepVoxels;
+      // Nothing for a time step at which a tool writes into the segmentation: the measure never waits for it.
+      std::vector<std::optional<mitk::MultiLabelSegmentation::LabelMeasureMapType>> measures;
 
       for (const auto timeStep : timeSteps)
-        stepVoxels.push_back({ CountVoxels(groupImage, timeStep), groupImage->GetGeometry(timeStep) });
+      {
+        try
+        {
+          measures.emplace_back(segmentation->MeasureLabels(group, timeStep));
+        }
+        catch (const mitk::Exception&)
+        {
+          measures.emplace_back();
+        }
+      }
 
-      const auto addVolume = [voxelMilliliters](nlohmann::json& json, const StepVoxels* step, mitk::MultiLabelSegmentation::LabelValueType value) {
-        if (step == nullptr || step->Voxels.Counts.empty())
+      const auto addMeasure = [&](nlohmann::json& json, std::size_t i, mitk::MultiLabelSegmentation::LabelValueType value) {
+        if (measures.size() <= i || !measures[i].has_value())
         {
           json["voxels"] = nullptr;
           return;
         }
 
-        const auto count = step->Voxels.Counts[value];
+        const auto found = measures[i]->find(value);
+        const std::uint64_t count = found != measures[i]->end() ? found->second.VoxelCount : 0;
         json["voxels"] = count;
         json["volume_ml"] = count * voxelMilliliters;
 
-        if (count == 0)
+        if (found == measures[i]->end())
         {
           json["center"] = nullptr;
           return;
         }
 
-        mitk::Point3D index;
-
-        for (int axis = 0; axis < 3; ++axis)
-          index[axis] = step->Voxels.IndexSums[value][axis] / count;
-
         mitk::Point3D center;
-        step->Geometry->IndexToWorld(index, center);
+        groupImage->GetGeometry(timeSteps[i])->IndexToWorld(found->second.CentroidIndex, center);
         json["center"] = mitk::ToRestJson(center);
       };
 
@@ -295,22 +255,22 @@ namespace
 
         auto json = DescribeLabel(label, group);
 
-        if (selection.All)
+        if (measureAt.has_value() && measureAt->All)
         {
           auto steps = nlohmann::json::array();
 
           for (std::size_t i = 0; i < timeSteps.size(); ++i)
           {
             auto step = mitk::DescribeRestTimeStep(segmentation, timeSteps[i]);
-            addVolume(step, &stepVoxels[i], value);
+            addMeasure(step, i, value);
             steps.push_back(std::move(step));
           }
 
           json["time_steps"] = std::move(steps);
         }
-        else
+        else if (measureAt.has_value())
         {
-          addVolume(json, stepVoxels.empty() ? nullptr : &stepVoxels.front(), value);
+          addMeasure(json, 0, value);
         }
 
         labels.push_back(std::move(json));
@@ -318,12 +278,6 @@ namespace
     }
 
     return labels;
-  }
-
-  /** The labels with their voxels and volumes at the selected time point. */
-  nlohmann::json DescribeLabels(mitk::MultiLabelSegmentation* segmentation)
-  {
-    return DescribeLabels(segmentation, GetSelectedTime());
   }
 
   nlohmann::json DescribeGroup(mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
@@ -657,9 +611,10 @@ namespace
   /**
    * The labels of the preview of a tool that adds labels, as the confirm adds them: with values that only the
    * confirm gives them, and to the group of the active label, unless the tool transfers all groups of its
-   * preview, which then stand for those of the segmentation.
+   * preview, which then stand for those of the segmentation. With \a measure, they have voxels, volume_ml and
+   * center at the selected time point.
    */
-  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool)
+  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool, bool measure)
   {
     auto* preview = tool->GetPreviewSegmentation();
 
@@ -670,7 +625,7 @@ namespace
     const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
     const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
 
-    auto labels = DescribeLabels(preview);
+    auto labels = measure ? DescribeLabels(preview, GetSelectedTime()) : DescribeLabels(preview);
 
     for (auto& label : labels)
     {
@@ -748,10 +703,15 @@ namespace
 
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < preview->GetNumberOfGroups(); ++group)
     {
-      const auto counts = CountVoxels(preview->GetGroupImage(group), timeSteps.front()).Counts;
-
-      for (std::size_t value = 1; value < counts.size(); ++value)
-        count += counts[value];
+      try
+      {
+        for (const auto& [value, measure] : preview->MeasureLabels(group, timeSteps.front()))
+          count += measure.VoxelCount;
+      }
+      catch (const mitk::Exception&)
+      {
+        // A group that a tool writes into is left out: the count never waits for the tool.
+      }
     }
 
     return count;
@@ -835,7 +795,8 @@ namespace
     }
   }
 
-  nlohmann::json DescribeVoxTell(mitk::VoxTellTool* tool)
+  /** \param measure Whether the preview labels have voxels, volume_ml and center, which take a pass over them. */
+  nlohmann::json DescribeVoxTell(mitk::VoxTellTool* tool, bool measure = false)
   {
     return {
       { "installed", IsInstalled(tool).value_or(false) },
@@ -843,7 +804,7 @@ namespace
       { "prompts", tool->GetPrompts() },
       { "prompts_without_result", tool->GetPromptsWithoutResult() },
       { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", DescribePreviewLabels(tool) }
+      { "preview_labels", DescribePreviewLabels(tool, measure) }
     };
   }
 
@@ -938,8 +899,11 @@ namespace
     return json;
   }
 
-  /** \param withTasks Whether to list the tasks, which only GET does, as there are many. */
-  nlohmann::json DescribeTotalSegmentator(mitk::TotalSegmentatorTool* tool, bool withTasks)
+  /**
+   * \param withTasks Whether to list the tasks, which only GET does, as there are many.
+   * \param measure Whether the preview labels have voxels, volume_ml and center, which take a pass over them.
+   */
+  nlohmann::json DescribeTotalSegmentator(mitk::TotalSegmentatorTool* tool, bool withTasks, bool measure = false)
   {
     nlohmann::json state = {
       { "installed", mitk::TotalSegmentatorTool::IsInstalled() },
@@ -951,7 +915,7 @@ namespace
       { "roi_subset", tool->GetRoiSubset() },
       { "running", tool->IsUpdating() },
       { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", DescribePreviewLabels(tool) }
+      { "preview_labels", DescribePreviewLabels(tool, measure) }
     };
 
     if (withTasks && tool->IsInitialized())
@@ -1257,7 +1221,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "segmentation becomes the one the Segmentation view works on, with its first label active, which ends "
     "the active tool and discards results it did not confirm. An image that the view does not take is "
     "answered with 422 NOT_ACCEPTED. Returns "
-    "{data: {uid, name, labels: [label]}} with status 201, labels as GET .../labels gives them.";
+    "{data: {uid, name, labels: [label]}} with status 201, labels as GET .../labels gives them without measure.";
   create.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -1340,20 +1304,24 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   RestRoute labels;
   labels.Method = "GET";
   labels.Path = "/segmentation/segmentations/:uid/labels";
-  labels.Summary = "List the labels of a segmentation with their volumes";
+  labels.Summary = "List the labels of a segmentation, optionally with their volumes";
   labels.Description =
-    "Query parameter: timepoint_ms (optional), a time point in milliseconds, or all for each time step of the "
-    "segmentation; the selected time point without it. Returns {data: [{value, name, color, visible, locked, "
-    "group, voxels, volume_ml, center}]}, the voxels and volumes at the time point, and center, the center of the "
-    "voxels in millimeters, null for an empty label; with all, each label has time_steps: [{min_timepoint_ms, "
+    "Returns {data: [{value, name, color, visible, locked, group}]}. Query parameters: measure (optional, true "
+    "or false), true adds voxels, volume_ml and center to each label, which costs a pass over the segmentation, "
+    "so ask for it only when the numbers are needed; timepoint_ms (optional, with measure=true only), a time "
+    "point in milliseconds, or all for each time step of the segmentation, the selected time point without it. "
+    "With measure=true, voxels and volume_ml are those at the time point, and center is the center of the voxels "
+    "in millimeters, null for an empty label; with all, each label has time_steps: [{min_timepoint_ms, "
     "max_timepoint_ms, voxels, volume_ml, center}] instead. Centers tell which labels or instances of two "
     "segmentations mark the same finding. voxels is null while a tool writes into the segmentation, and when the "
     "segmentation has no data at the time point.";
   labels.Handler = [server](const RestRequest& request) {
     const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto measure = IsMeasureRequested(request);
+    const auto selection = measure ? std::optional<RestTimeSelection>(RestTimeSelection::FromRequest(request)) : std::nullopt;
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      return DescribeLabels(GetSegmentation(node, request.Path), RestTimeSelection::FromRequest(request));
+      return DescribeLabels(GetSegmentation(node, request.Path), selection);
     }));
   };
   routes.push_back(labels);
@@ -1461,7 +1429,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   removeLabel.Description =
     "Undoable. Removing the active label can leave the segmentation without an active label, which GET "
     "/api/v1/segmentation/session tells. Returns {data: [label]}, the labels that remain, as GET .../labels "
-    "gives them.";
+    "gives them without measure.";
   removeLabel.Handler = [server](const RestRequest& request) {
     const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
 
@@ -1493,7 +1461,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "a corner belong to the same part; no voxel is added or removed. Query parameter: timepoint_ms (optional), "
     "the time point to split, the selected time point without it; other time steps stay with the label. "
     "Undoable. Returns {data: [label]}, the label and its new instances, largest first, as GET .../labels gives "
-    "them; only the label if it has no separate parts.";
+    "them without measure, so without their voxels, volumes and centers, which GET .../labels?measure=true tells; "
+    "only the label if it has no separate parts.";
   splitLabel.Handler = [server](const RestRequest& request) {
     const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
 
@@ -1525,16 +1494,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       node->Modified();
       RenderingManager::GetInstance()->RequestUpdateAll();
 
-      const auto labels = DescribeLabels(segmentation, selection);
       auto instances = nlohmann::json::array();
 
       for (const auto value : values)
       {
-        const auto described = std::find_if(labels.begin(), labels.end(),
-          [value](const nlohmann::json& json) { return json.at("value") == value; });
-
-        if (described != labels.end())
-          instances.push_back(*described);
+        if (const auto instance = segmentation->GetLabel(value); instance.IsNotNull())
+          instances.push_back(DescribeLabel(instance, segmentation->GetGroupIndexOfLabel(value)));
       }
 
       return instances;
@@ -1676,8 +1641,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Writes the preview of the active tool into the segmentation, like its Confirm button. Body, all "
     "optional: {merge: false, ignore_locks: false, all_time_steps: false}, the options under the button. "
     "Undoable. Answers 409 NOTHING_TO_CONFIRM if the tool has no result, as after a confirm. "
-    "Returns {data: {segmentation: {uid, name}, labels: [label]}} as GET .../labels gives them; "
-    "check there that the label is filled. If the tool has to compute the result first, for all_time_steps "
+    "Returns {data: {segmentation: {uid, name}, labels: [label]}} as GET .../labels gives them without measure; "
+    "check with GET .../labels?measure=true that the label is filled. If the tool has to compute the result first, for all_time_steps "
     "with a tool that previews only the time step on display, or for an active label that changed since the "
     "result was computed, which takes as long as that many runs, the confirm runs as a job: query parameter "
     "wait (seconds) waits for it, and the job's result is the answer.";
@@ -2066,13 +2031,17 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   voxTell.Path = "/segmentation/voxtell";
   voxTell.Summary = "Get the state of VoxTell, which segments structures named in text";
   voxTell.Description =
-    "Needs VoxTell as active tool. Returns {data: {installed, model_loaded, prompts, prompts_without_result, "
-    "error, preview_labels: [label]}}, preview_labels being the unconfirmed result, one label per prompt, as GET "
-    ".../labels describes labels but without value: group is the group that the confirm adds them to, that of the "
-    "active label unless create_groups put a label into another one, which the confirm creates if the "
-    "segmentation does not have it, and they get their values with the confirm.";
+    "Needs VoxTell as active tool. Query parameter: measure (optional, true or false), true adds voxels, "
+    "volume_ml and center to the preview labels, which costs a pass over the preview. Returns {data: {installed, "
+    "model_loaded, prompts, prompts_without_result, error, preview_labels: [label]}}, preview_labels being the "
+    "unconfirmed result, one label per prompt, as GET .../labels describes labels but without value: group is the "
+    "group that the confirm adds them to, that of the active label unless create_groups put a label into another "
+    "one, which the confirm creates if the segmentation does not have it, and they get their values with the "
+    "confirm. voxels, volume_ml and center are those of GET .../labels at the selected time point.";
   voxTell.Handler = [server](const RestRequest& request) {
-    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeVoxTell(GetVoxTell(request.Path)); }));
+    const auto measure = IsMeasureRequested(request);
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeVoxTell(GetVoxTell(request.Path), measure); }));
   };
   routes.push_back(voxTell);
 
@@ -2174,7 +2143,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "first if they are missing, which the progress notifications and GET /api/v1/workbench/tasks show, then "
     "loads it. Runs as a job: query parameter wait (seconds) waits for it. If the model is loaded already, the "
     "job has succeeded when the answer comes. The job's result is the state as GET /api/v1/segmentation/voxtell "
-    "gives it.";
+    "gives it without measure.";
   voxTellModel.Handler = [server](const RestRequest& request) {
     const auto loaded = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -2269,7 +2238,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "The VoxTell panel shows the prompts. Prompts VoxTell does not know need its text model, which is "
     "downloaded first if it is missing (about 8 GB) and loaded, which takes a while. Runs as a job: query "
     "parameter wait (seconds) waits for it. The job's result is the state as GET "
-    "/api/v1/segmentation/voxtell gives it; POST /api/v1/segmentation/confirm then adds one label per "
+    "/api/v1/segmentation/voxtell gives it without measure; POST /api/v1/segmentation/confirm then adds one label per "
     "prompt to the segmentation.";
   voxTellPrompts.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
@@ -2416,16 +2385,21 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   totalSegmentator.Path = "/segmentation/totalsegmentator";
   totalSegmentator.Summary = "Get the state of TotalSegmentator, which segments the structures of a body region at once";
   totalSegmentator.Description =
-    "Needs TotalSegmentator as active tool. Returns {data: {installed, initialized, has_license, device, task, speed, "
+    "Needs TotalSegmentator as active tool. Query parameter: measure (optional, true or false), true adds voxels, "
+    "volume_ml and center to the preview labels, which costs a pass over the preview. Returns {data: {installed, "
+    "initialized, has_license, device, task, speed, "
     "roi_subset: [class], running, error, preview_labels: [label], tasks: [{name, modality: CT | MR, licensed, "
     "available, speeds: [{name: standard | fast | fastest, resolution_mm}], roi_subset, class_count}]}}. task, speed "
     "and roi_subset are what the next run segments; an empty roi_subset means all classes of the task. available is "
     "false for licensed tasks without a license. The tasks are there once TotalSegmentator has started (initialized). "
     "preview_labels are the unconfirmed result of the last run, as GET .../labels describes labels but without "
     "value: group is the group of the active label, where the confirm adds them, and they get their values with the "
-    "confirm. Device and license are settings of the user.";
+    "confirm; voxels, volume_ml and center are those of GET .../labels at the selected time point. Device and "
+    "license are settings of the user.";
   totalSegmentator.Handler = [server](const RestRequest& request) {
-    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeTotalSegmentator(GetTotalSegmentator(request.Path), true); }));
+    const auto measure = IsMeasureRequested(request);
+
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeTotalSegmentator(GetTotalSegmentator(request.Path), true, measure); }));
   };
   routes.push_back(totalSegmentator);
 
@@ -2437,7 +2411,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Needs TotalSegmentator as active tool, installed by the user through its panel. Its panel starts it as well when "
     "it opens. Runs as a job: query parameter wait (seconds) waits for it. If it has started already, the job has "
     "succeeded when the answer comes. The job's result is the state as GET /api/v1/segmentation/totalsegmentator "
-    "gives it, without tasks.";
+    "gives it without measure and without tasks.";
   totalSegmentatorStart.Handler = [server](const RestRequest& request) {
     const auto initialized = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -2643,7 +2617,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "the reference image with the task, speed and roi_subset chosen with PATCH /api/v1/segmentation/totalsegmentator. "
     "Runs as a job, which takes seconds to minutes; the first run of a task downloads its model weights first, which "
     "the progress notifications and GET /api/v1/workbench/tasks show. Query parameter wait (seconds) waits for it. "
-    "The job's result is the state as GET /api/v1/segmentation/totalsegmentator gives it, without tasks; POST "
+    "The job's result is the state as GET /api/v1/segmentation/totalsegmentator gives it without measure and without tasks; POST "
     "/api/v1/segmentation/confirm then adds the labels of preview_labels to the segmentation. preview_labels has a "
     "label for each class found in the image, and is empty if none was.";
   totalSegmentatorRun.Handler = [server](const RestRequest& request) {

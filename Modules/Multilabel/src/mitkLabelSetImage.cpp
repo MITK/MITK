@@ -1324,6 +1324,95 @@ bool mitk::MultiLabelSegmentation::IsEmpty(const Label* label, TimeStepType t) c
   return this->IsEmpty(label->GetValue(), t);
 }
 
+mitk::MultiLabelSegmentation::LabelMeasureMapType mitk::MultiLabelSegmentation::MeasureLabels(GroupIndexType groupIndex, TimeStepType timeStep) const
+{
+  if (!this->GetTimeGeometry()->IsValidTimeStep(timeStep))
+    mitkThrow() << "Cannot measure labels. Invalid time step: " << timeStep;
+
+  const auto* image = this->GetGroupImage(groupIndex);
+  const auto labelValues = this->GetLabelValuesByGroup(groupIndex);
+
+  // Maps a pixel value to its position in labelValues, so that the pass needs no table of all pixel values per block.
+  std::vector<std::int32_t> slotOfValue(std::size_t(std::numeric_limits<LabelValueType>::max()) + 1, -1);
+
+  for (std::size_t slot = 0; slot < labelValues.size(); ++slot)
+    slotOfValue[labelValues[slot]] = static_cast<std::int32_t>(slot);
+
+  const std::size_t sizeX = image->GetDimension(0);
+  const std::size_t sizeY = image->GetDimension(1);
+  const std::size_t numPixels = sizeX * sizeY * image->GetDimension(2);
+
+  ImageReadAccessor accessor(Image::ConstPointer(image), image->GetVolumeData(timeStep), ImageAccessorBase::ExceptionIfLocked);
+  const auto* pixels = static_cast<const LabelValueType*>(accessor.GetData());
+
+  std::vector<CentroidSums> totals(labelValues.size());
+  std::mutex totalsMutex;
+
+  ParallelizeBlocks(numPixels, [&](std::size_t begin, std::size_t end)
+    {
+      std::vector<CentroidSums> blockSums(labelValues.size());
+
+      auto x = begin % sizeX;
+      auto y = (begin / sizeX) % sizeY;
+      auto z = begin / (sizeX * sizeY);
+
+      for (auto i = begin; i < end; ++i)
+      {
+        if (const auto slot = slotOfValue[pixels[i]]; slot >= 0)
+        {
+          auto& sums = blockSums[slot];
+          ++sums.Count;
+          sums.X += x;
+          sums.Y += y;
+          sums.Z += z;
+        }
+
+        if (++x == sizeX)
+        {
+          x = 0;
+
+          if (++y == sizeY)
+          {
+            y = 0;
+            ++z;
+          }
+        }
+      }
+
+      const std::lock_guard<std::mutex> lock(totalsMutex);
+
+      for (std::size_t slot = 0; slot < totals.size(); ++slot)
+      {
+        totals[slot].Count += blockSums[slot].Count;
+        totals[slot].X += blockSums[slot].X;
+        totals[slot].Y += blockSums[slot].Y;
+        totals[slot].Z += blockSums[slot].Z;
+      }
+    });
+
+  LabelMeasureMapType measures;
+
+  for (std::size_t slot = 0; slot < totals.size(); ++slot)
+  {
+    const auto& sums = totals[slot];
+
+    if (0 == sums.Count)
+      continue;
+
+    const auto count = static_cast<double>(sums.Count);
+
+    LabelMeasure measure;
+    measure.VoxelCount = sums.Count;
+    measure.CentroidIndex[0] = static_cast<double>(sums.X) / count;
+    measure.CentroidIndex[1] = static_cast<double>(sums.Y) / count;
+    measure.CentroidIndex[2] = static_cast<double>(sums.Z) / count;
+
+    measures[labelValues[slot]] = measure;
+  }
+
+  return measures;
+}
+
 void mitk::MultiLabelSegmentation::SetLookupTable(mitk::LookupTable* lut)
 {
   m_LookupTable = lut;

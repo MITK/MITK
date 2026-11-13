@@ -55,7 +55,7 @@ public:
    * \brief Why the REST server that runs already lets others in as well.
    *
    * Empty if no server runs, or if the one that runs lets in only clients
-   * with a token, on this computer, which cannot name files.
+   * with a token on this computer, whatever files these may name.
    */
   QStringList GetRunningServerRisks() const;
 
@@ -69,8 +69,8 @@ public:
   /**
    * \brief Withdraws the tools and stops the server that Offer() started.
    *
-   * Waits for the calls that run, which wait for the GUI thread, by running
-   * its event loop. Call it from the GUI thread.
+   * Waits for the calls that run by running the event loop of the GUI
+   * thread, which they may wait for. Call it from the GUI thread.
    */
   void Withdraw();
 

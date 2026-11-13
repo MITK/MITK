@@ -26,6 +26,10 @@ found in the LICENSE file.
 
 #include <QCoreApplication>
 
+#include <cstdint>
+#include <limits>
+#include <stdexcept>
+
 namespace
 {
   const std::string McpPath = "/mcp";
@@ -147,6 +151,7 @@ QString QmitkAgentToolServer::Offer()
   catch (const mitk::Exception& e)
   {
     MITK_ERROR << e.GetDescription();
+    this->Withdraw();
     return QString("The Workbench tools are not available: %1").arg(e.GetDescription());
   }
 
@@ -162,7 +167,7 @@ void QmitkAgentToolServer::Withdraw()
   {
     m_Endpoint->Withdraw();
 
-    // Calls that run wait for the GUI thread, which is this one.
+    // Calls that run may wait for the GUI thread, which is this one.
     while (m_Endpoint->GetRunningCallCount() > 0)
       QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
 
@@ -268,7 +273,17 @@ void QmitkAgentToolServer::AddMemoryTools()
     { "required", { "id" } }
   };
   forget.Handler = [memory, server](const nlohmann::json& arguments, const mitk::RestRequest&) {
-    const auto id = arguments.at("id").get<int>();
+    const auto& idArgument = arguments.at("id");
+
+    // get<int>() alone would turn a fraction, a boolean or a too large number into the id of another note.
+    if (!idArgument.is_number_integer() ||
+        idArgument.get<std::int64_t>() < 1 ||
+        idArgument.get<std::int64_t>() > std::numeric_limits<int>::max())
+    {
+      throw std::invalid_argument("The id of a note is a positive integer.");
+    }
+
+    const auto id = idArgument.get<int>();
 
     return mitk::CallInGuiThread(*server, [memory, id]() {
       memory->Remove(id);

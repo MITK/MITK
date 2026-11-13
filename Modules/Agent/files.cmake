@@ -1,3 +1,7 @@
+set(H_FILES
+  include/QmitkAgentStep.h
+)
+
 set(CPP_FILES
   mitkMcpEndpoint.cpp
   mitkMcpRestApiTools.cpp

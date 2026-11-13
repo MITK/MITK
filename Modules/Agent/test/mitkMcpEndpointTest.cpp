@@ -23,8 +23,6 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr int TestPort = 59201;
-
   nlohmann::json Request(int id, const std::string& method, const nlohmann::json& params = nlohmann::json::object())
   {
     return { { "jsonrpc", "2.0" }, { "id", id }, { "method", method }, { "params", params } };
@@ -75,7 +73,8 @@ namespace
     mitk::RestServerConfig config;
     config.enabled = true;
     config.host = "127.0.0.1";
-    config.port = TestPort;
+    // A free port of the system's choice: a fixed one can be taken or reserved.
+    config.port = 0;
     return config;
   }
 
@@ -95,6 +94,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestImageResult);
   MITK_TEST(TestToolException);
   MITK_TEST(TestUnknownTool);
+  MITK_TEST(TestMalformedMessages);
   MITK_TEST(TestRefuseCalls);
   MITK_TEST(TestUnknownMethod);
   MITK_TEST(TestNotificationGetsNoAnswer);
@@ -183,6 +183,20 @@ public:
     CPPUNIT_ASSERT_EQUAL(-32602, response["error"]["code"].get<int>());
   }
 
+  void TestMalformedMessages()
+  {
+    const auto endpoint = MakeEndpoint();
+
+    for (const auto& params : { nlohmann::json(), nlohmann::json::array({ "echo" }), nlohmann::json::object({ { "name", 5 } }) })
+    {
+      const auto response = endpoint->HandleMessage(Request(1, "tools/call", params), mitk::RestRequest());
+      CPPUNIT_ASSERT_EQUAL(-32602, response["error"]["code"].get<int>());
+    }
+
+    const auto response = endpoint->HandleMessage(nlohmann::json::array(), mitk::RestRequest());
+    CPPUNIT_ASSERT_EQUAL(-32600, response["error"]["code"].get<int>());
+  }
+
   void TestRefuseCalls()
   {
     const auto endpoint = MakeEndpoint();
@@ -254,7 +268,7 @@ public:
     CPPUNIT_ASSERT_THROW(endpoint->Offer(&server, "/mcp"), mitk::Exception);
     CPPUNIT_ASSERT(server.Start());
 
-    httplib::Client client("127.0.0.1", TestPort);
+    httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
     const auto response = client.Post("/api/v1/mcp", Call("echo", { { "text", "over http" } }).dump(), "application/json");
     const auto stream = client.Get("/api/v1/mcp");
 

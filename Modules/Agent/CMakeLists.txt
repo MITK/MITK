@@ -7,6 +7,8 @@ mitk_create_module(
     PRIVATE Qt6|Concurrent
 )
 
-if(BUILD_TESTING)
-  add_subdirectory(test)
+if(TARGET ${MODULE_TARGET})
+  if(BUILD_TESTING)
+    add_subdirectory(test)
+  endif()
 endif()

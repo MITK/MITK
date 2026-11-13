@@ -301,6 +301,9 @@ nlohmann::json mitk::McpEndpoint::HandleMessage(const nlohmann::json& message, c
 {
   if (message.is_array())
   {
+    if (message.empty())
+      return MakeError(nullptr, InvalidRequest, "Empty batch");
+
     auto responses = nlohmann::json::array();
 
     for (const auto& item : message)
@@ -347,7 +350,10 @@ nlohmann::json mitk::McpEndpoint::HandleRequest(const nlohmann::json& message, c
 
   if (method == "tools/call")
   {
-    const auto name = params.value("name", std::string());
+    if (!params.is_object() || !params.contains("name") || !params["name"].is_string())
+      return MakeError(id, InvalidParams, "Expected the name of a tool");
+
+    const auto name = params["name"].get<std::string>();
     McpTool tool;
     std::optional<RunningCall> runningCall;
 

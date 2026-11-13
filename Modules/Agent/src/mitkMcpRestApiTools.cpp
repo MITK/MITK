@@ -62,7 +62,8 @@ namespace
       if (response.Body.size() > MaxImageBytes)
       {
         return mitk::McpToolResult::FromError("The image has " + std::to_string(response.Body.size()) +
-          " bytes, too many to show. Ask for a smaller one, for example with the query parameters width and height.");
+          " bytes, too many to show. Ask for a smaller one with the query parameters of the endpoint, "
+          "for example max_size, or width and height.");
       }
 
       mitk::McpToolResult result;

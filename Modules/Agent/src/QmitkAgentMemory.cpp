@@ -26,6 +26,13 @@ found in the LICENSE file.
 
 namespace
 {
+  /** The message reaches the agent as well, so it leaves out the path, which holds the name of the user's account. */
+  [[noreturn]] void ThrowWriteError(const QString& filePath)
+  {
+    MITK_ERROR << "Cannot write the agent's memory to " << filePath.toStdString();
+    throw std::runtime_error("The agent's memory could not be saved. The log of the Workbench tells more.");
+  }
+
   void WriteNotes(const QString& filePath, const std::vector<QmitkAgentMemory::Note>& notes, int nextId)
   {
     QJsonArray array;
@@ -36,12 +43,12 @@ namespace
     QSaveFile file(filePath);
 
     if (!file.open(QIODevice::WriteOnly))
-      throw std::runtime_error(QString("Cannot write the memory file %1.").arg(filePath).toStdString());
+      ThrowWriteError(filePath);
 
     file.write(QJsonDocument(QJsonObject{ { "nextId", nextId }, { "notes", array } }).toJson());
 
     if (!file.commit())
-      throw std::runtime_error(QString("Cannot write the memory file %1.").arg(filePath).toStdString());
+      ThrowWriteError(filePath);
   }
 }
 

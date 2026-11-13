@@ -122,7 +122,7 @@ mitk::TimePointType mitk::TimeNavigationController::GetSelectedTimePoint() const
 
   if (!m_InputWorldTimeGeometry->IsValidTimeStep(timeStep))
   {
-    mitkThrow() << "SliceNavigationController is in an invalid state. It has a time step"
+    mitkThrow() << "TimeNavigationController is in an invalid state. It has a time step "
                 << "selected that is not covered by its time geometry. Selected time step: " << timeStep
                 << "; TimeGeometry steps count: " << m_InputWorldTimeGeometry->CountTimeSteps();
   }

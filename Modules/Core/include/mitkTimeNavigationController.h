@@ -183,6 +183,7 @@ namespace mitk
      * \brief Convenience method that returns the time point that corresponds to the selected
      *        time step. The conversion is done using the time geometry of the controller.
      *        If the time geometry is not yet set, this function will always return 0.0.
+     * \throws mitk::Exception if the time geometry does not cover the selected time step.
      */
     TimePointType GetSelectedTimePoint() const;
 

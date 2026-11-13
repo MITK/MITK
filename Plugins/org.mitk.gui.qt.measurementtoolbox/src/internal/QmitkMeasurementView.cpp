@@ -804,8 +804,10 @@ void QmitkMeasurementView::UpdateHint()
     if (const auto* figure = dynamic_cast<const mitk::PlanarFigure*>(d->m_PendingNode->GetData()); nullptr != figure)
       hint = GetPlacementHint(figure);
   }
-  else if (d->m_Controls->tools->isEnabled())
+  else if (!d->m_Controls->tools->testAttribute(Qt::WA_ForceDisabled))
   {
+    // Not isEnabled(), which is also false while a parent is disabled, as
+    // the whole view is while it is locked.
     const auto selectedFigures = this->GetSelectedFigures();
 
     hint = !selectedFigures.empty()

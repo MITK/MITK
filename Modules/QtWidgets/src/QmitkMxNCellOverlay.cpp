@@ -3052,6 +3052,13 @@ bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
     return true;
   }
 
+  // A filter also gets the input of a disabled render window, which only
+  // QWidget::event() drops.
+  if (watched == m_Cell->GetRenderWindow() && event->isInputEvent() && !m_Cell->GetRenderWindow()->isEnabled())
+  {
+    return QmitkOverlayWidget::eventFilter(watched, event);
+  }
+
   // Arrange mode takes plate input from the render window's own stream: the
   // overlay stays mouse-transparent there, so VTK keeps every pointer event
   // that does not start on a plate.

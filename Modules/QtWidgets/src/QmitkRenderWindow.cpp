@@ -118,11 +118,17 @@ namespace
     }
   };
 
-  /** The events that QWidget::event() drops while a widget is disabled. */
+  /**
+   * The events that QWidget::event() drops while a widget is disabled, and
+   * the hover events, which Qt still sends then and VTK takes for mouse moves.
+   */
   bool IsInputEvent(QEvent::Type type)
   {
     switch (type)
     {
+      case QEvent::HoverEnter:
+      case QEvent::HoverLeave:
+      case QEvent::HoverMove:
       case QEvent::MouseButtonPress:
       case QEvent::MouseButtonRelease:
       case QEvent::MouseButtonDblClick:

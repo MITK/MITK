@@ -53,6 +53,8 @@ public:
 
   ~QmitkPartLockFollower() override;
 
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
   void Update();
 

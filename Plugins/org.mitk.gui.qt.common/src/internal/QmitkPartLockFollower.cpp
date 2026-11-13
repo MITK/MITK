@@ -23,6 +23,7 @@ found in the LICENSE file.
 
 #include <internal/berryWorkbenchPartReference.h>
 
+#include <QEvent>
 #include <QFile>
 
 namespace
@@ -53,6 +54,9 @@ QmitkPartLockFollower::QmitkPartLockFollower(const berry::IWorkbenchPart* part, 
       m_SetTitle(GetLockIcon(), QmitkPartLock::GetInstance()->GetReason());
   });
 
+  if (m_Content != nullptr)
+    m_Content->installEventFilter(this);
+
   // A part that opens while the lock holds starts locked.
   this->Update();
 }
@@ -61,12 +65,28 @@ QmitkPartLockFollower::~QmitkPartLockFollower()
 {
 }
 
+bool QmitkPartLockFollower::eventFilter(QObject* watched, QEvent* event)
+{
+  // The content of an editor is the control of its pane, which BlueBerry
+  // enables on its own, for example when its tab is dropped into another
+  // stack.
+  if (watched == m_Content.data() && event->type() == QEvent::EnabledChange && m_Content->isEnabled()
+      && QmitkPartLock::GetInstance()->IsLocked(m_PartId))
+  {
+    m_Content->setEnabled(false);
+  }
+
+  return QObject::eventFilter(watched, event);
+}
+
 void QmitkPartLockFollower::Update()
 {
   const auto* lock = QmitkPartLock::GetInstance();
   const bool locked = lock->IsLocked(m_PartId);
 
-  if (m_Content != nullptr)
+  // Only at a transition: a part that was not locked keeps the state it has
+  // for other reasons.
+  if (m_Content != nullptr && locked != m_Locked)
     m_Content->setEnabled(!locked);
 
   if (locked)

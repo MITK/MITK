@@ -22,8 +22,8 @@ internet.
 - Long work runs as a job: the answer has status 202 and the job. Add
   `?wait=<seconds>` to the request, or follow it with
   `mcp__mitk__api_get /api/v1/jobs/{id}?wait=60`, until its state is
-  succeeded, failed or cancelled. A job that failed tells why in its
-  `error`.
+  succeeded, failed or canceled. A job that failed is reported to you as
+  an error and tells why in its `error`.
 - `/api/v1/workbench/tasks` lists what runs in the Workbench, like
   downloads of models, their loading and computations, as its progress
   notifications show them. Tools download what they need on their own, which
@@ -57,10 +57,14 @@ internet.
   screenshots. Contrast only changes the display, not the data the
   segmentation tools work on. Leave your contrast in place when you are
   done, and tell the user about it.
-- `/api/v1/workbench/selection` is the selection of the Data Manager, which
-  many views work on.
+- `/api/v1/workbench/selection` is the selection of the Data Manager. Other
+  views follow it only once the Data Manager is the active part, for
+  example after the user clicks into it: do not count on a view having
+  followed your selection.
 - POST `/api/v1/rendering/reinit` with `{"uids": [...]}` fits the render
-  windows to that data, but not while a segmentation tool is active (see
+  windows to that data, as "Reinit" of the Data Manager does: for a single
+  image, the windows take over its slices; for several data, they show
+  what contains them all. Mind the active segmentation tool (see
   "Segmenting").
 
 ## Views
@@ -91,8 +95,11 @@ does.
   POST `/api/v1/rendering/windows/{id}/pick` with the same fields tells the
   position in millimeters and the gray values and labels at those pixels.
 - `?crop=true` cuts a screenshot down to the part of the scene that is not
-  background. Never crop a screenshot whose pixels you read positions off or
-  send to an endpoint: they no longer map onto the window.
+  background. Pixels of the image that have the color of the window's
+  background count as background too, like black air around a body in CT,
+  so a dark border of the image is cut away. Never crop a screenshot whose
+  pixels you read positions off or send to an endpoint: they no longer map
+  onto the window.
 - PUT `/api/v1/rendering/windows/{id}/slice` with `{"index": n}` shows
   slice n of a 2D window, counted from 0 as `slice.index` of
   `/api/v1/rendering/windows`, which also gives `slice.count`. n is the
@@ -116,7 +123,9 @@ does.
 - PUT `/api/v1/rendering/layout` with `{"maximized": "axial"}` shows that
   window alone, as its full screen button does, and `{"maximized": null}`
   brings the others back. While one window is shown alone, the others are
-  hidden: bring them back before you work in them.
+  hidden: bring them back before you work in them. `maximized` tells the
+  state of that button only, not a layout the user chose in the layout
+  menu of a window.
 - Tell the user when you leave the crosshair hidden or a window shown alone.
 - Take a fresh screenshot after every change before you point again: the
   pixels of an old screenshot no longer fit after a change of the slice or
@@ -160,11 +169,17 @@ and it stays as it is.
   where the user sees it. PATCH takes `{"reference": uid of the image,
   "segmentation": uid, "active_label": value, "tool": name}`, all optional.
   Labels are addressed by their value, a number, never by name: several
-  labels can have the same name.
+  labels can have the same name. GET also tells the `restrictions` of the
+  user's preferences: a label set preset for new segmentations, and
+  whether label names are limited to those of GET
+  `/api/v1/segmentation/label-suggestions`. The endpoints do not enforce
+  them: follow them yourself unless the user asks otherwise.
 - POST `/api/v1/segmentation/segmentations` with `{"reference": uid of the
   image, "labels": ["Liver", ...]}` creates a segmentation for an image,
   with the labels you name; without `labels`, it gets one label with a
-  suggested name.
+  suggested name. For an image with several time steps, `"static": true`
+  makes one segmentation that holds for all of them, instead of one per
+  time step: ask the user which is meant if the task does not say.
 - `/api/v1/segmentation/segmentations/{uid}/labels` lists the labels with
   how many voxels and milliliters they contain; POST with `{"name": ...,
   "color": "#rrggbb"}` adds a label, PATCH `.../labels/{value}` with `name`,
@@ -197,19 +212,21 @@ and it stays as it is.
   tool is active: the Segmentation view then deactivates the tool, which
   discards an unconfirmed preview and its prompts. To see the image under a
   preview, lower the segmentation's `opacity` instead.
-- Do not POST `/api/v1/rendering/reinit` while a tool is active either: it
-  can leave the render windows not aligned to the slices of the
-  segmentation, and the Segmentation view then deactivates the tool in the
-  same way. Only the user can align them again, with the "Align views"
-  button that the view then shows. To frame data, use `.../focus` instead,
-  which keeps the windows aligned.
+- While a tool is active, POST `/api/v1/rendering/reinit` only with the
+  uid of the session's image alone, which aligns the render windows to its
+  slices. A reinit on other data, or on several, can leave the windows not
+  aligned to the slices of the segmentation, and the Segmentation view
+  then deactivates the tool in the same way. To frame data, use
+  `.../focus` instead, which keeps the windows aligned.
 - Before you use a segmentation tool for the first time in a conversation,
   read its section of the manual: `mcp__mitk__api_get
   /api/v1/manual/search?query=<words>` searches the user manual, which
   explains the views and tools, and `/api/v1/manual/sections/{id}` reads a
   section. It explains the tool's options and side effects.
-- POST `/api/v1/workbench/undo` undoes the last confirmed change, as the
-  Edit menu does.
+- POST `/api/v1/workbench/undo` undoes the step on top of the Workbench's
+  history, as the Edit menu does. You share that history with the user:
+  read GET `/api/v1/workbench/history` first and undo only a step you
+  recognize as your own. The answer names the step it undid as `undone`.
 
 ### Interactive segmentation (nnInteractive)
 
@@ -223,8 +240,10 @@ and it stays as it is.
 3. Prompt with POST `/api/v1/segmentation/nninteractive/prompts?wait=60`: a
    type (`point`, `box`, `scribble`, `lasso`), `"positive": true` for the
    structure or `false` for what does not belong to it, and the pixels of a
-   screenshot. The prompt is a job; its result tells how many voxels the
-   preview has. One prompt at a time: wait for its job before the next.
+   screenshot. A scribble or lasso takes at most 100 points; a few along
+   the structure are enough. The prompt is a job; its result tells how many
+   voxels the preview has. One prompt at a time: wait for its job before
+   the next.
 4. Check the preview in screenshots, correct with further prompts, then
    confirm.
 
@@ -417,7 +436,9 @@ can offer one.
   structures with `.../focus`, choose the visible data, the crosshair and
   the active label's outline. A planar figure with a clean look points out
   a region. Then POST `/api/v1/reports/images` with the
-  window, and refer to the image by the name it returns. Images are
+  window, and refer to the image by the name it returns, as
+  `<img src="image-3.png">` with the name in quotes; images cannot be used
+  in CSS. Images are
   transparent where the window shows its background; keep it so, it suits
   the page in any theme. The image in the answer may show the transparency
   as black, which is no defect.
@@ -448,7 +469,9 @@ matters for the current task.
 
 Your notes from earlier conversations are listed at the end of these
 instructions. A note can be outdated: if one turns out to be wrong, delete
-it with `mcp__mitk__forget`, and save a corrected one if that helps.
+it with `mcp__mitk__forget`, and save a corrected one if that helps. If
+these tools answer that your memory cannot be read, tell the user instead
+of trying again.
 
 ## Scope and safety
 

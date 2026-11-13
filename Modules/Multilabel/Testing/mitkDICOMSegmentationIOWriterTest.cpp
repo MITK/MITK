@@ -258,8 +258,10 @@ namespace
 
   // A value of the segmentation's patient, study or frame of reference that DCMTK refuses for its VR
   // without Specific Character Set: characters outside the default repertoire or outside the syntax
-  // of the VR, or a UID longer than 64 characters. DCMTK checks no other lengths. The writer hands
-  // these values to dcmqi on the first source item. The fragments are what the refusal must name.
+  // of the VR, or a UI value over 64 characters or a CS or TM value over 16. DCMTK checks no other
+  // lengths. An empty Frame of Reference UID DCMTK refuses as an empty Type 1 value. The writer
+  // hands these values to dcmqi on the first source item. The fragments are what the refusal must
+  // name.
   struct UnwritableIdentityValue
   {
     std::string name;
@@ -279,9 +281,13 @@ namespace
       { "study-uid", 0x0020, 0x000D, "1.2.826.0.1.3680043.10.999.01.1", {"(0020,000D)", "1.2.826.0.1.3680043.10.999.01.1"} },
       { "frame-of-reference-uid", 0x0020, 0x0052, "1.2.826.0.1.3680043.10.999.01.3",
         {"(0020,0052)", "1.2.826.0.1.3680043.10.999.01.3"} },
+      { "frame-of-reference-uid-empty", 0x0020, 0x0052, "", {"(0020,0052)", "empty"} },
       // 66 characters; a UID has at most 64.
       { "study-uid-too-long", 0x0020, 0x000D, "1.2.826.0.1.3680043.10.999.1.1234567890.1234567890.1234567890.1234",
         {"(0020,000D)", "1.2.826.0.1.3680043.10.999.1.1234567890.1234567890.1234567890.1234"} },
+      // 17 characters; CS and TM have at most 16.
+      { "patient-sex-too-long", 0x0010, 0x0040, "ABCDEFGHIJKLMNOPQ", {"(0010,0040)", "ABCDEFGHIJKLMNOPQ"} },
+      { "study-time-too-long", 0x0008, 0x0030, "120000.1234567890", {"(0008,0030)", "120000.1234567890"} },
     };
   }
 

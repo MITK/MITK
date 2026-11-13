@@ -339,9 +339,10 @@ namespace
   // dcmqi takes the patient, study and frame of reference over from the first source item, and
   // DCMTK checks them when it writes the SEG, which then fails without naming the value. The item
   // checked is the one the writer hands to dcmqi, with the rule DCMTK applies; of the lengths, it
-  // checks only that of a UID. Body Part Examined is left out: dcmqi copies it into the SEG after
-  // that check. Synthetic mode keeps a value that is present, so no mode avoids these refusals, and
-  // they are checked before anything else, for the reasons given at CheckWritableLabels.
+  // checks those of UI, CS and TM values, not those of PN, LO and SH. Body Part Examined is left
+  // out: dcmqi copies it into the SEG after that check. Synthetic mode keeps a value that is
+  // present, so no mode avoids these refusals, and they are checked before anything else, for the
+  // reasons given at CheckWritableLabels.
   void CheckWritableIdentity(const mitk::MultiLabelSegmentation &seg)
   {
     // DCMTK looks the character set of a value up in the surrounding dataset. The writer writes
@@ -356,6 +357,18 @@ namespace
       if (tag == DCM_SpecificCharacterSet || tag == DCM_BodyPartExamined)
         continue;
 
+      std::ostringstream tagText;
+      tagText << '(' << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << tag.getGroup() << ','
+              << std::setw(4) << tag.getElement() << ')';
+
+      // DCMTK's write refuses an empty Type 1 value before it checks the value. Of the Type 1
+      // attributes on the item, DCMTK invents an empty Study Instance UID, but dcmqi mints a Frame of
+      // Reference UID only if the item has none, not if it is empty.
+      if (tag == DCM_FrameOfReferenceUID && element->isEmpty())
+        mitkThrow() << "Cannot write the segmentation as DICOM SEG: its " << tag.getTagName() << " " << tagText.str()
+                    << " is empty, which DICOM does not allow. Remove the property so that synthetic mode mints "
+                    << "one, or set a valid UID.";
+
       // DCMTK's write treats only these results as errors.
       const auto check = element->checkValue("1", OFTrue);
       if (check != EC_InvalidCharacter && check != EC_ValueRepresentationViolated &&
@@ -364,9 +377,6 @@ namespace
 
       OFString value;
       element->getOFStringArray(value);
-      std::ostringstream tagText;
-      tagText << '(' << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << tag.getGroup() << ','
-              << std::setw(4) << tag.getElement() << ')';
       mitkThrow() << "Cannot write the segmentation as DICOM SEG: its " << tag.getTagName() << " " << tagText.str()
                   << " \"" << value.c_str() << "\" is no valid " << DcmVR(element->getVR()).getVRName()
                   << " value without Specific Character Set (" << check.text() << ").";

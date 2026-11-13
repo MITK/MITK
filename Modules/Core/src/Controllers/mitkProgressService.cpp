@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "mitkProgressService.h"
 
+#include <mitkActionOriginScope.h>
+
 #include <algorithm>
 
 namespace
@@ -220,6 +222,7 @@ std::shared_ptr<mitk::ProgressTaskState> mitk::ProgressService::StartTask(const 
     info.Id = id;
     info.Sequence = ++m_NextSequence;
     info.Name = name;
+    info.Origin = ActionOriginScope::GetCurrent();
     info.StepsToDo = steps;
     info.Cancelable = cancelable;
 

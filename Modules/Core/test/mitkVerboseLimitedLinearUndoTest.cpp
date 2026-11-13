@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkActionOriginScope.h>
 #include <mitkInteractionConst.h>
 #include <mitkOperation.h>
 #include <mitkUndoController.h>
@@ -136,6 +137,39 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
   // after deleting UndoController g_GlobalCounter will still be 4 because m_CurrentUndoModel inside myUndoModel is a
   // static singleton
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking singleton UndoModel");
+
+  // The origin of a step is the one that was current when it was made.
+  auto originModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addStep = [&originModel]() {
+      originModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+      mitk::OperationEvent::IncCurrObjectEventId();
+    };
+
+    addStep();
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addStep();
+      const mitk::ActionOriginScope inner("inner");
+      addStep();
+    }
+
+    addStep();
+  }
+
+  const auto origins = originModel->GetUndoOrigins();
+  MITK_TEST_CONDITION_REQUIRED(origins.size() == originModel->GetUndoDescriptions().size(),
+                               "checking one origin per undo entry");
+  MITK_TEST_CONDITION_REQUIRED(origins.size() == 4 && origins[0].empty() && origins[1] == "inner" &&
+                                 origins[2] == "client" && origins[3].empty(),
+                               "checking origins of steps made inside and outside of scopes");
+  MITK_TEST_CONDITION_REQUIRED(mitk::ActionOriginScope::GetCurrent().empty(), "checking scopes are left again");
+
+  originModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(originModel->GetRedoOrigins().size() == 1 && originModel->GetRedoOrigins()[0].empty(),
+                               "checking origin of a redo entry");
 
   // always end with this!
   MITK_TEST_END()

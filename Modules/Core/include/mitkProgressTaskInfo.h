@@ -64,6 +64,13 @@ namespace mitk
     /** \brief Human-readable name of the operation, shown to the user. */
     std::string Name;
 
+    /**
+     * \brief Who started the task: the ActionOriginScope name of the starting thread.
+     *
+     * Empty for the user.
+     */
+    std::string Origin;
+
     /** \brief Total number of steps, or 0 if the task is indeterminate. */
     unsigned int StepsToDo = 0;
 

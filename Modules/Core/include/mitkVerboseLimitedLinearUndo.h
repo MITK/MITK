@@ -77,6 +77,25 @@ namespace mitk
      */
     virtual StackDescription GetRedoDescriptions();
 
+    /**
+     * \brief Return who made each entry of the undo stack.
+     *
+     * Entries are grouped by ObjectEventId exactly as in GetUndoDescriptions(), and the origin of
+     * an entry is that of its most recent item.
+     *
+     * \return One origin per entry of GetUndoDescriptions(), in the same order; empty for the user.
+     * \sa ActionOriginScope
+     */
+    std::vector<std::string> GetUndoOrigins() const;
+
+    /**
+     * \brief Return who made each entry of the redo stack.
+     *
+     * \return One origin per entry of GetRedoDescriptions(), in the same order; empty for the user.
+     * \sa GetUndoOrigins()
+     */
+    std::vector<std::string> GetRedoOrigins() const;
+
   protected:
     VerboseLimitedLinearUndo();
     ~VerboseLimitedLinearUndo() override;

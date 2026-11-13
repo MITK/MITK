@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkProgressTask.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkCoreServices.h>
 #include <mitkIProgressListener.h>
 #include <mitkIProgressService.h>
@@ -67,6 +68,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkProgressTaskTestSuite);
   MITK_TEST(TaskLifecycle_Success);
+  MITK_TEST(TaskOrigin_IsTheOriginOfTheStartingThread_Success);
   MITK_TEST(ConcurrentTasks_AreIndependent_Success);
   MITK_TEST(Progress_ClampsAtTotal_Success);
   MITK_TEST(AddStepsToDo_ExtendsTotal_Success);
@@ -133,6 +135,26 @@ public:
 
     CPPUNIT_ASSERT(snapshots.back().Finished);
     CPPUNIT_ASSERT_EQUAL(4u, snapshots.back().Progress);
+  }
+
+  void TaskOrigin_IsTheOriginOfTheStartingThread_Success()
+  {
+    mitk::ProgressTaskId ownId = 0;
+    mitk::ProgressTaskId userId = 0;
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      mitk::ProgressTask own("Own", 1);
+      ownId = own.GetId();
+    }
+
+    {
+      mitk::ProgressTask user("User", 1);
+      userId = user.GetId();
+    }
+
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), m_Listener->GetSnapshots(ownId).front().Origin);
+    CPPUNIT_ASSERT(m_Listener->GetSnapshots(userId).front().Origin.empty());
   }
 
   void ConcurrentTasks_AreIndependent_Success()

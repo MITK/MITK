@@ -13,6 +13,29 @@ found in the LICENSE file.
 #include <mitkVerboseLimitedLinearUndo.h>
 #include <mitkOperationEvent.h>
 
+#include <deque>
+
+namespace
+{
+  std::vector<std::string> CollectOrigins(const std::deque<mitk::UndoStackItem*>& list)
+  {
+    std::vector<std::string> origins;
+
+    int oeid = 0;
+
+    for (auto iter = list.rbegin(); iter != list.rend(); ++iter)
+    {
+      if (origins.empty() || oeid != (*iter)->GetObjectEventId())
+      {
+        oeid = (*iter)->GetObjectEventId();
+        origins.push_back((*iter)->GetOrigin());
+      }
+    }
+
+    return origins;
+  }
+}
+
 mitk::VerboseLimitedLinearUndo::VerboseLimitedLinearUndo()
 {
 }
@@ -113,6 +136,16 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
   descriptions.push_back(StackDescriptionItem(oeid, currentDescription));
 
   return descriptions; // list ready
+}
+
+std::vector<std::string> mitk::VerboseLimitedLinearUndo::GetUndoOrigins() const
+{
+  return CollectOrigins(m_UndoList);
+}
+
+std::vector<std::string> mitk::VerboseLimitedLinearUndo::GetRedoOrigins() const
+{
+  return CollectOrigins(m_RedoList);
 }
 
 mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()

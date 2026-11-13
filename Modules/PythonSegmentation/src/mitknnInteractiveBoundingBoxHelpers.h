@@ -63,10 +63,11 @@ namespace mitk::nnInteractive
                                            const InteractionBoundingBox& boundingBox);
 
   // Returns the plane of the slice of an image that points in world
-  // coordinates lie in, as a render window lays it out that shows the image
-  // in its own orientation. The slice is along the index axis on which the
+  // coordinates lie in. The slice is along the index axis on which the
   // points spread least, the last of equal ones, which makes a line along an
-  // axis axial for most images.
+  // axis axial for most images. Only the position of the plane is that of
+  // the slice: its in-plane axes and the direction of its normal can differ
+  // from those of a render window that shows the slice.
   //
   // \throw mitk::Exception if the points do not lie in one slice, i.e. spread
   //        over more than a voxel along each axis.

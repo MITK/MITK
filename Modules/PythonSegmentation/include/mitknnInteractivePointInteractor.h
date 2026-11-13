@@ -70,8 +70,9 @@ namespace mitk::nnInteractive
     /** \brief Removes the most recently placed point for the given prompt type.
      *
      * A no-op if no point set exists for \p promptType or it is already empty.
-     * The point set node is left in place (it may be the actively bound node);
-     * empty sets are cleaned up by OnDisable() / OnReset() as before.
+     * A point set that becomes empty is removed with its node, unless it is
+     * the one the enabled interactor adds points to; OnDisable() and OnReset()
+     * clean up that one.
      *
      * \param[in] promptType The prompt type whose last point should be removed.
      */

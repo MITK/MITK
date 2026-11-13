@@ -270,7 +270,7 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
   if (leastSpread > 1.0)
     mitkThrow() << "The points do not lie in one slice of the image: along each of its axes they spread over more than a voxel.";
 
-  // The slices as the slice navigation lays them out for the image.
+  // The slices of the image along that axis.
   int axes[3];
   geometry->MapAxesToOrientations(axes);
 
@@ -287,7 +287,7 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
   center.Fill(0.0);
   center += sum / static_cast<double>(points.size());
 
-  PlaneGeometry::Pointer plane;
+  const PlaneGeometry* nearestPlane = nullptr;
   double leastDistance = std::numeric_limits<double>::max();
 
   for (unsigned int slice = 0; slice < slices->GetSlices(); ++slice)
@@ -298,9 +298,12 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
     if (distance < leastDistance)
     {
       leastDistance = distance;
-      plane = slicePlane->Clone();
+      nearestPlane = slicePlane;
     }
   }
 
-  return plane;
+  if (nearestPlane == nullptr)
+    return nullptr;
+
+  return nearestPlane->Clone();
 }

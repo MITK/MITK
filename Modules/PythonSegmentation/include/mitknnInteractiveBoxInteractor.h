@@ -75,7 +75,9 @@ namespace mitk::nnInteractive
      *            \p plane.
      * \param[in] promptType The prompt type of the box.
      *
-     * \return The box, whose corners nnInteractive gets.
+     * \return The box, whose corners nnInteractive gets. Its node owns it,
+     *         so it lives until RemoveLastInteraction() removes the box or
+     *         the interactor is reset.
      */
     const PlanarFigure* AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType);
 

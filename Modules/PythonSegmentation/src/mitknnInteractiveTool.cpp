@@ -702,6 +702,11 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       m_Impl->PendingPromptError = e.GetDescription();
       return;
     }
+    catch (const std::exception& e)
+    {
+      m_Impl->PendingPromptError = e.what();
+      return;
+    }
 
     interactionType = prompt.Type;
     promptType = prompt.PromptType;
@@ -1236,6 +1241,8 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
         MITK_INFO << "Connected to the nnInteractive server directly, bypassing the configured HTTP proxy.";
 
       m_Impl->SetCapabilities(start->Capabilities);
+
+      const bool autoZoomChanged = m_Impl->AutoZoom != start->AutoZoom;
       m_Impl->AutoZoom = start->AutoZoom;
 
       if (start->SelectedBackend.has_value())
@@ -1250,6 +1257,9 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
       // state); keep the tool's record in sync.
       m_Impl->ClearLastInteraction();
       m_Impl->UndoRefreshPending = false;
+
+      if (autoZoomChanged)
+        this->OptionsChangedEvent.Send();
 
       done(nullptr);
 
@@ -1310,7 +1320,8 @@ void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
   if (points.size() < minCount || points.size() > maxCount)
   {
     mitkThrow() << "A " << GetInteractionTypeAsString(interactionType) << " prompt needs "
-      << (minCount == maxCount ? std::to_string(minCount) : "at least " + std::to_string(minCount)) << " points.";
+      << (minCount == maxCount ? std::to_string(minCount) : "at least " + std::to_string(minCount))
+      << (minCount == 1 ? " point." : " points.");
   }
 
   // Cloned, as the plane of a render window changes with its slice.
@@ -1321,7 +1332,18 @@ void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
   m_Impl->PendingPromptDone = std::move(done);
 
   // As the interactors trigger it.
-  this->UpdatePreview(false);
+  try
+  {
+    this->UpdatePreview(false);
+  }
+  catch (...)
+  {
+    // The update did not start, so nothing takes the prompt or calls done,
+    // and the next update of anybody must not find them.
+    m_Impl->PendingPrompt.reset();
+    m_Impl->PendingPromptDone = nullptr;
+    throw;
+  }
 
   // The update ended already, without work off the GUI thread: it did not
   // reach DoUpdatePreview(), or that failed before.
@@ -1459,6 +1481,8 @@ void mitk::nnInteractiveTool::TearDownSession()
   this->ResetPreviewContent();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  this->InteractionsChangedEvent.Send();
 }
 
 void mitk::nnInteractiveTool::UpdatePrepare()
@@ -1615,10 +1639,11 @@ mitk::nnInteractiveTool::Impl::PromptCall mitk::nnInteractiveTool::Impl::DrawPro
   }
 
   // Without the plane of a render window, the prompt lies in the slice of
-  // the image that its points lie in.
-  const auto plane = prompt.Plane.IsNotNull()
-    ? prompt.Plane
-    : PlaneGeometry::ConstPointer(CreateSlicePlane(prompt.Points, geometry));
+  // the image that its points lie in. A point is not drawn in a plane.
+  auto plane = prompt.Plane;
+
+  if (plane.IsNull() && prompt.Type != InteractionType::Point)
+    plane = PlaneGeometry::ConstPointer(CreateSlicePlane(prompt.Points, geometry));
 
   // The interactor of the prompt's type draws it as it draws one of the
   // mouse, and the model gets what that drawing gives, as from the prompts

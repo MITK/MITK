@@ -759,11 +759,15 @@ void QmitknnInteractiveToolGUI::OnSessionStarted()
   }
 
   const auto backend = this->GetTool()->GetBackend();
+  const bool isAutoZoomAvailable = !backend.has_value() || backend == mitk::nnInteractive::Backend::CUDA;
 
-  if (!backend.has_value() || backend == mitk::nnInteractive::Backend::CUDA)
+  // In both directions: an earlier session on the CPU has disabled it, and
+  // only a start by the Initialize button enables it on its own.
+  m_Ui->autoZoomCheckBox->setEnabled(isAutoZoomAvailable);
+
+  if (isAutoZoomAvailable)
     return;
 
-  m_Ui->autoZoomCheckBox->setEnabled(false);
   m_Ui->autoZoomCheckBox->setChecked(false);
   m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
 }

@@ -251,7 +251,7 @@ namespace mitk
      *
      * Lets a GUI tell the prompts of a program from those of the user.
      * Empty after a prompt of an interactor or an initial mask, after the
-     * prompt was undone, and after a reset.
+     * prompt was undone, after a reset, and after the session has ended.
      *
      * \sa InteractionsChangedEvent
      */
@@ -369,7 +369,8 @@ namespace mitk
      *            if the session setup fails (local or remote), was cancelled or
      *            was aborted. Runs on the GUI thread, before this returns if
      *            the start fails right away, e.g. while the tool is busy or
-     *            no server is configured.
+     *            no server is configured. Not called if the tool is destroyed
+     *            first.
      *
      * \pre nnInteractive must be installed in the virtual environment.
      * \pre A reference image must be available through the ToolManager.
@@ -500,7 +501,9 @@ namespace mitk
      * \param[in] done Receives null once the prediction is in the preview, or
      *            a mitk::Exception if it failed. Runs on the GUI thread once
      *            the update has ended, which is after this returns unless the
-     *            prompt failed right away.
+     *            prompt failed right away. Not called if this throws or if
+     *            the tool is destroyed first. The tool keeps it until then,
+     *            so it must not own the tool.
      *
      * \throw mitk::Exception if no session runs, a prompt still computes, the
      *        model does not support the interaction, or the points do not
@@ -539,7 +542,8 @@ namespace mitk
 
     /** \brief Event triggered when the interactions have changed, by whatever
      *         caller: a prompt or an initial mask was added, the last
-     *         interaction was undone, or the interactions were reset.
+     *         interaction was undone, the interactions were reset, or the
+     *         teardown of the session cleared them.
      *
      * \sa CanUndo(), GetLastProgramPrompt()
      */

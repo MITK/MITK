@@ -174,6 +174,13 @@ void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType prom
 
   if (!pointSet->IsEmpty())
     pointSet->RemovePointAtEnd(0);
+
+  // The enabled interactor adds to its point set, also to an empty one.
+  // Nothing else would clean up an empty one before the next reset.
+  const bool isInUse = this->IsEnabled() && promptType == this->GetCurrentPromptType();
+
+  if (pointSet->IsEmpty() && !isInUse)
+    m_Impl->DestroyPointSetNode(promptType);
 }
 
 void mitk::nnInteractive::PointInteractor::OnEnable()

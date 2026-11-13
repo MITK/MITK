@@ -18,10 +18,13 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkINodeSelectionService.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkIProgressService.h>
 #include <mitkIRestServerService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkLabelSuggestionHelper.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
@@ -30,6 +33,7 @@ found in the LICENSE file.
 #include <mitkRestTime.h>
 #include <mitkSegChangeOperationApplier.h>
 #include <mitkSegWithPreviewTool.h>
+#include <mitkSegmentationHelper.h>
 #include <mitkTimeNavigationController.h>
 #include <mitkToolManagerProvider.h>
 
@@ -51,6 +55,7 @@ found in the LICENSE file.
 #include <berryPlatformUI.h>
 
 #include <QCoreApplication>
+#include <QFileInfo>
 #include <QString>
 #include <QTimer>
 
@@ -378,6 +383,53 @@ namespace
 #endif
   }
 
+  /**
+   * What the preferences of the Segmentation view demand of its user, which the routes do not enforce. Without
+   * the suggested names, which can be hundreds: the session is asked for often.
+   */
+  nlohmann::json DescribeRestrictions()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(ViewId);
+    const auto preset = QFileInfo(QString::fromStdString(preferences->Get("label set preset", ""))).fileName().toStdString();
+
+    return {
+      { "label_set_preset", preset.empty() ? nlohmann::json() : nlohmann::json(preset) },
+      { "label_suggestions_enforced", mitk::LabelSuggestionHelper::GetSuggestionPreferences().enforceSuggestions }
+    };
+  }
+
+  /** The label names that the view suggests, and takes alone if the suggestions are enforced. */
+  nlohmann::json DescribeLabelSuggestions()
+  {
+    const auto suggestionPreferences = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+
+    // Loaded as the view loads them for its label inspector.
+    auto helper = mitk::LabelSuggestionHelper::New();
+    helper->LoadStandardSuggestions();
+
+    if (!suggestionPreferences.externalLabelSuggestionFile.empty())
+    {
+      try
+      {
+        helper->ParseSuggestions(suggestionPreferences.externalLabelSuggestionFile, suggestionPreferences.replaceStandardSuggestions);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "The label suggestions of the preferences cannot be read: " << e.GetDescription();
+      }
+    }
+
+    auto names = nlohmann::json::array();
+
+    for (const auto& suggestion : helper->GetAllSuggestions())
+      names.push_back(suggestion->GetName());
+
+    return {
+      { "names", names },
+      { "enforced", suggestionPreferences.enforceSuggestions }
+    };
+  }
+
   nlohmann::json DescribeSession(const mitk::IRestServerService& server, const std::string& path)
   {
     auto* toolManager = GetToolManager();
@@ -419,7 +471,8 @@ namespace
           ? nlohmann::json{ { "value", activeLabel->GetValue() }, { "name", activeLabel->GetName() } }
           : nlohmann::json() },
       { "tool", activeTool != nullptr ? nlohmann::json(activeTool->GetName()) : nlohmann::json() },
-      { "tools", tools }
+      { "tools", tools },
+      { "restrictions", DescribeRestrictions() }
     };
   }
 
@@ -455,6 +508,27 @@ namespace
       Throw("NOT_A_SEGMENTATION", "Unprocessable Content", "The node \"" + node->GetName() + "\" is no segmentation.", 422, path);
 
     return segmentation;
+  }
+
+  /** Refuses a body with a field that \p subject does not have, which a client that misspelled one would read as done. */
+  void ThrowIfUnknownField(const nlohmann::json& body, const std::vector<std::string>& fields, const std::string& subject, const std::string& path)
+  {
+    if (!body.is_object())
+      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The body must be an object with the fields to change.", path));
+
+    for (const auto& item : body.items())
+    {
+      if (std::find(fields.begin(), fields.end(), item.key()) != fields.end())
+        continue;
+
+      std::string list;
+
+      for (std::size_t i = 0; i < fields.size(); ++i)
+        list += (i == 0 ? "" : i + 1 == fields.size() ? " and " : ", ") + fields[i];
+
+      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"" + item.key() + "\" is no field of " + subject + ". " +
+        (fields.size() == 1 ? "The field is " : "The fields are ") + list + ".", path));
+    }
   }
 
   /**
@@ -622,6 +696,29 @@ namespace
     }
   }
 
+  /**
+   * How a prompt ended and the job that reports it. The job is made after the tool took the prompt, which can end
+   * before that, so whichever of the two comes second passes the outcome on. Used in the GUI thread only.
+   */
+  struct PromptOutcome
+  {
+    std::shared_ptr<mitk::RestJob> Job;
+    bool Ended = false;
+    std::exception_ptr Error;
+    nlohmann::json Result;
+
+    void ReportToJob() const
+    {
+      if (this->Job == nullptr || !this->Ended)
+        return;
+
+      if (this->Error != nullptr)
+        FailJob(*this->Job, this->Error);
+      else
+        this->Job->Succeed(this->Result);
+    }
+  };
+
   mitk::nnInteractiveTool* GetNNInteractive(const std::string& path)
   {
     auto* tool = dynamic_cast<mitk::nnInteractiveTool*>(GetToolManager()->GetActiveTool());
@@ -729,7 +826,7 @@ namespace
     const auto result = QmitkVenvProcess::RunStep(mitk::VoxTell::VENV_NAME, mitk::VoxTell::BuildDownloadStep(displayName, files), &output);
 
     if (result == QmitkVenvProcess::StepResult::Cancelled)
-      mitkThrow() << displayName << " was cancelled.";
+      mitkThrow() << displayName << " was canceled.";
 
     if (result == QmitkVenvProcess::StepResult::Failed)
     {
@@ -922,7 +1019,7 @@ namespace
 
     void OnInitializationFailed(std::string message)
     {
-      this->End(MakeError(message.empty() ? std::string("Starting TotalSegmentator was cancelled.") : message));
+      this->End(MakeError(message.empty() ? std::string("Starting TotalSegmentator was canceled.") : message));
     }
 
     // Not from within the event, which goes on to its other listeners, and
@@ -963,7 +1060,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   getSession.Summary = "Get what the Segmentation view works on: image, segmentation, label and tool";
   getSession.Description =
     "Returns {data: {view_open, reference: {uid, name, time_steps} | null, segmentation: {uid, name, time_steps} | "
-    "null, active_label: {value, name} | null, tool: name | null, tools: [{name, usable, installed}]}}. The "
+    "null, active_label: {value, name} | null, tool: name | null, tools: [{name, usable, installed}], "
+    "restrictions: {label_set_preset, label_suggestions_enforced}}}. The "
     "reference is the image that tools segment; tools write into the active label of the segmentation. "
     "time_steps are the time points that each time step of the data covers, [{min_timepoint_ms, "
     "max_timepoint_ms}], the maximum excluded; data of a single time step has null bounds, as it shows at any "
@@ -971,11 +1069,28 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "tools are known once the Segmentation view has been open. installed is there for tools that need an "
     "installation of their own, like nnInteractive, VoxTell and TotalSegmentator; the user installs them "
     "through the tool's panel in the Segmentation view. Tools download the models they need on their own, "
-    "which GET /api/v1/workbench/tasks shows.";
+    "which GET /api/v1/workbench/tasks shows. restrictions are what the user's preferences demand of "
+    "segmentations that the user makes: label_set_preset, the file name of the preset that the view loads into "
+    "a new segmentation, or null; label_suggestions_enforced, whether the view takes only the label names of "
+    "GET /api/v1/segmentation/label-suggestions. The routes do not enforce them, so a client that works for the "
+    "user follows them.";
   getSession.Handler = [server](const RestRequest& request) {
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeSession(*server, request.Path); }));
   };
   routes.push_back(getSession);
+
+  RestRoute getLabelSuggestions;
+  getLabelSuggestions.Method = "GET";
+  getLabelSuggestions.Path = "/segmentation/label-suggestions";
+  getLabelSuggestions.Summary = "Get the label names that the Segmentation view suggests";
+  getLabelSuggestions.Description =
+    "Returns {data: {names: [name], enforced}}: the label names of the user's preferences, which can be "
+    "hundreds, and whether the view takes only those. Needed only to follow enforced suggestions, see "
+    "restrictions of GET /api/v1/segmentation/session.";
+  getLabelSuggestions.Handler = [server](const RestRequest&) {
+    return RestResponse::FromData(CallInGuiThread(*server, []() { return DescribeLabelSuggestions(); }));
+  };
+  routes.push_back(getLabelSuggestions);
 
   RestRoute patchSession;
   patchSession.Method = "PATCH";
@@ -988,9 +1103,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "changing them ends the active tool, as in the view, and discards results it did not confirm. A node that "
     "the view does not take is answered with 422 NOT_ACCEPTED and changes nothing. An active_label or tool "
     "that is refused leaves what was applied before it applied. After segmentation: null, "
-    "the view selects another segmentation of the image if there is one. Returns {data: session} as GET does.";
+    "the view selects another segmentation of the image if there is one. Other fields are refused. Returns "
+    "{data: session} as GET does.";
   patchSession.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
+    ThrowIfUnknownField(body, { "reference", "segmentation", "active_label", "tool" }, "the session", request.Path);
 
     if (body.contains("active_label") && (!body["active_label"].is_number_unsigned() ||
         body["active_label"].get<std::uint64_t>() > std::numeric_limits<MultiLabelSegmentation::LabelValueType>::max()))
@@ -1130,8 +1247,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   create.Path = "/segmentation/segmentations";
   create.Summary = "Create a segmentation for an image";
   create.Description =
-    "Body: {reference: uid of the image, name (optional), labels (optional): [name or {name, color: "
-    "\"#rrggbb\"}]}. Without labels, the segmentation gets one label with a suggested name. The new "
+    "Body: {reference: uid of the image, name (optional), static (optional, default false), labels "
+    "(optional): [name or {name, color: \"#rrggbb\"}]}. With static true and an image of several time steps, "
+    "the segmentation has one time step that holds for all of them, as the view creates a static "
+    "segmentation; otherwise it has the time steps of the image. Without labels, the segmentation gets one "
+    "label with a suggested name. The label set preset and the enforced label suggestions of the user's "
+    "preferences, which GET /api/v1/segmentation/session reports as restrictions, do not bind this request: "
+    "it loads no preset and takes any label name. The new "
     "segmentation becomes the one the Segmentation view works on, with its first label active, which ends "
     "the active tool and discards results it did not confirm. An image that the view does not take is "
     "answered with 422 NOT_ACCEPTED. Returns "
@@ -1141,6 +1263,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
     if (!body.contains("reference"))
       throw RestException(ErrorResponse::InvalidRequest("\"reference\", the uid of an image, is missing.", request.Path));
+
+    if (body.contains("static") && !body["static"].is_boolean())
+      throw RestException(ErrorResponse::InvalidRequest("\"static\" must be true or false.", request.Path));
 
     const auto reference = FindNode(*server, body["reference"], request.Path);
     const auto dataStorage = server->GetDataStorage();
@@ -1164,7 +1289,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           "The Segmentation view does not take \"" + reference->GetName() + "\" as image to segment.", 422, request.Path);
       }
 
-      auto newNode = LabelSetImageHelper::CreateNewSegmentationNode(reference, image, body.value("name", std::string()), dataStorage);
+      Image::ConstPointer segmentationTemplate = image;
+
+      if (body.value("static", false) && 1 < image->GetTimeSteps())
+        segmentationTemplate = SegmentationHelper::GetStaticSegmentationTemplate(image);
+
+      auto newNode = LabelSetImageHelper::CreateNewSegmentationNode(reference, segmentationTemplate, body.value("name", std::string()), dataStorage);
       auto* segmentation = GetSegmentation(newNode, request.Path);
 
       std::vector<Label::Pointer> labels;
@@ -1234,7 +1364,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   addLabel.Summary = "Add a label to a segmentation";
   addLabel.Description =
     "Body: {name (optional; a suggested name otherwise), color (optional, \"#rrggbb\"), group (optional, "
-    "the active group otherwise)}. Undoable. Returns {data: label} with status 201. To segment into it, "
+    "the active group otherwise)}. The enforced label suggestions of the user's preferences, which GET "
+    "/api/v1/segmentation/session reports as restrictions, do not bind this request: it takes any name. "
+    "Undoable. Returns {data: label} with status 201. To segment into it, "
     "make it the active label with PATCH /api/v1/segmentation/session.";
   addLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
@@ -1282,9 +1414,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   changeLabel.Summary = "Rename, recolor, show, hide, lock or unlock a label";
   changeLabel.Description =
     "Body, all optional: {name, color: \"#rrggbb\", visible, locked}. Locked labels are kept when tools "
-    "write into the segmentation. Renaming and recoloring are undoable. Returns {data: label}.";
+    "write into the segmentation. Renaming and recoloring are undoable. Other fields are refused. Returns "
+    "{data: label}.";
   changeLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
+    ThrowIfUnknownField(body, { "name", "color", "visible", "locked" }, "a label", request.Path);
     const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
@@ -1474,9 +1608,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   changeGroup.Method = "PATCH";
   changeGroup.Path = "/segmentation/segmentations/:uid/groups/:index";
   changeGroup.Summary = "Rename a group of a segmentation";
-  changeGroup.Description = "Body: {name}; an empty name gives the group its default display name back. Undoable. Returns {data: group}.";
+  changeGroup.Description =
+    "Body: {name}; an empty name gives the group its default display name back. Other fields are refused. "
+    "Undoable. Returns {data: group}.";
   changeGroup.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
+    ThrowIfUnknownField(body, { "name" }, "a group", request.Path);
 
     if (!body.contains("name") || !body["name"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"name\", the new name of the group, is missing.", request.Path));
@@ -1655,9 +1792,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "auto_zoom widens the region the model looks at when a result reaches its edge, for large structures, "
     "at the cost of speed; it needs a GPU. auto_refine runs the model on the content of a label when it "
     "becomes the target of the session, instead of taking the content as it is until the next prompt. "
-    "Returns {data: state} as GET does.";
+    "Other fields are refused. Returns {data: state} as GET does.";
   nnInteractiveOptions.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
+    ThrowIfUnknownField(body, { "auto_zoom", "auto_refine" }, "the options of nnInteractive", request.Path);
 
     for (const auto* key : { "auto_zoom", "auto_refine" })
     {
@@ -1803,18 +1941,19 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   addPrompt.Path = "/segmentation/nninteractive/prompts";
   addPrompt.Summary = "Prompt nnInteractive with a point, box, scribble or lasso";
   addPrompt.Description =
-    "Needs a running session. Body: {type: point|box|scribble|lasso, positive: true (the structure, "
+    "Needs a running session (409 NOT_INITIALIZED without one). Body: {type: point|box|scribble|lasso, positive: true (the structure, "
     "default) or false (what does not belong to it), and the points: either pixels: [[x, y], ...] of a "
     "screenshot of a 2D window with window and image_size, as GET /api/v1/rendering/windows/{id}/screenshot "
     "describes it, or points: [[x, y, z], ...] in millimeters, all in one slice of the image}. A point "
     "needs one point; a box two opposite corners; a scribble a line of points, painted with the brush of "
     "the panel, three pixels wide; a lasso a closed contour of at least three points, whose inside is the "
-    "prompt. The prompt is drawn as if the user had drawn it with the mouse in that window, and the 2D "
+    "prompt. A scribble or lasso takes at most 100 points; a few points along the structure are enough. "
+    "A prompt that is refused answers 422 PROMPT_FAILED and starts no job. The prompt is drawn as if the user had drawn it with the mouse in that window, and the 2D "
     "windows show it. Prompts add up and refine the unconfirmed result, which POST "
     "/api/v1/segmentation/confirm writes into the active label. The model computes the prompt as a job: "
     "query parameter wait (seconds) waits for it, and the job's result is the state as GET "
     "/api/v1/segmentation/nninteractive gives it. One prompt at a time: a prompt while one computes "
-    "gets 409. Cancelling the job of a prompt ends the session and discards its prompts and the unconfirmed "
+    "gets 409. Canceling the job of a prompt ends the session and discards its prompts and the unconfirmed "
     "result.";
   addPrompt.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
@@ -1824,6 +1963,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     const auto job = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       nnInteractiveTool::Pointer tool(GetNNInteractive(request.Path));
+
+      if (!tool->IsSessionRunning())
+      {
+        Throw("NOT_INITIALIZED", "Conflict",
+          "nnInteractive has no session. Start one with POST /api/v1/segmentation/nninteractive/session.", 409, request.Path);
+      }
+
       ThrowIfBusy(tool, request.Path);
 
       const auto points = GetRestWorldPoints(body, request.Path);
@@ -1835,30 +1981,33 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         ? GetRestRenderer(body["window"].get<std::string>(), request.Path)->GetCurrentWorldPlaneGeometry()
         : nullptr;
 
-      auto job = server->CreateJob("Prompt nnInteractive");
-      job->SetCancelHandler([]() { CancelTasks("nnInteractive"); });
+      // The job exists once the tool has taken the prompt, which can have failed by then.
+      const auto outcome = std::make_shared<PromptOutcome>();
 
       try
       {
         // The tool keeps the callback, so a reference to the tool in it would
         // keep the tool alive.
-        tool->AddPrompt(type, points, promptType, plane, [job, tool = tool.GetPointer()](std::exception_ptr error) {
-          if (error != nullptr)
-          {
-            FailJob(*job, error);
-            return;
-          }
+        tool->AddPrompt(type, points, promptType, plane, [outcome, tool = tool.GetPointer()](std::exception_ptr error) {
+          outcome->Ended = true;
+          outcome->Error = error;
 
-          job->Succeed(DescribeNNInteractive(tool));
+          if (error == nullptr)
+            outcome->Result = DescribeNNInteractive(tool);
+
+          outcome->ReportToJob();
         });
       }
       catch (const Exception& e)
       {
-        job->Fail(e.GetDescription());
         Throw("PROMPT_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
       }
 
-      return job;
+      outcome->Job = server->CreateJob("Prompt nnInteractive");
+      outcome->Job->SetCancelHandler([]() { CancelTasks("nnInteractive"); });
+      outcome->ReportToJob();
+
+      return outcome->Job;
     });
 
     return RestJob::Respond(request, job);
@@ -2023,8 +2172,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   voxTellModel.Description =
     "Needs VoxTell as active tool, installed by the user through its panel. Downloads the files of the model "
     "first if they are missing, which the progress notifications and GET /api/v1/workbench/tasks show, then "
-    "loads it. Runs as a job if the model is not loaded yet: query parameter wait (seconds) waits for it. The "
-    "result is the state as GET /api/v1/segmentation/voxtell gives it.";
+    "loads it. Runs as a job: query parameter wait (seconds) waits for it. If the model is loaded already, the "
+    "job has succeeded when the answer comes. The job's result is the state as GET /api/v1/segmentation/voxtell "
+    "gives it.";
   voxTellModel.Handler = [server](const RestRequest& request) {
     const auto loaded = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -2039,10 +2189,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       return tool->IsModelLoaded() ? std::optional<nlohmann::json>(DescribeVoxTell(tool)) : std::nullopt;
     });
 
-    if (loaded.has_value())
-      return RestResponse::FromData(*loaded);
-
     auto job = server->CreateJob("Load the VoxTell model");
+
+    if (loaded.has_value())
+    {
+      job->Succeed(*loaded);
+      return RestJob::Respond(request, job);
+    }
+
     job->SetCancelHandler([]() { CancelTasks("VoxTell"); });
 
     server->Post([job, path = request.Path]() {
@@ -2215,7 +2369,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
             if (tool->WasLastUpdateCancelled())
             {
-              job->Fail("VoxTell was cancelled.");
+              job->Fail("VoxTell was canceled.");
               return;
             }
 
@@ -2281,8 +2435,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   totalSegmentatorStart.Summary = "Start TotalSegmentator, which learns its tasks";
   totalSegmentatorStart.Description =
     "Needs TotalSegmentator as active tool, installed by the user through its panel. Its panel starts it as well when "
-    "it opens. Runs as a job if it has not started yet: query parameter wait (seconds) waits for it. The result is "
-    "the state as GET /api/v1/segmentation/totalsegmentator gives it, without tasks.";
+    "it opens. Runs as a job: query parameter wait (seconds) waits for it. If it has started already, the job has "
+    "succeeded when the answer comes. The job's result is the state as GET /api/v1/segmentation/totalsegmentator "
+    "gives it, without tasks.";
   totalSegmentatorStart.Handler = [server](const RestRequest& request) {
     const auto initialized = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -2297,10 +2452,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       return tool->IsInitialized() ? std::optional<nlohmann::json>(DescribeTotalSegmentator(tool, false)) : std::nullopt;
     });
 
-    if (initialized.has_value())
-      return RestResponse::FromData(*initialized);
-
     auto job = server->CreateJob("Start TotalSegmentator");
+
+    if (initialized.has_value())
+    {
+      job->Succeed(*initialized);
+      return RestJob::Respond(request, job);
+    }
+
     job->SetCancelHandler([]() { CancelTasks("TotalSegmentator"); });
 
     server->Post([job, path = request.Path]() {
@@ -2343,7 +2502,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       const auto* task = GetInitializedTotalSegmentator(request.Path)->FindTask(name);
 
       if (task == nullptr)
-        Throw("TASK_NOT_FOUND", "Not Found", "TotalSegmentator has no task \"" + name + "\".", 404, request.Path);
+        Throw("TOTALSEGMENTATOR_TASK_NOT_FOUND", "Not Found", "TotalSegmentator has no task \"" + name + "\".", 404, request.Path);
 
       return DescribeTotalSegmentatorTask(*task, true);
     }));
@@ -2418,10 +2577,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "models (resolution_mm of the task's speeds), quicker; speed is standard unless given with a task. A request "
     "with task or speed selects all classes of the task again, unless roi_subset, the exact class names of GET "
     ".../tasks/{name}, chooses some: "
-    "only tasks with roi_subset true take one, and an empty list chooses all. Returns {data: state} as GET does, "
-    "without tasks.";
+    "only tasks with roi_subset true take one, and an empty list chooses all. Other fields are refused. Returns "
+    "{data: state} as GET does, without tasks.";
   totalSegmentatorOptions.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
+    ThrowIfUnknownField(body, { "task", "speed", "roi_subset" }, "the options of TotalSegmentator", request.Path);
 
     if (body.contains("task") && !body["task"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"task\" must be the name of a task.", request.Path));
@@ -2542,7 +2702,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           WhenToolIdle(tool, [job, tool]() {
             if (!tool->LastRunSucceeded())
             {
-              job->Fail(tool->GetLastErrorMessage().empty() ? "TotalSegmentator was cancelled." : tool->GetLastErrorMessage());
+              job->Fail(tool->GetLastErrorMessage().empty() ? "TotalSegmentator was canceled." : tool->GetLastErrorMessage());
               return;
             }
 

@@ -24,11 +24,8 @@ found in the LICENSE file.
 
 #include <QDesktopServices>
 #include <QDir>
-#include <QFileDialog>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QScrollBar>
-#include <QStandardPaths>
 #include <QToolBar>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -38,9 +35,6 @@ const QString QmitkReportEditor::EDITOR_ID = "org.mitk.editors.report";
 namespace
 {
   const QString Scheme = QStringLiteral("mitk-report");
-
-  /** The folder the user saved a report to last, for the session. */
-  QString s_LastFolder;
 }
 
 QmitkReportEditor::QmitkReportEditor() = default;
@@ -48,7 +42,7 @@ QmitkReportEditor::QmitkReportEditor() = default;
 QmitkReportEditor::~QmitkReportEditor()
 {
   if (auto* store = QmitkReportsPluginActivator::GetStore(); store != nullptr)
-    store->Remove(m_ReportId);
+    store->CloseReport(m_ReportId);
 }
 
 void QmitkReportEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
@@ -85,7 +79,7 @@ void QmitkReportEditor::CreateQtPartControl(QWidget* parent)
   layout->addWidget(toolBar);
 
   auto* save = toolBar->addAction(
-    QmitkIconTheme::GetIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")),
+    QmitkIconTheme::GetIcon(QStringLiteral(":/org.mitk.gui.qt.reports/SaveAsHtml.svg")),
     "Save as HTML...");
   save->setToolTip("Save the report as an HTML file with its images included");
   connect(save, &QAction::triggered, this, &QmitkReportEditor::SaveAsHtml);
@@ -93,7 +87,8 @@ void QmitkReportEditor::CreateQtPartControl(QWidget* parent)
   auto* browser = toolBar->addAction(
     QmitkIconTheme::GetIcon(QStringLiteral(":/org.mitk.gui.qt.reports/OpenInBrowser.svg")),
     "Open in Browser");
-  browser->setToolTip("Open the report in the web browser, for example to print it");
+  browser->setToolTip("Open the report in the web browser, for example to print it. The page is a temporary copy, "
+                      "which is removed when the report is closed.");
   connect(browser, &QAction::triggered, this, &QmitkReportEditor::OpenInBrowser);
 
   m_View = new QmitkHtmlWidget(parent);
@@ -152,32 +147,8 @@ void QmitkReportEditor::OnLinkClicked(const QUrl& url)
 
 void QmitkReportEditor::SaveAsHtml()
 {
-  const auto* store = QmitkReportsPluginActivator::GetStore();
-  const auto* report = store != nullptr ? store->Get(m_ReportId) : nullptr;
-
-  if (report == nullptr)
-    return;
-
-  const auto folder = !s_LastFolder.isEmpty()
-    ? s_LastFolder
-    : QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-
-  const auto path = QFileDialog::getSaveFileName(m_View->window(), "Save Report",
-    QDir(folder).filePath(QmitkReportStore::GetFileBaseName(*report) + ".html"), "HTML files (*.html *.htm)");
-
-  if (path.isEmpty())
-    return;
-
-  s_LastFolder = QFileInfo(path).absolutePath();
-
-  try
-  {
-    store->WriteDocument(m_ReportId, path);
-  }
-  catch (const mitk::Exception& e)
-  {
-    QMessageBox::warning(m_View->window(), "Save Report", QString::fromStdString(e.GetDescription()));
-  }
+  if (auto* store = QmitkReportsPluginActivator::GetStore(); store != nullptr)
+    store->SaveReport(m_ReportId, m_View->window());
 }
 
 void QmitkReportEditor::OpenInBrowser()

@@ -18,13 +18,20 @@ it can be passed on as it is and opened in any web browser. The file contains no
 content security policy keeps browsers from loading anything from elsewhere.
 
 "Open in Browser" shows the report in the web browser, for example to print it or to save it as
-a PDF. The browser opens a copy in a temporary folder, which the Workbench removes when it
-closes.
+a PDF. The browser opens a copy in a temporary folder; the Workbench removes the copy when the
+report is closed, so save the report if you want to keep the page.
 
 \section org_mitk_editors_reportLifetime Closing a report
 
-A report exists only as long as its editor. Closing the editor discards the report, and reports
-are not restored when the Workbench starts again. Save a report you want to keep before you
-close it.
+A report exists only as long as its editor, and reports are not restored when the Workbench
+starts again. A report that was not saved, or that changed since you saved it, is not lost
+without asking:
+
+- When you close the editor's tab, the tab closes and a question follows: "Save as HTML..."
+  saves the report and discards it afterwards; "Discard" discards it. If you cancel the file
+  dialog, the question comes again.
+- When you close the Workbench while reports are unsaved, the Workbench asks once for all of
+  them: "Save as HTML..." saves each one, "Discard" discards them, and "Cancel" keeps the
+  Workbench open.
 
 */

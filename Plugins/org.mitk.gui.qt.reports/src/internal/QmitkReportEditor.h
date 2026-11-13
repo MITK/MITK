@@ -22,7 +22,9 @@ class QUrl;
  * \brief Shows a report of the QmitkReportStore, which the user can save as
  *        HTML or open in the web browser.
  *
- * The report lives as long as its editor: closing the editor removes it.
+ * The report lives as long as its editor: closing the editor removes it, after
+ * asking the user whether to save it if it is unsaved. The question follows the
+ * close, because a part cannot veto the closing of its tab.
  */
 class QmitkReportEditor : public berry::QtEditorPart
 {

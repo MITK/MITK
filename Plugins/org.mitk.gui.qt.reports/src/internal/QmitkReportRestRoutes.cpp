@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <QBuffer>
 #include <QFile>
 #include <QImage>
+#include <QRegularExpression>
 
 #include <algorithm>
 #include <cctype>
@@ -46,6 +47,9 @@ namespace
 {
   /** The longest side of the images that clients get back to check a capture. */
   constexpr int MaxPreviewSize = 1000;
+
+  /** The most HTML that a report takes, in bytes: 32 MB. */
+  constexpr qsizetype MaxHtmlSize = 33554432;
 
   [[noreturn]] void Throw(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
   {
@@ -94,6 +98,20 @@ namespace
       throw RestException(ErrorResponse::InvalidRequest(name + " must be a string.", path));
 
     return QString::fromStdString(body[name].get<std::string>());
+  }
+
+  /** Refuse HTML that is too large, or that refers to an image the store would not find. */
+  void CheckHtml(const QString& html, const std::string& path)
+  {
+    if (html.toUtf8().size() > MaxHtmlSize)
+      Throw("REPORT_TOO_LARGE", "Payload Too Large", "The html takes at most 32 MB (33554432 bytes).", 413, path);
+
+    // The store finds images by their quoted src values only.
+    static const QRegularExpression unquotedSource(QStringLiteral("<img\\b[^>]*?(?<![\\w-])src\\s*+=\\s*+(?![\"'])"),
+      QRegularExpression::CaseInsensitiveOption);
+
+    if (unquotedSource.match(html).hasMatch())
+      throw RestException(ErrorResponse::InvalidRequest("An img tag has a src without quotes. Images need src in quotes, like <img src=\"image-3.png\">.", path));
   }
 
   nlohmann::json Describe(const QmitkReportStore::Report& report, bool withHtml)
@@ -199,6 +217,8 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
     if (!title.has_value() || title->trimmed().isEmpty() || !html.has_value())
       throw RestException(ErrorResponse::InvalidRequest("The body needs a title and html.", request.Path));
 
+    CheckHtml(*html, request.Path);
+
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       auto* store = GetStore(request.Path);
       int id = 0;
@@ -256,6 +276,8 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
 
     if (!html.has_value() || (title.has_value() && title->trimmed().isEmpty()))
       throw RestException(ErrorResponse::InvalidRequest("The body needs html, and a title is not empty.", request.Path));
+
+    CheckHtml(*html, request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       auto* store = GetStore(request.Path);

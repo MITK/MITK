@@ -496,6 +496,31 @@ public:
     litehtml::position::vector redraw;
     if (m_Document->on_mouse_over(x, y, event->position().x() / m_Zoom, event->position().y() / m_Zoom, redraw))
       q->viewport()->update();
+
+    this->ShowLinkTarget(this->GetLinkTarget());
+  }
+
+  /** \brief The target of the link under the mouse, resolved as a click would open it; empty if there is none. */
+  QString GetLinkTarget() const
+  {
+    // A click is handled by the nearest anchor around the element under the mouse.
+    for (std::shared_ptr<const litehtml::element> element = m_Document->get_over_element(); element != nullptr;
+         element = element->parent())
+    {
+      const char *href = element->get_attr("href");
+
+      if (href != nullptr && std::strcmp(element->get_tagName(), "a") == 0)
+        return m_BaseUrl.resolved(QUrl(QString::fromUtf8(href))).toString();
+    }
+
+    return QString();
+  }
+
+  void ShowLinkTarget(const QString &target)
+  {
+    // The scroll area's own tool tip is the one shown, as it receives the viewport's events.
+    if (q->toolTip() != target)
+      q->setToolTip(target);
   }
 
   /** \brief Returns false when there is nothing to handle (no document or non-left button). */
@@ -533,6 +558,8 @@ public:
 
   void OnMouseLeave()
   {
+    this->ShowLinkTarget(QString());
+
     if (!m_Document)
       return;
 

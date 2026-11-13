@@ -24,6 +24,7 @@ html {
   --head: #eef1f4;
   --warn: #d97706;
   --warn-text: #5c3200;
+  --warn-flag: #9a5300;
   --warn-back: #fff6e6;
   --warn-line: #f2c46d;
   --info: #0969da;
@@ -31,6 +32,7 @@ html {
   --info-back: #eef5ff;
   --info-line: #9cc4f5;
   --ok: #2c8a3e;
+  --on-ok: #ffffff;
   --ok-text: #12391b;
   --ok-back: #eefaf0;
   --ok-line: #9fd4a9;
@@ -58,6 +60,7 @@ html {
     --head: #181c27;
     --warn: #f38400;
     --warn-text: #e9dcc8;
+    --warn-flag: #f38400;
     --warn-back: #241a0e;
     --warn-line: #6b4410;
     --info: #7fd8ff;
@@ -65,6 +68,7 @@ html {
     --info-back: #0f1d29;
     --info-line: #24506b;
     --ok: #8db600;
+    --on-ok: #0d0f14;
     --ok-text: #dbe9b8;
     --ok-back: #151d0c;
     --ok-line: #42560f;
@@ -348,7 +352,7 @@ img, svg {
 
 .callout.ok .icon {
   background: var(--ok);
-  color: #ffffff;
+  color: var(--on-ok);
 }
 
 .panel {
@@ -478,7 +482,7 @@ img, svg {
 .flag.warn {
   border-color: var(--warn-line);
   background: var(--warn-back);
-  color: var(--warn);
+  color: var(--warn-flag);
 }
 
 .flag.info {

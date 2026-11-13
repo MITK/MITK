@@ -310,7 +310,10 @@ void QmitkAgentWidget::ClearMemory()
     ? QString("Delete the note of the agent's memory? This cannot be undone.")
     : QString("Delete all %1 notes of the agent's memory? This cannot be undone.").arg(count);
 
-  if (QMessageBox::question(m_Ui->conversation, "Agent Memory", question) != QMessageBox::Yes)
+  const auto answer = QMessageBox::question(m_Ui->conversation, "Agent Memory", question,
+    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+  if (answer != QMessageBox::Yes)
     return;
 
   try

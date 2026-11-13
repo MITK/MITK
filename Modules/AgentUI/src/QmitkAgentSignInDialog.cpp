@@ -31,6 +31,9 @@ QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Accoun
   m_Ui->pageLabel->hide();
   m_Ui->errorLabel->hide();
 
+  // The output of a process is no rich text, even where it looks like it.
+  m_Ui->errorLabel->setTextFormat(Qt::PlainText);
+
   connect(m_Ui->continueButton, &QPushButton::clicked, this, &QmitkAgentSignInDialog::SubmitCode);
   connect(m_Ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -44,8 +47,9 @@ QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Accoun
   });
 
   connect(m_Process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+    // No finished() follows a failed start.
     if (error == QProcess::FailedToStart)
-      this->ShowError(QString("Claude Code cannot be started: %1").arg(m_Process->errorString()));
+      this->ShowEnd(QString("Claude Code cannot be started: %1").arg(m_Process->errorString()));
   });
 
   m_Process->setProcessEnvironment(QmitkClaudeCodeProcess::GetEnvironment());
@@ -54,8 +58,16 @@ QmitkAgentSignInDialog::QmitkAgentSignInDialog(const QString& executable, Accoun
 
 QmitkAgentSignInDialog::~QmitkAgentSignInDialog()
 {
-  // Deleting the process kills it, which must not reach this half-destroyed dialog.
+  // Killing the process must not reach this half-destroyed dialog.
   m_Process->disconnect(this);
+
+  // Still running after Cancel. Deleted while it runs, the process would warn
+  // about it and wait far longer.
+  if (m_Process->state() != QProcess::NotRunning)
+  {
+    m_Process->kill();
+    m_Process->waitForFinished(3000);
+  }
 }
 
 void QmitkAgentSignInDialog::OnOutput()
@@ -90,12 +102,9 @@ void QmitkAgentSignInDialog::OnFinished(int exitCode, QProcess::ExitStatus exitS
 
   const auto error = QString::fromUtf8(m_ErrorOutput).trimmed();
 
-  this->ShowError(error.isEmpty()
+  this->ShowEnd(error.isEmpty()
     ? QString("Claude Code ended before it was signed in (exit code %1).").arg(exitCode)
     : error);
-
-  m_Ui->codeEdit->setEnabled(false);
-  m_Ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
 }
 
 void QmitkAgentSignInDialog::SubmitCode()
@@ -115,4 +124,13 @@ void QmitkAgentSignInDialog::ShowError(const QString& error)
 {
   m_Ui->errorLabel->setText(error);
   m_Ui->errorLabel->show();
+}
+
+void QmitkAgentSignInDialog::ShowEnd(const QString& error)
+{
+  this->ShowError(error);
+
+  m_Ui->codeEdit->setEnabled(false);
+  m_Ui->continueButton->setEnabled(false);
+  m_Ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
 }

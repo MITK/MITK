@@ -114,6 +114,7 @@ namespace
 QmitkAgentConversationWidget::QmitkAgentConversationWidget(QWidget* parent)
   : QTextBrowser(parent),
     m_StreamBlock(-1),
+    m_StreamLastBlock(-1),
     m_FollowEnd(true),
     m_NoteFontSize(0.0),
     m_StepGroupOpen(false),
@@ -154,8 +155,8 @@ void QmitkAgentConversationWidget::AppendUserMessage(const QString& text)
 {
   // The user's own message brings the conversation back to its end.
   m_FollowEnd = true;
-  m_StreamBlock = -1;
   m_StepGroupOpen = false;
+  this->InterruptStreamedText();
 
   auto* document = this->document();
   QTextCursor cursor(document);
@@ -168,7 +169,13 @@ void QmitkAgentConversationWidget::AppendUserMessage(const QString& text)
     : -1;
 
   cursor.insertFrame(GetMessageFrameFormat());
-  cursor.insertHtml(QString("<b>You:</b> %1").arg(text.toHtmlEscaped().replace('\n', "<br>")));
+
+  QTextCharFormat labelFormat;
+  labelFormat.setFontWeight(QFont::Bold);
+  cursor.insertText("You:", labelFormat);
+
+  // Not as HTML, which would collapse indentation and runs of spaces.
+  cursor.insertText(QChar(' ') + QString(text).replace(QChar('\n'), QChar(QChar::LineSeparator)), QTextCharFormat());
 
   if (emptyBlock >= 0)
   {
@@ -200,11 +207,12 @@ void QmitkAgentConversationWidget::AppendError(const QString& text)
 void QmitkAgentConversationWidget::BeginStreamedText()
 {
   m_StreamBlock = this->AppendBlock().blockNumber();
+  m_StreamLastBlock = -1;
 }
 
 void QmitkAgentConversationWidget::AppendStreamedText(const QString& text)
 {
-  if (m_StreamBlock < 0)
+  if (m_StreamBlock < 0 || m_StreamLastBlock >= 0)
     return;
 
   QTextCursor cursor(this->document());
@@ -221,13 +229,67 @@ void QmitkAgentConversationWidget::EndStreamedText(const QString& markdown)
     return;
   }
 
+  auto* document = this->document();
+  const auto blockCount = document->blockCount();
+  auto text = markdown;
+
   // The complete text replaces the streamed one, formatted now.
-  QTextCursor cursor(this->document()->findBlockByNumber(m_StreamBlock));
-  cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+  QTextCursor cursor(document->findBlockByNumber(m_StreamBlock));
+
+  if (m_StreamLastBlock < 0)
+  {
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+  }
+  else
+  {
+    const auto last = document->findBlockByNumber(m_StreamLastBlock);
+    cursor.setPosition(last.position() + last.length() - 1, QTextCursor::KeepAnchor);
+
+    // Above other content, a new line at the end would add an empty block.
+    while (text.endsWith('\n'))
+      text.chop(1);
+  }
+
   cursor.removeSelectedText();
-  cursor.insertMarkdown(markdown);
+  cursor.insertMarkdown(text);
+
+  // Groups of steps below the text find their blocks by number.
+  const auto addedBlocks = document->blockCount() - blockCount;
+
+  for (auto& group : m_StepGroups)
+  {
+    if (group.SummaryBlock > m_StreamBlock)
+    {
+      group.SummaryBlock += addedBlocks;
+      group.PreviewBlock += addedBlocks;
+      group.LastBlock += addedBlocks;
+    }
+  }
+
   m_StreamBlock = -1;
+  m_StreamLastBlock = -1;
   this->ScrollToEnd();
+}
+
+void QmitkAgentConversationWidget::InterruptStreamedText()
+{
+  if (m_StreamBlock < 0 || m_StreamLastBlock >= 0)
+    return;
+
+  // What follows takes an empty block at the end as its own.
+  auto last = this->document()->lastBlock();
+
+  if (last.length() == 1)
+    last = last.previous();
+
+  if (last.isValid() && last.blockNumber() >= m_StreamBlock)
+  {
+    m_StreamLastBlock = last.blockNumber();
+  }
+  else
+  {
+    m_StreamBlock = -1;
+  }
 }
 
 void QmitkAgentConversationWidget::AppendStep(const QmitkAgentStep& step)
@@ -287,6 +349,7 @@ void QmitkAgentConversationWidget::Clear()
   this->clear();
   m_Images.clear();
   m_StreamBlock = -1;
+  m_StreamLastBlock = -1;
   m_StepGroups.clear();
   m_StepGroupOpen = false;
 }
@@ -328,19 +391,22 @@ QTextCursor QmitkAgentConversationWidget::AppendBlock()
 {
   // The space after a group of steps, like the one before its summary.
   QTextBlockFormat format;
+  const bool afterSteps = m_StepGroupOpen;
 
-  if (m_StepGroupOpen)
+  if (afterSteps)
     format.setTopMargin(StepSpacing);
 
-  m_StreamBlock = -1;
+  this->InterruptStreamedText();
   m_StepGroupOpen = false;
 
   QTextCursor cursor(this->document());
   cursor.movePosition(QTextCursor::End);
 
   // The last block is empty at the start, and after a frame like the one
-  // around a message of the user, which is always followed by a block.
-  if (cursor.block().length() > 1)
+  // around a message of the user, which is always followed by a block. The
+  // empty block of a step without text stays with its group, though, as it
+  // is hidden and shown with it.
+  if (afterSteps || cursor.block().length() > 1)
   {
     cursor.insertBlock(format, QTextCharFormat());
   }
@@ -577,6 +643,9 @@ void QmitkAgentConversationWidget::ShowImage(int id)
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setWindowTitle("Screenshot");
 
+  // Screenshots are in device pixels.
+  pixmap.setDevicePixelRatio(this->devicePixelRatioF());
+
   auto* image = new QLabel(dialog);
   image->setPixmap(pixmap);
 
@@ -589,7 +658,7 @@ void QmitkAgentConversationWidget::ShowImage(int id)
   layout->addWidget(scrollArea);
 
   const auto available = this->screen()->availableGeometry().size() * 0.9;
-  dialog->resize(pixmap.size().boundedTo(available));
+  dialog->resize(pixmap.deviceIndependentSize().toSize().boundedTo(available));
   dialog->show();
 }
 
@@ -601,10 +670,19 @@ void QmitkAgentConversationWidget::OnLinkClicked(const QUrl& url)
   }
   else if (url.scheme() == StepsScheme)
   {
-    const auto index = url.path().toULongLong();
+    bool ok = false;
+    const auto index = url.path().toULongLong(&ok);
 
-    if (index < m_StepGroups.size())
-      this->SetStepGroupExpanded(index, !m_StepGroups[index].Expanded);
+    if (ok && index < m_StepGroups.size())
+    {
+      const bool expand = !m_StepGroups[index].Expanded;
+      this->SetStepGroupExpanded(index, expand);
+
+      // Steps that unfold above the end grow the conversation below the view
+      // without a scroll, so it would still count as being at its end.
+      if (expand && index + 1 < m_StepGroups.size())
+        m_FollowEnd = false;
+    }
   }
   // Links in the agent's answers must not open local files or programs.
   else if (url.scheme() == "https" || url.scheme() == "http")

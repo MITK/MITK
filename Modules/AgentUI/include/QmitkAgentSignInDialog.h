@@ -54,6 +54,9 @@ private:
   void SubmitCode();
   void ShowError(const QString& error);
 
+  /** \brief Shows the error and leaves only closing the dialog, as Claude Code does not run (anymore). */
+  void ShowEnd(const QString& error);
+
   std::unique_ptr<Ui::QmitkAgentSignInDialog> m_Ui;
   QProcess* m_Process;
   QByteArray m_Output;

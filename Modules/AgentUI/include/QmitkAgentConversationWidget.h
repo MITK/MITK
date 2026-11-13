@@ -53,13 +53,17 @@ public:
   void AppendNote(const QString& text);
   void AppendError(const QString& text);
 
-  /** \brief Starts a block for text that arrives in pieces. Any other append ends it. */
+  /** \brief Starts a block for text that arrives in pieces. Any other append ends the pieces. */
   void BeginStreamedText();
 
-  /** \brief Adds a piece to the text that BeginStreamedText() started, if it has not ended. */
+  /** \brief Adds a piece to the text that BeginStreamedText() started, unless other content followed it. */
   void AppendStreamedText(const QString& text);
 
-  /** \brief Replaces the streamed text with the complete one, formatted, or appends it if none is streamed. */
+  /**
+   * \brief Replaces the streamed text with the complete one, formatted, or appends it if none is streamed.
+   *
+   * The text is replaced where it is, also above content that followed it.
+   */
   void EndStreamedText(const QString& markdown);
 
   /** \brief Adds a step to the last group of steps, or starts a new group after other content. */
@@ -101,9 +105,12 @@ private:
   /**
    * \brief A cursor in a new block at the end for a message.
    *
-   * Ends the streamed text and the group of steps, if there are.
+   * Ends the pieces of the streamed text and the group of steps, if there are.
    */
   QTextCursor AppendBlock();
+
+  /** \brief Keeps where the streamed text ends, as other content follows it now, or forgets it if it is empty. */
+  void InterruptStreamedText();
 
   /** \brief A cursor in a new list item at the end for a step, which joins the last group of steps or starts a new one. */
   QTextCursor AppendStepItem();
@@ -143,6 +150,9 @@ private:
    * steps further up moves the positions after it.
    */
   int m_StreamBlock;
+
+  /** \brief The block where the streamed text ends once other content follows it, or -1 while it is the end of the conversation. */
+  int m_StreamLastBlock;
 
   /** \brief Whether the conversation scrolls along, which stops while the user reads further up. */
   bool m_FollowEnd;

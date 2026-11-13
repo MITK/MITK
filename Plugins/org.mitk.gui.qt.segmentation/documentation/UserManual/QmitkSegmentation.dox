@@ -584,6 +584,7 @@ Two automation options on the preferences page streamline this workflow: <i>Auto
 
 With <i>Auto-create next label</i>, confirming adds a new, empty label to the same group and selects it, so that your next interactions segment the next structure.
 It gets the default label name, which you can change at any time.
+If you uncheck <i>Ignore label naming preferences</i> on the preferences page, the label naming preferences of the Segmentation view apply instead, so that you may be asked for a name.
 If the label is still empty when you close nnInteractive or switch to another tool, it is removed again and the label you confirmed last becomes active.
 The label is kept if you select a different label or click <b>Reset</b> in the meantime, or once it has content.
 

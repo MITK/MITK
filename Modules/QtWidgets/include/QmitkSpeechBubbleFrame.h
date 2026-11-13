@@ -38,12 +38,14 @@ public:
   ~QmitkSpeechBubbleFrame() override;
 
   /**
-   * \brief The fill and outline colors of the bubble in the current theme.
+   * \brief The fill color of the bubble in the current theme.
    *
    * For other places that show what the user wrote, so that they look like
    * the bubble.
    */
   static QColor GetFillColor(const QPalette& palette, bool enabled = true);
+
+  /** \brief The outline color of the bubble in the current theme, for the same use as GetFillColor(). */
   static QColor GetBorderColor(const QPalette& palette, bool enabled = true);
 
 protected:

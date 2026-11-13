@@ -3,7 +3,7 @@
 
 \imageMacro{imagenavigator-dox.svg,"Icon of the Image Navigator",2.00}
 
-\imageMacroEx{QmtikImageNavigator_ImageNavigator.png,"The Image Navigator",8,384}
+\imageMacroEx{QmtikImageNavigator_ImageNavigator.png,"The Image Navigator",8,384px}
 
 The Image Navigator shows where the crosshair is and moves it to the position you enter: as a location in millimeters, as a slice of the axial, sagittal, and coronal render windows, and as a time step.
 All render windows follow.

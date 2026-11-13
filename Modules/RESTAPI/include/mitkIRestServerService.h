@@ -262,7 +262,9 @@ namespace mitk
      *        thread in the Workbench, and wait for it.
      *
      * For route handlers, which run on threads of the server. Without a
-     * dispatcher, the task runs right away. The task must not throw; see
+     * dispatcher, the task runs right away. The task runs under the
+     * ActionOriginScope name of the calling thread, which is the name of the
+     * request's client in a route handler. The task must not throw; see
      * mitk::CallInGuiThread() for a variant that passes results and
      * exceptions on.
      *
@@ -276,7 +278,8 @@ namespace mitk
      *        without waiting for it.
      *
      * For long work that a job reports on, like starting a model. Without a
-     * dispatcher, the task runs right away.
+     * dispatcher, the task runs right away. The task runs under the
+     * ActionOriginScope name of the calling thread.
      */
     virtual void Post(std::function<void()> task) const = 0;
 

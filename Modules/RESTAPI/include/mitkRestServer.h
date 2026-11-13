@@ -146,6 +146,9 @@ namespace mitk
 
     std::shared_ptr<RestJob> FindJob(const RestRequest& request) const;
 
+    /** \brief A token of CreateToken(), or std::nullopt for any other token. */
+    std::optional<RestTokenInfo> FindToken(const std::string& token) const;
+
     /** \brief The rights of a token of CreateToken(), or std::nullopt for any other token. */
     std::optional<RestTokenRights> GetTokenRights(const std::string& token) const;
 

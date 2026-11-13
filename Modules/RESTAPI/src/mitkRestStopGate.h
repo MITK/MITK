@@ -43,6 +43,7 @@ namespace mitk
      * \brief Run a task on the dispatcher's thread and wait for it.
      *
      * The task runs right away without a dispatcher and on its thread.
+     * Otherwise it runs under the ActionOriginScope name of the calling thread.
      * What the task throws is thrown again here. Without a gate, nothing
      * ends the wait early.
      *

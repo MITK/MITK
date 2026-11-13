@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkSegTool2D.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkProgressTask.h>
 #include <mitkScopedProgressTask.h>
 #include <mitkSegChangeOperationApplier.h>
@@ -66,6 +67,9 @@ struct mitk::SegWithPreviewTool::UpdatePass
 
   /** What follows the update, like the transfer of a confirmation. */
   std::function<void()> Then;
+
+  /** Who started the update, so that what follows it counts for the same. */
+  std::string Origin;
 
   // Declared in this order, so that the task is taken from the command before it ends.
   std::unique_ptr<ProgressTask> Task;
@@ -822,6 +826,7 @@ void mitk::SegWithPreviewTool::StartUpdate(bool ignoreLazyPreviewSetting, std::f
   pass->WorkingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
   pass->TimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
   pass->Then = std::move(then);
+  pass->Origin = ActionOriginScope::GetCurrent();
 
   if (nullptr != pass->Input && nullptr != pass->Preview)
   {
@@ -1054,6 +1059,8 @@ void mitk::SegWithPreviewTool::EndUpdate()
   if (!pass->Failed)
     then = std::move(pass->Then);
 
+  const std::string origin = pass->Origin;
+
   pass.reset();
 
   // However the update ends, the tool is not busy afterwards. A tool left busy
@@ -1065,7 +1072,10 @@ void mitk::SegWithPreviewTool::EndUpdate()
     std::rethrow_exception(cleanUpError);
 
   if (then)
+  {
+    const ActionOriginScope scope(origin);
     then();
+  }
 }
 
 void mitk::SegWithPreviewTool::SetGUIThreadPoster(GUIThreadPoster poster)
@@ -1102,9 +1112,12 @@ void mitk::SegWithPreviewTool::StartWork(std::function<void()> work, std::functi
   // Runs the done of the work, which is the end of the work for the caller.
   // What it throws, like a failed transfer that followed an update, has no
   // caller left to go to, so it goes to the user.
-  const auto finish = [this](const std::function<void(std::exception_ptr)>& done, std::exception_ptr error) {
+  const auto origin = ActionOriginScope::GetCurrent();
+
+  const auto finish = [this, origin](const std::function<void(std::exception_ptr)>& done, std::exception_ptr error) {
     try
     {
+      const ActionOriginScope scope(origin);
       done(error);
     }
     catch (const itk::ExceptionObject& e)
@@ -1145,11 +1158,12 @@ void mitk::SegWithPreviewTool::StartWork(std::function<void()> work, std::functi
 
   // Set once the thread exists, which may fail. Its done cannot reset it
   // before: that runs on this thread, after this function has returned.
-  m_WorkThread = std::thread([this, poster, finish, alive = std::weak_ptr<int>(m_Alive), work = std::move(work), done = std::move(done)]() mutable {
+  m_WorkThread = std::thread([this, poster, finish, origin, alive = std::weak_ptr<int>(m_Alive), work = std::move(work), done = std::move(done)]() mutable {
     std::exception_ptr error;
 
     try
     {
+      const ActionOriginScope scope(origin);
       work();
     }
     catch (...)

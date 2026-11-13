@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkRestStopGate.h"
 
+#include <mitkActionOriginScope.h>
 #include <mitkErrorResponse.h>
 #include <mitkRestRoute.h>
 
@@ -58,7 +59,7 @@ void mitk::RestStopGate::Run(const std::shared_ptr<RestStopGate>& gateOrNull, St
   if (!gate->m_Stopping)
   {
     // The task is referenced: it outlives the call unless the call is abandoned, and then it does not run.
-    dispatcher->Post([gate, call, &task]() {
+    dispatcher->Post([gate, call, &task, origin = ActionOriginScope::GetCurrent()]() {
       {
         std::lock_guard<std::mutex> callLock(gate->m_Mutex);
 
@@ -72,6 +73,7 @@ void mitk::RestStopGate::Run(const std::shared_ptr<RestStopGate>& gateOrNull, St
 
       try
       {
+        const ActionOriginScope scope(origin);
         task();
       }
       catch (...)

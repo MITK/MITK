@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRestServer.h>
+#include <mitkActionOriginScope.h>
 #include <mitkDataStorageBridge.h>
 #include <mitkHealthController.h>
 #include <mitkDataStorageController.h>
@@ -877,7 +878,10 @@ void RestServer::Post(std::function<void()> task) const
 
   if (dispatcher.IsNotNull())
   {
-    dispatcher->Post(std::move(task));
+    dispatcher->Post([task = std::move(task), origin = ActionOriginScope::GetCurrent()]() {
+      const ActionOriginScope scope(origin);
+      task();
+    });
   }
   else
   {
@@ -983,15 +987,23 @@ void RestServer::RemoveToken(const std::string& token)
   m_Tokens.erase(token);
 }
 
-std::optional<RestTokenRights> RestServer::GetTokenRights(const std::string& token) const
+std::optional<RestTokenInfo> RestServer::FindToken(const std::string& token) const
 {
   std::lock_guard<std::mutex> lock(m_TokenMutex);
 
   for (const auto& [knownToken, info] : m_Tokens)
   {
     if (ConstantTimeCompare(token, knownToken))
-      return info.Rights;
+      return info;
   }
+
+  return std::nullopt;
+}
+
+std::optional<RestTokenRights> RestServer::GetTokenRights(const std::string& token) const
+{
+  if (const auto info = this->FindToken(token); info.has_value())
+    return info->Rights;
 
   return std::nullopt;
 }
@@ -1103,6 +1115,13 @@ void RestServer::HandleRoutedHttp(const httplib::Request& req, httplib::Response
 
 RestResponse RestServer::Route(RestRequest& request) const
 {
+  // What the request changes counts for its client, not for the user: the
+  // name of a token of CreateToken(), or a generic name for any other client.
+  const auto bearer = request.GetBearerToken();
+  const auto tokenInfo = bearer.has_value() ? this->FindToken(*bearer) : std::optional<RestTokenInfo>();
+  const ActionOriginScope originScope(
+    tokenInfo.has_value() && !tokenInfo->Client.empty() ? tokenInfo->Client : std::string("REST client"));
+
   // Built-in routes first, as httplib tries them before it hands the rest to
   // the router.
   auto match = m_BuiltInRouter->Find(request.Method, request.Path);

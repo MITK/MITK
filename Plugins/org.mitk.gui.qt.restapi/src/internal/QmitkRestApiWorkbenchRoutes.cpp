@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkRestApiWorkbenchRoutes.h"
 
+#include <mitkActionOriginScope.h>
 #include <mitkCoreServices.h>
 #include <mitkDataNodeSelection.h>
 #include <mitkErrorResponse.h>
@@ -113,17 +114,32 @@ namespace
     return json;
   }
 
+  mitk::VerboseLimitedLinearUndo* GetHistoryModel()
+  {
+    return dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+  }
+
+  /** The entries of one stack, each with whether the asking client made it. Call where the client's origin scope holds. */
+  nlohmann::json DescribeEntries(const mitk::VerboseLimitedLinearUndo::StackDescription& descriptions,
+                                 const std::vector<std::string>& origins)
+  {
+    const auto client = mitk::ActionOriginScope::GetCurrent();
+    auto entries = nlohmann::json::array();
+
+    for (std::size_t i = 0; i < descriptions.size(); ++i)
+      entries.push_back({ { "description", descriptions[i].second }, { "own", origins[i] == client } });
+
+    return entries;
+  }
+
   nlohmann::json DescribeHistory()
   {
     nlohmann::json history = { { "undo", nlohmann::json::array() }, { "redo", nlohmann::json::array() } };
 
-    if (auto* model = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()))
+    if (auto* model = GetHistoryModel())
     {
-      for (const auto& [id, description] : model->GetUndoDescriptions())
-        history["undo"].push_back(description);
-
-      for (const auto& [id, description] : model->GetRedoDescriptions())
-        history["redo"].push_back(description);
+      history["undo"] = DescribeEntries(model->GetUndoDescriptions(), model->GetUndoOrigins());
+      history["redo"] = DescribeEntries(model->GetRedoDescriptions(), model->GetRedoOrigins());
     }
 
     return history;
@@ -132,7 +148,7 @@ namespace
   /** The description the history lists first for the step that an undo or redo would take; empty if there is none. */
   std::string DescribeNextStep(bool undo)
   {
-    if (auto* model = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()))
+    if (auto* model = GetHistoryModel())
     {
       const auto descriptions = undo ? model->GetUndoDescriptions() : model->GetRedoDescriptions();
 
@@ -152,6 +168,7 @@ namespace
       { "name", task.Name },
       { "progress", task.StepsToDo > 0 ? nlohmann::json(static_cast<double>(task.Progress) / task.StepsToDo) : nlohmann::json() },
       { "seconds", std::round(seconds) },
+      { "own", task.Origin == mitk::ActionOriginScope::GetCurrent() },
       { "cancelable", task.Cancelable },
       { "cancel_requested", task.CancelRequested }
     };
@@ -175,33 +192,77 @@ namespace
     return std::nullopt;
   }
 
-  /** Runs the undo or the redo of the application's Edit menu. */
+  struct StepOutcome
+  {
+    enum class State
+    {
+      NothingToDo,
+      NotOwn,
+      Done
+    };
+
+    State Result = State::NothingToDo;
+
+    /** The description of the step that was taken, or of the one that is not the client's. */
+    std::string Step;
+
+    nlohmann::json History;
+  };
+
+  /** Runs the undo or the redo of the application's Edit menu, if the step on top is the client's own. */
   mitk::RestResponse Step(const mitk::IRestServerService& server, const mitk::RestRequest& request, bool undo)
   {
-    const auto [done, history] = mitk::CallInGuiThread(server, [undo]() {
+    const auto outcome = mitk::CallInGuiThread(server, [undo]() {
+      StepOutcome taken;
+
       auto* model = mitk::UndoController::GetCurrentUndoModel();
-      const bool empty = model == nullptr || (undo ? model->UndoListEmpty() : model->RedoListEmpty());
-      const auto step = empty ? std::string() : DescribeNextStep(undo);
-      const bool stepped = !empty && (undo ? model->Undo() : model->Redo());
 
-      if (stepped)
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      if (model == nullptr || (undo ? model->UndoListEmpty() : model->RedoListEmpty()))
+        return taken;
 
-      auto history = DescribeHistory();
+      taken.Step = DescribeNextStep(undo);
 
-      if (stepped)
-        history[undo ? "undone" : "redone"] = step;
+      // Without origins nothing can be told to be the client's own.
+      const auto* historyModel = GetHistoryModel();
+      const auto origins = historyModel != nullptr
+        ? (undo ? historyModel->GetUndoOrigins() : historyModel->GetRedoOrigins())
+        : std::vector<std::string>();
 
-      return std::make_pair(stepped, history);
+      if (origins.empty() || origins.front() != mitk::ActionOriginScope::GetCurrent())
+      {
+        taken.Result = StepOutcome::State::NotOwn;
+        return taken;
+      }
+
+      if (!(undo ? model->Undo() : model->Redo()))
+        return taken;
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      taken.Result = StepOutcome::State::Done;
+      taken.History = DescribeHistory();
+      taken.History[undo ? "undone" : "redone"] = taken.Step;
+
+      return taken;
     });
 
-    if (!done)
+    switch (outcome.Result)
     {
-      return mitk::RestResponse::FromError(mitk::ErrorResponse::Create("NOTHING_TO_" + std::string(undo ? "UNDO" : "REDO"),
-        "Conflict", std::string("There is nothing to ") + (undo ? "undo." : "redo."), 409, request.Path));
+      case StepOutcome::State::NotOwn:
+        return mitk::RestResponse::FromError(mitk::ErrorResponse::Create("NOT_YOUR_STEP", "Conflict",
+          "The step on top of the history, \"" + outcome.Step + "\", is not yours. Ask the user to " +
+            (undo ? "undo" : "redo") + " it.",
+          409, request.Path));
+
+      case StepOutcome::State::NothingToDo:
+        return mitk::RestResponse::FromError(mitk::ErrorResponse::Create("NOTHING_TO_" + std::string(undo ? "UNDO" : "REDO"),
+          "Conflict", std::string("There is nothing to ") + (undo ? "undo." : "redo."), 409, request.Path));
+
+      case StepOutcome::State::Done:
+        break;
     }
 
-    return mitk::RestResponse::FromData(history);
+    return mitk::RestResponse::FromData(outcome.History);
   }
 }
 
@@ -373,7 +434,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   history.Summary = "List what undo and redo would revert or repeat";
   history.Description =
     "The history of the application's Edit menu, which covers changes of segmentations, but not adding or "
-    "removing data. Returns {data: {undo: [description], redo: [description]}}, most recent first.";
+    "removing data. Returns {data: {undo: [{description, own}], redo: [{description, own}]}}, most recent first. "
+    "own tells whether you made the step; undo and redo take only your own steps, the steps of the user and of "
+    "other clients stay for them.";
   history.Handler = [server](const RestRequest&) {
     return RestResponse::FromData(CallInGuiThread(*server, []() { return DescribeHistory(); }));
   };
@@ -385,7 +448,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   undo.Summary = "Undo the last change, as Edit > Undo does";
   undo.Description =
     "Returns {data: {undone, undo, redo}}: undone is the description of the step that was undone, undo and redo "
-    "are the history as GET /api/v1/workbench/history lists it afterwards. 409 if there is nothing to undo.";
+    "are the history as GET /api/v1/workbench/history lists it afterwards. Takes the step on top of the history "
+    "only if it is your own. 409 NOTHING_TO_UNDO if there is nothing to undo, 409 NOT_YOUR_STEP if the step on top "
+    "was made by the user or by another client: ask the user to undo it.";
   undo.Handler = [server](const RestRequest& request) { return Step(*server, request, true); };
   routes.push_back(undo);
 
@@ -395,7 +460,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   redo.Summary = "Redo the last undone change, as Edit > Redo does";
   redo.Description =
     "Returns {data: {redone, undo, redo}}: redone is the description of the step that was redone, undo and redo "
-    "are the history as GET /api/v1/workbench/history lists it afterwards. 409 if there is nothing to redo.";
+    "are the history as GET /api/v1/workbench/history lists it afterwards. Takes the step on top of the history "
+    "only if it is your own. 409 NOTHING_TO_REDO if there is nothing to redo, 409 NOT_YOUR_STEP if the step on top "
+    "was made by the user or by another client: ask the user to redo it.";
   redo.Handler = [server](const RestRequest& request) { return Step(*server, request, false); };
   routes.push_back(redo);
 
@@ -405,8 +472,8 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   tasks.Summary = "List the tasks that run, as the progress notifications show them";
   tasks.Description =
     "Downloads, loading models and computations, whether the user started them or a request did. Returns "
-    "{data: [{id, name, progress (0 to 1, or null if unknown), seconds, cancelable, cancel_requested}]}. While "
-    "a task runs, the Workbench may answer slowly; wait for it before relying on its results.";
+    "{data: [{id, name, progress (0 to 1, or null if unknown), seconds, own, cancelable, cancel_requested}]}: own "
+    "tells whether you started the task. While a task runs, the Workbench may answer slowly; wait for it before relying on its results.";
   tasks.Handler = [](const RestRequest&) {
     auto json = nlohmann::json::array();
 
@@ -424,7 +491,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   cancelTask.Method = "DELETE";
   cancelTask.Path = "/workbench/tasks/:id";
   cancelTask.Summary = "Cancel a task, as the cancel button of its progress notification does";
-  cancelTask.Description = "Returns {data: task}, or 409 if the task cannot be canceled.";
+  cancelTask.Description =
+    "Cancels only a task that you started. Returns {data: task}, or 409 NOT_YOUR_TASK if the user or another "
+    "client started the task: ask the user to cancel it. 409 TASK_NOT_CANCELABLE if the task cannot be canceled.";
   cancelTask.Handler = [](const RestRequest& request) {
     const auto task = FindTask(request);
 
@@ -432,6 +501,12 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
     {
       throw RestException(ErrorResponse::Create("TASK_NOT_FOUND", "Not Found",
         "There is no running task " + request.PathParams.at("id") + ".", 404, request.Path));
+    }
+
+    if (task->Origin != ActionOriginScope::GetCurrent())
+    {
+      throw RestException(ErrorResponse::Create("NOT_YOUR_TASK", "Conflict",
+        "The task \"" + task->Name + "\" is not yours. Ask the user to cancel it.", 409, request.Path));
     }
 
     if (!task->Cancelable)

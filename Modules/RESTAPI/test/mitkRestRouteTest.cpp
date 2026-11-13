@@ -13,7 +13,9 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkException.h>
+#include <mitkRestGuiThread.h>
 #include <mitkRestPoints.h>
 #include <mitkRestServer.h>
 #include <mitkStandaloneDataStorage.h>
@@ -174,6 +176,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(JobsCanBeCanceled);
   MITK_TEST(StopEndsWaitsForJobs);
   MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
+  MITK_TEST(RoutesActUnderTheNameOfTheirClient);
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(ServerForOneClient);
@@ -660,6 +663,49 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(503, this->StopDuringRequest(server, dispatcher, "/api/v1/dispatched"));
     CPPUNIT_ASSERT(!ran);
+  }
+
+  void RoutesActUnderTheNameOfTheirClient()
+  {
+    auto dispatcher = BusyDispatcher::New();
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+    server.SetDispatcher(dispatcher);
+
+    mitk::RestRoute route;
+    route.Method = "GET";
+    route.Path = "/origin";
+    route.Handler = [&server](const mitk::RestRequest&) {
+      const auto inHandler = mitk::ActionOriginScope::GetCurrent();
+      const auto inGuiThread = mitk::CallInGuiThread(server, []() { return mitk::ActionOriginScope::GetCurrent(); });
+      return mitk::RestResponse::FromData({ { "handler", inHandler }, { "gui", inGuiThread } });
+    };
+    server.AddRoute(route);
+
+    const auto token = server.CreateToken("test client", mitk::RestTokenRights());
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto ask = [&server, &dispatcher](const std::string& requestToken) {
+      auto response = std::async(std::launch::async, [&server, requestToken]() {
+        return server.HandleRequest(MakeRequest("GET", "/api/v1/origin", requestToken));
+      });
+
+      CPPUNIT_ASSERT(dispatcher->WaitForTask(std::chrono::seconds(10)));
+      dispatcher->Run();
+
+      return nlohmann::json::parse(response.get().Body)["data"];
+    };
+
+    const auto withToken = ask(token);
+    const auto withoutToken = ask("");
+    server.Stop();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("test client"), withToken["handler"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("test client"), withToken["gui"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("REST client"), withoutToken["handler"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("REST client"), withoutToken["gui"].get<std::string>());
+    CPPUNIT_ASSERT(mitk::ActionOriginScope::GetCurrent().empty());
   }
 
   void StopEndsBuiltInRequestsThatWaitForTheDispatchThread()

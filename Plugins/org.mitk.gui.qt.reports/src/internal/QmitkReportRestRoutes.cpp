@@ -119,7 +119,8 @@ namespace
   [[noreturn]] void ThrowUnknownImages(const mitk::Exception& e, const std::string& path)
   {
     Throw("IMAGE_NOT_FOUND", "Bad Request", e.GetDescription() +
-      std::string(" Reports show images of POST /api/v1/reports/images by their names; nothing else."), 400, path);
+      std::string(" Reports show images of POST /api/v1/reports/images by their names; nothing else. Only the last "
+        "100 captured images are kept for new reports; capture an older one again."), 400, path);
   }
 
   /** Open the report's editor, or bring it to the top, leaving the keyboard focus where it is. */
@@ -288,14 +289,17 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
     "/api/v1/rendering/windows/{id}/screenshot takes them. Cropped images of a series, like one view at several "
     "time points, differ in size and position. Set the window up first: slice, visible data, crosshair, camera. The image is kept under a name that "
     "reports show it by, like <img src=\"image-3.png\">; the header X-MITK-Report-Image gives {name, image_size, "
-    "timepoint_ms}, the time point the window showed. Returns the image to check it, at most 1000 pixels on its "
-    "longest side.";
+    "timepoint_ms}, the time point the window showed. Only the last 100 captured images are kept for new reports; a "
+    "report keeps the images it shows. Returns the image to check it, at most 1000 pixels on its longest side.";
   capture.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     const auto window = body.contains("window") && body["window"].is_string() ? body["window"].get<std::string>() : std::string();
 
     if (window.empty() || !std::all_of(window.begin(), window.end(), [](unsigned char c) { return std::isalnum(c) != 0 || c == '_' || c == '-'; }))
       throw RestException(ErrorResponse::InvalidRequest("window must name a render window, like axial or 3d.", request.Path));
+
+    if (body.contains("decorations") && !body["decorations"].is_boolean())
+      throw RestException(ErrorResponse::InvalidRequest("decorations must be true or false.", request.Path));
 
     // Reports show the scene without the window's corner texts, logo and border by default.
     auto target = "/api/v1/rendering/windows/" + window + "/screenshot?decorations=" +
@@ -309,7 +313,8 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
       if (!body[name].is_number_integer())
         throw RestException(ErrorResponse::InvalidRequest(std::string(name) + " must be a whole number.", request.Path));
 
-      target += std::string("&") + name + "=" + std::to_string(body[name].get<int>());
+      // Passed on as written, so that the screenshot endpoint refuses a number beyond its range.
+      target += std::string("&") + name + "=" + body[name].dump();
     }
 
     if (body.contains("crop"))
@@ -371,7 +376,7 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
 
     if (longest > MaxPreviewSize)
     {
-      image = image.scaled(image.width() * MaxPreviewSize / longest, image.height() * MaxPreviewSize / longest, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+      image = image.scaled(MaxPreviewSize, MaxPreviewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
       preview = EncodePng(image);
     }
 

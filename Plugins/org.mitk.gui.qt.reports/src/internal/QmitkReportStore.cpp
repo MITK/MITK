@@ -200,7 +200,8 @@ QString QmitkReportStore::WriteTemporaryFile(int id)
   if (report == nullptr)
     mitkThrow() << "There is no report " << id << ".";
 
-  if (m_TemporaryDir == nullptr)
+  // A folder that could not be created, or that something else removed since, gets another try.
+  if (m_TemporaryDir == nullptr || !m_TemporaryDir->isValid() || !QDir(m_TemporaryDir->path()).exists())
     m_TemporaryDir = std::make_unique<QTemporaryDir>(QDir(QDir::tempPath()).filePath(QStringLiteral("MITK-Reports-XXXXXX")));
 
   if (!m_TemporaryDir->isValid())

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkReportStore.h"
 
 #include <QIcon>
+#include <QTextDocument>
 
 QmitkReportEditorInput::QmitkReportEditorInput(int reportId)
   : m_ReportId(reportId)
@@ -42,7 +43,13 @@ QString QmitkReportEditorInput::GetName() const
 
 QString QmitkReportEditorInput::GetToolTipText() const
 {
-  return this->GetName();
+  const auto name = this->GetName();
+
+  // Qt shows a tool tip that looks like HTML as rich text and loads the images it names. Escaped, a title that a
+  // client wrote shows as written.
+  return Qt::mightBeRichText(name)
+    ? QStringLiteral("<span>") + name.toHtmlEscaped() + QStringLiteral("</span>")
+    : name;
 }
 
 QIcon QmitkReportEditorInput::GetIcon() const

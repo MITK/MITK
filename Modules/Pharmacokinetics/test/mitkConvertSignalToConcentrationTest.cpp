@@ -51,7 +51,7 @@ public:
     itk::Index<4> testIndex0 = { { 0, 0, 0, 0 } };
     itk::Index<4> testIndex1 = { { 0, 2, 2, 3 } };
     itk::Index<4> testIndex2 = { { 2, 2, 1, 9 } };
-    itk::Index<4> testIndex3 = { { 0, 3, 2, 1 } };
+    itk::Index<4> testIndex3 = { { 0, 2, 2, 1 } };
     itk::Index<4> testIndex4 = { { 2, 2, 2, 4 } };
     m_testIndices.push_back(testIndex0);
     m_testIndices.push_back(testIndex1);
@@ -76,7 +76,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(90.0);
     refValues.push_back(360.0);
-    refValues.push_back(0.0);
+    refValues.push_back(30.0);
     refValues.push_back(160.0);
 
     std::stringstream ss;
@@ -100,7 +100,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(30.0);
     refValues.push_back(280.0);
-    refValues.push_back(0.0);
+    refValues.push_back(-30.0);
     refValues.push_back(80.0);
 
     std::stringstream ss;
@@ -124,7 +124,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(30.0);
     refValues.push_back(280.0);
-    refValues.push_back(0.0);
+    refValues.push_back(-30.0);
     refValues.push_back(80.0);
 
     std::stringstream ss;
@@ -148,7 +148,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(3.461538);
     refValues.push_back(20.0);
-    refValues.push_back(0.0);
+    refValues.push_back(1.153846);
     refValues.push_back(5.714286);
 
     std::stringstream ss;
@@ -207,7 +207,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(7871.5616001);
     refValues.push_back(-1059.012343);
-    refValues.push_back(0.0);
+    refValues.push_back(335.628488);
     refValues.push_back(-3251.392613);
 
     std::stringstream ss;
@@ -232,7 +232,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(-1.495494);
     refValues.push_back(-3.044522);
-    refValues.push_back(0.0);
+    refValues.push_back(-0.767255);
     refValues.push_back(-1.904237);
 
     std::stringstream ss;

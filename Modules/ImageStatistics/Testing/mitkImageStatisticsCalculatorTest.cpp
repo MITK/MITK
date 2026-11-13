@@ -166,6 +166,7 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestUS4DCroppedMultilabelMaskTimeStep1);
   MITK_TEST(TestUS4DCroppedPlanarFigureTimeStep1);
   MITK_TEST(TestUS4DCroppedAllTimesteps);
+  MITK_TEST(TestUS4DCroppedRestrictedTimeSteps);
   MITK_TEST(TestUS4DCropped3DMask);
   CPPUNIT_TEST_SUITE_END();
 
@@ -218,6 +219,7 @@ public:
   void TestUS4DCroppedMultilabelMaskTimeStep1();
   void TestUS4DCroppedPlanarFigureTimeStep1();
   void TestUS4DCroppedAllTimesteps();
+  void TestUS4DCroppedRestrictedTimeSteps();
   void TestUS4DCropped3DMask();
 private:
   mitk::Image::ConstPointer m_TestImage;
@@ -1926,6 +1928,43 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
   {
     CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple time steps", statisticsContainer->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, i));
   }
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedRestrictedTimeSteps()
+{
+  std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
+  m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
+
+  const auto allTimeSteps = ComputeStatistics(m_US4DCroppedImage);
+  const auto& expected = allTimeSteps->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1);
+
+  mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
+  calculator->SetInputImage(m_US4DCroppedImage);
+  calculator->SetTimeSteps({1});
+  const auto restricted = calculator->GetStatistics();
+
+  CPPUNIT_ASSERT(restricted->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1));
+  for (mitk::TimeStepType timeStep : {0, 2, 3})
+  {
+    CPPUNIT_ASSERT_MESSAGE("A time step outside the restriction was computed",
+      !restricted->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, timeStep));
+  }
+
+  const auto& actual = restricted->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1);
+  const std::vector<std::string> names = {mitk::ImageStatisticsConstants::MEAN(), mitk::ImageStatisticsConstants::MINIMUM(),
+                                          mitk::ImageStatisticsConstants::MAXIMUM(), mitk::ImageStatisticsConstants::MEDIAN()};
+  for (const auto& name : names)
+  {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(name),
+                                 actual.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(name), mitk::eps);
+  }
+
+  calculator->SetTimeSteps({});
+  CPPUNIT_ASSERT(calculator->GetStatistics()->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0));
+
+  calculator->SetTimeSteps({4});
+  CPPUNIT_ASSERT_THROW(calculator->GetStatistics(), mitk::Exception);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()

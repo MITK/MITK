@@ -54,6 +54,7 @@ void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
 WorkbenchPartReference::WorkbenchPartReference()
   : state(STATE_LAZY)
   , pinned(false)
+  , queueEvents(false)
   , propertyChangeListener(new PropertyChangeListener(this))
 {
 }
@@ -375,7 +376,7 @@ void WorkbenchPartReference::DeferEvents(bool shouldQueue)
     while (iter != queuedEvents.end())
     {
       this->FirePropertyChange(*iter);
-      queuedEvents.erase(iter++);
+      iter = queuedEvents.erase(iter);
     }
   }
 }

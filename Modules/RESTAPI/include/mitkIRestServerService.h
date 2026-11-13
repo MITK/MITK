@@ -187,9 +187,13 @@ namespace mitk
      * before the objects their handlers use are destroyed. The endpoints of
      * the server's own controllers come first: a route with the method and
      * path of one of them is never reached. Clients see added routes as
-     * experimental. Requests with an Origin header are refused, which keeps
-     * web pages from changing state through them; a GET request of a web
-     * page carries none, so GET routes must not change state.
+     * experimental. Requests that a web page could send are refused: those
+     * with an Origin header, with a Sec-Fetch-Site header other than none
+     * and same-origin, or with a Host header that names neither localhost,
+     * an IP address, the host of the server nor the host name of the machine.
+     * This keeps web pages from changing state through them. As old browsers
+     * send none of these headers with a GET request, GET routes must not
+     * change state.
      *
      * \return An id for RemoveRoute().
      * \throw mitk::Exception if the route is invalid, or one with the same

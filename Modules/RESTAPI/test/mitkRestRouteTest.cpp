@@ -171,7 +171,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(TokenWithoutFileAccessCannotLoadFiles);
   MITK_TEST(EndpointsListsBuiltInAndAddedRoutes);
   MITK_TEST(JobsCanBeAwaited);
-  MITK_TEST(JobsCanBeCancelled);
+  MITK_TEST(JobsCanBeCanceled);
   MITK_TEST(StopEndsWaitsForJobs);
   MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
@@ -278,12 +278,29 @@ public:
     CPPUNIT_ASSERT(server.Start());
 
     httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
-    const auto res = client.Post("/api/v1/things", httplib::Headers{ { "Origin", "https://example.org" } }, "{}", "application/json");
+    const auto post = [&client](const std::string& name, const std::string& value) {
+      return client.Post("/api/v1/things", httplib::Headers{ { name, value } }, "{}", "application/json");
+    };
+
+    const auto res = post("Origin", "https://example.org");
+    const auto crossSite = post("Sec-Fetch-Site", "cross-site");
+    const auto sameOrigin = post("Sec-Fetch-Site", "same-origin");
+    const auto foreignHost = post("Host", "rebound.example.org:8080");
+    const auto localHost = post("Host", "LocalHost:8080");
     server.Stop();
 
     CPPUNIT_ASSERT(res != nullptr);
     CPPUNIT_ASSERT_EQUAL(403, res->status);
     CPPUNIT_ASSERT_EQUAL(std::string("ACCESS_DENIED"), GetErrorCode(res->body));
+
+    CPPUNIT_ASSERT(crossSite != nullptr);
+    CPPUNIT_ASSERT_EQUAL(403, crossSite->status);
+    CPPUNIT_ASSERT(sameOrigin != nullptr);
+    CPPUNIT_ASSERT_EQUAL(200, sameOrigin->status);
+    CPPUNIT_ASSERT(foreignHost != nullptr);
+    CPPUNIT_ASSERT_EQUAL(403, foreignHost->status);
+    CPPUNIT_ASSERT(localHost != nullptr);
+    CPPUNIT_ASSERT_EQUAL(200, localHost->status);
   }
 
   void UnknownPathsAreAnsweredWithJson()
@@ -518,7 +535,6 @@ public:
       auto job = server.CreateJob("Work a little");
 
       workers.Threads.emplace_back([job, released]() {
-        job->SetProgress(0.5, "halfway");
         released.wait();
         job->Succeed({ { "answer", 42 } });
       });
@@ -562,31 +578,33 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, noNumber.Status);
   }
 
-  void JobsCanBeCancelled()
+  void JobsCanBeCanceled()
   {
     mitk::RestServer server;
     server.SetConfig(MakeConfig());
 
-    const auto cancellable = server.CreateJob("Wait for cancellation");
+    const auto cancelable = server.CreateJob("Wait for cancellation");
     bool stopped = false;
-    cancellable->SetCancelHandler([&stopped]() { stopped = true; });
+    cancelable->SetCancelHandler([&stopped]() { stopped = true; });
 
     const auto stubborn = server.CreateJob("Cannot be stopped");
 
     CPPUNIT_ASSERT(server.Start());
 
-    const auto cancelled = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + cancellable->GetId()));
-    const auto again = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + cancellable->GetId()));
+    const auto canceled = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + cancelable->GetId()));
+    const auto again = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + cancelable->GetId()));
     const auto refused = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + stubborn->GetId()));
 
     // Work that ends after the cancellation does not change the outcome.
-    cancellable->Succeed();
+    cancelable->Succeed();
 
     server.Stop();
 
-    CPPUNIT_ASSERT_EQUAL(200, cancelled.Status);
+    CPPUNIT_ASSERT_EQUAL(200, canceled.Status);
+    CPPUNIT_ASSERT_EQUAL(std::string("canceled"), nlohmann::json::parse(canceled.Body)["data"]["state"].get<std::string>());
     CPPUNIT_ASSERT(stopped);
-    CPPUNIT_ASSERT(cancellable->GetState() == mitk::RestJob::State::Cancelled);
+    CPPUNIT_ASSERT(cancelable->GetState() == mitk::RestJob::State::Canceled);
+    CPPUNIT_ASSERT_EQUAL(std::string("JOB_NOT_CANCELABLE"), GetErrorCode(refused.Body));
     CPPUNIT_ASSERT_EQUAL(409, again.Status);
     CPPUNIT_ASSERT_EQUAL(409, refused.Status);
     CPPUNIT_ASSERT(!stubborn->HasEnded());

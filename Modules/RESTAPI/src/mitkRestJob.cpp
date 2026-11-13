@@ -16,12 +16,44 @@ found in the LICENSE file.
 #include <mitkLexicalCast.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <limits>
 
 namespace
 {
   constexpr double MaxWaitSeconds = 120.0;
+  constexpr int MaxConcurrentWaits = 4;
+
+  std::atomic<int> WaitingRequests{ 0 };
+
+  /** Takes one of the places to wait for a job, if one is free, and gives it back at the end of its life. */
+  class WaitPlace
+  {
+  public:
+    WaitPlace() : m_Taken(WaitingRequests.fetch_add(1) < MaxConcurrentWaits)
+    {
+      if (!m_Taken)
+        WaitingRequests.fetch_sub(1);
+    }
+
+    ~WaitPlace()
+    {
+      if (m_Taken)
+        WaitingRequests.fetch_sub(1);
+    }
+
+    WaitPlace(const WaitPlace&) = delete;
+    WaitPlace& operator=(const WaitPlace&) = delete;
+
+    bool IsTaken() const
+    {
+      return m_Taken;
+    }
+
+  private:
+    const bool m_Taken;
+  };
 
   std::string GetStateName(mitk::RestJob::State state)
   {
@@ -33,8 +65,8 @@ namespace
         return "succeeded";
       case mitk::RestJob::State::Failed:
         return "failed";
-      case mitk::RestJob::State::Cancelled:
-        return "cancelled";
+      case mitk::RestJob::State::Canceled:
+        return "canceled";
     }
 
     return "unknown";
@@ -46,8 +78,7 @@ mitk::RestJob::RestJob(const std::string& id, const std::string& description)
     m_Description(description),
     m_Start(std::chrono::steady_clock::now()),
     m_State(State::Running),
-    m_WaitsInterrupted(false),
-    m_Progress(-1.0)
+    m_WaitsInterrupted(false)
 {
 }
 
@@ -65,17 +96,6 @@ mitk::RestJob::State mitk::RestJob::GetState() const
 bool mitk::RestJob::HasEnded() const
 {
   return this->GetState() != State::Running;
-}
-
-void mitk::RestJob::SetProgress(double fraction, const std::string& message)
-{
-  std::lock_guard<std::mutex> lock(m_Mutex);
-
-  if (m_State != State::Running)
-    return;
-
-  m_Progress = fraction < 0.0 ? -1.0 : std::min(fraction, 1.0);
-  m_Message = message;
 }
 
 void mitk::RestJob::Succeed(const nlohmann::json& result)
@@ -110,7 +130,7 @@ bool mitk::RestJob::Cancel()
   // Outside the lock, as the handler may end the job itself.
   handler();
 
-  this->End(State::Cancelled, nlohmann::json(), std::string());
+  this->End(State::Canceled, nlohmann::json(), std::string());
   return true;
 }
 
@@ -147,12 +167,7 @@ nlohmann::json mitk::RestJob::ToJson() const
 
   if (m_State == State::Running)
   {
-    json["progress"] = m_Progress < 0.0 ? nlohmann::json() : nlohmann::json(m_Progress);
-
-    if (!m_Message.empty())
-      json["message"] = m_Message;
-
-    json["cancellable"] = static_cast<bool>(m_CancelHandler);
+    json["cancelable"] = static_cast<bool>(m_CancelHandler);
   }
   else if (m_State == State::Succeeded)
   {
@@ -188,7 +203,16 @@ mitk::RestResponse mitk::RestJob::Respond(const RestRequest& request, const std:
     wait = std::clamp(wait, 0.0, MaxWaitSeconds);
   }
 
-  const bool ended = job->WaitUntilEnded(std::chrono::milliseconds(static_cast<long long>(wait * 1000.0)));
+  bool ended = job->HasEnded();
+
+  if (!ended && wait > 0.0)
+  {
+    const WaitPlace place;
+
+    if (place.IsTaken())
+      ended = job->WaitUntilEnded(std::chrono::milliseconds(static_cast<long long>(wait * 1000.0)));
+  }
+
   auto response = RestResponse::FromData(job->ToJson(), ended ? 200 : 202);
 
   if (!ended)

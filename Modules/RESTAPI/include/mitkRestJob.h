@@ -29,7 +29,7 @@ namespace mitk
    *
    * Clients follow jobs below /api/v1/jobs. An endpoint makes one with
    * IRestServerService::CreateJob(), answers with Respond(), and reports
-   * progress and the outcome through the job. All methods are thread-safe.
+   * the outcome through the job. All methods are thread-safe.
    */
   class MITKRESTAPI_EXPORT RestJob
   {
@@ -39,7 +39,7 @@ namespace mitk
       Running,
       Succeeded,
       Failed,
-      Cancelled
+      Canceled
     };
 
     RestJob(const std::string& id, const std::string& description);
@@ -50,12 +50,6 @@ namespace mitk
     std::string GetId() const;
     State GetState() const;
     bool HasEnded() const;
-
-    /**
-     * \param fraction The part of the work that is done, from 0 to 1, or
-     *        negative if that is unknown.
-     */
-    void SetProgress(double fraction, const std::string& message = "");
 
     /**
      * \brief End the job with a result.
@@ -69,14 +63,14 @@ namespace mitk
     void Fail(const std::string& message);
 
     /**
-     * \brief Make the job cancellable.
+     * \brief Make the job cancelable.
      *
      * \param handler Stops the work. Runs on a thread of the server.
      */
     void SetCancelHandler(std::function<void()> handler);
 
     /**
-     * \brief End the job as cancelled, after asking its handler to stop the work.
+     * \brief End the job as canceled, after asking its handler to stop the work.
      *
      * \return False if the job has no cancel handler or has ended already.
      */
@@ -98,8 +92,8 @@ namespace mitk
     void SetWaitsInterrupted(bool interrupted);
 
     /**
-     * \brief The job as clients see it: {id, description, state, progress,
-     *        message, seconds, result | error}.
+     * \brief The job as clients see it: {id, description, state, seconds,
+     *        cancelable while it runs, result | error}.
      */
     nlohmann::json ToJson() const;
 
@@ -109,6 +103,10 @@ namespace mitk
      * Waits up to the seconds that the query parameter "wait" of the request
      * gives, at most 120. Then answers with the job: status 200 if it has
      * ended, 202 and its location if it still runs.
+     *
+     * At most four requests wait at the same time, as each one occupies a
+     * thread of the server. A further request does not wait and answers as
+     * if its wait had run out.
      */
     static RestResponse Respond(const RestRequest& request, const std::shared_ptr<RestJob>& job);
 
@@ -123,8 +121,6 @@ namespace mitk
     mutable std::condition_variable m_Ended;
     State m_State;
     bool m_WaitsInterrupted;
-    double m_Progress;
-    std::string m_Message;
     nlohmann::json m_Result;
     std::string m_Error;
     std::chrono::steady_clock::time_point m_End;

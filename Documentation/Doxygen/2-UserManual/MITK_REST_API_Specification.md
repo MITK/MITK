@@ -122,7 +122,9 @@ GET /api/v1/endpoints
 
 lists all endpoints with method, path and summary, and marks the experimental ones with `"experimental": true`. The query parameter `path` limits the list to paths that start with it; `details=true` adds what each endpoint takes and returns.
 
-Experimental endpoints refuse requests that carry an `Origin` header (403 `ACCESS_DENIED`). Browsers send it, other clients do not, so web pages cannot use these endpoints through the user's browser.
+Experimental endpoints refuse requests that a web page could send (403 `ACCESS_DENIED`): requests that carry an `Origin` header, requests with a `Sec-Fetch-Site` header other than `none` and `same-origin`, and requests whose `Host` header names neither `localhost`, an IP address, the host the server is configured with nor the host name of the machine. Browsers send these headers, other clients do not, so web pages cannot use these endpoints through the user's browser. A request without a `Host` header is not refused.
+
+Long-running work of these endpoints, like running a model, is a job below `/api/v1/jobs`. Jobs are shared by all clients of the server: every client can list and cancel them.
 
 ---
 
@@ -264,7 +266,7 @@ GET /api/v1/datastorage/nodes?filter.visible=true&context=stdmulti.widget0&prope
 
 The API follows standard REST conventions with the following deliberate deviations:
 
-**404 for "operation not applicable" on a valid resource.** When a sub-resource path is well-formed and the addressed resource exists, but the requested operation does not apply to that particular resource variant, the API returns **404 `UNSUPPORTED_OPERATION`** rather than 405 / 409 / 422. Example: `GET /rendering/editors/stdmulti/windows/3d/selected-slice` returns 404 `UNSUPPORTED_OPERATION` because slice navigation is meaningless on the 3D window. Rationale: the conceptual sub-resource (`selected-slice` of the `3d` window) does not exist for that variant, so 404 communicates absence consistently with `RENDER_WINDOW_NOT_FOUND`. Clients should treat any 404 from a per-window sub-resource as "this variant does not expose this operation" and inspect `error.code` to disambiguate from genuine "window not found".
+**404 for "operation not applicable" on a valid resource.** When a sub-resource path is well-formed and the addressed resource exists, but the requested operation does not apply to that particular resource variant, the API returns **404 `UNSUPPORTED_OPERATION`** rather than 405 / 409 / 422. Example: a screenshot of an editor that shows no render window canvas returns 404 `UNSUPPORTED_OPERATION`. Rationale: the conceptual sub-resource does not exist for that variant, so 404 communicates absence consistently with `RENDER_WINDOW_NOT_FOUND`. Clients should treat any 404 from a per-window sub-resource as "this variant does not expose this operation" and inspect `error.code` to disambiguate from genuine "window not found". A request that needs a 2D window but names the 3D window, such as `GET /rendering/editors/stdmulti/windows/3d/selected-slice`, is a mistake of the request and returns 400 `INVALID_REQUEST`.
 
 **DELETE returns 200 with body, not 204 No Content.** `DELETE /datastorage/nodes/{uid}` and `DELETE /datastorage/nodes/{uid}/properties/{name}` return **200** with a JSON body rather than the conventional 204. Rationale: the response body carries client-useful information (node deletes return `deleted_uid` and `deleted_children`; property deletes echo the resolved `meta.property_scope`) that lets the client confirm what was actually removed without an extra round-trip. Clients should not assume any DELETE in this API returns 204.
 
@@ -1610,7 +1612,7 @@ Fit all render windows to the bounding box of all currently visible data, or to 
 
 Three operating modes:
 - **No body**: fits all render windows to the bounding box of all visible data.
-- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry.
+- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry. If the node's data is image-like (sliced data), the views adopt the data's own time geometry, as the Data Manager does, which rectifies askew geometries. For other data, the bounding geometry of the node is used.
 - **`{"uids": ["node-001", "node-002"]}`**: fits render windows to the combined bounding geometry of all listed nodes.
 
 Every UID in the `uids` array must identify an existing node with data and a valid time geometry; the first failure returns an error.
@@ -2048,11 +2050,11 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice
 
-Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
+Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. The 3D window has no slices and is answered with 400.
 
 The step is the position of the window's slice stepper. Depending on the orientation of the image, it can run opposite to the slice index that the Image Navigator shows. The experimental `/api/v1/rendering/windows` endpoints count slices like the Image Navigator.
 
-**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 400 `INVALID_REQUEST`).
 
 **Response 200 (`application/json`):**
 
@@ -2074,8 +2076,8 @@ When no geometry is loaded, `bounds.min_position` and `bounds.max_position` seri
 
 | Status | Code | Description |
 |--------|------|-------------|
+| 400 | `INVALID_REQUEST` | `{id}` is `3d`, which has no slices |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
@@ -2086,7 +2088,7 @@ When no geometry is loaded, `bounds.min_position` and `bounds.max_position` seri
 
 For StdMulti only `{"step": N}` is accepted — the three 2D slices are coupled, so moving by world coordinate is done via `PUT /rendering/selected-position`. Sending a `position` field returns 400 with a hint. `step` is not range-checked; out-of-range values are clamped/snapped by MITK.
 
-**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 400 `INVALID_REQUEST`).
 
 **Request body (required, `application/json`):**
 
@@ -2109,9 +2111,8 @@ Content-Type: application/json
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field |
+| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field; `{id}` is `3d`, which has no slices |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 422 | `RENDERING_ERROR` | MITK raised an error while applying the step |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
@@ -2622,7 +2623,7 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window id is not known to the editor |
-| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed window (e.g. `selected-slice` on `3d`) |
+| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed editor (e.g. a screenshot of an editor without a render window canvas) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |

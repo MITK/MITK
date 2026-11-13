@@ -2059,7 +2059,7 @@
           "Rendering"
         ],
         "summary": "Fit all views to visible data or specific nodes",
-        "description": "Three operating modes: (1) No body -- fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs -- fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to 'Fit views to all data' (no body) and 'Fit views to selection' (with UIDs) in the Data Manager context menu of the Workbench.",
+        "description": "Three operating modes: (1) No body -- fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- fits render windows to the geometry of that node. If the node's data is image-like (sliced data), the views adopt its own time geometry, as the Data Manager does, which rectifies askew geometries; for other data the bounding geometry of the node is used. (3) Body with `uids` containing multiple UIDs -- fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to 'Fit views to all data' (no body) and 'Fit views to selection' (with UIDs) in the Data Manager context menu of the Workbench.",
         "operationId": "postRenderingReinit",
         "requestBody": {
           "required": false,
@@ -2546,7 +2546,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get selected slice of a StdMultiWidget 2D window",
-        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported -- under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. The 3D window has no slices: the request is answered with 400. No `plane` field is reported -- under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
         "operationId": "getRenderingStdmultiSelectedSlice",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowId" }
@@ -2569,6 +2569,7 @@
               }
             }
           },
+          "400": { "description": "The window is the 3D window, which has no slices." },
           "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
           "500": { "$ref": "#/components/responses/InternalError" },
           "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
@@ -2586,7 +2587,7 @@
       "put": {
         "tags": ["Rendering"],
         "summary": "Set selected slice of a StdMultiWidget 2D window",
-        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked -- out-of-range values are clamped/snapped by MITK.",
+        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. The 3D window has no slices: the request is answered with 400. `step` is not range-checked -- out-of-range values are clamped/snapped by MITK.",
         "operationId": "putRenderingStdmultiSelectedSlice",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowId" }
@@ -2610,7 +2611,7 @@
         "responses": {
           "204": { "description": "Slice updated" },
           "400": {
-            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti -- use /rendering/selected-position).",
+            "description": "Invalid body, missing/negative/non-integer step, unknown field, a `position` field was supplied (not accepted for StdMulti -- use /rendering/selected-position), or the window is the 3D window.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
@@ -4479,7 +4480,7 @@
         }
       },
       "WindowNotFoundOrUnsupported": {
-        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window -- e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
+        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed editor, for example because it shows no render window canvas (UNSUPPORTED_OPERATION).",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/Error" },
@@ -4504,9 +4505,9 @@
                     "type": "https://rest-api.mitk.org/errors/UNSUPPORTED_OPERATION",
                     "code": "UNSUPPORTED_OPERATION",
                     "title": "Unsupported Operation",
-                    "message": "selected-slice is not applicable to the 3D window.",
+                    "message": "Active editor does not expose a QmitkAbstractMultiWidget canvas",
                     "status": 404,
-                    "instance": "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice"
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
                   }
                 }
               }

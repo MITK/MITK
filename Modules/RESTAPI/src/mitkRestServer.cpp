@@ -37,6 +37,8 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
+#include <itksys/SystemInformation.hxx>
+
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 
@@ -155,6 +157,77 @@ namespace
       return std::nullopt;
 
     return header.substr(Prefix.size());
+  }
+
+  /** The host of the value of a Host header, without the port. */
+  std::string GetHostOfHostHeader(const std::string& value)
+  {
+    if (!value.empty() && value.front() == '[')
+    {
+      const auto end = value.find(']');
+      return end == std::string::npos ? value : value.substr(1, end - 1);
+    }
+
+    // More than one colon is an IPv6 literal without brackets and without a port.
+    if (std::count(value.begin(), value.end(), ':') != 1)
+      return value;
+
+    return value.substr(0, value.find(':'));
+  }
+
+  bool IsIpLiteral(const std::string& host)
+  {
+    in_addr address4;
+    in6_addr address6;
+
+    return inet_pton(AF_INET, host.c_str(), &address4) == 1 || inet_pton(AF_INET6, host.c_str(), &address6) == 1;
+  }
+
+  const std::string& GetOwnHostName()
+  {
+    static const std::string Name = []() {
+      itksys::SystemInformation information;
+      const char* const name = information.GetHostname();
+      return ToLower(name != nullptr ? name : "");
+    }();
+
+    return Name;
+  }
+
+  /**
+   * Why a browser could have sent the request, or an empty string if it
+   * could not. Besides the Origin header, which browsers add to requests
+   * that can change state, this covers requests for a host name that a web
+   * page can only reach through DNS rebinding, and requests that the browser
+   * marks as coming from another site.
+   */
+  std::string GetBrowserRefusalReason(const httplib::Request& req, const std::string& serverHost)
+  {
+    if (req.has_header("Origin"))
+      return "This endpoint does not accept requests from web pages.";
+
+    if (req.has_header("Sec-Fetch-Site"))
+    {
+      const auto site = ToLower(req.get_header_value("Sec-Fetch-Site"));
+
+      if (site != "none" && site != "same-origin")
+        return "This endpoint does not accept requests from web pages.";
+    }
+
+    if (req.has_header("Host"))
+    {
+      const auto host = ToLower(GetHostOfHostHeader(req.get_header_value("Host")));
+
+      const bool isServerHost = !serverHost.empty() && host == ToLower(serverHost);
+      const bool isOwnHostName = !GetOwnHostName().empty() && host == GetOwnHostName();
+
+      if (host != "localhost" && !IsIpLiteral(host) && !isServerHost && !isOwnHostName)
+      {
+        return "This endpoint does not accept requests for the host name \"" + host + "\".";
+      }
+    }
+
+    return std::string();
   }
 
   /** Router patterns name parameters ":uid", OpenAPI paths "{uid}". */
@@ -282,9 +355,10 @@ RestServer::RestServer()
   job.Path = ApiV1 + "/jobs/:id";
   job.Summary = "Get a job, optionally waiting for it to end";
   job.Description =
-    "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. Returns {data: job}, "
-    "a job being {id, description, state: running|succeeded|failed|cancelled, seconds, and progress (0 to 1 or "
-    "null), message and cancellable while it runs, result once it succeeded, error once it failed}.";
+    "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. At most 4 requests wait "
+    "at the same time; a further one answers at once, with 202 while the job runs. Returns {data: job}, "
+    "a job being {id, description, state: running|succeeded|failed|canceled, seconds, and cancelable while it "
+    "runs, result once it succeeded, error once it failed}.";
   job.Handler = [this](const RestRequest& request) { return this->HandleGET_job(request); };
   m_Router->Add(std::move(job));
 
@@ -292,7 +366,7 @@ RestServer::RestServer()
   cancelJob.Method = "DELETE";
   cancelJob.Path = ApiV1 + "/jobs/:id";
   cancelJob.Summary = "Cancel a job";
-  cancelJob.Description = "Returns {data: job}, or 409 if the job cannot be cancelled or has ended.";
+  cancelJob.Description = "Returns {data: job}, or 409 if the job cannot be canceled or has ended.";
   cancelJob.Handler = [this](const RestRequest& request) { return this->HandleDELETE_job(request); };
   m_Router->Add(std::move(cancelJob));
 }
@@ -386,6 +460,9 @@ bool RestServer::Start(const RestServerConfig& config, const std::string& starte
 
     m_Server->set_read_timeout(config.readTimeoutSeconds);
     m_Server->set_write_timeout(config.writeTimeoutSeconds);
+
+    const auto threadPoolSize = static_cast<size_t>(std::max(1, config.threadPoolSize));
+    m_Server->new_task_queue = [threadPoolSize]() { return new httplib::ThreadPool(threadPoolSize); };
 
     // Apply payload size limit
     m_Server->set_payload_max_length(
@@ -853,8 +930,8 @@ RestResponse RestServer::HandleDELETE_job(const RestRequest& request)
 
   if (!job->Cancel())
   {
-    return RestResponse::FromError(ErrorResponse::Create("JOB_NOT_CANCELLABLE", "Conflict",
-      job->HasEnded() ? "The job has ended already." : "The job cannot be cancelled.", 409, request.Path));
+    return RestResponse::FromError(ErrorResponse::Create("JOB_NOT_CANCELABLE", "Conflict",
+      job->HasEnded() ? "The job has ended already." : "The job cannot be canceled.", 409, request.Path));
   }
 
   return RestResponse::FromData(job->ToJson());
@@ -987,13 +1064,14 @@ void RestServer::HandleRoutedHttp(const httplib::Request& req, httplib::Response
 {
   RestResponse response;
 
-  // Browsers send an Origin with every request that can change state, and no
-  // other client needs one. Rejecting it keeps web pages from driving the
+  // Same lock-free read as in CheckClientAccess().
+  const auto refusalReason = GetBrowserRefusalReason(req, m_RunningConfig ? m_RunningConfig->host : std::string());
+
+  // Rejecting what a browser could send keeps web pages from driving the
   // Workbench through the user's browser, whatever the CORS headers say.
-  if (req.has_header("Origin"))
+  if (!refusalReason.empty())
   {
-    response = RestResponse::FromError(
-      ErrorResponse::AccessDenied("This endpoint does not accept requests from web pages.", req.path));
+    response = RestResponse::FromError(ErrorResponse::AccessDenied(refusalReason, req.path));
   }
   else
   {

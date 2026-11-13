@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
+#include <mitkSlicedData.h>
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
@@ -258,6 +259,18 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
             return;
           }
           nodeSet->InsertElement(nodeSet->Size(), nodes[i]);
+        }
+
+        // As the Data Manager does it: the views adopt the geometry of a single image-like
+        // node, which rectifies askew geometries.
+        if (nodes.size() == 1)
+        {
+          if (const auto* const slicedData = dynamic_cast<const SlicedData*>(nodes[0]->GetData()))
+          {
+            RenderingManager::GetInstance()->InitializeViews(
+              slicedData->GetTimeGeometry(), RenderingManager::REQUEST_UPDATE_ALL, true);
+            return;
+          }
         }
 
         const auto geometry = dataStorage->ComputeBoundingGeometry3D(nodeSet);
@@ -1272,9 +1285,9 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
   if (IsStdMulti3dWindow(id))
   {
-    const auto error = ErrorResponse::UnsupportedOperation(
-      "selected-slice is not applicable to the 3D window.", req.path);
-    this->SendErrorResponse(res, 404, error);
+    const auto error = ErrorResponse::InvalidRequest(
+      "The 3D window has no slices. selected-slice needs a 2D window (axial, sagittal or coronal).", req.path);
+    this->SendErrorResponse(res, 400, error);
     return;
   }
 
@@ -1315,9 +1328,9 @@ void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request
 
   if (IsStdMulti3dWindow(id))
   {
-    const auto error = ErrorResponse::UnsupportedOperation(
-      "selected-slice is not applicable to the 3D window.", req.path);
-    this->SendErrorResponse(res, 404, error);
+    const auto error = ErrorResponse::InvalidRequest(
+      "The 3D window has no slices. selected-slice needs a 2D window (axial, sagittal or coronal).", req.path);
+    this->SendErrorResponse(res, 400, error);
     return;
   }
 

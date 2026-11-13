@@ -101,8 +101,9 @@ namespace mitk
      * - No body (or body without "uids"): fits all render windows to the bounding box of
      *   all currently visible data. Calls
      *   RenderingManager::InitializeViewsByBoundingObjects(dataStorage).
-     * - Body with "uids" containing one UID: fits render windows to the bounding geometry
-     *   of that node.
+     * - Body with "uids" containing one UID: fits render windows to the time geometry of
+     *   that node's data if it is sliced data, as the Data Manager does, else to the
+     *   bounding geometry of the node.
      * - Body with "uids" containing multiple UIDs: fits render windows to the combined
      *   bounding geometry of all listed nodes.
      *   Both node cases call RenderingManager::InitializeViews(geometry, REQUEST_UPDATE_ALL, true).
@@ -228,7 +229,7 @@ namespace mitk
     /**
      * \brief Handle GET /rendering/editors/stdmulti/windows/{id}/selected-slice.
      *
-     * Returns {step, position, bounds}. Returns 404 UNSUPPORTED_OPERATION for the 3D window.
+     * Returns {step, position, bounds}. Returns 400 for the 3D window.
      */
     void HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
 
@@ -237,7 +238,7 @@ namespace mitk
      *
      * Body accepts only `{"step": N}`. A `position` field triggers 400 with a
      * hint pointing at /rendering/selected-position (StdMulti slices are coupled).
-     * The 3D window returns 404 UNSUPPORTED_OPERATION.
+     * The 3D window returns 400.
      */
     void HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
 

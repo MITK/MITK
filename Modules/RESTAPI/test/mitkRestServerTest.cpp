@@ -293,7 +293,7 @@ public:
     config.host = "0.0.0.0";
     config.port = 9999;
     config.enabled = false;
-    config.threadPoolSize = 8;
+    config.threadPoolSize = 6;
     config.readTimeoutSeconds = 60;
     config.writeTimeoutSeconds = 60;
 
@@ -303,7 +303,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("0.0.0.0"), retrievedConfig.host);
     CPPUNIT_ASSERT_EQUAL(9999, retrievedConfig.port);
     CPPUNIT_ASSERT_EQUAL(false, retrievedConfig.enabled);
-    CPPUNIT_ASSERT_EQUAL(8, retrievedConfig.threadPoolSize);
+    CPPUNIT_ASSERT_EQUAL(6, retrievedConfig.threadPoolSize);
     CPPUNIT_ASSERT_EQUAL(60, retrievedConfig.readTimeoutSeconds);
     CPPUNIT_ASSERT_EQUAL(60, retrievedConfig.writeTimeoutSeconds);
   }

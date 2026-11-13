@@ -120,7 +120,7 @@ The REST API preferences can be accessed via <b>Window > Preferences > REST API<
 
 \subsection org_mitk_views_restapi_prefs_performance Performance Settings
 
-- <b>Thread Pool Size</b>: Number of threads for handling concurrent requests (default: 4)
+- <b>Thread Pool Size</b>: Number of threads for handling concurrent requests (default: 8)
 - <b>Read Timeout</b>: Maximum time in seconds to wait for incoming request data (default: 30)
 - <b>Write Timeout</b>: Maximum time in seconds to wait for sending response data (default: 30)
 

@@ -618,6 +618,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteKeepsTextWithBackslashAndLineBreaks);
   MITK_TEST(WriteNamesUnnamedLabelsByTheirDescription);
   MITK_TEST(WriteRefusesUnnamedLabelsWhoseSegmentLabelIsNoLOValue);
+  MITK_TEST(WriteRefusesUnnamedLabelWithoutVoxelsWhoseDescriptionIsNoLOValue);
   MITK_TEST(WriteRefusesUnknownOptionValues);
   MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
   CPPUNIT_TEST_SUITE_END();
@@ -1400,6 +1401,20 @@ public:
       this->AssertWriteRefused(seg, {}, "unnamed-type-meaning-" + std::to_string(i), Refusal::UnrepresentableValue,
                                {"label 1", "Segment Label", "Segmented Property Type"});
     }
+  }
+
+  // dcmqi writes no segment for a label without voxels, so it never checks its Segment Label. The
+  // writer checks every label, so such a label is refused like one with voxels.
+  void WriteRefusesUnnamedLabelWithoutVoxelsWhoseDescriptionIsNoLOValue()
+  {
+    auto seg = BuildSegWithRule();
+    auto unnamed = mitk::Label::New(2, "");
+    unnamed->SetDescription("Left\\Right");
+    unnamed->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    seg->AddLabel(unnamed, 0, true, false);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: label 2 has no voxels", seg->IsEmpty(2));
+    this->AssertWriteRefused(seg, {}, "unnamed-without-voxels", Refusal::UnrepresentableValue,
+                             {"label 2", "Segment Label", "description"});
   }
 
   // A value outside the choices is refused rather than taken for one of them. The segmentation is

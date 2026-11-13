@@ -27,6 +27,7 @@ class mitkTemporoSpatialStringPropertyTestSuite : public mitk::TestFixture
 
   MITK_TEST(serializeTemporoSpatialStringPropertyToJSON);
   MITK_TEST(deserializeJSONToTemporoSpatialStringProperty);
+  MITK_TEST(FromJSON_PropertyWithValues_ReplacesThem);
 
   MITK_TEST(ExtractTimeStepFromTemporoSpatialStringProperty);
 
@@ -241,6 +242,19 @@ public:
     CPPUNIT_ASSERT(tsProp->GetValue(0, 2) == "1");
     CPPUNIT_ASSERT(tsProp->GetValue(1, 2) == "1");
     CPPUNIT_ASSERT(*tsProp == *refCondensibleProp);
+  }
+
+  void FromJSON_PropertyWithValues_ReplacesThem()
+  {
+    auto property = mitk::TemporoSpatialStringProperty::New();
+    property->SetValue(0, 0, "old_0_0");
+    property->SetValue(0, 5, "old_0_5");
+
+    const auto json = nlohmann::json::parse(R"({"values": [{"z": 0, "t": 0, "value": "new_0_0"}]})");
+
+    CPPUNIT_ASSERT(property->FromJSON(json));
+    CPPUNIT_ASSERT(property->GetValue(0, 0) == "new_0_0");
+    CPPUNIT_ASSERT(!property->HasValue(0, 5));
   }
 
   void ExtractTimeStepFromTemporoSpatialStringProperty()

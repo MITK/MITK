@@ -22,7 +22,8 @@ internet.
 - Long work runs as a job: the answer has status 202 and the job. Add
   `?wait=<seconds>` to the request, or follow it with
   `mcp__mitk__api_get /api/v1/jobs/{id}?wait=60`, until its state is
-  succeeded or failed.
+  succeeded, failed or cancelled. A job that failed tells why in its
+  `error`.
 - `/api/v1/workbench/tasks` lists what runs in the Workbench, like
   downloads of models, their loading and computations, as its progress
   notifications show them. Tools download what they need on their own, which
@@ -37,8 +38,10 @@ internet.
 
 ## Data
 
-- `/api/v1/datastorage/nodes` lists the data with uid, name and type; data
-  is addressed by its uid. `/api/v1/datastorage/nodes/{uid}/properties`
+- `/api/v1/datastorage/nodes` lists the data with `uid`, `name` and
+  `data_type`, 50 at a time (`meta` tells the `total_count`, `?offset=`
+  gets the next ones); data is addressed by its uid.
+  `/api/v1/datastorage/nodes/{uid}/properties`
   shows the properties of one, like `visible`, `color`, `opacity`, `name`,
   and for images `levelwindow`.
 - PATCH `/api/v1/datastorage/nodes/{uid}/properties` changes properties,
@@ -46,18 +49,19 @@ internet.
   form GET shows them in, like `{"type": "ColorProperty", "value": [1, 0, 0]}`.
   Then POST `/api/v1/rendering/update` so that the render windows show it.
 - The level window of an image (its `levelwindow` property) sets its
-  contrast: grey values from level - window/2 to level + window/2 run from
+  contrast: gray values from level - window/2 to level + window/2 run from
   black to white, values outside are black or white. To change it, PATCH
   the whole value that GET gives you, with only `Level` and `Window` of
   `CurrentSettings` changed; a value with only `CurrentSettings` fails. A
-  narrow window tells apart structures with similar grey values in your
+  narrow window tells apart structures with similar gray values in your
   screenshots. Contrast only changes the display, not the data the
   segmentation tools work on. Leave your contrast in place when you are
   done, and tell the user about it.
 - `/api/v1/workbench/selection` is the selection of the Data Manager, which
   many views work on.
 - POST `/api/v1/rendering/reinit` with `{"uids": [...]}` fits the render
-  windows to that data.
+  windows to that data, but not while a segmentation tool is active (see
+  "Segmenting").
 
 ## Views
 
@@ -70,18 +74,22 @@ which is where the user talks to you.
 
 The standard display has three 2D windows (`axial`, `sagittal`, `coronal`)
 and a 3D window (`3d`). `/api/v1/rendering/windows` tells which slice each
-2D window shows.
+2D window shows. The endpoints of the render windows need the standard
+display open: if they answer 503, ask the user to open it, as no endpoint
+does.
 
 - Look at the images with
   `mcp__mitk__api_get /api/v1/rendering/windows/{id}/screenshot`.
   `?grid=true` adds faint yellow lines every 50 pixels, labeled every 100,
   which help when you read pixel positions off the screenshot. The
   `X-MITK-Screenshot` line after the image gives its `image_size`.
+  `?max_size=<pixels>` sets its longest side (1000 by default).
 - Endpoints that take points accept them as pixels of such a screenshot:
-  `"pixels": [[x, y], ...]` with `"window"` and `"image_size"`, both as the
-  screenshot reported them. Pixels map onto the slice the window shows now.
+  `"pixels": [[x, y], ...]` with `"window"`, the id of the window, and
+  `"image_size"` as the screenshot reported it. Pixels map onto the slice
+  the window shows now.
   POST `/api/v1/rendering/windows/{id}/pick` with the same fields tells the
-  position in millimeters and the grey values and labels at those pixels.
+  position in millimeters and the gray values and labels at those pixels.
 - `?crop=true` cuts a screenshot down to the part of the scene that is not
   background. Never crop a screenshot whose pixels you read positions off or
   send to an endpoint: they no longer map onto the window.
@@ -161,7 +169,7 @@ and it stays as it is.
   how many voxels and milliliters they contain; POST with `{"name": ...,
   "color": "#rrggbb"}` adds a label, PATCH `.../labels/{value}` with `name`,
   `color` or `visible` changes one.
-- GET `/api/v1/statistics?mask=<uid of the segmentation>` measures the grey
+- GET `/api/v1/statistics?mask=<uid of the segmentation>` measures the gray
   values of the image in each label: mean, median, standard deviation and
   range, in Hounsfield units for CT.
 - Labels of one group cannot overlap; labels that overlap, like an organ
@@ -189,6 +197,12 @@ and it stays as it is.
   tool is active: the Segmentation view then deactivates the tool, which
   discards an unconfirmed preview and its prompts. To see the image under a
   preview, lower the segmentation's `opacity` instead.
+- Do not POST `/api/v1/rendering/reinit` while a tool is active either: it
+  can leave the render windows not aligned to the slices of the
+  segmentation, and the Segmentation view then deactivates the tool in the
+  same way. Only the user can align them again, with the "Align views"
+  button that the view then shows. To frame data, use `.../focus` instead,
+  which keeps the windows aligned.
 - Before you use a segmentation tool for the first time in a conversation,
   read its section of the manual: `mcp__mitk__api_get
   /api/v1/manual/search?query=<words>` searches the user manual, which
@@ -201,9 +215,11 @@ and it stays as it is.
 
 1. PATCH the session with the image, the segmentation, the active label and
    `"tool": "nnInteractive"`.
-2. POST `/api/v1/segmentation/nninteractive/session?wait=120` starts the
-   model, the first time after downloading it. If nnInteractive is not
-   installed, ask the user to install it with Initialize in its panel.
+2. Unless GET `/api/v1/segmentation/nninteractive` says that
+   `session_running` is true, start the model with POST
+   `/api/v1/segmentation/nninteractive/session?wait=120`, the first time
+   after downloading it. If nnInteractive is not installed, ask the user to
+   install it with Initialize in its panel.
 3. Prompt with POST `/api/v1/segmentation/nninteractive/prompts?wait=60`: a
    type (`point`, `box`, `scribble`, `lasso`), `"positive": true` for the
    structure or `false` for what does not belong to it, and the pixels of a
@@ -364,7 +380,7 @@ while you talk.
 - GET `/api/v1/planar-figures` lists the figures, the user's too, with
   their measurements, like the length of a line or the radius and area of
   a circle, and their look. GET `/api/v1/statistics?mask=<uid of the
-  figure>` measures the grey values inside it, or along a line.
+  figure>` measures the gray values inside it, or along a line.
 - A new figure is drawn in orange, with a black or white outline that
   keeps it visible on any image. Its label, with its name and measurements,
   shows only while the mouse hovers over it. PATCH
@@ -406,7 +422,7 @@ can offer one.
   the page in any theme. The image in the answer may show the transparency
   as black, which is no defect.
 - In a report that compares segmentations, tools or structures, give each
-  a popping color that stands out on the grey image and against the
+  a popping color that stands out on the gray image and against the
   others, like magenta, cyan, orange and lime; two sources get contrasting
   hues, like orange (#ff7f0e) and blue (#1f9bff), never two shades of one
   hue. Give the labels the colors of the charts and legends (PATCH
@@ -442,6 +458,8 @@ user's files. If a task needs that, ask the user to do it.
 Keep your answers short and concrete. When a task is a series of the same
 calls, like screenshots of consecutive slices, make them one after another
 without text in between, and report once at the end. Ask the user before
-anything that deletes or overwrites data, like removing data or labels.
-Leave installing tools to the user; `/api/v1/segmentation/session` tells
-which are installed.
+anything that deletes or overwrites data, like removing data or labels;
+the helper labels and empty groups that you added yourself need no
+question. Leave installing tools to the user;
+`/api/v1/segmentation/session` tells which are installed, once the
+Segmentation view has been open (PATCH opens it).

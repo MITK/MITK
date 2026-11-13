@@ -129,9 +129,8 @@ QmitkClaudeCodeProcess::AuthStatus QmitkClaudeCodeProcess::QueryAuthStatus(const
   AuthStatus status;
 
   QProcess process;
-  process.setWorkingDirectory(options.WorkingDirectory);
-  process.setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
-  process.start(options.Executable, { SettingSources, "auth", "status" });
+  SetUpAuthCommand(process, options, { "status" });
+  process.start();
 
   if (!process.waitForFinished(10000))
   {
@@ -199,6 +198,14 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(bool ignoreApiKeyVari
   return environment;
 }
 
+void QmitkClaudeCodeProcess::SetUpAuthCommand(QProcess& process, const Options& options, const QStringList& arguments)
+{
+  process.setProgram(options.Executable);
+  process.setArguments(QStringList{ SettingSources, "auth" } + arguments);
+  process.setWorkingDirectory(options.WorkingDirectory);
+  process.setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
+}
+
 void QmitkClaudeCodeProcess::Start(const Options& options)
 {
   if (this->IsRunning())
@@ -262,9 +269,12 @@ bool QmitkClaudeCodeProcess::IsRunning() const
 
 void QmitkClaudeCodeProcess::SendUserMessage(const QString& text)
 {
+  // Claude Code takes a message that starts with a slash for one of its
+  // commands, also as a list of content blocks. Anything in front of the
+  // slash makes it text for the model.
   const QJsonObject message = {
     { "role", "user" },
-    { "content", text }
+    { "content", text.startsWith('/') ? ' ' + text : text }
   };
 
   this->WriteLine({
@@ -277,7 +287,7 @@ void QmitkClaudeCodeProcess::SendUserMessage(const QString& text)
 
 void QmitkClaudeCodeProcess::Interrupt()
 {
-  this->SendControlRequest({ { "subtype", "interrupt" } });
+  m_InterruptRequestId = this->SendControlRequest({ { "subtype", "interrupt" } });
 }
 
 void QmitkClaudeCodeProcess::Kill()
@@ -318,8 +328,16 @@ QString QmitkClaudeCodeProcess::SendControlRequest(const QJsonObject& request)
 void QmitkClaudeCodeProcess::OnControlResponse(const QJsonObject& message)
 {
   const auto response = message.value("response").toObject();
+  const auto requestId = response.value("request_id").toString();
 
-  if (response.value("request_id").toString() != m_InitializeRequestId || response.value("subtype").toString() != "success")
+  if (!m_InterruptRequestId.isEmpty() && requestId == m_InterruptRequestId)
+  {
+    m_InterruptRequestId.clear();
+    emit InterruptAcknowledged();
+    return;
+  }
+
+  if (requestId != m_InitializeRequestId || response.value("subtype").toString() != "success")
     return;
 
   QList<ModelInfo> models;

@@ -143,6 +143,16 @@ public:
   static AuthStatus QueryAuthStatus(const Options& options);
 
   /**
+   * \brief Set \p process up to run "claude auth" with \p arguments, for example "status" or "login".
+   *
+   * With the executable, working directory, settings and environment of
+   * \p options, as Start() runs Claude Code, so that signing in, the status
+   * and the agent agree on what Claude Code reads. The caller starts the
+   * process.
+   */
+  static void SetUpAuthCommand(QProcess& process, const Options& options, const QStringList& arguments);
+
+  /**
    * \brief The environment Claude Code is started with.
    *
    * The current environment without the variables a parent Claude Code
@@ -156,10 +166,21 @@ public:
 
   bool IsRunning() const;
 
-  /** \brief Send a user message. It starts a turn or is queued behind the running one. */
+  /**
+   * \brief Send a user message. It starts a turn or is queued behind the running one.
+   *
+   * The text is always a message for the model, never one of Claude Code's
+   * slash commands.
+   */
   void SendUserMessage(const QString& text);
 
-  /** \brief Ask Claude Code to end the running turn. */
+  /**
+   * \brief Ask Claude Code to end the running turn.
+   *
+   * Claude Code answers with InterruptAcknowledged() at once and ends the
+   * turn with a result message. Without a running turn, only the
+   * acknowledgment comes.
+   */
   void Interrupt();
 
   /** \brief Kill the process. */
@@ -175,6 +196,9 @@ signals:
    * Not emitted if it lists no model.
    */
   void Initialized(const QList<QmitkClaudeCodeProcess::ModelInfo>& models);
+
+  /** \brief Claude Code took the request of Interrupt(). */
+  void InterruptAcknowledged();
 
   /** \brief The process ended. \p errorOutput is the end of what it wrote to stderr. */
   void Finished(int exitCode, const QString& errorOutput);
@@ -195,6 +219,7 @@ private:
   QByteArray m_ErrorOutput;
   unsigned int m_RequestCounter;
   QString m_InitializeRequestId;
+  QString m_InterruptRequestId;
 };
 
 #endif

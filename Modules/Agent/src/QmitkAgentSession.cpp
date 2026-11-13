@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <QmitkAgentMemory.h>
 #include <QmitkAgentToolServer.h>
 
+#include <mitkLog.h>
+
 #include <QFile>
 #include <QFutureWatcher>
 #include <QJsonArray>
@@ -120,8 +122,10 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
     m_CheckPending(false),
     m_AuthQueries(0),
     m_PendingTurns(0),
+    m_TurnInFlight(false),
     m_Stopping(false),
     m_Killing(false),
+    m_Prepared(false),
     m_ConversationCost(0.0)
 {
   m_Directory.setPath(GetWorkspaceDirectory());
@@ -132,6 +136,7 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
 
   connect(m_Process, &QmitkClaudeCodeProcess::MessageReceived, this, &QmitkAgentSession::OnMessageReceived);
   connect(m_Process, &QmitkClaudeCodeProcess::Initialized, this, &QmitkAgentSession::ModelsChanged);
+  connect(m_Process, &QmitkClaudeCodeProcess::InterruptAcknowledged, this, &QmitkAgentSession::OnInterruptAcknowledged);
   connect(m_Process, &QmitkClaudeCodeProcess::Finished, this, &QmitkAgentSession::OnProcessFinished);
   connect(m_Process, &QmitkClaudeCodeProcess::ErrorOccurred, this, &QmitkAgentSession::ErrorAdded);
 }
@@ -247,9 +252,7 @@ void QmitkAgentSession::CheckClaudeCode()
       m_SignedIn = true;
       this->SetStatus(StatusKind::SignedIn, QString("Claude Code, signed in %1.").arg(status.Describe()), status.ApiKeySource == "ANTHROPIC_API_KEY");
 
-      // Ahead of the first message, so that it gets a faster answer and the
-      // models to choose from are known.
-      if (!m_Process->IsRunning())
+      if (m_Prepared && !m_Process->IsRunning())
         this->StartProcess();
     }
   });
@@ -270,6 +273,14 @@ void QmitkAgentSession::CheckClaudeCodeAgain()
 
   this->KillProcess();
   this->CheckClaudeCode();
+}
+
+void QmitkAgentSession::PrepareForMessages()
+{
+  m_Prepared = true;
+
+  if (m_SignedIn && !m_Process->IsRunning())
+    this->StartProcess();
 }
 
 bool QmitkAgentSession::IsSignedIn() const
@@ -294,6 +305,8 @@ bool QmitkAgentSession::Send(const QString& text)
       "Reopen the Agent view to continue.");
     return false;
   }
+
+  m_Prepared = true;
 
   if (!m_Process->IsRunning())
     this->StartProcess();
@@ -325,8 +338,24 @@ bool QmitkAgentSession::Send(const QString& text)
 
 void QmitkAgentSession::Stop()
 {
-  if (!this->IsTurnRunning() || m_Stopping)
+  if (!this->IsTurnRunning())
     return;
+
+  if (m_Stopping)
+  {
+    // The turn did not end on the interrupt. Without its process it cannot
+    // go on, and the session id lets the next message continue.
+    this->KillProcess();
+
+    m_PendingTurns = 0;
+    m_TurnInFlight = false;
+    m_ToolCalls.clear();
+
+    emit NoteAdded("Claude Code did not stop and was ended. Your next message continues the conversation.");
+    emit TurnStateChanged();
+    emit TurnsFinished();
+    return;
+  }
 
   m_Stopping = true;
   m_ToolServer->RefuseCalls("The user stopped you, so this call did nothing. Wait for the user's next message.");
@@ -342,6 +371,7 @@ void QmitkAgentSession::StartNewConversation()
 
   m_SessionId.clear();
   m_PendingTurns = 0;
+  m_TurnInFlight = false;
   m_ToolCalls.clear();
   m_ConversationCost = 0.0;
   emit CostChanged();
@@ -351,7 +381,7 @@ void QmitkAgentSession::StartNewConversation()
   {
     this->CheckClaudeCodeAgain();
   }
-  else if (m_SignedIn)
+  else if (m_SignedIn && m_Prepared)
   {
     this->StartProcess();
   }
@@ -525,6 +555,8 @@ void QmitkAgentSession::OnSystemMessage(const QJsonObject& message)
   if (subtype != "init")
     return;
 
+  // Claude Code reports it at the start of every turn.
+  m_TurnInFlight = this->IsTurnRunning();
   m_SessionId = message.value("session_id").toString();
 
   bool serverListed = false;
@@ -678,8 +710,27 @@ void QmitkAgentSession::OnToolResults(const QJsonObject& message)
   }
 }
 
+void QmitkAgentSession::OnInterruptAcknowledged()
+{
+  if (!m_Stopping || m_TurnInFlight || !this->IsTurnRunning())
+    return;
+
+  // Claude Code runs no turn, so no result follows that would end the ones
+  // counted here: the session and Claude Code disagree about them.
+  MITK_WARN << "The Agent view counted " << m_PendingTurns << " running turn(s) that Claude Code does not run.";
+
+  m_PendingTurns = 0;
+  emit NoteAdded("Stopped.");
+  emit TurnStateChanged();
+  emit TurnsFinished();
+}
+
 void QmitkAgentSession::OnResult(const QJsonObject& message)
 {
+  if (!this->IsTurnRunning())
+    MITK_WARN << "Claude Code ended a turn that the Agent view did not count as running.";
+
+  m_TurnInFlight = false;
   m_PendingTurns = std::max(0, m_PendingTurns - 1);
   emit TurnStateChanged();
 
@@ -728,6 +779,7 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
   const bool turnWasRunning = this->IsTurnRunning();
 
   m_PendingTurns = 0;
+  m_TurnInFlight = false;
   emit TurnStateChanged();
 
   if (m_Killing)

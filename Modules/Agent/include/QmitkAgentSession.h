@@ -99,8 +99,23 @@ public:
   void SetEffort(const QString& effort);
   QString GetEffort() const;
 
-  /** \brief Finds Claude Code, asks it how it signs in, and starts it if it is signed in. */
+  /**
+   * \brief Finds Claude Code and asks it how it signs in.
+   *
+   * Starts it only after PrepareForMessages(), so that a session nobody
+   * turns to runs no process.
+   */
   void CheckClaudeCode();
+
+  /**
+   * \brief Starts Claude Code ahead of the first message, if it is signed in
+   *        and does not run, so that the message gets a faster answer and the
+   *        models to choose from are known.
+   *
+   * To be called when the user turns to the agent. If the sign-in is still
+   * being checked, Claude Code starts once the check has found it signed in.
+   */
+  void PrepareForMessages();
 
   /**
    * \brief Finds and asks Claude Code again after its settings or sign-in changed.
@@ -125,6 +140,10 @@ public:
    * \brief Interrupts the running turn and refuses the agent's tool calls
    *        until the next message, so that none still on its way changes the
    *        Workbench after the user stopped the agent.
+   *
+   * Called again while the turn still has not ended, ends Claude Code, so
+   * that the user always gets out of a turn; the next message continues the
+   * conversation in a new process.
    */
   void Stop();
 
@@ -195,6 +214,7 @@ private:
   void OnAssistantMessage(const QJsonObject& message);
   void OnToolResults(const QJsonObject& message);
   void OnResult(const QJsonObject& message);
+  void OnInterruptAcknowledged();
   void OnProcessFinished(int exitCode, const QString& errorOutput);
 
   std::unique_ptr<QmitkAgentMemory> m_Memory;
@@ -229,10 +249,21 @@ private:
    */
   int m_PendingTurns;
 
+  /**
+   * \brief Whether Claude Code has reported the start of a turn and not yet its result.
+   *
+   * Tells an interrupt that ends a turn from one that finds none: only the
+   * first is followed by a result.
+   */
+  bool m_TurnInFlight;
+
   /** \brief Whether the user stopped the agent, whose tool calls are refused until the next message. */
   bool m_Stopping;
 
   bool m_Killing;
+
+  /** \brief Whether the user has turned to the agent, see PrepareForMessages(). */
+  bool m_Prepared;
 
   /** \brief The chosen model and effort; empty for Claude Code's defaults. */
   QString m_Model;

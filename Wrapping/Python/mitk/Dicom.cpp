@@ -98,8 +98,10 @@ void InitDicom(py::module_& m)
     "A missing source-image relation is not reported here because the SEG\n"
     "IOD allows it (``ReferencedSeriesSequence`` is type 1C), but a\n"
     "strict-mode write needs one with per-slice source UIDs. In either mode\n"
-    "the writer refuses labels and source-image relations that DICOM SEG\n"
-    "cannot represent.\n"
+    "the writer refuses labels, source-image relations and patient, study\n"
+    "and frame of reference values that DICOM SEG cannot represent, such as\n"
+    "a non-ASCII ``PatientName``. Only the presence of the identifying tags\n"
+    "is checked here, not their values.\n"
     "\n"
     ":param seg: The segmentation to inspect.\n"
     ":returns: List of :py:class:`MissingItem` describing each gap.\n");

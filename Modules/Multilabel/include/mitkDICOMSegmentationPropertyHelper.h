@@ -157,8 +157,9 @@ namespace mitk
      * so a strict-mode write needs no synthesis. The write can still be
      * refused: strict mode also requires a source-image relation with
      * per-slice source UIDs, and DICOMSegmentationIO::Write refuses, in
-     * either mode, labels and source-image relations that DICOM SEG cannot
-     * represent.
+     * either mode, labels, source-image relations and patient, study and
+     * frame of reference values that DICOM SEG cannot represent. Validate
+     * checks only that the identifying tags are present, not their values.
      *
      * \pre seg must be a valid pointer.
      */

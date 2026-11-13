@@ -83,8 +83,9 @@ namespace mitk
      * or control characters other than TAB, LF, FF, CR and ESC), or a Tracking UID that is no valid
      * UID; only changing the label lets the write succeed.
      * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs
-     * whose source series UID, or the SOP Instance or SOP Class UID of a slice, is missing or no
-     * valid UID; naming the attribute for a patient, study or frame of reference value that is no
+     * whose source series UID is missing or no valid UID, or one of whose slices has a SOP Instance
+     * UID that is no valid UID or lacks a valid SOP Class UID (slices without a SOP Instance UID are
+     * skipped); naming the attribute for a patient, study or frame of reference value that is no
      * valid value of its VR without Specific Character Set (non-ASCII characters, a value outside
      * the syntax of the VR, such as an invalid date or UID, or a UI, CS or TM value over its maximum
      * length) and for an empty Frame of Reference UID; naming the option for an option value outside

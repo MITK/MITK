@@ -176,7 +176,7 @@ namespace
 
     return {
       { "color", look.Color.name().toStdString() },
-      { "line_width", look.LineWidth },
+      { "line_width", std::round(look.LineWidth * 1000.0) / 1000.0 },
       { "label", {
         { "show", label != LabelVisibilities.end() ? label->Name : "never" },
         { "name", look.ShowName },
@@ -305,16 +305,16 @@ namespace
    * Ends pulses after their duration, with one timer per figure. Lives in the
    * GUI thread, as a child of the object that the routes were created with.
    */
-  class PulseTimers : public QObject
+  class QmitkPulseTimers : public QObject
   {
   public:
-    explicit PulseTimers(QObject* parent)
+    explicit QmitkPulseTimers(QObject* parent)
       : QObject(parent)
     {
     }
 
     /** Ends the pulses that are still timed at once, as no timer would end them anymore. */
-    ~PulseTimers() override
+    ~QmitkPulseTimers() override
     {
       bool hasEnded = false;
 
@@ -384,7 +384,7 @@ namespace
   };
 
   /** Runs in the GUI thread. */
-  void ApplyLookChange(mitk::DataNode* node, const LookChange& change, PulseTimers* pulseTimers)
+  void ApplyLookChange(mitk::DataNode* node, const LookChange& change, QmitkPulseTimers* pulseTimers)
   {
     if (change.Color.has_value())
       node->SetColor(change.Color->redF(), change.Color->greenF(), change.Color->blueF());
@@ -479,7 +479,7 @@ namespace
 std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server, QObject* owner)
 {
   // Only used in the GUI thread, where it lives.
-  const QPointer<PulseTimers> pulseTimers = new PulseTimers(owner);
+  const QPointer<QmitkPulseTimers> pulseTimers = new QmitkPulseTimers(owner);
 
   std::vector<RestRoute> routes;
 
@@ -493,8 +493,8 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     "polygon or angle; image, the uid of the image the figure marks, its parent in the Data Manager, or null; closed, "
     "whether it encloses a region; points, its control points in millimeters (of a circle its center and a point on "
     "it, of a rectangle two opposite corners); measurements: [{name, value, unit}] as the Measurement view shows "
-    "them, like Length, Radius, Diameter, Circumference or Area, in mm and mm2; the look as PATCH "
-    "/api/v1/planar-figures/{uid} changes it. GET /api/v1/statistics?mask=<uid> measures the grey values of the "
+    "them, like Length, Radius, Diameter, Circumference, Area or Angle, in mm, mm2 and deg; the look as PATCH "
+    "/api/v1/planar-figures/{uid} changes it. GET /api/v1/statistics?mask=<uid> measures the gray values of the "
     "image in or along a figure.";
   list.Handler = [server](const RestRequest& request) {
     const auto dataStorage = server->GetDataStorage();
@@ -642,7 +642,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     "whether the figure grows and shrinks to draw attention to it; pulse_seconds, with pulse true: the seconds after "
     "which the pulse stops by itself, up to 600; without it, the figure pulses until pulse is false}. Other fields "
     "are refused, and an invalid field changes nothing. The render windows show the change right away. Returns the "
-    "figure as GET /api/v1/planar-figures lists it. Status 422 if uid is no planar figure of the Measurement view.";
+    "figure as GET /api/v1/planar-figures lists it. Status 422 if uid is no planar figure of the Measurement view, or one that is still being drawn.";
   change.Handler = [server, pulseTimers](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -676,7 +676,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       if (planarFigure == nullptr || !planarFigure->IsComplete() || !GetFigurePredicate()->CheckNode(node))
       {
         Throw("NOT_A_PLANAR_FIGURE", "Unprocessable Content", "\"" + node->GetName() + "\" is no planar figure of "
-          "the Measurement view.", 422, request.Path);
+          "the Measurement view, or is still being drawn.", 422, request.Path);
       }
 
       ApplyLookChange(node, lookChange, pulseTimers);

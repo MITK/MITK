@@ -25,8 +25,6 @@ found in the LICENSE file.
 #include <mitkRestGuiThread.h>
 #include <mitkRestTime.h>
 
-#include <cmath>
-
 using mitk::CallInGuiThread;
 using mitk::ErrorResponse;
 using mitk::RestException;
@@ -76,8 +74,9 @@ namespace
 
     if (timeSteps.empty())
     {
+      // Written as JSON writes the number, which does not depend on the locale.
       Throw("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "\"" + node->GetName() + "\" has no data at " +
-        std::to_string(selection.TimePoint) + " ms. Its time_steps say which time points it covers.", 422, path);
+        nlohmann::json(selection.TimePoint).dump() + " ms. Its time_steps say which time points it covers.", 422, path);
     }
 
     return timeSteps;
@@ -91,7 +90,7 @@ namespace
     json["voxels"] = values.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(Constants::NUMBEROFVOXELS());
 
     if (values.HasStatistic(Constants::VOLUME()))
-      json["volume_ml"] = std::round(values.GetValueConverted<double>(Constants::VOLUME()) / 10.0) / 100.0;
+      json["volume_ml"] = values.GetValueConverted<double>(Constants::VOLUME()) / 1000.0;
 
     if (!values.HasStatistic(Constants::MEAN()))
       return;
@@ -111,7 +110,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
   RestRoute statistics;
   statistics.Method = "GET";
   statistics.Path = "/statistics";
-  statistics.Summary = "Measure the grey values of an image, in each label of a segmentation or as a whole";
+  statistics.Summary = "Measure the gray values of an image, in each label of a segmentation or as a whole";
   statistics.Description =
     "As the Image Statistics view measures them. Query parameters: image, the uid of an image; mask (optional), the "
     "uid of a segmentation of it or of a planar figure on it, as GET /api/v1/planar-figures lists them; "
@@ -122,8 +121,8 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     "group, voxels, volume_ml, mean, median, standard_deviation, min, max}]}}: one entry per label, or one for a "
     "planar figure or the whole image, without value, name and group. A planar figure measures the pixels of its "
     "slice inside it, or along it for a line: voxels counts them, and there is no volume_ml, as the figure's area "
-    "is among its measurements. With all, each entry has time_steps: [{min_timepoint_ms, max_timepoint_ms, "
-    "voxels, ...}] instead of the values. Grey values are in the image's unit, Hounsfield units for CT; empty "
+    "is among its measurements. A 2D image has no volume_ml either. With all, each entry has time_steps: [{min_timepoint_ms, max_timepoint_ms, "
+    "voxels, ...}] instead of the values. Gray values are in the image's unit, Hounsfield units for CT; empty "
     "labels have none. Status 422 if the image or mask has no data at the time point, or if a planar figure lies "
     "tilted to the image's slices.";
   statistics.Handler = [server](const RestRequest& request) {
@@ -146,6 +145,11 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     auto labels = nlohmann::json::array();
     mitk::RestTimeSelection selection;
     std::vector<mitk::TimeStepType> timeSteps;
+    std::string imageName;
+    std::string maskName;
+    auto dimensions = nlohmann::json::array();
+    mitk::Vector3D spacing;
+    nlohmann::json imageTimeSteps;
 
     CallInGuiThread(*server, [&]() {
       if (maskNode.IsNotNull())
@@ -198,7 +202,19 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
       timeSteps = GetTimeSteps(selection, imageNode, request.Path);
 
       if (maskNode.IsNotNull())
+      {
         GetTimeSteps(selection, maskNode, request.Path);
+        maskName = maskNode->GetName();
+      }
+
+      // What the answer tells of the nodes is read here, as the user can change them during the measurement below.
+      imageName = imageNode->GetName();
+
+      for (unsigned int i = 0; i < image->GetDimension(); ++i)
+        dimensions.push_back(image->GetDimension(i));
+
+      spacing = image->GetGeometry()->GetSpacing();
+      imageTimeSteps = mitk::DescribeRestTimeSteps(image);
     });
 
     // Measured here instead of the GUI thread, as the Image Statistics view does in a worker.
@@ -236,7 +252,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     }
 
     // Values of a region at a time step; empty labels have no statistics of their own.
-    const auto addValues = [measured, &figure](nlohmann::json& json, mitk::ImageStatisticsContainer::LabelValueType value, mitk::TimeStepType timeStep) {
+    const auto addValues = [measured, &figure, &dimensions](nlohmann::json& json, mitk::ImageStatisticsContainer::LabelValueType value, mitk::TimeStepType timeStep) {
       if (measured->StatisticsExist(value, timeStep))
       {
         AddValues(json, measured->GetStatistics(value, timeStep));
@@ -247,8 +263,8 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
         json["volume_ml"] = 0.0;
       }
 
-      // A planar figure covers a single slice, so its voxels make no volume.
-      if (figure.IsNotNull())
+      // A planar figure covers a single slice, so its voxels make no volume, and those of a 2D image an area.
+      if (figure.IsNotNull() || dimensions.size() < 3)
         json.erase("volume_ml");
     };
 
@@ -259,7 +275,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
         for (const auto timeStep : timeSteps)
         {
-          auto step = mitk::DescribeRestTimeStep(image, timeStep);
+          auto step = imageTimeSteps.at(timeStep);
           addValues(step, value, timeStep);
           steps.push_back(std::move(step));
         }
@@ -292,25 +308,18 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
       entries.push_back(addEntry(nlohmann::json::object(), mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE));
     }
 
-    auto dimensions = nlohmann::json::array();
-
-    for (unsigned int i = 0; i < image->GetDimension(); ++i)
-      dimensions.push_back(image->GetDimension(i));
-
-    const auto spacing = image->GetGeometry()->GetSpacing();
-
     nlohmann::json mask = nullptr;
 
     if (maskNode.IsNotNull())
-      mask = { { "uid", server->GetNodeUid(maskNode) }, { "name", maskNode->GetName() } };
+      mask = { { "uid", server->GetNodeUid(maskNode) }, { "name", maskName } };
 
     return RestResponse::FromData({
       { "image", {
         { "uid", server->GetNodeUid(imageNode) },
-        { "name", imageNode->GetName() },
+        { "name", imageName },
         { "dimensions", dimensions },
         { "spacing_mm", { spacing[0], spacing[1], spacing[2] } },
-        { "time_steps", mitk::DescribeRestTimeSteps(image) } } },
+        { "time_steps", imageTimeSteps } } },
       { "mask", mask },
       { "timepoint_ms", selection.ToJson() },
       { "statistics", entries }

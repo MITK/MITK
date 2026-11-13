@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleRegistry.h>
+
+#include <QThread>
 #endif
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
@@ -79,7 +81,15 @@ void mitk::PluginActivator::stop(ctkPluginContext* context)
   }
 
   m_RestRoutes.clear();
-  m_RestRouteParent.reset();
+
+  // When the application ends, the framework stops its plugins in a thread of its own, from
+  // which objects of the GUI thread like running timers must not be deleted. They are left
+  // to the GUI thread then, which deletes them if it still handles events.
+  if (m_RestRouteParent != nullptr && m_RestRouteParent->thread() != QThread::currentThread())
+    m_RestRouteParent.release()->deleteLater();
+  else
+    m_RestRouteParent.reset();
+
   m_RestServer = nullptr;
 #endif
 

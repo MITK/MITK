@@ -100,8 +100,9 @@ namespace mitk
    *
    * Implements the request-response part of the MCP Streamable HTTP
    * transport: clients POST JSON-RPC messages and get the answer as a JSON
-   * body. There is no server-initiated stream. Authentication and keeping
-   * browsers out are left to the REST server.
+   * body. There is no server-initiated stream. Authentication in general and
+   * keeping browsers out are left to the REST server; RequireToken() narrows
+   * the endpoint to one client.
    */
   class MITKAGENT_EXPORT McpEndpoint
   {
@@ -152,6 +153,16 @@ namespace mitk
     /** \brief Run tool calls again after RefuseCalls(). */
     void AcceptCalls();
 
+    /**
+     * \brief Let HandlePost() answer only requests that carry \p token as
+     *        their bearer token; all others get status 401.
+     *
+     * The REST server lets in every client that it knows, so this is what
+     * keeps the endpoint to the one client the tools are meant for. An empty
+     * token, the default, checks nothing.
+     */
+    void RequireToken(const std::string& token);
+
     /** \brief Answer a POST of JSON-RPC messages as the endpoint does. */
     RestResponse HandlePost(const RestRequest& request);
 
@@ -176,6 +187,7 @@ namespace mitk
     mutable std::mutex m_Mutex;
     std::map<std::string, McpTool> m_Tools;
     std::optional<std::string> m_Refusal;
+    std::string m_RequiredToken;
 
     IRestServerService* m_Server;
     std::vector<RestRouteId> m_Routes;

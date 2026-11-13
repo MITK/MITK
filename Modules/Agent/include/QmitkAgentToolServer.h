@@ -62,6 +62,9 @@ public:
   /**
    * \brief Offers the tools, through the REST server that runs or one of the agent's own.
    *
+   * The endpoint answers only requests with the agent's token, also on a
+   * server that lets others in.
+   *
    * \return Why the tools are not offered; empty if they are.
    */
   QString Offer();

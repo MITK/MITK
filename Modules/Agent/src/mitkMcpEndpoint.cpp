@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkMcpEndpoint.h>
 
+#include <mitkErrorResponse.h>
 #include <mitkExceptionMacro.h>
 #include <mitkIRestServerService.h>
 
@@ -272,8 +273,30 @@ void mitk::McpEndpoint::AcceptCalls()
   m_Refusal.reset();
 }
 
+void mitk::McpEndpoint::RequireToken(const std::string& token)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_RequiredToken = token;
+}
+
 mitk::RestResponse mitk::McpEndpoint::HandlePost(const RestRequest& request)
 {
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+
+    if (!m_RequiredToken.empty())
+    {
+      const auto token = request.GetBearerToken();
+
+      if (!token.has_value() || *token != m_RequiredToken)
+      {
+        auto response = RestResponse::FromError(ErrorResponse::Unauthorized("This endpoint is not open to you.", request.Path));
+        response.Headers["WWW-Authenticate"] = "Bearer";
+        return response;
+      }
+    }
+  }
+
   nlohmann::json message;
 
   try

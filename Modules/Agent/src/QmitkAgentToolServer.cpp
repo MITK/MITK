@@ -146,6 +146,7 @@ QString QmitkAgentToolServer::Offer()
   try
   {
     m_Token = QString::fromStdString(m_RestServer->CreateToken("Agent view", mitk::RestTokenRights()));
+    m_Endpoint->RequireToken(m_Token.toStdString());
     m_Endpoint->Offer(m_RestServer, McpPath);
   }
   catch (const mitk::Exception& e)

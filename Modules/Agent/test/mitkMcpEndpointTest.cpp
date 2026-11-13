@@ -101,7 +101,9 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestDuplicateTool);
   MITK_TEST(TestParseError);
   MITK_TEST(TestOfferedOnRestServer);
+  MITK_TEST(TestRequiredToken);
   MITK_TEST(TestRestApiTools);
+  MITK_TEST(TestRestApiToolsFlagFailedJobs);
   MITK_TEST(TestRestApiToolsUseTheCallersToken);
   CPPUNIT_TEST_SUITE_END();
 
@@ -263,28 +265,55 @@ public:
     server.SetConfig(MakeConfig());
 
     const auto endpoint = MakeEndpoint();
+    endpoint->RequireToken("agent-token");
     endpoint->Offer(&server, "/mcp");
 
     CPPUNIT_ASSERT_THROW(endpoint->Offer(&server, "/mcp"), mitk::Exception);
     CPPUNIT_ASSERT(server.Start());
 
     httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
-    const auto response = client.Post("/api/v1/mcp", Call("echo", { { "text", "over http" } }).dump(), "application/json");
+    const httplib::Headers agent = { { "Authorization", "Bearer agent-token" } };
+    const auto response = client.Post("/api/v1/mcp", agent, Call("echo", { { "text", "over http" } }).dump(), "application/json");
+    const auto withoutToken = client.Post("/api/v1/mcp", Call("echo", { { "text", "over http" } }).dump(), "application/json");
     const auto stream = client.Get("/api/v1/mcp");
 
     endpoint->Withdraw();
-    const auto withdrawn = client.Post("/api/v1/mcp", Call("echo").dump(), "application/json");
+    const auto withdrawn = client.Post("/api/v1/mcp", agent, Call("echo").dump(), "application/json");
     server.Stop();
 
     CPPUNIT_ASSERT_MESSAGE(httplib::to_string(response.error()), response);
     CPPUNIT_ASSERT_EQUAL(200, response->status);
     CPPUNIT_ASSERT_EQUAL(std::string("over http"), GetText(nlohmann::json::parse(response->body)));
 
+    CPPUNIT_ASSERT(withoutToken);
+    CPPUNIT_ASSERT_EQUAL(401, withoutToken->status);
+
     CPPUNIT_ASSERT(stream);
     CPPUNIT_ASSERT_EQUAL(405, stream->status);
 
     CPPUNIT_ASSERT(withdrawn);
     CPPUNIT_ASSERT_EQUAL(404, withdrawn->status);
+  }
+
+  void TestRequiredToken()
+  {
+    const auto endpoint = MakeEndpoint();
+    endpoint->RequireToken("agent-token");
+
+    mitk::RestRequest request;
+    request.Body = Call("echo", { { "text", "hello" } }).dump();
+
+    CPPUNIT_ASSERT_EQUAL(401, endpoint->HandlePost(request).Status);
+
+    request.Headers["authorization"] = "Bearer other-token";
+    const auto refused = endpoint->HandlePost(request);
+    CPPUNIT_ASSERT_EQUAL(401, refused.Status);
+    CPPUNIT_ASSERT(!nlohmann::json::parse(refused.Body).contains("result"));
+
+    request.Headers["authorization"] = "Bearer agent-token";
+    const auto accepted = endpoint->HandlePost(request);
+    CPPUNIT_ASSERT_EQUAL(200, accepted.Status);
+    CPPUNIT_ASSERT_EQUAL(std::string("hello"), GetText(nlohmann::json::parse(accepted.Body)));
   }
 
   void TestRestApiTools()
@@ -312,6 +341,46 @@ public:
 
     CPPUNIT_ASSERT(outside["result"]["isError"].get<bool>());
     CPPUNIT_ASSERT(wrongMethod["result"]["isError"].get<bool>());
+  }
+
+  void TestRestApiToolsFlagFailedJobs()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    for (const std::string state : { "failed", "canceled" })
+    {
+      mitk::RestRoute route;
+      route.Method = "GET";
+      route.Path = "/test/" + state;
+      route.Handler = [&server, state](const mitk::RestRequest& request) {
+        const auto job = server.CreateJob("test");
+
+        if (state == "failed")
+          job->Fail("broken");
+        else
+        {
+          job->SetCancelHandler([]() {});
+          job->Cancel();
+        }
+
+        return mitk::RestJob::Respond(request, job);
+      };
+      server.AddRoute(route);
+    }
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto failed = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/failed" } }), mitk::RestRequest());
+    const auto canceled = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/canceled" } }), mitk::RestRequest());
+
+    server.Stop();
+
+    CPPUNIT_ASSERT(failed["result"]["isError"].get<bool>());
+    CPPUNIT_ASSERT(!canceled["result"]["isError"].get<bool>());
   }
 
   void TestRestApiToolsUseTheCallersToken()

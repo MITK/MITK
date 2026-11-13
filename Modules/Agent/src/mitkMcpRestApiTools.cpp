@@ -13,10 +13,12 @@ found in the LICENSE file.
 #include <mitkMcpRestApiTools.h>
 
 #include <mitkIRestServerService.h>
+#include <mitkLog.h>
 #include <mitkMcpEndpoint.h>
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <stdexcept>
 
 namespace
@@ -51,6 +53,45 @@ namespace
       request.Headers["authorization"] = *authorization;
 
     return request;
+  }
+
+  /** The name of the node that the path of a request addresses, if it addresses one that exists. */
+  std::optional<std::string> FindNodeName(const mitk::IRestServerService& server, const std::string& path)
+  {
+    static const std::string NodesPath = "/api/v1/datastorage/nodes/";
+
+    if (0 != path.compare(0, NodesPath.size(), NodesPath))
+      return std::nullopt;
+
+    const auto uid = path.substr(NodesPath.size(), path.find('/', NodesPath.size()) - NodesPath.size());
+
+    if (uid.empty())
+      return std::nullopt;
+
+    const auto node = server.FindNode(uid);
+
+    return node.IsNotNull()
+      ? std::make_optional(node->GetName())
+      : std::nullopt;
+  }
+
+  /** Whether the answer is a job that has failed, which a client that only looks at the status would take for success. */
+  bool IsFailedJob(const mitk::RestResponse& response)
+  {
+    if (response.Status >= 400 || !response.HasJsonBody() || response.Body.find("\"failed\"") == std::string::npos)
+      return false;
+
+    const auto body = nlohmann::json::parse(response.Body, nullptr, false);
+
+    if (!body.is_object() || !body.contains("data") || !body["data"].is_object())
+      return false;
+
+    const auto& data = body["data"];
+    const auto state = data.find("state");
+    const auto id = data.find("id");
+
+    return state != data.end() && state->is_string() && *state == "failed" &&
+           id != data.end() && id->is_string() && 0 == id->get<std::string>().compare(0, 4, "job_");
   }
 
   mitk::McpToolResult ToToolResult(const mitk::RestResponse& response)
@@ -108,7 +149,7 @@ namespace
     }
 
     auto result = mitk::McpToolResult::FromText(text);
-    result.IsError = response.Status >= 400;
+    result.IsError = response.Status >= 400 || IsFailedJob(response);
     return result;
   }
 }
@@ -171,7 +212,14 @@ void mitk::AddRestApiTools(McpEndpoint& endpoint, IRestServerService* server)
       request.Headers["content-type"] = "application/json";
     }
 
-    return ToToolResult(server->HandleRequest(request));
+    // Before the call: a DELETE removes the node.
+    const auto nodeName = FindNodeName(*server, request.Path);
+    const auto response = server->HandleRequest(request);
+
+    MITK_INFO << "Agent: " << method << " " << request.Path << " -> " << response.Status
+              << (nodeName.has_value() ? " \"" + *nodeName + "\"" : std::string());
+
+    return ToToolResult(response);
   };
   endpoint.AddTool(call);
 }

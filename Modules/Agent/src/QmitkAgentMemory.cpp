@@ -54,16 +54,34 @@ namespace
 
 QmitkAgentMemory::QmitkAgentMemory(const QString& filePath)
   : m_FilePath(filePath),
-    m_NextId(1)
+    m_NextId(1),
+    m_Readable(true)
 {
-  QFile file(filePath);
+  this->Load();
+}
+
+void QmitkAgentMemory::Load() const
+{
+  // Logs only when the file turns unreadable, not at every attempt to read it again.
+  const bool wasReadable = m_Readable;
+
+  m_Notes.clear();
+  m_NextId = 1;
+  m_Readable = false;
+
+  QFile file(m_FilePath);
 
   if (!file.exists())
+  {
+    m_Readable = true;
     return;
+  }
 
   if (!file.open(QIODevice::ReadOnly))
   {
-    MITK_WARN << "Cannot read the agent's memory from " << filePath.toStdString();
+    if (wasReadable)
+      MITK_WARN << "Cannot read the agent's memory from " << m_FilePath.toStdString();
+
     return;
   }
 
@@ -71,7 +89,9 @@ QmitkAgentMemory::QmitkAgentMemory(const QString& filePath)
 
   if (!document.isObject())
   {
-    MITK_WARN << "The agent's memory in " << filePath.toStdString() << " is not valid JSON.";
+    if (wasReadable)
+      MITK_WARN << "The agent's memory in " << m_FilePath.toStdString() << " is not valid JSON.";
+
     return;
   }
 
@@ -91,10 +111,31 @@ QmitkAgentMemory::QmitkAgentMemory(const QString& filePath)
   }
 
   m_NextId = std::max(m_NextId, object.value("nextId").toInt());
+  m_Readable = true;
+}
+
+const QString& QmitkAgentMemory::GetFilePath() const
+{
+  return m_FilePath;
+}
+
+bool QmitkAgentMemory::IsReadable() const
+{
+  if (!m_Readable)
+    this->Load();
+
+  return m_Readable;
+}
+
+void QmitkAgentMemory::RequireReadable() const
+{
+  if (!this->IsReadable())
+    throw std::runtime_error("The agent's memory cannot be read, so it is not changed.");
 }
 
 const std::vector<QmitkAgentMemory::Note>& QmitkAgentMemory::GetNotes() const
 {
+  this->IsReadable();
   return m_Notes;
 }
 
@@ -125,6 +166,8 @@ std::vector<QmitkAgentMemory::Note>::iterator QmitkAgentMemory::Find(int id)
 
 int QmitkAgentMemory::Add(const QString& text)
 {
+  this->RequireReadable();
+
   const auto normalized = Normalize(text);
 
   if (normalized.isEmpty())
@@ -147,6 +190,8 @@ int QmitkAgentMemory::Add(const QString& text)
 
 void QmitkAgentMemory::SetText(int id, const QString& text)
 {
+  this->RequireReadable();
+
   const auto normalized = Normalize(text);
 
   if (normalized.isEmpty())
@@ -163,6 +208,8 @@ void QmitkAgentMemory::SetText(int id, const QString& text)
 
 void QmitkAgentMemory::Remove(int id)
 {
+  this->RequireReadable();
+
   const auto index = std::distance(m_Notes.begin(), this->Find(id));
 
   auto notes = m_Notes;
@@ -174,6 +221,8 @@ void QmitkAgentMemory::Remove(int id)
 
 void QmitkAgentMemory::Clear()
 {
+  this->RequireReadable();
+
   WriteNotes(m_FilePath, {}, m_NextId);
   m_Notes.clear();
 }
@@ -181,14 +230,24 @@ void QmitkAgentMemory::Clear()
 QString QmitkAgentMemory::Describe() const
 {
   QString text = "\n## Your notes\n\n";
+  QString list;
+  std::size_t count = 0;
 
-  if (m_Notes.empty())
-    return text + "You have not saved any notes yet.\n";
-
-  text += "What you saved with `remember` in earlier conversations, with their ids:\n\n";
+  this->IsReadable();
 
   for (const auto& note : m_Notes)
-    text += QString("- [%1] %2\n").arg(note.Id).arg(note.Text);
+  {
+    if (note.Text.size() > MaxNoteLength)
+      continue;
 
-  return text;
+    if (count++ >= MaxNoteCount)
+      break;
+
+    list += QString("- [%1] %2\n").arg(note.Id).arg(note.Text);
+  }
+
+  if (list.isEmpty())
+    return text + "You have not saved any notes yet.\n";
+
+  return text + "What you saved with `remember` in earlier conversations, with their ids:\n\n" + list;
 }

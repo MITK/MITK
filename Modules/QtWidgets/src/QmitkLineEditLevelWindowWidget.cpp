@@ -64,14 +64,18 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   connect(m_WindowInput, SIGNAL(editingFinished()), this, SLOT(SetWindowValue()));
 
   // The fields are read with QString::toDouble(), which ignores the system
-  // locale, so their validators must not follow it either.
+  // locale, so their validators must not follow it either. The C locale takes
+  // a comma for a group separator, which would turn "1,5" into 15.
+  QLocale locale = QLocale::c();
+  locale.setNumberOptions(QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
+
   auto *levelValidator = new QDoubleValidator(this);
-  levelValidator->setLocale(QLocale::c());
+  levelValidator->setLocale(locale);
   m_LevelInput->setValidator(levelValidator);
 
   auto *windowValidator = new QDoubleValidator(this);
   windowValidator->setBottom(0);
-  windowValidator->setLocale(QLocale::c());
+  windowValidator->setLocale(locale);
   m_WindowInput->setValidator(windowValidator);
 
   this->hide();

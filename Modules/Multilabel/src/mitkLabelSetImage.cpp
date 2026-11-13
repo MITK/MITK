@@ -1042,7 +1042,7 @@ mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation:
 
   this->InvokeEvent(LabelsChangedEvent(result));
 
-  Modified();
+  this->Modified();
 
   return result;
 }

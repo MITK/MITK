@@ -248,7 +248,8 @@ namespace mitk
      * The label keeps its largest component. Every further component moves to a new instance of the
      * label in the same group: a clone with the same name and color, but without center of mass and
      * without DICOM tracking ID and UID, because these identify a single finding. Voxels connect via
-     * faces, edges and corners (26-neighborhood). No voxel is added or removed.
+     * faces, edges and corners (26-neighborhood). No voxel is added or removed. Locks are not regarded:
+     * a locked label is split as well, and the new instances are locked like it.
      *
      * \param labelValue The value of the label that should be split.
      * \param t The time step whose content is split; the content of other time steps stays with the

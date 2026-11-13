@@ -1566,11 +1566,18 @@ void QmitkMultiLabelInspector::OnSplitLabel()
 
   undoRedoGenerator.RegisterUndoRedoOperationEvent("Split label \"" + labelName + "\" into " + std::to_string(instances.size()) + " instances");
 
-  this->SetSelectedLabel(labelValue);
+  // Not SetSelectedLabel(), which does nothing for an unchanged value: the
+  // value is still selected, but its row is a new one if the label had no
+  // other instance, as its label row stood for the instance until now.
+  this->UpdateSelectionModel({ labelValue });
+  m_LastValidSelectedLabels = { labelValue };
 
   auto index = m_Model->indexOfLabel(labelValue);
   if (index.isValid())
+  {
     m_Controls->view->expand(index.parent());
+    m_Controls->view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+  }
 
   emit ModelUpdated();
 

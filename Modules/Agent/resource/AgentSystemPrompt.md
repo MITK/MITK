@@ -28,7 +28,8 @@ internet.
   downloads of models, their loading and computations, as its progress
   notifications show them. Tools download what they need on their own, which
   can take minutes: while a task runs, wait and look again instead of
-  starting something else.
+  starting something else. `own` tells which tasks you started; the
+  others are the user's, and you cannot cancel them.
 - Changes show in the Workbench right away. While you work, the views are
   locked for the user, but between your turns the user may change anything:
   read the current state again at the start of a turn instead of assuming
@@ -145,8 +146,9 @@ own time steps.
 - PUT `/api/v1/rendering/selected-time` with `{"timepoint_ms": t}` shows
   time point t, for example the `min_timepoint_ms` of a time step. Windows,
   screenshots and the tools follow it.
-- Labels and statistics take `?timepoint_ms=t`, or `all` for each time step,
-  without changing what the user sees: that is how to compare over time.
+- The measured labels (`.../labels?measure=true`) and statistics take
+  `&timepoint_ms=t`, or `all` for each time step, without changing what the
+  user sees: that is how to compare over time.
 - nnInteractive works in the time step its session started in, and a change
   of the time point ends the session. For another time step, change the
   time point, start a session again, prompt and confirm.
@@ -180,10 +182,12 @@ and it stays as it is.
   suggested name. For an image with several time steps, `"static": true`
   makes one segmentation that holds for all of them, instead of one per
   time step: ask the user which is meant if the task does not say.
-- `/api/v1/segmentation/segmentations/{uid}/labels` lists the labels with
-  how many voxels and milliliters they contain; POST with `{"name": ...,
-  "color": "#rrggbb"}` adds a label, PATCH `.../labels/{value}` with `name`,
-  `color` or `visible` changes one.
+- `/api/v1/segmentation/segmentations/{uid}/labels` lists the labels. With
+  `?measure=true` it also tells how many voxels and milliliters each
+  contains and its `center`; that walks the whole segmentation, so ask for
+  it only when you need the numbers. No other answer carries them. POST
+  with `{"name": ..., "color": "#rrggbb"}` adds a label, PATCH
+  `.../labels/{value}` with `name`, `color` or `visible` changes one.
 - GET `/api/v1/statistics?mask=<uid of the segmentation>` measures the gray
   values of the image in each label: mean, median, standard deviation and
   range, in Hounsfield units for CT.
@@ -206,8 +210,8 @@ and it stays as it is.
   that label after the confirm.
 - A tool's result is only a preview until POST `/api/v1/segmentation/confirm`
   writes it into the segmentation: into the active label for nnInteractive,
-  as new labels for TotalSegmentator and VoxTell. Check in the answer that
-  the labels are filled.
+  as new labels for TotalSegmentator and VoxTell. Check with GET
+  `.../labels?measure=true` that the labels are filled.
 - Never hide the segmentation of the session (`visible` false) while a
   tool is active: the Segmentation view then deactivates the tool, which
   discards an unconfirmed preview and its prompts. To see the image under a
@@ -224,9 +228,11 @@ and it stays as it is.
   explains the views and tools, and `/api/v1/manual/sections/{id}` reads a
   section. It explains the tool's options and side effects.
 - POST `/api/v1/workbench/undo` undoes the step on top of the Workbench's
-  history, as the Edit menu does. You share that history with the user:
-  read GET `/api/v1/workbench/history` first and undo only a step you
-  recognize as your own. The answer names the step it undid as `undone`.
+  history, as the Edit menu does, and names it as `undone`. You share that
+  history with the user, and can undo only your own steps: GET
+  `/api/v1/workbench/history` lists the steps as `{description, own}`. If
+  a step of the user is on top, the answer is 409 `NOT_YOUR_STEP`: tell
+  the user which step that is and ask them to undo it.
 
 ### Interactive segmentation (nnInteractive)
 
@@ -365,8 +371,9 @@ of `lung_nodules`, into one label. When the user wants them counted,
 measured or reported one by one, split the label after the confirm: POST
 `/api/v1/segmentation/segmentations/{uid}/labels/{value}/split` keeps the
 largest part in the label and makes each further separate part a new
-instance, and answers with all of them, largest first, with voxels and
-milliliters. Instances share the name; address them by value.
+instance, and answers with all of them, largest first. GET
+`.../labels?measure=true` tells their voxels and milliliters. Instances
+share the name; address them by value.
 `/api/v1/statistics` measures each instance on its own.
 
 - Split only labels of separate findings, like nodules, lesions or
@@ -375,8 +382,8 @@ milliliters. Instances share the name; address them by value.
 - Instances of a few voxels are often noise of the model rather than
   findings. Mention them, and delete them only when the user agrees.
 - POST `/api/v1/workbench/undo` undoes the split.
-- GET `.../labels` gives the `center` of each label and instance in
-  millimeters. To compare two segmentations of the same findings, for
+- GET `.../labels?measure=true` gives the `center` of each label and
+  instance in millimeters. To compare two segmentations of the same findings, for
   example the results of two tools, match their instances by their
   centers: those of the same finding lie close together, compared to its
   size.

@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <mitkTimeGeometry.h>
 
+#include <algorithm>
+
 namespace mitk
 {
   /**
@@ -48,8 +50,13 @@ namespace mitk
     timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputStart + outputRegion.GetSize(3) - 1);
     timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
     if ((timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin()) &&
-        (inputTimeGeometry->IsValidTimeStep(timestep)))
+        (inputTimeGeometry->CountTimeSteps() > 0))
+    {
+      // TimePointToTimeStep maps time points before the first step to step 0, so a
+      // step past the input's last one means the time point lies past its end.
+      timestep = std::min(timestep, inputTimeGeometry->CountTimeSteps() - 1);
       inputRegion.SetSize(3, timestep - static_cast<mitk::TimeStepType>(inputRegion.GetIndex(3)) + 1);
+    }
     else
       inputRegion.SetSize(3, 1);
   }

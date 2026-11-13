@@ -43,6 +43,7 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
   MITK_TEST(GetTimeStep_TimePointOutsideOwnGrid_Clamps);
   MITK_TEST(New_GlobalTimeAtNonZeroPoint_StartsAtSelectedTimePoint);
   MITK_TEST(New_SelectedTimeStepPastGlobalGrid_ThrowsAndAcquiresNothing);
+  MITK_TEST(New_NullName_IsUnnamedRenderer);
   MITK_TEST(SetTimeStep_OwnStep_ShowsItsTimePoint);
   MITK_TEST(SetTimeStep_NoWorldTimeGeometry_Throws);
   MITK_TEST(SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow);
@@ -325,6 +326,15 @@ public:
     CPPUNIT_ASSERT_MESSAGE("No time observer after the failed construction", !hasTimeObserver);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The render window's reference count after the failed construction",
                                  referenceCount, renderWindow->GetReferenceCount());
+  }
+
+  void New_NullName_IsUnnamedRenderer()
+  {
+    auto renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    const char* const noName = nullptr;
+    const auto renderer = mitk::VtkPropRenderer::New(noName, renderWindow);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("unnamed renderer"), std::string(renderer->GetName()));
   }
 
   void SetTimeStep_OwnStep_ShowsItsTimePoint()

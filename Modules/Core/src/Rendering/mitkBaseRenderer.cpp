@@ -157,7 +157,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
     m_CurrentWorldPlaneGeometryData(nullptr),
     m_CurrentWorldPlaneGeometryNode(nullptr),
     m_CurrentWorldPlaneGeometryTransformTime(0),
-    m_Name(name),
+    m_Name(name != nullptr ? name : "unnamed renderer"),
     m_EmptyWorldGeometry(true),
     m_NumberOfVisibleLODEnabledMappers(0)
 {
@@ -168,13 +168,8 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_Bounds[4] = 0;
   m_Bounds[5] = 0;
 
-  if (name != nullptr)
+  if (name == nullptr)
   {
-    m_Name = name;
-  }
-  else
-  {
-    m_Name = "unnamed renderer";
     itkWarningMacro(<< "Created unnamed renderer. Bad for serialization. Please choose a name.");
   }
 

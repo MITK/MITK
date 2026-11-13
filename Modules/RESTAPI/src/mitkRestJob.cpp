@@ -13,15 +13,17 @@ found in the LICENSE file.
 #include <mitkRestJob.h>
 
 #include <mitkErrorResponse.h>
+#include <mitkLexicalCast.h>
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace
 {
   constexpr double MaxWaitSeconds = 120.0;
 
-  std::string ToString(mitk::RestJob::State state)
+  std::string GetStateName(mitk::RestJob::State state)
   {
     switch (state)
     {
@@ -139,7 +141,7 @@ nlohmann::json mitk::RestJob::ToJson() const
   nlohmann::json json = {
     { "id", m_Id },
     { "description", m_Description },
-    { "state", ToString(m_State) },
+    { "state", GetStateName(m_State) },
     { "seconds", std::round(seconds * 10.0) / 10.0 }
   };
 
@@ -172,12 +174,18 @@ mitk::RestResponse mitk::RestJob::Respond(const RestRequest& request, const std:
   {
     try
     {
-      wait = std::clamp(std::stod(*value), 0.0, MaxWaitSeconds);
+      // Not std::stod(), which reads the decimal separator of the C locale.
+      wait = LexicalCast<double>(*value);
     }
-    catch (const std::exception&)
+    catch (const BadLexicalCast&)
     {
-      throw RestException(ErrorResponse::InvalidRequest("The query parameter \"wait\" must be a number of seconds.", request.Path));
+      wait = std::numeric_limits<double>::quiet_NaN();
     }
+
+    if (!std::isfinite(wait))
+      throw RestException(ErrorResponse::InvalidRequest("The query parameter \"wait\" must be a number of seconds.", request.Path));
+
+    wait = std::clamp(wait, 0.0, MaxWaitSeconds);
   }
 
   const bool ended = job->WaitUntilEnded(std::chrono::milliseconds(static_cast<long long>(wait * 1000.0)));

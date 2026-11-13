@@ -26,6 +26,8 @@ namespace mitk
    * Routes can be added and removed while other threads route requests. Of the
    * routes that match a path, the one with the most literal segments wins, so
    * "/editors/mxn" beats "/editors/:id" whatever order they were added in.
+   * Among routes with equally many, the one that has the literal segment at
+   * the first position where they differ wins.
    */
   class MITKRESTAPI_EXPORT RestRouter
   {
@@ -40,9 +42,9 @@ namespace mitk
      * \param route A route with a full path, like "/api/v1/manual".
      *
      * \throw mitk::Exception if the method is unknown, the path does not start
-     *        with a slash, the handler is empty, or a route with the same method
-     *        and path exists. Paths that differ only in the names of their
-     *        parameters are the same.
+     *        with a slash, the handler is empty, the path names a parameter
+     *        twice, or a route with the same method and path exists. Paths
+     *        that differ only in the names of their parameters are the same.
      */
     RestRouteId Add(RestRoute route);
 

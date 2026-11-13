@@ -97,25 +97,56 @@ namespace
   }
 
   /**
+   * @brief Whether a simple JSON value is a number of the kind a numeric property holds.
+   *
+   * FromJSON() of these properties would convert silently: 2.7 to 2 and true
+   * to 1 for an integer, true to 1.0 for a float.
+   */
+  bool FitsNumericProperty(const nlohmann::json& value, const mitk::BaseProperty* property)
+  {
+    if (dynamic_cast<const mitk::IntProperty*>(property) != nullptr)
+      return value.is_number_integer();
+
+    if (dynamic_cast<const mitk::UIntProperty*>(property) != nullptr ||
+        dynamic_cast<const mitk::UShortProperty*>(property) != nullptr)
+    {
+      return value.is_number_unsigned() || (value.is_number_integer() && value.get<std::int64_t>() >= 0);
+    }
+
+    if (dynamic_cast<const mitk::FloatProperty*>(property) != nullptr ||
+        dynamic_cast<const mitk::DoubleProperty*>(property) != nullptr)
+    {
+      return value.is_number();
+    }
+
+    return true;
+  }
+
+  /**
    * @brief The property that a JSON value of a request sets on a node or its data.
    *
    * A simple value, like 3, takes the type of the property it changes: JSON does
    * not tell 3 from 3.0, and clients in JavaScript cannot send 3.0 at all. A value
    * with a type has to name the type of the property it changes, as property lists
    * refuse to change the type of a property. A new property gets its type from the
-   * value.
+   * value, except that a simple value takes the type of the property it overrides
+   * (the one of the default context or of the data), as readers cast to that type.
    *
    * @throw std::exception if the value does not fit the property it changes.
    */
   mitk::BaseProperty::Pointer ConvertPropertyFromRequestJson(const nlohmann::json& value, const mitk::DataNode* node,
     const std::string& propertyKey, const std::string& contextName, mitk::PropertyScope scope)
   {
-    const auto existing = GetConstProperty(node, propertyKey, contextName, scope);
+    const bool hasType = value.is_object() && value.contains("type");
+    auto existing = GetConstProperty(node, propertyKey, contextName, scope);
+
+    if (existing.IsNull() && !hasType && scope != mitk::PropertyScope::Data)
+      existing = node->GetConstProperty(propertyKey, contextName, true);
 
     if (existing.IsNull())
       return mitk::ConvertPropertyFromSelfContainedJson(value);
 
-    if (value.is_object() && value.contains("type"))
+    if (hasType)
     {
       auto property = mitk::ConvertPropertyFromSelfContainedJson(value);
 
@@ -136,7 +167,7 @@ namespace
 
     auto property = existing->Clone();
 
-    if (!property->FromJSON(value))
+    if (!FitsNumericProperty(value, existing) || !property->FromJSON(value))
     {
       mitkThrow() << "Property \"" << propertyKey << "\" of type " << existing->GetNameOfClass()
         << " cannot take the value " << value.dump() << ".";

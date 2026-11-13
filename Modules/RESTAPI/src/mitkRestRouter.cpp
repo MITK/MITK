@@ -63,6 +63,29 @@ namespace
 
     return true;
   }
+
+  /** Whether \a a has the literal segment at the first position where one path has a literal and the other a parameter. */
+  bool HasEarlierLiteral(const std::vector<std::string>& a, const std::vector<std::string>& b)
+  {
+    for (std::size_t i = 0; i < a.size() && i < b.size(); ++i)
+    {
+      if (IsParameter(a[i]) != IsParameter(b[i]))
+        return IsParameter(b[i]);
+    }
+
+    return false;
+  }
+
+  bool HasRepeatedParameter(const std::vector<std::string>& segments)
+  {
+    for (auto segment = segments.begin(); segment != segments.end(); ++segment)
+    {
+      if (IsParameter(*segment) && std::find(segment + 1, segments.end(), *segment) != segments.end())
+        return true;
+    }
+
+    return false;
+  }
 }
 
 mitk::RestRouteId mitk::RestRouter::Add(RestRoute route)
@@ -78,6 +101,10 @@ mitk::RestRouteId mitk::RestRouter::Add(RestRoute route)
 
   Entry entry;
   entry.Segments = Split(route.Path);
+
+  if (HasRepeatedParameter(entry.Segments))
+    mitkThrow() << "The route " << route.Method << " " << route.Path << " names a parameter twice";
+
   entry.LiteralSegmentCount = static_cast<int>(std::count_if(entry.Segments.begin(), entry.Segments.end(),
     [](const std::string& segment) { return !IsParameter(segment); }));
 
@@ -129,8 +156,14 @@ std::optional<mitk::RestRouter::Match> mitk::RestRouter::Find(const std::string&
         : entry.Segments[i] == segments[i];
     }
 
-    if (matches && (best == nullptr || entry.LiteralSegmentCount > best->LiteralSegmentCount))
+    if (!matches)
+      continue;
+
+    if (best == nullptr || entry.LiteralSegmentCount > best->LiteralSegmentCount ||
+        (entry.LiteralSegmentCount == best->LiteralSegmentCount && HasEarlierLiteral(entry.Segments, best->Segments)))
+    {
       best = &entry;
+    }
   }
 
   if (best == nullptr)

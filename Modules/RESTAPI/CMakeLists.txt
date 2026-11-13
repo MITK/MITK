@@ -11,6 +11,8 @@ mitk_create_module(
 
 add_subdirectory(autoload/RESTAPIAutoload)
 
-if(BUILD_TESTING)
-  add_subdirectory(test)
+if(TARGET ${MODULE_TARGET})
+  if(BUILD_TESTING)
+    add_subdirectory(test)
+  endif()
 endif()

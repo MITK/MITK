@@ -187,7 +187,9 @@ namespace mitk
      * before the objects their handlers use are destroyed. The endpoints of
      * the server's own controllers come first: a route with the method and
      * path of one of them is never reached. Clients see added routes as
-     * experimental, and browsers cannot reach them.
+     * experimental. Requests with an Origin header are refused, which keeps
+     * web pages from changing state through them; a GET request of a web
+     * page carries none, so GET routes must not change state.
      *
      * \return An id for RemoveRoute().
      * \throw mitk::Exception if the route is invalid, or one with the same
@@ -195,6 +197,12 @@ namespace mitk
      */
     virtual RestRouteId AddRoute(RestRoute route) = 0;
 
+    /**
+     * \brief Remove a route of AddRoute().
+     *
+     * Does not wait for requests: a handler that a request has reached
+     * already may still run after the call returns.
+     */
     virtual void RemoveRoute(RestRouteId id) = 0;
 
     /**
@@ -204,10 +212,17 @@ namespace mitk
      * Authentication works as over HTTP: the request needs an "Authorization:
      * Bearer" header if the server requires authentication, and a token of
      * CreateToken() limits the request to the token's rights. Browser checks
-     * do not apply, as the request does not come from a browser.
+     * do not apply, as the request does not come from a browser, and neither
+     * do the list of client addresses and the rate limit. Unlike over HTTP, a
+     * built-in route does not match a path with a trailing slash or with an
+     * empty parameter.
      *
      * Meant for clients in the same process that relay requests of their own
-     * clients, like an endpoint for AI agents.
+     * clients, like an endpoint for AI agents. Call it only from within a
+     * route handler: Stop() waits for the handlers of the server's own threads
+     * before it destroys what requests use, not for other callers. Never call
+     * it on the thread that owns the data storage: requests of the built-in
+     * routes hold a lock while they wait for that thread.
      *
      * \param request A request with a method and a target set by
      *        RestRequest::SetTarget(), below /api/v1.

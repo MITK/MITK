@@ -61,7 +61,7 @@ namespace mitk
     /** \brief The value of a header, if the request has it. The name is not case-sensitive. */
     std::optional<std::string> GetHeader(const std::string& name) const;
 
-    /** \brief The token of an "Authorization: Bearer" header, if the request has one. */
+    /** \brief The token of an "Authorization: Bearer" header, if the request has one. The scheme is not case-sensitive. */
     std::optional<std::string> GetBearerToken() const;
 
     /**
@@ -138,7 +138,8 @@ namespace mitk
      *
      * Runs on a thread of the server. Work on the data storage, render windows
      * or widgets has to be handed to the GUI thread. Exceptions become error
-     * responses: RestException with its error, others with status 500.
+     * responses: RestException with its error, exceptions of nlohmann::json
+     * (a body of the wrong shape) with status 400, others with status 500.
      */
     RestHandler Handler;
   };
@@ -149,6 +150,10 @@ namespace mitk
    * \brief What clients that authenticate with a token of
    *        IRestServerService::CreateToken() may do beyond reading and changing
    *        the data storage and the views.
+   *
+   * The rights bind only requests that present the token. On a server that
+   * does not require authentication, a request without a token is limited by
+   * the file access mode of the server alone.
    */
   struct MITKRESTAPI_EXPORT RestTokenRights
   {

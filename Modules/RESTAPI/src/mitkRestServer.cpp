@@ -147,10 +147,11 @@ namespace
 
   std::optional<std::string> GetBearerToken(const httplib::Request& req)
   {
-    static const std::string Prefix = "Bearer ";
+    // Authentication schemes are case-insensitive (RFC 9110).
+    static const std::string Prefix = "bearer ";
     const auto header = req.get_header_value("Authorization");
 
-    if (header.size() <= Prefix.size() || 0 != header.compare(0, Prefix.size(), Prefix))
+    if (header.size() <= Prefix.size() || ToLower(header.substr(0, Prefix.size())) != Prefix)
       return std::nullopt;
 
     return header.substr(Prefix.size());
@@ -715,7 +716,7 @@ RestResponse RestServer::HandleRequest(RestRequest request)
 
   const auto config = this->GetRunningConfig();
 
-  if (!hasCreatedToken && config.has_value() && config->requireAuth &&
+  if (!hasCreatedToken && config.has_value() && config->requireAuth && !IsAuthExemptPath(request.Path) &&
       !(token.has_value() && ConstantTimeCompare(*token, config->apiToken)))
   {
     response = RestResponse::FromError(ErrorResponse::Unauthorized("Invalid or missing API token", request.Path));
@@ -1016,6 +1017,8 @@ void RestServer::HandleRoutedHttp(const httplib::Request& req, httplib::Response
 
   if (!response.ContentType.empty())
     res.set_content(response.Body, response.ContentType);
+  else if (!response.Body.empty())
+    res.set_content(response.Body, "application/octet-stream");
 
   this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
 }
@@ -1046,9 +1049,23 @@ RestResponse RestServer::Route(RestRequest& request) const
   {
     return RestResponse::FromError(e.GetError());
   }
+  catch (const nlohmann::json::exception& e)
+  {
+    // Handlers read the fields of a body without checking each type first.
+    return RestResponse::FromError(ErrorResponse::InvalidRequest(e.what(), request.Path));
+  }
+  catch (const itk::ExceptionObject& e)
+  {
+    // what() starts with the source file of the throw.
+    return RestResponse::FromError(ErrorResponse::InternalError(e.GetDescription(), request.Path));
+  }
   catch (const std::exception& e)
   {
     return RestResponse::FromError(ErrorResponse::InternalError(e.what(), request.Path));
+  }
+  catch (...)
+  {
+    return RestResponse::FromError(ErrorResponse::InternalError("Unknown error", request.Path));
   }
 }
 
@@ -1448,9 +1465,9 @@ bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Respo
   const std::string authHeader = req.get_header_value("Authorization");
 
   // Validate Bearer token format
-  const std::string bearerPrefix = "Bearer ";
+  const std::string bearerPrefix = "bearer ";
   if (authHeader.size() <= bearerPrefix.size() ||
-      authHeader.substr(0, bearerPrefix.size()) != bearerPrefix)
+      ToLower(authHeader.substr(0, bearerPrefix.size())) != bearerPrefix)
   {
     auto error = ErrorResponse::Unauthorized("Invalid authorization format. Expected: Bearer <token>", req.path);
     res.status = 401;

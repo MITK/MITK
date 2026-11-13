@@ -109,6 +109,9 @@ std::vector<mitk::Point3D> mitk::GetRestWorldPoints(const nlohmann::json& body, 
     const double windowWidth = renderer->GetSizeX();
     const double windowHeight = renderer->GetSizeY();
 
+    if (windowWidth <= 0 || windowHeight <= 0)
+      throw RestException(ErrorResponse::RenderWindowNotAvailable(path));
+
     // Screenshots shrink the window evenly, rounded to whole pixels; a cropped one does not.
     if (std::abs(imageWidth * windowHeight - imageHeight * windowWidth) > 2 * std::max(windowWidth, windowHeight))
     {
@@ -124,10 +127,16 @@ std::vector<mitk::Point3D> mitk::GetRestWorldPoints(const nlohmann::json& body, 
       if (!IsNumberArray(item, 2))
         ThrowInvalid("Each pixel must be [x, y] in the screenshot.", path);
 
+      const double x = item[0].get<double>();
+      const double y = item[1].get<double>();
+
+      if (x < 0 || x > imageWidth || y < 0 || y > imageHeight)
+        ThrowInvalid("Each pixel must lie within \"image_size\".", path);
+
       // Display coordinates start at the bottom left, screenshots at the top left.
       Point2D display;
-      display[0] = item[0].get<double>() * scaleX;
-      display[1] = renderer->GetSizeY() - item[1].get<double>() * scaleY;
+      display[0] = x * scaleX;
+      display[1] = renderer->GetSizeY() - y * scaleY;
 
       Point3D point;
       renderer->DisplayToWorld(display, point);

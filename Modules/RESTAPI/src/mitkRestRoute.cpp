@@ -37,15 +37,17 @@ namespace
 
 void mitk::RestRequest::SetTarget(const std::string& target)
 {
-  const auto queryStart = target.find('?');
+  // The server does not see a fragment over HTTP either.
+  const auto withoutFragment = target.substr(0, target.find('#'));
+  const auto queryStart = withoutFragment.find('?');
 
-  Path = httplib::decode_path_component(target.substr(0, queryStart));
+  Path = httplib::decode_path_component(withoutFragment.substr(0, queryStart));
   QueryParams.clear();
 
   if (queryStart != std::string::npos)
   {
     httplib::Params params;
-    httplib::detail::parse_query_text(target.substr(queryStart + 1), params);
+    httplib::detail::parse_query_text(withoutFragment.substr(queryStart + 1), params);
     QueryParams.insert(params.begin(), params.end());
   }
 }
@@ -72,10 +74,10 @@ std::optional<std::string> mitk::RestRequest::GetHeader(const std::string& name)
 
 std::optional<std::string> mitk::RestRequest::GetBearerToken() const
 {
-  static const std::string Prefix = "Bearer ";
+  static const std::string Prefix = "bearer ";
   const auto header = this->GetHeader("Authorization");
 
-  if (!header.has_value() || header->size() <= Prefix.size() || 0 != header->compare(0, Prefix.size(), Prefix))
+  if (!header.has_value() || header->size() <= Prefix.size() || ToLower(header->substr(0, Prefix.size())) != Prefix)
     return std::nullopt;
 
   return header->substr(Prefix.size());
@@ -108,7 +110,16 @@ mitk::RestResponse mitk::RestResponse::FromData(const nlohmann::json& data, int 
 mitk::RestResponse mitk::RestResponse::FromError(const nlohmann::json& error)
 {
   RestResponse response;
-  response.Status = error.contains("error") ? error["error"].value("status", 500) : 500;
+  response.Status = 500;
+
+  // Runs where exceptions become responses, so it must not throw for an error of another shape.
+  if (error.is_object() && error.contains("error") && error["error"].is_object() && error["error"].contains("status"))
+  {
+    const auto& status = error["error"]["status"];
+
+    if (status.is_number_integer() && status.get<std::int64_t>() >= 400 && status.get<std::int64_t>() <= 599)
+      response.Status = status.get<int>();
+  }
   response.ContentType = "application/json";
   response.Body = error.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
   return response;

@@ -33,8 +33,6 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr int TestPort = 59101;
-
   /** A dispatcher whose thread is busy: it keeps the tasks until Run(). */
   class BusyDispatcher : public mitk::StorageThreadDispatcherBase
   {
@@ -96,12 +94,28 @@ namespace
     std::vector<std::function<void()>> m_Tasks;
   };
 
+  /** Joins its threads on every way out of a scope: a failed assertion would end the process otherwise. */
+  struct WorkerThreads
+  {
+    ~WorkerThreads()
+    {
+      for (auto& thread : Threads)
+      {
+        if (thread.joinable())
+          thread.join();
+      }
+    }
+
+    std::vector<std::thread> Threads;
+  };
+
   mitk::RestServerConfig MakeConfig()
   {
     mitk::RestServerConfig config;
     config.enabled = true;
     config.host = "127.0.0.1";
-    config.port = TestPort;
+    // A free port of the system's choice: a fixed one can be taken or reserved.
+    config.port = 0;
     return config;
   }
 
@@ -152,6 +166,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(UnknownPathsAreAnsweredWithJson);
   MITK_TEST(HandleRequestReachesBuiltInRoutes);
   MITK_TEST(HandleRequestNeedsRunningServer);
+  MITK_TEST(BodyOfTheWrongShapeIsAClientError);
   MITK_TEST(CreatedTokenIsAcceptedWhenAuthIsRequired);
   MITK_TEST(TokenWithoutFileAccessCannotLoadFiles);
   MITK_TEST(EndpointsListsBuiltInAndAddedRoutes);
@@ -193,6 +208,14 @@ public:
     CPPUNIT_ASSERT(!router.Find("GET", "/api/v1/editors").has_value());
     CPPUNIT_ASSERT(!router.Find("GET", "/api/v1/editors/").has_value());
     CPPUNIT_ASSERT(!router.Find("POST", "/api/v1/editors/mxn").has_value());
+
+    // Equally many literal segments: the earlier literal wins, not the route added first.
+    router.Add(MakeRoute("GET", "/api/v1/things/:id/items", "later literal"));
+    router.Add(MakeRoute("GET", "/api/v1/things/all/:kind", "earlier literal"));
+
+    match = router.Find("GET", "/api/v1/things/all/items");
+    CPPUNIT_ASSERT(match.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("items"), match->PathParams.at("kind"));
   }
 
   void RouterRejectsSameShape()
@@ -203,6 +226,7 @@ public:
     CPPUNIT_ASSERT_THROW(router.Add(MakeRoute("GET", "/api/v1/labels/:id", "b")), mitk::Exception);
     CPPUNIT_ASSERT_THROW(router.Add(MakeRoute("FETCH", "/api/v1/other", "c")), mitk::Exception);
     CPPUNIT_ASSERT_THROW(router.Add(MakeRoute("GET", "api/v1/other", "d")), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(router.Add(MakeRoute("GET", "/api/v1/a/:id/b/:id", "f")), mitk::Exception);
     CPPUNIT_ASSERT_NO_THROW(router.Add(MakeRoute("PUT", "/api/v1/labels/:id", "e")));
   }
 
@@ -225,7 +249,7 @@ public:
 
     CPPUNIT_ASSERT(server.Start());
 
-    httplib::Client client("127.0.0.1", TestPort);
+    httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
     const auto res = client.Get("/api/v1/things/chair");
     const auto health = client.Get("/api/v1/health");
 
@@ -253,7 +277,7 @@ public:
 
     CPPUNIT_ASSERT(server.Start());
 
-    httplib::Client client("127.0.0.1", TestPort);
+    httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
     const auto res = client.Post("/api/v1/things", httplib::Headers{ { "Origin", "https://example.org" } }, "{}", "application/json");
     server.Stop();
 
@@ -269,7 +293,7 @@ public:
 
     CPPUNIT_ASSERT(server.Start());
 
-    httplib::Client client("127.0.0.1", TestPort);
+    httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
     const auto res = client.Delete("/api/v1/nothing/here");
     server.Stop();
 
@@ -311,6 +335,33 @@ public:
     CPPUNIT_ASSERT_EQUAL(503, response.Status);
   }
 
+  void BodyOfTheWrongShapeIsAClientError()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    mitk::RestRoute route;
+    route.Method = "POST";
+    route.Path = "/things";
+    route.Handler = [](const mitk::RestRequest& request) {
+      return mitk::RestResponse::FromData({ { "size", request.GetJsonBody().value("size", 1) } });
+    };
+    server.AddRoute(std::move(route));
+
+    CPPUNIT_ASSERT(server.Start());
+
+    auto request = MakeRequest("POST", "/api/v1/things");
+    request.Body = "[1, 2]";
+    const auto notAnObject = server.HandleRequest(request);
+    request.Body = R"({"size": "large"})";
+    const auto wrongType = server.HandleRequest(request);
+    server.Stop();
+
+    CPPUNIT_ASSERT_EQUAL(400, notAnObject.Status);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), GetErrorCode(notAnObject.Body));
+    CPPUNIT_ASSERT_EQUAL(400, wrongType.Status);
+  }
+
   void CreatedTokenIsAcceptedWhenAuthIsRequired()
   {
     mitk::RestServer server;
@@ -325,11 +376,13 @@ public:
 
     CPPUNIT_ASSERT(server.Start());
 
-    httplib::Client client("127.0.0.1", TestPort);
+    httplib::Client client("127.0.0.1", server.GetRunningConfig()->port);
     const auto withoutToken = client.Get("/api/v1/things");
     const auto withCreatedToken = client.Get("/api/v1/things", httplib::Headers{ { "Authorization", "Bearer " + token } });
     const auto withMainToken = client.Get("/api/v1/datastorage/nodes", httplib::Headers{ { "Authorization", "Bearer main-token" } });
+    const auto withLowerCaseScheme = client.Get("/api/v1/things", httplib::Headers{ { "Authorization", "bearer " + token } });
 
+    const auto inProcessHealth = server.HandleRequest(MakeRequest("GET", "/api/v1/health"));
     const auto inProcessWithout = server.HandleRequest(MakeRequest("GET", "/api/v1/things"));
     const auto inProcessWith = server.HandleRequest(MakeRequest("GET", "/api/v1/things", token));
 
@@ -341,6 +394,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(401, withoutToken->status);
     CPPUNIT_ASSERT_EQUAL(200, withCreatedToken->status);
     CPPUNIT_ASSERT(withMainToken->status != 401);
+    CPPUNIT_ASSERT(withLowerCaseScheme != nullptr);
+    CPPUNIT_ASSERT_EQUAL(200, withLowerCaseScheme->status);
+    CPPUNIT_ASSERT_EQUAL(200, inProcessHealth.Status);
     CPPUNIT_ASSERT_EQUAL(401, inProcessWithout.Status);
     CPPUNIT_ASSERT_EQUAL(200, inProcessWith.Status);
     CPPUNIT_ASSERT_EQUAL(401, withRemovedToken->status);
@@ -448,17 +504,22 @@ public:
     mitk::RestServer server;
     server.SetConfig(MakeConfig());
 
-    std::vector<std::thread> workers;
+    // Declared before the promise: a broken promise releases the workers as
+    // well, so they can be joined on every way out.
+    WorkerThreads workers;
+
+    std::promise<void> release;
+    const auto released = release.get_future().share();
 
     mitk::RestRoute work;
     work.Method = "POST";
     work.Path = "/work";
-    work.Handler = [&server, &workers](const mitk::RestRequest& request) {
+    work.Handler = [&server, &workers, released](const mitk::RestRequest& request) {
       auto job = server.CreateJob("Work a little");
 
-      workers.emplace_back([job]() {
+      workers.Threads.emplace_back([job, released]() {
         job->SetProgress(0.5, "halfway");
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        released.wait();
         job->Succeed({ { "answer", 42 } });
       });
 
@@ -471,12 +532,14 @@ public:
     const auto started = server.HandleRequest(MakeRequest("POST", "/api/v1/work"));
     const auto startedJob = nlohmann::json::parse(started.Body)["data"];
     const auto running = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs/" + startedJob["id"].get<std::string>()));
+    release.set_value();
     const auto awaited = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs/" + startedJob["id"].get<std::string>() + "?wait=10"));
     const auto direct = server.HandleRequest(MakeRequest("POST", "/api/v1/work?wait=10"));
     const auto list = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs"));
     const auto missing = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs/job_999"));
+    const auto noNumber = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs/" + startedJob["id"].get<std::string>() + "?wait=nan"));
 
-    for (auto& worker : workers)
+    for (auto& worker : workers.Threads)
       worker.join();
 
     server.Stop();
@@ -496,6 +559,7 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), nlohmann::json::parse(list.Body)["data"].size());
     CPPUNIT_ASSERT_EQUAL(404, missing.Status);
+    CPPUNIT_ASSERT_EQUAL(400, noNumber.Status);
   }
 
   void JobsCanBeCancelled()
@@ -537,8 +601,8 @@ public:
 
     CPPUNIT_ASSERT(server.Start());
 
-    auto waiting = std::async(std::launch::async, [&job]() {
-      httplib::Client client("127.0.0.1", TestPort);
+    auto waiting = std::async(std::launch::async, [&job, port = server.GetRunningConfig()->port]() {
+      httplib::Client client("127.0.0.1", port);
       return client.Get("/api/v1/jobs/" + job->GetId() + "?wait=20");
     });
 
@@ -604,8 +668,8 @@ private:
   {
     CPPUNIT_ASSERT(server.Start());
 
-    auto waiting = std::async(std::launch::async, [path]() {
-      httplib::Client client("127.0.0.1", TestPort);
+    auto waiting = std::async(std::launch::async, [path, port = server.GetRunningConfig()->port]() {
+      httplib::Client client("127.0.0.1", port);
       return client.Get(path);
     });
 
@@ -671,6 +735,8 @@ public:
     const auto startedBy = server.GetStartedBy();
     const auto tokens = server.GetTokens();
 
+    CPPUNIT_ASSERT(running.has_value());
+
     httplib::Client client("127.0.0.1", running->port);
     const auto withoutToken = client.Get("/api/v1/datastorage/nodes");
     const auto withEmptyToken = client.Get("/api/v1/datastorage/nodes", httplib::Headers{ { "Authorization", "Bearer " } });
@@ -683,7 +749,6 @@ public:
 
     server.Stop();
 
-    CPPUNIT_ASSERT(running.has_value());
     CPPUNIT_ASSERT(running->port > 0);
     CPPUNIT_ASSERT_EQUAL(std::string("Agent view"), startedBy);
     CPPUNIT_ASSERT(server.GetStartedBy().empty());

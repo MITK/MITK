@@ -27,9 +27,10 @@ namespace mitk
    * For the handlers of REST routes, which run on threads of the server.
    * Exceptions of the function are thrown again in the calling thread.
    *
-   * Do not call the server's FindNode(), GetDataStorage() and the like from
-   * within the function: requests below /api/v1 hold locks while they wait
-   * for the GUI thread. Resolve those before, in the handler's thread.
+   * Do not call the server's GetDataStorage() or HandleRequest() from within
+   * the function: requests of the built-in routes hold a lock while they wait
+   * for the GUI thread, and both calls take that lock. Resolve those before,
+   * in the handler's thread. FindNode() and GetNodeUid() take no such lock.
    */
   template <typename Function>
   auto CallInGuiThread(const IRestServerService& server, Function function) -> std::invoke_result_t<Function>

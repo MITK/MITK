@@ -142,6 +142,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(GetNodePropertyWithScopeAndValue);
   MITK_TEST(SetNodeProperty);
   MITK_TEST(SetNodePropertyKeepsTypeOfSimpleValue);
+  MITK_TEST(SetNodePropertyOverrideTakesTypeOfOverriddenProperty);
   MITK_TEST(SetNodePropertyRefusesOtherType);
   MITK_TEST(SetNodePropertyRefusesUnfittingValue);
   MITK_TEST(SetNodePropertyRefusesIncompleteObject);
@@ -1370,6 +1371,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(3.0f, property->GetValue());
   }
 
+  void SetNodePropertyOverrideTakesTypeOfOverriddenProperty()
+  {
+    const std::string context = "stdmulti.widget0";
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+    m_Root1->GetPropertyList(context); // makes the list of the context
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+    params.context = context;
+
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
+
+    const auto property = m_Root1->GetConstProperty("line.width", context, false);
+    const auto* floatProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
+    CPPUNIT_ASSERT(floatProperty != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, floatProperty->GetValue());
+  }
+
   void SetNodePropertyRefusesOtherType()
   {
     m_Root1->SetFloatProperty("line.width", 2.0f);
@@ -1399,6 +1419,19 @@ public:
     bool flag = false;
     CPPUNIT_ASSERT(m_Root1->GetBoolProperty("flag", flag));
     CPPUNIT_ASSERT(flag);
+
+    // Not rounded and not converted from a boolean
+    m_Root1->SetIntProperty("test.count", 1);
+
+    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", 2.7, params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", true, params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    int count = 0;
+    CPPUNIT_ASSERT(m_Root1->GetIntProperty("test.count", count));
+    CPPUNIT_ASSERT_EQUAL(1, count);
   }
 
   void NewUidIsGivenOnTheDispatchThread()

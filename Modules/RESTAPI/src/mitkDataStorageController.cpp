@@ -345,12 +345,14 @@ namespace
       return "";
     }
 
-    // Canonicalize the requested path
+    // A path that does not exist has to get the answer of one that does:
+    // a different one would tell which files exist outside of the allowed
+    // directories.
     std::error_code ec;
-    const fs::path canonicalPath = fs::canonical(filePath, ec);
+    const fs::path canonicalPath = fs::weakly_canonical(fs::absolute(filePath, ec), ec);
     if (ec)
     {
-      return "Cannot resolve file path: " + filePath;
+      return "File path is not within any allowed directory: " + filePath;
     }
 
     const std::string canonicalStr = canonicalPath.string();

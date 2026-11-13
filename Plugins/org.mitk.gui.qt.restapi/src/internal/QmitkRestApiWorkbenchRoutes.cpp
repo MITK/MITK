@@ -129,6 +129,20 @@ namespace
     return history;
   }
 
+  /** The description the history lists first for the step that an undo or redo would take; empty if there is none. */
+  std::string DescribeNextStep(bool undo)
+  {
+    if (auto* model = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()))
+    {
+      const auto descriptions = undo ? model->GetUndoDescriptions() : model->GetRedoDescriptions();
+
+      if (!descriptions.empty())
+        return descriptions.front().second;
+    }
+
+    return std::string();
+  }
+
   nlohmann::json ToJson(const mitk::ProgressTaskInfo& task)
   {
     const auto seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - task.StartTime).count();
@@ -167,12 +181,18 @@ namespace
     const auto [done, history] = mitk::CallInGuiThread(server, [undo]() {
       auto* model = mitk::UndoController::GetCurrentUndoModel();
       const bool empty = model == nullptr || (undo ? model->UndoListEmpty() : model->RedoListEmpty());
+      const auto step = empty ? std::string() : DescribeNextStep(undo);
       const bool stepped = !empty && (undo ? model->Undo() : model->Redo());
 
       if (stepped)
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return std::make_pair(stepped, DescribeHistory());
+      auto history = DescribeHistory();
+
+      if (stepped)
+        history[undo ? "undone" : "redone"] = step;
+
+      return std::make_pair(stepped, history);
     });
 
     if (!done)
@@ -287,8 +307,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   select.Path = "/workbench/selection";
   select.Summary = "Select data in the Data Manager";
   select.Description =
-    "Body: {uids: [uid, ...]}; an empty list clears the selection. Needs the Data Manager to be open. Returns "
-    "{data: [{uid, name}]}, as GET does.";
+    "Body: {uids: [uid, ...]}; an empty list clears the selection. Needs the Data Manager to be open. The Data "
+    "Manager shows the selection; other views that follow the selection pick it up once the Data Manager becomes "
+    "the active part, for example when the user clicks into it. Returns {data: [{uid, name}]}, as GET does.";
   select.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -362,7 +383,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   undo.Method = "POST";
   undo.Path = "/workbench/undo";
   undo.Summary = "Undo the last change, as Edit > Undo does";
-  undo.Description = "Returns {data: {undo, redo}} as GET /api/v1/workbench/history does, or 409 if there is nothing to undo.";
+  undo.Description =
+    "Returns {data: {undone, undo, redo}}: undone is the description of the step that was undone, undo and redo "
+    "are the history as GET /api/v1/workbench/history lists it afterwards. 409 if there is nothing to undo.";
   undo.Handler = [server](const RestRequest& request) { return Step(*server, request, true); };
   routes.push_back(undo);
 
@@ -370,7 +393,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   redo.Method = "POST";
   redo.Path = "/workbench/redo";
   redo.Summary = "Redo the last undone change, as Edit > Redo does";
-  redo.Description = "Returns {data: {undo, redo}} as GET /api/v1/workbench/history does, or 409 if there is nothing to redo.";
+  redo.Description =
+    "Returns {data: {redone, undo, redo}}: redone is the description of the step that was redone, undo and redo "
+    "are the history as GET /api/v1/workbench/history lists it afterwards. 409 if there is nothing to redo.";
   redo.Handler = [server](const RestRequest& request) { return Step(*server, request, false); };
   routes.push_back(redo);
 
@@ -399,7 +424,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   cancelTask.Method = "DELETE";
   cancelTask.Path = "/workbench/tasks/:id";
   cancelTask.Summary = "Cancel a task, as the cancel button of its progress notification does";
-  cancelTask.Description = "Returns {data: task}, or 409 if the task cannot be cancelled.";
+  cancelTask.Description = "Returns {data: task}, or 409 if the task cannot be canceled.";
   cancelTask.Handler = [](const RestRequest& request) {
     const auto task = FindTask(request);
 
@@ -410,7 +435,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
     }
 
     if (!task->Cancelable)
-      throw RestException(ErrorResponse::Create("TASK_NOT_CANCELABLE", "Conflict", "The task cannot be cancelled.", 409, request.Path));
+      throw RestException(ErrorResponse::Create("TASK_NOT_CANCELABLE", "Conflict", "The task cannot be canceled.", 409, request.Path));
 
     CoreServices::GetProgressService()->RequestCancel(task->Id);
 

@@ -95,8 +95,10 @@ private:
   \param scale upsampling factor (1 = on-screen resolution)
   \param fileName file location and name where the screenshot is saved
   \param filter selected file-type filter, used to derive the suffix when missing
+  \return Why no file was saved (the window could not be captured, the file could not be written, a crop found
+          only background), or an empty string if the screenshot was saved.
   */
-  void TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter = QString());
+  QString TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter = QString());
 
   QWidget* m_Parent = nullptr;
   std::unique_ptr<Ui::QmitkScreenshotMakerControls> m_Controls;

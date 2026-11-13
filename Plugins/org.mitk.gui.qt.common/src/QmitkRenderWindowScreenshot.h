@@ -81,8 +81,12 @@ public:
    * \brief The image of a render window of the render window part, with an
    *        alpha channel for a transparent background.
    *
-   * Returns a null image when cropping finds nothing but background. The
-   * window looks as before afterwards. Call in the GUI thread.
+   * Returns a null image only when cropping finds nothing but background.
+   * Throws mitk::Exception when the capture fails (no renderer or render
+   * window, or a capture that gave no image, for example because the window
+   * has no size or a magnified image does not fit into memory) and when an
+   * argument is null. The window looks as before afterwards. Call in the GUI
+   * thread.
    */
   static QImage Take(mitk::IRenderWindowPart* renderWindowPart, QmitkRenderWindow* window, const Options& options);
 };

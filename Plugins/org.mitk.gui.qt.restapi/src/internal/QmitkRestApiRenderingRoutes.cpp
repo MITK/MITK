@@ -641,7 +641,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   slice.Description =
     "Path parameter: id of a 2D window. Body: {index}, the slice to show, counted from 0 as GET "
     "/api/v1/rendering/windows and the Image Navigator count them; to move k slices, send the current index "
-    "plus k. Returns {data: window} as GET /api/v1/rendering/windows describes it.";
+    "plus k. Returns {data: window} as GET /api/v1/rendering/windows describes it, or 400 for the 3d window.";
   slice.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -655,7 +655,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       auto* window = FindRenderWindow(id, request.Path);
 
       if (!Is2D(window))
-        throw RestException(ErrorResponse::UnsupportedOperation("The " + id + " window shows no slices.", request.Path));
+        throw RestException(ErrorResponse::InvalidRequest("The " + id + " window shows no slices.", request.Path));
 
       auto* stepper = window->GetSliceNavigationController()->GetStepper();
       const auto count = static_cast<int>(stepper->GetSteps());
@@ -910,7 +910,9 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   layout.Summary = "Tell which render window is shown alone, if any";
   layout.Description =
     "Returns {data: {maximized}}: the id of the window that its full screen button shows alone, or null if "
-    "the windows show in their layout.";
+    "that button is on no window. This is the state of the full screen button of the window's menu; a layout "
+    "chosen in the layout menu (for example \"This big\") is not seen by it, and only displays that connect "
+    "LayoutDesignChanged support it.";
   layout.Handler = [server, describeLayout](const RestRequest& request) {
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return describeLayout(request.Path); }));
   };
@@ -922,7 +924,9 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   changeLayout.Summary = "Show one render window alone, or all of them again, as the full screen button does";
   changeLayout.Description =
     "Body: {maximized}, the id of a window (axial, sagittal, coronal, 3d) to show it alone, or null to bring "
-    "back the layout the windows had before. Returns {data: {maximized}} as GET does. Answers 409 "
+    "back the layout the windows had before. It sets the state of the full screen button of the window's menu; "
+    "a layout chosen in the layout menu (for example \"This big\") is not seen by it, and only displays that "
+    "connect LayoutDesignChanged support it. Returns {data: {maximized}} as GET does. Answers 409 "
     "LAYOUT_NOT_AVAILABLE while the editor of the windows is hidden, for example behind a report.";
   changeLayout.Handler = [server, describeLayout](const RestRequest& request) {
     const auto body = request.GetJsonBody();
@@ -972,7 +976,10 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     "the corner texts, logo, border and the gradient of the background; scale, 2 to 4, renders that many pixels per window pixel, without "
     "decorations, for sharper images (raise max_size with it); crop=true cuts the image down to the part of the "
     "scene that is not background, without decorations, and padding keeps that many pixels of background "
-    "around it. As the Screenshot Maker view takes them; transparent is transparent where "
+    "around it. With an opaque background, pixels that have the background's color count as background, so a "
+    "dark part of the image at the border is cut away; only the transparent background decides by opacity. "
+    "Answers 400 if the crop finds nothing but background, and 500 if the window could not be captured. "
+    "As the Screenshot Maker view takes them; transparent is transparent where "
     "the scene shows background, and partly so behind semitransparent objects. Returns a PNG. The header "
     "X-MITK-Screenshot describes it as JSON: the window as GET /api/v1/rendering/windows does, plus image_size: "
     "[width, height]. Endpoints that take points accept pixels of the screenshot with that window and image_size, "
@@ -993,14 +1000,20 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       const auto editor = FindStdMultiWidgetEditor();
       auto* renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
 
-      auto image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+      QImage image;
 
-      // With the window found, only a crop that finds nothing but background leaves no image.
-      if (image.isNull() && options.CropToContent)
-        throw RestException(ErrorResponse::InvalidRequest("The window shows only background, there is nothing to crop to.", request.Path));
+      try
+      {
+        image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+      }
+      catch (const Exception&)
+      {
+        throw RestException(ErrorResponse::InternalError("The window could not be captured.", request.Path));
+      }
 
+      // Take returns no image only for a crop that finds nothing but background.
       if (image.isNull())
-        throw RestException(ErrorResponse::InternalError("The render window gave no image.", request.Path));
+        throw RestException(ErrorResponse::InvalidRequest("The window shows only background, there is nothing to crop to.", request.Path));
 
       if (grid)
         DrawGrid(image);

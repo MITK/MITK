@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindow.h>
 
+#include <mitkException.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkRenderingManager.h>
 
@@ -181,13 +182,13 @@ namespace
 QImage QmitkRenderWindowScreenshot::Take(mitk::IRenderWindowPart* renderWindowPart, QmitkRenderWindow* window, const Options& options)
 {
   if (renderWindowPart == nullptr || window == nullptr)
-    return QImage();
+    mitkThrow() << "The render window part and the window must not be null.";
 
   auto* renderer = window->GetRenderer()->GetVtkRenderer();
   auto* renderWindow = window->GetRenderer()->GetRenderWindow();
 
   if (renderer == nullptr || renderWindow == nullptr)
-    return QImage();
+    mitkThrow() << "The window has no renderer or no render window.";
 
   const auto magnification = std::max(1u, options.Magnification);
 
@@ -266,6 +267,9 @@ QImage QmitkRenderWindowScreenshot::Take(mitk::IRenderWindowPart* renderWindowPa
   }
 
   restore();
+
+  if (image.isNull())
+    mitkThrow() << "The window could not be captured.";
 
   // Without the gradient, which cropping leaves out, the window shows the renderer's own background.
   const auto shownBackground = options.BackgroundMode == Background::Transparent ? QColor(Qt::transparent)

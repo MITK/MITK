@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindowScreenshot.h>
 #include <QmitkRenderWindowWidget.h>
 
+#include <mitkException.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkLog.h>
 #include <mitkStatusBar.h>
@@ -30,7 +31,9 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QIcon>
+#include <QImage>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QPainter>
@@ -39,6 +42,7 @@ found in the LICENSE file.
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QShortcut>
+#include <QStringList>
 #include <QTimer>
 #include <QWidget>
 
@@ -395,7 +399,12 @@ void QmitkScreenshotMaker::CaptureSingleWindow(QmitkRenderWindow* window)
     return;
 
   m_LastFile = fileName;
-  this->TakeScreenshot(window, static_cast<unsigned int>(m_Controls->m_MagFactor->value()), fileName, filter);
+
+  if (const auto problem = this->TakeScreenshot(window, static_cast<unsigned int>(m_Controls->m_MagFactor->value()), fileName, filter);
+      !problem.isEmpty())
+  {
+    QMessageBox::warning(m_Parent, "Screenshot", problem);
+  }
 }
 
 void QmitkScreenshotMaker::OnScreenshotAll()
@@ -415,6 +424,7 @@ void QmitkScreenshotMaker::OnScreenshotAll()
 
   const auto renderWindows = renderWindowPart->GetQmitkRenderWindows();
   const auto scale = static_cast<unsigned int>(m_Controls->m_MagFactor->value());
+  QStringList skipped;
 
   for (auto it = renderWindows.constBegin(); it != renderWindows.constEnd(); ++it)
   {
@@ -431,18 +441,25 @@ void QmitkScreenshotMaker::OnScreenshotAll()
     }
     baseName.replace(QRegularExpression("[^\\w.-]"), "_");
 
-    this->TakeScreenshot(window, scale, NextAvailableScreenshotName(directory, baseName), m_PNGExtension);
+    if (const auto problem = this->TakeScreenshot(window, scale, NextAvailableScreenshotName(directory, baseName), m_PNGExtension);
+        !problem.isEmpty())
+    {
+      skipped << QString("%1: %2").arg(it.key(), problem);
+    }
   }
+
+  if (!skipped.isEmpty())
+    QMessageBox::warning(m_Parent, "Screenshot", "These windows were skipped:\n\n" + skipped.join("\n"));
 }
 
-void QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter)
+QString QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter)
 {
   if (nullptr == window || scale < 1 || fileName.isEmpty())
-    return;
+    return QString();
 
   auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
   if (nullptr == renderWindowPart)
-    return;
+    return QString();
 
   // Resolve the output file name and format. Transparency requires PNG (alpha).
   QString outputFileName = fileName;
@@ -478,16 +495,31 @@ void QmitkScreenshotMaker::TakeScreenshot(QmitkRenderWindow* window, unsigned in
   options.CropToContent = m_Controls->checkCropToContent->isChecked();
   options.Padding = static_cast<unsigned int>(m_Controls->spinCropPadding->value());
 
-  const auto image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+  QImage image;
 
-  if (image.isNull() && options.CropToContent)
+  try
   {
-    MITK_WARN << "Did not save the screenshot " << outputFileName.toStdString() << ": the window shows only background, there is nothing to crop to.";
-    return;
+    image = QmitkRenderWindowScreenshot::Take(renderWindowPart, window, options);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "Cannot take the screenshot " << outputFileName.toStdString() << ": " << e.GetDescription();
+    return "The window could not be captured.";
   }
 
-  if (image.isNull() || !image.save(outputFileName, useJpeg ? "JPG" : "PNG", useJpeg ? 100 : -1))
+  if (image.isNull())
+  {
+    MITK_WARN << "Did not save the screenshot " << outputFileName.toStdString() << ": the window shows only background, there is nothing to crop to.";
+    return "The window shows only background, there is nothing to crop to.";
+  }
+
+  if (!image.save(outputFileName, useJpeg ? "JPG" : "PNG", useJpeg ? 100 : -1))
+  {
     MITK_ERROR << "Cannot save the screenshot " << outputFileName.toStdString();
+    return "The image could not be saved to " + QDir::toNativeSeparators(outputFileName) + ".";
+  }
+
+  return QString();
 }
 
 void QmitkScreenshotMaker::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)

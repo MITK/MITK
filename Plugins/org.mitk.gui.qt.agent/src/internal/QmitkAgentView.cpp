@@ -78,7 +78,8 @@ namespace
 QmitkAgentView::QmitkAgentView()
   : m_Widget(nullptr),
     m_UnlockTimer(nullptr),
-    m_HoldsLock(false)
+    m_HoldsLock(false),
+    m_StopAgreed(false)
 {
   berry::PlatformUI::GetWorkbench()->AddWorkbenchListener(this);
 }
@@ -150,14 +151,29 @@ void QmitkAgentView::SetFocus()
 
 bool QmitkAgentView::PreShutdown(berry::IWorkbench*, bool forced)
 {
-  if (forced || m_Session == nullptr || !m_Session->IsTurnRunning())
+  return forced || this->ConfirmStopping("The agent is working. Stop it and close the Workbench?");
+}
+
+bool QmitkAgentView::IsDirty() const
+{
+  return m_Session != nullptr && m_Session->IsTurnRunning() && !m_StopAgreed;
+}
+
+berry::ISaveablePart::CloseAnswer QmitkAgentView::PromptToSaveOnClose()
+{
+  return this->ConfirmStopping("The agent is working. Stop it and close?") ? CloseAnswer::Discard : CloseAnswer::Cancel;
+}
+
+bool QmitkAgentView::ConfirmStopping(const QString& question)
+{
+  if (m_Session == nullptr || !m_Session->IsTurnRunning() || m_StopAgreed)
     return true;
 
-  const auto answer = QMessageBox::question(m_Widget, "Agent",
-    "The agent is working. Stop it and close the Workbench?",
+  const auto answer = QMessageBox::question(m_Widget, "Agent", question,
     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
-  return answer == QMessageBox::Yes;
+  m_StopAgreed = answer == QMessageBox::Yes;
+  return m_StopAgreed;
 }
 
 void QmitkAgentView::OnPreferencesChanged(const mitk::IPreferences*)
@@ -171,6 +187,9 @@ void QmitkAgentView::UpdateLock()
   auto* lock = QmitkPartLock::GetInstance();
   const bool turnRunning = m_Session->IsTurnRunning();
   const bool callsRunning = m_Session->GetToolServer().GetRunningCallCount() > 0;
+
+  if (!turnRunning)
+    m_StopAgreed = false;
 
   if (!turnRunning && !callsRunning)
   {

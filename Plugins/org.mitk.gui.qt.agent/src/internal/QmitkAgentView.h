@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <berryISaveablePart.h>
 #include <berryIWorkbenchListener.h>
 
 #include <memory>
@@ -27,11 +28,12 @@ class QTimer;
  * \brief Chat with an agent that operates the Workbench.
  *
  * Shows a QmitkAgentWidget for a QmitkAgentSession, which lasts as long as
- * the view. Locks the other views and the editors while the agent works,
- * and asks before the Workbench closes meanwhile. Closing the view itself
- * ends a working agent without a question, as a view cannot refuse it.
+ * the view. Locks the other views and the editors while the agent works.
+ * Closing the view, resetting the perspective and closing the Workbench ask
+ * whether to stop the agent while it works. A turn counts as unsaved content
+ * for that purpose; there is nothing to save.
  */
-class QmitkAgentView : public QmitkAbstractView, public berry::IWorkbenchListener
+class QmitkAgentView : public QmitkAbstractView, public berry::IWorkbenchListener, public berry::ISaveablePart
 {
   Q_OBJECT
 
@@ -47,10 +49,26 @@ public:
   /** \brief Asks whether to stop a working agent; a no keeps the Workbench open. */
   bool PreShutdown(berry::IWorkbench* workbench, bool forced) override;
 
+  /** \brief Whether a turn runs and the user has not agreed to close the view. */
+  bool IsDirty() const override;
+
+  /** \brief Asks whether to stop a working agent; a yes closes the view, a no keeps it. */
+  CloseAnswer PromptToSaveOnClose() override;
+
 protected:
   void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
 
 private:
+  /**
+   * \brief Ask whether to stop the working agent, unless the user agreed already.
+   *
+   * The consent holds until the turn ends, so that one close does not ask
+   * twice, for example when the Workbench closes and then its views.
+   *
+   * \return Whether the user agrees, or no turn runs.
+   */
+  bool ConfirmStopping(const QString& question);
+
   /**
    * \brief Locks the other views and the editors while the agent works.
    *
@@ -75,6 +93,9 @@ private:
 
   /** \brief Whether this view locked the parts, as only then it may unlock them. */
   bool m_HoldsLock;
+
+  /** \brief Whether the user agreed to stop the working agent for the close that is under way. */
+  bool m_StopAgreed;
 };
 
 #endif

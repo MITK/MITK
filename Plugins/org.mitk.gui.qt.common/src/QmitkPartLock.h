@@ -28,7 +28,10 @@ found in the LICENSE file.
  * QmitkAbstractRenderEditor follow the lock, except the one view the holder
  * exempts. A locked part keeps showing what happens, but its content is
  * disabled, which keeps out the mouse, the keyboard and shortcuts, and its
- * tab shows a lock instead of its icon. Menus and tool bars stay usable.
+ * tab shows a lock instead of its icon. Menus and tool bars stay usable, and
+ * so do file drops onto the editor area and parts that do not follow the
+ * lock, such as the Welcome page; the pixel routes of the REST API detect a
+ * view that changed in between.
  *
  * There is one holder at a time. Use it in the GUI thread only.
  */

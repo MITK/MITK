@@ -971,8 +971,11 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     "As the Screenshot Maker view takes them; transparent is transparent where "
     "the scene shows background, and partly so behind semitransparent objects. Returns a PNG. The header "
     "X-MITK-Screenshot describes it as JSON: the window as GET /api/v1/rendering/windows does, plus image_size: "
-    "[width, height]. Endpoints that take points accept pixels of the screenshot with that window and image_size, "
-    "unless it is cropped: its pixels no longer map onto the window, so crop does not go with grid either.";
+    "[width, height] and view_state, a fingerprint of the view that the screenshot shows (camera, slice, zoom, time "
+    "point and window size). Endpoints that take points accept pixels of the screenshot with that window, image_size "
+    "and view_state, unless it is cropped: its pixels no longer map onto the window, so crop does not go with grid "
+    "either. They answer 409 VIEW_CHANGED if the view has changed since, for example by scrolling, zooming or "
+    "another time point: take a new screenshot then.";
   screenshot.Handler = [server](const RestRequest& request) {
     const bool grid = GetQueryFlag(request, "grid", false);
     const auto options = GetScreenshotOptions(request);
@@ -1015,6 +1018,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
 
       auto info = DescribeWindow(id, window);
       info["image_size"] = { image.width(), image.height() };
+      info["view_state"] = GetRestViewState(window->GetRenderer());
 
       auto response = RestResponse::FromBytes(png.toStdString(), "image/png");
       response.Headers["X-MITK-Screenshot"] = info.dump();
@@ -1028,8 +1032,10 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   pick.Path = "/rendering/windows/:id/pick";
   pick.Summary = "Find the world coordinates and data values under pixels of a screenshot";
   pick.Description =
-    "Path parameter: id of a window. Body: {pixels: [[x, y], ...], image_size: [width, height]} of a "
-    "screenshot of that window, which must be a 2D window, or {points: [[x, y, z], ...]} in millimeters. "
+    "Path parameter: id of a window. Body: {pixels: [[x, y], ...], image_size: [width, height], view_state} of a "
+    "screenshot of that window, which must be a 2D window, with image_size and view_state as its header "
+    "X-MITK-Screenshot gives them (409 VIEW_CHANGED if the view has changed since: take a new screenshot), or "
+    "{points: [[x, y, z], ...]} in millimeters. "
     "Returns {data: [{position: [x, y, z] in millimeters, data: [{uid, name, "
     "value} for images, {uid, name, labels: [{value, name}]} for segmentations]}]}, for the data the window "
     "shows at each point.";

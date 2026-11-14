@@ -87,12 +87,14 @@ does.
   `mcp__mitk__api_get /api/v1/rendering/windows/{id}/screenshot`.
   `?grid=true` adds faint yellow lines every 50 pixels, labeled every 100,
   which help when you read pixel positions off the screenshot. The
-  `X-MITK-Screenshot` line after the image gives its `image_size`.
+  `X-MITK-Screenshot` line after the image gives its `image_size` and
+  `view_state`.
   `?max_size=<pixels>` sets its longest side (1000 by default).
 - Endpoints that take points accept them as pixels of such a screenshot:
   `"pixels": [[x, y], ...]` with `"window"`, the id of the window, and
-  `"image_size"` as the screenshot reported it. Pixels map onto the slice
-  the window shows now.
+  `"image_size"` and `"view_state"` as the screenshot reported them. Pixels
+  map onto the slice the window shows now; if it changed since the
+  screenshot, the answer is 409 `VIEW_CHANGED`: take a new screenshot.
   POST `/api/v1/rendering/windows/{id}/pick` with the same fields tells the
   position in millimeters and the gray values and labels at those pixels.
 - `?crop=true` cuts a screenshot down to the part of the scene that is not
@@ -404,7 +406,8 @@ They also point out a region: in an image for a report, or to the user
 while you talk.
 
 - POST `/api/v1/planar-figures` with `{"type": "circle", "image": uid,
-  "window": "axial", "pixels": [...], "image_size": [...], "name": ...}`
+  "window": "axial", "pixels": [...], "image_size": [...], "view_state":
+  ..., "name": ...}`
   draws one in the slice the window shows: a line from its two ends, a
   circle from its center and a point on it, a rectangle from two opposite
   corners. Name it after what it marks.

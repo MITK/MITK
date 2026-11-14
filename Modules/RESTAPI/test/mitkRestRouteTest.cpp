@@ -20,12 +20,18 @@ found in the LICENSE file.
 #include <mitkRestPoints.h>
 #include <mitkRestServer.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkVtkPropRenderer.h>
 #include <mitkWeakPointer.h>
 #include "mitkRestRouter.h"
 
 #include <httplib.h>
 
 #include <nlohmann/json.hpp>
+
+#include <vtkCamera.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 
 #include <atomic>
 #include <chrono>
@@ -182,6 +188,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(RestColorsAreParsedAndFormatted);
+  MITK_TEST(PixelsNeedTheViewStateOfTheirScreenshot);
   MITK_TEST(ServerForOneClient);
   MITK_TEST(RemovedNodeHeldByAHandlerDiesInTheDispatchThread);
   CPPUNIT_TEST_SUITE_END();
@@ -786,6 +793,51 @@ public:
     CPPUNIT_ASSERT_THROW(mitk::GetRestWorldPoints({ { "points", { { 1, 2, 3 } } } }, "/test", 2), mitk::RestException);
     CPPUNIT_ASSERT_THROW(mitk::GetRestWorldPoints({ { "pixels", { { 1, 2 } } } }, "/test"), mitk::RestException);
     CPPUNIT_ASSERT_THROW(mitk::GetRestWorldPoints(nlohmann::json::object(), "/test"), mitk::RestException);
+  }
+
+  void PixelsNeedTheViewStateOfTheirScreenshot()
+  {
+    // Sized, as a window reports no size before it is shown.
+    auto renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    renderWindow->SetSize(300, 300);
+    auto renderer = mitk::VtkPropRenderer::New("stdmulti.widget0", renderWindow);
+    mitk::BaseRenderer::AddInstance(renderWindow, renderer);
+
+    struct Registration
+    {
+      ~Registration() { mitk::BaseRenderer::RemoveInstance(Window); }
+      vtkRenderWindow* Window;
+    } registration{ renderWindow };
+
+    const auto state = mitk::GetRestViewState(renderer);
+
+    CPPUNIT_ASSERT(!state.empty());
+    CPPUNIT_ASSERT_EQUAL(state, mitk::GetRestViewState(renderer));
+
+    auto camera = renderer->GetVtkRenderer()->GetActiveCamera();
+    camera->SetParallelScale(camera->GetParallelScale() + 1.0);
+    CPPUNIT_ASSERT(state != mitk::GetRestViewState(renderer));
+
+    nlohmann::json body = { { "window", "axial" }, { "pixels", { { 10, 10 } } },
+      { "image_size", { renderer->GetSizeX(), renderer->GetSizeY() } } };
+
+    const auto statusOf = [&body]() {
+      try
+      {
+        mitk::GetRestWorldPoints(body, "/test");
+      }
+      catch (const mitk::RestException& e)
+      {
+        return e.GetError()["error"]["status"].get<int>();
+      }
+
+      return 0;
+    };
+
+    CPPUNIT_ASSERT_EQUAL(400, statusOf());
+
+    body["view_state"] = state;
+    CPPUNIT_ASSERT_EQUAL(409, statusOf());
   }
 
   /** As the Agent view starts it: a free port, only created tokens, no files. */

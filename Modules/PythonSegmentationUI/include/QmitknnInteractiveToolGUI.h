@@ -90,6 +90,9 @@ protected:
    */
   void InitializeUI(QBoxLayout* mainLayout) override;
 
+  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
+  void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool) override;
+
   /** \brief Disables the panel while a prompt computes and catches up on a
    *         label change made meanwhile once it has ended.
    */
@@ -295,6 +298,9 @@ protected:
   bool Install();
 
 private:
+  /** \brief Removes the subscriptions that ConnectNewTool() made. Does nothing for \c nullptr. */
+  void UnsubscribeFromTool(mitk::nnInteractiveTool* tool);
+
   /** \brief Reads the "auto-create next label" preference. Not cached. */
   bool IsAutoCreateNextLabelEnabled() const;
 

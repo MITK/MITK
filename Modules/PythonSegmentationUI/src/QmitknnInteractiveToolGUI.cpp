@@ -170,32 +170,7 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
   // in a partially-destructed state during application shutdown, which
   // causes crashes when segmentation events fan out to dead observers.
 
-  if (auto* tool = this->GetTool())
-  {
-    tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
-
-    tool->SessionStartedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnSessionStarted);
-
-    tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnSessionEnded);
-
-    tool->SessionLostEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
-      this, &QmitknnInteractiveToolGUI::OnSessionLost);
-
-    tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
-
-    tool->InteractionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
-
-    tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
-
-    tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-  }
+  this->UnsubscribeFromTool(this->GetTool());
 
   if (m_Preferences != nullptr)
   {
@@ -230,30 +205,6 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
   connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
-
-  this->GetTool()->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-
-  this->GetTool()->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
-
-  this->GetTool()->InteractionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
-
-  this->GetTool()->OptionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
-
-  this->GetTool()->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
-
-  this->GetTool()->SessionStartedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnSessionStarted);
-
-  this->GetTool()->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnSessionEnded);
-
-  this->GetTool()->SessionLostEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
-    this, &QmitknnInteractiveToolGUI::OnSessionLost);
 
   this->UpdateModelLicenseDisplay(std::nullopt);
 
@@ -979,6 +930,75 @@ void QmitknnInteractiveToolGUI::UncheckOtherInteractorButtons(QPushButton* inter
 mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
 {
   return this->GetConnectedToolAs<mitk::nnInteractiveTool>();
+}
+
+void QmitknnInteractiveToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  if (auto* tool = dynamic_cast<mitk::nnInteractiveTool*>(newTool); tool != nullptr)
+  {
+    tool->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+
+    tool->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+    tool->InteractionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
+
+    tool->OptionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
+
+    tool->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+    tool->SessionStartedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionStarted);
+
+    tool->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionEnded);
+
+    tool->SessionLostEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
+      this, &QmitknnInteractiveToolGUI::OnSessionLost);
+  }
+}
+
+void QmitknnInteractiveToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
+{
+  this->UnsubscribeFromTool(dynamic_cast<mitk::nnInteractiveTool*>(oldTool));
+
+  Superclass::DisconnectOldTool(oldTool);
+}
+
+void QmitknnInteractiveToolGUI::UnsubscribeFromTool(mitk::nnInteractiveTool* tool)
+{
+  if (tool == nullptr)
+    return;
+
+  tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+  tool->SessionStartedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionStarted);
+
+  tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionEnded);
+
+  tool->SessionLostEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
+    this, &QmitknnInteractiveToolGUI::OnSessionLost);
+
+  tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+  tool->InteractionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
+
+  tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
+
+  tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
 }
 
 void QmitknnInteractiveToolGUI::OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels)

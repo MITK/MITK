@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkOperation.h>
 #include <mitkOperationActor.h>
-#include <mitkProportionalTimeGeometry.h>
-#include <mitkArbitraryTimeGeometry.h>
 #include <mitkSlicedGeometry3D.h>
 #include <mitkTimeNavigationController.h>
 #include <mitkVtkPropRenderer.h>
@@ -286,8 +284,9 @@ namespace mitk
       return nullptr;
     }
 
-    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
-    return m_CreatedWorldGeometry->GetGeometryForTimeStep(selectedTimestep);
+    const auto selectedTimePoint = timeNavigationController->GetSelectedTimePoint();
+    return m_CreatedWorldGeometry->GetGeometryForTimeStep(
+      m_CreatedWorldGeometry->TimePointToClampedTimeStep(selectedTimePoint));
   }
 
   const PlaneGeometry* SliceNavigationController::GetCurrentPlaneGeometry()
@@ -401,21 +400,15 @@ namespace mitk
     SlicedGeometry3D::Pointer slicedWorldGeometry;
     BaseGeometry::ConstPointer currentGeometry;
 
-    // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the current time step
-    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
-    if (m_InputWorldTimeGeometry->IsValidTimeStep(selectedTimestep))
-    {
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep);
-    }
-    else
-    {
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
-    }
+    // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the selected time point
+    const auto selectedTimeStep =
+      m_InputWorldTimeGeometry->TimePointToClampedTimeStep(timeNavigationController->GetSelectedTimePoint());
+    currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimeStep);
 
     if (AnatomicalPlane::Original == m_ViewDirection)
     {
       slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
-        m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep).GetPointer());
+        m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimeStep).GetPointer());
       if (slicedWorldGeometry.IsNull())
       {
         slicedWorldGeometry = SlicedGeometry3D::New();
@@ -434,38 +427,11 @@ namespace mitk
     m_Stepper->SetSteps(slicedWorldGeometry->GetSlices());
     m_Stepper->SetPos(0);
 
-    const TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
-    // create new time geometry and initialize it according to the type of the 'm_InputWorldTimeGeometry'
-    // the created world geometry will either have equidistant timesteps (ProportionalTimeGeometry)
-    // or individual time bounds for each timestep (ArbitraryTimeGeometry)
-    m_CreatedWorldGeometry = mitk::TimeGeometry::Pointer();
-    if (nullptr != dynamic_cast<const mitk::ProportionalTimeGeometry*>(m_InputWorldTimeGeometry.GetPointer()))
-    {
-      const TimePointType minimumTimePoint = m_InputWorldTimeGeometry->TimeStepToTimePoint(0);
-      const TimePointType stepDuration =
-        m_InputWorldTimeGeometry->TimeStepToTimePoint(1) - minimumTimePoint;
-
-      auto createdTimeGeometry = ProportionalTimeGeometry::New();
-      createdTimeGeometry->Initialize(slicedWorldGeometry, inputTimeSteps);
-      createdTimeGeometry->SetFirstTimePoint(minimumTimePoint);
-      createdTimeGeometry->SetStepDuration(stepDuration);
-
-      m_CreatedWorldGeometry = createdTimeGeometry;
-    }
-    else
-    {
-      auto createdTimeGeometry = mitk::ArbitraryTimeGeometry::New();
-      createdTimeGeometry->ReserveSpaceForGeometries(inputTimeSteps);
-      const BaseGeometry::Pointer clonedGeometry = slicedWorldGeometry->Clone();
-
-      for (TimeStepType i = 0; i < inputTimeSteps; ++i)
-      {
-        const auto bounds = m_InputWorldTimeGeometry->GetTimeBounds(i);
-        createdTimeGeometry->AppendNewTimeStep(clonedGeometry, bounds[0], bounds[1]);
-      }
-
-      createdTimeGeometry->Update();
-      m_CreatedWorldGeometry = createdTimeGeometry;
-    }
+    // A copy of the input's time steps, not a re-derived grid: time points
+    // then resolve to the same time step in both.
+    auto createdTimeGeometry = m_InputWorldTimeGeometry->Clone();
+    createdTimeGeometry->ReplaceTimeStepGeometries(slicedWorldGeometry);
+    createdTimeGeometry->Update();
+    m_CreatedWorldGeometry = createdTimeGeometry;
   }
 } // namespace mitk

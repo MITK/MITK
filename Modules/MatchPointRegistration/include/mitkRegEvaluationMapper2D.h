@@ -126,6 +126,11 @@ public:
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
 
+    /** \brief Time step of the target image at the last update. TIMESTEP_INVALID after a time
+     *         step that is invalid for it, so that coming back to the time step shown before
+     *         regenerates. */
+    TimeStepType m_LastUpdateTimeStep = TIMESTEP_INVALID;
+
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
@@ -212,6 +217,9 @@ protected:
     */
   void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+  /** \brief Calculates the time step of the target image, which defines the time steps shown. */
+  void CalculateTimeStep(mitk::BaseRenderer* renderer) override;
+
   void PrepareContour( mitk::DataNode* datanode, LocalStorage * localStorage );
 
   void PrepareDifference( LocalStorage * localStorage );
@@ -264,6 +272,10 @@ protected:
     * \param imageGeometry
     **/
   bool RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry );
+
+private:
+  /** Helper function to reset the local storage in order to indicate an invalid state.*/
+  void SetToInvalidState(LocalStorage* localStorage);
 };
 
 } // namespace mitk

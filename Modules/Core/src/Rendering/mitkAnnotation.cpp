@@ -287,7 +287,7 @@ bool mitk::Annotation::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRender
   if (m_LastGenerateDataTime < Annotation->GetPropertyList()->GetMTime())
     return true;
 
-  if (renderer && m_LastGenerateDataTime < renderer->GetTimeStepUpdateTime())
+  if (renderer && m_LastGenerateDataTime < renderer->GetTimePointUpdateTime())
     return true;
 
   return false;

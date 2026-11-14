@@ -146,6 +146,14 @@ namespace mitk
     /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep(BaseRenderer *renderer);
 
+    /**
+     * \brief Set the time step that GetTimestep() returns.
+     *
+     * For CalculateTimeStep() overrides whose time steps come from another
+     * object than the node's data.
+     */
+    void SetTimestep(TimeStepType timeStep) { m_TimeStep = timeStep; }
+
     /** \brief Reset the mapper (i.e., make sure that nothing is displayed) if no
     * valid data is present. In most cases the reimplemented function
     * disables the according actors (toggling visibility off)
@@ -191,7 +199,8 @@ namespace mitk
        * \brief Check whether GenerateDataForRenderer() needs to be called.
        *
        * Compares the last generate-data timestamp against the modification times
-       * of the mapper, data node, underlying data, and renderer time step.
+       * of the mapper, data node, underlying data, and the renderer's time point
+       * (BaseRenderer::GetTimePointUpdateTime()).
        *
        * \param[in] renderer The renderer to check against.
        * \param[in] mapper The mapper to check against.

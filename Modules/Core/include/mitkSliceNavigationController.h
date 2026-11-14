@@ -310,11 +310,21 @@ namespace mitk
      */
     void SelectSliceByPoint(const Point3D& point);
 
-    /** \brief Returns the BaseGeometry of the currently selected time step. */
+    /**
+     * \brief Returns the BaseGeometry of the created world geometry at its time step for
+     *        the time point the global time navigation selects, clamped to its valid time steps.
+     *
+     * \throws mitk::Exception if the global time navigation has a time step selected that
+     *         its own time geometry does not cover.
+     */
     const BaseGeometry* GetCurrentGeometry3D();
 
-    /** \brief Returns the currently selected Plane in the current
-     * BaseGeometry (if existent).
+    /**
+     * \brief Returns the currently selected Plane in the current
+     * BaseGeometry (if existent), see GetCurrentGeometry3D().
+     *
+     * \throws mitk::Exception if the global time navigation has a time step selected that
+     *         its own time geometry does not cover.
      */
     const PlaneGeometry* GetCurrentPlaneGeometry();
 

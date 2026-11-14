@@ -260,8 +260,12 @@ void QmitkImageNavigatorView::OnRefetch()
 
   this->SetVisibilityOfTimeSlider(timeNavController->GetStepper()->GetSteps());
 
-  const auto timeStep = timeNavController->GetSelectedTimeStep();
-  auto geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+  mitk::BaseGeometry::Pointer geometry;
+  if (0 != timeGeometry->CountTimeSteps())
+  {
+    geometry = timeGeometry->GetGeometryForTimeStep(
+      timeGeometry->TimePointToClampedTimeStep(timeNavController->GetSelectedTimePoint()));
+  }
 
   if (geometry.IsNotNull())
   {

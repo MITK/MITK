@@ -86,7 +86,7 @@ bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *
       return true;
   }
 
-  if (renderer && m_LastGenerateDataTime < renderer->GetTimeStepUpdateTime())
+  if (renderer && m_LastGenerateDataTime < renderer->GetTimePointUpdateTime())
     return true;
 
   return false;

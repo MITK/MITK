@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkBaseRendererHelper.h>
 
+#include <mitkExceptionMacro.h>
 #include <mitkMapper.h>
 #include <mitkResliceMethodProperty.h>
 
@@ -33,6 +34,8 @@ found in the LICENSE file.
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+
+#include <algorithm>
 
 namespace mitk
 {
@@ -143,15 +146,18 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
     m_CurrentWorldGeometry(nullptr),
     m_CurrentWorldPlaneGeometry(nullptr),
     m_Slice(0),
+    // Read before anything is acquired: it throws for a time step that the
+    // time navigation's geometry lacks, and the destructor does not run then.
+    m_TimePoint(RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint()),
     m_TimeStep(),
     m_CurrentWorldPlaneGeometryUpdateTime(),
-    m_TimeStepUpdateTime(),
+    m_TimePointUpdateTime(),
     m_KeepDisplayedRegion(true),
     m_ReferenceGeometryAligned(true),
     m_CurrentWorldPlaneGeometryData(nullptr),
     m_CurrentWorldPlaneGeometryNode(nullptr),
     m_CurrentWorldPlaneGeometryTransformTime(0),
-    m_Name(name),
+    m_Name(name != nullptr ? name : "unnamed renderer"),
     m_EmptyWorldGeometry(true),
     m_NumberOfVisibleLODEnabledMappers(0)
 {
@@ -162,13 +168,8 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_Bounds[4] = 0;
   m_Bounds[5] = 0;
 
-  if (name != nullptr)
+  if (name == nullptr)
   {
-    m_Name = name;
-  }
-  else
-  {
-    m_Name = "unnamed renderer";
     itkWarningMacro(<< "Created unnamed renderer. Bad for serialization. Please choose a name.");
   }
 
@@ -209,8 +210,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
   m_SliceNavigationController->ConnectGeometrySliceEvent(this);
 
-  auto* timeNavigationController = RenderingManager::GetInstance()->GetTimeNavigationController();
-  timeNavigationController->ConnectTimeEvent(this);
+  RenderingManager::GetInstance()->GetTimeNavigationController()->ConnectTimeEvent(this);
 
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow(m_RenderWindow);
@@ -366,17 +366,37 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
   this->UpdateCurrentGeometries();
 }
 
-void mitk::BaseRenderer::SetTimeStep(TimeStepType timeStep)
+void mitk::BaseRenderer::SetTimePoint(TimePointType timePoint)
 {
-  if (m_TimeStep == timeStep)
+  if (m_TimePoint == timePoint)
   {
     return;
   }
 
-  m_TimeStep = timeStep;
-  m_TimeStepUpdateTime.Modified();
+  m_TimePoint = timePoint;
+  m_TimePointUpdateTime.Modified();
 
+  // Also marks the plane as updated, even if it is unchanged. Mappers outside
+  // MITK may follow time changes only through that.
   this->UpdateCurrentGeometries();
+}
+
+void mitk::BaseRenderer::SetTimeStep(TimeStepType timeStep)
+{
+  if (m_WorldTimeGeometry.IsNull() || 0 == m_WorldTimeGeometry->CountTimeSteps())
+  {
+    mitkThrowException(mitk::NoTimeStepsException)
+      << "Cannot select time step " << timeStep << " in renderer " << m_Name
+      << ": it has no world time geometry with time steps.";
+  }
+
+  const auto lastTimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
+  this->SetTimePoint(m_WorldTimeGeometry->TimeStepToTimePoint(std::min(timeStep, lastTimeStep)));
+}
+
+mitk::TimeStepType mitk::BaseRenderer::GetTimeStep() const
+{
+  return m_TimeStep;
 }
 
 mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const
@@ -390,18 +410,12 @@ mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) c
 
 mitk::TimePointType mitk::BaseRenderer::GetTime() const
 {
-  if (m_WorldTimeGeometry.IsNull())
-  {
-    return 0;
-  }
-  else
-  {
-    const TimePointType timeInMS = m_WorldTimeGeometry->TimeStepToTimePoint(GetTimeStep());
-    if (timeInMS == itk::NumericTraits<mitk::ScalarType>::NonpositiveMin())
-      return 0;
-    else
-      return timeInMS;
-  }
+  return m_TimePoint;
+}
+
+unsigned long mitk::BaseRenderer::GetTimeStepUpdateTime()
+{
+  return static_cast<unsigned long>(this->GetTimePointUpdateTime());
 }
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject& geometrySendEvent)
@@ -438,7 +452,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject& geometryUpdateEv
     // Slice selections send geometry updates that usually leave the planes
     // unchanged; treating those as updates makes every 2D mapper regenerate.
     // SetCurrentWorldPlaneGeometry itself keeps marking equal planes as
-    // updated: most 2D mappers rely on that to follow time step changes.
+    // updated: mappers outside MITK may follow time changes only through that.
     if (!IsSamePlane(*m_CurrentWorldPlaneGeometry, *geometry2D))
     {
       this->SetCurrentWorldPlaneGeometry(geometry2D); // calls Modified()
@@ -460,14 +474,13 @@ void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject& geometrySliceE
 
 void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject& geometryTimeEvent)
 {
-  const auto* timeEvent = dynamic_cast<const TimeNavigationController::TimeEvent *>(&geometryTimeEvent);
-
-  if (nullptr == timeEvent)
+  if (nullptr == dynamic_cast<const TimeNavigationController::TimeEvent*>(&geometryTimeEvent))
   {
     return;
   }
 
-  this->SetTimeStep(timeEvent->GetTimeStep());
+  const auto* timeNavigationController = RenderingManager::GetInstance()->GetTimeNavigationController();
+  this->SetTimePoint(timeNavigationController->GetSelectedTimePoint());
 }
 
 void mitk::BaseRenderer::SendUpdateSlice()
@@ -705,17 +718,14 @@ void mitk::BaseRenderer::UpdateCurrentGeometries()
 {
   m_ReferenceGeometryAligned = true;
 
-  if (m_WorldTimeGeometry.IsNull())
+  if (m_WorldTimeGeometry.IsNull() || 0 == m_WorldTimeGeometry->CountTimeSteps())
   {
     // simply mark the base renderer as modified
     Modified();
     return;
   }
 
-  if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
-  {
-    m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
-  }
+  m_TimeStep = m_WorldTimeGeometry->TimePointToClampedTimeStep(m_TimePoint);
 
   auto slicedWorldGeometry =
     dynamic_cast<SlicedGeometry3D*>(m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
@@ -788,6 +798,7 @@ void mitk::BaseRenderer::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " MapperID: " << m_MapperID << std::endl;
   os << indent << " Slice: " << m_Slice << std::endl;
+  os << indent << " TimePoint: " << m_TimePoint << std::endl;
   os << indent << " TimeStep: " << m_TimeStep << std::endl;
 
   os << indent << " CurrentWorldPlaneGeometry: ";

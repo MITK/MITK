@@ -46,6 +46,7 @@ set(MODULE_TESTS
   mitkITKEventObserverGuardTest.cpp
   mitkBaseDataTest.cpp
   mitkBaseRendererTest.cpp
+  mitkMapperOwnTimeStepTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkMemoryUtilitiesTest.cpp
@@ -87,6 +88,7 @@ set(MODULE_TESTS
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   mitkStepperTest.cpp
+  mitkTimeNavigationControllerTest.cpp
   mitkRenderingManagerTest.cpp
   mitkRenderingManagerSuspendTest.cpp
   mitkRenderingManagerAnimationTest.cpp

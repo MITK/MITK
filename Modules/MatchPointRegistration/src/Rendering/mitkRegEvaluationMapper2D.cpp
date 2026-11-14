@@ -206,7 +206,8 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
   if(targetInput->GetMTime()>localStorage->m_LastUpdateTime
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
+    || (localStorage->m_LastUpdateTimeStep != this->GetTimestep()))
   { //target input has been modified -> reslice target input
     targetInput->Update();
 
@@ -214,11 +215,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     // and the geometry of the image that is to be rendered.
     if ( !RenderingGeometryIntersectsImage( worldGeometry, targetInput->GetSlicedGeometry() ) )
     {
-      // set image to nullptr, to clear the texture in 3D, because
-      // the latest image is used there if the plane is out of the geometry
-      // see bug-13275
-      localStorage->m_EvaluationImage = nullptr;
-      localStorage->m_Mapper->SetInputData( localStorage->m_EmptyPolyData );
+      this->SetToInvalidState(localStorage);
       return;
     }
 
@@ -750,18 +747,21 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == nullptr )
     || ( dataTimeGeometry->CountTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
+    localStorage->m_LastUpdateTimeStep = TIMESTEP_INVALID;
+    this->SetToInvalidState(localStorage);
     return;
   }
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
@@ -775,7 +775,8 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
     || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetPropertyList()->GetMTime()) //was a target node property modified?
     || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetPropertyList(renderer)->GetMTime())
     || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetPropertyList()->GetMTime()) //was a moving node property modified?
-    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetPropertyList(renderer)->GetMTime()))
+    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetPropertyList(renderer)->GetMTime())
+    || (localStorage->m_LastUpdateTimeStep != this->GetTimestep()))
   {
     this->GenerateDataForRenderer( renderer );
   }
@@ -783,6 +784,28 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTimeStep = this->GetTimestep();
+}
+
+void mitk::RegEvaluationMapper2D::CalculateTimeStep(mitk::BaseRenderer* renderer)
+{
+  if (nullptr == renderer || nullptr == this->GetDataNode())
+  {
+    this->SetTimestep(0);
+    return;
+  }
+
+  // The evaluation object has no time geometry of its own.
+  this->SetTimestep(renderer->GetTimeStep(this->GetTargetImage()));
+}
+
+void mitk::RegEvaluationMapper2D::SetToInvalidState(LocalStorage* localStorage)
+{
+  // set image to nullptr, to clear the texture in 3D, because
+  // the latest image is used there if the plane is out of the geometry
+  // see bug-13275
+  localStorage->m_EvaluationImage = nullptr;
+  localStorage->m_Mapper->SetInputData(localStorage->m_EmptyPolyData);
 }
 
 void mitk::RegEvaluationMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

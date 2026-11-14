@@ -78,8 +78,10 @@ void mitk::TimeNavigationController::Update()
 
     TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
     const TimeBounds &timeBounds = m_InputWorldTimeGeometry->GetTimeBounds();
-    m_Stepper->SetSteps(static_cast<unsigned int>(inputTimeSteps));
+    // Position first: stepper observers read the selected time point, so
+    // the position must stay valid for the new geometry at every event.
     m_Stepper->SetPos(0);
+    m_Stepper->SetSteps(static_cast<unsigned int>(inputTimeSteps));
     m_Stepper->SetRange(timeBounds[0], timeBounds[1]);
   }
 
@@ -120,7 +122,7 @@ mitk::TimePointType mitk::TimeNavigationController::GetSelectedTimePoint() const
 
   if (!m_InputWorldTimeGeometry->IsValidTimeStep(timeStep))
   {
-    mitkThrow() << "SliceNavigationController is in an invalid state. It has a time step"
+    mitkThrow() << "TimeNavigationController is in an invalid state. It has a time step "
                 << "selected that is not covered by its time geometry. Selected time step: " << timeStep
                 << "; TimeGeometry steps count: " << m_InputWorldTimeGeometry->CountTimeSteps();
   }

@@ -140,11 +140,7 @@ void mitk::DoseImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
   // and the geometry of the image that is to be rendered.
   if (!RenderingGeometryIntersectsImage(worldGeometry, input->GetSlicedGeometry()))
   {
-    // set image to nullptr, to clear the texture in 3D, because
-    // the latest image is used there if the plane is out of the geometry
-    // see bug-13275
-    localStorage->m_ReslicedImage = nullptr;
-    localStorage->m_Mapper->SetInputData(localStorage->m_EmptyPolyData);
+    this->SetToInvalidState(localStorage);
     return;
   }
 
@@ -630,17 +626,20 @@ void mitk::DoseImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep(renderer);
 
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
+    localStorage->m_LastUpdateTimeStep = TIMESTEP_INVALID;
+    this->SetToInvalidState(localStorage);
     return;
   }
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to rerender
   if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
@@ -653,7 +652,8 @@ void mitk::DoseImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
       ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastUpdateTimeStep != this->GetTimestep()))
   {
     this->GenerateDataForRenderer(renderer);
   }
@@ -661,6 +661,16 @@ void mitk::DoseImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTimeStep = this->GetTimestep();
+}
+
+void mitk::DoseImageVtkMapper2D::SetToInvalidState(LocalStorage* localStorage)
+{
+  // set image to nullptr, to clear the texture in 3D, because
+  // the latest image is used there if the plane is out of the geometry
+  // see bug-13275
+  localStorage->m_ReslicedImage = nullptr;
+  localStorage->m_Mapper->SetInputData(localStorage->m_EmptyPolyData);
 }
 
 void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,

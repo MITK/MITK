@@ -53,6 +53,14 @@ that interface to the graphics library (e.g. via OpenGL, vtk). The mapper archit
 mitk::Mapper::Update() calls the time step of the input data for the specified renderer and checks whether the time step is valid and calls method mitk::Mapper::GenerateDataForRenderer(), which is reimplemented in the individual mappers and should be used to generate primitives.
 mitk::Mapper::SetDefaultProperties() should be used to define mapper-specific properties.
 
+A renderer shows the time point of the global time navigation (mitk::BaseRenderer::GetTime()); mitk::Mapper::Update()
+turns it into the time step of the mapper's data (mitk::Mapper::GetTimestep()). Data and render windows can have
+different time grids, so a mapper that caches its output must regenerate when that time step changes: keep the time
+step of the last update in the local storage and compare it, or check mitk::BaseRenderer::GetTimePointUpdateTime().
+When the time step is invalid for the data, reset the stored time step too, so that coming back to the same time step
+regenerates. The renderer's current world geometry (mitk::BaseRenderer::GetCurrentWorldGeometry()), the update time
+and the MTime of the current world plane geometry tell about the plane, not about the time.
+
 \section QVTKRendering_programmerGuide User Guide: Programming hints for rendering related stuff (in plugins)
 
 \li The QmitkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial");

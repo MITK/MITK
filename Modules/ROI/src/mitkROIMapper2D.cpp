@@ -83,7 +83,7 @@ mitk::ROIMapper2D::~ROIMapper2D()
 
 void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
-  const auto timePoint = renderer->GetWorldTimeGeometry()->TimeStepToTimePoint(renderer->GetTimeStep());
+  const auto timePoint = renderer->GetTime();
   const auto* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
   auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   const auto* dataNode = this->GetDataNode();

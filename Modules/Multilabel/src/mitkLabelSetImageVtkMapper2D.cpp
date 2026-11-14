@@ -240,16 +240,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   if (contentBecameInvalid)
   {
-    // set image to nullptr, to clear the texture in 3D, because
-    // the latest image is used there if the plane is out of the geometry
-    // see bug-13275
-    for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
-    {
-      localStorage->m_ReslicedImageVector[lidx] = nullptr;
-      localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
-      localStorage->m_OutlineActor->SetVisibility(false);
-      localStorage->m_OutlineShadowActor->SetVisibility(false);
-    }
+    this->SetToInvalidState(localStorage);
     localStorage->m_LastDataUpdateTime.Modified();
   }
 
@@ -283,9 +274,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   {
     this->GenerateImageSlice(renderer, outdatedGroups);
   }
-
-  localStorage->m_LastTimeStep = currentTimestep;
-
 
   // Base opacity is baked into the lookup table (see GenerateLookupTable); the layer
   // actor stays fully opaque so a highlighted label can be spotlit above the base.
@@ -699,16 +687,20 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // Calculate time step of the image data for the specified renderer (integer value)
   this->CalculateTimeStep(renderer);
 
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
   if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
+    this->SetToInvalidState(localStorage);
+    localStorage->m_HasValidContent = false;
+    localStorage->m_LastTimeStep = TIMESTEP_INVALID;
     return;
   }
 
   image->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to re-render
 
@@ -721,6 +713,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastTimeStep != this->GetTimestep()) ||
       (this->GetOpacityFactor() != localStorage->m_LastOpacityFactor))
   {
     this->GenerateDataForRenderer(renderer);
@@ -732,6 +725,22 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
+  }
+
+  localStorage->m_LastTimeStep = this->GetTimestep();
+}
+
+void mitk::LabelSetImageVtkMapper2D::SetToInvalidState(LocalStorage* localStorage)
+{
+  // set image to nullptr, to clear the texture in 3D, because
+  // the latest image is used there if the plane is out of the geometry
+  // see bug-13275
+  for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
+  {
+    localStorage->m_ReslicedImageVector[lidx] = nullptr;
+    localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
+    localStorage->m_OutlineActor->SetVisibility(false);
+    localStorage->m_OutlineShadowActor->SetVisibility(false);
   }
 }
 

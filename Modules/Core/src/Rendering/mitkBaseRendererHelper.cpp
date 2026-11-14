@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkBaseRendererHelper.h>
 
-#include <mitkSliceNavigationHelper.h>
+#include <mitkSlicedGeometry3D.h>
 
 bool mitk::BaseRendererHelper::IsRendererGeometryAlignedWithGeometry(BaseRenderer* renderer, const TimeGeometry* timeGeometry)
 {
@@ -33,55 +33,32 @@ bool mitk::BaseRendererHelper::IsRendererGeometryAlignedWithGeometry(BaseRendere
     return true;
   }
 
-  auto viewDirection = renderer->GetSliceNavigationController()->GetViewDirection();
-  TimeGeometry::Pointer orientedTimeGeometry;
-  try
-  {
-    switch (viewDirection)
-    {
-    case mitk::AnatomicalPlane::Original:
-      break;
-    case mitk::AnatomicalPlane::Axial:
-    {
-      orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, viewDirection, false, false, true);
-      break;
-    }
-    case mitk::AnatomicalPlane::Coronal:
-    {
-      orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, viewDirection, false, true, false);
-      break;
-    }
-    case mitk::AnatomicalPlane::Sagittal:
-    {
-      orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, viewDirection, true, true, false);
-      break;
-    }
-    }
-  }
-  catch (mitk::Exception& e)
-  {
-    mitkReThrow(e);
-  }
+  const auto viewDirection = renderer->GetSliceNavigationController()->GetViewDirection();
 
-  if (nullptr == orientedTimeGeometry)
+  bool top = false;
+  bool frontside = false;
+  bool rotated = false;
+  switch (viewDirection)
   {
+  case mitk::AnatomicalPlane::Original:
     return false;
+  case mitk::AnatomicalPlane::Axial:
+    rotated = true;
+    break;
+  case mitk::AnatomicalPlane::Coronal:
+    frontside = true;
+    break;
+  case mitk::AnatomicalPlane::Sagittal:
+    top = true;
+    frontside = true;
+    break;
   }
 
-  auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  const BaseGeometry* workingImageBaseGeometry = orientedTimeGeometry->GetGeometryForTimePoint(selectedTimePoint);
-  if (nullptr == workingImageBaseGeometry)
-  {
-    // time point not valid for the time geometry
-    mitkThrow() << "Cannot extract a base geometry. A time point is selected that is not covered by"
-                << "the given time geometry. Selected time point: " << selectedTimePoint;
-  }
+  const auto referenceGeometry =
+    timeGeometry->GetGeometryForTimeStep(timeGeometry->TimePointToClampedTimeStep(renderer->GetTime()));
 
-  bool geometryIsEqual =
-    Equal(*workingImageBaseGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), eps, true);
+  auto orientedGeometry = SlicedGeometry3D::New();
+  orientedGeometry->InitializePlanes(referenceGeometry, viewDirection, top, frontside, rotated);
 
-  return geometryIsEqual;
+  return Equal(*orientedGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), eps, true);
 }

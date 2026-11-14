@@ -286,6 +286,9 @@ namespace mitk
     bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, const BaseGeometry* imageGeometry) const;
 
   private:
+    /** Helper function to reset the local storage in order to indicate an invalid state.*/
+    void SetToInvalidState(LocalStorage* localStorage);
+
     /** \brief Get the opacity factor from user preferences.
       * \return The opacity factor.
       */

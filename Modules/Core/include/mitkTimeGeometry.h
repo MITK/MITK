@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 #include <mitkBaseGeometry.h>
 #include <mitkCommon.h>
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {
@@ -36,6 +37,18 @@ namespace mitk
    * representable value, which is used as the "invalid" marker.
    */
   static const TimeStepType TIMESTEP_INVALID = -1;
+
+  /**
+   * \brief Exception thrown when a time point or time step has to be resolved
+   *        against a time geometry that has no time steps, or against none.
+   *
+   * \sa TimeGeometry::TimePointToClampedTimeStep
+   */
+  class MITKCORE_EXPORT NoTimeStepsException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(NoTimeStepsException, mitk::Exception);
+  };
 
   /**
   * \brief Manages the geometries of a data object for each time step
@@ -160,6 +173,19 @@ namespace mitk
     * time step will be returned.
     */
     virtual TimeStepType TimePointToTimeStep(TimePointType timePoint) const = 0;
+
+    /**
+     * \brief Converts a time point into a time step as TimePointToTimeStep() does,
+     *        clamped to the valid time steps.
+     *
+     * A time point before the first time step gives time step 0, a time point
+     * after the last time step gives the last time step. Use this where a valid
+     * time step is needed for any time point, e.g. to pick the geometry of a
+     * view that follows a time point its own time steps may not cover.
+     *
+     * \throws mitk::NoTimeStepsException if the time geometry has no time steps.
+     */
+    TimeStepType TimePointToClampedTimeStep(TimePointType timePoint) const;
 
     /**
     * \brief Returns the geometry of a specific time point

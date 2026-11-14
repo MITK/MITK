@@ -34,8 +34,12 @@ namespace mitk
    *  - range: the time bounds for the slider (minimum, maximum)
    *
    * The timestep controls the selection of a specific time point from the TimeGeometry.
-   * The TimeNavigationController generates ITK events to tell observers,
-   * like a BaseRenderer, when the selected timestep changes.
+   * The TimeNavigationController sends a TimeEvent to tell observers, like a
+   * BaseRenderer, about the selected time: on every change of the stepper and
+   * on every Update().
+   * Observers read the selected time point (GetSelectedTimePoint()) and resolve
+   * it against their own time geometry; a BaseRenderer does that for its world
+   * time geometry.
    *
    * Example:
    * \code
@@ -85,25 +89,22 @@ namespace mitk
 
     /**
      * \brief Do the actual time-related properties extraction
-              and send the currently selected time step to the connected
-              observers (renderers).
+     *        and send the selected time to the connected observers (SendTime()).
      */
     virtual void Update();
 
     /**
-     * \brief Send the currently selected time step to the connected
-     *        observers (renderers).
+     * \brief Send the selected time to the connected observers with a TimeEvent.
      *
-     * Called by Update().
+     * Called on every change of the stepper and at the end of every Update(),
+     * also when the update changed nothing.
      */
     virtual void SendTime();
 
     /**
-     * \brief ITK event that carries the currently selected time step.
+     * \brief ITK event that notifies observers of the selected time.
      *
-     * This event is invoked by the TimeNavigationController whenever the
-     * selected time step changes. Observers (e.g. BaseRenderer) can listen
-     * for this event to update their rendering accordingly.
+     * Invoked by SendTime(), also when the selection did not change.
      */
     class MITKCORE_EXPORT TimeEvent : public itk::AnyEvent
     {
@@ -118,7 +119,12 @@ namespace mitk
       bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
       ::itk::EventObject *MakeObject() const override { return new Self(m_TimeStep); }
 
-      /** \brief Return the time step carried by this event. */
+      /**
+       * \brief Return the time step carried by this event.
+       *
+       * It is a time step of the controller's input world time geometry;
+       * receivers with other time grids read GetSelectedTimePoint() instead.
+       */
       TimeStepType GetTimeStep() const { return m_TimeStep; }
     private:
 
@@ -177,6 +183,7 @@ namespace mitk
      * \brief Convenience method that returns the time point that corresponds to the selected
      *        time step. The conversion is done using the time geometry of the controller.
      *        If the time geometry is not yet set, this function will always return 0.0.
+     * \throws mitk::Exception if the time geometry does not cover the selected time step.
      */
     TimePointType GetSelectedTimePoint() const;
 

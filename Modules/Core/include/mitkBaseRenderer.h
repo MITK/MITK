@@ -244,7 +244,8 @@ namespace mitk
      * \brief Set the world time geometry using the given TimeGeometry.
      *
      * Setting a new world time geometry updates the current world geometry and the
-     * current world plane geometry, using the currently selected slice and timestep.
+     * current world plane geometry, using the currently selected slice and the
+     * time step of this geometry that contains the current time point (GetTime()).
      */
     virtual void SetWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
@@ -307,15 +308,34 @@ namespace mitk
     itkGetConstMacro(Slice, unsigned int);
 
     /**
-     * \brief Set the timestep that should be used for geometry extraction.
+     * \brief Show the time point of the given time step of the world time geometry.
      *
-     * The timestep defines the current time-extracted 3D-geometry (CurrentWorldGeometry).
-     * Setting a new timestep will update the current world geometry and the
-     * current world plane geometry.
+     * A time step past the last one selects the last one. The renderer shows that
+     * time point only until the next TimeNavigationController::TimeEvent, which
+     * sets the global time point again. The time navigation sends that event on
+     * every Update(), e.g. on each reinit, also when its selection did not change.
+     *
+     * It is final: the time navigation does not call it, and subclasses follow
+     * time changes by overriding SetGeometryTime().
+     *
+     * \throws mitk::NoTimeStepsException if the renderer has no world time geometry
+     *         or it has no time steps.
      */
-    virtual void SetTimeStep(TimeStepType timeStep);
+    virtual void SetTimeStep(TimeStepType timeStep) final;
 
-    itkGetConstMacro(TimeStep, TimeStepType);
+    /**
+     * \brief Get the time step of the world time geometry that contains the
+     *        current time point (GetTime()), clamped to its valid time steps.
+     *
+     * It selects the current time-extracted 3D-geometry (CurrentWorldGeometry).
+     * It is not the time step of the data shown; use GetTimeStep(const BaseData*)
+     * for that.
+     *
+     * \deprecated Selects only the world geometry frame; its time point is not the
+     *             time shown. Use GetTime() or GetTimeStep(const BaseData*).
+     */
+    [[deprecated("Selects only the world geometry frame. Use GetTime() or GetTimeStep(const BaseData*).")]]
+    virtual TimeStepType GetTimeStep() const;
 
     /**
      * \brief Get the timestep of a BaseData object which
@@ -329,7 +349,12 @@ namespace mitk
     TimeStepType GetTimeStep(const BaseData* data) const;
 
     /**
-     * \brief Get the time in ms of the currently display content (geometry).
+     * \brief Get the time point in ms this renderer shows.
+     *
+     * It is the global time point (TimeNavigationController::GetSelectedTimePoint())
+     * as of construction or the last TimeNavigationController::TimeEvent, or the
+     * one set by SetTimeStep() after that. It may lie outside the time range of
+     * the world time geometry.
      */
     TimePointType GetTime() const;
 
@@ -356,8 +381,8 @@ namespace mitk
     virtual void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
 
     /**
-     * \brief Set the current time using "SetTimeStep" and update the current world geometry
-     *        and the current world plane geometry.
+     * \brief Show the time point the global time navigation selects and update
+     *        the current world geometry and the current world plane geometry.
      *
      * The function is triggered by a TimeNavigationController::TimeEvent.
      */
@@ -376,9 +401,19 @@ namespace mitk
     itkGetMacro(CurrentWorldPlaneGeometryUpdateTime, unsigned long);
 
     /**
-     * \brief Get timestamp of the update time of the current timestep.
+     * \brief Get the timestamp of the last change of the time point (GetTime()).
+     *
+     * It moves on every change of the time point, also when the time step of
+     * the world time geometry stays, because the data shown may change its
+     * own time step.
      */
-    itkGetMacro(TimeStepUpdateTime, unsigned long);
+    itkGetConstMacro(TimePointUpdateTime, itk::ModifiedTimeType);
+
+    /**
+     * \deprecated Moves whenever the renderer's time point changes, not only
+     *             when its time step changes. Use GetTimePointUpdateTime().
+     */
+    virtual unsigned long GetTimeStepUpdateTime();
 
     /**
      * \brief Pick a world coordinate (x,y,z) given a display coordinate (x,y).
@@ -618,10 +653,16 @@ namespace mitk
   private:
 
     /**
+     * \brief Store the time point, move the time point update time and update
+     *        the current geometries; does nothing if the time point is unchanged.
+     */
+    void SetTimePoint(TimePointType timePoint);
+
+    /**
      * \brief Pointer to the current TimeGeometry.
      *
      * This WorldTimeGeometry is used to extract a SlicedGeometry3D,
-     * using the current timestep (set via SetTimeStep).
+     * using the time step that contains the current time point.
      * The time-extracted 3D-geometry is used as the "CurrentWorldGeometry".
      * A PlaneGeometry can further be extracted using the current slice (set via SetSlice).
      * The slice-extracted 2D-geometry is used as the "CurrentWorldPlaneGeometry".
@@ -656,10 +697,11 @@ namespace mitk
     PlaneGeometry::Pointer m_CurrentWorldPlaneGeometry;
 
     unsigned int m_Slice;
+    TimePointType m_TimePoint;
     TimeStepType m_TimeStep;
 
     itk::TimeStamp m_CurrentWorldPlaneGeometryUpdateTime;
-    itk::TimeStamp m_TimeStepUpdateTime;
+    itk::TimeStamp m_TimePointUpdateTime;
 
     BindDispatcherInteractor* m_BindDispatcherInteractor;
 

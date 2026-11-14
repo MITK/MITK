@@ -147,11 +147,11 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
     return;
   }
 
-  const auto* worldGeometry = renderer->GetWorldTimeGeometry();
-  const auto timeBounds = worldGeometry->GetTimeBounds(renderer->GetTimeStep());
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  if (!surface->GetTimeGeometry()->IsValidTimePoint(timeBounds[0]))
+  if (!surface->GetTimeGeometry()->IsValidTimePoint(renderer->GetTime()))
   {
+    localStorage->m_LastUpdateTimeStep = TIMESTEP_INVALID;
     this->ResetMapper(renderer);
     return;
   }
@@ -160,7 +160,6 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   this->CalculateTimeStep(renderer);
 
   surface->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to rerender
   if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
@@ -173,7 +172,8 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
       (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
       ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastUpdateTimeStep != this->GetTimestep()))
   {
     this->GenerateDataForRenderer(renderer);
   }
@@ -181,6 +181,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTimeStep = this->GetTimestep();
 }
 
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)

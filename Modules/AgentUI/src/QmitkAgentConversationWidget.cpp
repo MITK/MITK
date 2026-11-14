@@ -349,6 +349,14 @@ void QmitkAgentConversationWidget::SetStepsShown(bool shown)
 void QmitkAgentConversationWidget::Clear()
 {
   this->clear();
+
+  for (const auto& dialog : std::as_const(m_ImageDialogs))
+  {
+    if (!dialog.isNull())
+      dialog->close();
+  }
+
+  m_ImageDialogs.clear();
   m_Images.clear();
   m_StreamBlock = -1;
   m_StreamLastBlock = -1;
@@ -653,6 +661,13 @@ QTextImageFormat QmitkAgentConversationWidget::CreateThumbnail(const QImage& ima
 
 void QmitkAgentConversationWidget::ShowImage(int id)
 {
+  if (const auto openDialog = m_ImageDialogs.value(id); !openDialog.isNull())
+  {
+    openDialog->raise();
+    openDialog->activateWindow();
+    return;
+  }
+
   QPixmap pixmap;
 
   if (!pixmap.loadFromData(m_Images.value(id)))
@@ -661,6 +676,7 @@ void QmitkAgentConversationWidget::ShowImage(int id)
   // Not modal, so that the agent can go on working and the user can compare.
   auto* dialog = new QDialog(this);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
+  m_ImageDialogs.insert(id, dialog);
   dialog->setWindowTitle("Screenshot");
 
   // Screenshots are in device pixels.

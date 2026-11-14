@@ -18,7 +18,9 @@ found in the LICENSE file.
 #include <QmitkAgentStep.h>
 
 #include <QByteArray>
+#include <QDialog>
 #include <QHash>
+#include <QPointer>
 #include <QTextBrowser>
 #include <QTextCursor>
 
@@ -172,6 +174,9 @@ private:
 
   /** \brief Images of the conversation, encoded, as a long conversation collects many screenshots. */
   QHash<int, QByteArray> m_Images;
+
+  /** \brief The open dialog of an image, so that a second click raises it instead of opening another. */
+  QHash<int, QPointer<QDialog>> m_ImageDialogs;
 
   /** \brief Never reused, so that the conversation cannot show an image of an earlier one. */
   int m_NextImageId;

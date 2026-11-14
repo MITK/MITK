@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestTime.h>
 
 using mitk::CallInGuiThread;
@@ -34,30 +35,15 @@ using mitk::RestRoute;
 
 namespace
 {
-  [[noreturn]] void Throw(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
-  {
-    throw RestException(ErrorResponse::Create(code, title, detail, status, path));
-  }
-
-  mitk::DataNode::Pointer FindNode(const mitk::IRestServerService& server, const std::string& uid, const std::string& path)
-  {
-    auto node = server.FindNode(uid);
-
-    if (node.IsNull())
-      throw RestException(ErrorResponse::NodeNotFound(uid, path));
-
-    return node;
-  }
-
-  /** The image a mask belongs to: its source in the data storage. */
-  mitk::DataNode::Pointer FindReferenceImage(const mitk::DataStorage* dataStorage, const mitk::DataNode* mask)
+  /** The image a mask belongs to: its source in the data storage. Runs in the GUI thread. */
+  mitk::DataNodeHandle FindReferenceImage(const mitk::IRestServerService& server, const mitk::DataStorage* dataStorage, const mitk::DataNode* mask)
   {
     const auto sources = dataStorage->GetSources(mask, nullptr, true);
 
     for (const auto& source : *sources)
     {
       if (dynamic_cast<const mitk::Image*>(source->GetData()) != nullptr)
-        return source;
+        return server.FindNode(server.GetNodeUid(source));
     }
 
     return nullptr;
@@ -75,7 +61,7 @@ namespace
     if (timeSteps.empty())
     {
       // Written as JSON writes the number, which does not depend on the locale.
-      Throw("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "\"" + node->GetName() + "\" has no data at " +
+      mitk::ThrowRestError("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "\"" + node->GetName() + "\" has no data at " +
         nlohmann::json(selection.TimePoint).dump() + " ms. Its time_steps say which time points it covers.", 422, path);
     }
 
@@ -132,8 +118,8 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     if (!imageUid.has_value() && !maskUid.has_value())
       throw RestException(ErrorResponse::InvalidRequest("Name an image, a mask or both: ?image=<uid>&mask=<uid>.", request.Path));
 
-    auto imageNode = imageUid.has_value() ? FindNode(*server, *imageUid, request.Path) : mitk::DataNode::Pointer();
-    const auto maskNode = maskUid.has_value() ? FindNode(*server, *maskUid, request.Path) : mitk::DataNode::Pointer();
+    auto imageNode = imageUid.has_value() ? mitk::FindRestNode(*server, *imageUid, request.Path) : mitk::DataNodeHandle();
+    const auto maskNode = maskUid.has_value() ? mitk::FindRestNode(*server, *maskUid, request.Path) : mitk::DataNodeHandle();
     const auto dataStorage = server->GetDataStorage();
 
     if (dataStorage.IsNull())
@@ -152,7 +138,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     nlohmann::json imageTimeSteps;
 
     CallInGuiThread(*server, [&]() {
-      if (maskNode.IsNotNull())
+      if (maskNode != nullptr)
       {
         if (auto* mask = dynamic_cast<mitk::MultiLabelSegmentation*>(maskNode->GetData()); mask != nullptr)
         {
@@ -164,7 +150,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
             labels.push_back({ { "value", value }, { "name", label->GetName() }, { "group", mask->GetGroupIndexOfLabel(value) } });
           }
         }
-        else if (mitk::GetImageStatisticsPlanarFigurePredicate()->CheckNode(maskNode))
+        else if (mitk::GetImageStatisticsPlanarFigurePredicate()->CheckNode(maskNode.get()))
         {
           // A copy, as the Image Statistics view takes one: the measurement below runs outside the GUI
           // thread, where the user can move the figure meanwhile.
@@ -172,16 +158,16 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
         }
         else
         {
-          Throw("NOT_A_MASK", "Unprocessable Content", "The mask \"" + maskNode->GetName() + "\" is neither a "
+          mitk::ThrowRestError("NOT_A_MASK", "Unprocessable Content", "The mask \"" + maskNode->GetName() + "\" is neither a "
             "segmentation nor a planar figure that encloses a region or is a line.", 422, request.Path);
         }
 
-        if (imageNode.IsNull())
-          imageNode = FindReferenceImage(dataStorage, maskNode);
+        if (imageNode == nullptr)
+          imageNode = FindReferenceImage(*server, dataStorage, maskNode.get());
 
-        if (imageNode.IsNull())
+        if (imageNode == nullptr)
         {
-          Throw("REFERENCE_NOT_FOUND", "Unprocessable Content", "The mask \"" + maskNode->GetName() +
+          mitk::ThrowRestError("REFERENCE_NOT_FOUND", "Unprocessable Content", "The mask \"" + maskNode->GetName() +
             "\" belongs to no image. Name one with the query parameter image.", 422, request.Path);
         }
       }
@@ -189,21 +175,21 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
       image = dynamic_cast<const mitk::Image*>(imageNode->GetData());
 
       if (image.IsNull())
-        Throw("NOT_AN_IMAGE", "Unprocessable Content", "\"" + imageNode->GetName() + "\" is no image.", 422, request.Path);
+        mitk::ThrowRestError("NOT_AN_IMAGE", "Unprocessable Content", "\"" + imageNode->GetName() + "\" is no image.", 422, request.Path);
 
       if (figure.IsNotNull() && !mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(figure->GetPlaneGeometry(), image->GetGeometry()))
       {
-        Throw("FIGURE_TILTED", "Unprocessable Content", "The planar figure \"" + maskNode->GetName() + "\" lies tilted to "
+        mitk::ThrowRestError("FIGURE_TILTED", "Unprocessable Content", "The planar figure \"" + maskNode->GetName() + "\" lies tilted to "
           "the slices of \"" + imageNode->GetName() + "\". Statistics need a figure drawn in a window that shows the "
           "image's slices.", 422, request.Path);
       }
 
       selection = mitk::RestTimeSelection::FromRequest(request);
-      timeSteps = GetTimeSteps(selection, imageNode, request.Path);
+      timeSteps = GetTimeSteps(selection, imageNode.get(), request.Path);
 
-      if (maskNode.IsNotNull())
+      if (maskNode != nullptr)
       {
-        GetTimeSteps(selection, maskNode, request.Path);
+        GetTimeSteps(selection, maskNode.get(), request.Path);
         maskName = maskNode->GetName();
       }
 
@@ -246,12 +232,12 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     }
     catch (const itk::ExceptionObject& e)
     {
-      Throw("STATISTICS_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
+      mitk::ThrowRestError("STATISTICS_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
     }
     catch (const std::exception& e)
     {
       // The planar figure mask generator throws std::runtime_error, too.
-      Throw("STATISTICS_FAILED", "Unprocessable Content", e.what(), 422, request.Path);
+      mitk::ThrowRestError("STATISTICS_FAILED", "Unprocessable Content", e.what(), 422, request.Path);
     }
 
     // Values of a region at a time step; empty labels have no statistics of their own.
@@ -313,12 +299,12 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
 
     nlohmann::json mask = nullptr;
 
-    if (maskNode.IsNotNull())
-      mask = { { "uid", server->GetNodeUid(maskNode) }, { "name", maskName } };
+    if (maskNode != nullptr)
+      mask = { { "uid", server->GetNodeUid(maskNode.get()) }, { "name", maskName } };
 
     return RestResponse::FromData({
       { "image", {
-        { "uid", server->GetNodeUid(imageNode) },
+        { "uid", server->GetNodeUid(imageNode.get()) },
         { "name", imageName },
         { "dimensions", dimensions },
         { "spacing_mm", { spacing[0], spacing[1], spacing[2] } },

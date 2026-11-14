@@ -20,12 +20,8 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsRestRoutes.h"
 #include "QmitkPlanarFigureRestRoutes.h"
 
-#include <mitkIRestServerService.h>
 #include <mitkLog.h>
-
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleRegistry.h>
+#include <mitkRestHelpers.h>
 
 #include <QThread>
 #endif
@@ -44,22 +40,16 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
   m_Context = context;
 
 #if MITK_HAS_RESTAPI
-  // The REST server loads with the application's modules, before any plugin.
-  auto* mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
-  const auto reference = mitkContext->GetServiceReference<IRestServerService>();
-  m_RestServer = reference ? mitkContext->GetService(reference) : nullptr;
+  m_RestRoutes = std::make_unique<RestRouteRegistration>();
 
-  if (m_RestServer != nullptr)
+  if (m_RestRoutes->GetServer() != nullptr)
   {
     m_RestRouteParent = std::make_unique<QObject>();
 
     try
     {
-      for (const auto& route : CreateImageStatisticsRoutes(m_RestServer))
-        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
-
-      for (const auto& route : CreatePlanarFigureRoutes(m_RestServer, m_RestRouteParent.get()))
-        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+      m_RestRoutes->Add(CreateImageStatisticsRoutes(m_RestRoutes->GetServer()));
+      m_RestRoutes->Add(CreatePlanarFigureRoutes(m_RestRoutes->GetServer(), m_RestRouteParent.get()));
     }
     catch (const mitk::Exception& e)
     {
@@ -74,13 +64,7 @@ void mitk::PluginActivator::stop(ctkPluginContext* context)
   Q_UNUSED(context)
 
 #if MITK_HAS_RESTAPI
-  if (m_RestServer != nullptr)
-  {
-    for (const auto id : m_RestRoutes)
-      m_RestServer->RemoveRoute(id);
-  }
-
-  m_RestRoutes.clear();
+  m_RestRoutes.reset();
 
   // When the application ends, the framework stops its plugins in a thread of its own, from
   // which objects of the GUI thread like running timers must not be deleted. They are left
@@ -89,8 +73,6 @@ void mitk::PluginActivator::stop(ctkPluginContext* context)
     m_RestRouteParent.release()->deleteLater();
   else
     m_RestRouteParent.reset();
-
-  m_RestServer = nullptr;
 #endif
 
   m_Context = nullptr;

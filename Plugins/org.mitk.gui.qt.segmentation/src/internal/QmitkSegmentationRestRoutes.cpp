@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestJob.h>
 #include <mitkRestPoints.h>
 #include <mitkRestTime.h>
@@ -81,11 +82,6 @@ namespace
 {
   const std::string ViewId = "org.mitk.views.segmentation";
 
-  [[noreturn]] void Throw(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
-  {
-    throw mitk::RestException(mitk::ErrorResponse::Create(code, title, detail, status, path));
-  }
-
   mitk::ToolManager* GetToolManager()
   {
     return mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -100,7 +96,7 @@ namespace
       window = workbench->GetWorkbenchWindows().front();
 
     if (window.IsNull() || window->GetActivePage().IsNull())
-      Throw("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Workbench has no window.", 503, path);
+      mitk::ThrowRestError("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Workbench has no window.", 503, path);
 
     return window->GetActivePage();
   }
@@ -128,33 +124,14 @@ namespace
     return { { "uid", server.GetNodeUid(node) }, { "name", node->GetName() } };
   }
 
-  std::string ToHex(const mitk::Color& color)
-  {
-    char text[8];
-    std::snprintf(text, sizeof(text), "#%02x%02x%02x",
-      static_cast<int>(std::lround(color[0] * 255)),
-      static_cast<int>(std::lround(color[1] * 255)),
-      static_cast<int>(std::lround(color[2] * 255)));
-
-    return text;
-  }
-
   mitk::Color ParseColor(const nlohmann::json& json, const std::string& path)
   {
-    const auto text = json.is_string() ? json.get<std::string>() : std::string();
+    const auto color = mitk::ParseRestColor(json.is_string() ? json.get<std::string>() : std::string());
 
-    if (text.size() != 7 || text[0] != '#' ||
-        !std::all_of(text.begin() + 1, text.end(), [](unsigned char c) { return std::isxdigit(c) != 0; }))
-    {
+    if (!color.has_value())
       throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("A color must be written like \"#ff8800\".", path));
-    }
 
-    mitk::Color color;
-
-    for (int i = 0; i < 3; ++i)
-      color[i] = std::stoi(text.substr(1 + 2 * i, 2), nullptr, 16) / 255.0f;
-
-    return color;
+    return *color;
   }
 
   mitk::RestTimeSelection GetSelectedTime()
@@ -186,7 +163,7 @@ namespace
     return {
       { "value", label->GetValue() },
       { "name", label->GetName() },
-      { "color", ToHex(label->GetColor()) },
+      { "color", mitk::ToRestColor(label->GetColor()) },
       { "visible", label->GetVisible() },
       { "locked", label->GetLocked() },
       { "group", group }
@@ -441,25 +418,12 @@ namespace
     mitk::CoreServices::GetNodeSelectionService()->SendSelection(ViewId + "/" + selector, selection);
   }
 
-  mitk::DataNode::Pointer FindNode(const mitk::IRestServerService& server, const nlohmann::json& uid, const std::string& path)
-  {
-    if (!uid.is_string())
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("A node is given by its uid, a string.", path));
-
-    auto node = server.FindNode(uid.get<std::string>());
-
-    if (node.IsNull())
-      throw mitk::RestException(mitk::ErrorResponse::NodeNotFound(uid.get<std::string>(), path));
-
-    return node;
-  }
-
   mitk::MultiLabelSegmentation* GetSegmentation(mitk::DataNode* node, const std::string& path)
   {
     auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
     if (segmentation == nullptr)
-      Throw("NOT_A_SEGMENTATION", "Unprocessable Content", "The node \"" + node->GetName() + "\" is no segmentation.", 422, path);
+      mitk::ThrowRestError("NOT_A_SEGMENTATION", "Unprocessable Content", "The node \"" + node->GetName() + "\" is no segmentation.", 422, path);
 
     return segmentation;
   }
@@ -516,7 +480,7 @@ namespace
     auto label = segmentation->GetLabel(*value);
 
     if (label.IsNull())
-      Throw("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(*value) + ".", 404, request.Path);
+      mitk::ThrowRestError("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(*value) + ".", 404, request.Path);
 
     return label;
   }
@@ -529,7 +493,7 @@ namespace
       throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The group index must be a whole number.", request.Path));
 
     if (!segmentation->ExistGroup(*group))
-      Throw("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(*group) + ".", 404, request.Path);
+      mitk::ThrowRestError("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(*group) + ".", 404, request.Path);
 
     return *group;
   }
@@ -539,7 +503,7 @@ namespace
     auto* tool = dynamic_cast<mitk::SegWithPreviewTool*>(GetToolManager()->GetActiveTool());
 
     if (tool == nullptr)
-      Throw("NO_PREVIEW_TOOL", "Conflict", "No tool with a result to confirm is active.", 409, path);
+      mitk::ThrowRestError("NO_PREVIEW_TOOL", "Conflict", "No tool with a result to confirm is active.", 409, path);
 
     return tool;
   }
@@ -604,7 +568,7 @@ namespace
   void ThrowIfBusy(const mitk::SegWithPreviewTool* tool, const std::string& path)
   {
     if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
-      Throw("BUSY", "Conflict", std::string(tool->GetName()) + " is still working. Wait for its job to end.", 409, path);
+      mitk::ThrowRestError("BUSY", "Conflict", std::string(tool->GetName()) + " is still working. Wait for its job to end.", 409, path);
   }
 
 #if MITK_HAS_PYTHON
@@ -680,7 +644,7 @@ namespace
 
     if (tool == nullptr)
     {
-      Throw("TOOL_NOT_ACTIVE", "Conflict",
+      mitk::ThrowRestError("TOOL_NOT_ACTIVE", "Conflict",
         "nnInteractive is not active. Activate it with PATCH /api/v1/segmentation/session {\"tool\": \"nnInteractive\"}.", 409, path);
     }
 
@@ -772,7 +736,7 @@ namespace
 
     if (tool == nullptr)
     {
-      Throw("TOOL_NOT_ACTIVE", "Conflict",
+      mitk::ThrowRestError("TOOL_NOT_ACTIVE", "Conflict",
         "VoxTell is not active. Activate it with PATCH /api/v1/segmentation/session {\"tool\": \"VoxTell\"}.", 409, path);
     }
 
@@ -814,7 +778,7 @@ namespace
 
     if (tool == nullptr)
     {
-      Throw("TOOL_NOT_ACTIVE", "Conflict",
+      mitk::ThrowRestError("TOOL_NOT_ACTIVE", "Conflict",
         "TotalSegmentator is not active. Activate it with PATCH /api/v1/segmentation/session {\"tool\": \"TotalSegmentator\"}.", 409, path);
     }
 
@@ -856,7 +820,7 @@ namespace
 
     if (!tool->IsInitialized())
     {
-      Throw("NOT_INITIALIZED", "Conflict",
+      mitk::ThrowRestError("NOT_INITIALIZED", "Conflict",
         "TotalSegmentator has not started yet. Start it with POST /api/v1/segmentation/totalsegmentator/initialize.", 409, path);
     }
 
@@ -1083,14 +1047,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       throw RestException(ErrorResponse::InvalidRequest("\"tool\" must be the name of a tool or null.", request.Path));
 
     // Resolved before going to the GUI thread; see CallInGuiThread().
-    DataNode::Pointer reference;
-    DataNode::Pointer segmentation;
+    DataNodeHandle reference;
+    DataNodeHandle segmentation;
 
     if (body.contains("reference"))
-      reference = FindNode(*server, body["reference"], request.Path);
+      reference = mitk::FindRestNode(*server, body["reference"], request.Path);
 
     if (body.contains("segmentation") && !body["segmentation"].is_null())
-      segmentation = FindNode(*server, body["segmentation"], request.Path);
+      segmentation = mitk::FindRestNode(*server, body["segmentation"], request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -1101,44 +1065,44 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       // which ends the active tool. Hence the checks with the predicates of
       // the selectors before, and those after only as a safeguard.
       const auto throwReferenceNotAccepted = [&]() {
-        Throw("NOT_ACCEPTED", "Unprocessable Content",
+        mitk::ThrowRestError("NOT_ACCEPTED", "Unprocessable Content",
           "The Segmentation view does not take \"" + reference->GetName() + "\" as image to segment.", 422, request.Path);
       };
 
       const auto throwSegmentationNotAccepted = [&]() {
-        Throw("NOT_ACCEPTED", "Unprocessable Content",
+        mitk::ThrowRestError("NOT_ACCEPTED", "Unprocessable Content",
           "The Segmentation view does not take \"" + segmentation->GetName() + "\" as segmentation of the image. "
           "A segmentation needs the geometry of the image.", 422, request.Path);
       };
 
-      if (reference.IsNotNull())
+      if (reference != nullptr)
       {
-        if (!GetSegmentationReferenceImagePredicate()->CheckNode(reference))
+        if (!GetSegmentationReferenceImagePredicate()->CheckNode(reference.get()))
           throwReferenceNotAccepted();
 
         // The segmentation has to fit the new image, which is checked before the image changes.
-        if (segmentation.IsNotNull() && !GetMultiLabelSegmentationPredicate(reference->GetData()->GetGeometry())->CheckNode(segmentation))
+        if (segmentation != nullptr && !GetMultiLabelSegmentationPredicate(reference->GetData()->GetGeometry())->CheckNode(segmentation.get()))
           throwSegmentationNotAccepted();
 
-        SelectInView("referenceNode", reference);
+        SelectInView("referenceNode", reference.get());
 
-        if (toolManager->GetReferenceData(0) != reference)
+        if (toolManager->GetReferenceData(0) != reference.get())
           throwReferenceNotAccepted();
       }
 
-      if (segmentation.IsNotNull())
+      if (segmentation != nullptr)
       {
         const auto* currentReference = toolManager->GetReferenceData(0);
         const auto* geometry = currentReference != nullptr && currentReference->GetData() != nullptr
           ? currentReference->GetData()->GetGeometry()
           : nullptr;
 
-        if (!GetMultiLabelSegmentationPredicate(geometry)->CheckNode(segmentation))
+        if (!GetMultiLabelSegmentationPredicate(geometry)->CheckNode(segmentation.get()))
           throwSegmentationNotAccepted();
 
-        SelectInView("workingNode", segmentation);
+        SelectInView("workingNode", segmentation.get());
 
-        if (toolManager->GetWorkingData(0) != segmentation.GetPointer())
+        if (toolManager->GetWorkingData(0) != segmentation.get())
           throwSegmentationNotAccepted();
       }
       else if (body.contains("segmentation"))
@@ -1152,13 +1116,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         auto* working = toolManager->GetWorkingData(0);
 
         if (working == nullptr)
-          Throw("NO_SEGMENTATION", "Conflict", "Choose a segmentation first.", 409, request.Path);
+          mitk::ThrowRestError("NO_SEGMENTATION", "Conflict", "Choose a segmentation first.", 409, request.Path);
 
         const auto value = body["active_label"].get<MultiLabelSegmentation::LabelValueType>();
         const auto* segmentation = GetSegmentation(working, request.Path);
 
         if (!segmentation->ExistLabel(value))
-          Throw("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path);
+          mitk::ThrowRestError("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path);
 
         // Through the tool manager, so that the view selects the label as well.
         toolManager->SetActiveWorkingLabel(value);
@@ -1166,7 +1130,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // The view applies the label to the segmentation, or silently does not.
         if (const auto* active = segmentation->GetActiveLabel(); active == nullptr || active->GetValue() != value)
         {
-          Throw("NOT_ACCEPTED", "Unprocessable Content", "The Segmentation view did not make label " +
+          mitk::ThrowRestError("NOT_ACCEPTED", "Unprocessable Content", "The Segmentation view did not make label " +
             std::to_string(value) + " active; the active label is " +
             (active != nullptr ? std::to_string(active->GetValue()) : std::string("none")) + ".", 422, request.Path);
         }
@@ -1190,11 +1154,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           }
 
           if (tool == nullptr)
-            Throw("TOOL_NOT_FOUND", "Not Found", "There is no tool \"" + name + "\". GET /api/v1/segmentation/session lists them.", 404, request.Path);
+            mitk::ThrowRestError("TOOL_NOT_FOUND", "Not Found", "There is no tool \"" + name + "\". GET /api/v1/segmentation/session lists them.", 404, request.Path);
 
           if (!toolManager->ActivateTool(toolManager->GetToolID(tool)) || toolManager->GetActiveTool() != tool)
           {
-            Throw("TOOL_NOT_ACTIVATED", "Conflict",
+            mitk::ThrowRestError("TOOL_NOT_ACTIVATED", "Conflict",
               "The tool \"" + name + "\" cannot work on the chosen image and segmentation, or none are chosen.", 409, request.Path);
           }
         }
@@ -1231,7 +1195,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     if (body.contains("static") && !body["static"].is_boolean())
       throw RestException(ErrorResponse::InvalidRequest("\"static\" must be true or false.", request.Path));
 
-    const auto reference = FindNode(*server, body["reference"], request.Path);
+    const auto reference = mitk::FindRestNode(*server, body["reference"], request.Path);
     const auto dataStorage = server->GetDataStorage();
 
     if (dataStorage.IsNull())
@@ -1244,12 +1208,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       const auto* image = dynamic_cast<const Image*>(reference->GetData());
 
       if (image == nullptr || image->GetDimension() < 2)
-        Throw("NOT_AN_IMAGE", "Unprocessable Content", "\"" + reference->GetName() + "\" is no image of two or more dimensions.", 422, request.Path);
+        mitk::ThrowRestError("NOT_AN_IMAGE", "Unprocessable Content", "\"" + reference->GetName() + "\" is no image of two or more dimensions.", 422, request.Path);
 
       // See PATCH /segmentation/session: an image that the view refuses must not reach its selector.
-      if (!GetSegmentationReferenceImagePredicate()->CheckNode(reference))
+      if (!GetSegmentationReferenceImagePredicate()->CheckNode(reference.get()))
       {
-        Throw("NOT_ACCEPTED", "Unprocessable Content",
+        mitk::ThrowRestError("NOT_ACCEPTED", "Unprocessable Content",
           "The Segmentation view does not take \"" + reference->GetName() + "\" as image to segment.", 422, request.Path);
       }
 
@@ -1258,7 +1222,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (body.value("static", false) && 1 < image->GetTimeSteps())
         segmentationTemplate = SegmentationHelper::GetStaticSegmentationTemplate(image);
 
-      auto newNode = LabelSetImageHelper::CreateNewSegmentationNode(reference, segmentationTemplate, body.value("name", std::string()), dataStorage);
+      auto newNode = LabelSetImageHelper::CreateNewSegmentationNode(reference.get(), segmentationTemplate, body.value("name", std::string()), dataStorage);
       auto* segmentation = GetSegmentation(newNode, request.Path);
 
       std::vector<Label::Pointer> labels;
@@ -1286,9 +1250,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
 
       segmentation->SetActiveLabel(labels.front()->GetValue());
-      dataStorage->Add(newNode, reference);
+      dataStorage->Add(newNode, reference.get());
 
-      SelectInView("referenceNode", reference);
+      SelectInView("referenceNode", reference.get());
       SelectInView("workingNode", newNode);
 
       return newNode;
@@ -1316,12 +1280,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "segmentations mark the same finding. voxels is null while a tool writes into the segmentation, and when the "
     "segmentation has no data at the time point.";
   labels.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
     const auto measure = IsMeasureRequested(request);
     const auto selection = measure ? std::optional<RestTimeSelection>(RestTimeSelection::FromRequest(request)) : std::nullopt;
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      return DescribeLabels(GetSegmentation(node, request.Path), selection);
+      return DescribeLabels(GetSegmentation(node.get(), request.Path), selection);
     }));
   };
   routes.push_back(labels);
@@ -1338,11 +1302,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "make it the active label with PATCH /api/v1/segmentation/session.";
   addLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
 
       if (body.contains("group") && !body["group"].is_number_unsigned())
         throw RestException(ErrorResponse::InvalidRequest("\"group\" must be the index of a group.", request.Path));
@@ -1351,7 +1315,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       const auto group = body.value("group", activeGroup);
 
       if (group >= segmentation->GetNumberOfGroups())
-        Throw("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(group) + ".", 404, request.Path);
+        mitk::ThrowRestError("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(group) + ".", 404, request.Path);
 
       auto label = LabelSetImageHelper::CreateNewLabel(segmentation);
 
@@ -1365,7 +1329,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto* added = segmentation->AddLabel(label, group, false);
 
       if (added == nullptr)
-        Throw("TOO_MANY_LABELS", "Conflict", "The segmentation cannot hold another label.", 409, request.Path);
+        mitk::ThrowRestError("TOO_MANY_LABELS", "Conflict", "The segmentation cannot hold another label.", 409, request.Path);
 
       undoRedo.RegisterUndoRedoOperationEvent("Add label \"" + added->GetName() + "\"");
 
@@ -1387,11 +1351,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   changeLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     ThrowIfUnknownField(body, { "name", "color", "visible", "locked" }, "a label", request.Path);
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       auto label = GetLabel(segmentation, request);
       const auto group = segmentation->GetGroupIndexOfLabel(label->GetValue());
 
@@ -1431,11 +1395,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "/api/v1/segmentation/session tells. Returns {data: [label]}, the labels that remain, as GET .../labels "
     "gives them without measure.";
   removeLabel.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       const auto label = GetLabel(segmentation, request);
       const auto name = label->GetName();
 
@@ -1464,11 +1428,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "them without measure, so without their voxels, volumes and centers, which GET .../labels?measure=true tells; "
     "only the label if it has no separate parts.";
   splitLabel.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       const auto label = GetLabel(segmentation, request);
       const auto selection = RestTimeSelection::FromRequest(request);
 
@@ -1479,7 +1443,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (timeSteps.empty())
       {
-        Throw("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "The segmentation has no data at " +
+        mitk::ThrowRestError("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "The segmentation has no data at " +
           std::to_string(selection.TimePoint) + " ms.", 422, request.Path);
       }
 
@@ -1516,10 +1480,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "[group]}, a group being {index, name, display_name, labels: [{value, name, color, visible, locked, "
     "group}]}; name is empty if the group has none, display_name is what the Segmentation view shows.";
   groups.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      return DescribeGroups(GetSegmentation(node, request.Path));
+      return DescribeGroups(GetSegmentation(node.get(), request.Path));
     }));
   };
   routes.push_back(groups);
@@ -1530,10 +1494,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   group.Summary = "Get a group of a segmentation with its labels";
   group.Description = "Returns {data: group} as GET .../groups lists it.";
   group.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       return DescribeGroup(segmentation, GetGroupIndex(segmentation, request));
     }));
   };
@@ -1550,11 +1514,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "make that label active first.";
   addGroup.Handler = [server](const RestRequest& request) {
     const auto body = request.Body.empty() ? nlohmann::json::object() : request.GetJsonBody();
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       const auto added = segmentation->AddGroup();
 
       if (body.contains("name"))
@@ -1583,11 +1547,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     if (!body.contains("name") || !body["name"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"name\", the new name of the group, is missing.", request.Path));
 
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       const auto index = GetGroupIndex(segmentation, request);
 
       SegGroupModifyUndoRedoHelper undoRedo(segmentation, { index }, true, 0, true, true);
@@ -1609,16 +1573,16 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "keeps at least one group, so its last group stays (409). The groups after it move down by one index. "
     "Undoable. Returns {data: [group]}, the groups that remain, as GET .../groups lists them.";
   removeGroup.Handler = [server](const RestRequest& request) {
-    const auto node = FindNode(*server, request.PathParams.at("uid"), request.Path);
+    const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
-      auto* segmentation = GetSegmentation(node, request.Path);
+      auto* segmentation = GetSegmentation(node.get(), request.Path);
       const auto index = GetGroupIndex(segmentation, request);
 
       // MultiLabelSegmentation::RemoveGroup() would also remove the last one.
       if (segmentation->GetNumberOfGroups() < 2)
-        Throw("LAST_GROUP", "Conflict", "A segmentation keeps at least one group, and this is its last.", 409, request.Path);
+        mitk::ThrowRestError("LAST_GROUP", "Conflict", "A segmentation keeps at least one group, and this is its last.", 409, request.Path);
 
       const auto name = LabelSetImageHelper::CreateDisplayGroupName(segmentation, index);
 
@@ -1664,7 +1628,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       // An empty preview would erase the label it is transferred to, for example on a repeated confirm.
       if (!tool->HasResultToConfirm())
       {
-        Throw("NOTHING_TO_CONFIRM", "Conflict",
+        mitk::ThrowRestError("NOTHING_TO_CONFIRM", "Conflict",
           std::string(tool->GetName()) + " has no result to confirm. A confirmed result is not confirmed again.", 409, request.Path);
       }
 
@@ -1777,7 +1741,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         const auto autoZoom = body["auto_zoom"].get<bool>();
 
         if (autoZoom && tool->GetBackend() == nnInteractive::Backend::CPU)
-          Throw("NOT_AVAILABLE", "Conflict", "Auto-zoom is not available with the CPU backend.", 409, request.Path);
+          mitk::ThrowRestError("NOT_AVAILABLE", "Conflict", "Auto-zoom is not available with the CPU backend.", 409, request.Path);
 
         tool->SetAutoZoom(autoZoom);
       }
@@ -1816,7 +1780,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!IsInstalled(GetNNInteractive(request.Path)).value_or(false))
       {
-        Throw("TOOL_NOT_INSTALLED", "Conflict",
+        mitk::ThrowRestError("TOOL_NOT_INSTALLED", "Conflict",
           "nnInteractive is not installed. Ask the user to install it with the Initialize button of the nnInteractive panel.", 409, request.Path);
       }
     });
@@ -1931,7 +1895,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!tool->IsSessionRunning())
       {
-        Throw("NOT_INITIALIZED", "Conflict",
+        mitk::ThrowRestError("NOT_INITIALIZED", "Conflict",
           "nnInteractive has no session. Start one with POST /api/v1/segmentation/nninteractive/session.", 409, request.Path);
       }
 
@@ -1965,7 +1929,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
       catch (const Exception& e)
       {
-        Throw("PROMPT_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
+        mitk::ThrowRestError("PROMPT_FAILED", "Unprocessable Content", e.GetDescription(), 422, request.Path);
       }
 
       outcome->Job = server->CreateJob("Prompt nnInteractive");
@@ -1995,10 +1959,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       ThrowIfBusy(tool, request.Path);
 
       if (tool->IsSessionRunning() && !tool->SupportsUndo())
-        Throw("NOT_AVAILABLE", "Conflict", "The nnInteractive session does not support undo.", 409, request.Path);
+        mitk::ThrowRestError("NOT_AVAILABLE", "Conflict", "The nnInteractive session does not support undo.", 409, request.Path);
 
       if (!tool->CanUndo())
-        Throw("NOTHING_TO_UNDO", "Conflict", "There is no prompt to undo.", 409, request.Path);
+        mitk::ThrowRestError("NOTHING_TO_UNDO", "Conflict", "There is no prompt to undo.", 409, request.Path);
 
       tool->UndoLastInteraction();
       return DescribeNNInteractive(tool);
@@ -2088,7 +2052,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!tool->IsModelLoaded())
       {
-        Throw("MODEL_NOT_LOADED", "Conflict",
+        mitk::ThrowRestError("MODEL_NOT_LOADED", "Conflict",
           "VoxTell has no model loaded. Load it with POST /api/v1/segmentation/voxtell/model.", 409, request.Path);
       }
 
@@ -2151,7 +2115,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!IsInstalled(tool).value_or(false))
       {
-        Throw("TOOL_NOT_INSTALLED", "Conflict",
+        mitk::ThrowRestError("TOOL_NOT_INSTALLED", "Conflict",
           "VoxTell is not installed. Ask the user to install it with the Initialize button of the VoxTell panel.", 409, request.Path);
       }
 
@@ -2272,7 +2236,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!tool->IsModelLoaded())
       {
-        Throw("MODEL_NOT_LOADED", "Conflict",
+        mitk::ThrowRestError("MODEL_NOT_LOADED", "Conflict",
           "VoxTell has no model loaded. Load it with POST /api/v1/segmentation/voxtell/model.", 409, request.Path);
       }
 
@@ -2419,7 +2383,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!TotalSegmentatorTool::IsInstalled())
       {
-        Throw("TOOL_NOT_INSTALLED", "Conflict",
+        mitk::ThrowRestError("TOOL_NOT_INSTALLED", "Conflict",
           "TotalSegmentator is not installed. Ask the user to install it with the button of the TotalSegmentator panel.", 409, request.Path);
       }
 
@@ -2476,7 +2440,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       const auto* task = GetInitializedTotalSegmentator(request.Path)->FindTask(name);
 
       if (task == nullptr)
-        Throw("TOTALSEGMENTATOR_TASK_NOT_FOUND", "Not Found", "TotalSegmentator has no task \"" + name + "\".", 404, request.Path);
+        mitk::ThrowRestError("TOTALSEGMENTATOR_TASK_NOT_FOUND", "Not Found", "TotalSegmentator has no task \"" + name + "\".", 404, request.Path);
 
       return DescribeTotalSegmentatorTask(*task, true);
     }));
@@ -2572,7 +2536,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto* tool = GetInitializedTotalSegmentator(request.Path);
 
       if (tool->IsUpdating())
-        Throw("BUSY", "Conflict", "TotalSegmentator is running. Wait until the run has ended.", 409, request.Path);
+        mitk::ThrowRestError("BUSY", "Conflict", "TotalSegmentator is running. Wait until the run has ended.", 409, request.Path);
 
       // A request that is refused changes nothing, also if only its subset is.
       const auto previousTask = tool->GetTask();
@@ -2627,19 +2591,19 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       if (!TotalSegmentatorTool::IsInstalled())
       {
-        Throw("TOOL_NOT_INSTALLED", "Conflict",
+        mitk::ThrowRestError("TOOL_NOT_INSTALLED", "Conflict",
           "TotalSegmentator is not installed. Ask the user to install it with the button of the TotalSegmentator panel.", 409, request.Path);
       }
 
       if (const auto* task = tool->FindTask(tool->GetTask()); task != nullptr && task->Licensed && !TotalSegmentatorTool::HasLicense())
       {
-        Throw("LICENSE_REQUIRED", "Conflict",
+        mitk::ThrowRestError("LICENSE_REQUIRED", "Conflict",
           "The task \"" + tool->GetTask() + "\" requires a TotalSegmentator license, which the user sets in its settings. "
           "Choose a task that is available, or ask the user.", 409, request.Path);
       }
 
       if (tool->IsUpdating())
-        Throw("BUSY", "Conflict", "TotalSegmentator is running already.", 409, request.Path);
+        mitk::ThrowRestError("BUSY", "Conflict", "TotalSegmentator is running already.", 409, request.Path);
     });
 
     auto job = server->CreateJob("Run TotalSegmentator");

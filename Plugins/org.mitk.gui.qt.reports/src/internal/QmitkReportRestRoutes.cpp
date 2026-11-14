@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkIRestServerService.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
@@ -51,17 +52,12 @@ namespace
   /** The most HTML that a report takes, in bytes: 32 MB. */
   constexpr qsizetype MaxHtmlSize = 33554432;
 
-  [[noreturn]] void Throw(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
-  {
-    throw RestException(ErrorResponse::Create(code, title, detail, status, path));
-  }
-
   QmitkReportStore* GetStore(const std::string& path)
   {
     auto* store = QmitkReportsPluginActivator::GetStore();
 
     if (store == nullptr)
-      Throw("REPORTS_NOT_AVAILABLE", "Service Unavailable", "Reports are not available.", 503, path);
+      mitk::ThrowRestError("REPORTS_NOT_AVAILABLE", "Service Unavailable", "Reports are not available.", 503, path);
 
     return store;
   }
@@ -73,7 +69,7 @@ namespace
     if (!text.empty() && text.size() < 9 && std::all_of(text.begin(), text.end(), [](unsigned char c) { return std::isdigit(c) != 0; }))
       return std::stoi(text);
 
-    Throw("REPORT_NOT_FOUND", "Not Found", "There is no report " + text + ". GET /api/v1/reports lists them.", 404, request.Path);
+    mitk::ThrowRestError("REPORT_NOT_FOUND", "Not Found", "There is no report " + text + ". GET /api/v1/reports lists them.", 404, request.Path);
   }
 
   const QmitkReportStore::Report& GetReport(const QmitkReportStore* store, int id, const std::string& path)
@@ -82,7 +78,7 @@ namespace
 
     if (report == nullptr)
     {
-      Throw("REPORT_NOT_FOUND", "Not Found", "There is no report " + std::to_string(id) +
+      mitk::ThrowRestError("REPORT_NOT_FOUND", "Not Found", "There is no report " + std::to_string(id) +
         ". Closing its editor discards a report; GET /api/v1/reports lists the open ones.", 404, path);
     }
 
@@ -104,7 +100,7 @@ namespace
   void CheckHtml(const QString& html, const std::string& path)
   {
     if (html.toUtf8().size() > MaxHtmlSize)
-      Throw("REPORT_TOO_LARGE", "Payload Too Large", "The html takes at most 32 MB (33554432 bytes).", 413, path);
+      mitk::ThrowRestError("REPORT_TOO_LARGE", "Payload Too Large", "The html takes at most 32 MB (33554432 bytes).", 413, path);
 
     // The store finds images by their quoted src values only.
     static const QRegularExpression unquotedSource(QStringLiteral("<img\\b[^>]*?(?<![\\w-])src\\s*+=\\s*+(?![\"'])"),
@@ -136,7 +132,7 @@ namespace
 
   [[noreturn]] void ThrowUnknownImages(const mitk::Exception& e, const std::string& path)
   {
-    Throw("IMAGE_NOT_FOUND", "Bad Request", e.GetDescription() +
+    mitk::ThrowRestError("IMAGE_NOT_FOUND", "Bad Request", e.GetDescription() +
       std::string(" Reports show images of POST /api/v1/reports/images by their names; nothing else. Only the last "
         "100 captured images are kept for new reports; capture an older one again."), 400, path);
   }
@@ -153,7 +149,7 @@ namespace
     const auto page = window.IsNotNull() ? window->GetActivePage() : berry::IWorkbenchPage::Pointer();
 
     if (page.IsNull())
-      Throw("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Workbench has no window.", 503, path);
+      mitk::ThrowRestError("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Workbench has no window.", 503, path);
 
     const berry::IEditorInput::Pointer input(new QmitkReportEditorInput(id));
     page->OpenEditor(input, QmitkReportEditor::EDITOR_ID, false);
@@ -353,8 +349,7 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
     const auto background = body.contains("background") && body["background"].is_string()
       ? body["background"].get<std::string>()
       : std::string(body.contains("background") ? "" : "transparent");
-    const bool isColor = background.size() == 7 && background[0] == '#' &&
-      std::all_of(background.begin() + 1, background.end(), [](unsigned char c) { return std::isxdigit(c) != 0; });
+    const bool isColor = mitk::ParseRestColor(background).has_value();
 
     if (background != "transparent" && background != "window" && !isColor)
       throw RestException(ErrorResponse::InvalidRequest("background must be transparent, window or a color like #ffffff.", request.Path));

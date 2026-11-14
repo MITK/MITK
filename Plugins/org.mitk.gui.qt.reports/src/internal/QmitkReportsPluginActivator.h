@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef QmitkReportsPluginActivator_h
 #define QmitkReportsPluginActivator_h
 
+#include <mitkReportsPluginConfig.h>
+
 #include <ctkPluginActivator.h>
 
-#include <cstdint>
-#include <vector>
+#include <memory>
 
-namespace mitk
-{
-  struct IRestServerService;
-}
+#if MITK_HAS_RESTAPI
+#include <mitkRestHelpers.h>
+#endif
 
 class QmitkReportStore;
 
@@ -39,9 +39,10 @@ public:
   static QmitkReportStore* GetStore();
 
 private:
-  /** \brief The server that offers the plugin's REST endpoints, if there is one. */
-  mitk::IRestServerService* m_RestServer = nullptr;
-  std::vector<std::uint64_t> m_RestRoutes;
+#if MITK_HAS_RESTAPI
+  /** \brief Offers the plugin's REST endpoints, if the application has a server. */
+  std::unique_ptr<mitk::RestRouteRegistration> m_RestRoutes;
+#endif
 };
 
 #endif

@@ -35,12 +35,8 @@ found in the LICENSE file.
 #if MITK_HAS_RESTAPI
 #include "QmitkSegmentationRestRoutes.h"
 
-#include <mitkIRestServerService.h>
 #include <mitkLog.h>
-
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleRegistry.h>
+#include <mitkRestHelpers.h>
 #endif
 
 #include <usModuleInitialization.h>
@@ -84,17 +80,13 @@ void PluginActivator::start(ctkPluginContext *context)
   this->m_context = context;
 
 #if MITK_HAS_RESTAPI
-  // The REST server loads with the application's modules, before any plugin.
-  auto* mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
-  const auto reference = mitkContext->GetServiceReference<IRestServerService>();
-  m_RestServer = reference ? mitkContext->GetService(reference) : nullptr;
+  m_RestRoutes = std::make_unique<RestRouteRegistration>();
 
-  if (m_RestServer != nullptr)
+  if (m_RestRoutes->GetServer() != nullptr)
   {
     try
     {
-      for (const auto& route : CreateSegmentationRoutes(m_RestServer))
-        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+      m_RestRoutes->Add(CreateSegmentationRoutes(m_RestRoutes->GetServer()));
     }
     catch (const mitk::Exception& e)
     {
@@ -107,14 +99,7 @@ void PluginActivator::start(ctkPluginContext *context)
 void PluginActivator::stop(ctkPluginContext *)
 {
 #if MITK_HAS_RESTAPI
-  if (m_RestServer != nullptr)
-  {
-    for (const auto id : m_RestRoutes)
-      m_RestServer->RemoveRoute(id);
-  }
-
-  m_RestRoutes.clear();
-  m_RestServer = nullptr;
+  m_RestRoutes.reset();
 #endif
 
   this->m_context = nullptr;

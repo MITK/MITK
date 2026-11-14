@@ -16,9 +16,11 @@ found in the LICENSE file.
 #include <mitkActionOriginScope.h>
 #include <mitkException.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
 #include <mitkRestServer.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkWeakPointer.h>
 #include "mitkRestRouter.h"
 
 #include <httplib.h>
@@ -179,7 +181,9 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(RoutesActUnderTheNameOfTheirClient);
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
+  MITK_TEST(RestColorsAreParsedAndFormatted);
   MITK_TEST(ServerForOneClient);
+  MITK_TEST(RemovedNodeHeldByAHandlerDiesInTheDispatchThread);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -757,6 +761,19 @@ private:
 
 public:
 
+  void RestColorsAreParsedAndFormatted()
+  {
+    const auto color = mitk::ParseRestColor("#FF8800");
+
+    CPPUNIT_ASSERT(color.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("#ff8800"), mitk::ToRestColor(*color));
+
+    for (const auto* text : { "", "ff8800", "#ff880", "#ff88000", "#gg8800", "red" })
+      CPPUNIT_ASSERT(!mitk::ParseRestColor(text).has_value());
+
+    CPPUNIT_ASSERT_THROW(mitk::ThrowRestError("CODE", "Title", "Detail", 400, "/path"), mitk::RestException);
+  }
+
   void WorldPointsAreParsed()
   {
     const auto points = mitk::GetRestWorldPoints({ { "points", { { 1.5, 2, -3 }, { 0, 0, 0 } } } }, "/test", 2);
@@ -830,6 +847,86 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(403, loaded.Status);
     CPPUNIT_ASSERT_EQUAL(200, listed.Status);
+  }
+
+  /**
+   * A handler resolves its nodes in its own thread, as CallInGuiThread() asks.
+   * The user removes one meanwhile in the dispatch thread, here the test's.
+   */
+  void RemovedNodeHeldByAHandlerDiesInTheDispatchThread()
+  {
+    auto dataStorage = mitk::StandaloneDataStorage::New();
+    auto dispatcher = BusyDispatcher::New();
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+    server.SetDataStorage(dataStorage);
+
+    std::mutex mutex;
+    std::thread::id deletedIn;
+    std::thread::id observedIn;
+
+    auto node = mitk::DataNode::New();
+    node->SetName("held");
+    node->AddObserver(itk::DeleteEvent(), [&](const itk::EventObject&) {
+      std::lock_guard<std::mutex> lock(mutex);
+      deletedIn = std::this_thread::get_id();
+    });
+
+    mitk::WeakPointer<mitk::DataNode> observer(node);
+    observer.SetDeleteEventCallback([&]() {
+      std::lock_guard<std::mutex> lock(mutex);
+      observedIn = std::this_thread::get_id();
+    });
+
+    dataStorage->Add(node);
+
+    std::promise<void> held;
+    std::promise<void> removed;
+    auto removedFuture = removed.get_future().share();
+
+    mitk::RestRoute route;
+    route.Method = "GET";
+    route.Path = "/held/:uid";
+    route.Handler = [&](const mitk::RestRequest& request) {
+      auto heldNode = server.FindNode(request.PathParams.at("uid"));
+      held.set_value();
+      removedFuture.wait();
+
+      return mitk::RestResponse::FromData(heldNode != nullptr ? heldNode->GetName() : std::string("none"));
+    };
+    server.AddRoute(route);
+
+    // Before the dispatcher, which runs tasks only when the test says so.
+    const auto uid = server.GetNodeUid(node);
+    CPPUNIT_ASSERT(!uid.empty());
+
+    server.SetDispatcher(dispatcher);
+    CPPUNIT_ASSERT(server.Start());
+
+    auto response = std::async(std::launch::async, [&server, uid]() {
+      return server.HandleRequest(MakeRequest("GET", "/api/v1/held/" + uid));
+    });
+
+    const bool reached = held.get_future().wait_for(std::chrono::seconds(10)) == std::future_status::ready;
+
+    // What the Data Manager does: the storage lets go, and nobody else holds the node.
+    dataStorage->Remove(node);
+    node = nullptr;
+    removed.set_value();
+
+    const auto answer = response.get();
+
+    // What the handler left to the dispatch thread.
+    dispatcher->Run();
+    server.Stop();
+
+    CPPUNIT_ASSERT(reached);
+    CPPUNIT_ASSERT_EQUAL(200, answer.Status);
+
+    std::lock_guard<std::mutex> lock(mutex);
+    CPPUNIT_ASSERT(deletedIn == std::this_thread::get_id());
+    CPPUNIT_ASSERT(observedIn == std::this_thread::get_id());
   }
 };
 

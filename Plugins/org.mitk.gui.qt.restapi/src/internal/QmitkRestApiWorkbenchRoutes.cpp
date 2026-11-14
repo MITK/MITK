@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIProgressService.h>
 #include <mitkIRestServerService.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRenderingManager.h>
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
@@ -377,19 +378,14 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
     if (!body.contains("uids") || !body["uids"].is_array())
       throw RestException(ErrorResponse::InvalidRequest("The body needs \"uids\", a list of node UIDs.", request.Path));
 
-    std::vector<DataNode::Pointer> nodes;
+    std::vector<DataNodeHandle> nodes;
 
     for (const auto& uid : body["uids"])
     {
       if (!uid.is_string())
         throw RestException(ErrorResponse::InvalidRequest("Each entry of \"uids\" must be a node UID, a string.", request.Path));
 
-      auto node = server->FindNode(uid.get<std::string>());
-
-      if (node.IsNull())
-        throw RestException(ErrorResponse::NodeNotFound(uid.get<std::string>(), request.Path));
-
-      nodes.push_back(node);
+      nodes.push_back(FindRestNode(*server, uid.get<std::string>(), request.Path));
     }
 
     const auto selected = CallInGuiThread(*server, [&request, &nodes]() {
@@ -407,7 +403,12 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
       if (provider.IsNull())
         throw RestException(ErrorResponse::InternalError("The Data Manager has no selection to set.", request.Path));
 
-      provider->SetSelection(mitk::DataNodeSelection::ConstPointer(new mitk::DataNodeSelection(nodes)), QItemSelectionModel::ClearAndSelect);
+      std::vector<DataNode::Pointer> toSelect;
+
+      for (const auto& node : nodes)
+        toSelect.emplace_back(node.get());
+
+      provider->SetSelection(mitk::DataNodeSelection::ConstPointer(new mitk::DataNodeSelection(toSelect)), QItemSelectionModel::ClearAndSelect);
 
       // The Data Manager derives the "selected" properties from the
       // selection service, which lags behind when the selection is set from

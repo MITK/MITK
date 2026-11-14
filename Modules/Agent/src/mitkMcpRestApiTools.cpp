@@ -70,7 +70,7 @@ namespace
 
     const auto node = server.FindNode(uid);
 
-    return node.IsNotNull()
+    return node != nullptr
       ? std::make_optional(node->GetName())
       : std::nullopt;
   }

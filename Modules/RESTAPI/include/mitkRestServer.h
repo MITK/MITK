@@ -96,7 +96,7 @@ namespace mitk
     RestResponse HandleRequest(RestRequest request) override;
 
     std::shared_ptr<RestJob> CreateJob(const std::string& description) override;
-    DataNode::Pointer FindNode(const std::string& uid) const override;
+    DataNodeHandle FindNode(const std::string& uid) const override;
     std::string GetNodeUid(DataNode* node) const override;
     void Dispatch(const std::function<void()>& task) const override;
     void Post(std::function<void()> task) const override;

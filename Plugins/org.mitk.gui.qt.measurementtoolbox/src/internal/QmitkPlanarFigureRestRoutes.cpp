@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigureVtkMapper3D.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
 #include <mitkWeakPointer.h>
 
@@ -82,11 +83,6 @@ namespace
     { "on_hover_while_selected", Visibility::OnHoverWhileSelected },
     { "never", Visibility::Never }
   }};
-
-  [[noreturn]] void Throw(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
-  {
-    throw RestException(ErrorResponse::Create(code, title, detail, status, path));
-  }
 
   [[noreturn]] void ThrowInvalid(const std::string& detail, const std::string& path)
   {
@@ -189,7 +185,7 @@ namespace
   /** What a request changes of the look of a figure. */
   struct LookChange
   {
-    std::optional<QColor> Color;
+    std::optional<mitk::Color> Color;
     std::optional<float> LineWidth;
     std::optional<Visibility> Label;
     std::optional<bool> ShowName;
@@ -222,15 +218,10 @@ namespace
 
     if (body.contains("color"))
     {
-      const auto text = body["color"].is_string() ? body["color"].get<std::string>() : std::string();
+      change.Color = mitk::ParseRestColor(body["color"].is_string() ? body["color"].get<std::string>() : std::string());
 
-      const bool isHex = text.size() == 7 && text[0] == '#' &&
-        std::all_of(text.begin() + 1, text.end(), [](unsigned char c) { return std::isxdigit(c) != 0; });
-
-      if (!isHex)
+      if (!change.Color.has_value())
         ThrowInvalid("\"color\" must be written like \"#ff8800\".", path);
-
-      change.Color = QColor(QString::fromStdString(text));
     }
 
     if (body.contains("line_width"))
@@ -387,7 +378,7 @@ namespace
   void ApplyLookChange(mitk::DataNode* node, const LookChange& change, QmitkPulseTimers* pulseTimers)
   {
     if (change.Color.has_value())
-      node->SetColor(change.Color->redF(), change.Color->greenF(), change.Color->blueF());
+      node->SetColor(*change.Color);
 
     if (change.LineWidth.has_value())
       node->SetFloatProperty(LineWidthProperty, *change.LineWidth);
@@ -551,10 +542,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
 
     const auto lookChange = ParseLookChange(body, request.Path);
     const auto window = body["window"].get<std::string>();
-    const auto imageNode = server->FindNode(body["image"].get<std::string>());
-
-    if (imageNode.IsNull())
-      throw RestException(ErrorResponse::NodeNotFound(body["image"].get<std::string>(), request.Path));
+    const auto imageNode = mitk::FindRestNode(*server, body["image"], request.Path);
 
     const auto dataStorage = server->GetDataStorage();
 
@@ -568,7 +556,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
         ThrowInvalid("\"type\" must be line, circle or rectangle.", request.Path);
 
       if (dynamic_cast<const mitk::Image*>(imageNode->GetData()) == nullptr)
-        Throw("NOT_AN_IMAGE", "Unprocessable Content", "\"" + imageNode->GetName() + "\" is no image.", 422, request.Path);
+        mitk::ThrowRestError("NOT_AN_IMAGE", "Unprocessable Content", "\"" + imageNode->GetName() + "\" is no image.", 422, request.Path);
 
       const auto* renderer = mitk::GetRestRenderer(window, request.Path);
 
@@ -592,7 +580,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       {
         if (plane->Distance(points[i]) > halfThickness)
         {
-          Throw("POINT_OFF_SLICE", "Unprocessable Content", "A point lies off the slice that the " + window +
+          mitk::ThrowRestError("POINT_OFF_SLICE", "Unprocessable Content", "A point lies off the slice that the " + window +
             " window shows. Show the slice through the points first, for example with PUT "
             "/api/v1/rendering/selected-position, or give pixels of a screenshot.", 422, request.Path);
         }
@@ -621,7 +609,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       node->SetData(planarFigure);
       ApplyLookChange(node, lookChange, pulseTimers);
 
-      dataStorage->Add(node, imageNode);
+      dataStorage->Add(node, imageNode.get());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
       return DescribeFigure(dataStorage, node);
@@ -661,10 +649,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
 
     const auto lookChange = ParseLookChange(body, request.Path);
     const auto& uid = request.PathParams.at("uid");
-    const auto node = server->FindNode(uid);
-
-    if (node.IsNull())
-      throw RestException(ErrorResponse::NodeNotFound(uid, request.Path));
+    const auto node = mitk::FindRestNode(*server, uid, request.Path);
 
     const auto dataStorage = server->GetDataStorage();
 
@@ -674,16 +659,16 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     const auto figure = CallInGuiThread(*server, [&]() {
       const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
 
-      if (planarFigure == nullptr || !planarFigure->IsComplete() || !GetFigurePredicate()->CheckNode(node))
+      if (planarFigure == nullptr || !planarFigure->IsComplete() || !GetFigurePredicate()->CheckNode(node.get()))
       {
-        Throw("NOT_A_PLANAR_FIGURE", "Unprocessable Content", "\"" + node->GetName() + "\" is no planar figure of "
+        mitk::ThrowRestError("NOT_A_PLANAR_FIGURE", "Unprocessable Content", "\"" + node->GetName() + "\" is no planar figure of "
           "the Measurement view, or is still being drawn.", 422, request.Path);
       }
 
-      ApplyLookChange(node, lookChange, pulseTimers);
+      ApplyLookChange(node.get(), lookChange, pulseTimers);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return DescribeFigure(dataStorage, node);
+      return DescribeFigure(dataStorage, node.get());
     });
 
     return RestResponse::FromData(ToJson(*server, figure));

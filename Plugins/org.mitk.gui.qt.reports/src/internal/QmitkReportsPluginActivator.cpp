@@ -19,12 +19,8 @@ found in the LICENSE file.
 #if MITK_HAS_RESTAPI
 #include "QmitkReportRestRoutes.h"
 
-#include <mitkIRestServerService.h>
 #include <mitkLog.h>
-
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleRegistry.h>
+#include <mitkRestHelpers.h>
 #endif
 
 #include <usModuleInitialization.h>
@@ -44,17 +40,13 @@ void QmitkReportsPluginActivator::start(ctkPluginContext* context)
   s_Store = std::make_unique<QmitkReportStore>();
 
 #if MITK_HAS_RESTAPI
-  // The REST server loads with the application's modules, before any plugin.
-  auto* mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
-  const auto reference = mitkContext->GetServiceReference<mitk::IRestServerService>();
-  m_RestServer = reference ? mitkContext->GetService(reference) : nullptr;
+  m_RestRoutes = std::make_unique<mitk::RestRouteRegistration>();
 
-  if (m_RestServer != nullptr)
+  if (m_RestRoutes->GetServer() != nullptr)
   {
     try
     {
-      for (const auto& route : CreateReportRoutes(m_RestServer))
-        m_RestRoutes.push_back(m_RestServer->AddRoute(route));
+      m_RestRoutes->Add(CreateReportRoutes(m_RestRoutes->GetServer()));
     }
     catch (const mitk::Exception& e)
     {
@@ -67,14 +59,7 @@ void QmitkReportsPluginActivator::start(ctkPluginContext* context)
 void QmitkReportsPluginActivator::stop(ctkPluginContext*)
 {
 #if MITK_HAS_RESTAPI
-  if (m_RestServer != nullptr)
-  {
-    for (const auto id : m_RestRoutes)
-      m_RestServer->RemoveRoute(id);
-  }
-
-  m_RestRoutes.clear();
-  m_RestServer = nullptr;
+  m_RestRoutes.reset();
 #endif
 
   s_Store.reset();

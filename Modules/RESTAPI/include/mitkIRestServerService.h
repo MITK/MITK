@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 namespace mitk { class RenderWindowBridge; }
 
+#include <memory>
 #include <string>
 #include <optional>
 #include <vector>
@@ -30,6 +31,9 @@ namespace mitk { class RenderWindowBridge; }
 
 namespace mitk
 {
+  /** \brief A node that IRestServerService::FindNode() found; see there for what the handle guarantees. */
+  using DataNodeHandle = std::shared_ptr<DataNode>;
+
   /**
    * \brief Information about a REST API request.
    */
@@ -244,9 +248,16 @@ namespace mitk
     /**
      * \brief The node that a UID of the API stands for, or null.
      *
-     * Can be called from any thread.
+     * Can be called from any thread. The node stays alive as long as a copy
+     * of the handle exists. When the last copy goes, the reference to the
+     * node is released in the thread that owns the data storage: right away
+     * if the releasing thread is that thread or the server has no dispatcher,
+     * otherwise by Post(). A node that the user removed meanwhile therefore
+     * never dies in a thread of the server. Keep the handle in a handler
+     * rather than copying the node into a DataNode::Pointer, which would
+     * hold a reference of its own.
      */
-    virtual DataNode::Pointer FindNode(const std::string& uid) const = 0;
+    virtual DataNodeHandle FindNode(const std::string& uid) const = 0;
 
     /**
      * \brief The UID of a node, as the API names it.

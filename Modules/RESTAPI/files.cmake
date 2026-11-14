@@ -2,6 +2,7 @@ set(H_FILES
   include/mitkRestServerConfig.h
   include/mitkNodeQueryParams.h
   include/mitkRestGuiThread.h
+  include/mitkRestHelpers.h
   include/mitkRestJob.h
   include/mitkRestPoints.h
   include/mitkRestRoute.h
@@ -11,6 +12,7 @@ set(H_FILES
 set(CPP_FILES
   mitkRestServerConfig.cpp
   mitkIRestServerService.cpp
+  mitkRestHelpers.cpp
   mitkRestJob.cpp
   mitkRestPoints.cpp
   mitkRestRoute.cpp

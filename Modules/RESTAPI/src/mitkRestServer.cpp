@@ -835,9 +835,31 @@ std::shared_ptr<RestJob> RestServer::CreateJob(const std::string& description)
   return job;
 }
 
-DataNode::Pointer RestServer::FindNode(const std::string& uid) const
+DataNodeHandle RestServer::FindNode(const std::string& uid) const
 {
-  return m_Bridge->FindNode(uid);
+  auto node = m_Bridge->FindNode(uid);
+
+  if (node.IsNull())
+    return nullptr;
+
+  StorageThreadDispatcherBase::Pointer dispatcher;
+
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    dispatcher = m_Dispatcher.Lock();
+  }
+
+  auto* const pointer = node.GetPointer();
+
+  return DataNodeHandle(pointer, [node = std::move(node), dispatcher = std::move(dispatcher)](DataNode*) mutable {
+    if (dispatcher.IsNull() || dispatcher->IsDispatchThread())
+    {
+      node = nullptr;
+      return;
+    }
+
+    dispatcher->Post([node = std::move(node)]() {});
+  });
 }
 
 std::string RestServer::GetNodeUid(DataNode* node) const

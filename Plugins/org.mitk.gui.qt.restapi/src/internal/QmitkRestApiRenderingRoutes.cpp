@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
 #include <mitkRestTime.h>
 #include <mitkSliceNavigationController.h>
@@ -236,16 +237,16 @@ namespace
 
     if (const auto background = request.GetQueryParam("background"); background.has_value())
     {
-      const auto color = QColor::fromString(QString::fromStdString(*background));
+      const auto color = mitk::ParseRestColor(*background);
 
       if (*background == "transparent")
       {
         options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Transparent;
       }
-      else if (background->size() == 7 && background->front() == '#' && color.isValid())
+      else if (color.has_value())
       {
         options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Color;
-        options.BackgroundColor = color;
+        options.BackgroundColor = QColor(QString::fromStdString(*background));
       }
       else
       {
@@ -698,30 +699,18 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     if (margin < 0.0 || margin > 10.0)
       throw RestException(ErrorResponse::InvalidRequest("margin must lie between 0 and 10.", request.Path));
 
-    const auto findNode = [&](const nlohmann::json& uid) {
-      if (!uid.is_string())
-        throw RestException(ErrorResponse::InvalidRequest("Data is given by its uid, a string.", request.Path));
-
-      auto node = server->FindNode(uid.get<std::string>());
-
-      if (node.IsNull())
-        throw RestException(ErrorResponse::NodeNotFound(uid.get<std::string>(), request.Path));
-
-      return node;
-    };
-
     const auto labelNotFound = [&request](std::uint64_t value) {
       return RestException(ErrorResponse::Create("LABEL_NOT_FOUND", "Not Found",
         "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path));
     };
 
-    DataNode::Pointer segmentationNode;
+    DataNodeHandle segmentationNode;
     std::vector<MultiLabelSegmentation::LabelValueType> labels;
-    std::vector<DataNode::Pointer> nodes;
+    std::vector<DataNodeHandle> nodes;
 
     if (body.contains("segmentation"))
     {
-      segmentationNode = findNode(body["segmentation"]);
+      segmentationNode = FindRestNode(*server, body["segmentation"], request.Path);
 
       for (const auto& value : body.value("labels", nlohmann::json::array()))
       {
@@ -743,7 +732,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     else
     {
       for (const auto& uid : body.value("uids", nlohmann::json::array()))
-        nodes.push_back(findNode(uid));
+        nodes.push_back(FindRestNode(*server, uid, request.Path));
 
       if (nodes.empty())
         throw RestException(ErrorResponse::InvalidRequest("Give a segmentation with labels, or uids.", request.Path));
@@ -755,7 +744,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       auto* window = FindRenderWindow(id, request.Path);
       std::vector<Point3D> corners;
 
-      if (segmentationNode.IsNotNull())
+      if (segmentationNode != nullptr)
       {
         const auto* segmentation = dynamic_cast<const MultiLabelSegmentation*>(segmentationNode->GetData());
 
@@ -771,7 +760,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
             throw labelNotFound(value);
         }
 
-        corners = GetLabelCorners(segmentation, labels, GetSelectedTimeStep(segmentationNode, request.Path));
+        corners = GetLabelCorners(segmentation, labels, GetSelectedTimeStep(segmentationNode.get(), request.Path));
 
         if (corners.empty())
         {
@@ -811,7 +800,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
             continue;
           }
 
-          const auto timeStep = GetSelectedTimeStep(node, request.Path);
+          const auto timeStep = GetSelectedTimeStep(node.get(), request.Path);
 
           // Point sets compute their bounds only on request, and one without points keeps its initial ones.
           if (data->IsEmptyTimeStep(timeStep))

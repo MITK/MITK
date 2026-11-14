@@ -12,16 +12,18 @@ found in the LICENSE file.
 #ifndef mitkPluginActivator_h
 #define mitkPluginActivator_h
 
+#include <mitkMeasurementToolboxPluginConfig.h>
+
 #include <ctkPluginActivator.h>
 
-#include <cstdint>
 #include <memory>
-#include <vector>
+
+#if MITK_HAS_RESTAPI
+#include <mitkRestHelpers.h>
+#endif
 
 namespace mitk
 {
-  struct IRestServerService;
-
   class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
@@ -37,9 +39,10 @@ namespace mitk
   private:
     static ctkPluginContext* m_Context;
 
-    /** \brief The server that offers the plugin's REST endpoints, if there is one. */
-    IRestServerService* m_RestServer = nullptr;
-    std::vector<std::uint64_t> m_RestRoutes;
+#if MITK_HAS_RESTAPI
+    /** \brief Offers the plugin's REST endpoints, if the application has a server. */
+    std::unique_ptr<RestRouteRegistration> m_RestRoutes;
+#endif
 
     /** \brief Parent of what the REST endpoints keep in the GUI thread, like the timers that end pulses; goes with them. */
     std::unique_ptr<QObject> m_RestRouteParent;

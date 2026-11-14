@@ -568,6 +568,11 @@ bool mitk::VoxTellTool::IsModelLoaded() const
   return m_Impl->ModelLoaded && m_Impl->Worker != nullptr && m_Impl->Worker->IsRunning();
 }
 
+bool mitk::VoxTellTool::IsInitializing() const
+{
+  return m_Impl->Initializing;
+}
+
 std::string mitk::VoxTellTool::GetWorkerExitDescription() const
 {
   return m_Impl->Worker != nullptr ? m_Impl->Worker->GetExitDescription() : std::string();

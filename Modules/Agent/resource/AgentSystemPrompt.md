@@ -178,6 +178,11 @@ and it stays as it is.
   them: follow them yourself unless the user asks otherwise.
 - POST `/api/v1/segmentation/segmentations` with `{"reference": uid of the
   image, "labels": ["Liver", ...]}` creates a segmentation for an image,
+- `unconfirmed_result` of GET `/api/v1/segmentation/session` is true while
+  the active tool holds a result that is not confirmed. Changing the image,
+  the segmentation, the active label or the tool, and resetting
+  nnInteractive, discard it: if it is not a result you just made, ask the
+  user first whether to confirm or discard it.
   with the labels you name; without `labels`, it gets one label with a
   suggested name. For an image with several time steps, `"static": true`
   makes one segmentation that holds for all of them, instead of one per

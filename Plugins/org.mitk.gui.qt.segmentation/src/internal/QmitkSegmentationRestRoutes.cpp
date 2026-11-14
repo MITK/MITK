@@ -368,7 +368,7 @@ namespace
     auto* working = toolManager->GetWorkingData(0);
     auto* segmentation = working != nullptr ? dynamic_cast<mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
     const auto* activeLabel = segmentation != nullptr ? segmentation->GetActiveLabel() : nullptr;
-    const auto* activeTool = toolManager->GetActiveTool();
+    auto* activeTool = toolManager->GetActiveTool();
 
     auto tools = nlohmann::json::array();
 
@@ -402,6 +402,7 @@ namespace
           ? nlohmann::json{ { "value", activeLabel->GetValue() }, { "name", activeLabel->GetName() } }
           : nlohmann::json() },
       { "tool", activeTool != nullptr ? nlohmann::json(activeTool->GetName()) : nlohmann::json() },
+      { "unconfirmed_result", activeTool != nullptr && activeTool->ConfirmBeforeDeactivation() },
       { "tools", tools },
       { "restrictions", DescribeRestrictions() }
     };
@@ -573,6 +574,26 @@ namespace
 
 #if MITK_HAS_PYTHON
   /**
+   * Runs \p then on the GUI thread once \p isStarting is false, for a start that the panel of a tool began.
+   * Polls as WhenToolIdle() does. Gives up when \p job has ended meanwhile.
+   */
+  void WhenStartEnded(const std::shared_ptr<mitk::RestJob>& job, std::function<bool()> isStarting, std::function<void()> then)
+  {
+    if (job->HasEnded())
+      return;
+
+    if (!isStarting())
+    {
+      then();
+      return;
+    }
+
+    QTimer::singleShot(50, QCoreApplication::instance(), [job, isStarting = std::move(isStarting), then = std::move(then)]() mutable {
+      WhenStartEnded(job, std::move(isStarting), std::move(then));
+    });
+  }
+
+  /**
    * The labels of the preview of a tool that adds labels, as the confirm adds them: with values that only the
    * confirm gives them, and to the group of the active label, unless the tool transfers all groups of its
    * preview, which then stand for those of the segmentation. With \a measure, they have voxels, volume_ml and
@@ -702,6 +723,7 @@ namespace
 
     return {
       { "session_running", running },
+      { "session_starting", tool->IsSessionStarting() },
       { "remote", tool->IsRemoteSession() },
       { "prompt_types", prompts },
       { "can_undo", tool->CanUndo() },
@@ -765,6 +787,7 @@ namespace
     return {
       { "installed", IsInstalled(tool).value_or(false) },
       { "model_loaded", tool->IsModelLoaded() },
+      { "model_loading", tool->IsInitializing() },
       { "prompts", tool->GetPrompts() },
       { "prompts_without_result", tool->GetPromptsWithoutResult() },
       { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
@@ -988,9 +1011,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   getSession.Summary = "Get what the Segmentation view works on: image, segmentation, label and tool";
   getSession.Description =
     "Returns {data: {view_open, reference: {uid, name, time_steps} | null, segmentation: {uid, name, time_steps} | "
-    "null, active_label: {value, name} | null, tool: name | null, tools: [{name, usable, installed}], "
-    "restrictions: {label_set_preset, label_suggestions_enforced}}}. The "
+    "null, active_label: {value, name} | null, tool: name | null, unconfirmed_result, tools: [{name, usable, "
+    "installed}], restrictions: {label_set_preset, label_suggestions_enforced}}}. The "
     "reference is the image that tools segment; tools write into the active label of the segmentation. "
+    "unconfirmed_result is true if the active tool holds a result that is not confirmed and that the view would "
+    "ask the user about before it discards it; it is false without an active tool. "
     "time_steps are the time points that each time step of the data covers, [{min_timepoint_ms, "
     "max_timepoint_ms}], the maximum excluded; data of a single time step has null bounds, as it shows at any "
     "time point. The "
@@ -1705,8 +1730,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   nnInteractiveState.Path = "/segmentation/nninteractive";
   nnInteractiveState.Summary = "Get the state of nnInteractive, the interactive segmentation tool";
   nnInteractiveState.Description =
-    "Needs nnInteractive as active tool. Returns {data: {session_running, remote, prompt_types, can_undo, "
-    "auto_zoom, auto_refine, preview_voxels}}; preview_voxels is the size of the unconfirmed result.";
+    "Needs nnInteractive as active tool. Returns {data: {session_running, session_starting, remote, "
+    "prompt_types, can_undo, auto_zoom, auto_refine, preview_voxels}}; session_starting is true while a start "
+    "is under way, whoever began it; preview_voxels is the size of the unconfirmed result.";
   nnInteractiveState.Handler = [server](const RestRequest& request) {
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeNNInteractive(GetNNInteractive(request.Path)); }));
   };
@@ -1772,7 +1798,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   startSession.Description =
     "Needs nnInteractive as active tool, installed once by the user through its Initialize button. Loads "
     "the model, which can take a while the first time, as a job: query parameter wait (seconds) waits for "
-    "it. The job's result is the state as GET /api/v1/segmentation/nninteractive gives it. The session works "
+    "it. The job's result is the state as GET /api/v1/segmentation/nninteractive gives it. A start that the "
+    "user began in the panel is joined: the job ends with it, and fails if it did not succeed. The session works "
     "on the image and time step chosen now; changing them ends it.";
   startSession.Handler = [server, start](const RestRequest& request) {
     CallInGuiThread(*server, [&]() {
@@ -1818,6 +1845,18 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       {
         // Held, as the tool can be deactivated while the start runs.
         nnInteractiveTool::Pointer tool(GetNNInteractive(path));
+
+        if (tool->IsSessionStarting())
+        {
+          WhenStartEnded(job, [tool]() { return tool->IsSessionStarting(); }, [job, tool]() {
+            if (tool->IsSessionRunning())
+              job->Succeed(DescribeNNInteractive(tool));
+            else
+              job->Fail("The start in the panel did not succeed.");
+          });
+
+          return;
+        }
 
         auto task = std::make_shared<ProgressTask>("Initializing nnInteractive", ProgressTask::Indeterminate, true);
 
@@ -1997,7 +2036,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   voxTell.Description =
     "Needs VoxTell as active tool. Query parameter: measure (optional, true or false), true adds voxels, "
     "volume_ml and center to the preview labels, which costs a pass over the preview. Returns {data: {installed, "
-    "model_loaded, prompts, prompts_without_result, error, preview_labels: [label]}}, preview_labels being the "
+    "model_loaded, model_loading, prompts, prompts_without_result, error, preview_labels: [label]}}, "
+    "model_loading being true while the model is being prepared, whoever began it, and preview_labels being the "
     "unconfirmed result, one label per prompt, as GET .../labels describes labels but without value: group is the "
     "group that the confirm adds them to, that of the active label unless create_groups put a label into another "
     "one, which the confirm creates if the segmentation does not have it, and they get their values with the "
@@ -2106,7 +2146,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Needs VoxTell as active tool, installed by the user through its panel. Downloads the files of the model "
     "first if they are missing, which the progress notifications and GET /api/v1/workbench/tasks show, then "
     "loads it. Runs as a job: query parameter wait (seconds) waits for it. If the model is loaded already, the "
-    "job has succeeded when the answer comes. The job's result is the state as GET /api/v1/segmentation/voxtell "
+    "job has succeeded when the answer comes. A start that the user began in the panel is joined: the job ends "
+    "with it, and fails if it did not succeed. The job's result is the state as GET /api/v1/segmentation/voxtell "
     "gives it without measure.";
   voxTellModel.Handler = [server](const RestRequest& request) {
     const auto loaded = CallInGuiThread(*server, [&]() {
@@ -2147,6 +2188,18 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       {
         // Held, as the tool can be deactivated while the worker loads.
         tool = GetVoxTell(path);
+
+        if (tool->IsInitializing())
+        {
+          WhenStartEnded(job, [tool]() { return tool->IsInitializing(); }, [job, tool]() {
+            if (tool->IsModelLoaded())
+              job->Succeed(DescribeVoxTell(tool));
+            else
+              job->Fail("The start in the panel did not succeed.");
+          });
+
+          return;
+        }
 
         auto filesTask = std::make_shared<ProgressTask>("Preparing VoxTell", ProgressTask::Indeterminate, true);
 

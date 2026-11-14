@@ -230,6 +230,9 @@ namespace mitk
     /** \brief Checks whether a model is loaded and its worker still runs. */
     bool IsModelLoaded() const;
 
+    /** \brief Whether the model files, the model or the text model are being prepared. */
+    bool IsInitializing() const;
+
     /** \brief Why the worker stopped, see PythonWorker::GetExitDescription().
      *
      * \return The description, or an empty string if there is no worker or it

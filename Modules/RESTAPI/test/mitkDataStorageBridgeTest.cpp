@@ -24,7 +24,12 @@ found in the LICENSE file.
 #include <mitkImageGenerator.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkSurface.h>
+#include <mitkVtkPropRenderer.h>
 
+#include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
+
+#include <algorithm>
 #include <future>
 #include <set>
 #include <thread>
@@ -32,6 +37,30 @@ found in the LICENSE file.
 
 namespace
 {
+  /** A renderer with a name, known to mitk::BaseRenderer for as long as the object lives. */
+  class ScopedRenderer
+  {
+  public:
+    explicit ScopedRenderer(const std::string& name)
+      : m_RenderWindow(vtkSmartPointer<vtkRenderWindow>::New()),
+        m_Renderer(mitk::VtkPropRenderer::New(name.c_str(), m_RenderWindow))
+    {
+      mitk::BaseRenderer::AddInstance(m_RenderWindow, m_Renderer);
+    }
+
+    ~ScopedRenderer()
+    {
+      mitk::BaseRenderer::RemoveInstance(m_RenderWindow);
+    }
+
+    ScopedRenderer(const ScopedRenderer&) = delete;
+    ScopedRenderer& operator=(const ScopedRenderer&) = delete;
+
+  private:
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
+    mitk::VtkPropRenderer::Pointer m_Renderer;
+  };
+
   /** A dispatcher with a thread of its own for each task, which tells where the tasks ran. */
   class ThreadDispatcher : public mitk::StorageThreadDispatcherBase
   {
@@ -143,6 +172,8 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodeProperty);
   MITK_TEST(SetNodePropertyKeepsTypeOfSimpleValue);
   MITK_TEST(SetNodePropertyOverrideTakesTypeOfOverriddenProperty);
+  MITK_TEST(PropertyWritesRefuseUnknownContext);
+  MITK_TEST(ReplaceNodePropertiesRefusesAllOrNothing);
   MITK_TEST(SetNodePropertyRefusesOtherType);
   MITK_TEST(SetNodePropertyRefusesUnfittingValue);
   MITK_TEST(SetNodePropertyRefusesIncompleteObject);
@@ -1348,7 +1379,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "opacity", value, params);
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "opacity", value, params).status;
     CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     auto prop = m_Bridge->GetNodeProperty(m_Root1Uid, "opacity");
@@ -1363,7 +1394,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params);
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     auto* property = dynamic_cast<mitk::FloatProperty*>(m_Root1->GetProperty("line.width"));
@@ -1374,20 +1405,66 @@ public:
   void SetNodePropertyOverrideTakesTypeOfOverriddenProperty()
   {
     const std::string context = "stdmulti.widget0";
+    const ScopedRenderer renderer(context);
     m_Root1->SetFloatProperty("line.width", 2.0f);
-    m_Root1->GetPropertyList(context); // makes the list of the context
 
+    // The node has no list for the context yet; the write makes it
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
     params.context = context;
 
-    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params);
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     const auto property = m_Root1->GetConstProperty("line.width", context, false);
     const auto* floatProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
     CPPUNIT_ASSERT(floatProperty != nullptr);
     CPPUNIT_ASSERT_EQUAL(3.0f, floatProperty->GetValue());
+  }
+
+  void PropertyWritesRefuseUnknownContext()
+  {
+    const ScopedRenderer renderer("stdmulti.widget0");
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+    params.context = "stdmulti.widget9";
+
+    const auto setResult = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params);
+    CPPUNIT_ASSERT(setResult.status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(setResult.reason.find("stdmulti.widget9") != std::string::npos);
+    CPPUNIT_ASSERT(setResult.reason.find("stdmulti.widget0") != std::string::npos);
+
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "line.width", params).status ==
+      mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    const auto replaceResult = m_Bridge->ReplaceNodeProperties(m_Root1Uid, nlohmann::json::object(), params);
+    CPPUNIT_ASSERT(replaceResult.status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    // No list was made for the name
+    const auto contexts = m_Root1->GetPropertyContextNames();
+    CPPUNIT_ASSERT(std::find(contexts.begin(), contexts.end(), "stdmulti.widget9") == contexts.end());
+  }
+
+  void ReplaceNodePropertiesRefusesAllOrNothing()
+  {
+    m_Root1->SetFloatProperty("keep.me", 1.0f);
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    // The value of "keep.me" is fine, the one of "line.width" is not; neither is applied
+    const nlohmann::json properties = { { "keep.me", 5.0 }, { "line.width", "wide" } };
+    const auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, properties, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(result.reason.find("line.width") != std::string::npos);
+
+    float value = 0.0f;
+    CPPUNIT_ASSERT(m_Root1->GetFloatProperty("keep.me", value));
+    CPPUNIT_ASSERT_EQUAL(1.0f, value);
+    CPPUNIT_ASSERT(m_Root1->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
   }
 
   void SetNodePropertyRefusesOtherType()
@@ -1398,7 +1475,7 @@ public:
     params.scope = mitk::PropertyScope::Node;
 
     const nlohmann::json value = { { "type", "IntProperty" }, { "value", 3 } };
-    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", value, params);
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", value, params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     auto* property = dynamic_cast<mitk::FloatProperty*>(m_Root1->GetProperty("line.width"));
@@ -1413,7 +1490,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "flag", "yes", params);
+    auto status = m_Bridge->SetNodeProperty(m_Root1Uid, "flag", "yes", params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     bool flag = false;
@@ -1423,10 +1500,10 @@ public:
     // Not rounded and not converted from a boolean
     m_Root1->SetIntProperty("test.count", 1);
 
-    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", 2.7, params);
+    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", 2.7, params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
-    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", true, params);
+    status = m_Bridge->SetNodeProperty(m_Root1Uid, "test.count", true, params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     int count = 0;
@@ -1481,8 +1558,8 @@ public:
     const nlohmann::json incomplete = { { "CurrentSettings", { { "Level", 40 }, { "Window", 400 } } } };
     const nlohmann::json typed = { { "type", "LevelWindowProperty" }, { "value", incomplete } };
 
-    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", incomplete, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
-    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", typed, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", incomplete, params).status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", typed, params).status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     mitk::LevelWindow unchanged;
     CPPUNIT_ASSERT(m_Root1->GetLevelWindow(unchanged));
@@ -1504,7 +1581,7 @@ public:
     CPPUNIT_ASSERT(prop.has_value());
 
     // Delete it
-    auto deleted = m_Bridge->DeleteNodeProperty(m_Root1Uid, "customProp", params);
+    auto deleted = m_Bridge->DeleteNodeProperty(m_Root1Uid, "customProp", params).status;
     CPPUNIT_ASSERT(deleted == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify it's gone
@@ -1518,7 +1595,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto status = m_Bridge->DeleteNodeProperty(m_Root1Uid, "nonExistentProp", params);
+    auto status = m_Bridge->DeleteNodeProperty(m_Root1Uid, "nonExistentProp", params).status;
     CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
   }
 
@@ -1649,22 +1726,22 @@ public:
 
     // Scope=Node on node-only property -> succeeds
     params.scope = mitk::PropertyScope::Node;
-    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop", params) == mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop", params).status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Scope=Node on data-only property -> fails (property not in node scope)
     params.scope = mitk::PropertyScope::Node;
-    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params) == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params).status == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
 
     // Scope=Data on data property -> succeeds
     params.scope = mitk::PropertyScope::Data;
-    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params) == mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params).status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Re-add node property for the next check
     nodeWithData->SetBoolProperty("node_del_prop2", true);
 
     // Scope=Data on node-only property -> fails
     params.scope = mitk::PropertyScope::Data;
-    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop2", params) == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop2", params).status == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
   }
 
   void MutationRejectsAllScope()
@@ -1675,10 +1752,10 @@ public:
     // SetNodeProperty with scope=All -> returns InvalidInput
     nlohmann::json value;
     value["value"] = "test";
-    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "test_prop", value, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "test_prop", value, params).status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // DeleteNodeProperty with scope=All -> returns InvalidInput
-    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "visible", params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "visible", params).status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // ReplaceNodeProperties with scope=All -> returns InvalidInput
     nlohmann::json newProps;
@@ -1726,7 +1803,7 @@ public:
     mitk::PropertyQueryParams writeParams;
     writeParams.scope = mitk::PropertyScope::Node;
 
-    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "color", newColorValue, writeParams);
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "color", newColorValue, writeParams).status;
     CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Step 4: Get the property again and verify the new values
@@ -2128,7 +2205,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto result = m_Bridge->SetNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, value, params);
+    auto result = m_Bridge->SetNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, value, params).status;
     CPPUNIT_ASSERT(result == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // Verify the original UID is unchanged
@@ -2144,7 +2221,7 @@ public:
     params.scope = mitk::PropertyScope::Node;
 
     // Trying to delete an internal property should fail
-    auto result = m_Bridge->DeleteNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, params);
+    auto result = m_Bridge->DeleteNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, params).status;
     CPPUNIT_ASSERT(result == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // Verify the property still exists
@@ -2250,7 +2327,7 @@ public:
     mitk::PropertyQueryParams params;
     params.scope = mitk::PropertyScope::Node;
 
-    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "test_opacity", value, params);
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "test_opacity", value, params).status;
     CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking properties are set
@@ -2272,7 +2349,7 @@ public:
     m_Bridge->SetNodeProperty(m_Root2Uid, "deletable_prop", value, params);
 
     // Delete the property
-    auto deleted = m_Bridge->DeleteNodeProperty(m_Root2Uid, "deletable_prop", params);
+    auto deleted = m_Bridge->DeleteNodeProperty(m_Root2Uid, "deletable_prop", params).status;
     CPPUNIT_ASSERT(deleted == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking properties are set

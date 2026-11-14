@@ -65,6 +65,7 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteProtectedProperty);
   MITK_TEST(PatchNodeProperties);
   MITK_TEST(PutNodeProperties);
+  MITK_TEST(RefusedPropertyValuesTellTheReason);
   // Special character tests (percent-encoding)
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
@@ -704,6 +705,53 @@ public:
     CPPUNIT_ASSERT(json["data"].contains("replaced"));
     CPPUNIT_ASSERT(json["meta"].contains("node_uid"));
     CPPUNIT_ASSERT(json["meta"].contains("property_scope"));
+  }
+
+  void RefusedPropertyValuesTellTheReason()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetFloatProperty("line.width", 2.0f);
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    // PATCH lists the refused value with the reason
+    nlohmann::json body;
+    body["line.width"] = "wide";
+
+    auto patchReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+                                        body.dump(), {{"uid", uid}});
+    httplib::Response patchRes;
+    m_Controller->HandlePATCH_nodes_uid_properties(patchReq, patchRes);
+
+    CPPUNIT_ASSERT_EQUAL(200, patchRes.status);
+    auto json = nlohmann::json::parse(patchRes.body);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), json["data"]["failed"].size());
+    CPPUNIT_ASSERT(json["data"]["failed"][0]["error"].get<std::string>().find("FloatProperty") != std::string::npos);
+
+    // PUT of the list answers 400 with the key, and changes nothing
+    body["other"] = true;
+    auto putReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+                                      body.dump(), {{"uid", uid}});
+    httplib::Response putRes;
+    m_Controller->HandlePUT_nodes_uid_properties(putReq, putRes);
+
+    CPPUNIT_ASSERT_EQUAL(400, putRes.status);
+    json = nlohmann::json::parse(putRes.body);
+    CPPUNIT_ASSERT(json["error"]["message"].get<std::string>().find("line.width") != std::string::npos);
+    CPPUNIT_ASSERT(node->GetProperty("other") == nullptr);
+
+    // PUT of one property answers 400 with the reason
+    auto putOneReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/line.width",
+                                         nlohmann::json("wide").dump(),
+                                         {{"uid", uid}, {"property_key", "line.width"}});
+    httplib::Response putOneRes;
+    m_Controller->HandlePUT_nodes_uid_properties_key(putOneReq, putOneRes);
+
+    CPPUNIT_ASSERT_EQUAL(400, putOneRes.status);
+    json = nlohmann::json::parse(putOneRes.body);
+    CPPUNIT_ASSERT(json["error"]["message"].get<std::string>().find("FloatProperty") != std::string::npos);
   }
 
   // ===== Special character tests (percent-encoding) =====

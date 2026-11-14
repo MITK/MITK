@@ -363,15 +363,28 @@ namespace mitk
       const PropertyQueryParams& params = {}) const;
 
     /**
+     * \brief Result of a single property write or delete.
+     */
+    struct PropertyOperationResult
+    {
+      OperationStatus status = OperationStatus::InternalError;
+      std::string reason;  /**< Why the request was refused; set for InvalidInput. */
+    };
+
+    /**
      * \brief Set a single property on a node.
+     *
+     * A context names a render window. An unknown name is refused; for a known
+     * name the node gets its property list, if it has none yet.
      *
      * \param uid The node UID.
      * \param key The property key.
      * \param value The property value as JSON.
      * \param params Query parameters for scope and context.
-     * \return OperationStatus::Success, ::NodeNotFound, ::InvalidInput, or ::InternalError.
+     * \return Status (Success, NodeNotFound, InvalidInput, or InternalError) and,
+     *         for InvalidInput, the reason.
      */
-    OperationStatus SetNodeProperty(
+    PropertyOperationResult SetNodeProperty(
       const std::string& uid,
       const std::string& key,
       const Json& value,
@@ -383,9 +396,10 @@ namespace mitk
      * \param uid The node UID.
      * \param key The property key.
      * \param params Query parameters for scope and context.
-     * \return OperationStatus::Success, ::NodeNotFound, ::PropertyNotFound, ::InvalidInput, or ::InternalError.
+     * \return Status (Success, NodeNotFound, PropertyNotFound, InvalidInput, or
+     *         InternalError) and, for InvalidInput, the reason.
      */
-    OperationStatus DeleteNodeProperty(
+    PropertyOperationResult DeleteNodeProperty(
       const std::string& uid,
       const std::string& key,
       const PropertyQueryParams& params);
@@ -396,11 +410,16 @@ namespace mitk
     struct ReplacePropertiesResult
     {
       OperationStatus status = OperationStatus::InternalError;
-      Json result = {};  ///< {"replaced": [...], "removed": [...]} - valid only on Success
+      Json result = {};     /**< {"replaced": [...], "removed": [...]}; valid only on Success. */
+      std::string reason;   /**< Why the request was refused, naming the key of a refused value; set for InvalidInput. */
     };
 
     /**
      * \brief Replace all properties on a node (PUT semantics).
+     *
+     * All or nothing: every value is converted first. If one is refused, the
+     * result is InvalidInput with the key and the reason, and the node is not
+     * changed. A context is handled as in SetNodeProperty().
      *
      * \param uid The node UID.
      * \param properties JSON object with all properties (replaces existing).

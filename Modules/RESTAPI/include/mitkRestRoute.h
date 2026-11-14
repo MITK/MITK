@@ -154,6 +154,9 @@ namespace mitk
    * The rights bind only requests that present the token. On a server that
    * does not require authentication, a request without a token is limited by
    * the file access mode of the server alone.
+   *
+   * Route handlers of plugins cannot see the rights of a request yet, so a
+   * route that touches files needs that first.
    */
   struct MITKRESTAPI_EXPORT RestTokenRights
   {

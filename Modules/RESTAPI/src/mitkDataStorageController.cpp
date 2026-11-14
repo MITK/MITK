@@ -2102,19 +2102,18 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Get previous value if exists
   auto previousProperty = m_Bridge.GetNodeProperty(uid, key, params);
 
-  const auto setStatus = m_Bridge.SetNodeProperty(uid, key, value, params);
-  if (setStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  const auto setResult = m_Bridge.SetNodeProperty(uid, key, value, params);
+  if (setResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
     return;
   }
-  else if (setStatus == DataStorageBridge::OperationStatus::InvalidInput)
+  else if (setResult.status == DataStorageBridge::OperationStatus::InvalidInput)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
-      "Failed to deserialize property value or no data for requested scope", req.path));
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(setResult.reason, req.path));
     return;
   }
-  else if (setStatus != DataStorageBridge::OperationStatus::Success)
+  else if (setResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to set property value", req.path));
     return;
@@ -2192,18 +2191,23 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  const auto deleteStatus = m_Bridge.DeleteNodeProperty(uid, key, params);
-  if (deleteStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  const auto deleteResult = m_Bridge.DeleteNodeProperty(uid, key, params);
+  if (deleteResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
     return;
   }
-  else if (deleteStatus == DataStorageBridge::OperationStatus::PropertyNotFound)
+  else if (deleteResult.status == DataStorageBridge::OperationStatus::PropertyNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::PropertyNotFound(key, uid, req.path));
     return;
   }
-  else if (deleteStatus != DataStorageBridge::OperationStatus::Success)
+  else if (deleteResult.status == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(deleteResult.reason, req.path));
+    return;
+  }
+  else if (deleteResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to delete property", req.path));
     return;
@@ -2308,7 +2312,7 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
   else if (replaceResult.status == DataStorageBridge::OperationStatus::InvalidInput)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to replace properties", req.path));
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(replaceResult.reason, req.path));
     return;
   }
   else if (replaceResult.status != DataStorageBridge::OperationStatus::Success)
@@ -2413,7 +2417,8 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
       continue;
     }
 
-    if (m_Bridge.SetNodeProperty(uid, key, value, params) == DataStorageBridge::OperationStatus::Success)
+    const auto setResult = m_Bridge.SetNodeProperty(uid, key, value, params);
+    if (setResult.status == DataStorageBridge::OperationStatus::Success)
     {
       updated.push_back(key);
     }
@@ -2421,7 +2426,7 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
     {
       nlohmann::json failure;
       failure[JSON_KEY_PROPERTY] = key;
-      failure[JSON_KEY_ERROR] = "Failed to set property value";
+      failure[JSON_KEY_ERROR] = setResult.reason.empty() ? "Failed to set property value" : setResult.reason;
       failed.push_back(failure);
     }
   }

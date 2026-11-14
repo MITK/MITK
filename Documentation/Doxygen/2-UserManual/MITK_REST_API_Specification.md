@@ -1298,13 +1298,13 @@ GET /api/v1/datastorage/nodes/node-001/properties?context=stdmulti.widget0&prope
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties
 
-Replace all properties of a node (full replacement).
+Replace all properties of a node (full replacement). All or nothing: if a value is refused (it does not fit the type of the property it changes, or cannot be converted), the answer is 400 and names the key and the reason; no property is changed or removed.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1351,13 +1351,13 @@ Content-Type: application/json
 
 ##### PATCH /api/v1/datastorage/nodes/{uid}/properties
 
-Update multiple properties at once (merge semantics).
+Update multiple properties at once (merge semantics). A refused value is listed in `failed` with the reason in `error`; the other values are applied.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window is listed in `failed` with the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1402,11 +1402,11 @@ Content-Type: application/json
 ```json
 {
   "data": {
-    "updated": ["visible", "opacity"],
+    "updated": ["visible", "color"],
     "failed": [
       {
-        "property": "color",
-        "error": "Invalid color value: expected array of 3 floats"
+        "property": "opacity",
+        "error": "Property \"opacity\" of type FloatProperty cannot take the value \"half\"."
       }
     ]
   },
@@ -1477,13 +1477,13 @@ Get a single property value.
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
-Set a single property value (create or replace).
+Set a single property value (create or replace). A refused value answers 400 with the reason in the message.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request (simple property):**
@@ -1538,7 +1538,7 @@ Remove a property from a node.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Response (200 OK):**

@@ -32,8 +32,8 @@ public:
   static QmitkAgentPluginActivator* GetInstance();
 
 signals:
-  /** \brief Claude Code signed in, maybe with another account than before. */
-  void ClaudeCodeSignedIn();
+  /** \brief Claude Code signed in or out, maybe with another account than before. */
+  void ClaudeCodeAccountChanged();
 
 private:
   static ctkPluginContext* s_Context;

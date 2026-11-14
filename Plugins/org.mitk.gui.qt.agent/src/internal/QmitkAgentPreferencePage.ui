@@ -48,7 +48,24 @@
        <number>10</number>
       </property>
       <item>
-       <widget class="QmitkInfoCard" name="statusCard"/>
+       <layout class="QHBoxLayout" name="statusLayout" stretch="1,0">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QmitkInfoCard" name="statusCard"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="signOutButton">
+          <property name="toolTip">
+           <string>Signs Claude Code out of its Claude subscription or Anthropic Console account. An API key in the environment stays.</string>
+          </property>
+          <property name="text">
+           <string>Sign Out</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="buttonsLayout" stretch="1,1">

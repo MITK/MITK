@@ -29,7 +29,7 @@ namespace Ui
  *        and whether a subscription takes precedence over an API key.
  *
  * The credentials stay with Claude Code. The Agent view applies the
- * settings, and checks the sign-in again when Claude Code signed in here.
+ * settings, and checks the sign-in again when Claude Code signed in or out here.
  */
 class QmitkAgentPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -61,6 +61,9 @@ private:
 
   void BrowseExecutable();
   void SignIn(QmitkAgentSignInDialog::Account account);
+
+  /** \brief Runs "claude auth logout", with the same settings as the sign-in. */
+  void SignOut();
 
   std::unique_ptr<Ui::QmitkAgentPreferencePage> m_Ui;
   QWidget* m_Control;

@@ -119,7 +119,7 @@ void QmitkAgentView::CreateQtPartControl(QWidget* parent)
   connect(m_Session.get(), &QmitkAgentSession::TurnsFinished, this, &QmitkAgentView::BringToTop);
 
   if (auto* activator = QmitkAgentPluginActivator::GetInstance(); activator != nullptr)
-    connect(activator, &QmitkAgentPluginActivator::ClaudeCodeSignedIn, m_Session.get(), &QmitkAgentSession::CheckClaudeCodeAgain);
+    connect(activator, &QmitkAgentPluginActivator::ClaudeCodeAccountChanged, m_Session.get(), &QmitkAgentSession::CheckClaudeCodeAgain);
 
   this->UpdateLock();
 

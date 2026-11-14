@@ -47,6 +47,15 @@ namespace
 
     return QDir::fromNativeSeparators(path);
   }
+
+  /** Whether "claude auth logout" ends this sign-in: a subscription or a Console account, not a key from the environment. */
+  bool CanSignOut(const QmitkClaudeCodeProcess::AuthStatus& status)
+  {
+    if (!status.LoggedIn)
+      return false;
+
+    return status.Method == "claude.ai" || (status.Method == "api_key" && status.ApiKeySource == "/login managed key");
+  }
 }
 
 QmitkAgentPreferencePage::QmitkAgentPreferencePage()
@@ -81,6 +90,8 @@ void QmitkAgentPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Ui->consoleButton, &QPushButton::clicked, this, [this]() {
     this->SignIn(QmitkAgentSignInDialog::Account::Console);
   });
+
+  connect(m_Ui->signOutButton, &QPushButton::clicked, this, &QmitkAgentPreferencePage::SignOut);
 
   this->Update();
 }
@@ -138,6 +149,7 @@ void QmitkAgentPreferencePage::UpdateStatus()
 
   m_Ui->subscriptionButton->setEnabled(usable);
   m_Ui->consoleButton->setEnabled(usable);
+  m_Ui->signOutButton->setEnabled(false);
 
   if (executable.isEmpty())
   {
@@ -174,6 +186,7 @@ void QmitkAgentPreferencePage::UpdateStatus()
     else if (status.LoggedIn)
     {
       m_Ui->statusCard->SetMessage(QString("Signed in %1.").arg(status.Describe()).toHtmlEscaped());
+      m_Ui->signOutButton->setEnabled(CanSignOut(status));
     }
     else
     {
@@ -214,5 +227,50 @@ void QmitkAgentPreferencePage::SignIn(QmitkAgentSignInDialog::Account account)
 
   // Signing in takes effect at once, not only with OK.
   if (auto* activator = QmitkAgentPluginActivator::GetInstance(); activator != nullptr)
-    emit activator->ClaudeCodeSignedIn();
+    emit activator->ClaudeCodeAccountChanged();
+}
+
+void QmitkAgentPreferencePage::SignOut()
+{
+  m_Ui->signOutButton->setEnabled(false);
+  m_Ui->statusCard->SetMessage("Signing out...");
+
+  // With the control, which ends with the preferences dialog, unlike the page.
+  auto* process = new QProcess(m_Control);
+  QmitkClaudeCodeProcess::SetUpAuthCommand(*process, this->GetOptions(), { "logout" });
+
+  const auto fail = [this](const QString& error) {
+    m_Ui->statusCard->SetMessage(error.toHtmlEscaped(), QmitkInfoCard::Severity::Error);
+    m_Ui->signOutButton->setEnabled(true);
+  };
+
+  connect(process, &QProcess::finished, m_Control, [this, process, fail](int exitCode, QProcess::ExitStatus exitStatus) {
+    const auto error = QString::fromUtf8(process->readAllStandardError()).trimmed();
+    process->deleteLater();
+
+    if (exitStatus != QProcess::NormalExit || exitCode != 0)
+    {
+      fail(error.isEmpty()
+        ? QString("Claude Code ended before it was signed out (exit code %1).").arg(exitCode)
+        : error);
+
+      return;
+    }
+
+    this->UpdateStatus();
+
+    if (auto* activator = QmitkAgentPluginActivator::GetInstance(); activator != nullptr)
+      emit activator->ClaudeCodeAccountChanged();
+  });
+
+  // No finished() follows a failed start.
+  connect(process, &QProcess::errorOccurred, m_Control, [process, fail](QProcess::ProcessError error) {
+    if (error != QProcess::FailedToStart)
+      return;
+
+    fail(QString("Claude Code cannot be started: %1").arg(process->errorString()));
+    process->deleteLater();
+  });
+
+  process->start();
 }

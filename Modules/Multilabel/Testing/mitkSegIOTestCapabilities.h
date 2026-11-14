@@ -234,6 +234,12 @@ namespace mitk
       {
         return !code.GetValue().empty() && !code.GetScheme().empty() && !code.GetMeaning().empty();
       }
+
+      /** Whether DICOM counts the text value as empty: it holds spaces only. */
+      inline bool IsBlank(const std::string& value)
+      {
+        return value.find_first_not_of(' ') == std::string::npos;
+      }
     }
 
     /**
@@ -351,8 +357,8 @@ namespace mitk
         written.AddModifier(DICOMCodeSequence("261665006", "SCT", "Unknown (qualifier value)"));
       label.SetSegmentedPropertyType(written);
 
-      if (label.GetName().empty())
-        label.SetName(label.GetDescription().empty() ? label.GetSegmentedPropertyType()->GetMeaning() : label.GetDescription());
+      if (detail::IsBlank(label.GetName()))
+        label.SetName(detail::IsBlank(label.GetDescription()) ? label.GetSegmentedPropertyType()->GetMeaning() : label.GetDescription());
     }
 
     /**

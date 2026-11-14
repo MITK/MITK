@@ -618,6 +618,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesInvalidTrackingIDs);
   MITK_TEST(WriteKeepsTextWithBackslashAndLineBreaks);
   MITK_TEST(WriteNamesUnnamedLabelsByTheirDescription);
+  MITK_TEST(WriteTreatsBlankNamesAndDescriptionsAsNone);
   MITK_TEST(WriteRefusesUnnamedLabelsWhoseSegmentLabelIsNoLOValue);
   MITK_TEST(WriteRefusesUnnamedLabelWithoutVoxelsWhoseDescriptionIsNoLOValue);
   MITK_TEST(WriteRefusesUnknownOptionValues);
@@ -1378,9 +1379,36 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The name of the reloaded label", std::string("Liver lesion"), loadedSeg->GetLabel(1)->GetName());
   }
 
+  // DICOM counts an LO value of spaces only as empty, and DCMTK refuses an empty Segment Label, so a
+  // name or description of spaces only counts as none. BuildSegWithRule gives the label the type
+  // "Tissue". DICOM drops the trailing spaces of a description, so only the first case can be
+  // checked against the expectation WriteSegToTempFile derives.
+  void WriteTreatsBlankNamesAndDescriptionsAsNone()
+  {
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName("   ");
+      seg->GetLabel(1)->SetDescription("Liver lesion");
+      const auto path = this->WriteSegToTempFile(seg, {}, "blank-name");
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The Segment Label of a label with a blank name", std::string("Liver lesion"),
+                                   mitk::test::ReadSegmentSequence(path).at(1)->GetName());
+    }
+
+    const std::vector<std::string> names = { "", "   " };
+    for (std::size_t i = 0; i < names.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName(names[i]);
+      seg->GetLabel(1)->SetDescription("   ");
+      const auto path = this->WriteSegToTempFileUnchecked(seg, {}, "blank-description-" + std::to_string(i));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The Segment Label of a label with name \"" + names[i] + "\" and a blank description",
+                                   std::string("Tissue"), mitk::test::ReadSegmentSequence(path).at(1)->GetName());
+    }
+  }
+
   // The Segment Label of a label without a name is its description, else the meaning of its type, and
   // it is LO: unlike the description (ST), it admits no backslash and no control characters, and
-  // unlike a code meaning elsewhere, DCMTK checks it.
+  // unlike a code meaning elsewhere, DCMTK checks it. A name of spaces only counts as none.
   void WriteRefusesUnnamedLabelsWhoseSegmentLabelIsNoLOValue()
   {
     const std::vector<std::string> descriptions = { "Left\\Right", "Left\nRight", "Left\tRight" };
@@ -1393,7 +1421,16 @@ public:
                                {"label 1", "Segment Label", "description"});
     }
 
-    const std::vector<std::string> typeMeanings = { "Gew\xC3\xA4" "be", "Left\\Right" };
+    {
+      auto seg = BuildSegWithRule();
+      seg->GetLabel(1)->SetName("   ");
+      seg->GetLabel(1)->SetDescription("Left\\Right");
+      this->AssertWriteRefused(seg, {}, "blank-name-description", Refusal::UnrepresentableValue,
+                               {"label 1", "Segment Label", "description"});
+    }
+
+    // A type meaning of spaces only would be an empty Segment Label.
+    const std::vector<std::string> typeMeanings = { "Gew\xC3\xA4" "be", "Left\\Right", "   " };
     for (std::size_t i = 0; i < typeMeanings.size(); ++i)
     {
       auto seg = BuildSegWithRule();
@@ -1405,17 +1442,22 @@ public:
   }
 
   // dcmqi writes no segment for a label without voxels, so it never checks its Segment Label. The
-  // writer checks every label, so such a label is refused like one with voxels.
+  // writer checks every label, so such a label is refused like one with voxels. A name of spaces only
+  // counts as none.
   void WriteRefusesUnnamedLabelWithoutVoxelsWhoseDescriptionIsNoLOValue()
   {
-    auto seg = BuildSegWithRule();
-    auto unnamed = mitk::Label::New(2, "");
-    unnamed->SetDescription("Left\\Right");
-    unnamed->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
-    seg->AddLabel(unnamed, 0, true, false);
-    CPPUNIT_ASSERT_MESSAGE("Precondition: label 2 has no voxels", seg->IsEmpty(2));
-    this->AssertWriteRefused(seg, {}, "unnamed-without-voxels", Refusal::UnrepresentableValue,
-                             {"label 2", "Segment Label", "description"});
+    const std::vector<std::string> names = { "", "   " };
+    for (std::size_t i = 0; i < names.size(); ++i)
+    {
+      auto seg = BuildSegWithRule();
+      auto unnamed = mitk::Label::New(2, names[i]);
+      unnamed->SetDescription("Left\\Right");
+      unnamed->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+      seg->AddLabel(unnamed, 0, true, false);
+      CPPUNIT_ASSERT_MESSAGE("Precondition: label 2 has no voxels", seg->IsEmpty(2));
+      this->AssertWriteRefused(seg, {}, "unnamed-without-voxels-" + std::to_string(i), Refusal::UnrepresentableValue,
+                               {"label 2", "Segment Label", "description"});
+    }
   }
 
   // A value outside the choices is refused rather than taken for one of them. The segmentation is
@@ -2186,6 +2228,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code meaning",
                                  std::string("Unknown (qualifier value)"), type->GetModifier(0).GetMeaning());
   }
+
   // The writer writes a code only if its value, scheme and meaning are all set: an incomplete
   // category or type gets the stand-in, like a missing one, and an incomplete first type modifier is
   // left out. A label without a name is then named after the stand-in type. WriteSegToTempFile checks

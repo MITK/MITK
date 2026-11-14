@@ -137,14 +137,22 @@ namespace
     return type.has_value() && !type->GetValue().empty() && !type->GetScheme().empty() && !type->GetMeaning().empty();
   }
 
+  // DICOM counts a text value of spaces only as empty, and DCMTK refuses it where the value is Type 1.
+  // A backslash, which DCMTK also strips from an LO value, does not count: the LO check refuses it.
+  bool IsBlank(const std::string &value)
+  {
+    return value.find_first_not_of(' ') == std::string::npos;
+  }
+
   // Segment Label (0062,0005) is Type 1. For a label without a name dcmqi takes the description,
   // else the meaning of the Segmented Property Type, past the writer's checks and uncut. The writer
-  // makes that choice itself, so that the value written is the one checked and fitted into LO.
+  // makes that choice itself, so that the value written is the one checked and fitted into LO. A name
+  // or description of spaces only counts as none.
   std::string SegmentLabelOf(const mitk::Label &label)
   {
-    if (auto name = label.GetName(); !name.empty())
+    if (auto name = label.GetName(); !IsBlank(name))
       return name;
-    if (auto description = label.GetDescription(); !description.empty())
+    if (auto description = label.GetDescription(); !IsBlank(description))
       return description;
     return HasCompleteSegmentedPropertyType(label) ? label.GetSegmentedPropertyType()->GetMeaning()
                                                    : std::string(STAND_IN_TYPE_MEANING);
@@ -171,15 +179,15 @@ namespace
       refuse("label values above " + std::to_string(MAX_WRITABLE_LABEL_VALUE) + " are not supported.");
 
     const std::string segmentLabel = SegmentLabelOf(label);
+    std::string origin;
+    if (IsBlank(label.GetName()))
+      origin = IsBlank(label.GetDescription())
+                 ? " It is the meaning of its Segmented Property Type, as the label has neither name nor description."
+                 : " It is its description, as the label has no name.";
+    if (IsBlank(segmentLabel))
+      refuse("its Segment Label \"" + segmentLabel + "\" holds only spaces, which DICOM counts as empty." + origin);
     if (DcmLongString::checkStringValue(segmentLabel.c_str(), "1").bad())
-    {
-      std::string origin;
-      if (label.GetName().empty())
-        origin = label.GetDescription().empty()
-                   ? " It is the meaning of its Segmented Property Type, as the label has neither name nor description."
-                   : " It is its description, as the label has no name.";
       refuse("its Segment Label \"" + segmentLabel + loRule + origin);
-    }
 
     // dcmqi writes the algorithm name of these types only; the writer writes an undefined type as
     // MANUAL.

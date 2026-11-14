@@ -491,6 +491,7 @@ void QmitkAgentSession::StartProcess()
   options.Model = m_Model;
   options.Effort = m_Effort;
   options.ResumeSessionId = m_SessionId;
+  options.TrustedCertificateFile = m_ToolServer->GetCertificateFile();
 
   m_Process->Start(options);
 }

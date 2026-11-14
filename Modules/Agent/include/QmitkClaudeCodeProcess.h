@@ -79,6 +79,14 @@ public:
      * per token.
      */
     bool IgnoreApiKeyVariable = false;
+
+    /**
+     * \brief A certificate that Claude Code trusts in addition to the system's.
+     *
+     * For a server with a self-signed certificate. A NODE_EXTRA_CA_CERTS of
+     * the environment takes precedence.
+     */
+    QString TrustedCertificateFile;
   };
 
   struct MITKAGENT_EXPORT AuthStatus
@@ -157,8 +165,9 @@ public:
    *
    * The current environment without the variables a parent Claude Code
    * session sets, which would otherwise make the child behave as nested,
-   * with 127.0.0.1 exempt from any HTTP proxy, and with the directory of
-   * Options::Executable in front of the PATH.
+   * with this computer exempt from any HTTP proxy, with the directory of
+   * Options::Executable in front of the PATH, and with
+   * Options::TrustedCertificateFile as NODE_EXTRA_CA_CERTS unless that is set.
    */
   static QProcessEnvironment GetEnvironment(const Options& options);
 

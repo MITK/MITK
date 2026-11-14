@@ -187,6 +187,10 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& option
     environment.insert("PATH", path.isEmpty() ? directory : directory + QDir::listSeparator() + path);
   }
 
+  // Claude Code refuses a certificate that no authority it knows has signed.
+  if (!options.TrustedCertificateFile.isEmpty() && !environment.contains("NODE_EXTRA_CA_CERTS"))
+    environment.insert("NODE_EXTRA_CA_CERTS", QDir::toNativeSeparators(options.TrustedCertificateFile));
+
   for (const auto& key : environment.keys())
   {
     // Git Bash, the token of "claude setup-token", and the provider.
@@ -200,9 +204,9 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& option
       environment.remove(key);
   }
 
-  // The MCP server listens on 127.0.0.1, which a configured HTTP proxy would
-  // look for on its own host. Which spelling Claude Code reads first is not
-  // known, so both get the combined list.
+  // The MCP server listens on this computer, which a configured HTTP proxy
+  // would look for on its own host. Which spelling Claude Code reads first
+  // is not known, so both get the combined list.
   QStringList exempt;
 
   for (const auto& name : { QString("no_proxy"), QString("NO_PROXY") })
@@ -212,7 +216,7 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& option
       exempt << value;
   }
 
-  exempt << "127.0.0.1";
+  exempt << "127.0.0.1" << "localhost" << "::1";
 
   const auto noProxy = exempt.join(',');
   environment.insert("no_proxy", noProxy);

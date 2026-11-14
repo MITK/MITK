@@ -63,7 +63,8 @@ public:
    * \brief Offers the tools, through the REST server that runs or one of the agent's own.
    *
    * The endpoint answers only requests with the agent's token, also on a
-   * server that lets others in.
+   * server that lets others in. Refuses a server that runs but does not
+   * accept requests from this computer.
    *
    * \return Why the tools are not offered; empty if they are.
    */
@@ -94,6 +95,13 @@ public:
   /** \brief The agent's token for the REST server; empty unless the tools are offered. */
   QString GetToken() const;
 
+  /**
+   * \brief The certificate of the REST server, which Claude Code must trust to reach the tools.
+   *
+   * Empty unless the tools are offered on a server that uses HTTPS.
+   */
+  QString GetCertificateFile() const;
+
   /** \brief See mitk::McpEndpoint::RefuseCalls(). Does nothing unless the tools are offered. */
   void RefuseCalls(const std::string& reason);
 
@@ -116,6 +124,7 @@ private:
 
   QString m_Token;
   QString m_Url;
+  QString m_CertificateFile;
 };
 
 #endif

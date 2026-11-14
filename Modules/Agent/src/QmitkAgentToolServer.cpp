@@ -26,6 +26,7 @@ found in the LICENSE file.
 
 #include <QCoreApplication>
 
+#include <algorithm>
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
@@ -50,7 +51,8 @@ namespace
   {
     auto host = QString::fromStdString(config.host);
 
-    if (host == "::" || host == "0.0.0.0" || host == "localhost")
+    // "localhost" stays: the server may be bound to ::1 only, which 127.0.0.1 does not reach.
+    if (host == "::" || host == "0.0.0.0")
     {
       host = "127.0.0.1";
     }
@@ -65,6 +67,45 @@ namespace
   QString GetMcpUrl(const mitk::RestServerConfig& config)
   {
     return GetLocalUrl(config) + "/api/v1" + QString::fromStdString(McpPath);
+  }
+
+  /** Why the server does not accept requests from this machine; empty if it does. */
+  QString GetRefusalOfThisMachine(const mitk::RestServerConfig& config)
+  {
+    if (config.clientAccessMode == mitk::ClientAccessMode::Whitelist)
+    {
+      // The server compares the client's address as a string, so a name like
+      // "localhost" on the list lets nobody in.
+      const auto& allowed = config.allowedClientIPs;
+
+      const bool loopbackAllowed = std::any_of(allowed.begin(), allowed.end(), [](const std::string& address) {
+        return address == "127.0.0.1" || address == "::1" || address == "::ffff:127.0.0.1";
+      });
+
+      if (!loopbackAllowed)
+      {
+        return "The agent cannot work in the Workbench: the REST API server that runs accepts only the clients on its "
+          "list, which does not include this computer (127.0.0.1 or ::1). Add 127.0.0.1 to the list in the REST API "
+          "view, or stop the server, and reopen the Agent view.";
+      }
+    }
+    else if (config.clientAccessMode == mitk::ClientAccessMode::LocalhostOnly)
+    {
+      // Bound to any other address, requests from this computer arrive from
+      // that address, which is not a local one to the server.
+      const auto& host = config.host;
+      const bool reachable = host == "localhost" || host == "::1" || host == "::" || host == "0.0.0.0" ||
+        host.rfind("127.", 0) == 0;
+
+      if (!reachable)
+      {
+        return QString("The agent cannot work in the Workbench: the REST API server that runs listens only on %1 and "
+          "accepts only clients on this computer, which cannot reach it there. Change the server's host to localhost "
+          "in the REST API view, or stop the server, and reopen the Agent view.").arg(QString::fromStdString(host));
+      }
+    }
+
+    return QString();
   }
 }
 
@@ -138,6 +179,11 @@ QString QmitkAgentToolServer::Offer()
 
     m_StartedRestServer = true;
   }
+  else if (const auto config = m_RestServer->GetRunningConfig(); config.has_value())
+  {
+    if (const auto refusal = GetRefusalOfThisMachine(*config); !refusal.isEmpty())
+      return refusal;
+  }
 
   m_Endpoint = std::make_unique<mitk::McpEndpoint>("MITK Workbench", "0.2");
   mitk::AddRestApiTools(*m_Endpoint, m_RestServer);
@@ -156,13 +202,19 @@ QString QmitkAgentToolServer::Offer()
     return QString("The Workbench tools are not available: %1").arg(e.GetDescription());
   }
 
-  m_Url = GetMcpUrl(m_RestServer->GetRunningConfig().value());
+  const auto config = m_RestServer->GetRunningConfig().value();
+  m_Url = GetMcpUrl(config);
+
+  if (config.httpsEnabled)
+    m_CertificateFile = QString::fromStdString(config.sslCertPath);
+
   return QString();
 }
 
 void QmitkAgentToolServer::Withdraw()
 {
   m_Url.clear();
+  m_CertificateFile.clear();
 
   if (m_Endpoint != nullptr)
   {
@@ -214,6 +266,11 @@ QString QmitkAgentToolServer::GetUrl() const
 QString QmitkAgentToolServer::GetToken() const
 {
   return m_Token;
+}
+
+QString QmitkAgentToolServer::GetCertificateFile() const
+{
+  return m_CertificateFile;
 }
 
 void QmitkAgentToolServer::RefuseCalls(const std::string& reason)

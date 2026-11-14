@@ -837,9 +837,12 @@ std::shared_ptr<RestJob> RestServer::CreateJob(const std::string& description)
 
 DataNodeHandle RestServer::FindNode(const std::string& uid) const
 {
-  auto node = m_Bridge->FindNode(uid);
+  return this->HoldNode(m_Bridge->FindNode(uid));
+}
 
-  if (node.IsNull())
+DataNodeHandle RestServer::HoldNode(DataNode* node) const
+{
+  if (node == nullptr)
     return nullptr;
 
   StorageThreadDispatcherBase::Pointer dispatcher;
@@ -849,16 +852,14 @@ DataNodeHandle RestServer::FindNode(const std::string& uid) const
     dispatcher = m_Dispatcher.Lock();
   }
 
-  auto* const pointer = node.GetPointer();
-
-  return DataNodeHandle(pointer, [node = std::move(node), dispatcher = std::move(dispatcher)](DataNode*) mutable {
+  return DataNodeHandle(node, [held = DataNode::Pointer(node), dispatcher = std::move(dispatcher)](DataNode*) mutable {
     if (dispatcher.IsNull() || dispatcher->IsDispatchThread())
     {
-      node = nullptr;
+      held = nullptr;
       return;
     }
 
-    dispatcher->Post([node = std::move(node)]() {});
+    dispatcher->Post([held = std::move(held)]() {});
   });
 }
 

@@ -415,16 +415,16 @@ namespace
    */
   struct FigureDescription
   {
-    mitk::DataNode::Pointer Node;
+    mitk::DataNodeHandle Node;
 
     /** The image that the figure marks, its parent in the Data Manager. */
-    mitk::DataNode::Pointer Image;
+    mitk::DataNodeHandle Image;
 
     nlohmann::json Json;
   };
 
   /** Runs in the GUI thread. */
-  FigureDescription DescribeFigure(const mitk::DataStorage* dataStorage, mitk::DataNode* node)
+  FigureDescription DescribeFigure(const mitk::IRestServerService& server, const mitk::DataStorage* dataStorage, mitk::DataNode* node)
   {
     const auto* figure = static_cast<const mitk::PlanarFigure*>(node->GetData());
 
@@ -455,14 +455,14 @@ namespace
 
     json.update(ToJson(ReadLook(node, GetDefaultLook())));
 
-    return { node, images->empty() ? mitk::DataNode::Pointer() : images->front(), json };
+    return { server.HoldNode(node), server.HoldNode(images->empty() ? nullptr : images->front().GetPointer()), json };
   }
 
   nlohmann::json ToJson(const mitk::IRestServerService& server, const FigureDescription& figure)
   {
     auto json = figure.Json;
-    json["uid"] = server.GetNodeUid(figure.Node);
-    json["image"] = figure.Image.IsNotNull() ? nlohmann::json(server.GetNodeUid(figure.Image)) : nlohmann::json(nullptr);
+    json["uid"] = server.GetNodeUid(figure.Node.get());
+    json["image"] = figure.Image != nullptr ? nlohmann::json(server.GetNodeUid(figure.Image.get())) : nlohmann::json(nullptr);
     return json;
   }
 }
@@ -500,7 +500,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       for (const auto& node : *nodes)
       {
         if (static_cast<const mitk::PlanarFigure*>(node->GetData())->IsComplete())
-          descriptions.push_back(DescribeFigure(dataStorage, node));
+          descriptions.push_back(DescribeFigure(*server, dataStorage, node));
       }
 
       return descriptions;
@@ -612,7 +612,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       dataStorage->Add(node, imageNode.get());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return DescribeFigure(dataStorage, node);
+      return DescribeFigure(*server, dataStorage, node);
     });
 
     return RestResponse::FromData(ToJson(*server, figure), 201);
@@ -668,7 +668,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       ApplyLookChange(node.get(), lookChange, pulseTimers);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return DescribeFigure(dataStorage, node.get());
+      return DescribeFigure(*server, dataStorage, node.get());
     });
 
     return RestResponse::FromData(ToJson(*server, figure));

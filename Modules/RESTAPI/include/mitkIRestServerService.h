@@ -260,6 +260,15 @@ namespace mitk
     virtual DataNodeHandle FindNode(const std::string& uid) const = 0;
 
     /**
+     * \brief A handle for \p node that releases it as those of FindNode() do; null for null.
+     *
+     * For a node that a handler takes out of a call in the thread that owns
+     * the data storage, which a DataNode::Pointer would otherwise release in
+     * the handler's thread. Can be called from any thread.
+     */
+    virtual DataNodeHandle HoldNode(DataNode* node) const = 0;
+
+    /**
      * \brief The UID of a node, as the API names it.
      *
      * Can be called from any thread. A node without a UID gets one in the

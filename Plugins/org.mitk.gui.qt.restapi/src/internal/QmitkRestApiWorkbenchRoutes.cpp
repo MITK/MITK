@@ -102,15 +102,26 @@ namespace
     return { nodes.begin(), nodes.end() };
   }
 
-  nlohmann::json ToJson(const std::vector<mitk::DataNode::Pointer>& nodes, const mitk::IRestServerService* server)
+  /** For nodes that leave a call in the GUI thread. */
+  std::vector<mitk::DataNodeHandle> HoldNodes(const mitk::IRestServerService& server, const std::vector<mitk::DataNode::Pointer>& nodes)
   {
-    auto json = nlohmann::json::array();
+    std::vector<mitk::DataNodeHandle> handles;
 
     for (const auto& node : nodes)
     {
       if (node.IsNotNull())
-        json.push_back({ { "uid", server->GetNodeUid(node) }, { "name", node->GetName() } });
+        handles.push_back(server.HoldNode(node));
     }
+
+    return handles;
+  }
+
+  nlohmann::json ToJson(const std::vector<mitk::DataNodeHandle>& nodes, const mitk::IRestServerService* server)
+  {
+    auto json = nlohmann::json::array();
+
+    for (const auto& node : nodes)
+      json.push_back({ { "uid", server->GetNodeUid(node.get()) }, { "name", node->GetName() } });
 
     return json;
   }
@@ -359,7 +370,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   selection.Description =
     "Many views work on the data selected in the Data Manager. Returns {data: [{uid, name}]}.";
   selection.Handler = [server](const RestRequest& request) {
-    const auto nodes = CallInGuiThread(*server, [&request]() { return GetDataManagerSelection(request.Path); });
+    const auto nodes = CallInGuiThread(*server, [&request, server]() { return HoldNodes(*server, GetDataManagerSelection(request.Path)); });
     return RestResponse::FromData(ToJson(nodes, server));
   };
   routes.push_back(selection);
@@ -388,7 +399,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
       nodes.push_back(FindRestNode(*server, uid.get<std::string>(), request.Path));
     }
 
-    const auto selected = CallInGuiThread(*server, [&request, &nodes]() {
+    const auto selected = CallInGuiThread(*server, [&request, &nodes, server]() {
       const auto dataManager = GetWindow(request.Path)->GetActivePage()->FindView(DataManagerViewId);
 
       if (dataManager.IsNull())
@@ -422,7 +433,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
       }
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      return taken;
+      return HoldNodes(*server, taken);
     });
 
     return RestResponse::FromData(ToJson(selected, server));

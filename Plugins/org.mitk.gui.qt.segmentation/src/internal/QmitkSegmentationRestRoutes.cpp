@@ -1280,11 +1280,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       SelectInView("referenceNode", reference.get());
       SelectInView("workingNode", newNode);
 
-      return newNode;
+      return server->HoldNode(newNode);
     });
 
-    auto json = DescribeNode(node, *server);
-    json["labels"] = CallInGuiThread(*server, [&]() { return DescribeLabels(GetSegmentation(node, request.Path)); });
+    auto json = DescribeNode(node.get(), *server);
+    json["labels"] = CallInGuiThread(*server, [&]() { return DescribeLabels(GetSegmentation(node.get(), request.Path)); });
 
     return RestResponse::FromData(json, 201);
   };

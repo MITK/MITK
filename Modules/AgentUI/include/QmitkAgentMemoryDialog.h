@@ -31,8 +31,10 @@ namespace Ui
 /**
  * \brief Shows the notes of the agent's memory, which the user can edit and delete.
  *
- * Changes are stored at once. The memory rejects a note that is empty or too
- * long, which the dialog reports and then shows the stored text again. If
+ * Changes are stored at once. The editor of a note refuses an edit that makes
+ * the note longer than the memory allows and shows the length meanwhile. The
+ * memory rejects a note that is empty, which the dialog reports and then shows
+ * the stored text again, as for any other failure. If
  * the memory file cannot be read, the dialog says so and allows no editing.
  */
 class MITKAGENTUI_EXPORT QmitkAgentMemoryDialog : public QDialog

@@ -17,7 +17,9 @@ found in the LICENSE file.
 #include <QmitkSpeechBubbleFrame.h>
 
 #include <QAbstractTextDocumentLayout>
+#include <QApplication>
 #include <QDir>
+#include <QLabel>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPainter>
@@ -29,8 +31,92 @@ found in the LICENSE file.
 #include <QTextEdit>
 #include <QtMath>
 
+#include <functional>
+
 namespace
 {
+  /**
+   * Edits the text of a note and refuses an edit that makes the note longer
+   * than the memory allows, counted as the memory counts. A note of the file
+   * that is longer already can be shortened.
+   */
+  class NoteEditor : public QTextEdit
+  {
+  public:
+    /** Called with the length of the text after every accepted change. */
+    std::function<void(qsizetype)> LengthChanged;
+
+    explicit NoteEditor(QWidget* parent)
+      : QTextEdit(parent),
+        m_Length(0),
+        m_Position(0),
+        m_Active(false),
+        m_Reverting(false)
+    {
+      connect(this, &QTextEdit::textChanged, this, [this]() { this->OnTextChanged(); });
+
+      connect(this, &QTextEdit::cursorPositionChanged, this, [this]() {
+        // During an edit that is refused, the text differs already.
+        if (m_Active && !m_Reverting && this->toPlainText() == m_Text)
+          m_Position = this->textCursor().position();
+      });
+    }
+
+    void SetText(const QString& text)
+    {
+      m_Active = false;
+      this->setPlainText(text);
+      this->moveCursor(QTextCursor::End);
+
+      m_Text = text;
+      m_Length = text.simplified().size();
+      m_Position = this->textCursor().position();
+      m_Active = true;
+
+      if (this->LengthChanged)
+        this->LengthChanged(m_Length);
+    }
+
+  private:
+    void OnTextChanged()
+    {
+      if (!m_Active || m_Reverting)
+        return;
+
+      const auto text = this->toPlainText();
+      const auto length = text.simplified().size();
+
+      if (length > QmitkAgentMemory::MaxNoteLength && length > m_Length)
+      {
+        // The text is set back instead of undone: typed characters join into
+        // one undo step, which would take away more than this edit.
+        m_Reverting = true;
+        this->setPlainText(m_Text);
+
+        auto cursor = this->textCursor();
+        cursor.setPosition(qMin(m_Position, static_cast<int>(m_Text.size())));
+        this->setTextCursor(cursor);
+
+        m_Reverting = false;
+        QApplication::beep();
+        return;
+      }
+
+      m_Text = text;
+      m_Length = length;
+      m_Position = this->textCursor().position();
+
+      if (this->LengthChanged)
+        this->LengthChanged(m_Length);
+    }
+
+    QString m_Text;
+    qsizetype m_Length;
+    int m_Position;
+    bool m_Active;
+    bool m_Reverting;
+  };
+
   /**
    * Shows the text of each item as a paragraph in a frame with slightly
    * rounded corners. Edits it in place, and the row grows with the text.
@@ -39,6 +125,9 @@ namespace
   class ParagraphDelegate : public QStyledItemDelegate
   {
   public:
+    /** Called with the length of the edited text after every change, and with -1 when the editing ends. */
+    std::function<void(qsizetype)> LengthChanged;
+
     explicit ParagraphDelegate(QListView* view)
       : QStyledItemDelegate(view),
         m_View(view),
@@ -102,7 +191,8 @@ namespace
 
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const override
     {
-      auto* editor = new QTextEdit(parent);
+      auto* editor = new NoteEditor(parent);
+      editor->LengthChanged = this->LengthChanged;
       editor->setAcceptRichText(false);
       editor->setTabChangesFocus(true);
       editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -141,15 +231,16 @@ namespace
       m_EditedIndex = QPersistentModelIndex();
       QStyledItemDelegate::destroyEditor(editor, index);
 
+      if (this->LengthChanged)
+        this->LengthChanged(-1);
+
       // Back to the text, once the view has closed the editor.
       QMetaObject::invokeMethod(m_View, &QAbstractItemView::doItemsLayout, Qt::QueuedConnection);
     }
 
     void setEditorData(QWidget* editor, const QModelIndex& index) const override
     {
-      auto* textEdit = static_cast<QTextEdit*>(editor);
-      textEdit->setPlainText(index.data(Qt::EditRole).toString());
-      textEdit->moveCursor(QTextCursor::End);
+      static_cast<NoteEditor*>(editor)->SetText(index.data(Qt::EditRole).toString());
     }
 
     void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
@@ -201,7 +292,19 @@ QmitkAgentMemoryDialog::QmitkAgentMemoryDialog(QmitkAgentMemory& memory, qreal f
   m_Ui->setupUi(this);
 
   auto* list = m_Ui->noteList;
-  list->setItemDelegate(new ParagraphDelegate(list));
+  auto* delegate = new ParagraphDelegate(list);
+
+  delegate->LengthChanged = [label = QPointer<QLabel>(m_Ui->lengthLabel)](qsizetype length) {
+    if (label.isNull())
+      return;
+
+    label->setVisible(length >= 0);
+
+    if (length >= 0)
+      label->setText(QString("%1 of %2 characters").arg(length).arg(QmitkAgentMemory::MaxNoteLength));
+  };
+
+  list->setItemDelegate(delegate);
 
   // In a style sheet, as the application sets the font size of every widget
   // in one. The editor needs its own rule for the same reason.

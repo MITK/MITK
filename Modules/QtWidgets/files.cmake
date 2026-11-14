@@ -46,6 +46,7 @@ set(CPP_FILES
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
+  QmitkPartLock.cpp
   QmitkProgressNotification.cpp
   QmitkProgressNotificationOverlay.cpp
   QmitkPropertiesTableEditor.cpp

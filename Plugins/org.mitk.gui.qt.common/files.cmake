@@ -4,7 +4,6 @@ set(SRC_CPP_FILES
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
   QmitkDnDFrameWidget.cpp
-  QmitkPartLock.cpp
   QmitkRenderWindowScreenshot.cpp
   QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
@@ -28,7 +27,6 @@ set(MOC_H_FILES
   src/QmitkAbstractMultiWidgetEditor.h
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
-  src/QmitkPartLock.h
   src/QmitkSelectionServiceConnector.h
   src/QmitkSliceNavigationListener.h
   src/internal/QmitkCommonActivator.h

@@ -55,6 +55,7 @@ found in the LICENSE file.
 #include <QmitkCloseProjectAction.h>
 #include <QmitkUndoAction.h>
 #include <QmitkRedoAction.h>
+#include <QmitkPartLock.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressNotificationOverlay.h>
@@ -348,9 +349,10 @@ private:
     SetEnabled(windowAdvisor->openStdMultiWidgetEditorAction, enabled);
     SetEnabled(windowAdvisor->openMxNMultiWidgetEditorAction, enabled);
     SetEnabled(windowAdvisor->fileSaveProjectAction, enabled);
-    SetEnabled(windowAdvisor->closeProjectAction, enabled);
-    SetEnabled(windowAdvisor->undoAction, enabled);
-    SetEnabled(windowAdvisor->redoAction, enabled);
+    const bool unlocked = !QmitkPartLock::GetInstance()->IsLocked();
+    SetEnabled(windowAdvisor->closeProjectAction, enabled && unlocked);
+    SetEnabled(windowAdvisor->undoAction, enabled && unlocked);
+    SetEnabled(windowAdvisor->redoAction, enabled && unlocked);
     SetEnabled(windowAdvisor->imageNavigatorAction, enabled);
     SetEnabled(windowAdvisor->viewNavigatorAction, enabled);
     SetEnabled(windowAdvisor->resetPerspAction, enabled);
@@ -899,6 +901,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     m_UndoStackObserverGuard.Reset(undoModel, mitk::UndoStackEvent(), [this](const itk::EventObject&) {this->OnUndoStackChanged(); });
   }
   this->OnUndoStackChanged(); //ensure the enable state of undoAction/redoAction is correct
+
+  connect(QmitkPartLock::GetInstance(), &QmitkPartLock::Changed, this, [this]() { this->OnPartLockChanged(); });
 
   // ==== Perspective Toolbar ==================================
   if (showPerspectiveToolbar && hasMultiplePerspectives)
@@ -1476,7 +1480,19 @@ QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const
 void QmitkExtWorkbenchWindowAdvisor::OnUndoStackChanged()
 {
   auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+  const bool unlocked = !QmitkPartLock::GetInstance()->IsLocked();
 
-  this->undoAction->setEnabled(nullptr != undoModel && !undoModel->UndoListEmpty());
-  this->redoAction->setEnabled(nullptr != undoModel && !undoModel->RedoListEmpty());
+  this->undoAction->setEnabled(unlocked && nullptr != undoModel && !undoModel->UndoListEmpty());
+  this->redoAction->setEnabled(unlocked && nullptr != undoModel && !undoModel->RedoListEmpty());
+}
+
+void QmitkExtWorkbenchWindowAdvisor::OnPartLockChanged()
+{
+  // While a program works the Workbench, the user must not undo its steps
+  // or close the data under it, which menus and tool bars would allow.
+  const auto page = this->GetWindowConfigurer()->GetWindow()->GetActivePage();
+  const bool perspectiveOpen = page.IsNotNull() && !page->GetOpenPerspectives().empty();
+
+  this->closeProjectAction->setEnabled(perspectiveOpen && !QmitkPartLock::GetInstance()->IsLocked());
+  this->OnUndoStackChanged();
 }

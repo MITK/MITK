@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <vector>
 
 class ctkPluginContext;
+class QDir;
 
 /**
  * \brief The user manual of the application, searchable by section.
@@ -60,10 +61,12 @@ public:
   /**
    * \brief Read the help files of all plugins, unless they are read already.
    *
-   * Runs in the GUI thread.
+   * Runs in the GUI thread. The copy of the help files that the reading
+   * needs is deleted once the sections are built. A load that failed is not
+   * tried again: later calls return its message.
    *
    * \param context The context of a plugin, whose data directory takes a
-   *        private copy of the help files.
+   *        private copy of the help files while they are read.
    * \return An error message, or an empty string on success.
    */
   QString Load(ctkPluginContext* context);
@@ -83,6 +86,7 @@ public:
   std::optional<Section> GetSection(std::size_t id) const;
 
 private:
+  QString Index(ctkPluginContext* context, const QDir& directory);
   void AddPage(const QString& html);
   Section MakeSection(std::size_t id, qsizetype maxLength) const;
 
@@ -95,6 +99,7 @@ private:
 
   std::vector<Entry> m_Entries;
   bool m_Loaded = false;
+  QString m_LoadError;
 };
 
 #endif

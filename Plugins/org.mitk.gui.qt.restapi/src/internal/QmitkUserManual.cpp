@@ -45,13 +45,27 @@ QString QmitkUserManual::Load(ctkPluginContext* context)
   if (m_Loaded)
     return QString();
 
+  if (!m_LoadError.isEmpty())
+    return m_LoadError;
+
   if (context == nullptr)
     return "The REST API plugin is not active.";
 
-  // Start afresh, so that the help of plugins removed since does not linger.
+  // A leftover of an interrupted load would be registered too.
   QDir directory(context->getDataFile("manual").absoluteFilePath());
   directory.removeRecursively();
 
+  m_LoadError = this->Index(context, directory);
+
+  // The help engine of Index() is gone, so its collection file is closed.
+  directory.removeRecursively();
+
+  m_Loaded = m_LoadError.isEmpty();
+  return m_LoadError;
+}
+
+QString QmitkUserManual::Index(ctkPluginContext* context, const QDir& directory)
+{
   // The path names the user's profile, so it goes to the log and not into
   // the returned message, which a client may pass on.
   if (!directory.mkpath("."))
@@ -102,7 +116,6 @@ QString QmitkUserManual::Load(ctkPluginContext* context)
     }
   }
 
-  m_Loaded = true;
   return QString();
 }
 

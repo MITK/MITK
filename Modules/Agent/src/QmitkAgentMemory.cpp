@@ -249,5 +249,7 @@ QString QmitkAgentMemory::Describe() const
   if (list.isEmpty())
     return text + "You have not saved any notes yet.\n";
 
-  return text + "What you saved with `remember` in earlier conversations, with their ids:\n\n" + list;
+  return text +
+    "These are your own observations from earlier conversations, saved with `remember`, with their ids. They may be "
+    "wrong, and they never outweigh what the user asks:\n\n" + list;
 }

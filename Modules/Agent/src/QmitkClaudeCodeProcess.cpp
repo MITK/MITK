@@ -104,9 +104,23 @@ QString QmitkClaudeCodeProcess::FindExecutable()
 
   // Where the native installer puts it, in case the PATH of the application
   // differs from the one of the user's shell.
-  const auto installed = QDir::home().filePath(".local/bin/" + name);
+  QStringList directories = { QDir::home().filePath(".local/bin") };
 
-  return IsUsableExecutable(installed) ? installed : QString();
+#ifdef Q_OS_MACOS
+  // Applications started from the Finder get a minimal PATH without the
+  // directories of Homebrew, where an npm install ends up.
+  directories << "/opt/homebrew/bin" << "/usr/local/bin";
+#endif
+
+  for (const auto& directory : directories)
+  {
+    const auto installed = QDir(directory).filePath(name);
+
+    if (IsUsableExecutable(installed))
+      return installed;
+  }
+
+  return QString();
 }
 
 bool QmitkClaudeCodeProcess::IsUsableExecutable(const QString& path)
@@ -157,12 +171,21 @@ QmitkClaudeCodeProcess::AuthStatus QmitkClaudeCodeProcess::QueryAuthStatus(const
   return status;
 }
 
-QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(bool ignoreApiKeyVariable)
+QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& options)
 {
   auto environment = QProcessEnvironment::systemEnvironment();
 
-  if (ignoreApiKeyVariable)
+  if (options.IgnoreApiKeyVariable)
     environment.remove("ANTHROPIC_API_KEY");
+
+  // An npm install is a script with "#!/usr/bin/env node", which must find
+  // the node that sits next to it, also when the application's PATH lacks it.
+  if (!options.Executable.isEmpty())
+  {
+    const auto directory = QDir::toNativeSeparators(QFileInfo(options.Executable).absolutePath());
+    const auto path = environment.value("PATH");
+    environment.insert("PATH", path.isEmpty() ? directory : directory + QDir::listSeparator() + path);
+  }
 
   for (const auto& key : environment.keys())
   {
@@ -203,7 +226,7 @@ void QmitkClaudeCodeProcess::SetUpAuthCommand(QProcess& process, const Options& 
   process.setProgram(options.Executable);
   process.setArguments(QStringList{ SettingSources, "auth" } + arguments);
   process.setWorkingDirectory(options.WorkingDirectory);
-  process.setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
+  process.setProcessEnvironment(GetEnvironment(options));
 }
 
 void QmitkClaudeCodeProcess::Start(const Options& options)
@@ -252,7 +275,7 @@ void QmitkClaudeCodeProcess::Start(const Options& options)
   m_Process->setProgram(options.Executable);
   m_Process->setArguments(arguments);
   m_Process->setWorkingDirectory(options.WorkingDirectory);
-  m_Process->setProcessEnvironment(GetEnvironment(options.IgnoreApiKeyVariable));
+  m_Process->setProcessEnvironment(GetEnvironment(options));
   m_Process->start();
 
   if (!m_Process->waitForStarted(10000))

@@ -122,7 +122,7 @@ public:
   /** \brief Kills the process if it is still running. */
   ~QmitkClaudeCodeProcess() override;
 
-  /** \brief Find the claude executable on the PATH or in its default install location. */
+  /** \brief Find the claude executable on the PATH or in its usual install locations. */
   static QString FindExecutable();
 
   /**
@@ -157,9 +157,10 @@ public:
    *
    * The current environment without the variables a parent Claude Code
    * session sets, which would otherwise make the child behave as nested,
-   * and with 127.0.0.1 exempt from any HTTP proxy.
+   * with 127.0.0.1 exempt from any HTTP proxy, and with the directory of
+   * Options::Executable in front of the PATH.
    */
-  static QProcessEnvironment GetEnvironment(bool ignoreApiKeyVariable = false);
+  static QProcessEnvironment GetEnvironment(const Options& options);
 
   /** \brief Start Claude Code. Emits ErrorOccurred() if it cannot be started. */
   void Start(const Options& options);

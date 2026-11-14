@@ -571,6 +571,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(MigrateLegacyReferenceFilesSkipsWhenRuleAlreadyPresent);
   MITK_TEST(WriteSucceedsWithoutTrackingFields);
   MITK_TEST(WriteSucceedsWithoutSegPropertyCategoryAndType);
+  MITK_TEST(WriteReplacesIncompleteCodesByStandIns);
   MITK_TEST(StrictWriteSucceedsForInitializedFromDICOMSource);
   MITK_TEST(SyntheticWriteSucceedsForInitializedFromDICOMSource);
   MITK_TEST(StrictReSaveAfterDICOMSegRoundTripPreservesIdentity);
@@ -2184,6 +2185,73 @@ public:
                                  std::string("SCT"), type->GetModifier(0).GetScheme());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code meaning",
                                  std::string("Unknown (qualifier value)"), type->GetModifier(0).GetMeaning());
+  }
+  // The writer writes a code only if its value, scheme and meaning are all set: an incomplete
+  // category or type gets the stand-in, like a missing one, and an incomplete first type modifier is
+  // left out. A label without a name is then named after the stand-in type. WriteSegToTempFile checks
+  // the expectation it derives; the literal values pin the writer independently of it.
+  void WriteReplacesIncompleteCodesByStandIns()
+  {
+    struct Case
+    {
+      std::string nameHint;
+      std::function<void(mitk::Label&)> edit;
+      std::string segmentLabel;
+      std::string categoryValue;
+      std::string typeValue;
+      std::string modifierValue; // empty if no modifier is written
+    };
+    const std::vector<Case> cases = {
+      { "incomplete-type-of-unnamed",
+        [](mitk::Label& label) {
+          label.SetName("");
+          label.SetSegmentedPropertyType(mitk::DICOMCodeSequenceWithModifiers("", "SCT", "Liver"));
+        },
+        "Morphologically altered structure", "T-D0050", "49755003", "261665006" },
+      { "incomplete-type-with-modifier",
+        [](mitk::Label& label) {
+          mitk::DICOMCodeSequenceWithModifiers type("", "SCT", "Liver");
+          type.AddModifier(mitk::DICOMCodeSequence("24028007", "SCT", "Right"));
+          label.SetSegmentedPropertyType(type);
+        },
+        "L", "T-D0050", "49755003", "24028007" },
+      { "incomplete-category",
+        [](mitk::Label& label) { label.SetSegmentedPropertyCategory(mitk::DICOMCodeSequence("C1", "", "Category")); },
+        "L", "49755003", "T-D0050", "" },
+      { "incomplete-type-modifier",
+        [](mitk::Label& label) {
+          mitk::DICOMCodeSequenceWithModifiers type("T-D0050", "SRT", "Tissue");
+          type.AddModifier(mitk::DICOMCodeSequence("", "SCT", "Right"));
+          label.SetSegmentedPropertyType(type);
+        },
+        "L", "T-D0050", "T-D0050", "" },
+    };
+
+    for (const auto& c : cases)
+    {
+      auto seg = BuildSegWithRule();
+      c.edit(*seg->GetLabel(1));
+      const auto path = this->WriteSegToTempFile(seg, {}, c.nameHint);
+
+      const auto segment = mitk::test::ReadSegmentSequence(path).at(1);
+      const auto category = segment->GetSegmentedPropertyCategory();
+      const auto type = segment->GetSegmentedPropertyType();
+      CPPUNIT_ASSERT_MESSAGE(c.nameHint + ": the written segment has a category and a type",
+                             category.has_value() && type.has_value());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": Segment Label", c.segmentLabel, segment->GetName());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": category code value", c.categoryValue, category->GetValue());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": type code value", c.typeValue, type->GetValue());
+      if (c.modifierValue.empty())
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": no type modifier", std::size_t{0}, type->GetModifierCount());
+      }
+      else
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": one type modifier", std::size_t{1}, type->GetModifierCount());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": type modifier code value", c.modifierValue,
+                                     type->GetModifier(0).GetValue());
+      }
+    }
   }
 };
 

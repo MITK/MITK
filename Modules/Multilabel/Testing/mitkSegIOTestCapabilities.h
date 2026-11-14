@@ -228,6 +228,12 @@ namespace mitk
                     apply(*label);
                 } };
       }
+
+      /** Whether the DICOM SEG writer writes the code: it writes one only if value, scheme and meaning are all set. */
+      inline bool IsCompleteCode(const DICOMCodeSequence& code)
+      {
+        return !code.GetValue().empty() && !code.GetScheme().empty() && !code.GetMeaning().empty();
+      }
     }
 
     /**
@@ -320,19 +326,31 @@ namespace mitk
       };
     }
 
-    /** What the DICOM SEG writer puts on the wire for an attribute the label lacks, because the format requires it. */
+    /**
+     * What the DICOM SEG writer puts on the wire for an attribute the label lacks or holds
+     * incomplete, because the format requires it, and the one type modifier it writes.
+     */
     inline void ApplyDICOMSegWriterDefaults(Label& label)
     {
       if (label.GetAlgorithmType() == Label::AlgorithmType::Undefined)
         label.SetAlgorithmType(Label::AlgorithmType::MANUAL);
-      if (!label.GetSegmentedPropertyCategory().has_value())
+
+      const auto category = label.GetSegmentedPropertyCategory();
+      if (!category.has_value() || !detail::IsCompleteCode(*category))
         label.SetSegmentedPropertyCategory(DICOMCodeSequence("49755003", "SCT", "Morphologically altered structure"));
-      if (!label.GetSegmentedPropertyType().has_value())
-      {
-        DICOMCodeSequenceWithModifiers type("49755003", "SCT", "Morphologically altered structure");
-        type.AddModifier(DICOMCodeSequence("261665006", "SCT", "Unknown (qualifier value)"));
-        label.SetSegmentedPropertyType(type);
-      }
+
+      // The writer writes the label's first type modifier where that one is complete; otherwise the
+      // stand-in type gets the "Unknown" modifier and the label's own type none.
+      const auto type = label.GetSegmentedPropertyType().value_or(DICOMCodeSequenceWithModifiers());
+      const bool standIn = !detail::IsCompleteCode(type);
+      auto written = standIn ? DICOMCodeSequenceWithModifiers("49755003", "SCT", "Morphologically altered structure") : type;
+      written.ClearModifiers();
+      if (type.GetModifierCount() > 0 && detail::IsCompleteCode(type.GetModifier(0)))
+        written.AddModifier(type.GetModifier(0));
+      else if (standIn)
+        written.AddModifier(DICOMCodeSequence("261665006", "SCT", "Unknown (qualifier value)"));
+      label.SetSegmentedPropertyType(written);
+
       if (label.GetName().empty())
         label.SetName(label.GetDescription().empty() ? label.GetSegmentedPropertyType()->GetMeaning() : label.GetDescription());
     }

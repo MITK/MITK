@@ -606,6 +606,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteKeepsTheExtensionOfTheRequestedPath);
   MITK_TEST(WriteKeepsDottedStemOfPathWithoutExtension);
   MITK_TEST(WriteUsesLowestExistingAnatomicRegion);
+  MITK_TEST(WriteLeavesOutIncompleteAnatomicRegions);
   MITK_TEST(WriteRefuses4D);
   MITK_TEST(WriteRefuses2D);
   MITK_TEST(WriteRefusesDataThatIsNoSegmentation);
@@ -1187,6 +1188,64 @@ public:
     const auto path = this->WriteSegToTempFile(seg, {}, "sparse-region");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The written region", std::string("Region one"),
                                  mitk::test::ReadSegmentSequence(path).at(1)->GetAnatomicRegion(0).GetMeaning());
+  }
+
+  // The writer passes the anatomic region with the lowest index only if its value, scheme and meaning
+  // are all set, and its first modifier likewise; it does not fall back to a later region. dcmqi
+  // writes a region modifier only together with its region. WriteSegToTempFile checks the expectation
+  // it derives; the literal values pin the writer independently of it.
+  void WriteLeavesOutIncompleteAnatomicRegions()
+  {
+    struct Case
+    {
+      std::string nameHint;
+      std::function<void(mitk::Label&)> edit;
+      std::string regionValue; // empty if no region is written
+    };
+    const std::vector<Case> cases = {
+      { "incomplete-region",
+        [](mitk::Label& label) {
+          mitk::DICOMCodeSequenceWithModifiers region("", "SCT", "Liver");
+          region.AddModifier(mitk::DICOMCodeSequence("7771000", "SCT", "Left"));
+          label.SetAnatomicRegion(region, 0);
+        },
+        "" },
+      { "incomplete-region-modifier",
+        [](mitk::Label& label) {
+          mitk::DICOMCodeSequenceWithModifiers region("10200004", "SCT", "Liver");
+          region.AddModifier(mitk::DICOMCodeSequence("", "SCT", "Left"));
+          label.SetAnatomicRegion(region, 0);
+        },
+        "10200004" },
+      { "incomplete-lowest-region",
+        [](mitk::Label& label) {
+          label.SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("", "SCT", "Liver"), 0);
+          label.SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("10200004", "SCT", "Liver"), 1);
+        },
+        "" },
+    };
+
+    for (const auto& c : cases)
+    {
+      auto seg = BuildSegWithRule();
+      c.edit(*seg->GetLabel(1));
+      const auto path = this->WriteSegToTempFile(seg, {}, c.nameHint);
+
+      const auto segment = mitk::test::ReadSegmentSequence(path).at(1);
+      if (c.regionValue.empty())
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": no anatomic region", std::size_t{0},
+                                     segment->GetAnatomicRegionCount());
+      }
+      else
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": one anatomic region", std::size_t{1},
+                                     segment->GetAnatomicRegionCount());
+        const auto region = segment->GetAnatomicRegion(0);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": region code value", c.regionValue, region.GetValue());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(c.nameHint + ": no region modifier", std::size_t{0}, region.GetModifierCount());
+      }
+    }
   }
 
   void WriteRefuses4D()

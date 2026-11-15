@@ -334,7 +334,8 @@ namespace mitk
 
     /**
      * What the DICOM SEG writer puts on the wire for an attribute the label lacks or holds
-     * incomplete, because the format requires it, and the one type modifier it writes.
+     * incomplete, because the format requires it, the one type modifier it writes, and the
+     * incomplete anatomic region and region modifier it leaves out.
      */
     inline void ApplyDICOMSegWriterDefaults(Label& label)
     {
@@ -356,6 +357,31 @@ namespace mitk
       else if (standIn)
         written.AddModifier(DICOMCodeSequence("261665006", "SCT", "Unknown (qualifier value)"));
       label.SetSegmentedPropertyType(written);
+
+      // The writer passes the region with the lowest index only if it is complete, with no fallback
+      // to a later one, and its first modifier likewise; dcmqi writes a region modifier only together
+      // with its region.
+      const auto regionIndices =
+        detail::FindLabelCodeIndices(label, LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
+      if (!regionIndices.empty())
+      {
+        auto region = label.GetAnatomicRegion(regionIndices.front());
+        if (!detail::IsCompleteCode(region))
+        {
+          for (const auto index : regionIndices)
+            label.RemoveAnatomicRegion(index);
+        }
+        else
+        {
+          auto modifiers = region.GetModifiers();
+          if (!modifiers.empty() && detail::IsCompleteCode(modifiers.front()))
+            modifiers.resize(1);
+          else
+            modifiers.clear();
+          region.SetModifiers(modifiers);
+          label.SetAnatomicRegion(region, regionIndices.front());
+        }
+      }
 
       if (detail::IsBlank(label.GetName()))
         label.SetName(detail::IsBlank(label.GetDescription()) ? label.GetSegmentedPropertyType()->GetMeaning() : label.GetDescription());

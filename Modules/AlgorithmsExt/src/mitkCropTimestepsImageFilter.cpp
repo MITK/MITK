@@ -58,7 +58,7 @@ found in the LICENSE file.
     if (m_LowerBoundaryTimestep >= upperBoundary)
       mitkThrow() << "lower timestep " << m_LowerBoundaryTimestep << " is not smaller than upper timestep "
                   << upperBoundary << ".";
-    m_DesiredRegion = ComputeDesiredRegion(upperBoundary);
+    m_DesiredRegion = this->ComputeDesiredRegion(upperBoundary);
     unsigned int dimension = input->GetDimension();
     auto dimensions = new unsigned int[dimension];
     for (unsigned int i = 0; i < 3; ++i)
@@ -71,7 +71,7 @@ found in the LICENSE file.
     // create basic slicedGeometry that will be initialized below
     output->Initialize(mitk::PixelType(input->GetPixelType()), dimension, dimensions);
     delete[] dimensions;
-    auto newTimeGeometry = AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, upperBoundary);
+    auto newTimeGeometry = this->AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, upperBoundary);
     output->SetTimeGeometry(newTimeGeometry);
     output->SetPropertyList(input->GetPropertyList()->Clone());
   }

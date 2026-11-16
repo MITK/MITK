@@ -107,6 +107,27 @@ public:
    */
   void EnsureTransferFunction();
 
+  /**
+   * \brief End the edit in progress, asking first whether to save the curve as
+   *        a preset or discard it.
+   *
+   * There is no keeping a drawing unsaved: the node records the preset it was
+   * drawn over and the slider offsets, not the drawing, so the next selection
+   * would rebuild the preset over it. An edit that changed nothing ends
+   * without asking, and there being no edit in progress makes this inert.
+   *
+   * A host calls this before it takes the editor out of use, such as before
+   * switching volume rendering off, and goes ahead only if editing is over.
+   *
+   * \param[in] mayContinueEditing Whether the user may also take back the
+   *            request to end the edit, which then continues as if it had not
+   *            been made. Not for a selection change, which has already
+   *            happened by the time it asks.
+   * \return False if the user chose to continue editing; true otherwise,
+   *         including when there was no edit to end.
+   */
+  bool ConcludeEdit(bool mayContinueEditing);
+
 protected:
   /** \brief Re-measure the preset entries when the room they have to fill
    *         changes, take the clicks meant for the load entry, and apply the
@@ -355,22 +376,6 @@ private:
    * itself, since the sliders stand still for as long as editing lasts.
    */
   void DiscardEdit();
-
-  /**
-   * \brief End the edit in progress, asking first whether to save the curve as
-   *        a preset or discard it.
-   *
-   * There is no keeping a drawing unsaved: the node records the preset it was
-   * drawn over and the slider offsets, not the drawing, so the next selection
-   * would rebuild the preset over it. An edit that changed nothing ends
-   * without asking, and there being no edit in progress makes this inert.
-   *
-   * \param[in] mayContinueEditing Whether the user may also take back the
-   *            request to end the edit, which then continues as if it had not
-   *            been made. Not for a selection change, which has already
-   *            happened by the time it asks.
-   */
-  void ConcludeEdit(bool mayContinueEditing);
 
   /**
    * \brief Give the canvas its handles, or take them away, and show which of the

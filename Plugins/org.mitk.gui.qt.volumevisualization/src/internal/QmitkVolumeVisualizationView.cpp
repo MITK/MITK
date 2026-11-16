@@ -187,6 +187,12 @@ void QmitkVolumeVisualizationView::OnToggleRendering()
   // Properties view, switch rendering on without going through here.
   const bool state = !IsVolumeRenderingOn(selectedNode.GetPointer());
 
+  // Before the property changes: switching off hides the editor and grays it
+  // out, which would leave an edit in progress waiting on a curve no one can
+  // see. The user may also keep editing, and rendering then stays on.
+  if (!state && !m_Controls->transferFunctionEditor->ConcludeEdit(true))
+    return;
+
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
 
   if (state)

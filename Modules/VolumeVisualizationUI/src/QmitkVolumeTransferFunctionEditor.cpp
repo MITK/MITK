@@ -964,8 +964,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::OnRevertEdit);
 
   // Through a slot of its own rather than SetEditModeActive: leaving is for
-  // ConcludeEdit, which asks first, and only the button may have its request
-  // taken back.
+  // ConcludeEdit, which asks first, and only a request a user can still take
+  // back - this button's, or switching rendering off - offers to continue.
   connect(m_Controls->editModeButton, &QToolButton::toggled,
     this, &QmitkVolumeTransferFunctionEditor::OnEditModeToggled);
 
@@ -1156,11 +1156,12 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
   // became worth having: switching volume rendering on deliberately does not
   // re-bind the node.
   //
-  // Being disabled ends nothing. Switching volume rendering off is what grays
-  // the editor out, and an edit in progress then waits, untouchable, for
-  // rendering to come back - or for a selection change to ask about it. An
-  // analysis under way runs on, so that switching back on finds it done rather
-  // than starting it over.
+  // Being disabled ends nothing. The view's own button ends an edit before it
+  // switches volume rendering off; switched off elsewhere, such as in the
+  // Properties view, the editor is grayed out with the edit still in progress,
+  // which then waits, untouchable, for rendering to come back - or for a
+  // selection change to ask about it. An analysis under way runs on, so that
+  // switching back on finds it done rather than starting it over.
   if (this->isEnabled())
     this->RequestAnalysis();
 }
@@ -1924,12 +1925,12 @@ void QmitkVolumeTransferFunctionEditor::OnRevertEdit()
   this->ShowColorStops();
 }
 
-void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
+bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 {
   if (!m_EditModeActive || !m_CurveEdited)
   {
     this->SetEditModeActive(false);
-    return;
+    return true;
   }
 
   // Named, because a selection change asks after another image was clicked.
@@ -1969,7 +1970,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
       // nothing to go back to.
       this->DiscardEdit();
       this->SetEditModeActive(false);
-      return;
+      return true;
     }
 
     if (answer == saveButton)
@@ -1987,15 +1988,17 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
       // are saved from the baseline, and until then that is still the curve from
       // before the edit.
       this->SaveCustomPreset(fileName);
-      return;
+      return true;
     }
 
     if (mayContinueEditing)
     {
-      // The button that asked has already come up. Only it is put back, since
-      // ShowEditMode would also reset the axis the user may have widened.
+      // If the edit button asked, it has already come up, and this puts it back
+      // down; for any other caller it is still down and this changes nothing.
+      // Only it is put back, since ShowEditMode would also reset the axis the
+      // user may have widened.
       this->ShowEditModeButton(true);
-      return;
+      return false;
     }
   }
 }

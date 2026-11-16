@@ -209,8 +209,7 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
     return;
 
   this->m_PointSetNode->SetData(newPs);
-  dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(m_PointSetNode);
-  ObserveNewNode(m_PointSetNode);
+  this->SetPointSetNode(m_PointSetNode);
 }
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)

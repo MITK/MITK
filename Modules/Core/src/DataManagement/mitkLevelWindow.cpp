@@ -412,13 +412,19 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     maxValue += additionalRange;
   }
 
-  if (!std::isfinite(minValue))
+  if (!std::isfinite(minValue) || !std::isfinite(maxValue))
   {
-    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-  }
-  if (!std::isfinite(maxValue))
-  {
-    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+    auto [finiteMin, finiteMax] = GetFiniteMinMax(image, firstCountedTimeStep);
+    for (auto t = firstCountedTimeStep + 1; t < firstCountedTimeStep + countedTimeSteps; ++t)
+    {
+      const auto [stepMin, stepMax] = GetFiniteMinMax(image, t);
+      finiteMin = std::min(finiteMin, stepMin);
+      finiteMax = std::max(finiteMax, stepMax);
+    }
+    if (!std::isfinite(minValue))
+      minValue = finiteMin;
+    if (!std::isfinite(maxValue))
+      maxValue = finiteMax;
   }
 
   SetRangeMinMax(minValue, maxValue);

@@ -248,7 +248,8 @@
 	The axis you point at is named in the top line of one plate only: the plate of the
 	window the pointed-at glyph or chip belongs to - the plate itself, the window whose
 	barcode it is, or the window of the matrix row - followed by that window's offset on it,
-	if any. Every other plate keeps its window's name. A group card's glyph belongs to no
+	if any and if the line has room for it; the enlarged glyph's ribbon shows the offset in
+	any case. Every other plate keeps its window's name. A group card's glyph belongs to no
 	window, so no plate names its axis; the card does in its tooltip.
 
 \subsection org_mitk_views_mxnlayouteditor_Selection Selecting windows

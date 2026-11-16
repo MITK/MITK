@@ -57,8 +57,11 @@
 	Saved layouts are persisted as v3.0 JSON documents. The canonical reference for fields,
 	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v3.schema.json</tt>;
 	both the in-tree presets and any file produced by "Save..." follow this schema.
-	v2.0 documents remain loadable unchanged; per-dimension synchronization links and
-	per-group display names and colors are v3.0 additions.
+	v2.0 documents remain loadable unchanged, except one that names a group <tt>global</tt>
+	(in any letter case): that name belongs to the reserved group Global (see
+	\ref org_mitk_editors_mxnmultiwidget_DimSync), so loading such a file reports an error.
+	Rename the group throughout the file, then load it again. Per-dimension synchronization
+	links and per-group display names and colors are v3.0 additions.
 
 	Files written by older MITK releases use the v1.x format. The current editor does <b>not</b>
 	load v1.x files directly; loading one surfaces an error message that points at a one-shot
@@ -208,8 +211,8 @@
 
 	A single line on top of each plate carries the window's name. On the plate of the
 	window you are pointing from, it names the axis instead, followed by that window's
-	offset on it if it has one; where the line is short, the axis name is shortened,
-	never the offset.
+	offset on it if it has one and the line has room for it; the enlarged glyph's ribbon
+	shows the offset in any case. Where the line is short, the axis name is shortened first.
 
 	Where the window sits at an offset from its group - a slice step away, a zoom factor
 	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value rides a

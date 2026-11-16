@@ -1538,7 +1538,7 @@ public:
     overlay->SetPeekProgress(1.0);
     overlay->grab();  // forces a synchronous paintEvent
 
-    // The plate with nothing emphasised drives the empty-caption branch.
+    // With no axis pointed at, the plate has no pumped glyph to paint last.
     m_Editor->SetSyncPeek(true, std::nullopt);
     overlay->SetPeekProgress(1.0);
     overlay->grab();

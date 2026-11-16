@@ -806,15 +806,15 @@ public:
     // The GUI load raises its feedback and applies from a timer; a REST layout
     // request accepted in that gap would run into the pending apply.
     auto editor = MakeEditor();
-    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+    CPPUNIT_ASSERT(!editor->IsBusy());
 
     editor->ShowLayoutLoadFeedback();
     CPPUNIT_ASSERT_MESSAGE("A load announced but not yet applied counts as busy",
-      editor->IsApplyingLayout());
+      editor->IsBusy());
 
     editor->HideLayoutLoadFeedback();
     CPPUNIT_ASSERT_MESSAGE("Hiding the feedback ends the busy state",
-      !editor->IsApplyingLayout());
+      !editor->IsBusy());
   }
 
   // ====================================================================
@@ -867,7 +867,7 @@ public:
           return;
         }
         nestedInvoked = true;
-        applyingInsideSlot = editor->IsApplyingLayout();
+        applyingInsideSlot = editor->IsBusy();
         // Nothing may unwind through the signal emission, so every exception
         // is caught here and judged after the outer call has returned.
         try
@@ -884,14 +884,14 @@ public:
         }
       }, Qt::DirectConnection);
 
-    CPPUNIT_ASSERT(!editor->IsApplyingLayout());
+    CPPUNIT_ASSERT(!editor->IsBusy());
     editor->ApplyLayout(docA);
     QObject::disconnect(conn);
 
-    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must hold while ApplyLayout runs",
+    CPPUNIT_ASSERT_MESSAGE("IsBusy() must hold while ApplyLayout runs",
       applyingInsideSlot);
-    CPPUNIT_ASSERT_MESSAGE("IsApplyingLayout() must be cleared once ApplyLayout returns",
-      !editor->IsApplyingLayout());
+    CPPUNIT_ASSERT_MESSAGE("IsBusy() must be cleared once ApplyLayout returns",
+      !editor->IsBusy());
     CPPUNIT_ASSERT_MESSAGE(
       "A nested ApplyLayout must be rejected with QmitkMxNLayoutBusyException, not a generic mitk::Exception",
       !nestedThrewWrongType);

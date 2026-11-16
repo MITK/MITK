@@ -261,7 +261,9 @@ public:
 
   /** \brief What the plate's top line says: the pointed-at axis's label and,
    *         if this window is offset on it, the offset - on the plate that names
-   *         the axis; otherwise the window's name, with no offset. */
+   *         the axis; otherwise the window's name, with no offset. An offset
+   *         wider than the line is left out; the pointed-at glyph's ribbon
+   *         shows it. */
   struct PeekLineContent
   {
     QString text;

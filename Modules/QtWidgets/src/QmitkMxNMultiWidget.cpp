@@ -34,6 +34,7 @@ found in the LICENSE file.
 
 // vtk
 #include <vtkCamera.h>
+#include <vtkMath.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
@@ -274,31 +275,29 @@ namespace
   // that style's text colour instead (see GetSyncGroupColor).
   constexpr const char* GLOBAL_GROUP_OVERLAY_COLOR = "#f1f1f1";
 
+  // The Light style's text colour on Windows: its style sheet leaves the text
+  // colour to the platform.
+  constexpr const char* LIGHT_STYLE_TEXT_COLOR = "#000000";
+
   constexpr const char* GLOBAL_GROUP_DISPLAY_NAME = "Global";
 
-  // CIELAB (D65) coordinates of an sRGB colour.
   std::array<double, 3> ToLab(const QColor& color)
   {
-    const auto linear = [](double c) { return c <= 0.04045 ? c / 12.92 : std::pow((c + 0.055) / 1.055, 2.4); };
-    const double r = linear(color.redF());
-    const double g = linear(color.greenF());
-    const double b = linear(color.blueF());
-    const double x = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047;
-    const double y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b;
-    const double z = (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) / 1.08883;
-    const auto f = [](double t) { return t > 216.0 / 24389.0 ? std::cbrt(t) : (24389.0 / 27.0 * t + 16.0) / 116.0; };
-    return { 116.0 * f(y) - 16.0, 500.0 * (f(x) - f(y)), 200.0 * (f(y) - f(z)) };
+    const double rgb[3]{ color.redF(), color.greenF(), color.blueF() };
+    std::array<double, 3> lab{};
+    vtkMath::RGBToLab(rgb, lab.data());
+    return lab;
   }
 
   // A group colour this close (CIE76) to a colour the reserved group takes -
-  // the Dark style's text colour, or black, the Light style's on Windows -
-  // could not be told apart from it. The band does not follow the current
-  // style, so that a layout loads the same in either.
+  // the Dark style's text colour, or the Light style's - could not be told
+  // apart from it. The band does not follow the current style, so that a
+  // layout loads the same in either.
   bool IsInReservedColorBand(const QColor& color)
   {
     constexpr double ReservedBandDistance = 15.0;
     const auto lab = ToLab(color);
-    for (const auto* reserved : { GLOBAL_GROUP_OVERLAY_COLOR, "#000000" })
+    for (const auto* reserved : { GLOBAL_GROUP_OVERLAY_COLOR, LIGHT_STYLE_TEXT_COLOR })
     {
       const auto other = ToLab(QColor(reserved));
       if (std::hypot(lab[0] - other[0], lab[1] - other[1], lab[2] - other[2]) < ReservedBandDistance)
@@ -990,7 +989,7 @@ public:
   ~ViewDirectionNotifier()
   {
     --m_Editor->m_ViewDirectionNotifierDepth;
-    if (!m_Outermost || m_Editor->IsApplyingLayout())
+    if (!m_Outermost || m_Editor->IsBusy())
     {
       return;
     }
@@ -3251,25 +3250,25 @@ void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()
 
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
-  if (m_ApplyingLayout)
+  if (m_Busy)
   {
     mitkThrowException(QmitkMxNLayoutBusyException)
-      << "A layout is already being applied to this editor; retry once it has finished.";
+      << "The editor is busy rebuilding or laying out its windows; retry once it has finished.";
   }
   // Outside the load so its rollback, which pumps the event loop as well,
   // still runs with the flag set.
-  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  const QScopedValueRollback<bool> busy(m_Busy, true);
   this->LoadLayoutDocument(doc);
 }
 
 void QmitkMxNMultiWidget::ApplyDynamicLayout(const QmitkMxNDynamicLayout& layout)
 {
-  if (m_ApplyingLayout)
+  if (m_Busy)
   {
     mitkThrowException(QmitkMxNLayoutBusyException)
-      << "A layout is already being applied to this editor; retry once it has finished.";
+      << "The editor is busy rebuilding or laying out its windows; retry once it has finished.";
   }
-  const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
+  const QScopedValueRollback<bool> busy(m_Busy, true);
   this->ValidateDynamicLayout(layout);
   // Every view initialization resets the global time step: the new cells'
   // own on creation, and the fits below.
@@ -3517,9 +3516,24 @@ void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& win
   {
     return;
   }
+  if (this->isVisible())
+  {
+    // A cell fits its camera when it is constructed, before it is laid out.
+    // Core narrows a fit when a window shrinks but never widens it, so a cell
+    // laid out narrower than it was constructed would show its plane cut off
+    // at the sides. One pass of the event loop lays the new cells out; user
+    // input stays excluded, as while the load feedback is shown. The pass also
+    // delivers queued calls, which must find the editor busy, as during a
+    // load, so they do not rebuild the cells under the running operation. Not
+    // held longer: the operation's LayoutChanged handlers skip their refresh
+    // while the editor is busy.
+    const QScopedValueRollback<bool> busy(m_Busy, true);
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  }
   if (!this->isVisible())
   {
-    // A hidden editor is not laid out; its cells get their size when shown.
+    // A hidden editor is not laid out, also when a call the pass above
+    // delivered hid it; its cells get their size when shown.
     for (const auto& windowId : windowIds)
     {
       if (std::find(m_CellsToFitWhenShown.begin(), m_CellsToFitWhenShown.end(), windowId)
@@ -3529,19 +3543,6 @@ void QmitkMxNMultiWidget::FitNewCellsToTheirSize(const std::vector<QString>& win
       }
     }
     return;
-  }
-  // A cell fits its camera when it is constructed, before it is laid out.
-  // Core narrows a fit when a window shrinks but never widens it, so a cell
-  // laid out narrower than it was constructed would show its plane cut off at
-  // the sides. One pass of the event loop lays the new cells out; user input
-  // stays excluded, as while the load feedback is shown. The pass also
-  // delivers queued calls, which must find the editor busy, as during a load,
-  // so they do not rebuild the cells under the running operation. Not held
-  // longer: the operation's LayoutChanged handlers skip their refresh while
-  // the editor is busy.
-  {
-    const QScopedValueRollback<bool> applying(m_ApplyingLayout, true);
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
   }
 
   auto* renderingManager = mitk::RenderingManager::GetInstance();
@@ -3593,7 +3594,7 @@ void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
 {
   // A running layout operation fits the cells it builds itself; the cells
   // deferred before it, if they survive it, are fitted once it has finished.
-  if (this->IsApplyingLayout())
+  if (this->IsBusy())
   {
     if (!m_CellsToFitWhenShown.empty())
     {
@@ -3615,15 +3616,25 @@ void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
   {
     return;  // Hidden again: deferred once more.
   }
-  // A cell whose camera was set while it waited keeps that camera, so it is
-  // not among the cells that adapt below.
-  std::vector<QString> adapting;
+  // The links converged while the cells still had their construction camera;
+  // the deferred cells adapt to the members that kept theirs, and a group
+  // made only of them to its seed - as after a fit while shown.
+  try
+  {
+    this->ReconvergeGeometryRelativeGroups(windowIds);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "MxN display: re-converging after the deferred fit failed: " << e.GetDescription();
+  }
+  // A camera set while the cell waited comes last, as it would have on a
+  // shown display, where nothing converges a window after a client sets its
+  // camera.
   for (const auto& windowId : windowIds)
   {
     const auto changes = m_CameraChangesAfterFit.find(windowId);
     if (changes == m_CameraChangesAfterFit.end())
     {
-      adapting.push_back(windowId);
       continue;
     }
     const auto cell = this->GetRenderWindowWidget(windowId);
@@ -3642,17 +3653,6 @@ void QmitkMxNMultiWidget::FitCellsDeferredWhileHidden()
     mitk::RenderingManager::GetInstance()->RequestUpdate(cell->GetRenderWindow()->GetVtkRenderWindow());
   }
   m_CameraChangesAfterFit.clear();
-  // The links converged while the cells still had their construction camera;
-  // the deferred cells adapt to the members that kept theirs, and a group
-  // made only of them to its seed - as after a fit while shown.
-  try
-  {
-    this->ReconvergeGeometryRelativeGroups(adapting);
-  }
-  catch (const mitk::Exception& e)
-  {
-    MITK_WARN << "MxN display: re-converging after the deferred fit failed: " << e.GetDescription();
-  }
 }
 
 void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
@@ -3963,9 +3963,9 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
   }
 }
 
-bool QmitkMxNMultiWidget::IsApplyingLayout() const
+bool QmitkMxNMultiWidget::IsBusy() const
 {
-  return m_ApplyingLayout || m_LayoutLoadPending;
+  return m_Busy || m_LayoutLoadPending;
 }
 
 void QmitkMxNMultiWidget::SetCamera(const QString& windowId, const std::function<void(mitk::BaseRenderer*)>& change)
@@ -5343,7 +5343,7 @@ void QmitkMxNMultiWidget::ApplyThreeDViewDirection(const QString& windowId)
 void QmitkMxNMultiWidget::OnViewsInitialized()
 {
   // A layout being applied re-applies the directions once at its end.
-  if (this->IsApplyingLayout())
+  if (this->IsBusy())
   {
     return;
   }
@@ -6225,7 +6225,7 @@ void QmitkMxNMultiWidget::ShowLayoutLoadFeedback()
   // cannot reach the half rebuilt cell tree. Posted events, timers and queued
   // cross-thread calls (such as REST requests) are still delivered:
   // 'ApplyLayout' refuses to be re-entered and the REST bindings refuse MxN
-  // requests while 'IsApplyingLayout()' holds, but other callers - a view's
+  // requests while 'IsBusy()' holds, but other callers - a view's
   // timer, a non-MxN REST endpoint, a DataStorage change - do reach the editor
   // mid-rebuild. The accessors they use tolerate the missing active cell.
   dialog->setWindowModality(Qt::ApplicationModal);
@@ -6546,24 +6546,23 @@ QStringList QmitkMxNMultiWidget::CellsSharingAxis(const QString& group, QmitkMxN
 {
   QStringList result;
   const auto groupId = group.toStdString();
-
-  // Every window follows the application's time, which is all 'global' stands
-  // for on Time; no other group holds a window on it.
-  if (QmitkMxNSyncAxis::Time == axis)
-  {
-    if (QmitkMxNGlobalGroupId == groupId)
-    {
-      for (const auto& descriptor : this->ListWindowDescriptors())
-      {
-        result.append(descriptor.id);
-      }
-    }
-    return result;
-  }
-
-  const auto dimension = QmitkMxNSyncAxisDimension(axis);
   try
   {
+    // Every window follows the application's time, which is all 'global'
+    // stands for on Time; no other group holds a window on it.
+    if (QmitkMxNSyncAxis::Time == axis)
+    {
+      if (QmitkMxNGlobalGroupId == groupId)
+      {
+        for (const auto& descriptor : this->ListWindowDescriptors())
+        {
+          result.append(descriptor.id);
+        }
+      }
+      return result;
+    }
+
+    const auto dimension = QmitkMxNSyncAxisDimension(axis);
     for (const auto& info : this->GetSyncGroupInfos())
     {
       if (info.id != groupId)

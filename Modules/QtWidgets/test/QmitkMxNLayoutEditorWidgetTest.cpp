@@ -68,9 +68,11 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <typeinfo>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -210,6 +212,8 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(GlobalCard_IsNoDragSourceOrDropTarget);
   MITK_TEST(GlobalCard_RefusesAssign);
   MITK_TEST(GlobalCard_RefusesSelectionToggle);
+  MITK_TEST(GlobalGroup_ActionsChangeNothing);
+  MITK_TEST(GlobalGroup_ReinitLeavesGeometry);
   MITK_TEST(GlobalCard_FollowsAStyleSwitch);
   MITK_TEST(GlobalCard_TimeAxisHoversWithoutOfferingAClick);
   MITK_TEST(PlateMenuAndMatrixPicker_OmitGlobal);
@@ -3189,6 +3193,77 @@ public:
         }
       }
     }
+  }
+
+  void GlobalGroup_ActionsChangeNothing()
+  {
+    // Every window counts as a member of the reserved group, which the user
+    // cannot edit: a group action on it must neither touch a window nor tell
+    // the surfaces that something changed.
+    const auto other = m_Widget->CreateGroup();
+    m_Widget->AssignCellsToGroup(QStringList{ CellId(0) }, other);
+    Pump();
+    const auto snapshot = [this]()
+    {
+      std::vector<std::string> state;
+      for (std::size_t cell = 0; cell < 3; ++cell)
+      {
+        state.push_back(m_Editor->GetCellSelectionGroup(CellId(cell)));
+        for (const auto dimension : QmitkMxNAllSyncDimensions)
+        {
+          const auto link = m_Editor->GetSyncLink(CellId(cell), dimension);
+          state.push_back(link.has_value() ? link->group : std::string("-"));
+        }
+      }
+      return state;
+    };
+    const auto before = snapshot();
+
+    std::vector<std::pair<std::string, std::function<void()>>> actions;
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      for (const bool enabled : { true, false })
+      {
+        actions.emplace_back(std::string("ApplyDimensionToGroup ") + QmitkMxNSyncDimensionToLinkKey(dimension)
+                               + (enabled ? " on" : " off"),
+                             [this, dimension, enabled]()
+                             { m_Widget->ApplyDimensionToGroup(QmitkMxNGlobalGroupId, dimension, enabled); });
+      }
+    }
+    actions.emplace_back("LinkNavigationBundle", [this]() { m_Widget->LinkNavigationBundle(QmitkMxNGlobalGroupId); });
+    actions.emplace_back("RemoveCellsFromGroup",
+                         [this]()
+                         { m_Widget->RemoveCellsFromGroup(QStringList{ CellId(0), CellId(1) }, QmitkMxNGlobalGroupId); });
+    for (const auto& [name, action] : actions)
+    {
+      const SyncNotificationCounter notifications(m_Editor.get());
+      action();
+      Pump();
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(name + " on the reserved group reports no change", 0, notifications.Count());
+      CPPUNIT_ASSERT_MESSAGE(name + " on the reserved group changes no link", before == snapshot());
+    }
+  }
+
+  void GlobalGroup_ReinitLeavesGeometry()
+  {
+    auto image = mitk::DataNode::New();
+    image->SetName("image");
+    image->SetData(mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f));
+    image->SetIntProperty("layer", 0);
+    m_DataStorage->Add(image);
+    for (const auto& [windowId, cell] : m_Editor->GetRenderWindowWidgets())
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(cell->GetRenderWindow()->GetVtkRenderWindow(),
+                                                            image->GetData()->GetTimeGeometry());
+    }
+    const auto* navigation = m_Editor->GetRenderWindowWidget(CellId(0))->GetSliceNavigationController();
+    const auto* before = navigation->GetInputWorldTimeGeometry();
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the window has a geometry", nullptr != before);
+
+    m_Widget->ReinitGroupGeometry(QmitkMxNGlobalGroupId);
+
+    CPPUNIT_ASSERT_MESSAGE("Re-initializing the reserved group leaves the first window's geometry alone",
+                           before == navigation->GetInputWorldTimeGeometry());
   }
 
   static void MoveTo(QWidget& target, const QPoint& position)

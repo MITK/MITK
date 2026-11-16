@@ -51,8 +51,10 @@ class QPainter;
  * hue disappears on light group colours (the reserved group's light gray
  * among them). A strip that is one button as a whole shows, under the
  * pointer, the hover wash of the tool buttons beside it behind its slots; a
- * strip whose axes take the pointer keeps the pointed-at slot as it is and
- * fades the others to QmitkMxNHighlightFade.
+ * strip whose axes take the pointer fades every slot but the pointed-at one
+ * to QmitkMxNHighlightFade. The pointed-at slot keeps its look, except that
+ * in glyph mode one drawn as a gap or struck through is raised in the gap
+ * colour.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 {
@@ -129,8 +131,9 @@ public:
    *        or the collapsed color bar, chosen by ComputeLayout for that rect's
    *        size. 'gapColor' fills the unsynced hairline; 'hovered' lays the
    *        button hover wash behind the drawn slots; 'hoveredSlot', when not
-   *        -1, fades every other slot. Static so the rendering can be checked
-   *        on a QImage at any device pixel ratio.
+   *        -1, fades every other slot and, in glyph mode, raises that slot if
+   *        it is drawn as a gap or struck through. Static so the rendering can
+   *        be checked on a QImage at any device pixel ratio.
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,

@@ -131,6 +131,8 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_WhileHidden_CameraSetBeforeShowIsKept);
   MITK_TEST(Apply_WhileHidden_PartialCameraChange_KeepsTheFit);
   MITK_TEST(Apply_WhileHidden_PartialCameraChangeOnThreeDWindow_KeepsTheViewInitialization);
+  MITK_TEST(Apply_WhileHidden_CamerasSetOnGroupMembers_EndAsSetWhileShown);
+  MITK_TEST(Apply_WhileHidden_HiddenDuringTheDeferredFit_KeepsTheCameraAndFitsOnShow);
   MITK_TEST(Apply_WhileShowing_LeavesNoStaleFitForReusedIds);
   MITK_TEST(GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards);
   MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
@@ -1549,6 +1551,128 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The view angle is kept", 20.0, camera->GetViewAngle(), 1e-6);
   }
 
+  /** The cameras' parallel scales after applying 'doc' and then setting the
+   *  zoom of the windows in 'zooms', on an editor shown before or only after. */
+  std::map<QString, double> ParallelScalesAfterSettingZooms(const nlohmann::json& doc,
+                                                           const std::map<QString, double>& zooms, bool shownBefore)
+  {
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    if (shownBefore)
+    {
+      editor->show();
+      Pump();
+    }
+    editor->ApplyLayout(doc);
+    if (shownBefore)
+    {
+      Pump();
+    }
+    for (const auto& [windowId, zoom] : zooms)
+    {
+      editor->SetCamera(windowId, [zoom = zoom](mitk::BaseRenderer* renderer)
+                        { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoom); });
+    }
+    editor->show();
+    Pump();
+
+    std::map<QString, double> scales;
+    for (const auto& windowId : WindowIds(*editor))
+    {
+      scales[windowId] = CameraOf(*editor, windowId)->GetParallelScale();
+    }
+    return scales;
+  }
+
+  void Apply_WhileHidden_CamerasSetOnGroupMembers_EndAsSetWhileShown()
+  {
+    // On a shown display a camera a client sets is passed on to no group: it
+    // stays on its window, and the window's group mates keep theirs. A layout
+    // applied while hidden must end the same, with the cameras set before the
+    // display is shown - also when they are set on members of one zoom group.
+    AddSquareImage();
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__a", "size": 20, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } },
+        { "type": "window", "id": "mxn__b", "size": 40, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } },
+        { "type": "window", "id": "mxn__c", "size": 40, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } }
+      ] }
+    })json");
+    const double converged = this->ParallelScalesAfterApplying(doc, true).at("mxn__a");
+    const std::map<QString, double> zooms{ { "mxn__b", 0.5 * converged }, { "mxn__c", 0.75 * converged } };
+
+    const auto shown = this->ParallelScalesAfterSettingZooms(doc, zooms, true);
+    for (const auto& [windowId, zoom] : zooms)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: on a shown display " + windowId.toStdString()
+                                             + " keeps the zoom set for it",
+                                           zoom, shown.at(windowId), 1e-6);
+    }
+    const auto hidden = this->ParallelScalesAfterSettingZooms(doc, zooms, false);
+    for (const auto& [windowId, scale] : shown)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera of " + windowId.toStdString() + " ends as on a shown display",
+                                           scale, hidden.at(windowId), 1e-6);
+    }
+  }
+
+  void Apply_WhileHidden_HiddenDuringTheDeferredFit_KeepsTheCameraAndFitsOnShow()
+  {
+    // A timer or a queued call can hide the display while the fit deferred
+    // for showing lets the event loop lay the cells out. Hidden cells cannot
+    // be fitted; they wait for the next show, and a camera set for them while
+    // hidden must outlast that fit as it outlasts any other.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    auto* widget = editor.get();
+    editor->ApplyLayout(doc);
+    const double zoomed = 0.5 * fitted.at("mxn__wide");
+    editor->SetCamera("mxn__wide", [zoomed](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoomed); });
+
+    // Posted again until the display is busy, so it hides the display from
+    // inside the deferred fit's event pass, whenever that runs.
+    bool hiddenDuringFit = false;
+    int attempts = 0;
+    std::function<void()> hideWhenBusy;
+    hideWhenBusy = [widget, &hiddenDuringFit, &attempts, &hideWhenBusy]()
+    {
+      if (widget->IsBusy())
+      {
+        hiddenDuringFit = true;
+        widget->hide();
+      }
+      else if (++attempts < 100)
+      {
+        QMetaObject::invokeMethod(widget, hideWhenBusy, Qt::QueuedConnection);
+      }
+    };
+    editor->show();
+    QMetaObject::invokeMethod(widget, hideWhenBusy, Qt::QueuedConnection);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the display is hidden while the deferred fit lays the cells out",
+                           hiddenDuringFit && !editor->isVisible());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("While hidden the window keeps the camera set for it", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+
+    editor->show();
+    Pump();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Once shown, the camera set while hidden is kept", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The other window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+  }
+
   void Apply_WhileShowing_LeavesNoStaleFitForReusedIds()
   {
     // A layout applied while the fit deferred for showing is still queued
@@ -1620,7 +1744,7 @@ public:
       bool busy = false;
       QMetaObject::invokeMethod(widget, [widget, &ran, &busy]() {
         ran = true;
-        busy = widget->IsApplyingLayout();
+        busy = widget->IsBusy();
       }, Qt::QueuedConnection);
       operation();
       CPPUNIT_ASSERT_MESSAGE("Fixture: " + name + " delivers the queued call", ran);

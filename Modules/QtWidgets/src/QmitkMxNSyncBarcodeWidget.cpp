@@ -248,7 +248,9 @@ void QmitkMxNSyncBarcodeWidget::PaintInto(QPainter& painter, const QRect& target
   }
 
   // While one axis is pointed at, the others fade instead of the pointed-at one
-  // brightening, which a light group hue would not show.
+  // being recoloured, which a light group hue would not show. A pointed-at gap
+  // or struck-through glyph is raised: at its resting opacity it would barely
+  // stand apart from the faded linked slots.
   const auto fade = [hoveredSlot](int slot)
   {
     return hoveredSlot >= 0 && slot != hoveredSlot ? QmitkMxNHighlightFade : qreal(1.0);

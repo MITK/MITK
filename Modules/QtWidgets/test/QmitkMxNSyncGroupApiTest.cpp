@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMultiWidgetLayoutManager.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
@@ -23,6 +24,7 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QColor>
+#include <QFile>
 #include <QPalette>
 
 #include <string>
@@ -81,6 +83,7 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(GetSyncGroupInfos_DoesNotListGlobal);
   MITK_TEST(GetSyncGroupColorAndName_GlobalIsReserved);
   MITK_TEST(GetSyncGroupColor_GlobalFollowsTheStyleSheet);
+  MITK_TEST(GetSyncGroupColor_LightStyleLeavesTheTextColourToThePlatform);
   MITK_TEST(GlobalTakesNoPaletteSlot);
   MITK_TEST(ResolveCellGroupIdentity_FreshWindowStaysMono);
   MITK_TEST(SyncAxes_AreInFamilyOrder);
@@ -88,6 +91,7 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(BuildBarcodeSlots_NineSlotsInFamilyOrder_TimeIsGlobal);
   MITK_TEST(BuildBarcodeSlots_GlobalUsesTheOverlayColorInEveryStyle);
   MITK_TEST(CellsSharingAxis_TimeIsGlobalOnly);
+  MITK_TEST(CellsSharingAxis_EmptyWhileNoCellTree);
   MITK_TEST(ResolveCellAxisGroup_TimeNeverTouchesSelection);
   CPPUNIT_TEST_SUITE_END();
 
@@ -545,6 +549,18 @@ public:
       CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
       CPPUNIT_ASSERT_MESSAGE(color, QColor(color) == widget.GetSyncGroupColor(group));
     }
+
+    // The edge of the band at 15: the grays one step inside and one step outside
+    // it, at about 14.9 / 15.3 from #f1f1f1 and 14.7 / 15.2 from black.
+    for (const auto* color : { "#c7c7c7", "#252525" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+    }
+    for (const auto* color : { "#c6c6c6", "#262626" })
+    {
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
+    }
   }
 
   void GetSyncGroupInfos_DoesNotListGlobal()
@@ -576,20 +592,63 @@ public:
     }
   }
 
+  /** A Workbench style sheet as the BlueBerry plugin ships it. */
+  static QString WorkbenchStyleSheet(const char* path)
+  {
+    QFile file(QString::fromUtf8(path));
+    CPPUNIT_ASSERT_MESSAGE(std::string("Fixture: the style sheet is readable: ") + path,
+                           file.open(QIODevice::ReadOnly | QIODevice::Text));
+    return QString::fromUtf8(file.readAll());
+  }
+
+  struct StyleSheetGuard
+  {
+    ~StyleSheetGuard() { qApp->setStyleSheet(QString()); }
+  };
+
   void GetSyncGroupColor_GlobalFollowsTheStyleSheet()
   {
-    // The Dark style sets the text colour in a style sheet, which reaches a
-    // widget's palette only once the widget is polished.
-    struct StyleSheetGuard
-    {
-      ~StyleSheetGuard() { qApp->setStyleSheet(QString()); }
-    } guard;
-    qApp->setStyleSheet(QStringLiteral("QWidget { background-color: #2d2d30; color: #f1f1f1; }"));
+    // The Dark style sets the text colour in its style sheet, which reaches a
+    // widget's palette only once the widget is polished. The reserved band and
+    // the dark furniture carry a copy of that colour, since this module cannot
+    // read the plugin's sheet; a change of the sheet must not leave them behind.
+    const StyleSheetGuard guard;
+    qApp->setStyleSheet(WorkbenchStyleSheet(MITK_DARKSTYLE_QSS_PATH));
 
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     widget.InitializeMultiWidget();
-    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"),
+    const auto text = widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Dark style's text colour is the one the strips give the reserved group",
+                                 axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)].color.name().toStdString(),
+                                 text.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("... and the arrange frames",
+                                 widget.GetArrangeHighlightHue(QmitkMxNGlobalGroupId).name().toStdString(),
+                                 text.name().toStdString());
+    CPPUNIT_ASSERT_THROW_MESSAGE("... and lies in the reserved band",
+                                 widget.SetSyncGroupColor(widget.GetDefaultSyncGroupName(), text),
+                                 QmitkMxNReservedGroupException);
+  }
+
+  void GetSyncGroupColor_LightStyleLeavesTheTextColourToThePlatform()
+  {
+    // The band anchors the Light style on black, the platform's text colour on
+    // Windows: the Light style sheet must not set a text colour of its own.
+    QColor platform;
+    {
+      QmitkMxNMultiWidget unstyled;
+      unstyled.SetDataStorage(m_DataStorage);
+      unstyled.InitializeMultiWidget();
+      platform = unstyled.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    }
+
+    const StyleSheetGuard guard;
+    qApp->setStyleSheet(WorkbenchStyleSheet(MITK_LIGHTSTYLE_QSS_PATH));
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    CPPUNIT_ASSERT_EQUAL(platform.name().toStdString(),
                          widget.GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
   }
 
@@ -714,6 +773,39 @@ public:
                                                    QmitkMxNSyncAxis::Time).isEmpty());
     CPPUNIT_ASSERT_MESSAGE("'global' takes no other axis yet",
                            widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Selection).isEmpty());
+  }
+
+  void CellsSharingAxis_EmptyWhileNoCellTree()
+  {
+    // A layout rebuild tears the cell tree down while the cells are still
+    // registered. The hover handlers that ask who shares an axis cannot be
+    // told apart from that state and rely on an empty answer.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(1, 2);
+    std::vector<QString> ids;
+    for (const auto& descriptor : widget.ListWindowDescriptors())
+    {
+      ids.push_back(descriptor.id);
+    }
+    widget.GetMultiWidgetLayoutManager()->ClearLayout();
+
+    for (const auto& id : ids)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the cell is still registered and follows Time through 'global'",
+                                   std::string(QmitkMxNGlobalGroupId),
+                                   widget.ResolveCellAxisGroup(id, QmitkMxNSyncAxis::Time));
+    }
+    QStringList time;
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Time",
+                                    time = widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT(time.isEmpty());
+    QStringList slice;
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
+      "Slice", slice = widget.CellsSharingAxis(QString::fromStdString(widget.GetDefaultSyncGroupName()),
+                                               QmitkMxNSyncAxis::Slice));
+    CPPUNIT_ASSERT(slice.isEmpty());
   }
 
   void ResolveCellAxisGroup_TimeNeverTouchesSelection()

@@ -87,6 +87,7 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(PlateInput_PointingAtAGlyphRingsItsPartners);
   MITK_TEST(PeekPlate_LineNamesTheAxisOnlyOnTheNamingPlate);
   MITK_TEST(PeekPlate_OnlyTheHoveredPlateMakesRoomForTheButtons);
+  MITK_TEST(PeekPlate_AnOffsetTheLineCannotHoldIsLeftToTheRibbon);
   MITK_TEST(PartnerFrames_TimeTakesTheOverlayColourInEveryStyle);
   MITK_TEST(PlateInput_TheCloseButtonAsksToHideTheEditor);
   MITK_TEST(Drops_TheCellAcceptsDropsOnlyWhileArranging);
@@ -801,6 +802,37 @@ public:
     this->SendToRenderWindow(1, QEvent::MouseMove, this->Cell(1)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Off the plate its line takes the grid's width again",
                                  this->FullPlateLineWidth(1), this->Overlay(1)->SyncPeekLineRect().width());
+  }
+
+  void PeekPlate_AnOffsetTheLineCannotHoldIsLeftToTheRibbon()
+  {
+    // At the smallest glyph box the line of the plate under the pointer, which
+    // makes room for the arrange buttons, is narrower than a pan offset. The
+    // pointed-at glyph's ribbon shows the offset then; the line must not run
+    // it over the buttons.
+    this->ShowArranging();
+    // Windows about 150 px wide and over 214 px tall host a plate at the
+    // smallest glyph box.
+    m_Editor->resize(320, 600);
+    Pump();
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the plates sit at the smallest glyph box",
+                                 QmitkMxNCellOverlay::PeekGlyphBoxMin, this->Overlay(1)->SyncPeekGlyphBox());
+    mitk::Vector2D pan;
+    pan[0] = -123.0;
+    pan[1] = -456.0;
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "view", pan);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Pan, "view");
+    m_Editor->RefreshSyncControls();
+    Pump();
+
+    this->SendToRenderWindow(1, QEvent::MouseMove, this->PlateGlyphCenter(1, QmitkMxNSyncAxis::Pan));
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the plate under the pointer shows the buttons",
+                           this->Overlay(1)->PlateMenuButtonRect().isValid());
+    const auto line = this->Overlay(1)->SyncPeekLine();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The line names the axis", std::string("Pan"), line.text.toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("and leaves the offset it cannot hold to the ribbon", std::string(),
+                                 line.offset.toStdString());
   }
 
   void PartnerFrames_TimeTakesTheOverlayColourInEveryStyle()

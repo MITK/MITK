@@ -2140,7 +2140,7 @@ Returns metadata about the MxN multi-widget editor, including the current cell i
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No editor list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2175,7 +2175,7 @@ Distinct from the StdMulti window list: MxN cells carry the persisted `view_dire
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2210,7 +2210,7 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 
 **Selected slice on MxN cells is step-only.** `PUT .../selected-slice` accepts only `{"step": N}`. World-anchor moves on a single cell live at the per-cell `selected-position` resource; global anchor moves at `/rendering/selected-position`. Sending `position` to slice returns 400 with a hint pointing to both primitives.
 
-**Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip. While the workbench GUI applies a layout (a preset, a file or a dynamic layout) or changes the grid, every MxN endpoint, this PUT included, returns 503 `EDITOR_BUSY`; a rebuild typically takes 1-2 s, and a request repeated after it succeeds. Requests that arrive while a REST PUT is being applied are not rejected: they wait and are served once it has finished.
+**Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip. While the workbench GUI applies a layout (a preset, a file or a dynamic layout) or changes the grid, and while the editor, once shown, fits the windows built while it was hidden, every MxN endpoint, this PUT included, returns 503 `EDITOR_BUSY`; a rebuild typically takes 1-2 s, and a request repeated after it succeeds. Requests that arrive while a REST PUT is being applied are not rejected: they wait and are served once it has finished.
 
 **Camera is always 2D for MxN cells.** The layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A 3D cell type may arrive in a future version, at which point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
 
@@ -2219,7 +2219,7 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 | Status | Code | When |
 |--------|------|------|
 | 503 | `EDITOR_NOT_ACTIVE` | The MxN editor is not currently open in the workbench |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | The bridge callback is not registered (headless / Qt plugin not loaded), or the registered editor list does not expose the `mxn` alias |
 | 400 | `INVALID_REQUEST` | The cell `{id}` is malformed — does not match the canonical fully-qualified form `<prefix>__<bare>` with URL-segment-safe characters. Rejected controller-side before any bridge dispatch |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | The cell `id` is well-formed but unknown to the editor |
@@ -2240,7 +2240,7 @@ Query parameters, request body, response content-types and shared error shapes a
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 
 ---
 
@@ -2258,7 +2258,7 @@ Query parameters, request body, response content-types and shared error shapes a
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 
 ---
 
@@ -2293,7 +2293,7 @@ Returns the current MxN layout as a version 3.0 document, of the same shape as a
 | Status | Code | Description |
 |--------|------|-------------|
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2327,7 +2327,7 @@ Applies a layout document of version 3.0 or 2.0. **All existing cells are torn d
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure, e.g. version other than 2.0 or 3.0, duplicate window ids, unknown view direction, missing group reference in strict mode, a 3.0 window whose `links.time` is missing or targets anything but `global`, the reserved group `global` in any spelling as a `groups` key or as the target of any other link (also in 2.0 documents, which read only `links.selection`), type errors; the full rule set is in the schema descriptions. The `detail` field carries the engine's diagnostic message. |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2358,7 +2358,7 @@ Returns the camera state of the addressed MxN cell. Every MxN cell is 2D, so the
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2386,7 +2386,7 @@ Partial update. At least one camera field must be present. `standard_view` is ap
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK rendering framework raised `mitk::Exception` while applying the patch |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2418,7 +2418,7 @@ Returns the cell's selected-slice state: integer step, the live world position o
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2446,7 +2446,7 @@ Returns the cell's selected-slice state: integer step, the live world position o
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK navigator raised `mitk::Exception` |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice step setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2477,7 +2477,7 @@ This is **distinct** from the global `/rendering/selected-position` resource: th
 |--------|------|-------------|
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position getter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2509,7 +2509,7 @@ No range checking — out-of-range values are clamped/snapped by MITK.
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
 | 422 | `RENDERING_ERROR` | MITK engine raised `mitk::Exception` (e.g., geometry validation failure) |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position setter registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2558,7 +2558,7 @@ Per-cell summary plus capability flags.
 | 400 | `INVALID_REQUEST` | `{id}` is malformed (rejected controller-side before bridge dispatch) |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | `{id}` is well-formed but not a known MxN cell |
 | 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
-| 503 | `EDITOR_BUSY` | The MxN editor is applying a layout; transient, retry once it has finished |
+| 503 | `EDITOR_BUSY` | The MxN editor is busy rebuilding or laying out its windows; transient, retry once it has finished |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
@@ -2616,7 +2616,7 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
 | 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |
-| 503 | `EDITOR_BUSY` | Addressed editor is open but temporarily cannot serve requests (e.g. the MxN editor while it applies a layout); retry once it has finished |
+| 503 | `EDITOR_BUSY` | Addressed editor is open but temporarily cannot serve requests (e.g. the MxN editor while it rebuilds or lays out its windows); retry once it has finished |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 
 ### 9.3 Validation Errors

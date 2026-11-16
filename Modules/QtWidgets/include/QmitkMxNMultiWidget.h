@@ -1089,7 +1089,7 @@ public:
   *   events and queued cross-thread calls are still delivered while it is up.
   *   'ApplyLayout' is guarded against being re-entered from there.
   *
-  *   From Show until Hide the editor counts as busy ('IsApplyingLayout'),
+  *   From Show until Hide the editor counts as busy ('IsBusy'),
   *   including the gap before the deferred apply starts, so the caller must
   *   always pair the two.
   */
@@ -1218,7 +1218,7 @@ public:
   *   order, writes the lookup tables (through 'SetLookupTable'), opacities
   *   and volume renderings for the named windows' renderers, and runs the
   *   fits. The global time range then covers all data the display shows, and
-  *   the selected time point stays where it lies in it. 'IsApplyingLayout' is
+  *   the selected time point stays where it lies in it. 'IsBusy' is
   *   true throughout. Only renderer-specific properties are written. Nothing
   *   throws after the document is loaded.
   *
@@ -1320,7 +1320,7 @@ public:
   *   dialog moving, so posted events and queued calls can run in the middle of
   *   it; a call made from there, while this one is still in progress, is
   *   rejected with 'QmitkMxNLayoutBusyException' and leaves the running apply
-  *   untouched. See 'IsApplyingLayout'.
+  *   untouched. See 'IsBusy'.
   *
   * \param doc  A parsed v2.0 or v3.0 layout document.
   *
@@ -1354,7 +1354,7 @@ public:
   *   cross-thread calls) must check this and leave the editor alone while it
   *   is true.
   */
-  bool IsApplyingLayout() const;
+  bool IsBusy() const;
 
   /**
   * \brief Changes the camera of window 'windowId' by running 'change' on its
@@ -1362,9 +1362,13 @@ public:
   *
   *   Callers that set a cell's camera explicitly (e.g. over REST) go through
   *   this, because the display may be hidden: cells built while it is hidden
-  *   are fitted to their size once it is shown, and such a cell runs 'change'
-  *   again after that fit. What 'change' sets outlasts the fit; what it
-  *   leaves alone is fitted.
+  *   are fitted to their size once it is shown and their zoom, pan and slice
+  *   groups converge again, and such a cell runs 'change' again after that.
+  *   What 'change' sets outlasts the fit and the convergence; what it leaves
+  *   alone is fitted. As on a shown display, the change is passed on to none
+  *   of the window's groups. Such a cell keeps every change, in call order,
+  *   until its fit has run or it is removed, so memory and the time to show
+  *   the display grow with the calls made in between.
   *
   * \throws mitk::Exception if 'windowId' names no window with a renderer.
   *         Whatever 'change' throws on its first run reaches the caller.
@@ -1991,7 +1995,9 @@ private:
   *   For cells created since the event loop last ran. While the editor is
   *   hidden, nothing can be laid out: the fit is deferred until it is shown,
   *   and the zoom, pan and slice groups of the deferred cells then converge
-  *   again. The global time range and step are kept.
+  *   again. That holds as well when a call delivered by the event pass that
+  *   lays the cells out hides the editor. The global time range and step are
+  *   kept.
   */
   void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
 
@@ -2297,17 +2303,18 @@ private:
   QString m_MaximizedCell;
 
   /** \brief Set while a layout operation lets the event loop run; see
-  *          'IsApplyingLayout'. */
-  bool m_ApplyingLayout = false;
-  /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
-  *          hidden; they are fitted once it is shown, unless they are
+  *          'IsBusy'. */
+  bool m_Busy = false;
+  /** \brief Cells 'FitNewCellsToTheirSize' could not fit because the editor
+  *          was hidden; they are fitted once it is shown, unless they are
   *          removed first. */
   std::vector<QString> m_CellsToFitWhenShown;
   /** \brief The 'SetCamera' changes of cells in 'm_CellsToFitWhenShown', in
-  *          call order; they run again after the cell's fit. */
+  *          call order; they run again after the cell's fit and the
+  *          convergence of its groups. */
   std::map<QString, std::vector<std::function<void(mitk::BaseRenderer*)>>> m_CameraChangesAfterFit;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
-  *          see 'IsApplyingLayout'. */
+  *          see 'IsBusy'. */
   bool m_LayoutLoadPending = false;
 
   /**

@@ -1090,7 +1090,9 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
 void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
                                                        QmitkMxNSyncDimension dimension, bool enabled)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group, whose links the
+  // engine owns.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1255,7 +1257,8 @@ bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group)
 void QmitkMxNLayoutEditorWidget::RemoveCellsFromGroup(const QStringList& windowIds,
                                                       const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // No window can leave the reserved group.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1278,7 +1281,9 @@ void QmitkMxNLayoutEditorWidget::RemoveCellsFromGroup(const QStringList& windowI
 
 void QmitkMxNLayoutEditorWidget::LinkNavigationBundle(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group, whose links the
+  // engine owns.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1332,7 +1337,9 @@ void QmitkMxNLayoutEditorWidget::ReconvergeGroup(const std::string& group)
 
 void QmitkMxNLayoutEditorWidget::ReinitGroupGeometry(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group: its first member
+  // stands for no geometry component of the group's own.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1374,7 +1381,8 @@ std::string QmitkMxNLayoutEditorWidget::CreateGroup()
 
 void QmitkMxNLayoutEditorWidget::DeleteGroup(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // The reserved group always exists.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1415,7 +1423,7 @@ void QmitkMxNLayoutEditorWidget::RunPendingRebuild()
   // A layout load pumps the event loop while the cell tree is half built, so
   // the refresh waits it out. Polled rather than skipped: a load that fails
   // before it changes anything emits nothing a skipped refresh could wait for.
-  if (!m_MultiWidget.isNull() && m_MultiWidget->IsApplyingLayout())
+  if (!m_MultiWidget.isNull() && m_MultiWidget->IsBusy())
   {
     constexpr int retryMs = 50;
     QTimer::singleShot(retryMs, this, [this]() { this->RunPendingRebuild(); });

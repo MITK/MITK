@@ -928,7 +928,11 @@ QmitkMxNCellOverlay::PeekLineContent QmitkMxNCellOverlay::SyncPeekLine() const
   {
     const auto& axisSlot = axisSlots[m_PeekPaintAxis];
     content.text = axisSlot.label;
-    if (axisSlot.color.isValid() && axisSlot.applicable)
+    // An offset wider than the line would run over the arrange buttons. The
+    // pointed-at glyph's ribbon shows it then.
+    if (axisSlot.color.isValid() && axisSlot.applicable
+        && QFontMetrics(PeekLineFont(this->font())).horizontalAdvance(QLatin1Char(' ') + axisSlot.offsetText)
+             <= this->SyncPeekLineRect().width())
     {
       content.offset = axisSlot.offsetText;
     }
@@ -2017,7 +2021,8 @@ void QmitkMxNCellOverlay::PaintSyncPeek(QPainter& painter)
   const PeekLineContent content = this->SyncPeekLine();
   if (m_PeekPaintNamesAxis)
   {
-    // The offset is the information, so the label gives way to it.
+    // The offset is the information, so the label gives way to it; the line
+    // carries only an offset it can hold.
     const QString offset = content.offset.isEmpty() ? QString() : QLatin1Char(' ') + content.offset;
     const int offsetWidth = metrics.horizontalAdvance(offset);
     const QString label =

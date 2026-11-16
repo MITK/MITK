@@ -24,9 +24,11 @@ found in the LICENSE file.
  * \brief Synchronization dimensions a cell of the MxN editor can link
  *        per-group via the layout document's `links.<dim>` keys.
  *
- * The `selection` dimension is not part of this enum: it predates the
+ * The `selection` and `time` keys have no dimension. Selection predates the
  * per-dimension model, has its own engine (QmitkSynchronizedWidgetConnector),
- * and is handled by dedicated code paths.
+ * and is handled by dedicated code paths. Time is a key of the document only:
+ * every window follows the application's time, so `time` names the reserved
+ * group 'global' and the engine keeps no link for it.
  *
  * Geometry is not a dimension either. A slice step or a plane name only means
  * the same physical location within one reference geometry, so which cells
@@ -67,7 +69,11 @@ inline const char* QmitkMxNSyncDimensionToLinkKey(QmitkMxNSyncDimension dimensio
   return "";
 }
 
-/** \brief Parse a v3 `links` key; empty result for unknown keys (including "selection"). */
+/**
+ * \brief Parse a v3 `links` key; empty for "selection" and "time", which have
+ *        no dimension, and for unknown keys. Callers that reject unknown keys
+ *        handle "selection" and "time" first.
+ */
 inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(const std::string& key)
 {
   for (const auto dimension : QmitkMxNAllSyncDimensions)
@@ -92,12 +98,17 @@ inline constexpr const char* QmitkMxNGlobalGroupId = "global";
 /**
  * \brief The `links` keys whose links may target the reserved group 'global'.
  *
- * The one table the loader, the engine API and the layout editor consult, so
- * that enabling 'global' on another axis means adding its key here and giving
- * the axis the semantics of following the application's value. Keyed by link
+ * The loader and the engine API refuse 'global' under every other key, and the
+ * layout editor strikes those axes through on the group's card. Keyed by link
  * key, the vocabulary the loader works in; the engine maps a dimension with
  * QmitkMxNSyncDimensionToLinkKey, the editor an axis with
  * QmitkMxNSyncAxisToLinkKey.
+ *
+ * The only entry, 'time', stores no link, and that alone keeps the reserved
+ * group's contracts: it takes no palette entry, is not listed by
+ * QmitkMxNMultiWidget::GetSyncGroupInfos, and takes no `groups` entry. Listing
+ * a key whose links are stored breaks all three and stores 'global' in the
+ * spelling it was given.
  */
 inline constexpr std::array<std::string_view, 1> QmitkMxNLinkKeysAcceptingGlobal{ "time" };
 

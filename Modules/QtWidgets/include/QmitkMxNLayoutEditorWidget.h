@@ -149,7 +149,8 @@ public:
   /**
    * \brief Link or unlink every current member cell of 'group' on one
    *        dimension. Membership is defined by the engine's links: a no-op
-   *        for a group without members.
+   *        for a group without members. A no-op for the reserved group in
+   *        any spelling, whose links are not the user's to change.
    */
   void ApplyDimensionToGroup(const std::string& group, QmitkMxNSyncDimension dimension, bool enabled);
 
@@ -178,11 +179,14 @@ public:
    * \brief Take every given cell out of 'group': its links to the group are
    *        cleared on every dimension, and a selection on the group returns to
    *        the default group. Links to other groups are kept. The sync
-   *        furniture is notified once for the whole batch.
+   *        furniture is notified once for the whole batch. A no-op for the
+   *        reserved group in any spelling, which no window can leave.
    */
   void RemoveCellsFromGroup(const QStringList& windowIds, const std::string& group);
 
-  /** \brief Link pan+zoom+slice+crosshair for every member cell of 'group'. */
+  /** \brief Link pan+zoom+slice+crosshair for every member cell of 'group'. A
+   *         no-op for the reserved group in any spelling, whose links are not
+   *         the user's to change. */
   void LinkNavigationBundle(const std::string& group);
 
   /** \brief Re-converge every offset dimension (slice/zoom/pan) the group links. */
@@ -190,7 +194,9 @@ public:
 
   /**
    * \brief Reinit the geometry-authority component of the group's first
-   *        member cell (no-op for a group without members).
+   *        member cell (no-op for a group without members). A no-op for the
+   *        reserved group in any spelling: every window is its member, so its
+   *        first member stands for no group of its own.
    */
   void ReinitGroupGeometry(const std::string& group);
 
@@ -257,7 +263,8 @@ public:
   /**
    * \brief Remove a synchronization group entirely (its cells are unsynchronized
    *        and revert to the default group). A no-op for the default group, which
-   *        every cell falls back to and which is never removable. Public so tests
+   *        every cell falls back to and which is never removable, and for the
+   *        reserved group in any spelling, which always exists. Public so tests
    *        and the card menu can drive it.
    */
   void DeleteGroup(const std::string& group);
@@ -346,7 +353,7 @@ private:
   void RefreshOrRebuild();
 
   /** \brief Run the refresh ScheduleRebuild deferred, or, while the multi
-   *         widget is applying a layout, try again a little later. */
+   *         widget is busy, try again a little later. */
   void RunPendingRebuild();
 
   /** \brief Update every existing card's contents from the current engine state
@@ -487,7 +494,9 @@ private:
    *         the navigation-bundle default. */
   bool HasCachedGroupIntent(const std::string& group) const;
 
-  /** \brief All member cells of the group over every dimension, pre-order. */
+  /** \brief All member cells of the group over every dimension, pre-order;
+   *         every window for the reserved group, so a public action that
+   *         changes a group returns early for it. */
   std::vector<QString> GroupMembers(const std::string& group) const;
 
   /** \brief Dimensions the group currently links for at least one cell. */

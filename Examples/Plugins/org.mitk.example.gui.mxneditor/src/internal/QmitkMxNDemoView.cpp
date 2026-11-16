@@ -171,7 +171,7 @@ void QmitkMxNDemoView::SwitchLayout()
   }
   catch (const QmitkMxNLayoutBusyException&)
   {
-    m_Status->setText(tr("The display is still applying a layout; try again."));
+    m_Status->setText(tr("The display is busy rebuilding or laying out its windows; try again."));
   }
   catch (const mitk::Exception& e)
   {

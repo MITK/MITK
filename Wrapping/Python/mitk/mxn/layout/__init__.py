@@ -39,7 +39,7 @@ Public surface
   :data:`LAYOUT_VERSION`, :data:`DEFAULT_GROUP_NAME`,
   :data:`DEFAULT_GROUP`, :data:`DEFAULT_EDITOR_NAME`,
   :data:`NAMESPACE_DELIMITER`, :data:`WINDOW_ID_PATTERN`,
-  :data:`GROUP_NAME_PATTERN`.
+  :data:`GROUP_NAME_PATTERN`, :data:`RESERVED_GROUP_ID`.
 """
 
 from __future__ import annotations
@@ -64,6 +64,7 @@ from ._vocabulary import (
     GROUP_NAME_PATTERN,
     LAYOUT_VERSION,
     NAMESPACE_DELIMITER,
+    RESERVED_GROUP_ID,
     WINDOW_ID_PATTERN,
     LinkDimension,
     ViewDirection,
@@ -79,6 +80,7 @@ __all__ = [
     "NAMESPACE_DELIMITER",
     "WINDOW_ID_PATTERN",
     "GROUP_NAME_PATTERN",
+    "RESERVED_GROUP_ID",
     "LinkDimension",
     "ViewDirection",
     # Model

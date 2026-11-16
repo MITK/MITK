@@ -355,8 +355,6 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     countedTimeSteps = image->GetDimension(3);
     minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
-    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (TimeStepType i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
@@ -365,12 +363,26 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
       if (maxValue < maxValueTemp)
         maxValue = maxValueTemp;
-      ScalarType min2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
-      if (min2ndValue > min2ndValueTemp)
-        min2ndValue = min2ndValueTemp;
-      ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
-      if (max2ndValue < max2ndValueTemp)
-        max2ndValue = max2ndValueTemp;
+    }
+
+    // The second value of the whole image can be another time step's own minimum or
+    // maximum. A constant time step reports its only value as its second one, which
+    // must not count as a second value of the whole image.
+    min2ndValue = maxValue;
+    max2ndValue = minValue;
+    for (TimeStepType i = 0; i < image->GetDimension(3); ++i)
+    {
+      const auto stepMin = image->GetStatistics()->GetScalarValueMinNoRecompute(i);
+      const auto aboveMin =
+        stepMin > minValue ? stepMin : image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
+      if (aboveMin > minValue)
+        min2ndValue = std::min(min2ndValue, aboveMin);
+
+      const auto stepMax = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
+      const auto belowMax =
+        stepMax < maxValue ? stepMax : image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
+      if (belowMax < maxValue)
+        max2ndValue = std::max(max2ndValue, belowMax);
     }
   }
 

@@ -16,12 +16,14 @@ found in the LICENSE file.
 #include <mitkIOMimeTypes.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkLexicalCast.h>
 
 // STL
 #include <charconv>
 #include <fstream>
 #include <iostream>
 #include <string_view>
+#include <type_traits>
 
 #include <tinyxml2.h>
 
@@ -38,15 +40,32 @@ namespace
       mitkThrow() << "Missing or empty <" << name << "> element.";
 
     const auto number = text.substr(first, text.find_last_not_of(" \t\r\n") - first + 1);
-    const char *end = number.data() + number.size();
 
-    T value{};
-    const auto [last, error] = std::from_chars(number.data(), end, value);
+    // Floating-point std::from_chars is missing from older libc++ (macOS), while
+    // LexicalCast wraps negative input around for unsigned types.
+    if constexpr (std::is_floating_point_v<T>)
+    {
+      try
+      {
+        return mitk::LexicalCast<T>(std::string(number));
+      }
+      catch (const mitk::BadLexicalCast &)
+      {
+        mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+      }
+    }
+    else
+    {
+      const char *end = number.data() + number.size();
 
-    if (error != std::errc() || last != end)
-      mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+      T value{};
+      const auto [last, error] = std::from_chars(number.data(), end, value);
 
-    return value;
+      if (error != std::errc() || last != end)
+        mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+
+      return value;
+    }
   }
 
   mitk::TimeStepType ReadTimeStep(const tinyxml2::XMLElement *timeSeries)

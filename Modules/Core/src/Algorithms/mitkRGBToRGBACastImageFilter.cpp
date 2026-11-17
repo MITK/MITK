@@ -138,7 +138,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    const mitk::Image::Pointer image = SelectImageByTimeStep(this->GetInput(), timestep);
+    const mitk::Image::ConstPointer image = SelectImageByTimeStep(input, timestep);
 
     const mitk::PixelType &pixelType = image->GetPixelType();
 
@@ -171,7 +171,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::RGBToRGBACastImageFilter::InternalCast(itk::Image<TPixel, VImageDimension> *inputItkImage,
+void mitk::RGBToRGBACastImageFilter::InternalCast(const itk::Image<TPixel, VImageDimension> *inputItkImage,
                                                   mitk::RGBToRGBACastImageFilter *addComponentFilter,
                                                   typename TPixel::ComponentType defaultAlpha)
 {

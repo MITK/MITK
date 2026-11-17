@@ -90,11 +90,11 @@ void
   descFilter->AddObserver(::itk::ProgressEvent(), spProgressCommand);
 
   //add the time frames to the descriptor filter
-  std::vector<Image::Pointer> frameCache;
+  std::vector<Image::ConstPointer> frameCache;
   for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
-    Image::Pointer frameMITKImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
+    Image::ConstPointer frameMITKImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
     descFilter->SetInput(static_cast<unsigned int>(i), frameImage);

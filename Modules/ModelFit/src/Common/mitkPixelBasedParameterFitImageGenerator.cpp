@@ -94,11 +94,11 @@ void
   fitFilter->AddObserver(::itk::ProgressEvent(), spProgressCommand);
 
   //add the time frames to the fit filter
-  std::vector<Image::Pointer> frameCache;
+  std::vector<Image::ConstPointer> frameCache;
   for (TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
-    Image::Pointer frameMITKImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
+    Image::ConstPointer frameMITKImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
     fitFilter->SetInput(static_cast<unsigned int>(i), frameImage);

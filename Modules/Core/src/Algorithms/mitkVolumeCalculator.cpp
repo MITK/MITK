@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkVolumeCalculator.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkImageTimeSelector.h>
 #include <itkImageRegionConstIterator.h>
 
 #include <mitkImageStatisticsHolder.h>

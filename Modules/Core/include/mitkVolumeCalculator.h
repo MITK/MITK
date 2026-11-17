@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 
 #include <mitkImage.h>
-#include <mitkImageTimeSelector.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

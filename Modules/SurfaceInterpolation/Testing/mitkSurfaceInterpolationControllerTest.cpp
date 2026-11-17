@@ -541,13 +541,6 @@ public:
 
   bool AssertImagesEqual4D(mitk::MultiLabelSegmentation *img1, mitk::MultiLabelSegmentation *img2)
   {
-    auto selector1 = mitk::ImageTimeSelector::New();
-    selector1->SetInput(img1->GetGroupImage(0));
-    selector1->SetChannelNr(0);
-    auto selector2 = mitk::ImageTimeSelector::New();
-    selector2->SetInput(img2->GetGroupImage(0));
-    selector2->SetChannelNr(0);
-
     const auto numTs1 = img1->GetTimeSteps();
     const auto numTs2 = img2->GetTimeSteps();
     if (numTs1 != numTs2)
@@ -565,14 +558,8 @@ public:
 
     for (mitk::TimeStepType ts = 0; ts < numTs1; ++ts)
     {
-      selector1->SetTimeNr(ts);
-      selector2->SetTimeNr(ts);
-
-      selector1->Update();
-      selector2->Update();
-
-      mitk::Image::Pointer imgSel1 = selector1->GetOutput();
-      mitk::Image::Pointer imgSel2 = selector2->GetOutput();
+      mitk::Image::Pointer imgSel1 = mitk::SelectImageByTimeStep(img1->GetGroupImage(0), ts);
+      mitk::Image::Pointer imgSel2 = mitk::SelectImageByTimeStep(img2->GetGroupImage(0), ts);
 
       MITK_ASSERT_EQUAL(imgSel1, imgSel2, "Segmentation images are not equal");
     }

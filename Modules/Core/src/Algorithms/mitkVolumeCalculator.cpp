@@ -43,7 +43,6 @@ void mitk::VolumeCalculator::InternalCompute(const itk::Image<TPixel, VImageDime
 
 mitk::VolumeCalculator::VolumeCalculator() : m_Image(nullptr), m_Threshold(0), m_Volume(0)
 {
-  m_TimeSelector = ImageTimeSelector::New();
 }
 
 mitk::VolumeCalculator::~VolumeCalculator()
@@ -60,13 +59,11 @@ void mitk::VolumeCalculator::ComputeVolume()
   const_cast<Image *>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion();
   if (m_Image->GetDimension() == 4)
   {
-    m_TimeSelector->SetInput(m_Image);
     m_Volumes.resize(m_Image->GetDimension(3));
     for (TimeStepType timeStep = 0; timeStep < m_Image->GetDimension(3); ++timeStep)
     {
-      m_TimeSelector->SetTimeNr(timeStep);
-      m_TimeSelector->Update();
-      AccessFixedDimensionByItk(m_TimeSelector->GetOutput(), InternalCompute, 3);
+      const auto timeStepImage = SelectImageByTimeStep(m_Image, timeStep);
+      AccessFixedDimensionByItk(timeStepImage, InternalCompute, 3);
       m_Volumes[timeStep] = m_Volume;
     }
   }

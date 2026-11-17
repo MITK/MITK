@@ -94,12 +94,7 @@ void
   for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
-    mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(this->m_DynamicImage);
-    imageTimeSelector->SetTimeNr(i);
-    imageTimeSelector->UpdateLargestPossibleRegion();
-
-    Image::Pointer frameMITKImage = imageTimeSelector->GetOutput();
+    Image::Pointer frameMITKImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
     frameCache.push_back(frameMITKImage);
     mitk::CastToItkImage(frameMITKImage, frameImage);
     descFilter->SetInput(static_cast<unsigned int>(i), frameImage);

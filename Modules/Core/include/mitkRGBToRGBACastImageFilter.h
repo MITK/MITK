@@ -78,7 +78,6 @@ namespace mitk
                       mitk::RGBToRGBACastImageFilter *addComponentFilter,
                       typename TPixel::ComponentType defaultAlpha);
 
-    mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
     mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
     /** \brief Time when the output header was last initialized. */

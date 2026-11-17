@@ -68,15 +68,10 @@ void mitk::ConcentrationCurveGenerator::Convert()
     tempImage->SetTimeGeometry(timeGeometry);
 
     PrepareBaselineImage();
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(this->m_DynamicImage);
 
     for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
     {
-        imageTimeSelector->SetTimeNr(i);
-        imageTimeSelector->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+        mitk::Image::ConstPointer mitkInputImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
         mitk::Image::Pointer outputImage = mitk::Image::New();
 
         outputImage = ConvertSignalToConcentrationCurve(mitkInputImage,this->m_BaselineImage);
@@ -96,16 +91,9 @@ void mitk::ConcentrationCurveGenerator::Convert()
 void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 {
 
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(this->m_DynamicImage);
-  imageTimeSelector->SetTimeNr(0);
-  imageTimeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer baselineImage;
-  baselineImage = imageTimeSelector->GetOutput();
-  
   if (m_BaselineStartTimeStep == m_BaselineEndTimeStep)
   {
-    this->m_BaselineImage = imageTimeSelector->GetOutput();
+    this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, 0);
   }
   else
   {

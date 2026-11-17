@@ -31,11 +31,7 @@ int mitkRotatedSlice4DTest(int, char *[])
 
   for (mitk::TimeStepType ts = 0; ts < numTimeSteps; ++ts)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image4D);
-    timeSelector->SetTimeNr(ts);
-    timeSelector->Update();
-    mitk::Image::Pointer image3D = timeSelector->GetOutput();
+    mitk::Image::Pointer image3D = mitk::SelectImageByTimeStep(image4D, ts);
 
     int sliceNumber = std::min(5, static_cast<int>(image3D->GetSlicedGeometry()->GetSlices()));
 

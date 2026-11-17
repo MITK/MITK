@@ -256,12 +256,7 @@ InternalImageMapType ConvertImageTimeSteps(mitk::Image* image)
 
   for (mitk::TimeStepType i = 0; i < image->GetTimeSteps(); ++i)
   {
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(image);
-    imageTimeSelector->SetTimeNr(i);
-    imageTimeSelector->UpdateLargestPossibleRegion();
-
-    mitk::Image::Pointer imageTimePoint = imageTimeSelector->GetOutput();
+    mitk::Image::Pointer imageTimePoint = mitk::SelectImageByTimeStep(image, i);
 
     AccessFixedDimensionByItk_1(imageTimePoint,
       DoInternalImageConversion,
@@ -283,11 +278,7 @@ void doDumping()
     std::cout <<
       "Pixel Dumper: Selected mask has multiple timesteps. Only use first timestep to mask the pixel dumping." << std::endl;
 
-    mitk::ImageTimeSelector::Pointer maskTimeSelector = mitk::ImageTimeSelector::New();
-    maskTimeSelector->SetInput(mask);
-    maskTimeSelector->SetTimeNr(0);
-    maskTimeSelector->UpdateLargestPossibleRegion();
-    mask = maskTimeSelector->GetOutput();
+    mask = mitk::SelectImageByTimeStep(mask, 0);
   }
 
   try

@@ -278,12 +278,7 @@ void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk:
 {
   for (mitk::TimeStepType i = 0; i < input->GetTimeSteps(); ++i)
   {
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(input);
-    imageTimeSelector->SetTimeNr(i);
-    imageTimeSelector->UpdateLargestPossibleRegion();
-
-    mitk::ImageMappingHelper::InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
+    mitk::ImageMappingHelper::InputImageType::ConstPointer timeStepInput = mitk::SelectImageByTimeStep(input, i);
     mitk::ImageMappingHelper::ResultImageType::Pointer timeStepResult;
 
     if (timeStepInput->GetPixelType().GetNumberOfComponents() > 1)

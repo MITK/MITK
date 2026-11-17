@@ -26,7 +26,6 @@ mitk::RGBToRGBACastImageFilter::RGBToRGBACastImageFilter()
   this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);
 
-  m_InputTimeSelector = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();
 }
 
@@ -120,7 +119,6 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     return;
   }
 
-  m_InputTimeSelector->SetInput(input);
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
@@ -137,12 +135,10 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     timeInMS = outputTimeGeometry->TimeStepToTimePoint(t);
     timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
 
-    m_InputTimeSelector->SetTimeNr(timestep);
-    m_InputTimeSelector->UpdateLargestPossibleRegion();
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    mitk::Image *image = m_InputTimeSelector->GetOutput();
+    const mitk::Image::Pointer image = SelectImageByTimeStep(this->GetInput(), timestep);
 
     const mitk::PixelType &pixelType = image->GetPixelType();
 

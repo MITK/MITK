@@ -46,13 +46,11 @@ mitk::DescriptivePharmacokineticBrixModelFactory::DoCreateParameterizer(
           DescriptivePharmacokineticBrixModel::NAME_STATIC_PARAMETER_tau);
     modelParameterizer->SetTau(tau[0]);
 
-    mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(fit->inputImage);
-    imageTimeSelector->SetTimeNr(0);
-    imageTimeSelector->UpdateLargestPossibleRegion();
+    if (fit->inputImage.IsNull())
+      mitkThrow() << "Cannot create Brix parameterizer: the fit has no input image.";
 
     mitk::DescriptivePharmacokineticBrixModelParameterizer::BaseImageType::Pointer baseImage;
-    mitk::CastToItkImage(imageTimeSelector->GetOutput(), baseImage);
+    mitk::CastToItkImage(mitk::SelectImageByTimeStep(fit->inputImage, 0), baseImage);
 
     modelParameterizer->SetBaseImage(baseImage);
 

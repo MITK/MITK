@@ -871,11 +871,7 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
                 "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit. AIF Mask name: "
                 <<
                 m_selectedAIFMaskNode->GetName() ;
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(this->m_selectedAIFMask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      this->m_selectedAIFMask = maskedImageTimeSelector->GetOutput();
+      this->m_selectedAIFMask = mitk::SelectImageByTimeStep(this->m_selectedAIFMask, 0);
     }
 
     if (this->m_selectedAIFMask.IsNotNull())

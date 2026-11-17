@@ -389,14 +389,8 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(TimeStepType t, unsigne
            (!isOdf || !isOdf->GetValue()) && (!isSh || !isSh->GetValue())) // we have a vector image
   {
     // recompute
-    mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();
-    if (timeSelector.IsNotNull())
-    {
-      timeSelector->SetTimeNr(t);
-      timeSelector->UpdateLargestPossibleRegion();
-      const mitk::Image *image = timeSelector->GetOutput();
-      AccessVectorPixelTypeByItk_n(image, _ComputeExtremaInItkVectorImage, (this, t, component));
-    }
+    const Image::ConstPointer image = SelectImageByTimeStep(m_Image, t);
+    AccessVectorPixelTypeByItk_n(image, _ComputeExtremaInItkVectorImage, (this, t, component));
   }
   else
   {

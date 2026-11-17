@@ -563,15 +563,10 @@ if(m_Controls->NoiseCheckBox->isChecked())
     tempImage->SetTimeGeometry(timeGeometry);
 
     ImageType::Pointer itkImage = ImageType::New();
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(generatedImage);
 
     for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
-        imageTimeSelector->SetTimeNr(i);
-        imageTimeSelector->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+        mitk::Image::Pointer mitkInputImage = mitk::SelectImageByTimeStep(generatedImage, i);
 
         mitk::CastToItkImage(mitkInputImage, itkImage );
 
@@ -646,15 +641,10 @@ if(m_Controls->NoiseCheckBox->isChecked())
    tempImage->SetTimeGeometry(timeGeometry);
 
    ImageType::Pointer itkImage = ImageType::New();
-   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-   imageTimeSelector->SetInput(generatedImage);
 
    for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
    {
-       imageTimeSelector->SetTimeNr(i);
-       imageTimeSelector->UpdateLargestPossibleRegion();
-
-       mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+       mitk::Image::Pointer mitkInputImage = mitk::SelectImageByTimeStep(generatedImage, i);
 
        mitk::CastToItkImage(mitkInputImage, itkImage );
 
@@ -736,15 +726,10 @@ if(m_Controls->NoiseCheckBox->isChecked())
     tempImage->SetTimeGeometry(timeGeometry);
 
     ImageType::Pointer itkImage = ImageType::New();
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(generatedImage);
 
     for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
-        imageTimeSelector->SetTimeNr(i);
-        imageTimeSelector->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+        mitk::Image::Pointer mitkInputImage = mitk::SelectImageByTimeStep(generatedImage, i);
 
         mitk::CastToItkImage(mitkInputImage, itkImage );
 
@@ -814,15 +799,10 @@ if(m_Controls->NoiseCheckBox->isChecked())
     tempImage->SetTimeGeometry(timeGeometry);
 
     ImageType::Pointer itkImage = ImageType::New();
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(generatedImage);
 
     for (mitk::TimeStepType i = 0; i < generatedImage->GetTimeSteps(); ++i)
     {
-        imageTimeSelector->SetTimeNr(i);
-        imageTimeSelector->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+        mitk::Image::Pointer mitkInputImage = mitk::SelectImageByTimeStep(generatedImage, i);
 
         mitk::CastToItkImage(mitkInputImage, itkImage );
 

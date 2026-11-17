@@ -33,18 +33,11 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
 
   if (timeSteps > 1)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-
     for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
-      timeSelector->SetTimeNr(t);
-      timeSelector->Update();
-
-      mitk::Image::Pointer img3D = timeSelector->GetOutput();
-      img3D->DisconnectPipeline();
+      auto img3D = mitk::SelectImageByTimeStep(image, t);
 
       AccessFixedDimensionByItk_3(img3D, itkClosing, 3, img3D, factor, structuralElement);
 
@@ -70,18 +63,11 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
 
   if (timeSteps > 1)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-
     for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
-      timeSelector->SetTimeNr(t);
-      timeSelector->Update();
-
-      mitk::Image::Pointer img3D = timeSelector->GetOutput();
-      img3D->DisconnectPipeline();
+      auto img3D = mitk::SelectImageByTimeStep(image, t);
 
       AccessByItk_n(img3D, itkErode, (img3D, factor, structuralElement));
 
@@ -107,18 +93,11 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
 
   if (timeSteps > 1)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-
     for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
-      timeSelector->SetTimeNr(t);
-      timeSelector->Update();
-
-      mitk::Image::Pointer img3D = timeSelector->GetOutput();
-      img3D->DisconnectPipeline();
+      auto img3D = mitk::SelectImageByTimeStep(image, t);
 
       AccessFixedDimensionByItk_3(img3D, itkDilate, 3, img3D, factor, structuralElement);
 
@@ -144,18 +123,11 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
 
   if (timeSteps > 1)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-
     for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
-      timeSelector->SetTimeNr(t);
-      timeSelector->Update();
-
-      mitk::Image::Pointer img3D = timeSelector->GetOutput();
-      img3D->DisconnectPipeline();
+      auto img3D = mitk::SelectImageByTimeStep(image, t);
 
       AccessFixedDimensionByItk_3(img3D, itkOpening, 3, img3D, factor, structuralElement);
 
@@ -179,18 +151,11 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
 
   if (timeSteps > 1)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-
     for (TimeStepType t = 0; t < timeSteps; ++t)
     {
       MITK_INFO << "  Processing time step " << t;
 
-      timeSelector->SetTimeNr(t);
-      timeSelector->Update();
-
-      mitk::Image::Pointer img3D = timeSelector->GetOutput();
-      img3D->DisconnectPipeline();
+      auto img3D = mitk::SelectImageByTimeStep(image, t);
 
       AccessFixedDimensionByItk_1(img3D, itkFillHoles, 3, img3D);
 

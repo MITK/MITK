@@ -72,7 +72,7 @@ found in the LICENSE file.
     delete[] dimensions;
     auto newTimeGeometry = AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, m_UpperBoundaryTimestep);
     output->SetTimeGeometry(newTimeGeometry);
-    output->SetPropertyList(input->GetPropertyList());
+    output->SetPropertyList(input->GetPropertyList()->Clone());
   }
 
   mitk::SlicedData::RegionType mitk::CropTimestepsImageFilter::ComputeDesiredRegion() const

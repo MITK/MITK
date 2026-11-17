@@ -93,7 +93,7 @@ void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 
   if (m_BaselineStartTimeStep == m_BaselineEndTimeStep)
   {
-    this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, 0);
+    this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, m_BaselineStartTimeStep);
   }
   else
   {

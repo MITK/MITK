@@ -180,7 +180,7 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
   TimeStepType t, unsigned int /*component*/)
 {
-  mitk::ImageTimeSelector *timeSelector = this->GetTimeSelector();
+  const auto timeSelector = this->GetTimeSelector();
   if (timeSelector != nullptr)
   {
     timeSelector->SetTimeNr(t);

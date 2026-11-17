@@ -1108,18 +1108,15 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   this->BusyCursorOn();
 
-  // check if 4D image and use filter on correct time step
-  if(newImage1->GetDimension() > 3)
-  {
-    auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
-    mitk::TimeStepType time = 0;
+  // reduce 4D images to the selected time step; 3D images stay as they are
+  auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
+  mitk::TimeStepType time = 0;
 
-    if( sn_widget != nullptr )
-      time = static_cast<mitk::TimeStepType>(sn_widget->GetPos());
+  if( sn_widget != nullptr )
+    time = static_cast<mitk::TimeStepType>(sn_widget->GetPos());
 
-    newImage1 = mitk::SelectImageByTimeStep(newImage1, time);
-    newImage2 = mitk::SelectImageByTimeStep(newImage2, time);
-  }
+  newImage1 = mitk::SelectImageByTimeStep(newImage1, time);
+  newImage2 = mitk::SelectImageByTimeStep(newImage2, time);
 
   auto itkImage1 = ImageType::New();
   auto itkImage2 = ImageType::New();

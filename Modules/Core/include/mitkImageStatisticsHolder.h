@@ -257,13 +257,6 @@ namespace mitk
      */
     virtual void Expand(TimeStepType timeSteps);
 
-    /**
-     * \brief Get an ImageTimeSelector configured with the associated image as input.
-     *
-     * \return A new ImageTimeSelector instance.
-     */
-    ImageTimeSelector::Pointer GetTimeSelector();
-
     mitk::Image *m_Image;
 
     mutable itk::Object::Pointer m_HistogramGeneratorObject;

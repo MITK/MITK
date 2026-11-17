@@ -180,33 +180,18 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
   TimeStepType t, unsigned int /*component*/)
 {
-  const auto timeSelector = this->GetTimeSelector();
-  if (timeSelector != nullptr)
-  {
-    timeSelector->SetTimeNr(t);
-    timeSelector->UpdateLargestPossibleRegion();
-
-    auto *generator =
-      static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
-    generator->SetImage(timeSelector->GetOutput());
-    generator->ComputeHistogram();
-    return static_cast<const mitk::ImageStatisticsHolder::HistogramType *>(generator->GetHistogram());
-  }
-  return nullptr;
+  auto *generator = static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
+  generator->SetImage(SelectImageByTimeStep(m_Image, t));
+  generator->ComputeHistogram();
+  // For a 3D image the generator holds this holder's own image, which owns
+  // this holder. Release it so that the image can still be deleted.
+  generator->SetImage(nullptr);
+  return static_cast<const mitk::ImageStatisticsHolder::HistogramType *>(generator->GetHistogram());
 }
 
 bool mitk::ImageStatisticsHolder::IsValidTimeStep(TimeStepType t) const
 {
   return m_Image->IsValidTimeStep(t);
-}
-
-mitk::ImageTimeSelector::Pointer mitk::ImageStatisticsHolder::GetTimeSelector()
-{
-  ImageTimeSelector::Pointer timeSelector =
-    ImageTimeSelector::New();
-  timeSelector->SetInput(m_Image);
-
-  return timeSelector;
 }
 
 void mitk::ImageStatisticsHolder::Expand(TimeStepType timeSteps)

@@ -93,6 +93,12 @@ void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 
   if (m_BaselineStartTimeStep == m_BaselineEndTimeStep)
   {
+    if (m_BaselineStartTimeStep >= this->m_DynamicImage->GetTimeSteps())
+    {
+      mitkThrow() << "Baseline time step " << m_BaselineStartTimeStep
+                  << " is out of range; the image has "
+                  << this->m_DynamicImage->GetTimeSteps() << " time steps.";
+    }
     this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, m_BaselineStartTimeStep);
   }
   else
@@ -132,7 +138,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typename Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
   typename TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
-  if (m_BaselineEndTimeStep > region_input.GetSize()[3])
+  if (m_BaselineEndTimeStep >= region_input.GetSize()[3])
   {
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
   }

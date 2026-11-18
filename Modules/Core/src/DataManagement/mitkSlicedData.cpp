@@ -117,7 +117,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   {
     for (; c < cEnd; ++c)
       for (int timeStep = t; timeStep < tEnd; ++timeStep)
-        if (IsVolumeSet(timeStep, c) == false)
+        if (this->IsVolumeSet(timeStep, c) == false)
           return true;
     return false;
   }
@@ -129,7 +129,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   for (; c < cEnd; ++c)
     for (int timeStep = t; timeStep < tEnd; ++timeStep)
       for (int slice = s; slice < sEnd; ++slice)
-        if (IsSliceSet(slice, timeStep, c) == false)
+        if (this->IsSliceSet(slice, timeStep, c) == false)
           return true;
 
   return false;

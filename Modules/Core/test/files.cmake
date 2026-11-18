@@ -53,6 +53,7 @@ set(MODULE_TESTS
   mitkMemoryUtilitiesTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkLevelWindowTest.cpp
+  mitkLevelWindowTimeStepsTest.cpp
   mitkMapperProviderRegistryTest.cpp
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp

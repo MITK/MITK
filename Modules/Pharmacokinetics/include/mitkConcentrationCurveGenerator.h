@@ -117,12 +117,14 @@ public:
     itkGetConstReferenceMacro(T2EchoTime, double);
 
     /** \brief Sets the first time step index included in baseline averaging (0-based).
+     *  Must not be after the baseline end time step.
      *  \param[in] _arg The start time step index. */
     itkSetMacro(BaselineStartTimeStep, TimeStepType);
     /** \brief Returns the baseline start time step index. */
     itkGetConstReferenceMacro(BaselineStartTimeStep, TimeStepType);
 
     /** \brief Sets the last time step index included in baseline averaging.
+     *  Must be below the number of time steps of the dynamic image.
      *  \param[in] _arg The end time step index. */
     itkSetMacro(BaselineEndTimeStep, TimeStepType);
     /** \brief Returns the baseline end time step index. */
@@ -162,7 +164,9 @@ public:
      *
      * Triggers the full conversion pipeline: baseline computation, per-frame conversion
      * using the configured functor, and assembly of the 4D result image.
-     * \return Smart pointer to the 4D concentration image. */
+     * \return Smart pointer to the 4D concentration image.
+     * \throw mitk::Exception if the baseline start time step is after the end time step, or the
+     *        end time step is not below the number of time steps of the dynamic image. */
     Image::Pointer GetConvertedImage();
 
 protected:
@@ -179,7 +183,8 @@ protected:
 
 
 
-    /** \brief Takes the 3D image of the first timepoint to set as baseline image.*/
+    /** \brief Sets the baseline image to the mean of the time steps from the baseline start to the end
+     *  time step, or to that time step alone if both are equal. */
     void PrepareBaselineImage();
 
     template<class TPixel>

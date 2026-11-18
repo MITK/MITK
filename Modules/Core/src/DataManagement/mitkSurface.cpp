@@ -409,35 +409,40 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
   if (leftHandSide.GetNumberOfCells() != rightHandSide.GetNumberOfCells())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of cells not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of cells not equal: "
+                << leftHandSide.GetNumberOfCells() << " vs. " << rightHandSide.GetNumberOfCells() << ".";
     noDifferenceFound = false;
   }
 
   if (leftHandSide.GetNumberOfVerts() != rightHandSide.GetNumberOfVerts())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of vertices not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of vertices not equal: "
+                << leftHandSide.GetNumberOfVerts() << " vs. " << rightHandSide.GetNumberOfVerts() << ".";
     noDifferenceFound = false;
   }
 
   if (leftHandSide.GetNumberOfLines() != rightHandSide.GetNumberOfLines())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of lines not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of lines not equal: "
+                << leftHandSide.GetNumberOfLines() << " vs. " << rightHandSide.GetNumberOfLines() << ".";
     noDifferenceFound = false;
   }
 
   if (leftHandSide.GetNumberOfPolys() != rightHandSide.GetNumberOfPolys())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of polys not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of polys not equal: "
+                << leftHandSide.GetNumberOfPolys() << " vs. " << rightHandSide.GetNumberOfPolys() << ".";
     noDifferenceFound = false;
   }
 
   if (leftHandSide.GetNumberOfStrips() != rightHandSide.GetNumberOfStrips())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of strips not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of strips not equal: "
+                << leftHandSide.GetNumberOfStrips() << " vs. " << rightHandSide.GetNumberOfStrips() << ".";
     noDifferenceFound = false;
   }
 
@@ -449,7 +454,8 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
     if (numberOfPointsLeft != numberOfPointsRight)
     {
       if (verbose)
-        MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of points not equal";
+        MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of points not equal: " << numberOfPointsLeft
+                  << " vs. " << numberOfPointsRight << ".";
       noDifferenceFound = false;
     }
     else

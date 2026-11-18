@@ -127,7 +127,7 @@ public:
   void SetVtkPolyDataInvalidTimeStep_Throws()
   {
     vtkSmartPointer<vtkPolyData> polys = m_SphereSource->GetOutput();
-    CPPUNIT_ASSERT_THROW(m_Surface->SetVtkPolyData(polys, mitk::TIMESTEP_INVALID), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Surface->SetVtkPolyData(polys, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
   }
 
   void GetBoundingBox_Success()

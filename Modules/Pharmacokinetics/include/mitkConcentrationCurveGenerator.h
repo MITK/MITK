@@ -165,8 +165,9 @@ public:
      * Triggers the full conversion pipeline: baseline computation, per-frame conversion
      * using the configured functor, and assembly of the 4D result image.
      * \return Smart pointer to the 4D concentration image.
-     * \throw mitk::Exception if the baseline start time step is after the end time step, or the
-     *        end time step is not below the number of time steps of the dynamic image. */
+     * \throw mitk::Exception if the baseline start time step is after the end time step.
+     * \throw mitk::InvalidTimeStepException if the baseline end time step is not below the number
+     *        of time steps of the dynamic image. */
     Image::Pointer GetConvertedImage();
 
 protected:

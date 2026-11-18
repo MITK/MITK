@@ -34,7 +34,7 @@ namespace
   {
     // Expand(t + 1) would wrap around to Expand(0) and leave t out of range.
     if (t == mitk::TIMESTEP_INVALID)
-      mitkThrow() << "Cannot write a point to an invalid time step.";
+      mitkThrowException(mitk::InvalidTimeStepException) << "Cannot write a point to an invalid time step.";
   }
 }
 

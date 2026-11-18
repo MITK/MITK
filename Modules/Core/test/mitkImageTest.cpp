@@ -216,9 +216,9 @@ public:
     auto image = mitk::Image::New();
     image->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::InvalidTimeStepException);
     image->AllocateZeroedVolume(1);
-    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::InvalidTimeStepException);
 
     MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
     image->AllocateZeroedVolume(0, 1);

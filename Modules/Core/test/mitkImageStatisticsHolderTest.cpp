@@ -136,12 +136,12 @@ namespace
 
   void AssertInvalidTimeStepThrows(mitk::ImageStatisticsHolder *statistics, mitk::TimeStepType t)
   {
-    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMin(t), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMin(t), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMax(t), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMax(t), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMinValuedVoxels(t), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMaxValuedVoxels(t), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMin(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMin(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMax(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMax(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMinValuedVoxels(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMaxValuedVoxels(t), mitk::InvalidTimeStepException);
   }
 }
 

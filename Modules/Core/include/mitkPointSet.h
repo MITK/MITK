@@ -256,7 +256,7 @@ namespace mitk
      * \param[in] id The point identifier.
      * \param[in] point The point in world coordinates.
      * \param[in] t Time step (default: 0).
-     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
+     * \throw mitk::InvalidTimeStepException if \a t is TIMESTEP_INVALID.
      */
     void SetPoint(PointIdentifier id, PointType point, TimeStepType t = 0);
 
@@ -267,7 +267,7 @@ namespace mitk
      * \param[in] point The point in world coordinates.
      * \param[in] spec The point specification type.
      * \param[in] t Time step (default: 0).
-     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
+     * \throw mitk::InvalidTimeStepException if \a t is TIMESTEP_INVALID.
      */
     void SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t = 0);
 
@@ -280,7 +280,7 @@ namespace mitk
      * \param[in] id The point identifier.
      * \param[in] point The point in world coordinates.
      * \param[in] t Time step (default: 0).
-     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
+     * \throw mitk::InvalidTimeStepException if \a t is TIMESTEP_INVALID.
      */
     void InsertPoint(PointIdentifier id, PointType point, TimeStepType t = 0);
 
@@ -296,7 +296,7 @@ namespace mitk
      * \param[in] point The point in world coordinates.
      * \param[in] spec The point specification type.
      * \param[in] t Time step.
-     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
+     * \throw mitk::InvalidTimeStepException if \a t is TIMESTEP_INVALID.
      */
     void InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t);
 
@@ -306,7 +306,7 @@ namespace mitk
      * \param[in] point The point in world coordinates.
      * \param[in] t Time step (default: 0).
      * \return The identifier assigned to the new point.
-     * \throw mitk::Exception if \a t is TIMESTEP_INVALID.
+     * \throw mitk::InvalidTimeStepException if \a t is TIMESTEP_INVALID.
      */
     PointIdentifier InsertPoint(PointType point, TimeStepType t = 0);
 

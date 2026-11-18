@@ -51,6 +51,18 @@ namespace mitk
   };
 
   /**
+   * \brief Exception thrown for a time step that the data it refers to does not have,
+   *        including TIMESTEP_INVALID.
+   *
+   * \sa NoTimeStepsException
+   */
+  class MITKCORE_EXPORT InvalidTimeStepException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(InvalidTimeStepException, mitk::Exception);
+  };
+
+  /**
   * \brief Manages the geometries of a data object for each time step
   *
   * This class is an abstract class. The concrete implementation

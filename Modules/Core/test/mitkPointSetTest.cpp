@@ -500,11 +500,13 @@ std::cout<<"[PASSED]"<<std::endl;
     mitk::Point3D point;
     point.Fill(1);
 
-    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::TIMESTEP_INVALID), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(point, mitk::TIMESTEP_INVALID), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::TIMESTEP_INVALID), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID),
+                         mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID),
+                         mitk::InvalidTimeStepException);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed writes changed the number of time steps", mitk::TimeStepType{1},
                                  pointSet->GetTimeSteps());
   }

@@ -359,7 +359,8 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(TimeStepType t, unsigned int component)
 {
   if (!m_Image->IsValidTimeStep(t))
-    mitkThrow() << "Invalid time step " << t << " for an image with " << m_Image->GetTimeSteps() << " time steps.";
+    mitkThrowException(mitk::InvalidTimeStepException)
+      << "Invalid time step " << t << " for an image with " << m_Image->GetTimeSteps() << " time steps.";
 
   // image modified?
   if (this->m_Image->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())

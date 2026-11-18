@@ -251,7 +251,7 @@ public:
     m_concentrationGen->SetBaselineStartTimeStep(0);
     m_concentrationGen->SetBaselineEndTimeStep(10);
 
-    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::InvalidTimeStepException);
   }
 
   void GetConvertedImageBaselineStartAfterEndTest()
@@ -271,7 +271,7 @@ public:
     m_concentrationGen->SetBaselineStartTimeStep(10);
     m_concentrationGen->SetBaselineEndTimeStep(10);
 
-    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::InvalidTimeStepException);
   }
 
 };

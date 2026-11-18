@@ -822,7 +822,6 @@ public:
                         name + ": clipped plane bounds span the output pixels");
   }
 
-  /* random a float value */
   /*
    * An invalid time step must not crash the filter. The 3D test image has only time step 0.
    */
@@ -846,6 +845,7 @@ public:
     MITK_TEST_CONDITION(!slicer->GetOutput()->IsInitialized(), "invalid time step: no slice is extracted");
   }
 
+  /* random a float value */
   static float randFloat()
   {
     return (((float)rand() + 1.0) / ((float)RAND_MAX + 1.0)) +

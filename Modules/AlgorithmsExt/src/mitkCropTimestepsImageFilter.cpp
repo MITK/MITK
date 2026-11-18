@@ -53,7 +53,8 @@ found in the LICENSE file.
     const auto upperBoundary = std::min(m_UpperBoundaryTimestep, timeSteps);
 
     if (m_UpperBoundaryTimestep != std::numeric_limits<TimeStepType>::max() && m_UpperBoundaryTimestep > timeSteps)
-      MITK_WARN << "upper boundary timestep set to " << upperBoundary;
+      MITK_WARN << "upper boundary timestep " << m_UpperBoundaryTimestep << " exceeds the input's " << timeSteps
+                << " timesteps; clamped to " << upperBoundary << " for the output";
 
     if (m_LowerBoundaryTimestep >= upperBoundary)
       mitkThrow() << "lower timestep " << m_LowerBoundaryTimestep << " is not smaller than upper timestep "

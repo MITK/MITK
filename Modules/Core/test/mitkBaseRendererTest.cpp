@@ -46,6 +46,8 @@ class mitkBaseRendererTestSuite : public mitk::TestFixture
   MITK_TEST(New_NullName_IsUnnamedRenderer);
   MITK_TEST(SetTimeStep_OwnStep_ShowsItsTimePoint);
   MITK_TEST(SetTimeStep_NoWorldTimeGeometry_Throws);
+  MITK_TEST(SetWorldTimeGeometry_NoTimeSteps_TimePointKept);
+  MITK_TEST(SetTimeStep_WorldTimeGeometryWithoutTimeSteps_Throws);
   MITK_TEST(SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow);
   MITK_TEST(SetTimeStep_ReferenceVariesOverTime_AlignmentFollowsOwnTimePoint);
   CPPUNIT_TEST_SUITE_END();
@@ -357,6 +359,23 @@ public:
     auto renderer = mitk::VtkPropRenderer::New("mitkBaseRendererTest.NoWorldTimeGeometry", renderWindow);
 
     CPPUNIT_ASSERT_THROW(renderer->SetTimeStep(1), mitk::NoTimeStepsException);
+  }
+
+  void SetWorldTimeGeometry_NoTimeSteps_TimePointKept()
+  {
+    m_Renderer->SetTimeStep(1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: time point of the own step 1",
+                                 mitk::TimePointType(1.0), m_Renderer->GetTime());
+
+    CPPUNIT_ASSERT_NO_THROW(m_Renderer->SetWorldTimeGeometry(mitk::ProportionalTimeGeometry::New()));
+    CPPUNIT_ASSERT_EQUAL(mitk::TimePointType(1.0), m_Renderer->GetTime());
+  }
+
+  void SetTimeStep_WorldTimeGeometryWithoutTimeSteps_Throws()
+  {
+    m_Renderer->SetWorldTimeGeometry(mitk::ProportionalTimeGeometry::New());
+
+    CPPUNIT_ASSERT_THROW(m_Renderer->SetTimeStep(0), mitk::NoTimeStepsException);
   }
 
   void SetInteractionReferenceGeometry_GlobalTimePastReferenceGrid_DoesNotThrow()

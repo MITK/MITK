@@ -350,6 +350,8 @@ void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, TimeStepTy
 
 void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, TimeStepType t)
 {
+  ThrowIfInvalidTimeStep(t);
+
   this->Expand(t + 1);
 
   mitk::Point3D indexPoint;

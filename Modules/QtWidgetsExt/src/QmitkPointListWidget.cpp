@@ -300,7 +300,7 @@ void QmitkPointListWidget::RemoveSelectedPoint()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());
@@ -315,7 +315,7 @@ void QmitkPointListWidget::MoveSelectedPointDown()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());
@@ -330,7 +330,7 @@ void QmitkPointListWidget::MoveSelectedPointUp()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());

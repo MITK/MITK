@@ -300,12 +300,8 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   }
 
   assert(positionEvent->GetSender()); // sure, right?
-  const auto timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
-
-  if (nullptr == image || !image->GetTimeGeometry()->IsValidTimeStep(timeStep))
-    return nullptr;
-
-  return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
+  return GetAffectedImageSliceAs2DImageByTimePoint(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(),
+                                                   image, positionEvent->GetSender()->GetTime(), component);
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry, const Image* image, TimePointType timePoint, unsigned int component /*= 0*/)
@@ -324,7 +320,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry, const Image *image, TimeStepType timeStep, unsigned int component /*= 0*/)
 {
-  if (!image || !planeGeometry)
+  if (!image || !planeGeometry || !image->GetTimeGeometry()->IsValidTimeStep(timeStep))
   {
     return nullptr;
   }

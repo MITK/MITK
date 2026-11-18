@@ -66,7 +66,6 @@ public:
   /**
    * \brief Sets the image nodes whose statistics should be displayed.
    *
-   * Internally resolves each image's time steps for the hierarchical model.
    * Triggers a model reset and rebuild.
    *
    * \param[in] nodes Vector of image data nodes.
@@ -76,7 +75,6 @@ public:
   /**
    * \brief Sets the mask nodes whose statistics should be displayed.
    *
-   * Handles the special case where a single-timestep mask is applied to a multi-timestep image.
    * Triggers a model reset and rebuild.
    *
    * \param[in] nodes Vector of mask data nodes.

@@ -93,7 +93,7 @@ int mitkPointSetReaderTest(int argc, char *argv[])
       resultPS->GetPointSet(resultPS->GetTimeSteps() - 1)->GetNumberOfPoints() == 0,
       "Testing output time step generation with empty time step!"); // CAVE: Only valid with the specified test data!
 
-    // Broken time series ids are rejected instead of being guessed or crashing.
+    // Broken time series ids are rejected.
     for (const char *id : {"two", "3abc", "-1", "", "18446744073709551615"})
       CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile(std::string("<time_series_id>") + id + "</time_series_id>")),
                            mitk::Exception);
@@ -106,7 +106,7 @@ int mitkPointSetReaderTest(int argc, char *argv[])
     MITK_TEST_CONDITION_REQUIRED(resultPS.IsNotNull() && resultPS->GetTimeSteps() == 1 && resultPS->GetSize(0) == 1,
                                  "Testing unknown element next to the time series");
 
-    // Broken points are rejected instead of being guessed or crashing.
+    // Broken points are rejected.
     const std::string timeStep0 = "<time_series_id>0</time_series_id>";
     for (const char *point : {"<point><id>0</id><x>ten</x><y>20</y><z>30</z></point>",
                               "<point><id>0</id><x></x><y>20</y><z>30</z></point>",
@@ -115,7 +115,7 @@ int mitkPointSetReaderTest(int argc, char *argv[])
                               "<point><id>-1</id><x>10</x><y>20</y><z>30</z></point>"})
       CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile(timeStep0, "", point)), mitk::Exception);
 
-    // Spaces around numbers are tolerated, as atoi and atof did.
+    // Spaces around numbers are tolerated, so files that loaded before still load.
     data = Read(reader, CreatePointSetFile("<time_series_id> 0 </time_series_id>", "",
                                            "<point><id> 0 </id><x> 10 </x><y>20</y><z>30</z></point>"));
     resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());

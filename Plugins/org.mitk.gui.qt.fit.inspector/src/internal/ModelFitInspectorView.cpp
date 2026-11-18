@@ -51,7 +51,7 @@ ModelFitInspectorView::ModelFitInspectorView() :
   m_currentFit(nullptr),
   m_currentModelParameterizer(nullptr),
   m_currentModelProviderService(nullptr),
-  m_currentSelectedTimeStep(0),
+  m_currentSelectedTimePoint(0.0),
   m_currentSelectedNode(nullptr)
 {
   m_currentSelectedPosition.Fill(0.0);
@@ -418,16 +418,16 @@ ModelFitInspectorView::GetInputNode(mitk::DataNode::ConstPointer node)
 void ModelFitInspectorView::ValidateAndSetCurrentPosition()
 {
   const mitk::Point3D currentSelectedPosition = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition(nullptr);
-  const mitk::TimeStepType currentSelectedTimestep =
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
+  const mitk::TimePointType currentSelectedTimePoint =
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition
-      || m_currentSelectedTimeStep != currentSelectedTimestep
+      || m_currentSelectedTimePoint != currentSelectedTimePoint
       || m_selectedNodeTime > m_currentPositionTime)
   {
     //the current position has been changed or the selected node has been changed since the last position validation -> check position
     m_currentSelectedPosition = currentSelectedPosition;
-    m_currentSelectedTimeStep = currentSelectedTimestep;
+    m_currentSelectedTimePoint = currentSelectedTimePoint;
     m_currentPositionTime.Modified();
     m_validSelectedPosition = false;
 
@@ -438,16 +438,9 @@ void ModelFitInspectorView::ValidateAndSetCurrentPosition()
       return;
     }
 
-    const auto currentSelectedTimePoint =
-      mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    mitk::BaseGeometry::ConstPointer geometry =
-      inputImage->GetTimeGeometry()->GetGeometryForTimePoint(currentSelectedTimePoint).GetPointer();
-
-    // check for invalid time point
-    if (geometry.IsNull())
-    {
-      geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-    }
+    const auto timeGeometry = inputImage->GetTimeGeometry();
+    const mitk::BaseGeometry::ConstPointer geometry =
+      timeGeometry->GetGeometryForTimeStep(timeGeometry->TimePointToClampedTimeStep(currentSelectedTimePoint));
 
     if (geometry.IsNull())
     {

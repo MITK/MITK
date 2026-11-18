@@ -163,8 +163,8 @@ protected:
    * This it is within the input image */
   bool m_validSelectedPosition;
 
-  /** @brief currently selected time step of the selected node for the visualization logic*/
-  mitk::TimeStepType m_currentSelectedTimeStep;
+  /** @brief selected time point of the time navigation controller at the last position validation*/
+  mitk::TimePointType m_currentSelectedTimePoint;
 
   /** @brief currently selected node for the visualization logic*/
   mitk::DataNode::ConstPointer m_currentSelectedNode;

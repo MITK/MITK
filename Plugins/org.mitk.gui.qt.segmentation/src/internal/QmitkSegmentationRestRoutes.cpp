@@ -1773,7 +1773,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "auto_zoom widens the region the model looks at when a result reaches its edge, for large structures, "
     "at the cost of speed; it needs a GPU. auto_refine runs the model on the content of a label when it "
     "becomes the target of the session, instead of taking the content as it is until the next prompt. "
-    "Other fields are refused. Returns {data: state} as GET does.";
+    "Other fields are refused. While a prompt computes or a session starts, the options cannot change and "
+    "the request gets 409 BUSY. Returns {data: state} as GET does.";
   nnInteractiveOptions.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     ThrowIfUnknownField(body, { "auto_zoom", "auto_refine" }, "the options of nnInteractive", request.Path);
@@ -1787,6 +1788,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* tool = GetNNInteractive(request.Path);
+      ThrowIfBusy(tool, request.Path);
 
       if (body.contains("auto_zoom"))
       {

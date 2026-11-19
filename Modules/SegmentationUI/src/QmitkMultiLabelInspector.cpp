@@ -1527,7 +1527,11 @@ void QmitkMultiLabelInspector::OnSplitLabel()
     const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
     if (!timeGeometry->IsValidTimePoint(timePoint))
+    {
+      QMessageBox::information(this->window(), "Split into instances",
+        "The segmentation has no data at the selected time point. There is nothing to split.");
       return;
+    }
 
     timeStep = timeGeometry->TimePointToTimeStep(timePoint);
   }

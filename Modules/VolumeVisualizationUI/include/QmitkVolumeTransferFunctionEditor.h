@@ -33,6 +33,7 @@ found in the LICENSE file.
 
 class QAction;
 class QListWidgetItem;
+class QMessageBox;
 class QmitkVolumeThumbnailRenderer;
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
@@ -624,6 +625,14 @@ private:
    * hidden behind another tab.
    */
   bool m_EditModeActive = false;
+
+  /** \brief The question ConcludeEdit is waiting on, if any.
+   *
+   * Waiting runs the event loop, and a selection change in the meantime asks
+   * about the same edit again. That later question closes this one, so that
+   * only a question that can still change anything is on show.
+   */
+  QMessageBox *m_EditQuestion = nullptr;
 
   /** \brief Whether any point was added, moved, removed or recolored since
    *         editing began.

@@ -190,8 +190,16 @@ void QmitkVolumeVisualizationView::OnToggleRendering()
   // Before the property changes: switching off hides the editor and grays it
   // out, which would leave an edit in progress waiting on a curve no one can
   // see. The user may also keep editing, and rendering then stays on.
-  if (!state && !m_Controls->transferFunctionEditor->ConcludeEdit(true))
-    return;
+  if (!state)
+  {
+    if (!m_Controls->transferFunctionEditor->ConcludeEdit(true))
+      return;
+
+    // The question waits in an event loop of its own, and the selection may have
+    // moved on meanwhile, to a node this click was not about.
+    if (m_SelectedNode.Lock() != selectedNode)
+      return;
+  }
 
   selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
 

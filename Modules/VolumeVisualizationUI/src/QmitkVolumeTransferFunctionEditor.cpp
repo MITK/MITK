@@ -1958,9 +1958,21 @@ bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
   // its next selection will rebuild it.
   question.setEscapeButton(continueButton);
 
+  // An earlier question about this same edit is still waiting underneath, and
+  // this one is what concludes it.
+  if (m_EditQuestion != nullptr)
+    m_EditQuestion->reject();
+
   while (true)
   {
+    m_EditQuestion = &question;
     question.exec();
+    m_EditQuestion = nullptr;
+
+    // Closed by a later question about this same edit, which has concluded it by
+    // now, against the node it was made on.
+    if (!m_EditModeActive)
+      return true;
 
     const auto *answer = question.clickedButton();
 
@@ -1978,6 +1990,10 @@ bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
       // Asked while the edit still runs, so that canceling comes back to the
       // question rather than leaving a drawing nobody saved.
       const auto fileName = this->AskPresetFileName();
+
+      // The file dialog waits the same way.
+      if (!m_EditModeActive)
+        return true;
 
       if (fileName.isEmpty())
         continue;

@@ -1004,7 +1004,7 @@ public:
     PaintBox(groupImage, 0, { 10, 20, 25 }, { 19, 29, 44 }, 5);
     PaintBox(groupImage, 0, { 70, 20, 10 }, { 75, 29, 19 }, 6); // Touches the medium component, but belongs to another label.
 
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(5);
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 0);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(3), result.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The split label does not come first", mitk::Label::PixelType(5), result[0]);
@@ -1034,12 +1034,12 @@ public:
     PaintBox(groupImage, 0, { 20, 30, 25 }, { 20, 30, 25 }, 5); // Touches the box at a corner only.
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A label connected at a corner was split",
-      mitk::MultiLabelSegmentation::LabelValueVectorType({ 5 }), segmentation->SplitLabelIntoConnectedComponents(5));
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 5 }), segmentation->SplitLabelIntoConnectedComponents(5, 0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("An empty label was split",
-      mitk::MultiLabelSegmentation::LabelValueVectorType({ 6 }), segmentation->SplitLabelIntoConnectedComponents(6));
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 6 }), segmentation->SplitLabelIntoConnectedComponents(6, 0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Labels were added", 2u, segmentation->GetNumberOfLabels(0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The label content changed", std::size_t(2001), CountVoxels(groupImage, 0, 5));
-    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(7), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(7, 0), mitk::Exception);
   }
 
   void TestSplitLabelIntoConnectedComponents_Dynamic()

@@ -261,7 +261,7 @@ namespace mitk
      * \pre labelValue must exist.
      * \pre t must be a valid time step.
      */
-    LabelValueVectorType SplitLabelIntoConnectedComponents(LabelValueType labelValue, TimeStepType t = 0);
+    LabelValueVectorType SplitLabelIntoConnectedComponents(LabelValueType labelValue, TimeStepType t);
 
     /**
      * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one,

@@ -33,18 +33,28 @@ class QPainter;
  *        not apply to the cell.
  *
  * The widget is a passive presenter: the owner computes one slot per axis
- * (which axis glyph, the group hue, a tooltip) and pushes them via SetSlots.
+ * (which axis, the group hue, a tooltip) and pushes them via SetSlots.
  * When the strip is wide enough it draws the self-describing axis glyphs
  * (tinted to the hue when linked, grayed when not), marking an axis that carries
- * an offset by filling its box's upper-right corner; when it is too narrow it
+ * an offset by filling its box's lower-right corner; when it is too narrow it
  * collapses to plain color slots, which have no room for that mark and so omit
  * it.
  *
  * A slot whose axis does not apply to the window (applicable == false) is
  * struck through in the gap color in both modes, with no offset mark.
  *
- * The whole strip doubles as a button: it emits Clicked so the owner can open
- * the layout editor. 'SetClickable' withdraws that button.
+ * By default the whole strip doubles as a button: it emits Clicked so the
+ * owner can open the layout editor. 'SetClickable' withdraws that button.
+ * 'SetAxisInteraction' makes the single axes take the pointer instead.
+ *
+ * Highlighting never recolours a slot, since a white frame or a brightened
+ * hue disappears on light group colours (the reserved group's light gray
+ * among them). A strip that is one button as a whole shows, under the
+ * pointer, the hover wash of the tool buttons beside it behind its slots; a
+ * strip whose axes take the pointer fades every slot but the pointed-at one
+ * to QmitkMxNHighlightFade. The pointed-at slot keeps its look, except that
+ * in glyph mode one drawn as a gap or struck through is raised in the gap
+ * colour.
  */
 class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 {
@@ -53,17 +63,18 @@ class MITKQTWIDGETS_EXPORT QmitkMxNSyncBarcodeWidget : public QWidget
 public:
 
   /**
-   * \brief One barcode slot. The owner supplies the axis glyph and its state;
-   *        the widget stays ignorant of what the axes mean.
+   * \brief One barcode slot. The owner supplies the axis and its state; the
+   *        widget draws the axis's glyph and stays ignorant of what the axes
+   *        mean.
    */
   struct AxisSlot
   {
-    QmitkMxNAxisGlyph glyph = QmitkMxNAxisGlyph::Pan;  // which axis icon to draw
+    QmitkMxNSyncAxis axis = QmitkMxNSyncAxis::Pan;  // which axis, and so which glyph
     // The group hue; invalid == this cell is unsynced on the axis (a gap). On an
     // axis that does not apply, a valid hue is a kept link, not drawn until the
     // axis applies.
     QColor color;
-    QString tooltip;  // per-slot hover text, shown in axis-clickable mode
+    QString tooltip;  // per-slot hover text, shown while the axes take the pointer
     QString label;    // the axis's display name, for a surface that names it in words
 
     // Heterogeneous state for the group perspective: the color is the group hue
@@ -74,7 +85,7 @@ public:
     bool partial = false;
 
     // The axis carries an offset relative to its group's reference. Marked by
-    // filling the box's upper-right corner, because an offset is otherwise
+    // filling the box's lower-right corner, because an offset is otherwise
     // invisible outside the layout editor's matrix, and a window parked at
     // slice -1 looks exactly like one sitting on the group. Not marked on a slot
     // whose axis does not apply.
@@ -118,9 +129,11 @@ public:
   /**
    * \brief Paint the given slots into 'target' as the strip does: the glyph row
    *        or the collapsed color bar, chosen by ComputeLayout for that rect's
-   *        size. 'gapColor' fills the unsynced hairline; 'hovered' brightens the
-   *        glyph frames to white. Static so the rendering can be checked on a
-   *        QImage at any device pixel ratio.
+   *        size. 'gapColor' fills the unsynced hairline; 'hovered' lays the
+   *        button hover wash behind the drawn slots; 'hoveredSlot', when not
+   *        -1, fades every other slot and, in glyph mode, raises that slot if
+   *        it is drawn as a gap or struck through. Static so the rendering can
+   *        be checked on a QImage at any device pixel ratio.
    */
   static void PaintInto(QPainter& painter, const QRect& target,
                         const QList<AxisSlot>& axisSlots, bool hovered, const QColor& gapColor,
@@ -135,14 +148,24 @@ public:
   /** \brief The current slots. */
   QList<AxisSlot> Slots() const;
 
+  /** \brief What the single axes do with the pointer. */
+  enum class AxisInteraction
+  {
+    None,   // the strip is one button as a whole (Clicked)
+    Hover,  // each axis reports the pointer (AxisHovered) but takes no click
+    Click   // each axis reports the pointer and is a button (AxisClicked)
+  };
+
   /**
-   * \brief Whether a click targets a single axis (AxisClicked) or the whole
-   *        strip (Clicked). Off by default: the per-cell strip is one button
-   *        onto the layout editor. The layout editor's group header turns it on
-   *        so each axis glyph toggles that axis for the group. A slot that
-   *        does not apply (applicable == false) emits no AxisClicked.
+   * \brief Whether the pointer targets the whole strip or the single axes.
+   *        None by default: the per-cell strip is one button onto the layout
+   *        editor. The layout editor's group cards use Click, so each axis
+   *        glyph toggles that axis for the group; the reserved group's card
+   *        uses Hover, since its axes are not the user's to toggle. With Hover
+   *        or Click the strip emits no Clicked, and a slot that does not apply
+   *        (applicable == false) emits no AxisClicked.
    */
-  void SetAxisClickable(bool clickable);
+  void SetAxisInteraction(AxisInteraction interaction);
 
   /**
    * \brief Whether a click on the passive strip is offered. When false,
@@ -172,17 +195,18 @@ public:
 Q_SIGNALS:
 
   /** \brief The whole strip acts as a button onto the layout editor (emitted
-   *         only when axis-clickable mode is off). */
+   *         only with AxisInteraction::None). */
   void Clicked();
 
   /** \brief A single axis glyph was clicked (index into the slot list). Emitted
-   *         only in axis-clickable mode. */
+   *         only with AxisInteraction::Click. */
   void AxisClicked(int index);
 
   /** \brief The axis glyph under the pointer changed: its slot index, or -1 when
-   *         the pointer leaves the glyphs. Emitted only in axis-clickable mode
-   *         (the layout editor's group cards), so a hover can light up every cell
-   *         sharing that axis's synchronization. */
+   *         the pointer leaves the glyphs. Emitted only with
+   *         AxisInteraction::Hover or ::Click (the layout editor's group cards),
+   *         so a hover can light up every cell sharing that axis's
+   *         synchronization. */
   void AxisHovered(int index);
 
   /**
@@ -209,9 +233,9 @@ protected:
   void resizeEvent(QResizeEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
 
-  /** \brief Tracks hover over the glyph area (lights the strip to advertise it
-   *         is clickable) and the pointing cursor; the strip may be wider than
-   *         its glyphs, so the empty part stays inert. */
+  /** \brief Tracks hover over the glyph area (the hover wash and the pointing
+   *         cursor advertise a click, where one is offered); the strip may be
+   *         wider than its glyphs, so the empty part stays inert. */
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;
@@ -236,13 +260,13 @@ private:
 
   QList<AxisSlot> m_Slots;
   bool m_Hovered = false;         // whole-strip hover (passive per-cell strip)
-  int m_HoveredSlot = -1;         // single hovered axis (axis-clickable mode)
+  int m_HoveredSlot = -1;         // single hovered axis (axes take the pointer)
   // What a passive strip last reported. Deliberately not m_Hovered /
   // m_HoveredSlot: those drive the paint, and reporting must not change what
   // a passive strip paints.
   bool m_ReportedOverStrip = false;
   int m_ReportedSlot = -1;
-  bool m_AxisClickable = false;
+  AxisInteraction m_AxisInteraction = AxisInteraction::None;
   bool m_Clickable = true;
   bool m_PreferGlyphWidth = false;
   QPoint m_PressPos;

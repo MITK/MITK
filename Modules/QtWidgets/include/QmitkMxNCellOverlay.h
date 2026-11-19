@@ -62,7 +62,7 @@ class vtkRenderWindow;
  *     here, in the same layer as the slice readout, so the two align; the
  *     VTK corner annotation is blanked at the cell), tracking the cell's
  *     current view direction; line 2 is `slice N/max` and, for time-resolved
- *     data, a clock glyph and `t n/m`.
+ *     data, the Time axis glyph and `t n/m`.
  *   - Intensity lives on the right edge and bottom-right: the colorbar (the
  *     cell's actual LUT) is a 2 px passive strip that widens into a legend +
  *     control on reveal (a value tick scale with the level marked in hue, an
@@ -237,13 +237,16 @@ public:
 
   /**
   * \brief Show or hide this cell's sync peek plate at the layout-wide 'glyphBox'
-  *        side and glyph arrangement 'rows', emphasising 'axis' - or none of
-  *        them without one, which is how the plate looks while the pointer rests
-  *        on the barcode between two glyphs. The geometry is handed in rather
-  *        than derived here: every plate in the layout must share one, or the
-  *        rows stop being comparable.
+  *        side, emphasising 'axis' - or none of them without one, which is how
+  *        the plate looks while the pointer rests on the barcode between two
+  *        glyphs. The geometry is handed in rather than derived here: every
+  *        plate in the layout must share one, or the plates stop being
+  *        comparable. The plate of 'namingWindowId', the window the pointed-at
+  *        element belongs to, names the axis in its top line; every other plate
+  *        keeps its window's name there.
   */
-  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox, QmitkMxNPeekRows rows);
+  void SetSyncPeek(bool visible, std::optional<QmitkMxNSyncAxis> axis, int glyphBox,
+                   const QString& namingWindowId = QString());
 
   /** \brief Whether this cell's peek plate is up. Exposed for verification. */
   bool IsSyncPeekVisible() const;
@@ -256,51 +259,69 @@ public:
    *         verification. */
   int SyncPeekGlyphBox() const;
 
-  /** \brief The glyph arrangement this cell's peek was given. Exposed for
+  /** \brief What the plate's top line says: the pointed-at axis's label and,
+   *         if this window is offset on it, the offset - on the plate that names
+   *         the axis; otherwise the window's name, with no offset. An offset
+   *         wider than the line is left out; the pointed-at glyph's ribbon
+   *         shows it. */
+  struct PeekLineContent
+  {
+    QString text;
+    QString offset;
+  };
+
+  /** \brief This cell's top line as it is painted now. Exposed for
    *         verification. */
-  QmitkMxNPeekRows SyncPeekRows() const;
+  PeekLineContent SyncPeekLine() const;
 
   /** \brief Where a peek plate and its parts land in a cell of 'cellSize'. */
   struct PeekPlateLayout
   {
     QRect plate;                              // invalid when the cell cannot host a plate
-    std::array<QRect, PeekAxisCount> glyphs;  // axis order; the pumped one is the large rect
-    QRect caption;                            // the pointed-at axis name, above the row
-    QRect values;                             // the per-axis offsets, under the first row
-    QRect name;                               // the window name, below the values
+    std::array<QRect, PeekAxisCount> glyphs;  // slot order; the pumped one is the large rect
+    QRect line;                               // the top line, above the glyph grid
   };
 
   /**
   * \brief The plate geometry for one cell: the plate centred in 'cellSize', the
-  *        eight glyph rects for 'glyphBox' with 'pumpedAxis' enlarged around its
-  *        own slot, and the text rects. Every other glyph keeps its slot, so
-  *        the pumped one may overlap its neighbours. A negative 'pumpedAxis' lays
-  *        the row out with nothing emphasised. 'rows' lays the glyphs out in one
-  *        row or two. Returns an invalid plate when the cell cannot host one.
-  *        Static so the geometry is testable without a realized overlay.
+  *        glyph rects for 'glyphBox' in a 3x3 grid - one family per row, in
+  *        slot order - with 'pumpedAxis' enlarged around its own slot, and the
+  *        top line. Every other glyph keeps its slot, so the pumped one may
+  *        overlap its neighbours. A negative 'pumpedAxis' lays the grid out with
+  *        nothing emphasised. Returns an invalid plate when the cell cannot host
+  *        one. Static so the geometry is testable without a realized overlay.
   *
-  *   The plate reserves the pumped glyph's overhang and all three text lines -
-  *   axis name, offset values, window name - whatever the pumped axis is and
-  *   whatever this window is offset by, so its rect depends only on 'cellSize',
-  *   'glyphBox', 'textLineHeight' and 'rows': switching axes while the peek is up
-  *   moves and resizes nothing.
+  *   The plate reserves the pumped glyph's overhang whatever the pumped axis
+  *   is, so its rect depends only on 'cellSize', 'glyphBox' and
+  *   'textLineHeight': switching axes while the peek is up moves and resizes
+  *   nothing. One text line, and offsets carried by ribbons on their glyphs
+  *   instead of value lines, keep the plate short enough for the narrow and
+  *   short windows of a lightbox to host one.
   */
-  static PeekPlateLayout ComputePeekPlate(const QSize& cellSize, int glyphBox,
-                                          int pumpedAxis, int textLineHeight, QmitkMxNPeekRows rows);
+  static PeekPlateLayout ComputePeekPlate(const QSize& cellSize, int glyphBox, int pumpedAxis,
+                                          int textLineHeight);
 
   /**
   * \brief The largest glyph box a cell of 'cellSize' can host within the plate's
-  *        share of the cell with the glyphs in 'rows', or 0 below the legible
-  *        floor. The multi widget calls this per cell and arrangement to derive
-  *        the one geometry the whole layout uses.
+  *        share of the cell, or 0 below the legible floor. The multi widget calls
+  *        this per cell to derive the one geometry the whole layout uses.
   */
-  static int MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight, QmitkMxNPeekRows rows);
+  static int MaxPeekGlyphBox(const QSize& cellSize, int textLineHeight);
+
+  /**
+  * \brief The ribbon that carries an axis's offset 'text' on the plate: a tab
+  *        at the lower-right corner of 'glyph', sized for the resting
+  *        'glyphBox', a little larger on an enlarged glyph, and growing to the
+  *        left for longer text. It moves with the drawn glyph's corner. Static
+  *        so it is testable without a realized overlay.
+  */
+  static QRect PeekRibbonRect(const QRect& glyph, int glyphBox, const QString& text, const QFont& baseFont);
 
   /**
   * \brief The height of one peek text line for a widget whose font is
-  *        'baseFont'. The plate's lines are set in the peripheral readout font,
-  *        which the multi widget cannot measure on its own: it passes its own
-  *        font, the one every cell inherits.
+  *        'baseFont'. The plate's line is set one step above the peripheral
+  *        readout font, which the multi widget cannot measure on its own: it
+  *        passes its own font, the one every cell inherits.
   */
   static int PeekTextLineHeight(const QFont& baseFont);
 
@@ -321,6 +342,12 @@ public:
    *         the same condition. Exposed for verification. */
   QRect PlateMenuButtonRect() const;
 
+  /** \brief The rect the plate's top line is elided and centred into, in
+   *         overlay coordinates: the grid's width, narrowed on both sides on
+   *         the plate that shows the buttons so the line stays clear of them.
+   *         Invalid without a plate. Exposed for verification. */
+  QRect SyncPeekLineRect() const;
+
   /** \brief Whether this cell's frame is bumped: arrange mode is on and the
    *         cell shares the pointed-at synchronization, or a group drag hovers
    *         it. Exposed for verification. */
@@ -330,7 +357,7 @@ public:
    *         it opens the direction picker. Exposed for verification. */
   QRect PlaneLabelRect() const;
 
-  /** \brief The `slice N/max` readout, followed by a clock glyph and the time
+  /** \brief The `slice N/max` readout, followed by the Time glyph and the time
    *         readout when there is more than one time step; bottom-left line 2.
    *         A 3D cell has no slice, so it shows the time alone, and nothing
    *         without several time steps. Exposed for verification. */
@@ -688,18 +715,18 @@ private:
   bool m_FrameRevealed = false;
 
   // The sync peek: whether the plate is up, which axis it emphasises (-1 for
-  // none), the layout-wide glyph box it was handed, and the fade driven by
-  // m_PeekAnimation.
+  // none), whether this plate names that axis, the layout-wide glyph box it was
+  // handed, and the fade driven by m_PeekAnimation.
   bool m_SyncPeekVisible = false;
   int m_SyncPeekAxis = -1;
+  bool m_SyncPeekNamesAxis = false;
   int m_SyncPeekGlyphBox = 0;
-  QmitkMxNPeekRows m_SyncPeekRows = QmitkMxNPeekRows::One;
   qreal m_PeekProgress = 0.0;
   // The geometry the plate is painted at: the request's while it is up, kept
   // through the fade-out after it is lowered.
   int m_PeekPaintAxis = -1;
+  bool m_PeekPaintNamesAxis = false;
   int m_PeekPaintBox = 0;
-  QmitkMxNPeekRows m_PeekPaintRows = QmitkMxNPeekRows::One;
   QPointer<QPropertyAnimation> m_PeekAnimation;
 
   bool m_ReadoutVisible = true;

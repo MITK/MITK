@@ -326,8 +326,8 @@ public:
     return nlohmann::json::parse(R"({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__left", "view_direction": "axial", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__right", "view_direction": "coronal", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__left", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__right", "view_direction": "coronal", "links": { "selection": "main", "time": "global" } }
       ] }
     })");
   }

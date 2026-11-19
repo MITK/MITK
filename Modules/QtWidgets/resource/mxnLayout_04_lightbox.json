@@ -20,6 +20,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -37,6 +38,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -54,6 +56,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -77,6 +80,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -94,6 +98,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": "main",
               "zoom": "main",
@@ -108,6 +113,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -131,6 +137,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -148,6 +155,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",
@@ -165,6 +173,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "main",

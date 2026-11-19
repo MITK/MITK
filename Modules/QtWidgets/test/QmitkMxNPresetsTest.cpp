@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <variant>
 #include <vector>
@@ -63,6 +64,7 @@ class QmitkMxNPresetsTestSuite : public mitk::TestFixture
   MITK_TEST(DynamicLayoutEntry_NeedsImageData);
   MITK_TEST(DynamicLayoutEntry_OpensTheDialog);
   MITK_TEST(Presets_AreIdentifiedWithoutTheirOrderingPrefix);
+  MITK_TEST(Presets_HaveUniqueIds);
   MITK_TEST(DocumentFor_QualifiesTheWindowIds);
   MITK_TEST(Presets_MatchTheirSpecification_OnTheDefaultNamedEditor);
   MITK_TEST(Presets_MatchTheirSpecification_OnAnotherNamedEditor);
@@ -327,6 +329,39 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Exactly the preset's groups, with their display names" + where, preset.groups == groups);
   }
 
+  /** The `links` objects of the windows below 'node', in pre-order. */
+  static void CollectWindowLinks(const nlohmann::json& node, std::vector<nlohmann::json>& links)
+  {
+    if ("window" == node.value("type", std::string()))
+    {
+      links.push_back(node.at("links"));
+    }
+    for (const auto& child : node.value("children", nlohmann::json::array()))
+    {
+      CollectWindowLinks(child, links);
+    }
+  }
+
+  /** Saving the applied preset writes its file's links and groups back unchanged. */
+  static void CheckSavedAsShipped(const QmitkMxNMultiWidget& editor, const QmitkMxNPresets::Preset& shipped)
+  {
+    const std::string where = " (" + shipped.name.toStdString() + ")";
+    const auto saved = editor.SerializeLayout();
+
+    std::vector<nlohmann::json> savedLinks;
+    std::vector<nlohmann::json> shippedLinks;
+    CollectWindowLinks(saved.at("root"), savedLinks);
+    CollectWindowLinks(shipped.document.at("root"), shippedLinks);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The window count" + where, shippedLinks.size(), savedLinks.size());
+    for (std::size_t i = 0; i < shippedLinks.size(); ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The links of window " + std::to_string(i) + where, shippedLinks[i].dump(),
+                                   savedLinks[i].dump());
+    }
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The groups" + where, shipped.document.at("groups").dump(),
+                                 saved.at("groups").dump());
+  }
+
   // --- The menu --------------------------------------------------------------
 
   void Menu_ListsThePresetsInOrder()
@@ -432,6 +467,18 @@ public:
                          names.join(QStringLiteral(" | ")).toStdString());
   }
 
+  void Presets_HaveUniqueIds()
+  {
+    // Preferences and the start preset find a preset by its id. Without the
+    // ordering prefix, two resources can end in the same name.
+    std::set<QString> ids;
+    for (const auto& preset : QmitkMxNPresets::All())
+    {
+      CPPUNIT_ASSERT_MESSAGE("The preset id '" + preset.id.toStdString() + "' occurs once",
+                             ids.insert(preset.id).second);
+    }
+  }
+
   /** The window ids below 'node'. */
   static void CollectWindowIds(const nlohmann::json& node, std::vector<std::string>& ids)
   {
@@ -470,10 +517,14 @@ public:
 
   void Presets_MatchTheirSpecification_OnTheDefaultNamedEditor()
   {
-    for (const auto& preset : Specification())
+    const auto specification = Specification();
+    const auto& shipped = QmitkMxNPresets::All();
+    CPPUNIT_ASSERT_EQUAL(specification.size(), shipped.size());
+    for (std::size_t i = 0; i < specification.size(); ++i)
     {
-      ApplyPreset(*m_LayoutEditor, *m_Editor, preset.menuName);
-      CheckPreset(*m_Editor, preset);
+      ApplyPreset(*m_LayoutEditor, *m_Editor, specification[i].menuName);
+      CheckPreset(*m_Editor, specification[i]);
+      CheckSavedAsShipped(*m_Editor, shipped[i]);
     }
   }
 

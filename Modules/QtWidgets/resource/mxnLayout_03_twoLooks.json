@@ -38,6 +38,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "nav",
               "slice": "ax",
               "zoom": "ax",
@@ -53,6 +54,7 @@
             "view_direction": "sagittal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "nav",
               "slice": "sag",
               "zoom": "sag",
@@ -68,6 +70,7 @@
             "view_direction": "coronal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "nav",
               "slice": "cor",
               "zoom": "cor",
@@ -89,6 +92,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "lookB",
+              "time": "global",
               "crosshair": "nav",
               "slice": "ax",
               "zoom": "ax",
@@ -104,6 +108,7 @@
             "view_direction": "sagittal",
             "links": {
               "selection": "lookB",
+              "time": "global",
               "crosshair": "nav",
               "slice": "sag",
               "zoom": "sag",
@@ -119,6 +124,7 @@
             "view_direction": "coronal",
             "links": {
               "selection": "lookB",
+              "time": "global",
               "crosshair": "nav",
               "slice": "cor",
               "zoom": "cor",

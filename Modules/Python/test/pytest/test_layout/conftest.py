@@ -43,6 +43,12 @@ def _find_repo_root() -> Path | None:
 
 
 @pytest.fixture(scope="session")
+def repo_root() -> Path | None:
+    """The MITK source tree, or None when running outside it."""
+    return _find_repo_root()
+
+
+@pytest.fixture(scope="session")
 def schema_path() -> Path | None:
     """Path to `mxn-layout-v2.schema.json`, or None when unavailable."""
     root = _find_repo_root()

@@ -16,8 +16,10 @@ found in the LICENSE file.
 #include <QmitkMxNArrangeMode.h>
 #include <QmitkMxNCellOverlay.h>
 #include <QmitkMxNGroupJoinMode.h>
+#include <QmitkMxNLayoutEditorWidget.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkImageGenerator.h>
@@ -32,6 +34,8 @@ found in the LICENSE file.
 #include <QDropEvent>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QTabWidget>
+#include <QTableWidget>
 
 #include <memory>
 #include <string>
@@ -81,6 +85,10 @@ class QmitkMxNArrangeModeTestSuite : public mitk::TestFixture
   MITK_TEST(PlateInput_CleanViewKeepsThePlate);
   MITK_TEST(PlateInput_TheMenuButtonSitsLeftOfTheCloseButton);
   MITK_TEST(PlateInput_PointingAtAGlyphRingsItsPartners);
+  MITK_TEST(PeekPlate_LineNamesTheAxisOnlyOnTheNamingPlate);
+  MITK_TEST(PeekPlate_OnlyTheHoveredPlateMakesRoomForTheButtons);
+  MITK_TEST(PeekPlate_AnOffsetTheLineCannotHoldIsLeftToTheRibbon);
+  MITK_TEST(PartnerFrames_TimeTakesTheOverlayColourInEveryStyle);
   MITK_TEST(PlateInput_TheCloseButtonAsksToHideTheEditor);
   MITK_TEST(Drops_TheCellAcceptsDropsOnlyWhileArranging);
   MITK_TEST(Drops_AGroupDropAssignsByTheTargetRule);
@@ -666,7 +674,7 @@ public:
     const auto slot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Slice);
     const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(
       this->Cell(0)->GetRenderWindow()->geometry().size(), this->Overlay(0)->SyncPeekGlyphBox(), -1,
-      QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(0)->font()), this->Overlay(0)->SyncPeekRows());
+      QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(0)->font()));
     const QPoint onSliceGlyph =
       layout.glyphs[slot].center() + this->Cell(0)->GetRenderWindow()->geometry().topLeft();
 
@@ -685,6 +693,192 @@ public:
     // Off the plate the plate's highlight goes.
     this->SendToRenderWindow(0, QEvent::MouseMove, this->Cell(0)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
     CPPUNIT_ASSERT(this->Arrange()->GetHighlightedWindowIds().isEmpty());
+  }
+
+  /** Where the glyph of 'axis' sits on cell 'index''s plate, in overlay coordinates. */
+  QPoint PlateGlyphCenter(int index, QmitkMxNSyncAxis axis) const
+  {
+    const auto layout = QmitkMxNCellOverlay::ComputePeekPlate(
+      this->Cell(index)->GetRenderWindow()->geometry().size(), this->Overlay(index)->SyncPeekGlyphBox(), -1,
+      QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(index)->font()));
+    return layout.glyphs[QmitkMxNSyncAxisToSlot(axis)].center()
+           + this->Cell(index)->GetRenderWindow()->geometry().topLeft();
+  }
+
+  /** The cells whose plate names 'axis' in its top line, as "index:offset". */
+  std::string NamingPlates() const
+  {
+    std::string naming;
+    for (int index = 0; index < 4; ++index)
+    {
+      const auto line = this->Overlay(index)->SyncPeekLine();
+      if (line.text != m_Editor->CellLabel(CellId(index)))
+      {
+        naming += (naming.empty() ? "" : ",") + std::to_string(index) + ":" + line.text.toStdString()
+                  + (line.offset.isEmpty() ? std::string() : " " + line.offset.toStdString());
+      }
+    }
+    return naming;
+  }
+
+  void PeekPlate_LineNamesTheAxisOnlyOnTheNamingPlate()
+  {
+    this->ShowArranging();
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav", -1);
+    m_Editor->SetSyncLink(CellId(3), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->RefreshSyncControls();
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("At rest every plate shows its window", std::string(), this->NamingPlates());
+
+    // A plate names the axis pointed at on it, with this window's offset ...
+    this->SendToRenderWindow(0, QEvent::MouseMove, this->PlateGlyphCenter(0, QmitkMxNSyncAxis::Slice));
+    CPPUNIT_ASSERT_EQUAL(std::string("0:Slice -1"), this->NamingPlates());
+    // ... and the naming moves with the plate, also on the same axis.
+    this->SendToRenderWindow(0, QEvent::MouseMove, this->Cell(0)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
+    this->SendToRenderWindow(3, QEvent::MouseMove, this->PlateGlyphCenter(3, QmitkMxNSyncAxis::Slice));
+    CPPUNIT_ASSERT_EQUAL(std::string("3:Slice"), this->NamingPlates());
+    this->SendToRenderWindow(3, QEvent::MouseMove, this->Cell(3)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
+
+    // A window's strip: that window's plate.
+    auto* strip = this->Cell(1)->GetUtilityWidget();
+    emit strip->SyncPeekHovered(true, QmitkMxNSyncAxis::Slice);
+    Pump();
+    CPPUNIT_ASSERT_EQUAL(std::string("1:Slice"), this->NamingPlates());
+    emit strip->SyncPeekHovered(false, std::nullopt);
+    Pump();
+
+    // A matrix chip: the plate of its row, also when only the row changes.
+    QmitkMxNLayoutEditorWidget layoutEditor;
+    layoutEditor.SetMultiWidget(m_Editor.get());
+    Pump();
+    layoutEditor.findChild<QTabWidget*>(QStringLiteral("QmitkMxNLayoutEditorFaces"))->setCurrentIndex(1);
+    Pump();
+    auto* matrix = layoutEditor.findChild<QTableWidget*>(QStringLiteral("QmitkMxNLayoutEditorMatrix"));
+    CPPUNIT_ASSERT(nullptr != matrix);
+    const int timeColumn = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time);
+    emit matrix->entered(matrix->model()->index(3, timeColumn));
+    CPPUNIT_ASSERT_EQUAL(std::string("3:Time"), this->NamingPlates());
+    QStringList framed = this->Arrange()->GetHighlightedWindowIds();
+    framed.sort();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Pointing at Time frames every window", Ids({ 0, 1, 2, 3 }),
+                                 framed.join(QLatin1Char(',')).toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("in the reserved group's colour on the dark furniture", std::string("#f1f1f1"),
+                                 this->Arrange()->GetHighlightHue().name().toStdString());
+    emit matrix->entered(matrix->model()->index(0, timeColumn));
+    CPPUNIT_ASSERT_EQUAL(std::string("0:Time"), this->NamingPlates());
+
+    // A group card's glyph belongs to no window; the card names the axis itself.
+    layoutEditor.HighlightGroupAxis(QStringLiteral("nav"), QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT_EQUAL(std::string(), this->NamingPlates());
+    CPPUNIT_ASSERT_MESSAGE("while every plate still emphasises the axis",
+                           std::optional<QmitkMxNSyncAxis>(QmitkMxNSyncAxis::Slice) == this->Overlay(2)->SyncPeekAxis());
+  }
+
+  /** The width of the top line on cell 'index''s plate when it takes the grid's width. */
+  int FullPlateLineWidth(int index) const
+  {
+    return QmitkMxNCellOverlay::ComputePeekPlate(
+             this->Cell(index)->GetRenderWindow()->geometry().size(), this->Overlay(index)->SyncPeekGlyphBox(), -1,
+             QmitkMxNCellOverlay::PeekTextLineHeight(this->Overlay(index)->font()))
+      .line.width();
+  }
+
+  void PeekPlate_OnlyTheHoveredPlateMakesRoomForTheButtons()
+  {
+    this->ShowArranging();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A plate without buttons gives its line the grid's width",
+                                 this->FullPlateLineWidth(1), this->Overlay(1)->SyncPeekLineRect().width());
+
+    this->SendToRenderWindow(1, QEvent::MouseMove, this->Overlay(1)->SyncPeekPlateRect().center());
+    const QRect line = this->Overlay(1)->SyncPeekLineRect();
+    const QRect close = this->Overlay(1)->PlateCloseButtonRect();
+    const QRect menu = this->Overlay(1)->PlateMenuButtonRect();
+    CPPUNIT_ASSERT(close.isValid() && menu.isValid());
+    CPPUNIT_ASSERT_MESSAGE("The plate under the pointer keeps its line clear of the buttons",
+                           line.isValid() && !line.intersects(close) && !line.intersects(menu));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("while the other plates keep the grid's width",
+                                 this->FullPlateLineWidth(0), this->Overlay(0)->SyncPeekLineRect().width());
+
+    this->SendToRenderWindow(1, QEvent::MouseMove, this->Cell(1)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Off the plate its line takes the grid's width again",
+                                 this->FullPlateLineWidth(1), this->Overlay(1)->SyncPeekLineRect().width());
+  }
+
+  void PeekPlate_AnOffsetTheLineCannotHoldIsLeftToTheRibbon()
+  {
+    // At the smallest glyph box the line of the plate under the pointer, which
+    // makes room for the arrange buttons, is narrower than a pan offset. The
+    // pointed-at glyph's ribbon shows the offset then; the line must not run
+    // it over the buttons.
+    this->ShowArranging();
+    // Windows about 150 px wide and over 214 px tall host a plate at the
+    // smallest glyph box.
+    m_Editor->resize(320, 600);
+    Pump();
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the plates sit at the smallest glyph box",
+                                 QmitkMxNCellOverlay::PeekGlyphBoxMin, this->Overlay(1)->SyncPeekGlyphBox());
+    mitk::Vector2D pan;
+    pan[0] = -123.0;
+    pan[1] = -456.0;
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Pan, "view", pan);
+    m_Editor->SetSyncLink(CellId(2), QmitkMxNSyncDimension::Pan, "view");
+    m_Editor->RefreshSyncControls();
+    Pump();
+
+    this->SendToRenderWindow(1, QEvent::MouseMove, this->PlateGlyphCenter(1, QmitkMxNSyncAxis::Pan));
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the plate under the pointer shows the buttons",
+                           this->Overlay(1)->PlateMenuButtonRect().isValid());
+    const auto line = this->Overlay(1)->SyncPeekLine();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The line names the axis", std::string("Pan"), line.text.toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("and leaves the offset it cannot hold to the ribbon", std::string(),
+                                 line.offset.toStdString());
+  }
+
+  void PartnerFrames_TimeTakesTheOverlayColourInEveryStyle()
+  {
+    // The partner frames lie over the windows' borders and render areas, which
+    // are dark in every style, so Time keeps the light gray the strips and the
+    // plates give it while the style's text colour is black.
+    this->ShowArranging();
+    auto palette = m_Editor->palette();
+    palette.setColor(QPalette::WindowText, QColor(Qt::black));
+    m_Editor->setPalette(palette);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The style's own colour for the reserved group must differ for the test to mean anything",
+                                 std::string("#000000"), m_Editor->GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
+    const std::string overlayColour("#f1f1f1");
+    const auto hue = [this]() { return this->Arrange()->GetHighlightHue().name().toStdString(); };
+
+    this->SendToRenderWindow(0, QEvent::MouseMove, this->PlateGlyphCenter(0, QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Pointing at Time on a plate", overlayColour, hue());
+    this->SendToRenderWindow(0, QEvent::MouseMove, this->Cell(0)->GetRenderWindow()->geometry().topLeft() + QPoint(5, 5));
+
+    auto* strip = this->Cell(1)->GetUtilityWidget();
+    emit strip->SyncPeekHovered(true, QmitkMxNSyncAxis::Time);
+    Pump();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("on a window's strip", overlayColour, hue());
+    emit strip->SyncPeekHovered(false, std::nullopt);
+    Pump();
+
+    QmitkMxNLayoutEditorWidget layoutEditor;
+    layoutEditor.SetMultiWidget(m_Editor.get());
+    Pump();
+    layoutEditor.findChild<QTabWidget*>(QStringLiteral("QmitkMxNLayoutEditorFaces"))->setCurrentIndex(1);
+    Pump();
+    auto* matrix = layoutEditor.findChild<QTableWidget*>(QStringLiteral("QmitkMxNLayoutEditorMatrix"));
+    CPPUNIT_ASSERT(nullptr != matrix);
+    emit matrix->entered(matrix->model()->index(0, QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("on a matrix chip", overlayColour, hue());
+
+    layoutEditor.HighlightGroupAxis(QString::fromUtf8(QmitkMxNGlobalGroupId), QmitkMxNSyncAxis::Time);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("on the Global card", overlayColour, hue());
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+    m_Editor->SetSyncLink(CellId(3), QmitkMxNSyncDimension::Slice, "nav");
+    Pump();
+    layoutEditor.HighlightGroupAxis(QStringLiteral("nav"), QmitkMxNSyncAxis::Slice);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("A user group keeps its own colour",
+                                 m_Editor->GetSyncGroupColor("nav").name().toStdString(), hue());
   }
 
   void PlateInput_TheCloseButtonAsksToHideTheEditor()

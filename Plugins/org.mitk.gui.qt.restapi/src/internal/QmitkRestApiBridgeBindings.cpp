@@ -156,14 +156,14 @@ namespace
    * to 503 EDITOR_NOT_ACTIVE.
    *
    * Every MxN endpoint resolves the editor here, so this is also where they
-   * are all refused while a layout is being applied: the rebuild pumps the
-   * event loop, which delivers queued REST calls against a half-built cell
-   * tree.
+   * are all refused while the editor is busy ('IsBusy'): its layout
+   * operations pump the event loop, which delivers queued REST calls while
+   * the cells are built or laid out.
    *
    * \throws mitk::RenderWindowBridgeNoEditorException if the MxN editor is
    *         not open or has no live multi-widget.
-   * \throws mitk::RenderWindowBridgeEditorBusyException while the editor is
-   *         applying a layout.
+   * \throws mitk::RenderWindowBridgeEditorBusyException while 'IsBusy'
+   *         holds.
    */
   MxNEditor ResolveMxNEditor()
   {
@@ -180,9 +180,9 @@ namespace
       throw mitk::RenderWindowBridgeNoEditorException(
         "MxN editor has no live multi-widget");
 
-    if (multiWidget->IsApplyingLayout())
+    if (multiWidget->IsBusy())
       throw mitk::RenderWindowBridgeEditorBusyException(
-        "MxN editor is applying a layout; retry once it has finished");
+        "MxN editor is busy rebuilding or laying out its windows; retry once it has finished");
 
     return { rwp, multiWidget };
   }
@@ -709,7 +709,13 @@ namespace mitk
     rwb->SetMxNCameraSetter(
       [](const std::string& id, const mitk::CameraPatch& patch)
       {
-        ApplyCameraPatchToRenderer(ResolveMxNRenderer(id), patch, id);
+        // Resolved first for the bridge's typed errors.
+        ResolveMxNRenderer(id);
+        // The editor's tab may be hidden; the editor applies the patch again
+        // after the fit it defers until the tab is shown.
+        const auto snap = ResolveMxNRenderWindow(id);
+        snap.multiWidget->SetCamera(snap.id, [patch, id](mitk::BaseRenderer* renderer)
+                                    { ApplyCameraPatchToRenderer(renderer, patch, id); });
       });
 
     rwb->SetMxNSelectedSliceGetter(

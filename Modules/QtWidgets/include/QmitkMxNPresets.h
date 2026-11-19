@@ -32,7 +32,7 @@ namespace QmitkMxNPresets
     /** \brief The resource's file name without its ordering prefix and
     *          extension ("sliceContext" for "mxnLayout_05_sliceContext.json").
     *          It changes neither when a preset is renamed nor when the
-    *          presets are reordered. */
+    *          presets are reordered, and it is unique among the presets. */
     QString id;
 
     /** \brief The display name, the document's "name". */

@@ -14,11 +14,11 @@ found in the LICENSE file.
 
 #include <QBuffer>
 #include <QColor>
+#include <QCoreApplication>
 #include <QFile>
 #include <QImage>
 #include <QImageReader>
 #include <QPainter>
-#include <QPainterPath>
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QRegularExpression>
@@ -26,20 +26,38 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 
+QString QmitkMxNSyncAxisLabel(QmitkMxNSyncAxis axis)
+{
+  switch (axis)
+  {
+    case QmitkMxNSyncAxis::Orientation: return QCoreApplication::translate("QmitkMxNSyncAxis", "Orientation");
+    case QmitkMxNSyncAxis::Pan:         return QCoreApplication::translate("QmitkMxNSyncAxis", "Pan");
+    case QmitkMxNSyncAxis::Zoom:        return QCoreApplication::translate("QmitkMxNSyncAxis", "Zoom");
+    case QmitkMxNSyncAxis::Slice:       return QCoreApplication::translate("QmitkMxNSyncAxis", "Slice");
+    case QmitkMxNSyncAxis::Time:        return QCoreApplication::translate("QmitkMxNSyncAxis", "Time");
+    case QmitkMxNSyncAxis::Crosshair:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Crosshair");
+    case QmitkMxNSyncAxis::Selection:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Data selection");
+    case QmitkMxNSyncAxis::Windowing:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Windowing");
+    case QmitkMxNSyncAxis::Lut:         return QCoreApplication::translate("QmitkMxNSyncAxis", "LUT");
+  }
+  return QString();
+}
+
 namespace
 {
-  QString ResourcePath(QmitkMxNAxisGlyph glyph)
+  QString ResourcePath(QmitkMxNSyncAxis axis)
   {
-    switch (glyph)
+    switch (axis)
     {
-      case QmitkMxNAxisGlyph::Pan:         return QStringLiteral(":/Qmitk/mxn-axis-pan.svg");
-      case QmitkMxNAxisGlyph::Zoom:        return QStringLiteral(":/Qmitk/mxn-axis-zoom.svg");
-      case QmitkMxNAxisGlyph::Slice:       return QStringLiteral(":/Qmitk/mxn-axis-slice.svg");
-      case QmitkMxNAxisGlyph::Crosshair:   return QStringLiteral(":/Qmitk/mxn-axis-crosshair.svg");
-      case QmitkMxNAxisGlyph::Orientation: return QStringLiteral(":/Qmitk/mxn-axis-orientation.svg");
-      case QmitkMxNAxisGlyph::Windowing:   return QStringLiteral(":/Qmitk/mxn-axis-windowing.svg");
-      case QmitkMxNAxisGlyph::Lut:         return QStringLiteral(":/Qmitk/mxn-axis-lut.svg");
-      case QmitkMxNAxisGlyph::Selection:   return QStringLiteral(":/Qmitk/mxn-axis-selection.svg");
+      case QmitkMxNSyncAxis::Pan:         return QStringLiteral(":/Qmitk/mxn-axis-pan.svg");
+      case QmitkMxNSyncAxis::Zoom:        return QStringLiteral(":/Qmitk/mxn-axis-zoom.svg");
+      case QmitkMxNSyncAxis::Slice:       return QStringLiteral(":/Qmitk/mxn-axis-slice.svg");
+      case QmitkMxNSyncAxis::Crosshair:   return QStringLiteral(":/Qmitk/mxn-axis-crosshair.svg");
+      case QmitkMxNSyncAxis::Orientation: return QStringLiteral(":/Qmitk/mxn-axis-orientation.svg");
+      case QmitkMxNSyncAxis::Windowing:   return QStringLiteral(":/Qmitk/mxn-axis-windowing.svg");
+      case QmitkMxNSyncAxis::Lut:         return QStringLiteral(":/Qmitk/mxn-axis-lut.svg");
+      case QmitkMxNSyncAxis::Selection:   return QStringLiteral(":/Qmitk/mxn-axis-selection.svg");
+      case QmitkMxNSyncAxis::Time:        return QStringLiteral(":/Qmitk/mxn-axis-time.svg");
     }
     return QString();
   }
@@ -119,12 +137,12 @@ namespace
     return layer;
   }
 
-  /** \brief Rasterise 'glyph' in 'color' at 'sizePx'. With 'shapeOnly', every
-   *         gradient stop is drawn opaque, so the image covers the glyph's
-   *         full outline even where its paint fades out. */
-  QImage RasterizeGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx, bool shapeOnly)
+  /** \brief Rasterise the glyph of 'axis' in 'color' at 'sizePx'. With
+   *         'shapeOnly', every gradient stop is drawn opaque, so the image
+   *         covers the glyph's full outline even where its paint fades out. */
+  QImage RasterizeGlyph(QmitkMxNSyncAxis axis, const QColor& color, int sizePx, bool shapeOnly)
   {
-    QFile file(ResourcePath(glyph));
+    QFile file(ResourcePath(axis));
     if (!file.open(QIODevice::ReadOnly))
     {
       return QImage();
@@ -155,13 +173,19 @@ namespace
   }
 }
 
-QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx,
+QColor QmitkMxNInkFor(const QColor& hue)
+{
+  const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
+  return luminance > 140.0 ? QColor(0x1a, 0x1a, 0x1a) : QColor(Qt::white);
+}
+
+QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNSyncAxis axis, const QColor& color, int sizePx,
                                 qreal devicePixelRatio)
 {
   // The recolor drops alpha, so the RGB alone identifies the artwork. The ratio
   // is part of the key: setting it on a shared copy would detach it per paint.
   const QString key = QStringLiteral("QmitkMxNAxisGlyph/%1/%2/%3/%4")
-                        .arg(static_cast<int>(glyph))
+                        .arg(static_cast<int>(axis))
                         .arg(color.name(QColor::HexRgb))
                         .arg(sizePx)
                         .arg(devicePixelRatio);
@@ -171,7 +195,7 @@ QPixmap QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph glyph, const QColor& color, in
     return cached;
   }
 
-  const QImage image = RasterizeGlyph(glyph, color, sizePx, false);
+  const QImage image = RasterizeGlyph(axis, color, sizePx, false);
   if (image.isNull())
   {
     return QPixmap();
@@ -188,11 +212,11 @@ int QmitkMxNAxisGlyphStickerMargin(int sizePx)
   return static_cast<int>(std::ceil(StickerInnerWidth(sizePx) + StickerOuterWidth(sizePx)));
 }
 
-QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph, const QColor& color, int sizePx,
+QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNSyncAxis axis, const QColor& color, int sizePx,
                                        qreal devicePixelRatio)
 {
   const QString key = QStringLiteral("QmitkMxNAxisGlyphSticker/%1/%2/%3/%4")
-                        .arg(static_cast<int>(glyph))
+                        .arg(static_cast<int>(axis))
                         .arg(color.name(QColor::HexRgb))
                         .arg(sizePx)
                         .arg(devicePixelRatio);
@@ -202,7 +226,7 @@ QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph, const QColor& co
     return cached;
   }
 
-  const QPixmap glyphPixmap = QmitkMxNRenderAxisGlyph(glyph, color, sizePx);
+  const QPixmap glyphPixmap = QmitkMxNRenderAxisGlyph(axis, color, sizePx);
   if (glyphPixmap.isNull())
   {
     return QPixmap();
@@ -214,7 +238,7 @@ QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph, const QColor& co
   // The rings follow the glyph's shape, not its paint: a glyph that fades out
   // (the lookup table's gradient) still gets a crisp outline all round.
   const QImage silhouette =
-    RasterizeGlyph(glyph, color, sizePx, true).convertToFormat(QImage::Format_ARGB32);
+    RasterizeGlyph(axis, color, sizePx, true).convertToFormat(QImage::Format_ARGB32);
   const QSize size(sizePx + 2 * margin, sizePx + 2 * margin);
   const QPoint offset(margin, margin);
 
@@ -236,26 +260,4 @@ QPixmap QmitkMxNRenderAxisGlyphSticker(QmitkMxNAxisGlyph glyph, const QColor& co
   pixmap.setDevicePixelRatio(devicePixelRatio);
   QPixmapCache::insert(key, pixmap);
   return pixmap;
-}
-
-void QmitkMxNPaintStickerText(QPainter& painter, const QPointF& baseline, const QFont& font,
-                              const QString& text, const QColor& color)
-{
-  QPainterPath path;
-  path.addText(baseline, font, text);
-
-  // Each ring is one logical pixel wide. A stroke is centred on the outline, so
-  // it must be twice as wide as what it should show outside the text; the fill
-  // drawn last covers the inner half.
-  constexpr qreal ring = 1.0;
-  painter.save();
-  painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(StickerOuterInk, 2 * (ring + ring), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-  painter.drawPath(path);
-  painter.setPen(QPen(StickerInnerInk, 2 * ring, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-  painter.drawPath(path);
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(color);
-  painter.drawPath(path);
-  painter.restore();
 }

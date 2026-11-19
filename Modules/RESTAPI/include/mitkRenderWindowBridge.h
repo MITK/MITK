@@ -82,7 +82,7 @@ namespace mitk
   /**
    * \brief Thrown by bridge callbacks when the target editor is open but
    *        temporarily cannot serve requests (e.g. the MxN editor while it
-   *        rebuilds its layout).
+   *        rebuilds or lays out its windows).
    *
    * The condition is transient; a retry after it has cleared succeeds.
    * Mapped by the controller layer to HTTP 503 EDITOR_BUSY.

@@ -55,6 +55,7 @@ class QmitkMxNDynamicLayoutDialogTestSuite : public mitk::TestFixture
   MITK_TEST(Options_FollowTheSlotsUntilChanged);
   MITK_TEST(SwapRoles_ExchangesTheSlotsAndMovesTheDefaults);
   MITK_TEST(Slots_NeverTakeANodeAnotherSlotHolds);
+  MITK_TEST(UnshownSelection_IsNamedUnderTheSlots);
   MITK_TEST(Reopen_StartsOnTheTemplateChosenLast);
 
   CPPUNIT_TEST_SUITE_END();
@@ -114,6 +115,39 @@ public:
   static QmitkAbstractNodeSelectionWidget* Slot(const QWidget& dialog, int index)
   {
     return Control<QmitkAbstractNodeSelectionWidget>(dialog, ("slot" + std::to_string(index)).c_str());
+  }
+
+  void UnshownSelection_IsNamedUnderTheSlots()
+  {
+    // A template takes only what its slots hold; the dialog says which of
+    // the selected data the layout leaves out.
+    const auto base = this->AddImage("base");
+    const auto adc = this->AddImage("adc");
+    const auto t2 = this->AddImage("t2");
+    auto dialog = this->MakeDialog({ base, adc, t2 }, QmitkMxNDynamicTemplate::SharedBase);
+    auto* label = Control<QLabel>(*dialog, "unshownSelection");
+
+    CPPUNIT_ASSERT_MESSAGE("Shared base leaves out the images over the base", !label->isHidden());
+    const auto text = label->text().toStdString();
+    CPPUNIT_ASSERT_MESSAGE("...and names them: " + text,
+                           std::string::npos != text.find("adc") && std::string::npos != text.find("t2")
+                             && std::string::npos == text.find("base,"));
+    CPPUNIT_ASSERT_MESSAGE("...and points images to the fusion pair: " + text,
+                           std::string::npos != text.find("fusion pair"));
+
+    dialog->SelectTemplate(QmitkMxNDynamicTemplate::OneViewPerDataset);
+    CPPUNIT_ASSERT_MESSAGE("One view per dataset shows all of them", label->isHidden());
+
+    dialog->SelectTemplate(QmitkMxNDynamicTemplate::FusionPair);
+    const auto fusionText = label->text().toStdString();
+    CPPUNIT_ASSERT_MESSAGE("The fusion pair leaves out the third image only: " + fusionText,
+                           !label->isHidden() && std::string::npos != fusionText.find("t2")
+                             && std::string::npos == fusionText.find("adc"));
+
+    Slot(*dialog, 1)->SetCurrentSelection({ t2 });
+    const auto editedText = label->text().toStdString();
+    CPPUNIT_ASSERT_MESSAGE("A slot edit updates it: " + editedText,
+                           std::string::npos != editedText.find("adc") && std::string::npos == editedText.find("t2"));
   }
 
   void Prefill_FillsTheSlotsFromTheSelection()

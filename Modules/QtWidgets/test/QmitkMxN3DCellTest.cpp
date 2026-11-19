@@ -109,6 +109,7 @@ class QmitkMxN3DCellTestSuite : public mitk::TestFixture
   MITK_TEST(Reinit_AfterLoad_RestoresDirection);
   MITK_TEST(Reinit_TwoEditors_EachKeepsItsDirection);
   MITK_TEST(Applicability_PerRenderMode);
+  MITK_TEST(Time_AppliesTo2DAnd3D);
   MITK_TEST(Zoom_ThreeDAnchor_ConvergesTwoDToItsHalfHeight);
   MITK_TEST(Zoom_SwitchToThreeD_KeepsGroupZoom);
   MITK_TEST(Gate_PanGroup_ThreeDNeverAnchors);
@@ -295,11 +296,11 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__slice", "view_direction": "sagittal",
-            "links": { "selection": "main" } },
+            "links": { "selection": "main", "time": "global" } },
           { "type": "window", "id": "mxn__volume", "view_direction": "sagittal", "render_mode": "3d",
-            "links": { "selection": "main" } },
+            "links": { "selection": "main", "time": "global" } },
           { "type": "window", "id": "mxn__overview", "view_direction": "free", "render_mode": "3d",
-            "links": { "selection": "main" } }
+            "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");
@@ -917,11 +918,25 @@ public:
     {
       const auto axis = *QmitkMxNSyncAxisFromSlot(slot);
       const bool expected = QmitkMxNSyncAxis::Pan == axis || QmitkMxNSyncAxis::Zoom == axis
-                            || QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis;
+                            || QmitkMxNSyncAxis::Orientation == axis || QmitkMxNSyncAxis::Selection == axis
+                            || QmitkMxNSyncAxis::Time == axis;
       CPPUNIT_ASSERT_EQUAL_MESSAGE("slot " + std::to_string(slot), expected,
                                    m_Editor->IsAxisApplicable(CellId(0), axis));
     }
     CPPUNIT_ASSERT_THROW(m_Editor->IsAxisApplicable("mxn__nowhere", QmitkMxNSyncAxis::Pan), mitk::Exception);
+  }
+
+  void Time_AppliesTo2DAnd3D()
+  {
+    // Every window follows the application's time, whatever it renders.
+    CPPUNIT_ASSERT(m_Editor->IsAxisApplicable(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_EQUAL(std::string("global"), m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time));
+    m_Editor->SetRenderMode(CellId(0), RenderMode::ThreeD);
+    CPPUNIT_ASSERT(m_Editor->IsAxisApplicable(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_EQUAL(std::string("global"), m_Editor->ResolveCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT_MESSAGE("A 3D window shares Time with the others",
+                           m_Editor->CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time)
+                             .contains(CellId(0)));
   }
 
   static double HalfHeight(mitk::BaseRenderer* renderer)
@@ -1150,11 +1165,11 @@ public:
   }
 
   static QmitkMxNSyncBarcodeWidget::AxisSlot SlotOf(const QList<QmitkMxNSyncBarcodeWidget::AxisSlot>& axisSlots,
-                                                    QmitkMxNAxisGlyph glyph)
+                                                    QmitkMxNSyncAxis axis)
   {
     for (const auto& slot : axisSlots)
     {
-      if (glyph == slot.glyph)
+      if (axis == slot.axis)
       {
         return slot;
       }
@@ -1173,12 +1188,12 @@ public:
 
     auto axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
     CPPUNIT_ASSERT_MESSAGE("precondition: in 2D the pan offset is shown",
-                           SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan).hasOffset);
+                           SlotOf(axisSlots, QmitkMxNSyncAxis::Pan).hasOffset);
 
     m_Editor->SetRenderMode(CellId(1), RenderMode::ThreeD);
 
     axisSlots = m_Editor->BuildBarcodeSlots(CellId(1));
-    const auto panSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Pan);
+    const auto panSlot = SlotOf(axisSlots, QmitkMxNSyncAxis::Pan);
     CPPUNIT_ASSERT_MESSAGE("A pan link stays applicable to a 3D cell and keeps its hue",
                            panSlot.applicable && panSlot.color.isValid());
     CPPUNIT_ASSERT_MESSAGE("A pan offset has no effect on a 3D cell, so the slot does not mark one",
@@ -1188,7 +1203,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The tooltip says the offset is kept for the 2D views: " + panSlot.tooltip.toStdString(),
                            panSlot.tooltip.contains(QStringLiteral("kept")));
 
-    const auto zoomSlot = SlotOf(axisSlots, QmitkMxNAxisGlyph::Zoom);
+    const auto zoomSlot = SlotOf(axisSlots, QmitkMxNSyncAxis::Zoom);
     CPPUNIT_ASSERT_MESSAGE("A zoom offset still applies to a 3D cell and is shown", zoomSlot.hasOffset);
     CPPUNIT_ASSERT_MESSAGE("The zoom offset is worded", !zoomSlot.offsetText.isEmpty());
 
@@ -1201,7 +1216,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", 5.0, stored[0], 1e-9);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The stored pan offset is never cleared", -3.0, stored[1], 1e-9);
     CPPUNIT_ASSERT_MESSAGE("Back in 2D the pan offset is shown again",
-                           SlotOf(m_Editor->BuildBarcodeSlots(CellId(1)), QmitkMxNAxisGlyph::Pan).hasOffset);
+                           SlotOf(m_Editor->BuildBarcodeSlots(CellId(1)), QmitkMxNSyncAxis::Pan).hasOffset);
   }
 
   // --- Camera synchronization ----------------------------------------------

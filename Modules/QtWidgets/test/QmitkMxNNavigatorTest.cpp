@@ -332,12 +332,10 @@ public:
     CPPUNIT_ASSERT(nullptr != barcode);
 
     const auto axisSlots = barcode->Slots();
-    // Seven per-dimension axes plus the selection axis.
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1,
-                         static_cast<int>(axisSlots.size()));
-    for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
     {
-      const auto dimension = QmitkMxNAllSyncDimensions[i];
+      const int slot = QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxisOf(dimension));
       const bool inNavigationBundle =
         dimension == QmitkMxNSyncDimension::Pan || dimension == QmitkMxNSyncDimension::Zoom
         || dimension == QmitkMxNSyncDimension::Slice || dimension == QmitkMxNSyncDimension::Crosshair;
@@ -347,14 +345,14 @@ public:
         || dimension == QmitkMxNSyncDimension::Windowing || dimension == QmitkMxNSyncDimension::Lut;
       CPPUNIT_ASSERT_EQUAL_MESSAGE(
         "A linked dimension is a filled barcode slot in the group hue; an unsynced one is a gap",
-        expectedFilled, axisSlots[static_cast<int>(i)].color.isValid());
+        expectedFilled, axisSlots[slot].color.isValid());
     }
     // The selection slot shows the cell's selection group consistently, including
     // the default group every cell starts in (it is a real, shared selection
     // group, not a "no sync" placeholder).
     CPPUNIT_ASSERT_MESSAGE(
       "The selection slot shows the cell's (default) selection group",
-      axisSlots.back().color.isValid());
+      axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Selection)].color.isValid());
   }
 
   QString DataScopeText(std::size_t index) const
@@ -407,7 +405,7 @@ public:
   {
     using Layout = QmitkMxNSyncBarcodeWidget::BarcodeLayout;
     // 'slotCount', not 'slots': the latter is the Qt macro and expands to nothing.
-    const int slotCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;  // 8
+    const int slotCount = QmitkMxNSyncAxisCount;
 
     // A wide, short strip (the per-cell utility row) draws a glyph row.
     const auto strip = QmitkMxNSyncBarcodeWidget::ComputeLayout(200, 18, slotCount);
@@ -658,7 +656,8 @@ public:
       QStringLiteral(":/Qmitk/mxn-axis-pan.svg"),         QStringLiteral(":/Qmitk/mxn-axis-zoom.svg"),
       QStringLiteral(":/Qmitk/mxn-axis-slice.svg"),       QStringLiteral(":/Qmitk/mxn-axis-crosshair.svg"),
       QStringLiteral(":/Qmitk/mxn-axis-orientation.svg"), QStringLiteral(":/Qmitk/mxn-axis-windowing.svg"),
-      QStringLiteral(":/Qmitk/mxn-axis-lut.svg"),         QStringLiteral(":/Qmitk/mxn-axis-selection.svg") };
+      QStringLiteral(":/Qmitk/mxn-axis-lut.svg"),         QStringLiteral(":/Qmitk/mxn-axis-selection.svg"),
+      QStringLiteral(":/Qmitk/mxn-axis-time.svg") };
     for (const auto& path : paths)
     {
       QFile file(path);

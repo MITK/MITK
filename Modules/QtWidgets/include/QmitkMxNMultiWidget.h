@@ -89,6 +89,20 @@ public:
 };
 
 /**
+* \brief Thrown when a call would create, join, remove or restyle the reserved
+*        group 'global' (QmitkMxNGlobalGroupId) on an axis that does not accept
+*        it, would give a window another group or no group on an axis that only
+*        'global' holds (Time), or would give a user group the reserved display
+*        name "Global" or a colour that cannot be told apart from the reserved
+*        group's.
+*/
+class MITKQTWIDGETS_EXPORT QmitkMxNReservedGroupException : public mitk::Exception
+{
+public:
+  mitkExceptionClassMacro(QmitkMxNReservedGroupException, mitk::Exception);
+};
+
+/**
 * \brief Thrown by the 'QmitkMxNMultiWidget' constructor when another MxN widget
 *        with the same name is alive: render-window IDs derive from the name,
 *        so the two would share cell IDs and per-cell renderer properties.
@@ -291,6 +305,8 @@ public:
   *                previously recorded name in place and skip the name
   *                preconditions below.
   *
+  * \pre  'name' is not the reserved id QmitkMxNGlobalGroupId in any spelling,
+  *       also on an idempotent call   (otherwise QmitkMxNReservedGroupException)
   * \pre  index >= 1                       (otherwise mitk::Exception)
   * \pre  A non-empty 'name' matches the layout format's group-name pattern
   *       '^[A-Za-z0-9_.-]+$'               (otherwise mitk::Exception)
@@ -315,6 +331,10 @@ public:
   *   call is a no-op for it.
   *   A no-op as well for an id that names no group. Emits SyncLinksChanged
   *   once.
+  *
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling: that group always exists, so
+  *         a caller that removes it has a bug.
   */
   void RemoveSynchronizationGroup(const std::string& id);
 
@@ -350,6 +370,10 @@ public:
   *   allocated on first use (mapping the string id to a free engine index) and
   *   reclaimed once its last member leaves - unless it came from a layout
   *   document or the default seed, which persist. No-op for an unknown cell.
+  *
+  * \throws QmitkMxNReservedGroupException when 'group' is the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling and selection is not among
+  *         QmitkMxNLinkKeysAcceptingGlobal.
   */
   void SetCellSelectionGroup(const QString& windowId, const std::string& group);
 
@@ -429,6 +453,9 @@ public:
   *
   * \throws mitk::Exception on an unknown window, a malformed group name, or
   *         an offset that the dimension does not accept.
+  * \throws QmitkMxNReservedGroupException when 'group' is the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling and the dimension's link key
+  *         is not among QmitkMxNLinkKeysAcceptingGlobal.
   * \throws QmitkMxNOrientationConflictException when a 2D cell would join an
   *         `Orientation` group whose direction is 'Free'.
   */
@@ -603,9 +630,10 @@ public:
   * \brief Whether the axis has a meaning for the cell in its current render
   *        mode.
   *
-  *   A 3D cell synchronizes pan, zoom, orientation and data selection; it
-  *   has no slice, and without image planes in 3D no level/window or lookup
-  *   table. Links on an axis that is not applicable are kept but inactive:
+  *   A 3D cell synchronizes pan, zoom, orientation and data selection, and
+  *   follows the application's time like every cell; it has no slice, and
+  *   without image planes in 3D no level/window or lookup table. Links on an
+  *   axis that is not applicable are kept but inactive:
   *   they neither relay, nor anchor, nor converge, and they take effect
   *   again once the cell returns to 2D.
   *
@@ -691,24 +719,44 @@ public:
   *   identical for every cell. The palette wraps when more groups exist than
   *   palette entries.
   *
+  *   The reserved group QmitkMxNGlobalGroupId takes no palette entry: its
+  *   colour is the text colour of the current Workbench style, as this
+  *   widget's palette reports it (QPalette::WindowText). Surfaces that are
+  *   dark in every style draw it in a fixed light gray instead; see
+  *   GetArrangeHighlightHue.
+  *
   * \throws mitk::Exception on a group that was never registered.
   */
   QColor GetSyncGroupColor(const std::string& group) const;
 
   /**
-  * \brief The window-perspective sync-barcode slots for one cell: eight axes in
-  *        fixed order (the seven 'QmitkMxNSyncDimension' axes, then data
-  *        selection), each carrying the group hue when the cell is linked on
-  *        that axis and an invalid color (a gap) otherwise, plus the axis glyph
-  *        and a per-slot tooltip.
+  * \brief The hue in which arrange mode frames the windows that share an axis
+  *        of 'group'.
+  *
+  *   The frames lie over the windows' borders and render areas, which are
+  *   dark in every style, so the reserved group QmitkMxNGlobalGroupId takes
+  *   the light gray it has on the barcodes and plates there. Every other
+  *   group takes GetSyncGroupColor.
+  *
+  * \throws mitk::Exception on a group that was never registered.
+  */
+  QColor GetArrangeHighlightHue(const std::string& group) const;
+
+  /**
+  * \brief The window-perspective sync-barcode slots for one cell: the nine
+  *        axes of QmitkMxNAllSyncAxes in slot order, each carrying the group
+  *        hue when the cell is linked on that axis and an invalid color (a gap)
+  *        otherwise, plus the axis glyph and a per-slot tooltip.
   *
   *   Binary per axis - a cell is linked or not; the heterogeneous group state
   *   is a group-perspective concern, not a cell's. Every cell always carries a
   *   selection group (the default group), and a fresh cell also links Windowing
   *   and LUT to the default group, so a cell at rest paints three slots in its
-  *   hue (Windowing, LUT, selection), not gaps. Shared by the per-cell utility-strip barcode and
-  *   the sync peek plates so both surfaces tell the same story. Returns
-  *   eight gap slots for an unknown cell.
+  *   hue (Windowing, LUT, selection), not gaps. Time is always the reserved
+  *   group 'global', in the light gray that group takes on furniture that is
+  *   dark in every style. Shared by the per-cell utility-strip barcode and the
+  *   sync peek plates so both surfaces tell the same story. For an unknown cell
+  *   every slot but Time is a gap.
   */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildBarcodeSlots(const QString& windowId) const;
 
@@ -764,22 +812,17 @@ public:
   struct PeekGeometry
   {
     int glyphBox = 0;  // 0 when no visible cell can host a plate
-    QmitkMxNPeekRows rows = QmitkMxNPeekRows::One;
   };
 
   /**
-  * \brief The plate geometry of this layout. For each glyph arrangement, the
-  *        box is the smallest desirable one across the visible cells that can
-  *        host a plate in it, clamped to the legible range. The arrangement
-  *        that gives more cells a plate wins, then the one with the larger
-  *        box, then the single row. A zero box, when no cell can host a plate
-  *        either way, is how the peek stays down in a layout of slivers.
+  * \brief The plate geometry of this layout: the smallest desirable glyph box
+  *        across the visible cells that can host a plate, clamped to the
+  *        legible range. A zero box, when no cell can host a plate, is how the
+  *        peek stays down in a layout of slivers.
   *
   *   A cell too small for a plate shows none rather than dragging every other
   *   window down to its size: the comparison survives a missing member better
-  *   than it survives eight different geometries. But a missing plate is a
-  *   window arrange mode cannot select, so fitting more plates beats a larger
-  *   one.
+  *   than it survives differently sized plates.
   */
   PeekGeometry ResolvePeekGeometry() const;
 
@@ -816,13 +859,16 @@ public:
   *        'group' on 'axis'. Empty for an unknown group, an axis the group
   *        links for no cell, or a transient mid-layout-change state. A kept
   *        link on an axis that does not apply to the cell (see
-  *        IsAxisApplicable) synchronizes nothing and is not counted.
+  *        IsAxisApplicable) synchronizes nothing and is not counted. On Time,
+  *        the reserved group 'global' holds every live window, in pre-order,
+  *        and every other group none.
   */
   QStringList CellsSharingAxis(const QString& group, QmitkMxNSyncAxis axis) const;
 
   /**
-  * \brief The group 'windowId' is on for 'axis' - the per-dimension link, or
-  *        the selection connector for the selection axis; empty when the cell
+  * \brief The group 'windowId' is on for 'axis' - the per-dimension link, the
+  *        selection connector for the selection axis, or the reserved group
+  *        'global' on Time; empty for an unknown window and when the cell
   *        synchronizes nothing there, including a kept link on an axis that
   *        does not apply to the cell (see IsAxisApplicable).
   */
@@ -831,7 +877,7 @@ public:
   /** \brief Which single group identity, if any, to paint on a cell's frame. */
   enum class CellGroupIdentityKind
   {
-    None,     // the cell has no group on any of the eight axes (not normally reachable)
+    None,     // the cell has no group on any axis (not normally reachable)
     Mono,     // every axis the cell is tied on names one group
     Complex   // the cell's tied axes span more than one group
   };
@@ -860,6 +906,12 @@ public:
   *   "navigation wins" tiebreak. A group color that throws mid-layout-change
   *   downgrades the result to 'None' for that pass. Consumed by
   *   'RefreshFrameColors'.
+  *
+  *   The reserved group 'global' does not count: once every window follows
+  *   the application's value on an axis, counting it would turn every frame
+  *   'Complex'. Time, on which every window is in 'global', is no input here;
+  *   an axis that lets 'global' join a dimension link or the selection has
+  *   to skip it.
   */
   CellGroupIdentity ResolveCellGroupIdentity(const QString& windowId) const;
 
@@ -881,18 +933,30 @@ public:
   * \brief The editor's current groups: every registered selection group plus
   *        every group a live cell links on any dimension, in stable
   *        first-registration order. Member lists are in cell pre-order.
+  *
+  *   These are the user's groups; the reserved group QmitkMxNGlobalGroupId,
+  *   which always exists, is not among them.
   */
   std::vector<SyncGroupInfo> GetSyncGroupInfos() const;
 
   /**
   * \brief The group's display name (`groups.<id>.name`), falling back to the
   *        id when none is set. The id itself never changes in-app; the
-  *        display name carries all human-facing identity.
+  *        display name carries all human-facing identity. The reserved group
+  *        QmitkMxNGlobalGroupId is always "Global".
   */
   std::string GetSyncGroupDisplayName(const std::string& id) const;
 
   /** \brief Display name of the selection group with the given engine index. */
   QString GetSyncGroupDisplayName(GroupSyncIndexType index) const;
+
+  /**
+  * \brief Whether 'text' names the reserved group QmitkMxNGlobalGroupId: its
+  *        id in any letter case, or its display name "Global", with
+  *        surrounding whitespace ignored. Calls that create, join or rename a
+  *        group refuse every text this accepts.
+  */
+  static bool NamesReservedGroup(const std::string& text);
 
   /**
   * \brief The group id of the selection group with the given engine index.
@@ -916,6 +980,10 @@ public:
   *
   * \throws mitk::Exception on a group that does not exist (neither
   *         registered nor linked by a live cell).
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling, and for the reserved group's
+  *         display name "Global", compared case-insensitively after trimming,
+  *         so that no second group reads "Global".
   */
   void SetSyncGroupDisplayName(const std::string& id, const std::string& displayName);
 
@@ -925,6 +993,12 @@ public:
   *
   * \throws mitk::Exception on a group that does not exist (neither
   *         registered nor linked by a live cell) or an invalid color.
+  * \throws QmitkMxNReservedGroupException for the reserved id
+  *         QmitkMxNGlobalGroupId in any spelling, and for a color that could
+  *         not be told apart from the colours the reserved group takes: a
+  *         CIE76 distance below 15 to \#f1f1f1 or to black, in either style,
+  *         or to the current style's text color. A later style switch does
+  *         not re-check colors already set.
   */
   void SetSyncGroupColor(const std::string& id, const QColor& color);
 
@@ -1017,7 +1091,7 @@ public:
   *   events and queued cross-thread calls are still delivered while it is up.
   *   'ApplyLayout' is guarded against being re-entered from there.
   *
-  *   From Show until Hide the editor counts as busy ('IsApplyingLayout'),
+  *   From Show until Hide the editor counts as busy ('IsBusy'),
   *   including the gap before the deferred apply starts, so the caller must
   *   always pair the two.
   */
@@ -1111,10 +1185,11 @@ public:
   *   Per-cell synchronization links are emitted for every linked dimension;
   *   `slice` / `zoom` / `pan` links carrying a non-identity offset use the
   *   object form (`{"target": ..., "offset": ...}`), all other links the
-  *   string shorthand. Every registered group is declared in the top-level
-  *   `groups` dict with its `select_all`, including one no cell references
-  *   yet; a group that is not registered and only navigation links name is
-  *   declared as an empty entry.
+  *   string shorthand. Every window carries `"time": "global"`, so the output
+  *   always meets ApplyLayout's v3.0 time requirement. Every registered group
+  *   is declared in the top-level `groups` dict with its `select_all`,
+  *   including one no cell references yet; a group that is not registered and
+  *   only navigation links name is declared as an empty entry.
   *
   *   See 'mxn-layout-v3.schema.json' for the document shape this method emits.
   *
@@ -1131,18 +1206,21 @@ public:
   *
   *   Validates the whole layout first, against the document and the data
   *   storage, and throws before anything changes:
-  *   - every 'groupNodes' entry names a selection group the document
-  *     declares;
+  *   - the document passes the structural checks 'ApplyLayout' runs;
+  *   - every 'groupNodes' entry names a group a window of the document
+  *     links on selection;
   *   - every assignment and fit names a window of the document;
   *   - lookup tables only go to windows the document links on LUT;
   *   - volume renderings only go to 3D windows;
+  *   - every volume rendering carries a transfer function;
   *   - every node is in the data storage.
   *
   *   Then it loads 'layout.document' as 'ApplyLayout' does. It makes every
   *   bound group show exactly its nodes, drawn bottom to top in the given
   *   order, writes the lookup tables (through 'SetLookupTable'), opacities
-  *   and volume renderings for the named windows' renderers, runs the fits,
-  *   and restores the global time step the fits reset. 'IsApplyingLayout' is
+  *   and volume renderings for the named windows' renderers, and runs the
+  *   fits. The global time range then covers all data the display shows, and
+  *   the selected time point stays where it lies in it. 'IsBusy' is
   *   true throughout. Only renderer-specific properties are written. Nothing
   *   throws after the document is loaded.
   *
@@ -1212,13 +1290,20 @@ public:
   *   positional reuse). On failure during construction, rolls back to a
   *   single default cell and rethrows.
   *
-  *   See 'mxn-layout-v3.schema.json' for the accepted document shape. A
-  *   v2.0 document is the compatible subset: missing `links` keys default to
-  *   unsynced per-cell singletons, and unknown link keys stay tolerated
-  *   (silently ignored) so existing v2 files load unchanged. For a v3.0
-  *   document the `links` object is closed: an unknown link key, an unknown
-  *   modifier, or an `offset` on a dimension that does not accept it (or of
-  *   the wrong type) is rejected.
+  *   See 'mxn-layout-v3.schema.json' for the accepted document shape. In a
+  *   v2.0 document missing `links` keys default to unsynced per-cell
+  *   singletons, and unknown link keys stay tolerated (silently ignored), so
+  *   existing v2 files load unchanged unless they name a group 'global'. For a
+  *   v3.0 document the `links` object is closed: an unknown link key, an
+  *   unknown modifier, or an `offset` on a dimension that does not accept it
+  *   (or of the wrong type) is rejected, and every window must carry
+  *   `"time": "global"`.
+  *
+  *   The reserved group QmitkMxNGlobalGroupId always exists and takes no
+  *   `groups` entry; a link may target it only under a key of
+  *   QmitkMxNLinkKeysAcceptingGlobal. A group colour or display name that the
+  *   reserved group keeps to itself is ignored with a warning, like a
+  *   malformed one.
   *
   *   Id contract: every window's `id` MUST already be in the canonical
   *   fully-qualified form `<multiWidgetName>__<bareSegment>` matching this
@@ -1237,7 +1322,7 @@ public:
   *   dialog moving, so posted events and queued calls can run in the middle of
   *   it; a call made from there, while this one is still in progress, is
   *   rejected with 'QmitkMxNLayoutBusyException' and leaves the running apply
-  *   untouched. See 'IsApplyingLayout'.
+  *   untouched. See 'IsBusy'.
   *
   * \param doc  A parsed v2.0 or v3.0 layout document.
   *
@@ -1249,8 +1334,10 @@ public:
   *         shape violation; id not starting with `<multiWidgetName>__`;
   *         duplicate window ids; unknown view_direction; missing group
   *         reference in strict mode; v3 links-closure violation (unknown
-  *         link key / modifier, misplaced or mistyped offset);
-  *         nlohmann parse / type errors (rewrapped from
+  *         link key / modifier, misplaced or mistyped offset); a v3 window
+  *         without `links.time` or with a time target other than 'global';
+  *         the reserved group 'global' as a link target where it is not
+  *         accepted, or as a `groups` key; nlohmann parse / type errors (rewrapped from
   *         'nlohmann::json::exception' subtypes).
   */
   void ApplyLayout(const nlohmann::json& doc);
@@ -1258,8 +1345,9 @@ public:
   /**
   * \brief True while an 'ApplyLayout' or 'ApplyDynamicLayout' is in progress,
   *        including its rollback on failure, while a grid change ('SetLayout',
-  *        'AddGridRow', 'AddGridColumn') lets the event loop lay out its new
-  *        cells, and while a layout load announced by
+  *        'AddGridRow', 'AddGridColumn') or the fit of cells built while the
+  *        editor was hidden lets the event loop lay out the cells, and while
+  *        a layout load announced by
   *        'ShowLayoutLoadFeedback' has not yet been closed by
   *        'HideLayoutLoadFeedback'.
   *
@@ -1268,7 +1356,26 @@ public:
   *   cross-thread calls) must check this and leave the editor alone while it
   *   is true.
   */
-  bool IsApplyingLayout() const;
+  bool IsBusy() const;
+
+  /**
+  * \brief Changes the camera of window 'windowId' by running 'change' on its
+  *        renderer.
+  *
+  *   Callers that set a cell's camera explicitly (e.g. over REST) go through
+  *   this, because the display may be hidden: cells built while it is hidden
+  *   are fitted to their size once it is shown and their zoom, pan and slice
+  *   groups converge again, and such a cell runs 'change' again after that.
+  *   What 'change' sets outlasts the fit and the convergence; what it leaves
+  *   alone is fitted. As on a shown display, the change is passed on to none
+  *   of the window's groups. Such a cell keeps every change, in call order,
+  *   until its fit has run or it is removed, so memory and the time to show
+  *   the display grow with the calls made in between.
+  *
+  * \throws mitk::Exception if 'windowId' names no window with a renderer.
+  *         Whatever 'change' throws on its first run reaches the caller.
+  */
+  void SetCamera(const QString& windowId, const std::function<void(mitk::BaseRenderer*)>& change);
 
   /**
   * \brief Sets the interactions users cannot perform on this widget.
@@ -1474,22 +1581,6 @@ protected:
 private:
 
   void SetLayoutImpl() override;
-
-  /**
-  * \brief Pre-mutation check that every window id in `doc` belongs to this
-  *        editor instance.
-  *
-  *   Walks every `window` node in the layout tree and rejects ids that do
-  *   not start with `<multiWidgetName>__`. Throws with a message naming the
-  *   offending id and the expected prefix. Run as the first step of
-  *   `ApplyLayout`, before any engine state is touched, so a misrouted
-  *   document does not destroy the existing layout on the way out.
-  *
-  *   The schema's pattern enforces structural shape (id must contain `__`)
-  *   but cannot encode "matches THIS editor's `multiWidgetName`": that
-  *   constraint is loader-instance-specific and lives here.
-  */
-  void ValidateIdsForThisEditor(const nlohmann::json& doc) const;
 
   /**
   * \brief Positional convenience overload used by 'SetLayout(r, c)' (and so by
@@ -1906,7 +1997,9 @@ private:
   *   For cells created since the event loop last ran. While the editor is
   *   hidden, nothing can be laid out: the fit is deferred until it is shown,
   *   and the zoom, pan and slice groups of the deferred cells then converge
-  *   again. The global time range and step are kept.
+  *   again. That holds as well when a call delivered by the event pass that
+  *   lays the cells out hides the editor. The global time range and step are
+  *   kept.
   */
   void FitNewCellsToTheirSize(const std::vector<QString>& windowIds);
 
@@ -2211,13 +2304,19 @@ private:
   /** \brief Window id of the maximized cell, empty while the grid is shown. */
   QString m_MaximizedCell;
 
-  /** \brief Set for the duration of 'ApplyLayout'; see 'IsApplyingLayout'. */
-  bool m_ApplyingLayout = false;
-  /** \brief Cells 'FitNewCellsToTheirSize' was given while the editor was
-  *          hidden; they are fitted once it is shown. */
+  /** \brief Set while a layout operation lets the event loop run; see
+  *          'IsBusy'. */
+  bool m_Busy = false;
+  /** \brief Cells 'FitNewCellsToTheirSize' could not fit because the editor
+  *          was hidden; they are fitted once it is shown, unless they are
+  *          removed first. */
   std::vector<QString> m_CellsToFitWhenShown;
+  /** \brief The 'SetCamera' changes of cells in 'm_CellsToFitWhenShown', in
+  *          call order; they run again after the cell's fit and the
+  *          convergence of its groups. */
+  std::map<QString, std::vector<std::function<void(mitk::BaseRenderer*)>>> m_CameraChangesAfterFit;
   /** \brief Set from 'ShowLayoutLoadFeedback' to 'HideLayoutLoadFeedback';
-  *          see 'IsApplyingLayout'. */
+  *          see 'IsBusy'. */
   bool m_LayoutLoadPending = false;
 
   /**

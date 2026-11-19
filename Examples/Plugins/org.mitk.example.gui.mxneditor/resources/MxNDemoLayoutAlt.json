@@ -17,6 +17,7 @@
         "view_direction": "axial",
         "links": {
           "selection": "demo",
+          "time": "global",
           "crosshair": "demo"
         },
         "size": 1
@@ -28,6 +29,7 @@
         "view_direction": "sagittal",
         "links": {
           "selection": "demo",
+          "time": "global",
           "crosshair": "demo"
         },
         "size": 1
@@ -39,6 +41,7 @@
         "view_direction": "coronal",
         "links": {
           "selection": "demo",
+          "time": "global",
           "crosshair": "demo"
         },
         "size": 1

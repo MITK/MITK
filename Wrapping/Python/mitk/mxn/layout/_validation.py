@@ -30,6 +30,7 @@ from typing import Final
 from ._vocabulary import (
     GROUP_NAME_PATTERN,
     LAYOUT_VERSION,
+    RESERVED_GROUP_ID,
     LinkDimension,
     ViewDirection,
     WINDOW_ID_PATTERN,
@@ -66,12 +67,19 @@ def validate_window_name(value: str | None) -> None:
 
 
 def validate_group_name(value: str) -> None:
-    """Group name: must match the URL-segment-safe pattern."""
+    """Group name: must match the URL-segment-safe pattern and must not be
+    the reserved group id in any spelling."""
     if not isinstance(value, str):
         raise ValueError(f"group name must be a string, got {type(value).__name__}")
     if not _GROUP_NAME_RE.fullmatch(value):
         raise ValueError(
             f"group name {value!r} does not match pattern {GROUP_NAME_PATTERN!r}"
+        )
+    # The pattern already excludes blanks, so case is all that varies.
+    if value.lower() == RESERVED_GROUP_ID:
+        raise ValueError(
+            f"group name {value!r} is the reserved group {RESERVED_GROUP_ID!r}, "
+            f"which is reserved in every spelling; rename the group"
         )
 
 
@@ -100,8 +108,8 @@ def validate_size(value: int) -> None:
 def validate_dimension_key(value: object) -> str:
     """Coerce a dimension key to its string form; reject non-string keys.
 
-    Free-form strings are accepted (forward-compat for v3 dimensions); the
-    caller cross-checks the v2-required `selection` key separately.
+    Free-form strings are accepted; the caller cross-checks the v2-required
+    `selection` key separately.
     """
     if isinstance(value, LinkDimension):
         return value.value

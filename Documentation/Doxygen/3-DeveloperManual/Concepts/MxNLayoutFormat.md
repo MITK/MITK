@@ -58,7 +58,7 @@ data nodes simply applies the new geometry; the data stays.
         "id": "mxn__widget0",
         "name": "Tumor axial",
         "view_direction": "axial",
-        "links": { "selection": "main" },
+        "links": { "selection": "main", "time": "global" },
         "size": 1
       }
     ]
@@ -67,10 +67,11 @@ data nodes simply applies the new geometry; the data stays.
 ```
 
 - `version`: the exact string `"3.0"` or `"2.0"`. The C++ loader rejects any
-  other value, and `SerializeLayout` always writes `"3.0"`. A v2.0 document is
-  a v3.0 document that only uses the selection dimension and loads unchanged
-  (see "Versions and closure" below). v1.x files are upgraded out-of-band
-  (see "Migrating from v1.x" below).
+  other value, and `SerializeLayout` always writes `"3.0"`. A v2.0 document
+  uses only the selection dimension and loads as it always did, unless it
+  names a group `global` (see "Versions and closure" below). Relabeled as
+  `"3.0"`, it additionally needs `links.time` in every window. v1.x files are
+  upgraded out-of-band (see "Migrating from v1.x" below).
 - `name`: optional human-readable preset name. Pure metadata; ignored by the
   loader and not used for routing. (The window leaves carry an optional
   `name` of their own, used the same way; see "Window identity and display
@@ -100,7 +101,7 @@ A node in the tree is one of two kinds, distinguished by `type`:
   "name": "Tumor axial",  // optional display label; omit if absent
   "view_direction": "axial",
   "render_mode": "3d",    // optional (v3.0); "2d" when omitted
-  "links": { "selection": "<groupName>" },
+  "links": { "selection": "<groupName>", "time": "global" },
   "size": 1               // optional; defaults to 1 when omitted
 }
 ```
@@ -132,10 +133,11 @@ A `window` is a leaf render-window. Every window must declare:
   three standard planes. Unknown strings throw at load time; there is no
   silent fallback.
 - `links`: per-dimension synchronization references. v2.0 has one dimension,
-  `selection`; v3.0 adds seven navigation and appearance dimensions (see
-  "Navigation and appearance links" below). Every window must declare
-  `links.selection` explicitly -- there are no implicit singletons. The other
-  dimensions are optional; a window without one is unsynchronized on it.
+  `selection`; v3.0 adds the navigation and appearance dimensions and
+  `time` (see "Navigation and appearance links" below). Every window must
+  declare `links.selection` and, in v3.0, `links.time` explicitly -- there are
+  no implicit singletons. Every other key is optional; a window without one is
+  unsynchronized on it.
 
 A window may additionally declare:
 
@@ -180,7 +182,8 @@ share the connector that mediates selection list, visibility, and stack
 order. Group names are arbitrary URL-segment-safe strings (alphanumeric,
 underscore, dot, hyphen). The same group name can be used across multiple
 dimensions in v3 (e.g. `"selection": "main", "zoom": "main"`); group names
-live in a single namespace and dimensions are orthogonal.
+live in a single namespace and dimensions are orthogonal. The id `global` is
+reserved in that namespace (see "The reserved group `global`" below).
 
 One selection group is the *default group*: the one every fresh cell joins
 and an unlinked selection reverts to. A selection group named `main`
@@ -204,9 +207,12 @@ The properties of a group entry:
   windows that join it later.
 - `color` (v3.0): optional hue as `"#RRGGBB"`, shown verbatim by the sync
   furniture. Without it the editor assigns a default hue by group creation
-  order. A malformed value is ignored with a warning, never rejected.
+  order. A malformed value, or one too close to the reserved group's colors
+  (see below), is ignored with a warning, never rejected.
 - `name` (v3.0): optional display name, shown instead of the group id on
-  every surface. The id (the dict key) stays the URL-safe identity.
+  every surface. The id (the dict key) stays the URL-safe identity. The
+  reserved group's display name "Global" is ignored with a warning (see
+  below).
 
 Groups referenced only by navigation dimensions may use an empty entry `{}`;
 such a group exists while some window links it and goes with its last link.
@@ -220,10 +226,11 @@ any one of its members.
 
 ## Navigation and appearance links
 
-v3.0 adds seven dimensions beside `selection`, each linking a window into a
-group independently of the others:
+Beside `selection`, v3.0 knows the navigation and appearance dimensions
+below, each linking a window into a group independently of the others, and
+the `time` key:
 
-| Dimension | What the group shares | Offset |
+| Key | What the group shares | Offset |
 | --- | --- | --- |
 | `slice` | the slice position | integer, in displayed slices |
 | `zoom` | the zoom factor | number > 0, a multiplicative factor |
@@ -232,17 +239,34 @@ group independently of the others:
 | `orientation` | the view direction | none |
 | `windowing` | level/window | none |
 | `lut` | the colormap | none |
+| `time` | the application's time; only the reserved group `global` | none |
 
-Every dimension accepts the bare group name. `slice`, `zoom` and `pan` also
+Every key accepts the bare group name. `slice`, `zoom` and `pan` also
 accept an object form carrying an offset:
 
 ```json
 "links": {
   "selection": "main",
+  "time": "global",
   "slice": { "target": "nav", "offset": -1 },
   "zoom": "nav"
 }
 ```
+
+The editor presents the nine synchronization axes - these keys and
+`selection` - in three families, in this order on the barcodes, the group
+cards, the advanced matrix and the sync peek plates: View (`orientation`,
+`pan`, `zoom`), Position (`slice`, `time`, `crosshair`) and Content
+(`selection`, `windowing`, `lut`). The order is presentation only; the
+document addresses links by key, in any order.
+
+Every window follows the application's time, which the reserved group
+`global` stands for, so `time` takes `"global"` or `{"target": "global"}` and
+no modifier. It is required in every window of a `"3.0"` document while
+`global` is the only time group, and `SerializeLayout` always writes it. Once
+time groups ship, `time` becomes optional under the rule every other key
+follows - a window without the key is independent on it - so no document
+written now changes its meaning.
 
 Every member's offset, the first member's included, is relative to one
 common group reference, so only the differences between the offsets carry
@@ -278,7 +302,28 @@ member turns its camera to that direction, and in a `"free"` group (see "3D
 windows") takes the group's camera direction.
 `windowing` and `lut` relay changes to every member but do not converge a
 joining window, which keeps its own value until the group's next change.
-`time` is reserved as a future key and rejected by v3.0.
+
+## The reserved group `global`
+
+`global` names the group whose members follow the application's value
+instead of a value of their own - on `time`, the application's time point.
+
+- It always exists and takes no entry in `groups`; a `groups` key `global` is
+  rejected.
+- A link may target it only under a key that accepts it. Today that is
+  `time` alone; every other key that targets `global` is rejected. The keys
+  that accept it may grow without a format change.
+- It is never a user group: the id is reserved in every spelling (`Global`,
+  `GLOBAL`, ...), in `"2.0"` documents as well.
+- Its display name is "Global". Its color is the light gray `#f1f1f1` (the
+  Dark style's text color) on the barcodes, plates and arrange-mode frames,
+  which are dark in every style, and the current style's text color on the
+  surfaces that follow the style, such as the layout editor.
+- No user group can take either: a group `name` "Global" (in any case,
+  ignoring surrounding blanks) or a `color` at a CIE76 distance below 15 to
+  `#f1f1f1` or to black is ignored with a warning when a layout is loaded,
+  like a malformed one. The band is the same in every style, so a layout
+  loads the same in each. The v3.0 schema refuses such a `name`.
 
 ## 3D windows
 
@@ -304,6 +349,7 @@ A 3D window synchronizes only what has a meaning for it:
 | Dimension | 2D window | 3D window |
 | --- | --- | --- |
 | `selection` | yes | yes |
+| `time` | yes | yes |
 | `orientation` | yes | yes, including `"free"` |
 | `pan` | yes | yes, relative |
 | `zoom` | yes | yes |
@@ -350,8 +396,8 @@ The top-level `groups` dict is optional:
 
 - **Strict (recommended for tool output and REST GET responses).** `groups`
   is present. Every label appearing in any cell's `links` must be a key in
-  `groups`; missing labels throw at load time. This catches typos and tool
-  drift early.
+  `groups`, except the reserved group `global`, which never is; missing
+  labels throw at load time. This catches typos and tool drift early.
 - **Lazy (for hand-authoring).** `groups` is omitted. Every referenced label
   becomes an implicit group with property defaults (`select_all: true`).
   Cells still declare `links.selection` explicitly.
@@ -382,9 +428,9 @@ is stable and reviewer-friendly.
         "orientation": "horizontal",
         "size": 1,
         "children": [
-          { "type": "window", "id": "mxn__widget0", "name": "Row 1 - Axial",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "Row 1 - Axial",    "view_direction": "axial",    "links": { "selection": "main", "time": "global" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main", "time": "global" }, "size": 1 }
         ]
       },
       {
@@ -392,9 +438,9 @@ is stable and reviewer-friendly.
         "orientation": "horizontal",
         "size": 1,
         "children": [
-          { "type": "window", "id": "mxn__widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "id": "mxn__widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "id": "mxn__widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget3", "view_direction": "axial",    "links": { "selection": "row2", "time": "global" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget4", "view_direction": "sagittal", "links": { "selection": "row2", "time": "global" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget5", "view_direction": "coronal",  "links": { "selection": "row2", "time": "global" }, "size": 1 }
         ]
       }
     ]
@@ -530,9 +576,10 @@ inside `links`, link objects and `groups` entries. This is deliberate: a
 loader that cannot honour a synchronization should not silently load the
 file and drop part of the contract.
 
-v2.0 to v3.0 is additive: more dimension keys inside `links`, the object
-form for offsets, the cosmetic `color` / `name` group properties, and
-`render_mode` with the `"free"` view direction for 3D windows. The
+v2.0 to v3.0 is additive but for one required key: more dimension keys
+inside `links`, the object form for offsets, the cosmetic `color` / `name`
+group properties, and `render_mode` with the `"free"` view direction for 3D
+windows - and `links.time`, which every v3.0 window must carry. The
 selection link and `select_all` keep their v2 shape, so tooling that learned
 the v2 shape keeps working. The loader reads both versions in one code path;
 there is no mandatory migration. A v2-only loader refuses a `"3.0"` document
@@ -544,11 +591,14 @@ windows and of `links` at runtime, and only for `"3.0"` documents: an unknown
 window key, an unknown link key, an unknown modifier, or an offset on a
 dimension that does not take one (or of the wrong type) throws. `"2.0"`
 documents keep their historical leniency, so unknown window and link keys in
-them are ignored and existing v2 files are never newly rejected. The one
-exception is the v3.0 vocabulary for 3D windows: a `"2.0"` document with
-`render_mode` or a `"free"` view direction is rejected, because ignoring it
-would load a 3D window as 2D. Unknown keys inside a group entry are
-tolerated in both versions.
+them are ignored (`time` among them). There are two exceptions. A `"2.0"`
+document with `render_mode` or a `"free"` view direction is rejected,
+because ignoring it would load a 3D window as 2D. And a `"2.0"` document that
+names a group `global`, as a `links.selection` target or a `groups` key, is
+rejected: `global` is meant to follow the application's value on selection
+as well, and a file that loaded it as an ordinary group would then silently
+change its meaning. Unknown keys
+inside a group entry are tolerated in both versions.
 
 ## Where to look in the source
 

@@ -99,6 +99,11 @@ QmitkMxNDynamicLayoutDialog::QmitkMxNDynamicLayoutDialog(mitk::DataStorage* data
   m_SwapButton->setObjectName(QStringLiteral("swapRoles"));
   connect(m_SwapButton, &QPushButton::clicked, this, &QmitkMxNDynamicLayoutDialog::SwapRoles);
   layout->addWidget(m_SwapButton, 0, Qt::AlignRight);
+  m_UnshownSelection = new QLabel(this);
+  m_UnshownSelection->setObjectName(QStringLiteral("unshownSelection"));
+  m_UnshownSelection->setWordWrap(true);
+  m_UnshownSelection->hide();
+  layout->addWidget(m_UnshownSelection);
 
   m_OptionRows = new QFormLayout;
   layout->addLayout(m_OptionRows);
@@ -259,7 +264,7 @@ void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
   {
     case QmitkMxNDynamicTemplate::DatasetsByPlanes:
       m_Aligned = check("aligned", tr("Aligned"), alignedToolTip);
-      m_ThreeDColumn = check("threeDColumn", tr("3D column"), tr("A 3D view per dataset, for its segmentations and surfaces."));
+      m_ThreeDColumn = check("threeDColumn", tr("3D column"), tr("A 3D view per dataset, for its multi-label segmentations and surfaces."));
       m_DatasetsAsColumns = check("datasetsAsColumns", tr("Datasets as columns"), tr("One column per dataset instead of one row."));
       break;
     case QmitkMxNDynamicTemplate::OneViewPerDataset:
@@ -274,7 +279,7 @@ void QmitkMxNDynamicLayoutDialog::BuildOptionRows()
                         { tr("Acquisition date"), static_cast<int>(QmitkMxNDatasetOrder::AcquisitionDate) } });
       break;
     case QmitkMxNDynamicTemplate::SharedBase:
-      m_ThreeDRow = check("threeDRow", tr("3D row"), tr("A 3D view under every window, for the segmentations and surfaces."));
+      m_ThreeDRow = check("threeDRow", tr("3D row"), tr("A 3D view under every window, for the multi-label segmentations and surfaces."));
       m_AllSegmentationsWindow = check("allSegmentationsWindow", tr("All-segmentations window"),
                                        tr("One more window that shows every segmentation."));
       break;
@@ -424,7 +429,42 @@ void QmitkMxNDynamicLayoutDialog::OnSlotsChanged()
       }
     }
   }
+  this->UpdateUnshownSelection();
   this->UpdateApplyState();
+}
+
+void QmitkMxNDynamicLayoutDialog::UpdateUnshownSelection()
+{
+  const auto unshown =
+    QmitkMxNDynamicLayouts::UnshownSelection(m_Template, m_Selection, this->GetBindings(), *m_DataStorage);
+  if (unshown.empty())
+  {
+    m_UnshownSelection->clear();
+    m_UnshownSelection->hide();
+    return;
+  }
+
+  constexpr std::size_t namesShown = 3;
+  QStringList names;
+  for (std::size_t i = 0; i < std::min(unshown.size(), namesShown); ++i)
+  {
+    names << QString::fromStdString(unshown[i]->GetName());
+  }
+  auto text = tr("Selected, not in this layout: %1").arg(names.join(QStringLiteral(", ")));
+  if (unshown.size() > namesShown)
+  {
+    text += tr(" and %1 more").arg(unshown.size() - namesShown);
+  }
+  text += QStringLiteral(".");
+  const bool anImage = std::any_of(unshown.begin(), unshown.end(), [](const auto& node) {
+    return QmitkMxNDynamicLayouts::IsOfDataClass(*node, QmitkMxNSlotDataClass::Image);
+  });
+  if (QmitkMxNDynamicTemplate::SharedBase == m_Template && anImage)
+  {
+    text += tr(" To show an image on top of another one, use the fusion pair.");
+  }
+  m_UnshownSelection->setText(text);
+  m_UnshownSelection->show();
 }
 
 void QmitkMxNDynamicLayoutDialog::UpdateApplyState()

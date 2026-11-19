@@ -40,6 +40,7 @@ found in the LICENSE file.
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QEvent>
 #include <QResizeEvent>
 
@@ -56,11 +57,15 @@ found in the LICENSE file.
  *     keeps its lenient treatment of unknown link keys while a "3.0"
  *     document has a closed `links` object (unknown keys, unknown
  *     modifiers, and misplaced or mistyped offsets throw).
- *   - All eight link dimensions parse in string and object form and
+ *   - Every link key parses in string and object form and
  *     round-trip through SerializeLayout / ApplyLayout, including the
  *     slice / zoom / pan offsets.
  *   - Strict mode requires every referenced group declared, across all
  *     dimensions; lazy mode does not.
+ *   - Every "3.0" window carries `"time": "global"`, which the writer always
+ *     writes; the reserved group 'global' is no target elsewhere and no
+ *     `groups` key, in "2.0" documents either, and the cosmetics it keeps to
+ *     itself are ignored on load.
  *   - A "3.0" window is closed as well; `render_mode` and `free` are
  *     validated, also across the windows of an orientation group.
  *   - The v3 documents shipped in the tree load.
@@ -77,12 +82,27 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3Doc_UnknownModifier_Throws);
   MITK_TEST(V3Doc_MistypedOffset_Throws);
   MITK_TEST(V3Doc_SelectionObjectForm_OK);
+  MITK_TEST(V3Doc_TimeGlobal_StringAndObjectForm_OK);
+  MITK_TEST(V3Doc_MissingTime_Throws);
+  MITK_TEST(V3Doc_TimeOtherGroup_Throws);
+  MITK_TEST(V3Doc_TimeOffset_Throws);
+  MITK_TEST(V3_StrictMode_GlobalNeedsNoGroupsEntry);
+  MITK_TEST(V2Doc_TimeKey_StillIgnored);
+  MITK_TEST(Serialize_WritesTimeGlobalForEveryWindow);
+  MITK_TEST(Serialize_NeverWritesGroupsGlobal);
+  MITK_TEST(V3Doc_GlobalOnOtherLink_Throws);
+  MITK_TEST(V3Doc_GroupsDeclaresGlobal_Throws);
+  MITK_TEST(V2Doc_SelectionGlobal_Throws);
+  MITK_TEST(V2Doc_GroupsDeclaresGlobal_Throws);
+  MITK_TEST(ReservedId_CaseVariants_Throw);
   MITK_TEST(V3_RoundTrip_AllDimensionsAndOffsets);
   MITK_TEST(V3_StrictMode_NavGroupUndeclared_Throws);
   MITK_TEST(V3_LazyMode_NavLinks_OK);
   MITK_TEST(GroupCosmetics_RoundTripVerbatim);
   MITK_TEST(GroupCosmetics_AbsentStaysAbsent);
   MITK_TEST(GroupCosmetics_MalformedColorIgnored);
+  MITK_TEST(GroupCosmetics_ColorInReservedBandIgnored);
+  MITK_TEST(GroupCosmetics_ReservedDisplayNameIgnored);
   MITK_TEST(GroupCosmetics_UnknownEntryKeyTolerated);
   MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
   MITK_TEST(EmptyGroup_SurvivesSaveAndLoad);
@@ -108,6 +128,13 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(AddGridColumn_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(AddGridRow_NarrowNewWindows_ShowTheirWholePlane);
   MITK_TEST(Apply_WhileHidden_EndsAsAppliedWhileShown);
+  MITK_TEST(Apply_WhileHidden_CameraSetBeforeShowIsKept);
+  MITK_TEST(Apply_WhileHidden_PartialCameraChange_KeepsTheFit);
+  MITK_TEST(Apply_WhileHidden_PartialCameraChangeOnThreeDWindow_KeepsTheViewInitialization);
+  MITK_TEST(Apply_WhileHidden_CamerasSetOnGroupMembers_EndAsSetWhileShown);
+  MITK_TEST(Apply_WhileHidden_HiddenDuringTheDeferredFit_KeepsTheCameraAndFitsOnShow);
+  MITK_TEST(Apply_WhileShowing_LeavesNoStaleFitForReusedIds);
+  MITK_TEST(GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards);
   MITK_TEST(GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy);
   MITK_TEST(Apply_DeclaredSizes_SetTheProportions);
   MITK_TEST(Apply_ThreeDWindow_FramesTheData);
@@ -172,7 +199,7 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "selection": "main" } }
+            "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");
@@ -181,6 +208,38 @@ public:
   static nlohmann::json& WindowLinks(nlohmann::json& doc, std::size_t childIndex = 0)
   {
     return doc["root"]["children"][childIndex]["links"];
+  }
+
+  /** Applying 'doc' fails with exactly 'message', and the editor keeps its cells. */
+  void AssertLoadFails(const nlohmann::json& doc, const std::string& message)
+  {
+    auto editor = MakeEditor();
+    const auto cellsBefore = editor->GetNumberOfRenderWindowWidgets();
+    try
+    {
+      editor->ApplyLayout(doc);
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_ASSERT_EQUAL(message, std::string(e.GetDescription()));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("A refused document leaves the layout alone",
+                                   cellsBefore, editor->GetNumberOfRenderWindowWidgets());
+      return;
+    }
+    CPPUNIT_FAIL("The load must fail with: " + message);
+  }
+
+  /** The `links` objects of the windows below 'node', in pre-order. */
+  static void CollectWindowLinks(const nlohmann::json& node, std::vector<nlohmann::json>& links)
+  {
+    if ("window" == node.value("type", std::string()))
+    {
+      links.push_back(node.at("links"));
+    }
+    for (const auto& child : node.value("children", nlohmann::json::array()))
+    {
+      CollectWindowLinks(child, links);
+    }
   }
 
   void V2Doc_UnknownLinkKey_Tolerated()
@@ -268,6 +327,201 @@ public:
       serialized.at("root").at("children").at(0).at("links").at("selection").get<std::string>());
   }
 
+  void V3Doc_TimeGlobal_StringAndObjectForm_OK()
+  {
+    for (const auto& time : { nlohmann::json("global"), nlohmann::json{ { "target", "global" } } })
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["time"] = time;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+      CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+    }
+  }
+
+  void V3Doc_MissingTime_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc).erase("time");
+    AssertLoadFails(doc, "Layout window 'mxn__w0' is missing the required 'links.time'. Every window follows the "
+                         "application's time, written as \"time\": \"global\".");
+  }
+
+  void V3Doc_TimeOtherGroup_Throws()
+  {
+    const std::pair<nlohmann::json, std::string> targets[] = {
+      { "main", "main" },
+      { nlohmann::json{ { "target", "nav" } }, "nav" },
+      { "Global", "Global" },  // the reserved id is spelled exactly in a document
+    };
+    for (const auto& [time, group] : targets)
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["time"] = time;
+      AssertLoadFails(doc, "Layout window 'mxn__w0': 'links.time' targets group '" + group
+                             + "', but time supports only the reserved group 'global'.");
+    }
+  }
+
+  void V3Doc_TimeOffset_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc)["time"] = nlohmann::json{ { "target", "global" }, { "offset", 1 } };
+    AssertLoadFails(doc, "Layout window 'mxn__w0': 'links.time' does not accept an 'offset' modifier.");
+  }
+
+  void V3_StrictMode_GlobalNeedsNoGroupsEntry()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } } };
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  void V2Doc_TimeKey_StillIgnored()
+  {
+    // A 2.0 document ignores every link key but selection; time is no exception.
+    for (const auto& time : { nlohmann::json("global"), nlohmann::json("main"), nlohmann::json(5) })
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = "2.0";
+      WindowLinks(doc)["time"] = time;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+      CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+    }
+  }
+
+  void Serialize_WritesTimeGlobalForEveryWindow()
+  {
+    // A 2.0 document carries no time; whatever was loaded, the writer adds it.
+    for (const auto* version : { "2.0", "3.0" })
+    {
+      auto doc = nlohmann::json::parse(R"json({
+        "root": {
+          "type": "split", "orientation": "horizontal",
+          "children": [
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial",
+              "links": { "selection": "main", "time": "global" } },
+            { "type": "split", "orientation": "vertical",
+              "children": [
+                { "type": "window", "id": "mxn__w1", "view_direction": "sagittal",
+                  "links": { "selection": "main", "time": "global" } },
+                { "type": "window", "id": "mxn__w2", "view_direction": "coronal",
+                  "links": { "selection": "other", "time": { "target": "global" } } }
+              ] }
+          ]
+        }
+      })json");
+      doc["version"] = version;
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      std::vector<nlohmann::json> links;
+      CollectWindowLinks(editor->SerializeLayout().at("root"), links);
+      CPPUNIT_ASSERT_EQUAL(std::size_t{ 3 }, links.size());
+      for (const auto& windowLinks : links)
+      {
+        CPPUNIT_ASSERT_MESSAGE(std::string("time is written as the string form after a ") + version + " load",
+                               windowLinks.contains("time") && nlohmann::json("global") == windowLinks.at("time"));
+      }
+    }
+  }
+
+  void Serialize_NeverWritesGroupsGlobal()
+  {
+    auto doc = SingleWindowDoc();
+    WindowLinks(doc)["slice"] = "nav";
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+
+    const auto groups = editor->SerializeLayout().at("groups");
+    CPPUNIT_ASSERT_MESSAGE("The reserved group takes no entry", !groups.contains("global"));
+    CPPUNIT_ASSERT_MESSAGE("The other referenced groups stay declared", groups.contains("main") && groups.contains("nav"));
+  }
+
+  static std::string GlobalOnLinkMessage(const std::string& key)
+  {
+    return "Layout window 'mxn__w0': 'links." + key
+           + "' targets the reserved group 'global'. 'global' is accepted only on: 'links.time'.";
+  }
+
+  void V3Doc_GlobalOnOtherLink_Throws()
+  {
+    for (const auto* key : { "selection", "pan", "zoom", "slice", "crosshair", "orientation", "windowing", "lut" })
+    {
+      for (const auto& target : { nlohmann::json("global"), nlohmann::json{ { "target", "global" } } })
+      {
+        auto doc = SingleWindowDoc();
+        WindowLinks(doc)[key] = target;
+        AssertLoadFails(doc, GlobalOnLinkMessage(key));
+      }
+    }
+  }
+
+  static constexpr const char* GroupsDeclaresGlobalMessage =
+    "Layout 'groups' declares the reserved group 'global'. It always exists and takes no entry.";
+
+  void V3Doc_GroupsDeclaresGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "global", nlohmann::json::object() } };
+    AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+  }
+
+  static constexpr const char* SelectionGlobalV2Message =
+    "Layout window 'mxn__w0': 'links.selection' targets the reserved group 'global'. Rename the group; 'global' "
+    "is reserved.";
+
+  void V2Doc_SelectionGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["version"] = "2.0";
+    WindowLinks(doc)["selection"] = "global";
+    AssertLoadFails(doc, SelectionGlobalV2Message);
+  }
+
+  void V2Doc_GroupsDeclaresGlobal_Throws()
+  {
+    auto doc = SingleWindowDoc();
+    doc["version"] = "2.0";
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "global", { { "select_all", true } } } };
+    AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+  }
+
+  void ReservedId_CaseVariants_Throw()
+  {
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["selection"] = "Global";
+      AssertLoadFails(doc, GlobalOnLinkMessage("selection"));
+    }
+    {
+      auto doc = SingleWindowDoc();
+      WindowLinks(doc)["slice"] = nlohmann::json{ { "target", "gLoBaL" }, { "offset", 1 } };
+      AssertLoadFails(doc, GlobalOnLinkMessage("slice"));
+    }
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = "2.0";
+      WindowLinks(doc)["selection"] = "GLOBAL";
+      AssertLoadFails(doc, SelectionGlobalV2Message);
+    }
+    for (const auto* version : { "2.0", "3.0" })
+    {
+      auto doc = SingleWindowDoc();
+      doc["version"] = version;
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } }, { "Global", nlohmann::json::object() } };
+      AssertLoadFails(doc, GroupsDeclaresGlobalMessage);
+    }
+  }
+
   void V3_RoundTrip_AllDimensionsAndOffsets()
   {
     const auto fixture = nlohmann::json::parse(R"json({
@@ -282,11 +536,11 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial",
-            "links": { "selection": "main", "pan": "nav", "zoom": "nav", "slice": "nav",
+            "links": { "selection": "main", "time": "global", "pan": "nav", "zoom": "nav", "slice": "nav",
                        "crosshair": "nav", "orientation": "planes",
                        "windowing": "wl", "lut": "wl" } },
           { "type": "window", "id": "mxn__w1", "view_direction": "axial",
-            "links": { "selection": "main",
+            "links": { "selection": "main", "time": "global",
                        "pan":   { "target": "nav", "offset": [12.5, -3.0] },
                        "zoom":  { "target": "nav", "offset": 2.0 },
                        "slice": { "target": "nav", "offset": -1 },
@@ -408,6 +662,43 @@ public:
     const auto roundTrip = editor->SerializeLayout();
     CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("color"));
     CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("name"));
+  }
+
+  void GroupCosmetics_ColorInReservedBandIgnored()
+  {
+    // Near the reserved group's light gray and near black, the colour the
+    // reserved group takes in the Light style.
+    for (const auto* color : { "#F1F1F1", "#ffffff", "#d0d0d0", "#000000", "#202020" })
+    {
+      auto doc = SingleWindowDoc();
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true }, { "color", color } } } };
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      const std::string what = std::string(" (") + color + ")";
+      CPPUNIT_ASSERT_MESSAGE("The default hue applies" + what, QColor(color) != editor->GetSyncGroupColor("main"));
+      CPPUNIT_ASSERT_MESSAGE("Nothing is written back" + what,
+                             !editor->SerializeLayout().at("groups").at("main").contains("color"));
+    }
+  }
+
+  void GroupCosmetics_ReservedDisplayNameIgnored()
+  {
+    for (const auto* name : { "Global", "global", " GLOBAL " })
+    {
+      auto doc = SingleWindowDoc();
+      doc["groups"] = nlohmann::json{ { "main", { { "select_all", true }, { "name", name } } } };
+
+      auto editor = MakeEditor();
+      editor->ApplyLayout(doc);
+
+      const std::string what = std::string(" ('") + name + "')";
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("The id is shown instead" + what, std::string("main"),
+                                   editor->GetSyncGroupDisplayName("main"));
+      CPPUNIT_ASSERT_MESSAGE("Nothing is written back" + what,
+                             !editor->SerializeLayout().at("groups").at("main").contains("name"));
+    }
   }
 
   void GroupCosmetics_UnknownEntryKeyTolerated()
@@ -645,7 +936,7 @@ public:
         windows.push_back({ { "type", "window" },
                             { "id", "mxn__r" + std::to_string(r) + "c" + std::to_string(c) },
                             { "view_direction", "axial" },
-                            { "links", { { "selection", "main" } } } });
+                            { "links", { { "selection", "main" }, { "time", "global" } } } });
       }
       rowNodes.push_back({ { "type", "split" }, { "orientation", "horizontal" }, { "children", windows } });
     }
@@ -682,8 +973,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");
@@ -744,9 +1035,9 @@ public:
         "type": "split", "orientation": "horizontal",
         "children": [
           { "type": "window", "id": "mxn__w0", "view_direction": "axial", "render_mode": "3d",
-            "links": { "selection": "main", "orientation": "planes" } },
+            "links": { "selection": "main", "time": "global", "orientation": "planes" } },
           { "type": "window", "id": "mxn__w1", "view_direction": "axial", "render_mode": "3d",
-            "links": { "selection": "main", "orientation": "planes" } }
+            "links": { "selection": "main", "time": "global", "orientation": "planes" } }
         ]
       }
     })json");
@@ -870,9 +1161,9 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__axial", "view_direction": "axial", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__sagittal", "view_direction": "sagittal", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__coronal", "view_direction": "coronal", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__axial", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__sagittal", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__coronal", "view_direction": "coronal", "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();
@@ -998,8 +1289,8 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
-        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();
@@ -1126,8 +1417,10 @@ public:
       auto doc = nlohmann::json::parse(R"json({
         "version": "3.0",
         "root": { "type": "split", "orientation": "horizontal", "children": [
-          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial",
+            "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial",
+            "links": { "selection": "main", "time": "global" } }
         ] }
       })json");
       if (zoomGroup)
@@ -1149,6 +1442,290 @@ public:
     }
   }
 
+  static nlohmann::json TwoAxialWindowsDoc()
+  {
+    return nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__narrow", "size": 20, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__wide", "size": 80, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global" } }
+      ] }
+    })json");
+  }
+
+  static vtkCamera* CameraOf(const QmitkMxNMultiWidget& editor, const QString& windowId)
+  {
+    return mitk::BaseRenderer::GetInstance(editor.GetRenderWindowWidget(windowId)->GetRenderWindow()->GetVtkRenderWindow())
+      ->GetVtkRenderer()
+      ->GetActiveCamera();
+  }
+
+  void Apply_WhileHidden_CameraSetBeforeShowIsKept()
+  {
+    // A REST client may apply a layout to an editor whose tab is hidden and
+    // then set a window's camera. The fit the display defers until it is
+    // shown must not replace that camera.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    const double zoomed = 0.5 * fitted.at("mxn__wide");
+    editor->SetCamera("mxn__wide", [zoomed](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoomed); });
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera set while hidden is kept", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The other window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_WhileHidden_PartialCameraChange_KeepsTheFit()
+  {
+    // A camera change that leaves the zoom alone, such as a pan over REST,
+    // must not cost a window built while hidden the fit to its size.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    double focalPoint[3];
+    double position[3];
+    CameraOf(*editor, "mxn__narrow")->GetFocalPoint(focalPoint);
+    CameraOf(*editor, "mxn__narrow")->GetPosition(position);
+    focalPoint[0] += 3.0;
+    position[0] += 3.0;
+    editor->SetCamera("mxn__narrow", [focalPoint, position](mitk::BaseRenderer* renderer)
+                      {
+                        auto* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+                        camera->SetFocalPoint(focalPoint);
+                        camera->SetPosition(position);
+                      });
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+    double shownFocalPoint[3];
+    CameraOf(*editor, "mxn__narrow")->GetFocalPoint(shownFocalPoint);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The pan is kept", focalPoint[0], shownFocalPoint[0], 1e-6);
+  }
+
+  void Apply_WhileHidden_PartialCameraChangeOnThreeDWindow_KeepsTheViewInitialization()
+  {
+    // A 3D window built while hidden is initialized as a 3D view once shown;
+    // until then it has the camera of its 2D construction, which shows
+    // nothing. Changing only the view angle must not keep that camera.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+        { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
+          "links": { "selection": "main", "time": "global" } }
+      ] }
+    })json"));
+    editor->SetCamera("mxn__volume", [](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(20.0); });
+    editor->show();
+    Pump();
+
+    auto* camera = CameraOf(*editor, "mxn__volume");
+    const double halfHeight = QmitkMxN3DCamera::VisibleHalfHeight(camera);
+    CPPUNIT_ASSERT_MESSAGE("The 3D window frames the 16 mm image; it shows a half-height of "
+                             + std::to_string(halfHeight) + " mm",
+                           halfHeight < 100.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The view angle is kept", 20.0, camera->GetViewAngle(), 1e-6);
+  }
+
+  /** The cameras' parallel scales after applying 'doc' and then setting the
+   *  zoom of the windows in 'zooms', on an editor shown before or only after. */
+  std::map<QString, double> ParallelScalesAfterSettingZooms(const nlohmann::json& doc,
+                                                           const std::map<QString, double>& zooms, bool shownBefore)
+  {
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    if (shownBefore)
+    {
+      editor->show();
+      Pump();
+    }
+    editor->ApplyLayout(doc);
+    if (shownBefore)
+    {
+      Pump();
+    }
+    for (const auto& [windowId, zoom] : zooms)
+    {
+      editor->SetCamera(windowId, [zoom = zoom](mitk::BaseRenderer* renderer)
+                        { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoom); });
+    }
+    editor->show();
+    Pump();
+
+    std::map<QString, double> scales;
+    for (const auto& windowId : WindowIds(*editor))
+    {
+      scales[windowId] = CameraOf(*editor, windowId)->GetParallelScale();
+    }
+    return scales;
+  }
+
+  void Apply_WhileHidden_CamerasSetOnGroupMembers_EndAsSetWhileShown()
+  {
+    // On a shown display a camera a client sets is passed on to no group: it
+    // stays on its window, and the window's group mates keep theirs. A layout
+    // applied while hidden must end the same, with the cameras set before the
+    // display is shown - also when they are set on members of one zoom group.
+    AddSquareImage();
+    const auto doc = nlohmann::json::parse(R"json({
+      "version": "3.0",
+      "root": { "type": "split", "orientation": "horizontal", "children": [
+        { "type": "window", "id": "mxn__a", "size": 20, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } },
+        { "type": "window", "id": "mxn__b", "size": 40, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } },
+        { "type": "window", "id": "mxn__c", "size": 40, "view_direction": "axial",
+          "links": { "selection": "main", "time": "global", "zoom": "z" } }
+      ] }
+    })json");
+    const double converged = this->ParallelScalesAfterApplying(doc, true).at("mxn__a");
+    const std::map<QString, double> zooms{ { "mxn__b", 0.5 * converged }, { "mxn__c", 0.75 * converged } };
+
+    const auto shown = this->ParallelScalesAfterSettingZooms(doc, zooms, true);
+    for (const auto& [windowId, zoom] : zooms)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Fixture: on a shown display " + windowId.toStdString()
+                                             + " keeps the zoom set for it",
+                                           zoom, shown.at(windowId), 1e-6);
+    }
+    const auto hidden = this->ParallelScalesAfterSettingZooms(doc, zooms, false);
+    for (const auto& [windowId, scale] : shown)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The camera of " + windowId.toStdString() + " ends as on a shown display",
+                                           scale, hidden.at(windowId), 1e-6);
+    }
+  }
+
+  void Apply_WhileHidden_HiddenDuringTheDeferredFit_KeepsTheCameraAndFitsOnShow()
+  {
+    // A timer or a queued call can hide the display while the fit deferred
+    // for showing lets the event loop lay the cells out. Hidden cells cannot
+    // be fitted; they wait for the next show, and a camera set for them while
+    // hidden must outlast that fit as it outlasts any other.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    const auto fitted = this->ParallelScalesAfterApplying(doc, true);
+
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    auto* widget = editor.get();
+    editor->ApplyLayout(doc);
+    const double zoomed = 0.5 * fitted.at("mxn__wide");
+    editor->SetCamera("mxn__wide", [zoomed](mitk::BaseRenderer* renderer)
+                      { renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(zoomed); });
+
+    // Posted again until the display is busy, so it hides the display from
+    // inside the deferred fit's event pass, whenever that runs.
+    bool hiddenDuringFit = false;
+    int attempts = 0;
+    std::function<void()> hideWhenBusy;
+    hideWhenBusy = [widget, &hiddenDuringFit, &attempts, &hideWhenBusy]()
+    {
+      if (widget->IsBusy())
+      {
+        hiddenDuringFit = true;
+        widget->hide();
+      }
+      else if (++attempts < 100)
+      {
+        QMetaObject::invokeMethod(widget, hideWhenBusy, Qt::QueuedConnection);
+      }
+    };
+    editor->show();
+    QMetaObject::invokeMethod(widget, hideWhenBusy, Qt::QueuedConnection);
+    Pump();
+    CPPUNIT_ASSERT_MESSAGE("Fixture: the display is hidden while the deferred fit lays the cells out",
+                           hiddenDuringFit && !editor->isVisible());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("While hidden the window keeps the camera set for it", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+
+    editor->show();
+    Pump();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Once shown, the camera set while hidden is kept", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The other window is fitted to its size", fitted.at("mxn__narrow"),
+                                         CameraOf(*editor, "mxn__narrow")->GetParallelScale(), 1e-6);
+  }
+
+  void Apply_WhileShowing_LeavesNoStaleFitForReusedIds()
+  {
+    // A layout applied while the fit deferred for showing is still queued
+    // rebuilds the cells under the same ids. The new cells are fitted by the
+    // load; the deferred fit of the old ones must not linger and later reset
+    // the new cells' cameras.
+    AddSquareImage();
+    const auto doc = TwoAxialWindowsDoc();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->ApplyLayout(doc);
+    editor->show();
+    editor->ApplyLayout(doc);
+    Pump();
+
+    const double zoomed = 0.5 * CameraOf(*editor, "mxn__wide")->GetParallelScale();
+    CameraOf(*editor, "mxn__wide")->SetParallelScale(zoomed);
+    editor->hide();
+    editor->show();
+    Pump();
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("A zoom set after the load survives hiding and showing", zoomed,
+                                         CameraOf(*editor, "mxn__wide")->GetParallelScale(), 1e-6);
+  }
+
+  void GridOperation_WhileShowing_FitsTheDeferredCellsAfterwards()
+  {
+    // Cells built while hidden wait for the display to be shown. A grid
+    // operation running when it is shown must not leave them unfitted until
+    // the display is hidden and shown again.
+    AddSquareImage();
+    auto editor = MakeEditor();
+    editor->resize(900, 600);
+    const VtkSizeFollowsWidget vtkSizes;
+    editor->SetLayout(1, 2);
+    const auto deferred = WindowIds(*editor);
+    editor->show();
+    editor->AddGridColumn();
+    // The deferred fit retries on a timer while the editor is busy.
+    QElapsedTimer waited;
+    waited.start();
+    while (waited.elapsed() < 250)
+    {
+      QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
+    for (const auto& windowId : deferred)
+    {
+      AssertShowsWholePlane(*editor, windowId);
+    }
+  }
+
   void GridOperations_QueuedCallDuringTheFit_FindsTheEditorBusy()
   {
     // The fit of new cells pumps the event loop to lay them out. A queued
@@ -1167,7 +1744,7 @@ public:
       bool busy = false;
       QMetaObject::invokeMethod(widget, [widget, &ran, &busy]() {
         ran = true;
-        busy = widget->IsApplyingLayout();
+        busy = widget->IsBusy();
       }, Qt::QueuedConnection);
       operation();
       CPPUNIT_ASSERT_MESSAGE("Fixture: " + name + " delivers the queued call", ran);
@@ -1189,10 +1766,10 @@ public:
       auto doc = nlohmann::json::parse(R"json({
         "version": "3.0",
         "root": { "type": "split", "orientation": "horizontal", "children": [
-          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__large", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
           { "type": "split", "orientation": "vertical", "children": [
-            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main" } },
-            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main" } }
+            { "type": "window", "id": "mxn__top", "view_direction": "sagittal", "links": { "selection": "main", "time": "global" } },
+            { "type": "window", "id": "mxn__bottom", "view_direction": "coronal", "links": { "selection": "main", "time": "global" } }
           ] }
         ] }
       })json");
@@ -1222,9 +1799,9 @@ public:
     editor->ApplyLayout(nlohmann::json::parse(R"json({
       "version": "3.0",
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main" } },
+        { "type": "window", "id": "mxn__slice", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
         { "type": "window", "id": "mxn__volume", "view_direction": "coronal", "render_mode": "3d",
-          "links": { "selection": "main" } }
+          "links": { "selection": "main", "time": "global" } }
       ] }
     })json"));
     Pump();

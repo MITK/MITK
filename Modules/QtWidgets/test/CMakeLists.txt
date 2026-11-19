@@ -134,10 +134,13 @@ mitkAddCustomModuleTest(QmitkRunInputBlockingTest QmitkRunInputBlockingTest
 )
 
 # The v3 layout documents shipped outside this module's resources - the
-# schema's own examples and the REST API's example - must load.
+# schema's own examples and the REST API's example - must load. The
+# Workbench style sheets pin the colours the reserved sync group copies.
 target_compile_definitions(MitkQtWidgetsTestDriver PRIVATE
   MITK_MXN_LAYOUT_V3_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../resource/mxn-layout-v3.schema.json"
   MITK_REST_API_OPENAPI_PATH="${MITK_SOURCE_DIR}/Modules/RESTAPI/resource/openapi.json"
+  MITK_DARKSTYLE_QSS_PATH="${MITK_SOURCE_DIR}/Plugins/org.blueberry.ui.qt/resources/darkstyle.qss"
+  MITK_LIGHTSTYLE_QSS_PATH="${MITK_SOURCE_DIR}/Plugins/org.blueberry.ui.qt/resources/lightstyle.qss"
 )
 
 # Schema validation of the MxN v2 layout (schema examples, in-tree preset,

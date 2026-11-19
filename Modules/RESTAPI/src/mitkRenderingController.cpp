@@ -1623,7 +1623,7 @@ void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib
       if (ed.busy)
       {
         const auto error = ErrorResponse::EditorBusy(
-          "MxNMultiWidgetEditor is applying a layout", req.path);
+          "MxN editor is busy rebuilding or laying out its windows; retry once it has finished", req.path);
         this->SendErrorResponse(res, 503, error);
         return;
       }

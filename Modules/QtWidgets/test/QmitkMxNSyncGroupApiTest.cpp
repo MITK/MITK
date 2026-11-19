@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkTestQApplication.h"
 
+#include <QmitkMultiWidgetLayoutManager.h>
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
@@ -21,6 +22,14 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <QApplication>
+#include <QColor>
+#include <QFile>
+#include <QPalette>
+
+#include <string>
+#include <vector>
+
 /**
  * Tests the canonical sync-group lifecycle API on QmitkMxNMultiWidget:
  *   - AddSynchronizationGroup throws on invalid index / null storage
@@ -28,6 +37,9 @@ found in the LICENSE file.
  *   - SetSynchronizationGroup auto-creates, moves between groups, and is
  *     edge-idempotent on the same group
  *   - NextFreeSyncGroupIndex picks gaps
+ *   - The reserved group 'global' cannot be created, joined, removed,
+ *     renamed or recoloured; its display name and a band of colours around
+ *     the colours it takes are reserved as well
  *
  * The test surfaces the protected 'GetSyncGroupConnector' / 'GetSyncGroupCount'
  * accessors via a thin subclass to inspect connector identity and registered
@@ -60,6 +72,28 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Set_IsIdempotentOnSameGroup);
   MITK_TEST(NextFreeSyncGroupIndex_PicksLowestUnused);
   MITK_TEST(SetSelectedPosition_UnknownWindowIsIgnored);
+  MITK_TEST(Reserved_AddSynchronizationGroup_Throws);
+  MITK_TEST(Reserved_SetSyncLink_ThrowsOnEveryDimension);
+  MITK_TEST(Reserved_SetCellSelectionGroup_Throws);
+  MITK_TEST(Reserved_RemoveSynchronizationGroup_Throws);
+  MITK_TEST(Reserved_SetSyncGroupDisplayNameOfGlobal_Throws);
+  MITK_TEST(Reserved_SetSyncGroupColorOfGlobal_Throws);
+  MITK_TEST(Reserved_DisplayNameGlobal_Throws);
+  MITK_TEST(ReservedBand_RefusesNearWhiteAndNearBlack);
+  MITK_TEST(ReservedBand_RefusesTheLiveTextColor);
+  MITK_TEST(GetSyncGroupInfos_DoesNotListGlobal);
+  MITK_TEST(GetSyncGroupColorAndName_GlobalIsReserved);
+  MITK_TEST(GetSyncGroupColor_GlobalFollowsTheStyleSheet);
+  MITK_TEST(GetSyncGroupColor_LightStyleLeavesTheTextColourToThePlatform);
+  MITK_TEST(GlobalTakesNoPaletteSlot);
+  MITK_TEST(ResolveCellGroupIdentity_FreshWindowStaysMono);
+  MITK_TEST(SyncAxes_AreInFamilyOrder);
+  MITK_TEST(SyncAxisDimension_TimeAndSelectionHaveNone);
+  MITK_TEST(BuildBarcodeSlots_NineSlotsInFamilyOrder_TimeIsGlobal);
+  MITK_TEST(BuildBarcodeSlots_GlobalUsesTheOverlayColorInEveryStyle);
+  MITK_TEST(CellsSharingAxis_TimeIsGlobalOnly);
+  MITK_TEST(CellsSharingAxis_EmptyWhileNoCellTree);
+  MITK_TEST(ResolveCellAxisGroup_TimeNeverTouchesSelection);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -363,6 +397,464 @@ public:
     position.Fill(0.0);
     CPPUNIT_ASSERT_NO_THROW(widget.SetSelectedPosition(position, QStringLiteral("mxn__nosuchwindow")));
     CPPUNIT_ASSERT_EQUAL(1u, widget.GetNumberOfRenderWindowWidgets());
+  }
+
+  // ---------- The reserved group 'global' ----------
+
+  /** The id of the reserved group, in the spellings that all name it. */
+  static std::vector<std::string> GlobalSpellings()
+  {
+    return { "global", "Global", "GLOBAL", "gLoBaL" };
+  }
+
+  static QString FirstWindow(const QmitkMxNMultiWidget& widget)
+  {
+    return widget.ListWindowDescriptors().front().id;
+  }
+
+  void Reserved_AddSynchronizationGroup_Throws()
+  {
+    TestableQmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.AddSynchronizationGroup(1);
+    AddedRecorder rec(widget);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.AddSynchronizationGroup(2, id), QmitkMxNReservedGroupException);
+      // Naming it is a caller's bug also where the call would be idempotent.
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.AddSynchronizationGroup(1, id), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 1 }, ConnectorCount(widget));
+    CPPUNIT_ASSERT_EQUAL(0, rec.count);
+  }
+
+  void Reserved_SetSyncLink_ThrowsOnEveryDimension()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto windowId = FirstWindow(widget);
+
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto before = widget.GetSyncLink(windowId, dimension);
+      for (const auto& id : GlobalSpellings())
+      {
+        CPPUNIT_ASSERT_THROW_MESSAGE(std::string(QmitkMxNSyncDimensionToLinkKey(dimension)) + " " + id,
+                                     widget.SetSyncLink(windowId, dimension, id), QmitkMxNReservedGroupException);
+      }
+      const auto after = widget.GetSyncLink(windowId, dimension);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The link on ") + QmitkMxNSyncDimensionToLinkKey(dimension) + " stays",
+                             before.has_value() == after.has_value()
+                               && (!before.has_value() || before->group == after->group));
+    }
+  }
+
+  void Reserved_SetCellSelectionGroup_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto windowId = FirstWindow(widget);
+    const auto before = widget.GetCellSelectionGroup(windowId);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetCellSelectionGroup(windowId, id), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(before, widget.GetCellSelectionGroup(windowId));
+  }
+
+  void Reserved_RemoveSynchronizationGroup_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.RemoveSynchronizationGroup(id), QmitkMxNReservedGroupException);
+    }
+  }
+
+  void Reserved_SetSyncGroupDisplayNameOfGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetSyncGroupDisplayName(id, "Everything"),
+                                   QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("Global"), widget.GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+  }
+
+  void Reserved_SetSyncGroupColorOfGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto before = widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+
+    for (const auto& id : GlobalSpellings())
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(id, widget.SetSyncGroupColor(id, QColor("#E1707A")),
+                                   QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT(before == widget.GetSyncGroupColor(QmitkMxNGlobalGroupId));
+  }
+
+  void Reserved_DisplayNameGlobal_Throws()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+    widget.SetSyncGroupDisplayName(group, "Tumor");
+
+    for (const auto* name : { "Global", "global", " global ", "GLOBAL\t" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(name, widget.SetSyncGroupDisplayName(group, name), QmitkMxNReservedGroupException);
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor"), widget.GetSyncGroupDisplayName(group));
+
+    // Only the name itself is reserved.
+    widget.SetSyncGroupDisplayName(group, "Global view");
+    CPPUNIT_ASSERT_EQUAL(std::string("Global view"), widget.GetSyncGroupDisplayName(group));
+  }
+
+  void ReservedBand_RefusesNearWhiteAndNearBlack()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+    widget.SetSyncGroupColor(group, QColor("#ff0000"));
+
+    // Below a CIE76 distance of 15 to #f1f1f1 or to black.
+    for (const auto* color : { "#f1f1f1", "#ffffff", "#d0d0d0", "#fff0f0", "#000000", "#202020" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The colour stays after refusing ") + color,
+                             QColor("#ff0000") == widget.GetSyncGroupColor(group));
+    }
+
+    // Just outside the band, and every default hue.
+    for (const auto* color : { "#c0c0c0", "#303030", "#E1707A", "#6FA8DC", "#93C47D", "#F0B26B", "#B08FD9",
+                               "#76C7C0", "#C9C97A", "#D08FB8" })
+    {
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
+      CPPUNIT_ASSERT_MESSAGE(color, QColor(color) == widget.GetSyncGroupColor(group));
+    }
+
+    // The edge of the band at 15: the grays one step inside and one step outside
+    // it, at about 14.9 / 15.3 from #f1f1f1 and 14.7 / 15.2 from black.
+    for (const auto* color : { "#c7c7c7", "#252525" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+    }
+    for (const auto* color : { "#c6c6c6", "#262626" })
+    {
+      CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
+    }
+  }
+
+  void ReservedBand_RefusesTheLiveTextColor()
+  {
+    // A platform or custom palette whose text color is neither black nor
+    // #f1f1f1 still keeps user groups from looking like the reserved one.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Fixture: #2b2b2b lies outside the fixed band",
+                                    widget.SetSyncGroupColor(group, QColor("#2b2b2b")));
+    widget.SetSyncGroupColor(group, QColor("#ff0000"));
+
+    auto palette = widget.palette();
+    palette.setColor(QPalette::WindowText, QColor("#2b2b2b"));
+    widget.setPalette(palette);
+
+    for (const auto* color : { "#2b2b2b", "#303030" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The color stays after refusing ") + color,
+                             QColor("#ff0000") == widget.GetSyncGroupColor(group));
+    }
+  }
+
+  void GetSyncGroupInfos_DoesNotListGlobal()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto infos = widget.GetSyncGroupInfos();
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 1 }, infos.size());
+    CPPUNIT_ASSERT_EQUAL(widget.GetDefaultSyncGroupName(), infos.front().id);
+  }
+
+  void GetSyncGroupColorAndName_GlobalIsReserved()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Global"), widget.GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+
+    for (const auto* text : { "#000000", "#f1f1f1", "#123456" })
+    {
+      auto palette = widget.palette();
+      palette.setColor(QPalette::WindowText, QColor(text));
+      widget.setPalette(palette);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The reserved group takes the style's text colour ") + text,
+                             QColor(text) == widget.GetSyncGroupColor(QmitkMxNGlobalGroupId));
+    }
+  }
+
+  /** A Workbench style sheet as the BlueBerry plugin ships it. */
+  static QString WorkbenchStyleSheet(const char* path)
+  {
+    QFile file(QString::fromUtf8(path));
+    CPPUNIT_ASSERT_MESSAGE(std::string("Fixture: the style sheet is readable: ") + path,
+                           file.open(QIODevice::ReadOnly | QIODevice::Text));
+    return QString::fromUtf8(file.readAll());
+  }
+
+  struct StyleSheetGuard
+  {
+    ~StyleSheetGuard() { qApp->setStyleSheet(QString()); }
+  };
+
+  void GetSyncGroupColor_GlobalFollowsTheStyleSheet()
+  {
+    // The Dark style sets the text colour in its style sheet, which reaches a
+    // widget's palette only once the widget is polished. The reserved band and
+    // the dark furniture carry a copy of that colour, since this module cannot
+    // read the plugin's sheet; a change of the sheet must not leave them behind.
+    const StyleSheetGuard guard;
+    qApp->setStyleSheet(WorkbenchStyleSheet(MITK_DARKSTYLE_QSS_PATH));
+
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto text = widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Dark style's text colour is the one the strips give the reserved group",
+                                 axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)].color.name().toStdString(),
+                                 text.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("... and the arrange frames",
+                                 widget.GetArrangeHighlightHue(QmitkMxNGlobalGroupId).name().toStdString(),
+                                 text.name().toStdString());
+    CPPUNIT_ASSERT_THROW_MESSAGE("... and lies in the reserved band",
+                                 widget.SetSyncGroupColor(widget.GetDefaultSyncGroupName(), text),
+                                 QmitkMxNReservedGroupException);
+  }
+
+  void GetSyncGroupColor_LightStyleLeavesTheTextColourToThePlatform()
+  {
+    // The band anchors the Light style on black, the platform's text colour on
+    // Windows: the Light style sheet must not set a text colour of its own.
+    QColor platform;
+    {
+      QmitkMxNMultiWidget unstyled;
+      unstyled.SetDataStorage(m_DataStorage);
+      unstyled.InitializeMultiWidget();
+      platform = unstyled.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    }
+
+    const StyleSheetGuard guard;
+    qApp->setStyleSheet(WorkbenchStyleSheet(MITK_LIGHTSTYLE_QSS_PATH));
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    CPPUNIT_ASSERT_EQUAL(platform.name().toStdString(),
+                         widget.GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
+  }
+
+  void GlobalTakesNoPaletteSlot()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.GetSyncGroupColor(QmitkMxNGlobalGroupId);
+    widget.AddSynchronizationGroup(widget.NextFreeSyncGroupIndex());
+
+    const auto infos = widget.GetSyncGroupInfos();
+    CPPUNIT_ASSERT_EQUAL(std::size_t{ 2 }, infos.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("#e1707a"), infos[0].color.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("#6fa8dc"), infos[1].color.name().toStdString());
+  }
+
+  void ResolveCellGroupIdentity_FreshWindowStaysMono()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto identity = widget.ResolveCellGroupIdentity(FirstWindow(widget));
+    CPPUNIT_ASSERT(QmitkMxNMultiWidget::CellGroupIdentityKind::Mono == identity.kind);
+    CPPUNIT_ASSERT(widget.GetSyncGroupColor(widget.GetDefaultSyncGroupName()) == identity.hue);
+  }
+
+  // ---------- The axes and Time ----------
+
+  void SyncAxes_AreInFamilyOrder()
+  {
+    using Axis = QmitkMxNSyncAxis;
+    const std::vector<Axis> expected{ Axis::Orientation, Axis::Pan,       Axis::Zoom,
+                                      Axis::Slice,       Axis::Time,      Axis::Crosshair,
+                                      Axis::Selection,   Axis::Windowing, Axis::Lut };
+    CPPUNIT_ASSERT_EQUAL(9, QmitkMxNSyncAxisCount);
+    for (int slot = 0; slot < QmitkMxNSyncAxisCount; ++slot)
+    {
+      const auto axis = expected[static_cast<std::size_t>(slot)];
+      CPPUNIT_ASSERT_MESSAGE("slot " + std::to_string(slot), axis == QmitkMxNAllSyncAxes[static_cast<std::size_t>(slot)]);
+      CPPUNIT_ASSERT_EQUAL(slot, QmitkMxNSyncAxisToSlot(axis));
+      CPPUNIT_ASSERT(axis == *QmitkMxNSyncAxisFromSlot(slot));
+    }
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisFromSlot(QmitkMxNSyncAxisCount).has_value());
+  }
+
+  void SyncAxisDimension_TimeAndSelectionHaveNone()
+  {
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis::Time).has_value());
+    CPPUNIT_ASSERT(!QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis::Selection).has_value());
+    for (const auto dimension : QmitkMxNAllSyncDimensions)
+    {
+      const auto axis = QmitkMxNSyncAxisOf(dimension);
+      CPPUNIT_ASSERT(dimension == *QmitkMxNSyncAxisDimension(axis));
+      CPPUNIT_ASSERT_EQUAL(std::string(QmitkMxNSyncDimensionToLinkKey(dimension)),
+                           std::string(QmitkMxNSyncAxisToLinkKey(axis)));
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("time"), std::string(QmitkMxNSyncAxisToLinkKey(QmitkMxNSyncAxis::Time)));
+    CPPUNIT_ASSERT_EQUAL(std::string("selection"),
+                         std::string(QmitkMxNSyncAxisToLinkKey(QmitkMxNSyncAxis::Selection)));
+  }
+
+  void BuildBarcodeSlots_NineSlotsInFamilyOrder_TimeIsGlobal()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL(QmitkMxNSyncAxisCount, static_cast<int>(axisSlots.size()));
+    for (const auto axis : QmitkMxNAllSyncAxes)
+    {
+      CPPUNIT_ASSERT(axis == axisSlots[QmitkMxNSyncAxisToSlot(axis)].axis);
+    }
+
+    const auto& time = axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)];
+    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"), time.color.name().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Time"), time.label.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("Time - group Global"), time.tooltip.toStdString());
+    CPPUNIT_ASSERT(!time.hasOffset && time.offsetText.isEmpty());
+    CPPUNIT_ASSERT(time.applicable);
+  }
+
+  void BuildBarcodeSlots_GlobalUsesTheOverlayColorInEveryStyle()
+  {
+    // The strip and the plates are dark in every style, so they keep the light
+    // gray while the style's own text colour is black.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    auto palette = widget.palette();
+    palette.setColor(QPalette::WindowText, QColor(Qt::black));
+    widget.setPalette(palette);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("#000000"), widget.GetSyncGroupColor(QmitkMxNGlobalGroupId).name().toStdString());
+    const auto axisSlots = widget.BuildBarcodeSlots(FirstWindow(widget));
+    CPPUNIT_ASSERT_EQUAL(std::string("#f1f1f1"),
+                         axisSlots[QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis::Time)].color.name().toStdString());
+  }
+
+  void CellsSharingAxis_TimeIsGlobalOnly()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(2, 2);
+
+    QStringList every;
+    for (const auto& descriptor : widget.ListWindowDescriptors())
+    {
+      every.append(descriptor.id);
+    }
+    CPPUNIT_ASSERT_EQUAL(4, static_cast<int>(every.size()));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Every window, in pre-order, shares Time through 'global'",
+                                 every.join(QLatin1Char(',')).toStdString(),
+                                 widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time)
+                                   .join(QLatin1Char(',')).toStdString());
+    CPPUNIT_ASSERT_MESSAGE("A user group shares no Time",
+                           widget.CellsSharingAxis(QString::fromStdString(widget.GetDefaultSyncGroupName()),
+                                                   QmitkMxNSyncAxis::Time).isEmpty());
+    CPPUNIT_ASSERT_MESSAGE("'global' takes no other axis yet",
+                           widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Selection).isEmpty());
+  }
+
+  void CellsSharingAxis_EmptyWhileNoCellTree()
+  {
+    // A layout rebuild tears the cell tree down while the cells are still
+    // registered. The hover handlers that ask who shares an axis cannot be
+    // told apart from that state and rely on an empty answer.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(1, 2);
+    std::vector<QString> ids;
+    for (const auto& descriptor : widget.ListWindowDescriptors())
+    {
+      ids.push_back(descriptor.id);
+    }
+    widget.GetMultiWidgetLayoutManager()->ClearLayout();
+
+    for (const auto& id : ids)
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Fixture: the cell is still registered and follows Time through 'global'",
+                                   std::string(QmitkMxNGlobalGroupId),
+                                   widget.ResolveCellAxisGroup(id, QmitkMxNSyncAxis::Time));
+    }
+    QStringList time;
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Time",
+                                    time = widget.CellsSharingAxis(QStringLiteral("global"), QmitkMxNSyncAxis::Time));
+    CPPUNIT_ASSERT(time.isEmpty());
+    QStringList slice;
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
+      "Slice", slice = widget.CellsSharingAxis(QString::fromStdString(widget.GetDefaultSyncGroupName()),
+                                               QmitkMxNSyncAxis::Slice));
+    CPPUNIT_ASSERT(slice.isEmpty());
+  }
+
+  void ResolveCellAxisGroup_TimeNeverTouchesSelection()
+  {
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    widget.SetLayout(1, 2);
+    const auto descriptors = widget.ListWindowDescriptors();
+    widget.SetCellSelectionGroup(descriptors.front().id, "tumor");
+
+    for (const auto& descriptor : descriptors)
+    {
+      const auto selectionBefore = widget.GetCellSelectionGroup(descriptor.id);
+      CPPUNIT_ASSERT_EQUAL(std::string("global"),
+                           widget.ResolveCellAxisGroup(descriptor.id, QmitkMxNSyncAxis::Time));
+      CPPUNIT_ASSERT_EQUAL(selectionBefore, widget.GetCellSelectionGroup(descriptor.id));
+    }
+    CPPUNIT_ASSERT_EQUAL(std::string("tumor"),
+                         widget.ResolveCellAxisGroup(descriptors.front().id, QmitkMxNSyncAxis::Selection));
+    CPPUNIT_ASSERT_MESSAGE("An unknown window has no Time group",
+                           widget.ResolveCellAxisGroup(QStringLiteral("mxn__nosuch"), QmitkMxNSyncAxis::Time).empty());
   }
 };
 

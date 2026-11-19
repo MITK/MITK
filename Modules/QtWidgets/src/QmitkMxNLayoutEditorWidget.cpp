@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDropEvent>
+#include <QFile>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -50,6 +51,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QItemSelectionModel>
 #include <QPainter>
+#include <QPixmapCache>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QShortcut>
@@ -85,34 +87,9 @@ namespace
       { return nullptr != node && QmitkMxNDynamicLayouts::IsOfDataClass(*node, QmitkMxNSlotDataClass::Image); });
   }
 
-  const char* DimensionLabel(QmitkMxNSyncDimension dimension)
+  QString AxisLabel(QmitkMxNSyncAxis axis)
   {
-    switch (dimension)
-    {
-      case QmitkMxNSyncDimension::Pan:         return "Pan";
-      case QmitkMxNSyncDimension::Zoom:        return "Zoom";
-      case QmitkMxNSyncDimension::Slice:       return "Slice";
-      case QmitkMxNSyncDimension::Crosshair:   return "Crosshair";
-      case QmitkMxNSyncDimension::Orientation: return "Orientation";
-      case QmitkMxNSyncDimension::Windowing:   return "Windowing";
-      case QmitkMxNSyncDimension::Lut:         return "LUT";
-    }
-    return "";
-  }
-
-  QmitkMxNAxisGlyph GlyphFor(QmitkMxNSyncDimension dimension)
-  {
-    switch (dimension)
-    {
-      case QmitkMxNSyncDimension::Pan:         return QmitkMxNAxisGlyph::Pan;
-      case QmitkMxNSyncDimension::Zoom:        return QmitkMxNAxisGlyph::Zoom;
-      case QmitkMxNSyncDimension::Slice:       return QmitkMxNAxisGlyph::Slice;
-      case QmitkMxNSyncDimension::Crosshair:   return QmitkMxNAxisGlyph::Crosshair;
-      case QmitkMxNSyncDimension::Orientation: return QmitkMxNAxisGlyph::Orientation;
-      case QmitkMxNSyncDimension::Windowing:   return QmitkMxNAxisGlyph::Windowing;
-      case QmitkMxNSyncDimension::Lut:         return QmitkMxNAxisGlyph::Lut;
-    }
-    return QmitkMxNAxisGlyph::Pan;
+    return QmitkMxNSyncAxisLabel(axis);
   }
 
   constexpr std::array<QmitkMxNSyncDimension, 4> NavigationBundle{
@@ -153,13 +130,6 @@ namespace
 
   const QString NotLinkedEntry = QStringLiteral("(not linked)");
 
-  /** Readable ink on a filled group hue, shared by every surface that fills with one. */
-  QColor InkFor(const QColor& hue)
-  {
-    const double luminance = 0.299 * hue.red() + 0.587 * hue.green() + 0.114 * hue.blue();
-    return luminance > 140.0 ? QColor(0x1a, 0x1a, 0x1a) : QColor(Qt::white);
-  }
-
   /** A group's hue as a menu / combo swatch. */
   QPixmap SwatchFor(const QColor& hue)
   {
@@ -181,6 +151,26 @@ namespace
   constexpr int ChipOffsetRole = Qt::UserRole + 3;
   constexpr int ChipHighlightRole = Qt::UserRole + 4;
   constexpr int ChipNotApplicableRole = Qt::UserRole + 5;
+  constexpr int ChipLockedRole = Qt::UserRole + 6;  // fixed by the reserved group; not editable
+
+  /** The lock icon in 'ink', 'side' pixels square, for a fixed chip or card. */
+  QPixmap LockPixmap(const QColor& ink, int side)
+  {
+    const QString key = QStringLiteral("QmitkMxNLock/%1/%2").arg(ink.name()).arg(side);
+    QPixmap pixmap;
+    if (QPixmapCache::find(key, &pixmap))
+    {
+      return pixmap;
+    }
+    QFile file(QStringLiteral(":/Qmitk/lock.svg"));
+    if (!file.open(QIODevice::ReadOnly))
+    {
+      return QPixmap();
+    }
+    pixmap = QmitkIconTheme::GetIcon(file.readAll(), ink.name()).pixmap(side, side);
+    QPixmapCache::insert(key, pixmap);
+    return pixmap;
+  }
 
   // Out-of-domain values the offset editors rest on when the selected cells
   // disagree, surfaced through specialValueText. An offset the user cannot mean,
@@ -203,21 +193,30 @@ namespace
    * elided from the middle so auto-named groups stay apart by their trailing
    * digit, and the offset pinned right where it is never the part that elides.
    * Selection is drawn as a frame rather than a fill, so it never hides the hue
-   * it sits on. Paint only - the matrix is a read surface, edited from its
-   * action bar.
+   * it sits on. While a synchronization is highlighted, every chip outside it
+   * fades: brightening the chips inside it would not show on a light hue.
+   * Paint only - the matrix is a read surface, edited from its action bar.
    */
   class MatrixChipDelegate : public QStyledItemDelegate
   {
   public:
-    using QStyledItemDelegate::QStyledItemDelegate;
+    /** 'highlightActive' tells whether any chip carries the highlight role. */
+    MatrixChipDelegate(std::function<bool()> highlightActive, QObject* parent)
+      : QStyledItemDelegate(parent), m_HighlightActive(std::move(highlightActive))
+    {
+    }
 
     void paint(QPainter* painter, const QStyleOptionViewItem& option,
                const QModelIndex& index) const override
     {
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing, true);
+      if (m_HighlightActive() && !index.data(ChipHighlightRole).toBool())
+      {
+        painter->setOpacity(QmitkMxNHighlightFade);
+      }
 
-      auto hue = index.data(ChipHueRole).value<QColor>();
+      const auto hue = index.data(ChipHueRole).value<QColor>();
       if (index.data(ChipNotApplicableRole).toBool())
       {
         // The axis has no meaning for this window: a struck-through outline
@@ -232,20 +231,19 @@ namespace
       }
       else if (hue.isValid())
       {
-        // A chip sharing the hovered synchronization brightens. A frame would be
-        // invisible here - the chip is already filled in the group hue - and the
-        // selection frame already owns the highlight color.
-        if (index.data(ChipHighlightRole).toBool())
-        {
-          hue = hue.lighter(145);
-        }
         const QRect chip = option.rect.adjusted(2, 2, -2, -2);
         painter->setPen(Qt::NoPen);
         painter->setBrush(hue);
         painter->drawRoundedRect(chip, 3, 3);
 
-        painter->setPen(InkFor(hue));
+        painter->setPen(QmitkMxNInkFor(hue));
         QRect text = chip.adjusted(4, 0, -4, 0);
+        if (index.data(ChipLockedRole).toBool())
+        {
+          const int side = std::max(1, std::min(text.height() - 4, option.fontMetrics.height()));
+          painter->drawPixmap(text.left(), text.center().y() - side / 2 + 1, LockPixmap(QmitkMxNInkFor(hue), side));
+          text.setLeft(text.left() + side + 3);
+        }
         const auto offset = index.data(ChipOffsetRole).toString();
         if (!offset.isEmpty())
         {
@@ -262,6 +260,7 @@ namespace
 
       if (option.state & QStyle::State_Selected)
       {
+        painter->setOpacity(1.0);
         QPen pen(option.palette.color(QPalette::Highlight));
         pen.setWidth(2);
         painter->setPen(pen);
@@ -278,26 +277,30 @@ namespace
       size.setHeight(size.height() + 6);
       return size;
     }
+
+  private:
+    std::function<bool()> m_HighlightActive;
   };
 
   /**
    * Style a group card's header as a solid bar in the group hue, with the name,
-   * count, and menu button in a contrasting ink. Shared by card creation and the
+   * count, and tail in a contrasting ink. The tail is a user card's "..." menu
+   * button or the reserved card's badge. Shared by card creation and the
    * in-place refresh so a recolor updates both the bar and its text.
    */
-  void StyleGroupHeader(QFrame* header, QLabel* name, QLabel* count, QToolButton* menuButton,
-                        const QColor& hue)
+  void StyleGroupHeader(QFrame* header, QLabel* name, QLabel* count, QWidget* tail, const QColor& hue)
   {
-    const QString ink = InkFor(hue).name();
+    const QString ink = QmitkMxNInkFor(hue).name();
     header->setStyleSheet(QStringLiteral("background-color: %1; border-top-left-radius: 3px; "
                                          "border-top-right-radius: 3px;").arg(hue.name()));
     name->setStyleSheet(QStringLiteral("color: %1; font-weight: bold; background: transparent;").arg(ink));
     count->setStyleSheet(QStringLiteral("color: %1; background: transparent;").arg(ink));
     // The "..." already says "menu"; the style's popup arrow would only be
     // drawn over it.
-    menuButton->setStyleSheet(
+    tail->setStyleSheet(
       QStringLiteral("QToolButton { color: %1; background: transparent; border: none; }"
-                     "QToolButton::menu-indicator { image: none; }").arg(ink));
+                     "QToolButton::menu-indicator { image: none; }"
+                     "QLabel { color: %1; background: transparent; }").arg(ink));
   }
 
   void ClearLayout(QLayout* layout)
@@ -688,7 +691,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
   m_Matrix->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_Matrix->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_Matrix->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Matrix->setItemDelegate(new MatrixChipDelegate(m_Matrix));
+  m_Matrix->setItemDelegate(
+    new MatrixChipDelegate([this]() { return !m_MatrixHighlighted.empty(); }, m_Matrix));
   m_Matrix->setContextMenuPolicy(Qt::CustomContextMenu);
   // Clickable headers take the whole line, which is what turns "link every
   // window on one dimension to this group" and "unlink this window entirely"
@@ -733,7 +737,8 @@ QmitkMxNLayoutEditorWidget::QmitkMxNLayoutEditorWidget(QWidget* parent)
       this->ClearSyncHighlight();
       return;
     }
-    this->HighlightGroupAxis(group, *axis);
+    const auto row = static_cast<std::size_t>(index.row());
+    this->HighlightGroupAxis(group, *axis, row < m_MatrixCellIds.size() ? m_MatrixCellIds[row] : QString());
   });
 
   auto* clearShortcut = new QShortcut(QKeySequence::Delete, m_Matrix);
@@ -823,6 +828,16 @@ bool QmitkMxNLayoutEditorWidget::eventFilter(QObject* watched, QEvent* event)
     }
   }
   return QWidget::eventFilter(watched, event);
+}
+
+void QmitkMxNLayoutEditorWidget::changeEvent(QEvent* event)
+{
+  QWidget::changeEvent(event);
+  // Deferred, so the colour is read once the style has repolished the widgets.
+  if (QEvent::PaletteChange == event->type() || QEvent::StyleChange == event->type())
+  {
+    this->ScheduleRebuild();
+  }
 }
 
 void QmitkMxNLayoutEditorWidget::SelectMatrixLine(int section, bool wholeRow,
@@ -954,7 +969,10 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
                                                     const std::string& group,
                                                     QmitkMxNGroupJoinMode mode)
 {
-  if (m_MultiWidget.isNull())
+  // Every window is in the reserved group on the axes it takes, so there is
+  // nothing to join; and a Replace join would clear a window's other links
+  // before the engine refused the reserved id, in whatever spelling.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -970,16 +988,23 @@ void QmitkMxNLayoutEditorWidget::AssignCellsToGroup(const QStringList& windowIds
     const auto intent = it->second;
     m_EmptyGroupAxisCache.erase(it);  // erase before applying so a re-entrant signal cannot re-flush
 
-    const std::size_t dimCount = QmitkMxNAllSyncDimensions.size();
     std::vector<QmitkMxNSyncDimension> dimensions;
-    for (std::size_t axis = 0; axis < dimCount; ++axis)
+    bool includeSelection = false;
+    for (const auto axis : QmitkMxNAllSyncAxes)
     {
-      if (intent[axis])
+      if (!intent[static_cast<std::size_t>(QmitkMxNSyncAxisToSlot(axis))])
       {
-        dimensions.push_back(QmitkMxNAllSyncDimensions[axis]);
+        continue;
+      }
+      if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
+      {
+        dimensions.push_back(*dimension);
+      }
+      else if (QmitkMxNSyncAxis::Selection == axis)
+      {
+        includeSelection = true;
       }
     }
-    const bool includeSelection = intent[dimCount];
     for (const auto& windowId : windowIds)
     {
       this->ApplyGroupAxesToCell(windowId, group, dimensions, includeSelection, mode);
@@ -1065,7 +1090,9 @@ void QmitkMxNLayoutEditorWidget::ApplyGroupAxesToCell(
 void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
                                                        QmitkMxNSyncDimension dimension, bool enabled)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group, whose links the
+  // engine owns.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1117,7 +1144,9 @@ void QmitkMxNLayoutEditorWidget::ApplyDimensionToGroup(const std::string& group,
 
 void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group, bool enabled)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group, which takes no
+  // selection: toggling it would reset or move every window's selection.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1146,7 +1175,9 @@ void QmitkMxNLayoutEditorWidget::ApplySelectionToGroup(const std::string& group,
 
 void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis)
 {
-  if (m_MultiWidget.isNull())
+  // Time has no group but the reserved one, and the reserved group holds every
+  // window on the axes it takes: neither is the user's to toggle.
+  if (m_MultiWidget.isNull() || QmitkMxNSyncAxis::Time == axis || QmitkMxNMultiWidget::NamesReservedGroup(groupId))
   {
     return;
   }
@@ -1192,13 +1223,13 @@ void QmitkMxNLayoutEditorWidget::ToggleGroupAxis(const std::string& groupId, Qmi
     return;
   }
   const bool enable = !(axisSlots[slot].color.isValid() && !axisSlots[slot].partial);
-  if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
-  {
-    this->ApplyDimensionToGroup(groupId, *dimension, enable);
-  }
-  else
+  if (QmitkMxNSyncAxis::Selection == axis)
   {
     this->ApplySelectionToGroup(groupId, enable);
+  }
+  else if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
+  {
+    this->ApplyDimensionToGroup(groupId, *dimension, enable);
   }
 }
 
@@ -1226,7 +1257,8 @@ bool QmitkMxNLayoutEditorWidget::GroupSelectionEnabled(const std::string& group)
 void QmitkMxNLayoutEditorWidget::RemoveCellsFromGroup(const QStringList& windowIds,
                                                       const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // No window can leave the reserved group.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1249,7 +1281,9 @@ void QmitkMxNLayoutEditorWidget::RemoveCellsFromGroup(const QStringList& windowI
 
 void QmitkMxNLayoutEditorWidget::LinkNavigationBundle(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group, whose links the
+  // engine owns.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1303,7 +1337,9 @@ void QmitkMxNLayoutEditorWidget::ReconvergeGroup(const std::string& group)
 
 void QmitkMxNLayoutEditorWidget::ReinitGroupGeometry(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // Every window counts as a member of the reserved group: its first member
+  // stands for no geometry component of the group's own.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1345,7 +1381,8 @@ std::string QmitkMxNLayoutEditorWidget::CreateGroup()
 
 void QmitkMxNLayoutEditorWidget::DeleteGroup(const std::string& group)
 {
-  if (m_MultiWidget.isNull())
+  // The reserved group always exists.
+  if (m_MultiWidget.isNull() || QmitkMxNMultiWidget::NamesReservedGroup(group))
   {
     return;
   }
@@ -1386,7 +1423,7 @@ void QmitkMxNLayoutEditorWidget::RunPendingRebuild()
   // A layout load pumps the event loop while the cell tree is half built, so
   // the refresh waits it out. Polled rather than skipped: a load that fails
   // before it changes anything emits nothing a skipped refresh could wait for.
-  if (!m_MultiWidget.isNull() && m_MultiWidget->IsApplyingLayout())
+  if (!m_MultiWidget.isNull() && m_MultiWidget->IsBusy())
   {
     constexpr int retryMs = 50;
     QTimer::singleShot(retryMs, this, [this]() { this->RunPendingRebuild(); });
@@ -1427,8 +1464,10 @@ void QmitkMxNLayoutEditorWidget::RefreshOrRebuild()
     }
   }
 
-  std::vector<std::string> currentIds;
-  currentIds.reserve(infos.size());
+  // The reserved group always exists and is not among the user's groups the
+  // engine lists; its card leads.
+  std::vector<std::string> currentIds{ QmitkMxNGlobalGroupId };
+  currentIds.reserve(infos.size() + 1);
   for (const auto& info : infos)
   {
     currentIds.push_back(info.id);
@@ -1619,6 +1658,10 @@ void QmitkMxNLayoutEditorWidget::ReconcileGroupCards(
     {
       card = it->second;
     }
+    else if (QmitkMxNGlobalGroupId == id)
+    {
+      card = this->BuildGlobalCard();
+    }
     else if (auto infoIt = infoById.find(id); infoIt != infoById.end())
     {
       card = this->BuildGroupCard(*infoIt->second);
@@ -1642,7 +1685,7 @@ QList<QmitkMxNSyncBarcodeWidget::AxisSlot>
 QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) const
 {
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> result;
-  result.reserve(static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1);
+  result.reserve(QmitkMxNSyncAxisCount);
   if (m_MultiWidget.isNull())
   {
     return result;
@@ -1673,12 +1716,12 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
   // partial merely because a 3D member cannot take a 2D-only axis, or a 2D
   // member cannot follow the free orientation of the group.
   const bool hasMembers = !members.empty();
-  const auto stateSlot = [hasMembers](QmitkMxNAxisGlyph glyph, const QColor& groupHue, int linked, int total,
+  const auto stateSlot = [hasMembers](QmitkMxNSyncAxis axis, const QColor& groupHue, int linked, int total,
                                       bool anyOffset,
                                       const QString& label) -> QmitkMxNSyncBarcodeWidget::AxisSlot
   {
     QmitkMxNSyncBarcodeWidget::AxisSlot slot;
-    slot.glyph = glyph;
+    slot.axis = axis;
     if (hasMembers && 0 == total)
     {
       slot.applicable = false;
@@ -1704,15 +1747,69 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
     return slot;
   };
 
-  std::size_t axisIndex = 0;
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  const bool reserved = QmitkMxNGlobalGroupId == group;
+  const auto reservedName = QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+  for (const auto axis : QmitkMxNAllSyncAxes)
   {
+    const auto slotIndex = static_cast<std::size_t>(QmitkMxNSyncAxisToSlot(axis));
+    if (reserved && !QmitkMxNLinkKeyAcceptsGlobal(QmitkMxNSyncAxisToLinkKey(axis)))
+    {
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot;
+      slot.axis = axis;
+      slot.applicable = false;
+      slot.tooltip = tr("%1 - not available to the group %2").arg(AxisLabel(axis), reservedName);
+      result.append(slot);
+      continue;
+    }
+    if (QmitkMxNSyncAxis::Time == axis)
+    {
+      // Only the reserved group holds windows on Time, all of them; a user
+      // group cannot take it.
+      QmitkMxNSyncBarcodeWidget::AxisSlot slot = stateSlot(axis, hue,
+                                                           reserved ? total : 0, total, false, AxisLabel(axis));
+      if (!reserved)
+      {
+        slot.applicable = false;
+        slot.tooltip = tr("%1 - every window follows the application's time (group %2)")
+                         .arg(AxisLabel(axis), reservedName);
+      }
+      result.append(slot);
+      continue;
+    }
+    if (QmitkMxNSyncAxis::Selection == axis)
+    {
+      int selectionLinked = 0;
+      if (useCache)
+      {
+        selectionLinked = cacheIt->second[slotIndex] ? 1 : 0;
+      }
+      else
+      {
+        for (const auto& windowId : members)
+        {
+          if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
+          {
+            ++selectionLinked;
+          }
+        }
+      }
+      // Data selection has no offset to carry, so it never takes the footnote mark.
+      result.append(stateSlot(axis, hue, selectionLinked, total, false, AxisLabel(axis)));
+      continue;
+    }
+    const auto maybeDimension = QmitkMxNSyncAxisDimension(axis);
+    if (!maybeDimension.has_value())
+    {
+      continue;
+    }
+
+    const auto dimension = *maybeDimension;
     int linked = 0;
     int applicableMembers = total;
     bool anyOffset = false;
     if (useCache)
     {
-      linked = cacheIt->second[axisIndex] ? 1 : 0;
+      linked = cacheIt->second[slotIndex] ? 1 : 0;
     }
     else
     {
@@ -1720,7 +1817,7 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
       int inactiveLinked = 0;
       for (const auto& windowId : members)
       {
-        const bool applicable = m_MultiWidget->IsAxisApplicable(windowId, QmitkMxNSyncAxisOf(dimension));
+        const bool applicable = m_MultiWidget->IsAxisApplicable(windowId, axis);
         const auto link = m_MultiWidget->GetSyncLink(windowId, dimension);
         const bool linkedToGroup = link.has_value() && link->group == group;
         const bool canTake = linkedToGroup || QmitkMxNSyncDimension::Orientation != dimension
@@ -1747,34 +1844,14 @@ QmitkMxNLayoutEditorWidget::BuildGroupBarcodeSlots(const std::string& group) con
         linked = inactiveLinked;
       }
     }
-    result.append(stateSlot(GlyphFor(dimension), hue, linked, applicableMembers, anyOffset,
-                            QString::fromUtf8(DimensionLabel(dimension))));
-    ++axisIndex;
+    result.append(stateSlot(axis, hue, linked, applicableMembers, anyOffset, AxisLabel(axis)));
   }
-
-  int selectionLinked = 0;
-  if (useCache)
-  {
-    selectionLinked = cacheIt->second[axisIndex] ? 1 : 0;
-  }
-  else
-  {
-    for (const auto& windowId : members)
-    {
-      if (m_MultiWidget->GetCellSelectionGroup(windowId) == group)
-      {
-        ++selectionLinked;
-      }
-    }
-  }
-  // Data selection has no offset to carry, so it never takes the footnote mark.
-  result.append(
-    stateSlot(QmitkMxNAxisGlyph::Selection, hue, selectionLinked, total, false, tr("Data selection")));
 
   return result;
 }
 
-void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis)
+void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis,
+                                                    const QString& namingWindowId)
 {
   if (m_MultiWidget.isNull())
   {
@@ -1785,14 +1862,14 @@ void QmitkMxNLayoutEditorWidget::HighlightGroupAxis(const QString& group, QmitkM
   QColor hue;
   try
   {
-    hue = m_MultiWidget->GetSyncGroupColor(group.toStdString());
+    hue = m_MultiWidget->GetArrangeHighlightHue(group.toStdString());
   }
   catch (const mitk::Exception&)
   {
   }
   this->SetMatrixHighlight(members, QmitkMxNSyncAxisToSlot(axis));
   m_MultiWidget->GetArrangeMode()->SetHighlight(QmitkMxNArrangeMode::HighlightSource::Editor, axis,
-                                                members, hue);
+                                                members, hue, namingWindowId);
 }
 
 void QmitkMxNLayoutEditorWidget::ClearSyncHighlight()
@@ -1812,7 +1889,9 @@ void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds
   }
 
   // Touch only what changes: hover moves arrive per mouse move, and repainting
-  // the whole grid for each would be work the eye never sees.
+  // the whole grid for each would be work the eye never sees. Only a highlight
+  // starting or ending changes every chip, since all the others fade.
+  const bool wasActive = !m_MatrixHighlighted.empty();
   for (const auto& [row, column] : m_MatrixHighlighted)
   {
     if (auto* item = m_Matrix->item(row, column))
@@ -1822,23 +1901,27 @@ void QmitkMxNLayoutEditorWidget::SetMatrixHighlight(const QStringList& windowIds
   }
   m_MatrixHighlighted.clear();
 
-  if (column < 0 || column >= m_Matrix->columnCount())
+  if (column >= 0 && column < m_Matrix->columnCount())
   {
-    return;
-  }
-  for (int row = 0; row < m_Matrix->rowCount(); ++row)
-  {
-    const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
-                      ? m_MatrixCellIds[static_cast<std::size_t>(row)]
-                      : QString();
-    if (windowIds.contains(id))
+    for (int row = 0; row < m_Matrix->rowCount(); ++row)
     {
-      if (auto* item = m_Matrix->item(row, column))
+      const auto id = static_cast<std::size_t>(row) < m_MatrixCellIds.size()
+                        ? m_MatrixCellIds[static_cast<std::size_t>(row)]
+                        : QString();
+      if (windowIds.contains(id))
       {
-        item->setData(ChipHighlightRole, true);
-        m_MatrixHighlighted.emplace_back(row, column);
+        if (auto* item = m_Matrix->item(row, column))
+        {
+          item->setData(ChipHighlightRole, true);
+          m_MatrixHighlighted.emplace_back(row, column);
+        }
       }
     }
+  }
+
+  if (wasActive != !m_MatrixHighlighted.empty())
+  {
+    m_Matrix->viewport()->update();
   }
 }
 
@@ -1911,6 +1994,12 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
         {
           m_MultiWidget->SetSyncGroupDisplayName(groupId, text.trimmed().toStdString());
         }
+        catch (const QmitkMxNReservedGroupException&)
+        {
+          this->ShowRefusedGroupEdit(
+            tr("\"%1\" is the name of the reserved group. Choose another name.")
+              .arg(QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(QmitkMxNGlobalGroupId))));
+        }
         catch (const mitk::Exception& e)
         {
           MITK_WARN << "Layout editor: display-name change ignored: " << e.GetDescription();
@@ -1932,6 +2021,12 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
         {
           m_MultiWidget->SetSyncGroupColor(groupId, color);
         }
+      }
+      catch (const QmitkMxNReservedGroupException&)
+      {
+        this->ShowRefusedGroupEdit(
+          tr("This color is too close to the color of the reserved group %1. Choose another color.")
+            .arg(QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(QmitkMxNGlobalGroupId))));
       }
       catch (const mitk::Exception& e)
       {
@@ -2006,14 +2101,14 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   StyleGroupHeader(header, nameLabel, countLabel, menuButton, hue);
   cardLayout->addWidget(header);
 
-  // Axis strip: the eight axes as glyphs in the group perspective (all / none /
+  // Axis strip: the axes as glyphs in the group perspective (all / none /
   // some). Clicking an axis homogenizes the group - "some" or "none" links every
   // member, "all" unlinks them; the granular "some" state is reached from the
   // advanced matrix. A group's members are the windows it links on any axis, so
   // an empty group has nothing to homogenize: there, clicking an axis only
   // records which axes the first windows assigned to it will get.
   auto* strip = new QmitkMxNSyncBarcodeWidget(card);
-  strip->SetAxisClickable(true);
+  strip->SetAxisInteraction(QmitkMxNSyncBarcodeWidget::AxisInteraction::Click);
   strip->setFixedHeight(24);
   strip->setToolTip(tr("The dimensions this group synchronizes. Click an axis to link or "
                        "unlink it for the whole group"));
@@ -2086,6 +2181,98 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGroupCard(const QmitkMxNMultiWidget::S
   };
 
   return card;
+}
+
+QWidget* QmitkMxNLayoutEditorWidget::BuildGlobalCard()
+{
+  const std::string groupId = QmitkMxNGlobalGroupId;
+
+  // A plain frame, not a GroupCardFrame: windows neither join nor leave the
+  // reserved group by drag and drop, and it is dragged onto no window.
+  auto* card = new QFrame(this);
+  card->setObjectName(QStringLiteral("mxnGroupCard__") + QString::fromStdString(groupId));
+  card->setFrameShape(QFrame::Box);
+  card->setLineWidth(1);
+  auto* cardLayout = new QVBoxLayout(card);
+  cardLayout->setContentsMargins(0, 0, 6, 6);
+  cardLayout->setSpacing(4);
+
+  auto* header = new QFrame(card);
+  header->setAttribute(Qt::WA_StyledBackground, true);
+  auto* headerRow = new QHBoxLayout(header);
+  headerRow->setContentsMargins(6, 3, 3, 3);
+
+  auto* nameLabel = new QLabel(QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(groupId)), header);
+  headerRow->addWidget(nameLabel, 1);
+  auto* countLabel = new QLabel(header);
+  headerRow->addWidget(countLabel);
+
+  // In place of the "..." menu: a badge saying why there is none.
+  auto* badge = new QWidget(header);
+  badge->setObjectName(QStringLiteral("mxnReservedBadge"));
+  badge->setToolTip(tr("Reserved group: follows the application's value. It can't be renamed, recolored or "
+                       "deleted."));
+  auto* badgeRow = new QHBoxLayout(badge);
+  badgeRow->setContentsMargins(4, 0, 2, 0);
+  badgeRow->setSpacing(3);
+  auto* lockLabel = new QLabel(badge);
+  badgeRow->addWidget(lockLabel);
+  badgeRow->addWidget(new QLabel(tr("reserved"), badge));
+  headerRow->addWidget(badge);
+  cardLayout->addWidget(header);
+
+  // Hover lights the windows that share an axis, as on every card; a click
+  // changes nothing.
+  auto* strip = new QmitkMxNSyncBarcodeWidget(card);
+  strip->SetAxisInteraction(QmitkMxNSyncBarcodeWidget::AxisInteraction::Hover);
+  strip->setFixedHeight(24);
+  strip->setToolTip(tr("The axes on which every window follows the application's value"));
+  connect(strip, &QmitkMxNSyncBarcodeWidget::AxisHovered, this, [this, groupId](int index)
+  {
+    if (const auto axis = QmitkMxNSyncAxisFromSlot(index))
+    {
+      this->HighlightGroupAxis(QString::fromStdString(groupId), *axis);
+    }
+    else
+    {
+      this->ClearSyncHighlight();
+    }
+  });
+  auto* stripRow = new QHBoxLayout();
+  stripRow->setContentsMargins(6, 0, 0, 0);
+  stripRow->addWidget(strip);
+  cardLayout->addLayout(stripRow);
+
+  QPointer<QmitkMxNSyncBarcodeWidget> stripPtr = strip;
+  QPointer<QLabel> namePtr = nameLabel;
+  QPointer<QLabel> countPtr = countLabel;
+  QPointer<QFrame> headerPtr = header;
+  QPointer<QWidget> badgePtr = badge;
+  QPointer<QLabel> lockPtr = lockLabel;
+  m_CardsById[groupId] = card;
+  m_CardRefreshers[groupId] = [this, groupId, stripPtr, namePtr, countPtr, headerPtr, badgePtr, lockPtr]()
+  {
+    if (m_MultiWidget.isNull() || !stripPtr || !namePtr || !countPtr || !headerPtr || !badgePtr || !lockPtr)
+    {
+      return;
+    }
+    stripPtr->SetSlots(this->BuildGroupBarcodeSlots(groupId));
+    countPtr->setText(tr("%n window(s)", nullptr, static_cast<int>(this->GroupMembers(groupId).size())));
+    // The style's text colour, so the bar follows a style switch.
+    const QColor hue = m_MultiWidget->GetSyncGroupColor(groupId);
+    StyleGroupHeader(headerPtr, namePtr, countPtr, badgePtr, hue);
+    const int side = countPtr->fontMetrics().height();
+    lockPtr->setPixmap(LockPixmap(QmitkMxNInkFor(hue), side));
+  };
+  m_CardRefreshers[groupId]();
+
+  return card;
+}
+
+void QmitkMxNLayoutEditorWidget::ShowRefusedGroupEdit(const QString& reason)
+{
+  m_ConflictNotice->SetMessage(reason.toHtmlEscaped(), QmitkInfoCard::Severity::Warning);
+  m_ConflictNotice->show();
 }
 
 void QmitkMxNLayoutEditorWidget::ShowGridDialog()
@@ -2273,8 +2460,24 @@ void QmitkMxNLayoutEditorWidget::RefreshAdvancedMatrixIfVisible()
   }
   else
   {
+    this->RefreshMatrixHeaderGlyphs();
     this->RefreshMatrixCells();
     this->UpdateMatrixActionBar();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshMatrixHeaderGlyphs()
+{
+  const QColor headerInk = this->palette().color(QPalette::Text);
+  for (const auto axis : QmitkMxNAllSyncAxes)
+  {
+    auto* headerItem = m_Matrix->horizontalHeaderItem(QmitkMxNSyncAxisToSlot(axis));
+    if (nullptr == headerItem)
+    {
+      continue;
+    }
+    const QPixmap glyph = QmitkMxNRenderAxisGlyph(axis, headerInk, 16);
+    headerItem->setIcon(glyph.isNull() ? QIcon() : QIcon(glyph));
   }
 }
 
@@ -2282,37 +2485,21 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
   const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>&,
   const std::vector<QmitkMxNMultiWidget::WindowDescriptor>& descriptors)
 {
-  // Eight axes: the seven QmitkMxNSyncDimension links plus the data-selection axis
-  // in the last column, matching the plates and group headers.
-  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
+  // One column per axis, in the slot order the plates and group headers use.
   m_Matrix->clear();
-  m_Matrix->setColumnCount(dimensionCount + 1);
+  m_Matrix->setColumnCount(QmitkMxNSyncAxisCount);
   m_Matrix->setRowCount(static_cast<int>(descriptors.size()));
 
   // Glyph-only column headers: the same axis glyph the plates and barcodes use,
-  // named in the tooltip. Eight spelled-out dimension names do not fit a docked
-  // view, and the glyphs are the language the rest of the editor speaks.
-  const QColor headerInk = this->palette().color(QPalette::Text);
-  int headerColumn = 0;
-  for (const auto dimension : QmitkMxNAllSyncDimensions)
+  // named in the tooltip. Nine spelled-out axis names do not fit a docked view,
+  // and the glyphs are the language the rest of the editor speaks.
+  for (const auto axis : QmitkMxNAllSyncAxes)
   {
     auto* headerItem = new QTableWidgetItem();
-    const QPixmap glyph = QmitkMxNRenderAxisGlyph(GlyphFor(dimension), headerInk, 16);
-    if (!glyph.isNull())
-    {
-      headerItem->setIcon(QIcon(glyph));
-    }
-    headerItem->setToolTip(QString::fromUtf8(DimensionLabel(dimension)));
-    m_Matrix->setHorizontalHeaderItem(headerColumn++, headerItem);
+    headerItem->setToolTip(AxisLabel(axis));
+    m_Matrix->setHorizontalHeaderItem(QmitkMxNSyncAxisToSlot(axis), headerItem);
   }
-  auto* selectionHeader = new QTableWidgetItem();
-  const QPixmap selectionGlyph = QmitkMxNRenderAxisGlyph(QmitkMxNAxisGlyph::Selection, headerInk, 16);
-  if (!selectionGlyph.isNull())
-  {
-    selectionHeader->setIcon(QIcon(selectionGlyph));
-  }
-  selectionHeader->setToolTip(tr("Data selection"));
-  m_Matrix->setHorizontalHeaderItem(dimensionCount, selectionHeader);
+  this->RefreshMatrixHeaderGlyphs();
 
   QStringList rowLabels;
   for (const auto& descriptor : descriptors)
@@ -2328,7 +2515,7 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
   // this build and on every later edit.
   for (int row = 0; row < static_cast<int>(descriptors.size()); ++row)
   {
-    for (int column = 0; column <= dimensionCount; ++column)
+    for (int column = 0; column < QmitkMxNSyncAxisCount; ++column)
     {
       m_Matrix->setItem(row, column, new QTableWidgetItem());
     }
@@ -2342,7 +2529,6 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
     return;
   }
 
-  const auto dimensionCount = static_cast<int>(QmitkMxNAllSyncDimensions.size());
   for (int row = 0; row < m_Matrix->rowCount(); ++row)
   {
     if (row >= static_cast<int>(m_MatrixCellIds.size()))
@@ -2350,33 +2536,51 @@ void QmitkMxNLayoutEditorWidget::RefreshMatrixCells()
       break;
     }
     const auto windowId = m_MatrixCellIds[static_cast<std::size_t>(row)];
-    for (int column = 0; column <= dimensionCount && column < m_Matrix->columnCount(); ++column)
+    for (const auto axis : QmitkMxNAllSyncAxes)
     {
-      auto* item = m_Matrix->item(row, column);
+      const int column = QmitkMxNSyncAxisToSlot(axis);
+      auto* item = column < m_Matrix->columnCount() ? m_Matrix->item(row, column) : nullptr;
       if (nullptr == item)
       {
+        continue;
+      }
+
+      if (QmitkMxNSyncAxis::Time == axis)
+      {
+        // Every window follows the application's time: a fixed chip, not a cell
+        // the action bar can edit.
+        const auto name = QString::fromStdString(m_MultiWidget->GetSyncGroupDisplayName(QmitkMxNGlobalGroupId));
+        item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+        item->setSelected(false);
+        item->setData(ChipNotApplicableRole, false);
+        item->setData(ChipLockedRole, true);
+        item->setData(ChipGroupRole, QString::fromLatin1(QmitkMxNGlobalGroupId));
+        item->setData(ChipNameRole, name);
+        item->setData(ChipHueRole, m_MultiWidget->GetSyncGroupColor(QmitkMxNGlobalGroupId));
+        item->setData(ChipOffsetRole, QString());
+        item->setText(name);
+        item->setToolTip(tr("Locked: every window follows the application's time"));
         continue;
       }
 
       std::string group;
       QString offset;
       QString keptOffset;
-      QString axisName;
+      const QString axisName = AxisLabel(axis);
       bool applicable = true;
       try
       {
-        applicable = m_MultiWidget->IsAxisApplicable(windowId, *QmitkMxNSyncAxisFromSlot(column));
-        if (column == dimensionCount)
+        applicable = m_MultiWidget->IsAxisApplicable(windowId, axis);
+        const auto maybeDimension = QmitkMxNSyncAxisDimension(axis);
+        if (QmitkMxNSyncAxis::Selection == axis)
         {
           // Data selection always resolves to a group - it has no unlinked
           // state - so this column is never empty.
           group = m_MultiWidget->GetCellSelectionGroup(windowId);
-          axisName = tr("Data selection");
         }
-        else
+        else if (maybeDimension.has_value())
         {
-          const auto dimension = QmitkMxNAllSyncDimensions[static_cast<std::size_t>(column)];
-          axisName = QString::fromUtf8(DimensionLabel(dimension));
+          const auto dimension = *maybeDimension;
           if (const auto link = m_MultiWidget->GetSyncLink(windowId, dimension))
           {
             group = link->group;
@@ -2538,6 +2742,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildMatrixActionBar()
   auto* groupRow = new QHBoxLayout();
   groupRow->addWidget(new QLabel(tr("Group"), bar));
   m_MatrixGroupPicker = new QComboBox(bar);
+  m_MatrixGroupPicker->setObjectName(QStringLiteral("mxnMatrixGroupPicker"));
   m_MatrixGroupPicker->setToolTip(tr("Assign the selected cells to a group. '%1' removes the "
                                      "link; on the data-selection axis, which is always in some "
                                      "group, it returns the window to the default one. Groups "
@@ -2779,32 +2984,15 @@ void QmitkMxNLayoutEditorWidget::UpdateMatrixActionBar()
     }
   }
 
-  QString axisPart;
-  QmitkMxNAxisGlyph axisGlyph = QmitkMxNAxisGlyph::Selection;
   const bool singleAxis = 1 == axes.size();
-  if (singleAxis)
-  {
-    if (const auto axisDimension = QmitkMxNSyncAxisDimension(axes.front()))
-    {
-      axisPart = QString::fromUtf8(DimensionLabel(*axisDimension));
-      axisGlyph = GlyphFor(*axisDimension);
-    }
-    else
-    {
-      axisPart = tr("Data selection");
-      axisGlyph = QmitkMxNAxisGlyph::Selection;
-    }
-  }
-  else
-  {
-    axisPart = tr("%n dimension(s)", nullptr, static_cast<int>(axes.size()));
-  }
+  const QString axisPart = singleAxis ? AxisLabel(axes.front())
+                                      : tr("%n dimension(s)", nullptr, static_cast<int>(axes.size()));
 
   // Name the axis in the bar with the same glyph the column header and the plates
   // carry, so the bar is visibly about the column the user is working in. Only
   // for a single axis: a glyph for "3 dimensions" would name none of them.
   const QPixmap axisIcon =
-    singleAxis ? QmitkMxNRenderAxisGlyph(axisGlyph, this->palette().color(QPalette::Text),
+    singleAxis ? QmitkMxNRenderAxisGlyph(axes.front(), this->palette().color(QPalette::Text),
                                          m_MatrixAxisIconLabel->fontMetrics().height())
                : QPixmap();
   m_MatrixAxisIconLabel->setPixmap(axisIcon);
@@ -3073,11 +3261,11 @@ void QmitkMxNLayoutEditorWidget::MirrorSelectionToMatrix(const QStringList& wind
 void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis,
                                                   const std::string& group)
 {
+  this->WriteCellAxisGroup(windowId, axis, group);
   if (m_MultiWidget.isNull())
   {
     return;
   }
-  this->WriteCellAxisGroup(windowId, axis, group);
   m_MultiWidget->RefreshSyncControls();
   this->ShowOrientationConflicts(group);
 }
@@ -3085,6 +3273,12 @@ void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, Qmitk
 void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis,
                                                     const std::string& group)
 {
+  if (QmitkMxNSyncAxis::Time == axis)
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "Time follows the application's time; only the reserved group '" << QmitkMxNGlobalGroupId
+      << "' holds it.";
+  }
   if (m_MultiWidget.isNull() || group.empty())
   {
     return;
@@ -3092,11 +3286,11 @@ void QmitkMxNLayoutEditorWidget::WriteCellAxisGroup(const QString& windowId, Qmi
 
   try
   {
-    if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
+    if (QmitkMxNSyncAxis::Selection == axis)
     {
       m_MultiWidget->SetCellSelectionGroup(windowId, group);
     }
-    else
+    else if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
     {
       // Carry any offset over: re-grouping a cell keeps the relationship the
       // user authored, it only changes what that relationship is measured from.
@@ -3149,16 +3343,22 @@ void QmitkMxNLayoutEditorWidget::ShowOrientationConflicts(const std::string& gro
 
 void QmitkMxNLayoutEditorWidget::ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)
 {
+  this->WriteCellAxisCleared(windowId, axis);
   if (m_MultiWidget.isNull())
   {
     return;
   }
-  this->WriteCellAxisCleared(windowId, axis);
   m_MultiWidget->RefreshSyncControls();
 }
 
 void QmitkMxNLayoutEditorWidget::WriteCellAxisCleared(const QString& windowId, QmitkMxNSyncAxis axis)
 {
+  if (QmitkMxNSyncAxis::Time == axis)
+  {
+    mitkThrowException(QmitkMxNReservedGroupException)
+      << "Time follows the application's time; only the reserved group '" << QmitkMxNGlobalGroupId
+      << "' holds it.";
+  }
   if (m_MultiWidget.isNull())
   {
     return;
@@ -3166,11 +3366,11 @@ void QmitkMxNLayoutEditorWidget::WriteCellAxisCleared(const QString& windowId, Q
 
   try
   {
-    if (const auto dimension = QmitkMxNSyncAxisDimension(axis); !dimension.has_value())
+    if (QmitkMxNSyncAxis::Selection == axis)
     {
       m_MultiWidget->ClearCellSelectionGroup(windowId);
     }
-    else
+    else if (const auto dimension = QmitkMxNSyncAxisDimension(axis))
     {
       m_MultiWidget->ClearSyncLink(windowId, *dimension);
     }
@@ -3264,11 +3464,17 @@ std::vector<QString> QmitkMxNLayoutEditorWidget::GroupMembers(const std::string&
 
   for (const auto& descriptor : m_MultiWidget->ListWindowDescriptors())
   {
-    // A cell belongs to a group when it is tied on ANY of the eight axes: the
-    // seven QmitkMxNSyncDimension links OR its data-selection group. Selection is
-    // a different stack part (the node-selection widget's group index) but the
-    // same axis to the user - the 8th barcode slot - so membership counts it
-    // uniformly, and the group card, count, and axis actions cover it.
+    // Every window is in the reserved group, on Time.
+    if (QmitkMxNGlobalGroupId == group)
+    {
+      members.push_back(descriptor.id);
+      continue;
+    }
+    // A cell belongs to a group when it is tied on any axis a user group can
+    // take: a QmitkMxNSyncDimension link or its data-selection group. Selection
+    // is a different stack part (the node-selection widget's group index) but
+    // the same axis to the user, so membership counts it uniformly, and the
+    // group card, count, and axis actions cover it.
     bool member = (m_MultiWidget->GetCellSelectionGroup(descriptor.id) == group);
     for (const auto dimension : QmitkMxNAllSyncDimensions)
     {

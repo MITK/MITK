@@ -24,6 +24,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "ctx",
@@ -43,6 +44,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": "ctx",
               "zoom": "ctx",
@@ -59,6 +61,7 @@
             "view_direction": "axial",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "slice": {
                 "target": "ctx",
@@ -85,6 +88,7 @@
             "view_direction": "sagittal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "windowing": "main",
               "lut": "main"
@@ -97,6 +101,7 @@
             "view_direction": "coronal",
             "links": {
               "selection": "main",
+              "time": "global",
               "crosshair": "main",
               "windowing": "main",
               "lut": "main"

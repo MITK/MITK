@@ -105,6 +105,12 @@ public:
    */
   bool eventFilter(QObject* watched, QEvent* event) override;
 
+protected:
+  /** \brief Refreshes the cards and the matrix on a style or palette change: the
+   *         reserved group is drawn in the style's text colour. */
+  void changeEvent(QEvent* event) override;
+
+public:
   /**
    * \brief The data storage the dynamic layout dialog chooses its data from.
    *        Without it, "Dynamic layout..." opens no dialog.
@@ -132,6 +138,10 @@ public:
    *        carries no offset, whatever offset it had in its previous group. An
    *        axis already linked to 'group' keeps its offset. Moving a single link
    *        while keeping its offset is SetCellAxisGroup.
+   *
+   *        A no-op for the reserved group in any spelling (see
+   *        QmitkMxNMultiWidget::NamesReservedGroup): every window already
+   *        follows it on the axes it takes.
    */
   void AssignCellsToGroup(const QStringList& windowIds, const std::string& group,
                           QmitkMxNGroupJoinMode mode = QmitkMxNGroupJoinMode::Replace);
@@ -139,7 +149,8 @@ public:
   /**
    * \brief Link or unlink every current member cell of 'group' on one
    *        dimension. Membership is defined by the engine's links: a no-op
-   *        for a group without members.
+   *        for a group without members. A no-op for the reserved group in
+   *        any spelling, whose links are not the user's to change.
    */
   void ApplyDimensionToGroup(const std::string& group, QmitkMxNSyncDimension dimension, bool enabled);
 
@@ -148,7 +159,8 @@ public:
    *        cell of 'group'. Selection is single-valued per cell, so enabling
    *        moves each member's selection group to this group (last-writer-wins
    *        if a member already had a different one); disabling returns each
-   *        member to the default selection group.
+   *        member to the default selection group. A no-op for the reserved
+   *        group in any spelling, which takes no selection.
    */
   void ApplySelectionToGroup(const std::string& group, bool enabled);
 
@@ -158,7 +170,8 @@ public:
    *        assigned, then cleared) and does not touch the engine, whatever is
    *        selected; a non-empty group homogenizes the axis over its members
    *        (link all / unlink all). Public so tests can drive the axis
-   *        interaction directly.
+   *        interaction directly. A no-op on Time and for the reserved group in
+   *        any spelling, whose axes are not the user's to toggle.
    */
   void ToggleGroupAxis(const std::string& groupId, QmitkMxNSyncAxis axis);
 
@@ -166,11 +179,14 @@ public:
    * \brief Take every given cell out of 'group': its links to the group are
    *        cleared on every dimension, and a selection on the group returns to
    *        the default group. Links to other groups are kept. The sync
-   *        furniture is notified once for the whole batch.
+   *        furniture is notified once for the whole batch. A no-op for the
+   *        reserved group in any spelling, which no window can leave.
    */
   void RemoveCellsFromGroup(const QStringList& windowIds, const std::string& group);
 
-  /** \brief Link pan+zoom+slice+crosshair for every member cell of 'group'. */
+  /** \brief Link pan+zoom+slice+crosshair for every member cell of 'group'. A
+   *         no-op for the reserved group in any spelling, whose links are not
+   *         the user's to change. */
   void LinkNavigationBundle(const std::string& group);
 
   /** \brief Re-converge every offset dimension (slice/zoom/pan) the group links. */
@@ -178,7 +194,9 @@ public:
 
   /**
    * \brief Reinit the geometry-authority component of the group's first
-   *        member cell (no-op for a group without members).
+   *        member cell (no-op for a group without members). A no-op for the
+   *        reserved group in any spelling: every window is its member, so its
+   *        first member stands for no group of its own.
    */
   void ReinitGroupGeometry(const std::string& group);
 
@@ -189,13 +207,23 @@ public:
    * \brief Link one cell on one axis to 'group'. An existing offset on the axis
    *        is carried over, so re-grouping a cell keeps the relationship the user
    *        authored. Public so the advanced matrix's edits are testable
-   *        headlessly.
+   *        headlessly. A link the engine refuses on any other axis is logged and
+   *        not made.
+   *
+   * \throws QmitkMxNReservedGroupException for QmitkMxNSyncAxis::Time, whatever
+   *         'group' is (QmitkMxNGlobalGroupId included), before any change:
+   *         every window follows the application's time through the reserved
+   *         group and stores no Time link.
    */
   void SetCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis, const std::string& group);
 
   /**
    * \brief Unlink one cell on one axis. Data selection has no unlinked state,
    *        so the selection axis returns the cell to the default group instead.
+   *
+   * \throws QmitkMxNReservedGroupException for QmitkMxNSyncAxis::Time, before
+   *         any change: no window can leave the reserved group
+   *         QmitkMxNGlobalGroupId on Time.
    */
   void ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis);
 
@@ -235,19 +263,24 @@ public:
   /**
    * \brief Remove a synchronization group entirely (its cells are unsynchronized
    *        and revert to the default group). A no-op for the default group, which
-   *        every cell falls back to and which is never removable. Public so tests
+   *        every cell falls back to and which is never removable, and for the
+   *        reserved group in any spelling, which always exists. Public so tests
    *        and the card menu can drive it.
    */
   void DeleteGroup(const std::string& group);
 
   /**
    * \brief The group-perspective barcode slots for a group's header: one per
-   *        axis (the seven dimensions then data selection). Each axis is
-   *        tri-state over the group's member cells - a solid hue when all
-   *        members link this group on that axis, a gap when none do, and the
-   *        partial (dashed) state when only some do (reachable via per-cell
-   *        edits or the advanced matrix). Distinct from the multiwidget's
-   *        per-cell, binary BuildBarcodeSlots.
+   *        axis, in slot order. Each axis is tri-state over the group's member
+   *        cells - a solid hue when all members link this group on that axis, a
+   *        gap when none do, and the partial (dashed) state when only some do
+   *        (reachable via per-cell edits or the advanced matrix). Distinct from
+   *        the multiwidget's per-cell, binary BuildBarcodeSlots.
+   *
+   *   Time is struck through on a user group's card: only the reserved group
+   *   'global' holds windows on it. That group's card has Time lit for every
+   *   window and strikes through every axis not in
+   *   QmitkMxNLinkKeysAcceptingGlobal.
    */
   QList<QmitkMxNSyncBarcodeWidget::AxisSlot> BuildGroupBarcodeSlots(const std::string& group) const;
 
@@ -272,9 +305,12 @@ public:
    *        mark them in the matrix and hand them to the arrange mode, which
    *        bumps their frames in the display; ClearSyncHighlight removes the highlight.
    *        Driven by a group card's glyph hover and a matrix chip's hover.
-   *        Public so the resolution is testable headlessly.
+   *        'namingWindowId' is the window the hovered element belongs to - a
+   *        matrix chip's row - whose plate names the axis; a card's glyph
+   *        belongs to no window and names the axis itself. Public so the
+   *        resolution is testable headlessly.
    */
-  void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis);
+  void HighlightGroupAxis(const QString& group, QmitkMxNSyncAxis axis, const QString& namingWindowId = QString());
   void ClearSyncHighlight();
 
 public Q_SLOTS:
@@ -317,7 +353,7 @@ private:
   void RefreshOrRebuild();
 
   /** \brief Run the refresh ScheduleRebuild deferred, or, while the multi
-   *         widget is applying a layout, try again a little later. */
+   *         widget is busy, try again a little later. */
   void RunPendingRebuild();
 
   /** \brief Update every existing card's contents from the current engine state
@@ -370,6 +406,10 @@ private:
    *         and the selection survives. A column only grows, when a chip
    *         outgrew it, never shrinks. */
   void RefreshMatrixCells();
+
+  /** \brief Draw the matrix's column-header glyphs in the current text color,
+   *         so a style switch that leaves the structure alone recolors them. */
+  void RefreshMatrixHeaderGlyphs();
 
   /** \brief The selected matrix cells as (window id, axis) pairs, in row then
    *         column order - row order being the layout's pre-order, which is the
@@ -442,6 +482,12 @@ private:
   void ReconcileGroupCards(const std::vector<std::string>& currentIds,
                            const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos);
   QWidget* BuildGroupCard(const QmitkMxNMultiWidget::SyncGroupInfo& info);
+  /** \brief The card of the reserved group 'global', first in the list: no
+   *         menu, no drag and drop, and its axes are not toggled from it. */
+  QWidget* BuildGlobalCard();
+  /** \brief Show in the notice card why a rename or recolour was refused for
+   *         the reserved name or colour. */
+  void ShowRefusedGroupEdit(const QString& reason);
   /** \brief Lay out the matrix's headers and its empty items for the current
    *         window set. RefreshMatrixCells fills the chips. */
   void RebuildMatrix(const std::vector<QmitkMxNMultiWidget::SyncGroupInfo>& infos,
@@ -452,7 +498,9 @@ private:
    *         the navigation-bundle default. */
   bool HasCachedGroupIntent(const std::string& group) const;
 
-  /** \brief All member cells of the group over every dimension, pre-order. */
+  /** \brief All member cells of the group over every dimension, pre-order;
+   *         every window for the reserved group, so a public action that
+   *         changes a group returns early for it. */
   std::vector<QString> GroupMembers(const std::string& group) const;
 
   /** \brief Dimensions the group currently links for at least one cell. */
@@ -555,14 +603,13 @@ private:
   std::vector<QString> m_MatrixCellIds;
   std::vector<std::string> m_MatrixGroupIds;
 
-  // Per-group, empty-group-only intent buffer: which of the eight axes (the
-  // seven QmitkMxNAllSyncDimensions, then data selection) the user toggled on
-  // while the group had no members. Applied to the first windows assigned.
-  // Editor-held (not card-bound) so the const BuildGroupBarcodeSlots can render
-  // from it and it survives the card reconcile. Erased once the group has a
-  // member by any route, when the group leaves the set or is deleted, and on a
-  // SetMultiWidget swap.
-  using AxisIntent = std::array<bool, QmitkMxNAllSyncDimensions.size() + 1>;
+  // Per-group, empty-group-only intent buffer, indexed by slot: which axes the
+  // user toggled on while the group had no members. Applied to the first
+  // windows assigned. Editor-held (not card-bound) so the const
+  // BuildGroupBarcodeSlots can render from it and it survives the card
+  // reconcile. Erased once the group has a member by any route, when the group
+  // leaves the set or is deleted, and on a SetMultiWidget swap.
+  using AxisIntent = std::array<bool, QmitkMxNSyncAxisCount>;
   std::map<std::string, AxisIntent> m_EmptyGroupAxisCache;
 
   bool m_RebuildPending = false;

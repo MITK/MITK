@@ -72,6 +72,7 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
 
   MITK_TEST(DataClasses_ImagesSegmentationsAndNeither);
   MITK_TEST(R1_Prefill_TakesTheSelectionInItsOrderPerDataClass);
+  MITK_TEST(UnshownSelection_NamesWhatNoWindowWouldShow);
   MITK_TEST(R2_DatasetIsTheImageWithItsSegmentationDerivations);
   MITK_TEST(R3_SharedBase_FromTheSelectionOrTheDataTree);
   MITK_TEST(R4_Aligned_ByIdenticalGeometry);
@@ -97,6 +98,10 @@ class QmitkMxNDynamicLayoutTestSuite : public mitk::TestFixture
   MITK_TEST(Apply_AlignedStaticFirst_DynamicWindowsStepThroughTime);
   MITK_TEST(Apply_DynamicSeriesOnDifferentGrids_EveryWindowShowsTheSelectedTime);
   MITK_TEST(Apply_ObjectFormSelectionLinks_Accepted);
+  MITK_TEST(Apply_MalformedSelectionLinks_ReportTheLoadersMessage);
+  MITK_TEST(Apply_NonObjectGroups_ReportsTheLoadersMessage);
+  MITK_TEST(Apply_UndeclaredSelectionGroup_ReportsTheLoadersMessage);
+  MITK_TEST(Apply_LazyModeDocument_BindsItsGroups);
   MITK_TEST(Apply_ValidationFailuresChangeNothing);
   MITK_TEST(Cleanup_ReusedIdInheritsNoRendererState);
   MITK_TEST(Cleanup_UnlinkKeepsTheCellsOtherRendererState);
@@ -322,6 +327,42 @@ public:
                            (std::vector<mitk::DataNode::Pointer>{ c }) == fusion.at(QmitkMxNSlot::Anatomy));
     CPPUNIT_ASSERT_MESSAGE("...the next one the first match no earlier slot took",
                            (std::vector<mitk::DataNode::Pointer>{ a }) == fusion.at(QmitkMxNSlot::FusedImage));
+  }
+
+  void UnshownSelection_NamesWhatNoWindowWouldShow()
+  {
+    using QmitkMxNDynamicLayouts::Prefill;
+    using QmitkMxNDynamicLayouts::UnshownSelection;
+    using NodeList = std::vector<mitk::DataNode::Pointer>;
+    const auto a = this->AddImage("a");
+    const auto b = this->AddImage("b");
+    const auto c = this->AddImage("c");
+    const auto d = this->AddImage("d");
+    const auto e = this->AddImage("e");
+    const auto mask = this->AddMask(a, "mask", 1);
+    const auto strayMask = this->AddMask(e, "stray mask", 1);
+    auto helper = this->AddImage("helper");
+    helper->SetBoolProperty("helper object", true);
+
+    const auto unshown = [this](QmitkMxNDynamicTemplate templateId, const NodeList& selection) {
+      return UnshownSelection(templateId, selection, Prefill(templateId, selection, *m_DataStorage), *m_DataStorage);
+    };
+
+    CPPUNIT_ASSERT_MESSAGE("Datasets x planes: images beyond the maximum and segmentations of no bound dataset; "
+                           "a bound dataset's own segmentation is shown",
+                           (NodeList{ e, strayMask })
+                             == unshown(QmitkMxNDynamicTemplate::DatasetsByPlanes, { mask, c, a, b, d, e, strayMask, helper }));
+    CPPUNIT_ASSERT_MESSAGE("Shared base: every image but the base",
+                           (NodeList{ b, c }) == unshown(QmitkMxNDynamicTemplate::SharedBase, { a, b, c, mask }));
+    CPPUNIT_ASSERT_MESSAGE("Fusion pair: a third image and every segmentation",
+                           (NodeList{ c, mask }) == unshown(QmitkMxNDynamicTemplate::FusionPair, { a, b, c, mask }));
+    CPPUNIT_ASSERT_MESSAGE("Nothing left out",
+                           unshown(QmitkMxNDynamicTemplate::OneViewPerDataset, { a, b, mask }).empty());
+
+    const QmitkMxNSlotBindings edited{ { QmitkMxNSlot::Anatomy, { b } }, { QmitkMxNSlot::FusedImage, { c } } };
+    CPPUNIT_ASSERT_MESSAGE("The slots as they are, not as prefilled",
+                           (NodeList{ a }) == UnshownSelection(QmitkMxNDynamicTemplate::FusionPair, { a, b, c }, edited,
+                                                               *m_DataStorage));
   }
 
   void R2_DatasetIsTheImageWithItsSegmentationDerivations()
@@ -1302,6 +1343,113 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Every window shows its group", (std::set<std::string>{ "anat", "fused", "fusion" }) == bound);
   }
 
+  /** Every window's selection link 's' rewritten as '{"group": s}', an
+   *  object without the 'target' the layout format requires. */
+  static void UseTargetlessSelectionLinks(nlohmann::json& node)
+  {
+    if ("window" == node.at("type").get<std::string>())
+    {
+      auto& links = node.at("links");
+      links["selection"] = nlohmann::json{ { "group", links.at("selection") } };
+      return;
+    }
+    for (auto& child : node.at("children"))
+    {
+      UseTargetlessSelectionLinks(child);
+    }
+  }
+
+  void Apply_MalformedSelectionLinks_ReportTheLoadersMessage()
+  {
+    // A dynamic layout is validated by the layout format's own rules, so a
+    // malformed link is reported as such, not as a consequence of it.
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    UseTargetlessSelectionLinks(layout.document.at("root"));
+
+    std::string message;
+    try
+    {
+      m_Editor->ApplyDynamicLayout(layout);
+    }
+    catch (const mitk::Exception& e)
+    {
+      message = e.GetDescription();
+    }
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("without the required 'target' string"));
+  }
+
+  /** The message 'ApplyDynamicLayout' rejects 'layout' with; empty if it
+   *  accepts it. */
+  std::string RejectionOf(const QmitkMxNDynamicLayout& layout)
+  {
+    try
+    {
+      m_Editor->ApplyDynamicLayout(layout);
+    }
+    catch (const mitk::Exception& e)
+    {
+      return e.GetDescription();
+    }
+    return {};
+  }
+
+  void Apply_NonObjectGroups_ReportsTheLoadersMessage()
+  {
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    layout.document["groups"] = nlohmann::json::array();
+
+    const auto message = this->RejectionOf(layout);
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("'groups' field must be a JSON object"));
+  }
+
+  void Apply_UndeclaredSelectionGroup_ReportsTheLoadersMessage()
+  {
+    const auto anatomy = this->AddImage("anatomy");
+    const auto fused = this->AddImage("fused");
+    auto layout = this->Generate({ { QmitkMxNSlot::Anatomy, { anatomy } }, { QmitkMxNSlot::FusedImage, { fused } } },
+                                 QmitkMxNFusionPairOptions{});
+    layout.document.at("groups").erase("anat");
+
+    const auto message = this->RejectionOf(layout);
+    CPPUNIT_ASSERT_MESSAGE("Rejected with the loader's message, got: '" + message + "'",
+                           std::string::npos != message.find("not declared in the 'groups' dict"));
+  }
+
+  void Apply_LazyModeDocument_BindsItsGroups()
+  {
+    // Without 'groups' the layout format registers every group a window
+    // links on selection, so the data bound to those groups has a place.
+    const auto base = this->AddImage("base");
+    const auto first = this->AddMask(base, "first", 5);
+    const auto other = this->AddImage("other");
+    this->ShowEditor();
+    auto layout = this->Generate({ { QmitkMxNSlot::BaseImage, { base } }, { QmitkMxNSlot::Segmentations, { first } } },
+                                 QmitkMxNSharedBaseOptions{ false, true });
+    layout.document.erase("groups");
+
+    CPPUNIT_ASSERT_NO_THROW(m_Editor->ApplyDynamicLayout(layout));
+    Pump();
+    for (const auto& descriptor : m_Editor->ListWindowDescriptors())
+    {
+      auto* renderer = this->Renderer(descriptor.id);
+      const auto& shown = layout.groupNodes.at(descriptor.selectionGroup.toStdString());
+      for (const auto& node : { base, first, other })
+      {
+        const bool expected = std::find(shown.begin(), shown.end(), node) != shown.end();
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(node->GetName() + " in " + descriptor.id.toStdString(), expected,
+                                     node->IsVisible(renderer));
+      }
+    }
+  }
+
   void Apply_ValidationFailuresChangeNothing()
   {
     const auto anatomy = this->AddImage("anatomy");
@@ -1366,7 +1514,7 @@ public:
       "version": "3.0",
       "groups": { "main": { "select_all": true } },
       "root": { "type": "split", "orientation": "horizontal", "children": [
-        { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" } }
+        { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
       ] }
     })json");
   }

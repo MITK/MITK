@@ -57,8 +57,11 @@
 	Saved layouts are persisted as v3.0 JSON documents. The canonical reference for fields,
 	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v3.schema.json</tt>;
 	both the in-tree presets and any file produced by "Save..." follow this schema.
-	v2.0 documents remain loadable unchanged; per-dimension synchronization links and
-	per-group display names and colors are v3.0 additions.
+	v2.0 documents remain loadable unchanged, except one that names a group <tt>global</tt>
+	(in any letter case): that name belongs to the reserved group Global (see
+	\ref org_mitk_editors_mxnmultiwidget_DimSync), so loading such a file reports an error.
+	Rename the group throughout the file, then load it again. Per-dimension synchronization
+	links and per-group display names and colors are v3.0 additions.
 
 	Files written by older MITK releases use the v1.x format. The current editor does <b>not</b>
 	load v1.x files directly; loading one surfaces an error message that points at a one-shot
@@ -179,22 +182,25 @@
 			centered on the window where the title of the collapsed strip is (see
 			\ref org_mitk_editors_mxnmultiwidget_Readouts). It is shortened where that room is
 			small and left out where it is too small.
-		<li> Sync barcode: one slot per dimension in the fixed order pan, zoom, slice,
-			crosshair, orientation, windowing, LUT, plus the data selection, colored with the
-			linked group's hue and left empty where the window is not synchronized. Pointing at one of its axis
-			glyphs shows the sync peek described below; clicking it opens the MxN Layout
-			Editor, or closes it if it is already visible (see
-			\ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
+		<li> Sync barcode: one slot per synchronization axis, in three families - orientation,
+			pan and zoom (how the window looks at its data), slice, time and crosshair (where in
+			the data), data selection, windowing and LUT (what is shown and how) - colored with
+			the linked group's hue and left empty where the window is not synchronized. Time is
+			always the light gray of the group Global (see
+			\ref org_mitk_editors_mxnmultiwidget_DimSync). Pointing at one of its axis glyphs shows
+			the sync peek described below; clicking it opens the MxN Layout Editor, or closes it if
+			it is already visible (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor). Under
+			the pointer the barcode lightens like the buttons beside it.
 		<li> Maximize button: Give this window the whole editor area, and bring the other
 			windows back
 	</ul>
 
 	Pointing at one of the barcode's axis glyphs and resting there for a moment brings
 	up a small plate in the middle of every window that has room for one. Each plate
-	shows that window's eight axes tinted by synchronization group, with the axis you
-	are pointing at enlarged, named above the row, and the window's own name below it.
+	shows that window's nine axes in a 3x3 grid, one family per row in the barcode's
+	order, tinted by synchronization group, with the axis you are pointing at enlarged.
 	The enlarged glyph grows in place and is outlined like a sticker, so it may overlap
-	its neighbours but never pushes them aside: the row keeps its shape wherever you point.
+	its neighbours but never pushes them aside: the grid keeps its shape wherever you point.
 	An axis the window synchronizes is drawn solid in its group's hue; one it does not
 	is faint and uncolored, whether or not it is the enlarged one - so a plate reads
 	both ways round, as the window's whole coupling and as the answer for the axis you
@@ -203,25 +209,23 @@
 
 	\imageMacroEx{QmitkMxN_SyncPeek.png, "The sync peek on the slice axis: the two upper windows share a slice group and the lower two do not synchronize slices", 16, 720px}
 
-	Where the windows are too narrow for a row of eight glyphs but tall enough, the
-	plates lay the axes out in two rows of four instead - pan, zoom, slice and crosshair
-	above orientation, windowing, LUT and data selection. The layout picks whichever
-	arrangement gives more windows a plate, and all plates use the same one, so an axis
-	is in the same place in every window.
+	A single line on top of each plate carries the window's name. On the plate of the
+	window you are pointing from, it names the axis instead, followed by that window's
+	offset on it if it has one and the line has room for it; the enlarged glyph's ribbon
+	shows the offset in any case. Where the line is short, the axis name is shortened first.
 
 	Where the window sits at an offset from its group - a slice step away, a zoom factor
-	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value sits
-	directly beneath that axis's glyph, in the group's own hue, so the pair reads as one
-	object and the plate says both what this window is coupled to and how far it departs
-	from it. The axis you are pointing at grows its value along with its glyph, so the
-	answer is largest exactly where you are asking. Only slice, zoom and pan can be
-	offset at all, so that line is mostly empty and the few values on it are what the
-	eye lands on. On the window barcodes and the group cards, which have no room for a
-	number, the same offset shows as a filled upper-right corner on the axis box;
-	the group card marks that some member is offset without saying which.
+	apart, a pan written as a pair of millimetres like <tt>(5|-3)</tt> - the value rides a
+	small ribbon at the lower-right corner of that axis's glyph, in the group's own hue,
+	so the pair reads as one object and the plate says both what this window is coupled
+	to and how far it departs from it. When its glyph is enlarged, the ribbon grows a
+	little with it and stays on its corner. Only slice, zoom and pan can be offset at all, so the few ribbons are what
+	the eye lands on. On the window barcodes and the group cards, which have no room for
+	a number, the same offset shows as a filled lower-right corner on the axis box; the
+	group card marks that some member is offset without saying which.
 
-	Sliding along the row moves the emphasis as each glyph is reached and holds it over
-	the gaps in between, so the row does not flicker under the pointer. The plates stay
+	Sliding along the barcode moves the emphasis as each glyph is reached and holds it over
+	the gaps in between, so the plates do not flicker under the pointer. The plates stay
 	up for as long as the pointer is anywhere on the barcode and go away once it leaves
 	- nothing is pinned, and a single click still opens the layout editor. While the
 	layout editor is open the plates stay up on their own and become the place where
@@ -254,8 +258,8 @@
 			name shows no title, and a window too narrow for a few characters hides it. When the
 			utility menu reveals, the title moves into it without changing its place.
 		<li> Bottom left (navigation): the view-plane label on the first line, and the
-			current <tt>slice/total</tt> on the second line. Time-resolved data adds a small
-			clock and <tt>time/total</tt> after the slice.
+			current <tt>slice/total</tt> on the second line. Time-resolved data adds the Time
+			axis glyph and <tt>time/total</tt> after the slice.
 		<li> Bottom right (intensity): the <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout,
 			beside the colorbar (see \ref org_mitk_editors_mxnmultiwidget_WindowingOverlay).
 		<li> Along the bottom edge: a thin hairline carrying the slice position as a tick;
@@ -335,9 +339,9 @@
 	data itself stays loaded.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Sync_Group Sharing a data selection
-	Which windows share a data selection is the eighth synchronization axis, next to the
-	seven dimensions (see \ref org_mitk_editors_mxnmultiwidget_DimSync), and it is assigned
-	the same way: in the MxN Layout Editor, on the window plates, the group cards or the
+	Which windows share a data selection is one of the synchronization axes (see
+	\ref org_mitk_editors_mxnmultiwidget_DimSync), and it is assigned the same way as the
+	others: in the MxN Layout Editor, on the window plates, the group cards or the
 	advanced matrix (see \ref org_mitk_views_mxnlayouteditor). Unlike the other axes, a
 	window is always in exactly one selection group. A new window joins the default group,
 	so all windows start out showing the same data. The default group is named "main" unless
@@ -405,7 +409,8 @@
 	The context menu leaves out "Set level/window..." and "Go to coordinate...".
 
 	Of the synchronization axes, a 3D view takes part in pan, zoom, orientation and data
-	selection; slice, crosshair, level/window and colormap are drawn struck through ("not
+	selection, and it follows the application's time like every window; slice, crosshair,
+	level/window and colormap are drawn struck through ("not
 	applicable") in its sync barcode and on its window plate. A link the window had before it
 	turned 3D is kept and takes effect again when it returns to 2D. Back in 2D through
 	"2D view", the window shows the slice, zoom and position it had before, unless its view
@@ -422,30 +427,40 @@
 	center.
 
 \subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
-	Window views are coupled per dimension:
-	pan, zoom, slice, crosshair, orientation, windowing (level/window), and LUT (colormap).
+	Window views are coupled per dimension - the nine axes in the table below.
 	Cells that share a named group for a dimension follow each other on exactly that
 	dimension. Slice, zoom, and pan links can additionally carry an offset relative to the
 	group (e.g. a movie-frame layout showing slices -1 / 0 / +1, or a detail view kept
 	twice as zoomed).
 
 	Every surface that shows synchronization - the sync barcode, the window plates, the
-	group cards and the column headers of the advanced matrix - uses one glyph per axis,
-	always in this order:
+	group cards and the column headers of the advanced matrix - uses one glyph per axis.
+	The nine axes come in three families, always in this order: View, how a window looks
+	at its data; Position, where in the data it is; Content, what it shows and how.
 	<table>
-		<tr><th>Axis</th><th>Glyph</th></tr>
-		<tr><td>Pan</td><td>four-way arrow</td></tr>
-		<tr><td>Zoom</td><td>magnifier</td></tr>
-		<tr><td>Slice</td><td>three stacked lines</td></tr>
-		<tr><td>Crosshair</td><td>cross with an open centre</td></tr>
-		<tr><td>Orientation</td><td>three axes meeting in one point</td></tr>
-		<tr><td>Windowing (level/window)</td><td>half-filled circle</td></tr>
-		<tr><td>LUT (colormap)</td><td>gradient bar</td></tr>
-		<tr><td>Data selection</td><td>eye</td></tr>
+		<tr><th>Family</th><th>Axis</th><th>Glyph</th></tr>
+		<tr><td>View</td><td>Orientation</td><td>three axes meeting in one point</td></tr>
+		<tr><td>View</td><td>Pan</td><td>four-way arrow</td></tr>
+		<tr><td>View</td><td>Zoom</td><td>magnifier</td></tr>
+		<tr><td>Position</td><td>Slice</td><td>three stacked lines</td></tr>
+		<tr><td>Position</td><td>Time</td><td>clock face with two hands</td></tr>
+		<tr><td>Position</td><td>Crosshair</td><td>cross with an open centre</td></tr>
+		<tr><td>Content</td><td>Data selection</td><td>eye</td></tr>
+		<tr><td>Content</td><td>Windowing (level/window)</td><td>half-filled circle</td></tr>
+		<tr><td>Content</td><td>LUT (colormap)</td><td>gradient bar</td></tr>
 	</table>
 	A glyph drawn in a group's hue is linked to that group; a faint, uncolored one is not
 	linked. A glyph struck through has no meaning for the window - in a 3D view, slice,
 	crosshair, level/window and colormap - and does not synchronize, whatever link it keeps.
+
+	Time is an axis every window has: all windows follow the application's time, the one
+	time point the time slider sets. They do so through the group <b>Global</b>, which is
+	shown in light gray on the window barcodes and plates and in the text color of the
+	Workbench style in the layout editor. Global is a reserved group. It always exists,
+	stands for following the application's value instead of a value of one's own, and
+	cannot be renamed, recolored or deleted; no other group can take its name or a color
+	too close to its own. For now it holds every window on Time and takes no other axis,
+	so Time cannot be unlinked or given to another group.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
 	The MxN Layout Editor is the authoritative view of the whole layout document: the

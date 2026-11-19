@@ -312,14 +312,14 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "children": [
-            { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
+            { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
             { "type": "split", "orientation": "vertical", "children": [
-              { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main" } },
-              { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main" } }
+              { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+              { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
             ]}
           ]},
           { "type": "split", "orientation": "horizontal", "children": [
-            { "type": "window", "id": "mxn__d", "view_direction": "axial", "links": { "selection": "main" } }
+            { "type": "window", "id": "mxn__d", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
           ]}
         ]
       }
@@ -625,9 +625,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json"));
@@ -821,12 +821,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "children": [
-            { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main" } },
-            { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" } }
+            { "type": "window", "id": "mxn__zeta",  "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+            { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
           ]},
           { "type": "split", "orientation": "horizontal", "children": [
-            { "type": "window", "id": "mxn__mid",  "view_direction": "axial", "links": { "selection": "main" } },
-            { "type": "window", "id": "mxn__beta", "view_direction": "axial", "links": { "selection": "main" } }
+            { "type": "window", "id": "mxn__mid",  "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+            { "type": "window", "id": "mxn__beta", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
           ]}
         ]
       }
@@ -1045,8 +1045,8 @@ public:
           {
             "type": "split", "orientation": "horizontal",
             "children": [
-              { "type": "window", "id": "mxn__left", "view_direction": "axial", "links": { "selection": "left" } },
-              { "type": "window", "id": "mxn__right", "view_direction": "axial", "links": { "selection": "right" } }
+              { "type": "window", "id": "mxn__left", "view_direction": "axial", "links": { "selection": "left", "time": "global" } },
+              { "type": "window", "id": "mxn__right", "view_direction": "axial", "links": { "selection": "right", "time": "global" } }
             ]
           }
         ]
@@ -1131,9 +1131,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "left" } },
-          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "right" } }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "left", "time": "global" } },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "right", "time": "global" } }
         ]
       }
     })json");
@@ -1251,8 +1251,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" } },
-          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main", "time": "global" } },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "main", "time": "global" } }
         ]
       }
     })json");

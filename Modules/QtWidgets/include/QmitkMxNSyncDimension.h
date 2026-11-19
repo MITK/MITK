@@ -13,18 +13,22 @@ found in the LICENSE file.
 #ifndef QmitkMxNSyncDimension_h
 #define QmitkMxNSyncDimension_h
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <optional>
 #include <string>
+#include <string_view>
 
 /**
  * \brief Synchronization dimensions a cell of the MxN editor can link
  *        per-group via the layout document's `links.<dim>` keys.
  *
- * The `selection` dimension is not part of this enum: it predates the
+ * The `selection` and `time` keys have no dimension. Selection predates the
  * per-dimension model, has its own engine (QmitkSynchronizedWidgetConnector),
- * and is handled by dedicated code paths.
+ * and is handled by dedicated code paths. Time is a key of the document only:
+ * every window follows the application's time, so `time` names the reserved
+ * group 'global' and the engine keeps no link for it.
  *
  * Geometry is not a dimension either. A slice step or a plane name only means
  * the same physical location within one reference geometry, so which cells
@@ -65,7 +69,11 @@ inline const char* QmitkMxNSyncDimensionToLinkKey(QmitkMxNSyncDimension dimensio
   return "";
 }
 
-/** \brief Parse a v3 `links` key; empty result for unknown keys (including "selection"). */
+/**
+ * \brief Parse a v3 `links` key; empty for "selection" and "time", which have
+ *        no dimension, and for unknown keys. Callers that reject unknown keys
+ *        handle "selection" and "time" first.
+ */
 inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(const std::string& key)
 {
   for (const auto dimension : QmitkMxNAllSyncDimensions)
@@ -79,37 +87,84 @@ inline std::optional<QmitkMxNSyncDimension> QmitkMxNSyncDimensionFromLinkKey(con
 }
 
 /**
- * \brief The axes the MxN synchronization surfaces (barcodes, advanced
- *        matrix, sync peek plates) present: the seven synchronization
- *        dimensions followed by data selection, in slot order.
+ * \brief The id of the reserved group whose members follow the application's
+ *        value (its time, for example) instead of a value of their own.
+ *
+ * The group always exists, takes no entry in a layout's `groups` dict, and is
+ * reserved in every spelling: no user group may be named "Global" or "GLOBAL".
+ */
+inline constexpr const char* QmitkMxNGlobalGroupId = "global";
+
+/**
+ * \brief The `links` keys whose links may target the reserved group 'global'.
+ *
+ * The loader and the engine API refuse 'global' under every other key, and the
+ * layout editor strikes those axes through on the group's card. Keyed by link
+ * key, the vocabulary the loader works in; the engine maps a dimension with
+ * QmitkMxNSyncDimensionToLinkKey, the editor an axis with
+ * QmitkMxNSyncAxisToLinkKey.
+ *
+ * The only entry, 'time', stores no link, and that alone keeps the reserved
+ * group's contracts: it takes no palette entry, is not listed by
+ * QmitkMxNMultiWidget::GetSyncGroupInfos, and takes no `groups` entry. Listing
+ * a key whose links are stored breaks all three and stores 'global' in the
+ * spelling it was given.
+ */
+inline constexpr std::array<std::string_view, 1> QmitkMxNLinkKeysAcceptingGlobal{ "time" };
+
+/** \brief Whether links under 'linkKey' may target the reserved group 'global'. */
+inline bool QmitkMxNLinkKeyAcceptsGlobal(std::string_view linkKey)
+{
+  return std::find(QmitkMxNLinkKeysAcceptingGlobal.begin(), QmitkMxNLinkKeysAcceptingGlobal.end(), linkKey)
+         != QmitkMxNLinkKeysAcceptingGlobal.end();
+}
+
+/**
+ * \brief The axes the MxN synchronization surfaces present (barcodes, group-card
+ *        strips, the advanced matrix, sync peek plates), in slot order: three
+ *        families of three - View (how the window looks at its data:
+ *        orientation, pan, zoom), Position (where in the data: slice, time,
+ *        crosshair) and Content (what is shown and how: selection, windowing,
+ *        LUT).
+ *
+ * The order is presentation only; the layout document addresses links by key.
+ * Selection and Time have no QmitkMxNSyncDimension: selection has its own
+ * engine, and every window follows the application's time through the
+ * reserved group 'global' until time groups other than 'global' exist, so
+ * there is nothing to store.
  */
 enum class QmitkMxNSyncAxis
 {
+  Orientation,
   Pan,
   Zoom,
   Slice,
+  Time,
   Crosshair,
-  Orientation,
+  Selection,
   Windowing,
-  Lut,
-  Selection
+  Lut
 };
 
-inline constexpr int QmitkMxNSyncAxisCount = static_cast<int>(QmitkMxNAllSyncDimensions.size()) + 1;
+inline constexpr std::array<QmitkMxNSyncAxis, 9> QmitkMxNAllSyncAxes{
+  QmitkMxNSyncAxis::Orientation, QmitkMxNSyncAxis::Pan,       QmitkMxNSyncAxis::Zoom,
+  QmitkMxNSyncAxis::Slice,       QmitkMxNSyncAxis::Time,      QmitkMxNSyncAxis::Crosshair,
+  QmitkMxNSyncAxis::Selection,   QmitkMxNSyncAxis::Windowing, QmitkMxNSyncAxis::Lut
+};
 
-static_assert(static_cast<int>(QmitkMxNSyncAxis::Selection) + 1 == QmitkMxNSyncAxisCount,
-              "QmitkMxNSyncAxis must list the synchronization dimensions, then Selection");
+inline constexpr int QmitkMxNSyncAxisCount = static_cast<int>(QmitkMxNAllSyncAxes.size());
+
 static_assert([] {
-                for (std::size_t i = 0; i < QmitkMxNAllSyncDimensions.size(); ++i)
+                for (std::size_t i = 0; i < QmitkMxNAllSyncAxes.size(); ++i)
                 {
-                  if (static_cast<std::size_t>(QmitkMxNAllSyncDimensions[i]) != i)
+                  if (static_cast<std::size_t>(QmitkMxNAllSyncAxes[i]) != i)
                   {
                     return false;
                   }
                 }
                 return true;
               }(),
-              "QmitkMxNAllSyncDimensions must follow the QmitkMxNSyncDimension declaration order");
+              "QmitkMxNAllSyncAxes must follow the QmitkMxNSyncAxis declaration order: a slot is its enum value");
 
 /** \brief The axis's position on the synchronization surfaces. */
 inline constexpr int QmitkMxNSyncAxisToSlot(QmitkMxNSyncAxis axis)
@@ -124,42 +179,52 @@ inline constexpr std::optional<QmitkMxNSyncAxis> QmitkMxNSyncAxisFromSlot(int sl
   {
     return std::nullopt;
   }
-  return static_cast<QmitkMxNSyncAxis>(slot);
+  return QmitkMxNAllSyncAxes[static_cast<std::size_t>(slot)];
 }
 
-/** \brief The dimension an axis synchronizes; empty for Selection. */
+/** \brief The dimension an axis synchronizes; empty for Selection and Time. */
 inline constexpr std::optional<QmitkMxNSyncDimension> QmitkMxNSyncAxisDimension(QmitkMxNSyncAxis axis)
 {
-  if (QmitkMxNSyncAxis::Selection == axis)
+  switch (axis)
   {
-    return std::nullopt;
+    case QmitkMxNSyncAxis::Orientation: return QmitkMxNSyncDimension::Orientation;
+    case QmitkMxNSyncAxis::Pan:         return QmitkMxNSyncDimension::Pan;
+    case QmitkMxNSyncAxis::Zoom:        return QmitkMxNSyncDimension::Zoom;
+    case QmitkMxNSyncAxis::Slice:       return QmitkMxNSyncDimension::Slice;
+    case QmitkMxNSyncAxis::Crosshair:   return QmitkMxNSyncDimension::Crosshair;
+    case QmitkMxNSyncAxis::Windowing:   return QmitkMxNSyncDimension::Windowing;
+    case QmitkMxNSyncAxis::Lut:         return QmitkMxNSyncDimension::Lut;
+    case QmitkMxNSyncAxis::Time:
+    case QmitkMxNSyncAxis::Selection:   return std::nullopt;
   }
-  return static_cast<QmitkMxNSyncDimension>(static_cast<int>(axis));
+  return std::nullopt;
 }
 
 /** \brief The axis presenting a dimension. */
 inline constexpr QmitkMxNSyncAxis QmitkMxNSyncAxisOf(QmitkMxNSyncDimension dimension)
 {
-  return static_cast<QmitkMxNSyncAxis>(static_cast<int>(dimension));
+  switch (dimension)
+  {
+    case QmitkMxNSyncDimension::Pan:         return QmitkMxNSyncAxis::Pan;
+    case QmitkMxNSyncDimension::Zoom:        return QmitkMxNSyncAxis::Zoom;
+    case QmitkMxNSyncDimension::Slice:       return QmitkMxNSyncAxis::Slice;
+    case QmitkMxNSyncDimension::Crosshair:   return QmitkMxNSyncAxis::Crosshair;
+    case QmitkMxNSyncDimension::Orientation: return QmitkMxNSyncAxis::Orientation;
+    case QmitkMxNSyncDimension::Windowing:   return QmitkMxNSyncAxis::Windowing;
+    case QmitkMxNSyncDimension::Lut:         return QmitkMxNSyncAxis::Lut;
+  }
+  return QmitkMxNSyncAxis::Pan;
 }
 
-/**
- * \brief How a sync peek plate lays out its eight axis glyphs: one row of
- *        eight, or two rows of four in reading order (pan, zoom, slice,
- *        crosshair above orientation, windowing, LUT, selection). One
- *        arrangement serves every plate of a layout, so an axis sits at the
- *        same place in every cell.
- */
-enum class QmitkMxNPeekRows
+/** \brief The axis's `links` key in the v3 layout document ("time", "selection", ...). */
+inline const char* QmitkMxNSyncAxisToLinkKey(QmitkMxNSyncAxis axis)
 {
-  One,
-  Two
-};
-
-/** \brief The glyphs per row of 'rows'. */
-inline constexpr int QmitkMxNPeekColumns(QmitkMxNPeekRows rows)
-{
-  return QmitkMxNPeekRows::One == rows ? QmitkMxNSyncAxisCount : QmitkMxNSyncAxisCount / 2;
+  switch (axis)
+  {
+    case QmitkMxNSyncAxis::Time:      return "time";
+    case QmitkMxNSyncAxis::Selection: return "selection";
+    default:                          return QmitkMxNSyncDimensionToLinkKey(*QmitkMxNSyncAxisDimension(axis));
+  }
 }
 
 #endif

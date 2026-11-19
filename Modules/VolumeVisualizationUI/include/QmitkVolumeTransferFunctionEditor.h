@@ -115,17 +115,19 @@ public:
    * There is no keeping a drawing unsaved: the node records the preset it was
    * drawn over and the slider offsets, not the drawing, so the next selection
    * would rebuild the preset over it. An edit that changed nothing ends
-   * without asking, and there being no edit in progress makes this inert.
+   * without asking. A drawing an earlier save failed to keep is asked about the
+   * same way, with no edit left to end. Nothing to ask about makes this inert.
    *
    * A host calls this before it takes the editor out of use, such as before
-   * switching volume rendering off, and goes ahead only if editing is over.
+   * switching volume rendering off, and goes ahead only if this returns true.
    *
    * \param[in] mayContinueEditing Whether the user may also take back the
-   *            request to end the edit, which then continues as if it had not
-   *            been made. Not for a selection change, which has already
-   *            happened by the time it asks.
-   * \return False if the user chose to continue editing; true otherwise,
-   *         including when there was no edit to end.
+   *            request, which then goes on as if it had not been made: the edit
+   *            continues, or the drawing stays on show. Not for a selection
+   *            change, which has already happened by the time it asks.
+   * \return False if the user took the request back, or if saving the curve
+   *         failed, which leaves the drawing on show, unsaved; true otherwise,
+   *         including when there was nothing to ask about.
    */
   bool ConcludeEdit(bool mayContinueEditing);
 
@@ -203,8 +205,11 @@ private:
    * is still the preset it came from - see DiffersFromPreset.
    *
    * \param[in] fileName A path as AskPresetFileName returns it.
+   * \return Whether the curve is now offered as that preset. False if there was
+   *         no curve to save, or after a warning that the file could not be
+   *         written or read back; the curve on show is left as it was.
    */
-  void SaveCustomPreset(const QString &fileName);
+  bool SaveCustomPreset(const QString &fileName);
 
   /**
    * \brief Offer a preset file of the user's choosing from now on, and apply
@@ -439,6 +444,17 @@ private:
    * it carries rather than by what was last done here.
    */
   bool DiffersFromPreset() const;
+
+  /**
+   * \brief Whether ConcludeEdit has a curve to ask about: one nothing records,
+   *        so that the next selection would rebuild the preset over it.
+   *
+   * Either an edit in progress that changed something, or a drawing an edit
+   * left behind because saving it failed, over a preset the grid still offers.
+   * A node recording no such preset comes back as the curve it carries, so a
+   * drawing over anything else is not lost.
+   */
+  bool HasUnsavedCurve() const;
 
   /**
    * \brief The colors on show, carried by points that can be taken hold of.

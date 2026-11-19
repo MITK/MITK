@@ -159,10 +159,10 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget *parent)
 
 void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  m_SelectedNode = nullptr;
+  mitk::DataNode::Pointer selectedNode;
 
   if (!nodes.empty() && nodes.front().IsNotNull() && nodes.front()->GetDataAs<mitk::Image>() != nullptr)
-    m_SelectedNode = nodes.front();
+    selectedNode = nodes.front();
 
   // Only here, and deliberately not from UpdateInterface: binding is where the
   // editor decides whether the node's existing function is one to adopt, and
@@ -170,7 +170,12 @@ void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNod
   // whatever function the node already carries, such as the default a scene
   // saved by an earlier MITK version gives every image, instead of leaving room
   // for a preset.
-  m_Controls->transferFunctionEditor->SetDataNode(m_SelectedNode.Lock().GetPointer());
+  m_Controls->transferFunctionEditor->SetDataNode(selectedNode);
+
+  // Only once the editor has let go of the previous node: concluding an edit
+  // there can ask a question, and refreshes in the meantime have to keep
+  // describing the node the editor still works on.
+  m_SelectedNode = selectedNode;
 
   this->UpdateInterface();
 }
@@ -189,7 +194,8 @@ void QmitkVolumeVisualizationView::OnToggleRendering()
 
   // Before the property changes: switching off hides the editor and grays it
   // out, which would leave an edit in progress waiting on a curve no one can
-  // see. The user may also keep editing, and rendering then stays on.
+  // see. Rendering stays on if the user keeps editing, or if saving the curve
+  // failed and the drawing has to stay in sight to be saved after all.
   if (!state)
   {
     if (!m_Controls->transferFunctionEditor->ConcludeEdit(true))

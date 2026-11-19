@@ -1144,7 +1144,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           mitk::ThrowRestError("NO_SEGMENTATION", "Conflict", "Choose a segmentation first.", 409, request.Path);
 
         const auto value = body["active_label"].get<MultiLabelSegmentation::LabelValueType>();
-        const auto* segmentation = GetSegmentation(working, request.Path);
+        auto* segmentation = GetSegmentation(working, request.Path);
 
         if (!segmentation->ExistLabel(value))
           mitk::ThrowRestError("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(value) + ".", 404, request.Path);
@@ -1152,9 +1152,19 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // Through the tool manager, so that the view selects the label as well.
         toolManager->SetActiveWorkingLabel(value);
 
-        // The view applies the label to the segmentation, or silently does not.
-        if (const auto* active = segmentation->GetActiveLabel(); active == nullptr || active->GetValue() != value)
+        // The view applies the label to the segmentation, but only with a render window editor open.
+        const auto isActive = [segmentation, value]() {
+          const auto* active = segmentation->GetActiveLabel();
+          return active != nullptr && active->GetValue() == value;
+        };
+
+        if (!isActive())
+          segmentation->SetActiveLabel(value);
+
+        if (!isActive())
         {
+          const auto* active = segmentation->GetActiveLabel();
+
           mitk::ThrowRestError("NOT_ACCEPTED", "Unprocessable Content", "The Segmentation view did not make label " +
             std::to_string(value) + " active; the active label is " +
             (active != nullptr ? std::to_string(active->GetValue()) : std::string("none")) + ".", 422, request.Path);

@@ -1287,6 +1287,7 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
 
   const auto cause = loss.Reason;
   const auto details = QString::fromStdString(loss.Details);
+  const bool cancelledByProgram = cause == Cause::Cancelled && loss.ByProgram;
 
   // Tear the session down on the next event-loop tick rather than now: this
   // fires from within an interactor's event handling, where disabling and
@@ -1294,12 +1295,16 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
   // clears all prompts and the preview, and -- via SessionEndedEvent ->
   // OnSessionEnded -- reverts the widget to its pre-init state, so the user just
   // clicks Initialize to start over.
-  QTimer::singleShot(0, this, [this, cause, details]() {
+  QTimer::singleShot(0, this, [this, cause, details, cancelledByProgram]() {
     if (QCoreApplication::closingDown())
       return;
 
     if (auto* tool = this->GetTool())
       tool->AbortSession();
+
+    // Whoever cancelled the prompt of a program is not the user at this panel.
+    if (cancelledByProgram)
+      return;
 
     QString message;
 

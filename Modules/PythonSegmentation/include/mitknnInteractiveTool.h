@@ -90,11 +90,12 @@ namespace mitk
       {
         RemoteConnection, /**< \brief The lease expired, or the server is at capacity or unreachable. */
         WorkerExited,     /**< \brief The worker process that hosted the session ended unexpectedly. */
-        Cancelled         /**< \brief The user cancelled a prompt, which ended the worker process of the session. */
+        Cancelled         /**< \brief A prompt was canceled, which ended the worker process of the session. */
       };
 
       Cause Reason;
       std::string Details; /**< \brief What was reported, e.g. the exit code and last output of the worker. */
+      bool ByProgram = false; /**< \brief The lost session was computing a prompt of AddPrompt(), not one of the user. */
     };
 
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
@@ -689,7 +690,7 @@ namespace mitk
     /** \brief Reports why a prompt failed: a lost or cancelled session goes to
      *         SessionLostEvent, any other error is rethrown.
      */
-    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task);
+    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task, bool byProgram);
 
     /** \brief Tells the caller of AddPrompt() what became of its prompt. */
     void EndProgramPrompt();

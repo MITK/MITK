@@ -816,7 +816,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       {
         if (!byProgram)
         {
-          this->EndFailedPrompt(error, task);
+          this->EndFailedPrompt(error, task, false);
           return;
         }
 
@@ -826,7 +826,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
         try
         {
-          this->EndFailedPrompt(error, task);
+          this->EndFailedPrompt(error, task, true);
           m_Impl->PendingPromptError = "nnInteractive: the prompt was cancelled, or the session ended.";
         }
         catch (const Exception& e)
@@ -882,7 +882,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
     });
 }
 
-void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const ProgressTask* task)
+void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const ProgressTask* task, bool byProgram)
 {
   try
   {
@@ -897,7 +897,7 @@ void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const Pr
     // The cancellation ended the worker and with it the session.
     if (task != nullptr && task->IsCancelRequested())
     {
-      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription() });
+      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription(), byProgram });
       return;
     }
 

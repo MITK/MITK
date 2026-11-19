@@ -76,6 +76,12 @@ private:
  * BlueBerry creates a view, and with it its QmitkPartLockFollower, when the
  * view is shown for the first time. Until then, its tab shows the icon of its
  * descriptor, which this replaces with the lock while the view is locked.
+ *
+ * The tabs are updated when the lock or the theme changes, and only for the
+ * views of the active perspective. A view whose tab appears later, for example
+ * after a perspective switch during the lock, shows its icon until it is
+ * created. Views that are not QmitkAbstractView cannot be locked: their tab
+ * shows the lock until the view is created, and the view itself is not locked.
  */
 class QmitkUncreatedViewLockFollower : public QObject
 {

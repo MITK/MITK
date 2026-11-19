@@ -333,9 +333,9 @@
 	The "..." button in the header opens the less frequent actions:
 	<ul>
 		<li> "Rename..." and "Change color..." set the display name and the hue. Both are
-			saved with the layout. The name "Global" and colors too close to its light gray
-			or to black belong to the reserved group Global; the editor refuses them and says
-			why in a notice.
+			saved with the layout. The name "Global" and colors too close to its light gray,
+			to black or to the current style's text color belong to the reserved group Global;
+			the editor refuses them and says why in a notice.
 		<li> "Add selected windows" and "Remove selected windows" act on the windows
 			selected on the plates.
 		<li> "Link navigation" links the pan, zoom, slice and crosshair bundle for every
@@ -352,7 +352,7 @@
 
 	The first card is always <b>Global</b>, the reserved group whose windows follow the
 	application's value instead of a value of their own. Its bar is drawn in the text
-	colour of the Workbench style, and a lock marked "reserved" stands where the "..." button
+	color of the Workbench style, and a lock marked "reserved" stands where the "..." button
 	would be: it cannot be renamed, recolored or deleted. For now it holds every window on
 	Time - its strip shows Time lit and every other axis struck through - and windows can
 	neither be added to nor removed from it, by drag and drop or by any menu.

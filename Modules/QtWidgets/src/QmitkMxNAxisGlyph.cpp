@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <QBuffer>
 #include <QColor>
+#include <QCoreApplication>
 #include <QFile>
 #include <QImage>
 #include <QImageReader>
@@ -24,6 +25,23 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cmath>
+
+QString QmitkMxNSyncAxisLabel(QmitkMxNSyncAxis axis)
+{
+  switch (axis)
+  {
+    case QmitkMxNSyncAxis::Orientation: return QCoreApplication::translate("QmitkMxNSyncAxis", "Orientation");
+    case QmitkMxNSyncAxis::Pan:         return QCoreApplication::translate("QmitkMxNSyncAxis", "Pan");
+    case QmitkMxNSyncAxis::Zoom:        return QCoreApplication::translate("QmitkMxNSyncAxis", "Zoom");
+    case QmitkMxNSyncAxis::Slice:       return QCoreApplication::translate("QmitkMxNSyncAxis", "Slice");
+    case QmitkMxNSyncAxis::Time:        return QCoreApplication::translate("QmitkMxNSyncAxis", "Time");
+    case QmitkMxNSyncAxis::Crosshair:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Crosshair");
+    case QmitkMxNSyncAxis::Selection:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Data selection");
+    case QmitkMxNSyncAxis::Windowing:   return QCoreApplication::translate("QmitkMxNSyncAxis", "Windowing");
+    case QmitkMxNSyncAxis::Lut:         return QCoreApplication::translate("QmitkMxNSyncAxis", "LUT");
+  }
+  return QString();
+}
 
 namespace
 {

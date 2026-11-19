@@ -407,6 +407,10 @@ private:
    *         outgrew it, never shrinks. */
   void RefreshMatrixCells();
 
+  /** \brief Draw the matrix's column-header glyphs in the current text color,
+   *         so a style switch that leaves the structure alone recolors them. */
+  void RefreshMatrixHeaderGlyphs();
+
   /** \brief The selected matrix cells as (window id, axis) pairs, in row then
    *         column order - row order being the layout's pre-order, which is the
    *         order a slice ramp spreads over. */

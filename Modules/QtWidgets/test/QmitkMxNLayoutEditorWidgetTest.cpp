@@ -147,6 +147,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
 
   MITK_TEST(Matrix_UnlinkedCellCarriesNoChipOrOffset);
   MITK_TEST(Matrix_IsOnlyAsTallAsItsRows);
+  MITK_TEST(Matrix_HeaderGlyphsFollowAPaletteChange);
   MITK_TEST(ArrangeHint_WarnsWhileAWindowIsMaximized);
   MITK_TEST(Matrix_LinkedCellChipNamesGroupAndOffset);
   MITK_TEST(Matrix_AxisAssignAndClearRoundTrip);
@@ -206,6 +207,7 @@ class QmitkMxNLayoutEditorWidgetTestSuite : public mitk::TestFixture
 
   MITK_TEST(SetCellAxisGroup_Time_ThrowsAndKeepsSelection);
   MITK_TEST(ClearCellAxis_Time_ThrowsAndKeepsSelection);
+  MITK_TEST(CellAxisTime_WithoutMultiWidget_Throws);
   MITK_TEST(UserCard_TimeSlotIsInert);
   MITK_TEST(EmptyUserCard_TimeTakesNoIntent);
   MITK_TEST(GlobalCard_IsFirstAndReserved);
@@ -1580,6 +1582,50 @@ public:
                            !matrix->verticalScrollBar()->isVisible());
     CPPUNIT_ASSERT_MESSAGE("...and the matrix is no taller than its rows need",
                            matrix->height() <= rowsHeight + matrix->horizontalScrollBar()->sizeHint().height());
+  }
+
+  void Matrix_HeaderGlyphsFollowAPaletteChange()
+  {
+    // A style switch that leaves the cells and groups alone only refreshes the
+    // matrix; its header glyphs must still take the new text color.
+    m_Widget->show();
+    this->RaiseAdvancedFace();
+    Pump();
+
+    const auto inkOf = [this](int column)
+    {
+      const QImage glyph = Matrix()->horizontalHeaderItem(column)->icon().pixmap(16).toImage();
+      QColor ink;
+      int alpha = 0;
+      for (int y = 0; y < glyph.height(); ++y)
+      {
+        for (int x = 0; x < glyph.width(); ++x)
+        {
+          const QColor pixel = glyph.pixelColor(x, y);
+          if (pixel.alpha() > alpha)
+          {
+            alpha = pixel.alpha();
+            ink = pixel;
+          }
+        }
+      }
+      return ink;
+    };
+
+    for (const QColor text : { QColor(Qt::red), QColor(Qt::blue) })
+    {
+      auto palette = m_Widget->palette();
+      palette.setColor(QPalette::Text, text);
+      m_Widget->setPalette(palette);
+      Pump();
+
+      for (int column = 0; column < Matrix()->columnCount(); ++column)
+      {
+        const QColor ink = inkOf(column);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Header glyph " + std::to_string(column) + " takes the new text color",
+                                     text.name().toStdString(), QColor(ink.rgb()).name().toStdString());
+      }
+    }
   }
 
   void Matrix_UnlinkedCellCarriesNoChipOrOffset()
@@ -2982,6 +3028,24 @@ public:
                                  group, m_Editor->GetCellSelectionGroup(CellId(0)));
   }
 
+  void CellAxisTime_WithoutMultiWidget_Throws()
+  {
+    // Time is refused for the argument alone, before the editor looks at what
+    // it is attached to.
+    m_Widget->SetMultiWidget(nullptr);
+    Pump();
+
+    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, "g"),
+                         QmitkMxNReservedGroupException);
+    CPPUNIT_ASSERT_THROW(m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Time, QmitkMxNGlobalGroupId),
+                         QmitkMxNReservedGroupException);
+    CPPUNIT_ASSERT_THROW(m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Time), QmitkMxNReservedGroupException);
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Other axes stay a no-op without a multi widget",
+                                    m_Widget->SetCellAxisGroup(CellId(0), QmitkMxNSyncAxis::Pan, "g"));
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("...also when cleared",
+                                    m_Widget->ClearCellAxis(CellId(0), QmitkMxNSyncAxis::Pan));
+  }
+
   void UserCard_TimeSlotIsInert()
   {
     const auto group = m_Widget->CreateGroup();
@@ -3046,7 +3110,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("A badge stands where the menu would be", nullptr != badge);
     CPPUNIT_ASSERT_MESSAGE("saying it is reserved", texts.contains(QStringLiteral("reserved")));
     CPPUNIT_ASSERT_EQUAL(std::string("Reserved group: follows the application's value. It can't be renamed, "
-                                     "recoloured or deleted."),
+                                     "recolored or deleted."),
                          badge->toolTip().toStdString());
     for (const auto* button : card->findChildren<QToolButton*>())
     {

@@ -89,7 +89,7 @@ namespace
 
   QString AxisLabel(QmitkMxNSyncAxis axis)
   {
-    return QmitkMxNLayoutEditorWidget::tr(QmitkMxNSyncAxisLabel(axis));
+    return QmitkMxNSyncAxisLabel(axis);
   }
 
   constexpr std::array<QmitkMxNSyncDimension, 4> NavigationBundle{
@@ -2210,7 +2210,7 @@ QWidget* QmitkMxNLayoutEditorWidget::BuildGlobalCard()
   // In place of the "..." menu: a badge saying why there is none.
   auto* badge = new QWidget(header);
   badge->setObjectName(QStringLiteral("mxnReservedBadge"));
-  badge->setToolTip(tr("Reserved group: follows the application's value. It can't be renamed, recoloured or "
+  badge->setToolTip(tr("Reserved group: follows the application's value. It can't be renamed, recolored or "
                        "deleted."));
   auto* badgeRow = new QHBoxLayout(badge);
   badgeRow->setContentsMargins(4, 0, 2, 0);
@@ -2460,8 +2460,24 @@ void QmitkMxNLayoutEditorWidget::RefreshAdvancedMatrixIfVisible()
   }
   else
   {
+    this->RefreshMatrixHeaderGlyphs();
     this->RefreshMatrixCells();
     this->UpdateMatrixActionBar();
+  }
+}
+
+void QmitkMxNLayoutEditorWidget::RefreshMatrixHeaderGlyphs()
+{
+  const QColor headerInk = this->palette().color(QPalette::Text);
+  for (const auto axis : QmitkMxNAllSyncAxes)
+  {
+    auto* headerItem = m_Matrix->horizontalHeaderItem(QmitkMxNSyncAxisToSlot(axis));
+    if (nullptr == headerItem)
+    {
+      continue;
+    }
+    const QPixmap glyph = QmitkMxNRenderAxisGlyph(axis, headerInk, 16);
+    headerItem->setIcon(glyph.isNull() ? QIcon() : QIcon(glyph));
   }
 }
 
@@ -2477,18 +2493,13 @@ void QmitkMxNLayoutEditorWidget::RebuildMatrix(
   // Glyph-only column headers: the same axis glyph the plates and barcodes use,
   // named in the tooltip. Nine spelled-out axis names do not fit a docked view,
   // and the glyphs are the language the rest of the editor speaks.
-  const QColor headerInk = this->palette().color(QPalette::Text);
   for (const auto axis : QmitkMxNAllSyncAxes)
   {
     auto* headerItem = new QTableWidgetItem();
-    const QPixmap glyph = QmitkMxNRenderAxisGlyph(axis, headerInk, 16);
-    if (!glyph.isNull())
-    {
-      headerItem->setIcon(QIcon(glyph));
-    }
     headerItem->setToolTip(AxisLabel(axis));
     m_Matrix->setHorizontalHeaderItem(QmitkMxNSyncAxisToSlot(axis), headerItem);
   }
+  this->RefreshMatrixHeaderGlyphs();
 
   QStringList rowLabels;
   for (const auto& descriptor : descriptors)
@@ -3250,11 +3261,11 @@ void QmitkMxNLayoutEditorWidget::MirrorSelectionToMatrix(const QStringList& wind
 void QmitkMxNLayoutEditorWidget::SetCellAxisGroup(const QString& windowId, QmitkMxNSyncAxis axis,
                                                   const std::string& group)
 {
+  this->WriteCellAxisGroup(windowId, axis, group);
   if (m_MultiWidget.isNull())
   {
     return;
   }
-  this->WriteCellAxisGroup(windowId, axis, group);
   m_MultiWidget->RefreshSyncControls();
   this->ShowOrientationConflicts(group);
 }
@@ -3332,11 +3343,11 @@ void QmitkMxNLayoutEditorWidget::ShowOrientationConflicts(const std::string& gro
 
 void QmitkMxNLayoutEditorWidget::ClearCellAxis(const QString& windowId, QmitkMxNSyncAxis axis)
 {
+  this->WriteCellAxisCleared(windowId, axis);
   if (m_MultiWidget.isNull())
   {
     return;
   }
-  this->WriteCellAxisCleared(windowId, axis);
   m_MultiWidget->RefreshSyncControls();
 }
 

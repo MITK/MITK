@@ -996,7 +996,9 @@ public:
   * \throws QmitkMxNReservedGroupException for the reserved id
   *         QmitkMxNGlobalGroupId in any spelling, and for a color that could
   *         not be told apart from the colours the reserved group takes: a
-  *         CIE76 distance below 15 to \#f1f1f1 or to black, in either style.
+  *         CIE76 distance below 15 to \#f1f1f1 or to black, in either style,
+  *         or to the current style's text color. A later style switch does
+  *         not re-check colors already set.
   */
   void SetSyncGroupColor(const std::string& id, const QColor& color);
 

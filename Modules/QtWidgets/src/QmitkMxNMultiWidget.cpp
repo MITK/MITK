@@ -275,8 +275,8 @@ namespace
   // that style's text colour instead (see GetSyncGroupColor).
   constexpr const char* GLOBAL_GROUP_OVERLAY_COLOR = "#f1f1f1";
 
-  // The Light style's text colour on Windows: its style sheet leaves the text
-  // colour to the platform.
+  // The Light style's text colour where the platform gives black: its style
+  // sheet leaves the text colour to the platform.
   constexpr const char* LIGHT_STYLE_TEXT_COLOR = "#000000";
 
   constexpr const char* GLOBAL_GROUP_DISPLAY_NAME = "Global";
@@ -289,23 +289,23 @@ namespace
     return lab;
   }
 
-  // A group colour this close (CIE76) to a colour the reserved group takes -
-  // the Dark style's text colour, or the Light style's - could not be told
-  // apart from it. The band does not follow the current style, so that a
-  // layout loads the same in either.
-  bool IsInReservedColorBand(const QColor& color)
+  // A group colour this close (CIE76) to a colour the reserved group takes
+  // could not be told apart from it.
+  bool IsTooCloseTo(const QColor& color, const QColor& reserved)
   {
     constexpr double ReservedBandDistance = 15.0;
     const auto lab = ToLab(color);
-    for (const auto* reserved : { GLOBAL_GROUP_OVERLAY_COLOR, LIGHT_STYLE_TEXT_COLOR })
-    {
-      const auto other = ToLab(QColor(reserved));
-      if (std::hypot(lab[0] - other[0], lab[1] - other[1], lab[2] - other[2]) < ReservedBandDistance)
-      {
-        return true;
-      }
-    }
-    return false;
+    const auto other = ToLab(reserved);
+    return std::hypot(lab[0] - other[0], lab[1] - other[1], lab[2] - other[2]) < ReservedBandDistance;
+  }
+
+  // The band around the Dark style's text colour and the Light style's. It
+  // does not follow the current style, so that a layout loads the same in
+  // either.
+  bool IsInReservedColorBand(const QColor& color)
+  {
+    return IsTooCloseTo(color, QColor(GLOBAL_GROUP_OVERLAY_COLOR))
+      || IsTooCloseTo(color, QColor(LIGHT_STYLE_TEXT_COLOR));
   }
 
   [[noreturn]] void ThrowReservedLinkTarget(const std::string& windowId, const std::string& key)
@@ -3725,7 +3725,7 @@ void QmitkMxNMultiWidget::LoadLayoutDocument(const nlohmann::json& doc)
           else if (IsInReservedColorBand(QColor(QString::fromStdString(color.get<std::string>()))))
           {
             MITK_WARN << "Ignoring 'groups." << it.key() << ".color' " << color.get<std::string>()
-                      << ": too close to the colours of the reserved group '" << QmitkMxNGlobalGroupId
+                      << ": too close to the colors of the reserved group '" << QmitkMxNGlobalGroupId
                       << "'; using the default hue.";
           }
           else
@@ -6699,7 +6699,7 @@ QmitkMxNMultiWidget::BuildBarcodeSlots(const QString& windowId) const
 
   for (const auto axis : QmitkMxNAllSyncAxes)
   {
-    const QString label = tr(QmitkMxNSyncAxisLabel(axis));
+    const QString label = QmitkMxNSyncAxisLabel(axis);
     if (QmitkMxNSyncAxis::Time == axis)
     {
       // Every window follows the application's time through 'global', drawn in
@@ -7087,7 +7087,7 @@ void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor&
   {
     mitkThrowException(QmitkMxNReservedGroupException)
       << "SetSyncGroupColor: group id '" << id << "' is reserved; the group '" << QmitkMxNGlobalGroupId
-      << "' cannot be recoloured.";
+      << "' cannot be recolored.";
   }
   if (!this->SyncGroupExists(id))
   {
@@ -7097,11 +7097,13 @@ void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor&
   {
     mitkThrow() << "SetSyncGroupColor: invalid color for group '" << id << "'.";
   }
-  if (IsInReservedColorBand(color))
+  // The live text colour as well: a platform or custom palette can give one
+  // outside the fixed band, and the editor shows the reserved group in it.
+  if (IsInReservedColorBand(color) || IsTooCloseTo(color, this->GetSyncGroupColor(QmitkMxNGlobalGroupId)))
   {
     mitkThrowException(QmitkMxNReservedGroupException)
       << "SetSyncGroupColor: color " << color.name(QColor::HexRgb).toStdString()
-      << " is reserved; it is too close to the colours of the group '" << QmitkMxNGlobalGroupId << "'.";
+      << " is reserved; it is too close to the colors of the group '" << QmitkMxNGlobalGroupId << "'.";
   }
 
   m_GroupColors[id] = color.name(QColor::HexRgb).toStdString();

@@ -80,6 +80,7 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   MITK_TEST(Reserved_SetSyncGroupColorOfGlobal_Throws);
   MITK_TEST(Reserved_DisplayNameGlobal_Throws);
   MITK_TEST(ReservedBand_RefusesNearWhiteAndNearBlack);
+  MITK_TEST(ReservedBand_RefusesTheLiveTextColor);
   MITK_TEST(GetSyncGroupInfos_DoesNotListGlobal);
   MITK_TEST(GetSyncGroupColorAndName_GlobalIsReserved);
   MITK_TEST(GetSyncGroupColor_GlobalFollowsTheStyleSheet);
@@ -560,6 +561,32 @@ public:
     for (const auto* color : { "#c6c6c6", "#262626" })
     {
       CPPUNIT_ASSERT_NO_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)));
+    }
+  }
+
+  void ReservedBand_RefusesTheLiveTextColor()
+  {
+    // A platform or custom palette whose text color is neither black nor
+    // #f1f1f1 still keeps user groups from looking like the reserved one.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+    widget.InitializeMultiWidget();
+    const auto group = widget.GetDefaultSyncGroupName();
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Fixture: #2b2b2b lies outside the fixed band",
+                                    widget.SetSyncGroupColor(group, QColor("#2b2b2b")));
+    widget.SetSyncGroupColor(group, QColor("#ff0000"));
+
+    auto palette = widget.palette();
+    palette.setColor(QPalette::WindowText, QColor("#2b2b2b"));
+    widget.setPalette(palette);
+
+    for (const auto* color : { "#2b2b2b", "#303030" })
+    {
+      CPPUNIT_ASSERT_THROW_MESSAGE(color, widget.SetSyncGroupColor(group, QColor(color)),
+                                   QmitkMxNReservedGroupException);
+      CPPUNIT_ASSERT_MESSAGE(std::string("The color stays after refusing ") + color,
+                             QColor("#ff0000") == widget.GetSyncGroupColor(group));
     }
   }
 

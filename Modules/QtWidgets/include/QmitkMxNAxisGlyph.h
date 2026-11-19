@@ -18,30 +18,16 @@ found in the LICENSE file.
 #include <QmitkMxNSyncDimension.h>
 
 #include <QColor>
+#include <QString>
 #include <QtGlobal>
 
 class QPixmap;
 
 /**
- * \brief The axis's display name, untranslated: callers pass it through tr(),
- *        so every surface names an axis alike.
+ * \brief The axis's translated display name, one translation context for
+ *        every surface, so every surface names an axis alike.
  */
-inline const char* QmitkMxNSyncAxisLabel(QmitkMxNSyncAxis axis)
-{
-  switch (axis)
-  {
-    case QmitkMxNSyncAxis::Orientation: return "Orientation";
-    case QmitkMxNSyncAxis::Pan:         return "Pan";
-    case QmitkMxNSyncAxis::Zoom:        return "Zoom";
-    case QmitkMxNSyncAxis::Slice:       return "Slice";
-    case QmitkMxNSyncAxis::Time:        return "Time";
-    case QmitkMxNSyncAxis::Crosshair:   return "Crosshair";
-    case QmitkMxNSyncAxis::Selection:   return "Data selection";
-    case QmitkMxNSyncAxis::Windowing:   return "Windowing";
-    case QmitkMxNSyncAxis::Lut:         return "LUT";
-  }
-  return "";
-}
+MITKQTWIDGETS_EXPORT QString QmitkMxNSyncAxisLabel(QmitkMxNSyncAxis axis);
 
 /** \brief Readable text ink on a fill in 'hue', for every surface that fills
  *         with a group's colour. */

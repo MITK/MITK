@@ -455,7 +455,7 @@
 
 	Time is an axis every window has: all windows follow the application's time, the one
 	time point the time slider sets. They do so through the group <b>Global</b>, which is
-	shown in light gray on the window barcodes and plates and in the text colour of the
+	shown in light gray on the window barcodes and plates and in the text color of the
 	Workbench style in the layout editor. Global is a reserved group. It always exists,
 	stands for following the application's value instead of a value of one's own, and
 	cannot be renamed, recolored or deleted; no other group can take its name or a color

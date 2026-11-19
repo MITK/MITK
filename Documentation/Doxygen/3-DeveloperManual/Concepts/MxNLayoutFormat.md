@@ -69,7 +69,7 @@ data nodes simply applies the new geometry; the data stays.
 - `version`: the exact string `"3.0"` or `"2.0"`. The C++ loader rejects any
   other value, and `SerializeLayout` always writes `"3.0"`. A v2.0 document
   uses only the selection dimension and loads as it always did, unless it
-  names a group `global` (see "Versions and closure" below). Relabelled as
+  names a group `global` (see "Versions and closure" below). Relabeled as
   `"3.0"`, it additionally needs `links.time` in every window. v1.x files are
   upgraded out-of-band (see "Migrating from v1.x" below).
 - `name`: optional human-readable preset name. Pure metadata; ignored by the
@@ -207,7 +207,7 @@ The properties of a group entry:
   windows that join it later.
 - `color` (v3.0): optional hue as `"#RRGGBB"`, shown verbatim by the sync
   furniture. Without it the editor assigns a default hue by group creation
-  order. A malformed value, or one too close to the reserved group's colours
+  order. A malformed value, or one too close to the reserved group's colors
   (see below), is ignored with a warning, never rejected.
 - `name` (v3.0): optional display name, shown instead of the group id on
   every surface. The id (the dict key) stays the URL-safe identity. The
@@ -315,9 +315,9 @@ instead of a value of their own - on `time`, the application's time point.
   that accept it may grow without a format change.
 - It is never a user group: the id is reserved in every spelling (`Global`,
   `GLOBAL`, ...), in `"2.0"` documents as well.
-- Its display name is "Global". Its colour is the light gray `#f1f1f1` (the
-  Dark style's text colour) on the barcodes, plates and arrange-mode frames,
-  which are dark in every style, and the current style's text colour on the
+- Its display name is "Global". Its color is the light gray `#f1f1f1` (the
+  Dark style's text color) on the barcodes, plates and arrange-mode frames,
+  which are dark in every style, and the current style's text color on the
   surfaces that follow the style, such as the layout editor.
 - No user group can take either: a group `name` "Global" (in any case,
   ignoring surrounding blanks) or a `color` at a CIE76 distance below 15 to

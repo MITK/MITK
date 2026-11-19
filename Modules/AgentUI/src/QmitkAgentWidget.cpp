@@ -285,7 +285,7 @@ void QmitkAgentWidget::OnStatusChanged(const QmitkAgentSession::Status& status)
 
   m_Ui->statusLabel->setToolTip(status.UsesApiKeyVariable
     ? QString("Claude Code prefers this key over a Claude subscription. To use a subscription instead, sign in "
-        "with it in the settings and choose to use it even if ANTHROPIC_API_KEY is set.")
+        "with it in the settings and choose to ignore ANTHROPIC_API_KEY.")
     : QString());
 }
 

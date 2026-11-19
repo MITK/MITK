@@ -6,7 +6,7 @@
    <item>
     <widget class="QLabel" name="introLabel">
      <property name="text">
-      <string>The agent is your own installation of Claude Code. It signs in like Claude Code does, and the Workbench never sees your credentials.</string>
+      <string>The agent runs on your own installation of Claude Code, which signs in by itself; the Workbench never sees your credentials.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -109,7 +109,7 @@
          <string>Claude Code prefers an API key in the environment variable ANTHROPIC_API_KEY over a Claude subscription, and the key is billed per token. With this, the agent does not get the variable.</string>
         </property>
         <property name="text">
-         <string>Use a Claude subscription even if ANTHROPIC_API_KEY is set</string>
+         <string>Ignore ANTHROPIC_API_KEY</string>
         </property>
        </widget>
       </item>

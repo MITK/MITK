@@ -65,8 +65,9 @@ void QmitkAgentMemory::Load() const
   // Logs only when the file turns unreadable, not at every attempt to read it again.
   const bool wasReadable = m_Readable;
 
+  // m_NextId only grows, so that an id is not used twice even if the file
+  // lost the notes that held it.
   m_Notes.clear();
-  m_NextId = 1;
   m_Readable = false;
 
   QFile file(m_FilePath);
@@ -129,7 +130,11 @@ bool QmitkAgentMemory::IsReadable() const
 
 void QmitkAgentMemory::RequireReadable() const
 {
-  if (!this->IsReadable())
+  // Read again at every change, as another instance of the Workbench may
+  // have changed the file.
+  this->Load();
+
+  if (!m_Readable)
     throw std::runtime_error("The agent's memory cannot be read, so it is not changed.");
 }
 

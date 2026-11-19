@@ -30,6 +30,9 @@ found in the LICENSE file.
  *
  * A file that exists but cannot be read is never written over: while it stays
  * unreadable, every change fails. Every call tries to read it again first.
+ * A change reads the file in any case, so that the notes of another instance
+ * of the Workbench on the same file are kept, and takes the larger of the
+ * next ids of the file and of the memory.
  * Notes of a file that exceed the limits stay in it and in GetNotes(), so that
  * the user can edit them, but are left out of Describe().
  *

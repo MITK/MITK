@@ -611,8 +611,6 @@ namespace
 
 std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* server)
 {
-  static const std::vector<std::string> WindowIds = { "axial", "sagittal", "coronal", "3d" };
-
   std::vector<RestRoute> routes;
 
   RestRoute windows;
@@ -627,7 +625,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     return RestResponse::FromData(CallInGuiThread(*server, [&request]() {
       auto json = nlohmann::json::array();
 
-      for (const auto& id : WindowIds)
+      for (const auto& id : GetRestWindowIds())
         json.push_back(DescribeWindow(id, FindRenderWindow(id, request.Path)));
 
       return json;
@@ -884,7 +882,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
   const auto describeLayout = [](const std::string& path) {
     nlohmann::json maximized = nullptr;
 
-    for (const auto& id : WindowIds)
+    for (const auto& id : GetRestWindowIds())
     {
       if (FindRenderWindow(id, path)->IsFullScreen())
         maximized = id;
@@ -932,7 +930,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       {
         // One window at a time: the others are hidden while it is shown alone,
         // so their buttons cannot be pressed either.
-        for (const auto& id : WindowIds)
+        for (const auto& id : GetRestWindowIds())
         {
           auto* window = FindRenderWindow(id, request.Path);
 

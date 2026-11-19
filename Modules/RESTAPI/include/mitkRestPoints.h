@@ -27,6 +27,12 @@ namespace mitk
   class BaseRenderer;
 
   /**
+   * \brief The ids of the render windows of the standard display, in the
+   *        order of its renderers: "axial", "sagittal", "coronal", "3d".
+   */
+  MITKRESTAPI_EXPORT const std::vector<std::string>& GetRestWindowIds();
+
+  /**
    * \brief The render window of the standard display that an id of the API
    *        names: "axial", "sagittal", "coronal" or "3d".
    *

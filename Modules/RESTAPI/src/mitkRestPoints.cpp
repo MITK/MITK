@@ -21,16 +21,19 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <functional>
 #include <locale>
 #include <sstream>
 
+const std::vector<std::string>& mitk::GetRestWindowIds()
+{
+  static const std::vector<std::string> windowIds = { "axial", "sagittal", "coronal", "3d" };
+  return windowIds;
+}
+
 namespace
 {
-  const std::array<std::string, 4> WindowIds = { "axial", "sagittal", "coronal", "3d" };
-
   [[noreturn]] void ThrowInvalid(const std::string& detail, const std::string& path)
   {
     throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(detail, path));
@@ -71,16 +74,17 @@ namespace
 
 mitk::BaseRenderer* mitk::GetRestRenderer(const std::string& windowId, const std::string& path)
 {
-  const auto id = std::find(WindowIds.begin(), WindowIds.end(), windowId);
+  const auto& windowIds = GetRestWindowIds();
+  const auto id = std::find(windowIds.begin(), windowIds.end(), windowId);
 
-  if (id == WindowIds.end())
+  if (id == windowIds.end())
   {
     throw RestException(ErrorResponse::RenderWindowNotFound(windowId +
       " (the windows are axial, sagittal, coronal and 3d)", path));
   }
 
-  // The standard display names its renderers after the order of WindowIds.
-  auto* renderer = BaseRenderer::GetByName("stdmulti.widget" + std::to_string(id - WindowIds.begin()));
+  // The standard display names its renderers after the order of the window ids.
+  auto* renderer = BaseRenderer::GetByName("stdmulti.widget" + std::to_string(id - windowIds.begin()));
 
   if (renderer == nullptr)
     throw RestException(ErrorResponse::RenderWindowNotAvailable(path));

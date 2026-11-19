@@ -35,6 +35,10 @@ namespace mitk
    *
    * Minimum or maximum might be infinite values. 2nd minimum and maximum are guaranteed to be finite values.
    *
+   * All values, the histogram included, may be cached. They follow changes of the image only once its
+   * modification time moves, so a caller that changes voxels, e.g. through an ImageWriteAccessor, has to
+   * call Modified() on the image afterwards.
+   *
    * \sa Image
    * \sa Image::GetStatistics()
    */

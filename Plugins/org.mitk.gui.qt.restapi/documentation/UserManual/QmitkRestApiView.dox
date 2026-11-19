@@ -149,6 +149,13 @@ The REST API provides the following main endpoints (base URL: <tt>http://host:po
 <tr><td>PUT</td><td><tt>/datastorage/nodes/{uid}/properties/{key}</tt></td><td>Set a property</td></tr>
 </table>
 
+Plugins add further, experimental endpoints: Segmentation <tt>/segmentation</tt>, Measurement
+Toolbox <tt>/statistics</tt> and <tt>/planar-figures</tt>, Reports <tt>/reports</tt>, this plugin
+<tt>/workbench</tt>, <tt>/manual</tt> and the window, crosshair and layout endpoints below
+<tt>/rendering</tt>, and the Agent plugin <tt>/mcp</tt>. The endpoints of a prefix exist once their
+plugin is active, so a prefix can be missing from a Workbench that has not activated the plugin yet.
+<tt>GET /api/v1/endpoints</tt> lists what exists now.
+
 \subsection org_mitk_views_restapi_usage_python Python Example
 
 Here is a simple Python example to list all nodes:

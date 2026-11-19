@@ -114,7 +114,7 @@ Returns API metadata including supported versions and deprecation notices.
 
 ### Experimental Endpoints
 
-Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. They are experimental: until this specification documents them, they may change or go away without a new major version. They describe themselves:
+Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. They are experimental: until this specification documents them, they may change or go away without a new major version. The plugins offer these prefixes: Segmentation `/segmentation`, Measurement Toolbox `/statistics` and `/planar-figures`, Reports `/reports`, the REST API plugin `/workbench`, `/manual` and the window, crosshair and layout endpoints below `/rendering`, and the Agent plugin `/mcp`. The endpoints of a prefix exist once their plugin is active, so a prefix can be missing from a Workbench that has not activated the plugin yet. They describe themselves:
 
 ```http
 GET /api/v1/endpoints

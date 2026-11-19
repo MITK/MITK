@@ -32,7 +32,7 @@ namespace mitk
  * Unmagnified images come from the window's frame buffer, which also works
  * while the window is hidden behind another editor. Magnified images are
  * rendered in tiles, which would repeat the decorations of the window (logo,
- * corner annotation, border, gradient background) in every tile, so these
+ * corner annotation, gradient background) in every tile, so these
  * are always left out then. Cropped images leave them out as well: they sit
  * at the edges of the window and would keep the crop from cutting anything.
  */
@@ -60,7 +60,7 @@ public:
     QColor BackgroundColor = Qt::black;
 
     /**
-     * \brief Whether the logo, corner annotation and border of the window are part of the image.
+     * \brief Whether the logo and corner annotation of the window are part of the image.
      *
      * The gradient of the background counts as a decoration: without
      * decorations, the background is flat for Background::AsShown as well.

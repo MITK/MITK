@@ -190,18 +190,27 @@ QImage QmitkRenderWindowScreenshot::Take(mitk::IRenderWindowPart* renderWindowPa
   if (renderer == nullptr || renderWindow == nullptr)
     mitkThrow() << "The window has no renderer or no render window.";
 
-  const auto magnification = std::max(1u, options.Magnification);
+  const auto requestedMagnification = std::max(1u, options.Magnification);
+  auto magnification = requestedMagnification;
+
+  // Scaling down to MaxSize throws away what magnifying beyond it renders. A
+  // cropped image can be much smaller than the window, so it keeps its pixels.
+  if (options.MaxSize > 0 && !options.CropToContent)
+  {
+    const auto* size = renderWindow->GetSize();
+    const auto longest = static_cast<unsigned int>(std::max(1, std::max(size[0], size[1])));
+
+    magnification = std::min(magnification, std::max(1u, (options.MaxSize + longest - 1) / longest));
+  }
 
   // A background of its own replaces the gradient, which is a decoration.
   QStringList decorations;
 
-  if (!options.Decorations || magnification > 1 || options.CropToContent)
+  if (!options.Decorations || requestedMagnification > 1 || options.CropToContent)
   {
     decorations = {
       mitk::IRenderWindowPart::DECORATION_LOGO,
       mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION,
-      mitk::IRenderWindowPart::DECORATION_BORDER,
-      mitk::IRenderWindowPart::DECORATION_MENU,
       mitk::IRenderWindowPart::DECORATION_BACKGROUND };
   }
   else if (options.BackgroundMode != Background::AsShown)

@@ -7,7 +7,7 @@ The Screenshot Maker saves screenshots of the display (render) windows. It works
 display editor, including the Standard Display and the MxN Display.
 
 Screenshots capture the window contents (image data, crosshair and the chosen background).
-Corner annotations, window borders and the MITK logo are left out so the result is a clean
+Corner annotations and the MITK logo are left out so the result is a clean
 image.
 
 \section QmitkScreenshotMakerSingle Screenshot of a single display window

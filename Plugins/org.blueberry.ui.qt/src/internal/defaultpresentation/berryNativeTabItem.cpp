@@ -61,9 +61,12 @@ void NativeTabItem::SetInfo(const PartInfo& info)
   QTabBar* widget = parent->GetTabFolder();
 
   int index = parent->IndexOf(this);
-  if (widget->tabText(index) != info.name)
+  // QTabBar takes a single "&" as the mnemonic marker.
+  const QString tabText = QString(info.name).replace(QLatin1Char('&'), QStringLiteral("&&"));
+
+  if (widget->tabText(index) != tabText)
   {
-    widget->setTabText(index, info.name);
+    widget->setTabText(index, tabText);
 
     if (closeButton != nullptr)
       closeButton->setAccessibleName(QString("Close %1").arg(info.name));

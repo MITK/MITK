@@ -545,8 +545,16 @@ const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::Scribble
 
 void mitk::nnInteractive::ScribbleInteractor::AddScribble(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType)
 {
+  if (plane == nullptr)
+    mitkThrow() << "A scribble needs a plane.";
+
   auto toolManager = this->GetToolManager();
-  const auto* referenceImage = toolManager->GetReferenceData(0)->GetDataAs<Image>();
+  auto referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+  const auto* referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+
+  if (referenceImage == nullptr)
+    mitkThrow() << "A scribble needs a reference image.";
+
   const auto timeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(toolManager->GetCurrentTimePoint());
 
   auto stroke = BrushStroke::Begin(referenceImage, plane, timeStep);

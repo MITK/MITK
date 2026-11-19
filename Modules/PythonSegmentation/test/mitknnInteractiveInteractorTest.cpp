@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveBoxInteractor.h>
 #include <mitknnInteractiveLassoInteractor.h>
+#include <mitknnInteractivePointInteractor.h>
 #include <mitknnInteractiveScribbleInteractor.h>
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
@@ -62,6 +63,7 @@ class mitknnInteractiveInteractorTestSuite : public mitk::TestFixture
   MITK_TEST(ScribbleIsPaintedWithTheBrush);
   MITK_TEST(LassoIsFilled);
   MITK_TEST(AddedPromptIsRemovable);
+  MITK_TEST(AddingWithoutPlaneOrReferenceImageThrows);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -207,6 +209,27 @@ public:
     interactor.RemoveLastInteraction(mitk::nnInteractive::PromptType::Negative);
     CPPUNIT_ASSERT(!interactor.HasInteractions());
     CPPUNIT_ASSERT_EQUAL(nodeCount, m_DataStorage->GetAll()->Size());
+  }
+
+  void AddingWithoutPlaneOrReferenceImageThrows()
+  {
+    const std::vector<mitk::Point3D> points = { MakePoint(2.0, 5.0, 20.0), MakePoint(6.5, 5.0, 20.0) };
+    const auto promptType = mitk::nnInteractive::PromptType::Positive;
+
+    mitk::nnInteractive::BoxInteractor box;
+    box.SetToolManager(m_ToolManager);
+    CPPUNIT_ASSERT_THROW(box.AddBox(nullptr, points[0], points[1], promptType), mitk::Exception);
+
+    mitk::nnInteractive::ScribbleInteractor scribble;
+    scribble.SetToolManager(m_ToolManager);
+    CPPUNIT_ASSERT_THROW(scribble.AddScribble(nullptr, points, promptType), mitk::Exception);
+
+    mitk::nnInteractive::LassoInteractor lasso;
+    lasso.SetToolManager(m_ToolManager);
+    CPPUNIT_ASSERT_THROW(lasso.AddLasso(nullptr, points, promptType), mitk::Exception);
+
+    mitk::nnInteractive::PointInteractor point;
+    CPPUNIT_ASSERT_THROW(point.AddPoint(points[0], promptType), mitk::Exception);
   }
 };
 

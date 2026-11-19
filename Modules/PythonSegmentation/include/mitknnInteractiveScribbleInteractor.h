@@ -94,10 +94,14 @@ namespace mitk::nnInteractive
      *
      * \param[in] plane The plane the scribble lies in, like that of a render
      *            window.
-     * \param[in] points In world coordinates, projected onto \p plane.
+     * \param[in] points In world coordinates, projected onto \p plane. They
+     *            must lie inside the reference image: this is not checked
+     *            here, nnInteractiveTool rejects a prompt with a point
+     *            outside before it draws it.
      * \param[in] promptType The prompt type of the scribble.
      *
-     * \throw mitk::Exception if the scribble does not cover the image.
+     * \throw mitk::Exception if \p plane is null, the tool manager has no
+     *        reference image, or the scribble does not cover the image.
      */
     void AddScribble(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType);
 

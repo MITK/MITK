@@ -64,6 +64,11 @@ namespace mitk::nnInteractive
      *
      * The point counts among the interactions, and RemoveLastInteraction()
      * removes it. UpdatePreviewEvent is not emitted.
+     *
+     * The point must lie inside the reference image: this is not checked here,
+     * nnInteractiveTool rejects a prompt with a point outside before it draws it.
+     *
+     * \throw mitk::Exception if the tool manager has no reference image.
      */
     void AddPoint(const Point3D& point, PromptType promptType);
 

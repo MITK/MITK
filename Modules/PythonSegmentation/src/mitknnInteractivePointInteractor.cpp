@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitknnInteractivePointInteractor.h>
 
+#include <mitkExceptionMacro.h>
+#include <mitkImage.h>
 #include <mitkPointSetDataInteractor.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -156,6 +158,12 @@ std::optional<mitk::Point3D> mitk::nnInteractive::PointInteractor::GetLastPoint(
 
 void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, PromptType promptType)
 {
+  auto* toolManager = this->GetToolManager();
+  const auto* referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+
+  if (referenceNode == nullptr || referenceNode->GetDataAs<Image>() == nullptr)
+    mitkThrow() << "A point needs a reference image.";
+
   m_Impl->CreatePointSetNode(promptType);
 
   // Unlike the point set interactor, this emits no PointSetAddEvent, which

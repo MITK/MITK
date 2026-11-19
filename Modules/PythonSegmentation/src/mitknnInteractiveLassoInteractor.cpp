@@ -527,8 +527,16 @@ const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInt
 
 void mitk::nnInteractive::LassoInteractor::AddLasso(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType)
 {
+  if (plane == nullptr)
+    mitkThrow() << "A lasso needs a plane.";
+
   auto toolManager = this->GetToolManager();
-  const auto* referenceImage = toolManager->GetReferenceData(0)->GetDataAs<Image>();
+  auto referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+  const auto* referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+
+  if (referenceImage == nullptr)
+    mitkThrow() << "A lasso needs a reference image.";
+
   const auto timeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(toolManager->GetCurrentTimePoint());
 
   // As the contour interactor builds one from the positions of the mouse.

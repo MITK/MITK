@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveBoxInteractor.h>
 
+#include <mitkExceptionMacro.h>
+#include <mitkImage.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkToolManager.h>
@@ -121,6 +123,15 @@ namespace mitk::nnInteractive
 
     const PlanarFigure* AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType)
     {
+      if (plane == nullptr)
+        mitkThrow() << "A box needs a plane.";
+
+      auto* toolManager = m_Owner->GetToolManager();
+      auto* referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+
+      if (referenceNode == nullptr || referenceNode->GetDataAs<Image>() == nullptr)
+        mitkThrow() << "A box needs a reference image.";
+
       // Spans the box as the planar figure interactor does when it is drawn
       // with the mouse, from the corner where the mouse is pressed to the one
       // where it is released.
@@ -134,7 +145,7 @@ namespace mitk::nnInteractive
       box->SetFromSpan(start, end);
 
       auto node = CreateBoxNode(box, promptType);
-      m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
+      m_Owner->GetDataStorage()->Add(node, referenceNode);
       this->CompleteBox(node, promptType);
 
       return box;

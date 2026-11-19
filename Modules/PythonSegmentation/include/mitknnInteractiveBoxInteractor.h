@@ -72,12 +72,17 @@ namespace mitk::nnInteractive
      *
      * \param[in] plane The plane the box lies in, like that of a render window.
      * \param[in] corner, oppositeCorner In world coordinates, projected onto
-     *            \p plane.
+     *            \p plane. They must lie inside the reference image: this is
+     *            not checked here, nnInteractiveTool rejects a prompt with
+     *            a point outside before it draws it.
      * \param[in] promptType The prompt type of the box.
      *
      * \return The box, whose corners nnInteractive gets. Its node owns it,
      *         so it lives until RemoveLastInteraction() removes the box or
      *         the interactor is reset.
+     *
+     * \throw mitk::Exception if \p plane is null or the tool manager has no
+     *        reference image.
      */
     const PlanarFigure* AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType);
 

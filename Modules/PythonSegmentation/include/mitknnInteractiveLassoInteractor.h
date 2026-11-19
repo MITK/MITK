@@ -93,10 +93,13 @@ namespace mitk::nnInteractive
      * \param[in] plane The plane the contour lies in, like that of a render
      *            window.
      * \param[in] points The closed contour in world coordinates, projected
-     *            onto \p plane.
+     *            onto \p plane. The points must lie inside the reference
+     *            image: this is not checked here, nnInteractiveTool rejects
+     *            a prompt with a point outside before it draws it.
      * \param[in] promptType The prompt type of the contour.
      *
-     * \throw mitk::Exception if the contour encloses no voxel of the image.
+     * \throw mitk::Exception if \p plane is null, the tool manager has no
+     *        reference image, or the contour encloses no voxel of the image.
      */
     void AddLasso(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType);
 

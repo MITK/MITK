@@ -182,9 +182,20 @@ const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::G
 {
   auto *generator = static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
   generator->SetImage(SelectImageByTimeStep(m_Image, t));
-  generator->ComputeHistogram();
+
   // For a 3D image the generator holds this holder's own image, which owns
-  // this holder. Release it so that the image can still be deleted.
+  // this holder. Release it on every path so that the image can still be
+  // deleted.
+  try
+  {
+    generator->ComputeHistogram();
+  }
+  catch (...)
+  {
+    generator->SetImage(nullptr);
+    throw;
+  }
+
   generator->SetImage(nullptr);
   return static_cast<const mitk::ImageStatisticsHolder::HistogramType *>(generator->GetHistogram());
 }

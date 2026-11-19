@@ -1464,8 +1464,8 @@ void QmitknnInteractiveToolGUI::OnInteractionsChanged()
   if (prompt.has_value())
   {
     m_Ui->programPromptLabel->setText(QString("Last prompt by a program: %1 %2")
-      .arg(QString::fromStdString(mitk::nnInteractive::GetPromptTypeAsString(prompt->Type)).toLower())
-      .arg(QString::fromStdString(mitk::nnInteractive::GetInteractionTypeAsString(prompt->Interaction)).toLower()));
+      .arg(QString::fromStdString(mitk::nnInteractive::GetPromptTypeAsString(prompt->PromptType)).toLower())
+      .arg(QString::fromStdString(mitk::nnInteractive::GetInteractionTypeAsString(prompt->InteractionType)).toLower()));
   }
 
   m_Ui->programPromptLabel->setVisible(prompt.has_value());

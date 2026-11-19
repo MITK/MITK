@@ -243,8 +243,8 @@ namespace mitk
      */
     struct Prompt
     {
-      nnInteractive::InteractionType Interaction;
-      nnInteractive::PromptType Type;
+      nnInteractive::InteractionType InteractionType;
+      nnInteractive::PromptType PromptType;
     };
 
     /** \brief Returns the prompt of AddPrompt() that was the last interaction,

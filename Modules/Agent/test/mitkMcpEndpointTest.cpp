@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <httplib.h>
 
+#include <QmitkAgentMemory.h>
+#include <QmitkAgentToolServer.h>
 #include <mitkMcpEndpoint.h>
 #include <mitkMcpRestApiTools.h>
 #include <mitkRestServer.h>
@@ -19,10 +21,56 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceProperties.h>
+#include <usServiceRegistration.h>
+
+#include <QFile>
+#include <QTemporaryDir>
+
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace
 {
+  /** A REST server that QmitkAgentToolServer finds as the service, ahead of any other. */
+  class RegisteredRestServer
+  {
+  public:
+    RegisteredRestServer()
+    {
+      us::ServiceProperties properties;
+      properties[us::ServiceConstants::SERVICE_RANKING()] = 1000;
+
+      m_Registration = us::GetModuleContext()->RegisterService<mitk::IRestServerService>(&Server, properties);
+    }
+
+    ~RegisteredRestServer()
+    {
+      m_Registration.Unregister();
+    }
+
+    RegisteredRestServer(const RegisteredRestServer&) = delete;
+    RegisteredRestServer& operator=(const RegisteredRestServer&) = delete;
+
+    mitk::RestServer Server;
+
+  private:
+    us::ServiceRegistration<mitk::IRestServerService> m_Registration;
+  };
+
+  void AddResponseRoute(mitk::RestServer& server, const std::string& path, const mitk::RestResponse& response)
+  {
+    mitk::RestRoute route;
+    route.Method = "GET";
+    route.Path = path;
+    route.Handler = [response](const mitk::RestRequest&) { return response; };
+    server.AddRoute(route);
+  }
+
   nlohmann::json Request(int id, const std::string& method, const nlohmann::json& params = nlohmann::json::object())
   {
     return { { "jsonrpc", "2.0" }, { "id", id }, { "method", method }, { "params", params } };
@@ -105,6 +153,10 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestRestApiTools);
   MITK_TEST(TestRestApiToolsFlagFailedJobs);
   MITK_TEST(TestRestApiToolsUseTheCallersToken);
+  MITK_TEST(TestRestApiToolsImageAnswer);
+  MITK_TEST(TestRestApiToolsImageLimit);
+  MITK_TEST(TestRestApiToolsEncodeBinaryAnswers);
+  MITK_TEST(TestOfferedServerAllowsNoFiles);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -415,6 +467,166 @@ public:
 
     CPPUNIT_ASSERT(!created["result"]["isError"].get<bool>());
     CPPUNIT_ASSERT(dataStorage->GetNamedNode("empty") != nullptr);
+  }
+
+  void TestRestApiToolsImageAnswer()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    auto screenshot = mitk::RestResponse::FromBytes("abcdef", "image/png");
+    screenshot.Headers["X-MITK-Image-Size"] = "640x480";
+    screenshot.Headers["X-Other"] = "not for the model";
+    AddResponseRoute(server, "/test/screenshot", screenshot);
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+    const auto answer = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/screenshot" } }), mitk::RestRequest());
+    server.Stop();
+
+    const auto& result = answer["result"];
+    CPPUNIT_ASSERT(!result["isError"].get<bool>());
+
+    // The image, then one text per header of the endpoint, and no other header.
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), result["content"].size());
+    CPPUNIT_ASSERT_EQUAL(std::string("image"), result["content"][0]["type"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("image/png"), result["content"][0]["mimeType"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("YWJjZGVm"), result["content"][0]["data"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("text"), result["content"][1]["type"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("X-MITK-Image-Size: 640x480"), result["content"][1]["text"].get<std::string>());
+  }
+
+  void TestRestApiToolsImageLimit()
+  {
+    // What the model takes after base64 encoding is at most 5 MB per image.
+    constexpr std::size_t limit = 3700000;
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    AddResponseRoute(server, "/test/atlimit", mitk::RestResponse::FromBytes(std::string(limit, 'x'), "image/png"));
+    AddResponseRoute(server, "/test/overlimit", mitk::RestResponse::FromBytes(std::string(limit + 1, 'x'), "image/png"));
+
+    // An error answer is no image, whatever its content type says.
+    auto failed = mitk::RestResponse::FromBytes("x", "image/png");
+    failed.Status = 404;
+    AddResponseRoute(server, "/test/failed", failed);
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+    const auto atLimit = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/atlimit" } }), mitk::RestRequest());
+    const auto overLimit = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/overlimit" } }), mitk::RestRequest());
+    const auto notFound = endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/failed" } }), mitk::RestRequest());
+    server.Stop();
+
+    CPPUNIT_ASSERT(!atLimit["result"]["isError"].get<bool>());
+    CPPUNIT_ASSERT_EQUAL(std::string("image"), atLimit["result"]["content"][0]["type"].get<std::string>());
+
+    CPPUNIT_ASSERT(overLimit["result"]["isError"].get<bool>());
+    CPPUNIT_ASSERT_EQUAL(std::string("text"), overLimit["result"]["content"][0]["type"].get<std::string>());
+    CPPUNIT_ASSERT(GetText(overLimit).find(std::to_string(limit + 1) + " bytes") != std::string::npos);
+
+    CPPUNIT_ASSERT(notFound["result"]["isError"].get<bool>());
+    CPPUNIT_ASSERT_EQUAL(std::string("text"), notFound["result"]["content"][0]["type"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("HTTP 404"), GetText(notFound).substr(0, 8));
+  }
+
+  void TestRestApiToolsEncodeBinaryAnswers()
+  {
+    // Bytes and their base64 text: one and two bytes of tail, none, and bytes above 127.
+    const std::vector<std::pair<std::string, std::string>> samples = {
+      { "a", "YQ==" },
+      { "ab", "YWI=" },
+      { "abc", "YWJj" },
+      { "abcd", "YWJjZA==" },
+      { "abcde", "YWJjZGU=" },
+      { std::string("\xFF\xFE\xFD", 3), "//79" },
+      { std::string("\xFF\xFE\xFD\xFF", 4), "//79/w==" }
+    };
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    for (std::size_t i = 0; i < samples.size(); ++i)
+      AddResponseRoute(server, "/test/bytes" + std::to_string(i), mitk::RestResponse::FromBytes(samples[i].first, "image/png"));
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+
+    std::vector<nlohmann::json> answers;
+
+    for (std::size_t i = 0; i < samples.size(); ++i)
+      answers.push_back(endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/test/bytes" + std::to_string(i) } }), mitk::RestRequest()));
+
+    server.Stop();
+
+    for (std::size_t i = 0; i < samples.size(); ++i)
+      CPPUNIT_ASSERT_EQUAL(samples[i].second, answers[i]["result"]["content"][0]["data"].get<std::string>());
+  }
+
+  void TestOfferedServerAllowsNoFiles()
+  {
+    const QTemporaryDir directory;
+    CPPUNIT_ASSERT(directory.isValid());
+
+    // A file that exists: the refusal must not come from a missing file.
+    const auto file = directory.filePath("image.nrrd");
+
+    {
+      QFile out(file);
+      CPPUNIT_ASSERT(out.open(QIODevice::WriteOnly));
+      out.write("NRRD");
+    }
+
+    auto dataStorage = mitk::StandaloneDataStorage::New();
+    RegisteredRestServer registered;
+    registered.Server.SetDataStorage(dataStorage);
+
+    QmitkAgentMemory memory(directory.filePath("memory.json"));
+    QmitkAgentToolServer tools(memory);
+
+    CPPUNIT_ASSERT_EQUAL(std::string(), tools.Offer().toStdString());
+
+    const auto config = registered.Server.GetRunningConfig();
+    CPPUNIT_ASSERT(config.has_value());
+
+    const auto agentTokens = registered.Server.GetTokens();
+
+    // A token that may name files, to tell the server's own restriction from the token's.
+    mitk::RestTokenRights rights;
+    rights.FileAccess = true;
+
+    mitk::RestRequest load;
+    load.Method = "POST";
+    load.SetTarget("/api/v1/datastorage/nodes");
+    load.Headers["authorization"] = "Bearer " + registered.Server.CreateToken("test", rights);
+    load.Headers["content-type"] = "application/json";
+    load.Body = nlohmann::json{ { "name", "loaded" }, { "transfer", { { "file_path", file.toStdString() } } } }.dump();
+
+    const auto response = registered.Server.HandleRequest(load);
+
+    tools.Withdraw();
+
+    CPPUNIT_ASSERT(config->clientAccessMode == mitk::ClientAccessMode::LocalhostOnly);
+    CPPUNIT_ASSERT(config->requireAuth);
+    CPPUNIT_ASSERT(config->apiToken.empty());
+    CPPUNIT_ASSERT(!config->httpsEnabled);
+    CPPUNIT_ASSERT(config->fileAccessMode == mitk::FileAccessMode::AllowedDirectories);
+    CPPUNIT_ASSERT(config->allowedFileDirectories.empty());
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), agentTokens.size());
+    CPPUNIT_ASSERT(!agentTokens[0].Rights.FileAccess);
+
+    CPPUNIT_ASSERT_EQUAL(403, response.Status);
+    CPPUNIT_ASSERT_MESSAGE(response.Body, response.Body.find("FILE_ACCESS_DENIED") != std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE(response.Body, response.Body.find("not within any allowed directory") != std::string::npos);
+    CPPUNIT_ASSERT(dataStorage->GetNamedNode("loaded") == nullptr);
   }
 };
 

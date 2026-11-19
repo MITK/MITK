@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <condition_variable>
 #include <future>
 #include <mutex>
+#include <set>
 #include <thread>
 #include <vector>
 
@@ -181,6 +182,9 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(TokenWithoutFileAccessCannotLoadFiles);
   MITK_TEST(EndpointsListsBuiltInAndAddedRoutes);
   MITK_TEST(JobsCanBeAwaited);
+  MITK_TEST(EndedJobsAreForgottenBeyondTheLimit);
+  MITK_TEST(TokenSurvivesRestartOfTheServer);
+  MITK_TEST(SecondStartKeepsTheRunningConfiguration);
   MITK_TEST(JobsCanBeCanceled);
   MITK_TEST(StopEndsWaitsForJobs);
   MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
@@ -591,6 +595,90 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), nlohmann::json::parse(list.Body)["data"].size());
     CPPUNIT_ASSERT_EQUAL(404, missing.Status);
     CPPUNIT_ASSERT_EQUAL(400, noNumber.Status);
+  }
+
+  void EndedJobsAreForgottenBeyondTheLimit()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto running = server.CreateJob("Keeps running");
+
+    for (int i = 0; i < 110; ++i)
+      server.CreateJob("Ends at once")->Succeed();
+
+    const auto latest = server.CreateJob("Latest");
+
+    CPPUNIT_ASSERT(server.Start());
+    const auto list = server.HandleRequest(MakeRequest("GET", "/api/v1/jobs"));
+    server.Stop();
+
+    CPPUNIT_ASSERT_EQUAL(200, list.Status);
+
+    std::set<std::string> ids;
+    int ended = 0;
+    const auto body = nlohmann::json::parse(list.Body);
+
+    for (const auto& job : body["data"])
+    {
+      ids.insert(job["id"].get<std::string>());
+
+      if (job["state"].get<std::string>() == "succeeded")
+        ++ended;
+    }
+
+    // The oldest ended jobs go, the running ones stay however old they are.
+    CPPUNIT_ASSERT_EQUAL(100, ended);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(102), ids.size());
+    CPPUNIT_ASSERT(ids.count(running->GetId()) == 1);
+    CPPUNIT_ASSERT(ids.count(latest->GetId()) == 1);
+    CPPUNIT_ASSERT(ids.count("job_2") == 0);
+    CPPUNIT_ASSERT(ids.count("job_11") == 0);
+    CPPUNIT_ASSERT(ids.count("job_12") == 1);
+  }
+
+  void TokenSurvivesRestartOfTheServer()
+  {
+    mitk::RestServer server;
+    auto config = MakeConfig();
+    config.requireAuth = true;
+    config.apiToken = "main-token";
+    server.SetConfig(config);
+    server.AddRoute(MakeRoute("GET", "/things", "thing"));
+
+    const auto token = server.CreateToken("test", mitk::RestTokenRights());
+
+    CPPUNIT_ASSERT(server.Start());
+    server.Stop();
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto with = server.HandleRequest(MakeRequest("GET", "/api/v1/things", token));
+    const auto without = server.HandleRequest(MakeRequest("GET", "/api/v1/things"));
+    const auto tokens = server.GetTokens();
+    server.Stop();
+
+    CPPUNIT_ASSERT_EQUAL(200, with.Status);
+    CPPUNIT_ASSERT_EQUAL(401, without.Status);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), tokens.size());
+  }
+
+  void SecondStartKeepsTheRunningConfiguration()
+  {
+    mitk::RestServer server;
+    auto other = MakeConfig();
+    other.requireAuth = true;
+    other.apiToken = "other-token";
+
+    CPPUNIT_ASSERT(server.Start(MakeConfig(), "first"));
+    CPPUNIT_ASSERT(server.Start(other, "second"));
+
+    const auto running = server.GetRunningConfig();
+    const auto startedBy = server.GetStartedBy();
+    server.Stop();
+
+    CPPUNIT_ASSERT(running.has_value());
+    CPPUNIT_ASSERT(!running->requireAuth);
+    CPPUNIT_ASSERT_EQUAL(std::string("first"), startedBy);
   }
 
   void JobsCanBeCanceled()

@@ -787,7 +787,14 @@ public:
       {
         const QRectF target(x, y, stepX, stepY);
         if (svg != nullptr)
+        {
+          // Qt SVG draws text without a font attribute in the painter's font, which is
+          // whatever the last callback left there.
+          QFont font = QApplication::font();
+          font.setPixelSize(this->get_default_font_size());
+          painter->setFont(font);
           svg->render(painter, target);
+        }
         else
           painter->drawImage(target, image);
       }

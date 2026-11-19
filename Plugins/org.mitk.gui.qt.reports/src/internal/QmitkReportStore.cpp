@@ -40,6 +40,17 @@ found in the LICENSE file.
 namespace
 {
   constexpr std::size_t MaxPoolSize = 100;
+  constexpr qsizetype MaxTitleLength = 200;
+
+  QString NormalizeTitle(const QString& title)
+  {
+    auto normalized = title.simplified().left(MaxTitleLength);
+
+    if (!normalized.isEmpty() && normalized.back().isHighSurrogate())
+      normalized.chop(1);
+
+    return normalized.trimmed();
+  }
 
   /** src attributes, with the quote in group 1 and the value in group 2. */
   const QRegularExpression& GetSourceAttribute()
@@ -162,7 +173,7 @@ int QmitkReportStore::Add(const QString& title, const QString& html)
   Report report;
   report.Images = this->CollectImages(html, nullptr);
   report.Id = m_NextReportId++;
-  report.Title = title;
+  report.Title = NormalizeTitle(title);
   report.Html = html;
   report.Modified = QDateTime::currentDateTime();
 
@@ -183,7 +194,7 @@ void QmitkReportStore::Update(int id, const QString& title, const QString& html)
     mitkThrow() << "There is no report " << id << ".";
 
   report->second.Images = this->CollectImages(html, &report->second);
-  report->second.Title = title;
+  report->second.Title = NormalizeTitle(title);
   report->second.Html = html;
   report->second.Modified = QDateTime::currentDateTime();
   report->second.Saved = false;

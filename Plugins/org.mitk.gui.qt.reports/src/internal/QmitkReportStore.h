@@ -72,6 +72,7 @@ public:
   /**
    * \brief Add a report and return its id.
    *
+   * \param title Stored with its white space simplified and cut to 200 characters.
    * \param html The body of the page.
    * \throw mitk::Exception if the HTML refers to images the pool does not have.
    */
@@ -79,6 +80,8 @@ public:
 
   /**
    * \brief Replace the title and body of a report.
+   *
+   * The title is stored as Add() does.
    *
    * \throw mitk::Exception if there is no such report, or if the HTML refers
    *        to images that neither the report nor the pool has.

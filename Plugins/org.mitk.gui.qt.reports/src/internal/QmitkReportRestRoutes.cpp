@@ -221,7 +221,7 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
 
       try
       {
-        id = store->Add(title->trimmed(), *html);
+        id = store->Add(*title, *html);
       }
       catch (const mitk::Exception& e)
       {
@@ -262,7 +262,7 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
   change.Path = "/reports/:id";
   change.Summary = "Rewrite a report";
   change.Description =
-    "Body: {html, title (optional)}, html replacing the whole body; see POST /api/v1/reports. The editor shows the "
+    "Body: {html, title (optional)}, html replacing the whole body; see POST /api/v1/reports, which also tells how a title is stored. The editor shows the "
     "new version where the user was reading and comes to the top. Returns {data: {id, title, images, modified}}.";
   change.Handler = [server](const RestRequest& request) {
     const auto id = GetReportId(request);
@@ -281,7 +281,7 @@ std::vector<RestRoute> CreateReportRoutes(mitk::IRestServerService* server)
 
       try
       {
-        store->Update(id, title.has_value() ? title->trimmed() : report.Title, *html);
+        store->Update(id, title.has_value() ? *title : report.Title, *html);
       }
       catch (const mitk::Exception& e)
       {

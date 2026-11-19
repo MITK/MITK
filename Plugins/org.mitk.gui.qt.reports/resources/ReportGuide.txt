@@ -1,4 +1,4 @@
-For the user to read, save as HTML or print; the user decides what to keep. Body: {title, html}, html being the body of an HTML page. Opens without taking the keyboard focus. Returns {data: {id, title, images, modified}} with status 201.
+For the user to read, save as HTML or print; the user decides what to keep. Body: {title, html}, html being the body of an HTML page. The title is stored with its white space simplified (runs of spaces and line breaks become one space) and cut to 200 characters; the same holds for PUT. Opens without taking the keyboard focus. Returns {data: {id, title, images, modified}} with status 201.
 
 The page brings its own style sheet, light or dark as the Workbench is, and shows the title and date, so start with the content. The Workbench shows it with litehtml, a browser once it is saved; both look the same as long as the page uses the components below and, for anything else, the CSS that litehtml renders. Build the page from them: a banner with the main finding, the key numbers, warnings as callouts, numbered sections, a card per structure.
 

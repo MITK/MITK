@@ -13,7 +13,6 @@ found in the LICENSE file.
 #define mitkImageStatisticsHolder_h
 
 #include <mitkImage.h>
-#include <mitkImageTimeSelector.h>
 #include <MitkCoreExports.h>
 
 #ifndef __itkHistogram_h

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkImageCast.h>
 #include <mitkImageDataItem.h>
 #include <mitkImageStatisticsHolder.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkTestingMacros.h>
 
 #include <mitkImageSliceSelector.h>

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkHistogramGenerator.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkProperties.h>
 

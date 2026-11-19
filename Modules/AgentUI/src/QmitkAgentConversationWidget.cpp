@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QTextBlock>
+#include <QTextFragment>
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextList>
@@ -98,6 +99,41 @@ namespace
     return format;
   }
 
+  /**
+   * Gives the links in a range of the document the theme's accent color.
+   * The Markdown importer takes the link color of the application palette,
+   * which style sheets cannot set.
+   */
+  void ColorLinks(QTextDocument* document, int start, int end)
+  {
+    QList<std::pair<int, int>> ranges;
+
+    for (auto block = document->findBlock(start); block.isValid() && block.position() < end; block = block.next())
+    {
+      for (auto it = block.begin(); !it.atEnd(); ++it)
+      {
+        const auto fragment = it.fragment();
+        const auto format = fragment.charFormat();
+        const auto fragmentEnd = fragment.position() + fragment.length();
+
+        // Thumbnails keep their format.
+        if (format.isAnchor() && !format.isImageFormat() && fragment.position() < end && fragmentEnd > start)
+          ranges.append({ fragment.position(), fragmentEnd });
+      }
+    }
+
+    QTextCharFormat linkFormat;
+    linkFormat.setForeground(QColor(QmitkIconTheme::GetAccentColor()));
+
+    for (const auto& [from, to] : ranges)
+    {
+      QTextCursor cursor(document);
+      cursor.setPosition(from);
+      cursor.setPosition(to, QTextCursor::KeepAnchor);
+      cursor.mergeCharFormat(linkFormat);
+    }
+  }
+
   /** Inserts the thumbnails in a row that wraps, after those the block already has. */
   void InsertThumbnails(QTextCursor& cursor, const QList<QTextImageFormat>& thumbnails)
   {
@@ -147,6 +183,7 @@ QmitkAgentConversationWidget::QmitkAgentConversationWidget(QWidget* parent)
     for (std::size_t i = 0; i < m_StepGroups.size(); ++i)
       this->UpdateStepSummary(i);
 
+    ColorLinks(this->document(), 0, this->document()->characterCount());
     this->viewport()->update();
   });
 }
@@ -192,7 +229,10 @@ void QmitkAgentConversationWidget::AppendUserMessage(const QString& text)
 void QmitkAgentConversationWidget::AppendMarkdown(const QString& markdown)
 {
   auto cursor = this->AppendBlock();
+  const auto start = cursor.position();
   cursor.insertMarkdown(markdown);
+
+  ColorLinks(this->document(), start, this->document()->characterCount());
   this->ScrollToEnd();
 }
 
@@ -253,7 +293,12 @@ void QmitkAgentConversationWidget::EndStreamedText(const QString& markdown)
   }
 
   cursor.removeSelectedText();
+
+  const auto start = cursor.position();
+  const auto charactersBefore = document->characterCount();
   cursor.insertMarkdown(text);
+
+  ColorLinks(document, start, start + document->characterCount() - charactersBefore);
 
   // Groups of steps below the text find their blocks by number.
   const auto addedBlocks = document->blockCount() - blockCount;

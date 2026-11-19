@@ -1371,11 +1371,22 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   changeLabel.Summary = "Rename, recolor, show, hide, lock or unlock a label";
   changeLabel.Description =
     "Body, all optional: {name, color: \"#rrggbb\", visible, locked}. Locked labels are kept when tools "
-    "write into the segmentation. Renaming and recoloring are undoable. Other fields are refused. Returns "
-    "{data: label}.";
+    "write into the segmentation. Renaming and recoloring are undoable. Other fields are refused, as is a "
+    "field of the wrong type, and then nothing changes. Returns {data: label}.";
   changeLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     ThrowIfUnknownField(body, { "name", "color", "visible", "locked" }, "a label", request.Path);
+
+    if (body.contains("name") && !body["name"].is_string())
+      throw RestException(ErrorResponse::InvalidRequest("\"name\" must be a string.", request.Path));
+
+    if (body.contains("visible") && !body["visible"].is_boolean())
+      throw RestException(ErrorResponse::InvalidRequest("\"visible\" must be true or false.", request.Path));
+
+    if (body.contains("locked") && !body["locked"].is_boolean())
+      throw RestException(ErrorResponse::InvalidRequest("\"locked\" must be true or false.", request.Path));
+
+    const auto newColor = body.contains("color") ? std::optional<Color>(ParseColor(body["color"], request.Path)) : std::nullopt;
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
@@ -1384,10 +1395,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto label = GetLabel(segmentation, request);
       const auto group = segmentation->GetGroupIndexOfLabel(label->GetValue());
 
-      if (body.contains("name") || body.contains("color"))
+      if (body.contains("name") || newColor.has_value())
       {
         const auto name = body.contains("name") ? body["name"].get<std::string>() : label->GetName();
-        const auto color = body.contains("color") ? ParseColor(body["color"], request.Path) : label->GetColor();
+        const auto color = newColor.value_or(label->GetColor());
 
         SegGroupModifyUndoRedoHelper undoRedo(segmentation, { group }, false, 0, false, true, true);
         segmentation->RenameLabel(label->GetValue(), name, color);
@@ -1533,12 +1544,17 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   addGroup.Path = "/segmentation/segmentations/:uid/groups";
   addGroup.Summary = "Add an empty group to a segmentation";
   addGroup.Description =
-    "Body, optional: {name}. Undoable. Returns {data: group} with status 201. Add labels to it with POST "
+    "Body, optional: {name}; a name that is no string is refused and nothing is added. Undoable. Returns "
+    "{data: group} with status 201. Add labels to it with POST "
     ".../labels and its index as group. Tools that add labels of their own, like TotalSegmentator and "
     "VoxTell, add them to the group of the active label: to fill this group with them, add a label to it and "
     "make that label active first.";
   addGroup.Handler = [server](const RestRequest& request) {
     const auto body = request.Body.empty() ? nlohmann::json::object() : request.GetJsonBody();
+
+    if (body.contains("name") && !body["name"].is_string())
+      throw RestException(ErrorResponse::InvalidRequest("\"name\" must be a string.", request.Path));
+
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {

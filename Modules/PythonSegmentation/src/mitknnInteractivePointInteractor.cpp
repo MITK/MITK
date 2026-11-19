@@ -168,7 +168,16 @@ void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, Prompt
 
   // Unlike the point set interactor, this emits no PointSetAddEvent, which
   // would prompt nnInteractive a second time.
-  m_Impl->PointSetNodes.at(promptType)->GetDataAs<PointSet>()->InsertPoint(point);
+  auto* pointSet = m_Impl->PointSetNodes.at(promptType)->GetDataAs<PointSet>();
+  const auto id = pointSet->InsertPoint(point);
+
+  // Only the enabled interactor highlights its latest point, and OnDisable()
+  // clears that highlight again. Nothing would clear one made while it is off.
+  for (const auto& [type, node] : m_Impl->PointSetNodes)
+    node->GetDataAs<PointSet>()->ClearSelection();
+
+  if (this->IsEnabled())
+    pointSet->SetSelectInfo(id, true);
 }
 
 void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType promptType)

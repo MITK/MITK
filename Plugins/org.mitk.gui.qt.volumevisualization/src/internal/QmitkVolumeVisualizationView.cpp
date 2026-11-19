@@ -159,10 +159,15 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget *parent)
 
 void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  mitk::DataNode::Pointer selectedNode;
+  // While the previous node is still the selected one: concluding an edit there
+  // can ask a question, and refreshes in the meantime have to keep describing
+  // the node the editor still works on.
+  m_Controls->transferFunctionEditor->ConcludeEdit(false);
+
+  m_SelectedNode = nullptr;
 
   if (!nodes.empty() && nodes.front().IsNotNull() && nodes.front()->GetDataAs<mitk::Image>() != nullptr)
-    selectedNode = nodes.front();
+    m_SelectedNode = nodes.front();
 
   // Only here, and deliberately not from UpdateInterface: binding is where the
   // editor decides whether the node's existing function is one to adopt, and
@@ -170,12 +175,7 @@ void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNod
   // whatever function the node already carries, such as the default a scene
   // saved by an earlier MITK version gives every image, instead of leaving room
   // for a preset.
-  m_Controls->transferFunctionEditor->SetDataNode(selectedNode);
-
-  // Only once the editor has let go of the previous node: concluding an edit
-  // there can ask a question, and refreshes in the meantime have to keep
-  // describing the node the editor still works on.
-  m_SelectedNode = selectedNode;
+  m_Controls->transferFunctionEditor->SetDataNode(m_SelectedNode.Lock().GetPointer());
 
   this->UpdateInterface();
 }

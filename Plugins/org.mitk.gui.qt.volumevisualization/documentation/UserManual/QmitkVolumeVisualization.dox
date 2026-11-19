@@ -303,8 +303,8 @@ carries on when rendering is switched back on.
 If saving fails, for example because the file cannot be written, a warning says
 so. The edit is over, but the drawing stays on show, marked as edited, and can
 still be saved by right-clicking the grid. Until it is, switching volume
-rendering off with the button at the top of this view, or selecting another
-image, asks about it again. <b>Discard</b> then puts back the preset the drawing
+rendering off with the button at the top of this view, selecting another image,
+or ending a later edit, even one that changed nothing, asks about it again. <b>Discard</b> then puts back the preset the drawing
 was made over. Instead of <b>Continue editing</b>, switching rendering off offers
 <b>Cancel</b>, which leaves rendering on.
 

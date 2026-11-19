@@ -1978,8 +1978,6 @@ bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 
     if (answer == discardButton)
     {
-      // Not editing, the question is about a drawing a failed save left behind,
-      // possibly the one this question just failed to save.
       if (m_EditModeActive)
       {
         // Before leaving, which makes the drawing the baseline and so leaves
@@ -1987,11 +1985,12 @@ bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
         this->DiscardEdit();
         this->SetEditModeActive(false);
       }
-      else
-      {
-        // What the next selection would do, done while the drawing is in sight.
+
+      // What is left may still be a drawing a failed save left behind, from
+      // before this edit or from this very question. The next selection would
+      // rebuild the preset over it, so that is done now, while it is in sight.
+      if (this->HasUnsavedCurve())
         this->ReplayRecipe(PresetName(this->AppliedPresetItem()));
-      }
 
       return true;
     }
@@ -2388,12 +2387,10 @@ bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const
 
 bool QmitkVolumeTransferFunctionEditor::HasUnsavedCurve() const
 {
-  // While editing, Discard takes back the edit and nothing older, so the edit
-  // is all there is to ask about.
-  if (m_EditModeActive)
-    return m_CurveEdited;
-
-  return m_CurveDrawnOver && this->AppliedPresetItem() != nullptr;
+  // A drawing a failed save left behind counts while editing too: entering edit
+  // mode starts m_CurveEdited over, and leaves the drawing no less unsaved.
+  return (m_EditModeActive && m_CurveEdited) ||
+         (m_CurveDrawnOver && this->AppliedPresetItem() != nullptr);
 }
 
 void QmitkVolumeTransferFunctionEditor::OnPickColorStopColor()

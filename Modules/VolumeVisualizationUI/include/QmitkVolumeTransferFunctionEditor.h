@@ -450,9 +450,10 @@ private:
    *        so that the next selection would rebuild the preset over it.
    *
    * Either an edit in progress that changed something, or a drawing an edit
-   * left behind because saving it failed, over a preset the grid still offers.
-   * A node recording no such preset comes back as the curve it carries, so a
-   * drawing over anything else is not lost.
+   * left behind because saving it failed, over a preset the grid still offers,
+   * whether or not a later edit is under way. A node recording no such preset
+   * comes back as the curve it carries, so a drawing over anything else is not
+   * lost.
    */
   bool HasUnsavedCurve() const;
 

@@ -733,6 +733,17 @@ namespace
     };
   }
 
+  /**
+   * Ends the job of a start with the state of the tool once the panel has seeded the session, which it does on
+   * the event that the tool sends after its start has ended. The queued call runs after that event.
+   */
+  void SucceedWhenSessionSeeded(const std::shared_ptr<mitk::RestJob>& job, const mitk::nnInteractiveTool::Pointer& tool)
+  {
+    QTimer::singleShot(0, QCoreApplication::instance(), [job, tool]() {
+      WhenToolIdle(tool, [job, tool]() { job->Succeed(DescribeNNInteractive(tool)); });
+    });
+  }
+
   mitk::nnInteractive::InteractionType ParseInteractionType(const nlohmann::json& body, const std::string& path)
   {
     const auto type = body.value("type", std::string());
@@ -1827,7 +1838,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Needs nnInteractive as active tool, installed once by the user through its Initialize button. Loads "
     "the model, which can take a while the first time, as a job: query parameter wait (seconds) waits for "
     "it. The job's result is the state as GET /api/v1/segmentation/nninteractive gives it. A start that the "
-    "user began in the panel is joined: the job ends with it, and fails if it did not succeed. The session works "
+    "user began in the panel is joined: the job ends with it, and fails if it did not succeed. The job ends "
+    "once the session has taken up the content of the active label, if it has any, so the state it gives "
+    "includes that. The session works "
     "on the image and time step chosen now; changing them ends it.";
   startSession.Handler = [server, start](const RestRequest& request) {
     CallInGuiThread(*server, [&]() {
@@ -1878,7 +1891,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         {
           WhenStartEnded(job, [tool]() { return tool->IsSessionStarting(); }, [job, tool]() {
             if (tool->IsSessionRunning())
-              job->Succeed(DescribeNNInteractive(tool));
+              SucceedWhenSessionSeeded(job, tool);
             else
               job->Fail("The start in the panel did not succeed.");
           });
@@ -1901,7 +1914,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           }
 
           task->Finish();
-          job->Succeed(DescribeNNInteractive(tool));
+          SucceedWhenSessionSeeded(job, tool);
         });
       }
       catch (...)

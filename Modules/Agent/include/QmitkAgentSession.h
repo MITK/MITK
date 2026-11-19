@@ -154,7 +154,8 @@ public:
    * \brief Starts the process again if it runs without a turn, to pick up the
    *        model, the effort, or the memory, which go in at the start.
    *
-   * A process that is not running picks them up with the next message.
+   * A process that is not running picks them up with the next message. While
+   * a turn runs, the restart waits for the turns to end.
    */
   void RestartIdleProcess();
 
@@ -236,6 +237,9 @@ private:
   /** \brief Whether CheckClaudeCodeAgain() waits for the running turn to end. */
   bool m_CheckPending;
 
+  /** \brief Whether RestartIdleProcess() waits for the running turn to end. */
+  bool m_RestartPending;
+
   /** \brief Counts the queries of the sign-in, so that only the last one counts. */
   int m_AuthQueries;
 
@@ -256,6 +260,17 @@ private:
    * first is followed by a result.
    */
   bool m_TurnInFlight;
+
+  /**
+   * \brief Whether the running process has reported its first init.
+   *
+   * A process that cannot take up the conversation it is asked to resume
+   * ends with a result before any init.
+   */
+  bool m_InitReported;
+
+  /** \brief Whether the running process could not take up the conversation, which was dropped. */
+  bool m_ConversationLost;
 
   /** \brief Whether the user stopped the agent, whose tool calls are refused until the next message. */
   bool m_Stopping;

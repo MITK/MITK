@@ -120,9 +120,12 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
     m_IgnoreApiKeyVariable(false),
     m_SignedIn(false),
     m_CheckPending(false),
+    m_RestartPending(false),
     m_AuthQueries(0),
     m_PendingTurns(0),
     m_TurnInFlight(false),
+    m_InitReported(false),
+    m_ConversationLost(false),
     m_Stopping(false),
     m_Killing(false),
     m_Prepared(false),
@@ -389,8 +392,14 @@ void QmitkAgentSession::StartNewConversation()
 
 void QmitkAgentSession::RestartIdleProcess()
 {
-  if (this->IsTurnRunning() || !m_Process->IsRunning())
+  if (!m_Process->IsRunning())
     return;
+
+  if (this->IsTurnRunning())
+  {
+    m_RestartPending = true;
+    return;
+  }
 
   this->KillProcess();
   this->StartProcess();
@@ -493,11 +502,16 @@ void QmitkAgentSession::StartProcess()
   options.ResumeSessionId = m_SessionId;
   options.TrustedCertificateFile = m_ToolServer->GetCertificateFile();
 
+  m_RestartPending = false;
+  m_InitReported = false;
+  m_ConversationLost = false;
+
   m_Process->Start(options);
 }
 
 void QmitkAgentSession::KillProcess()
 {
+  m_RestartPending = false;
   m_Killing = true;
   m_Process->Kill();
   m_Killing = false;
@@ -555,6 +569,9 @@ void QmitkAgentSession::OnSystemMessage(const QJsonObject& message)
 
   if (subtype != "init")
     return;
+
+  m_InitReported = true;
+  m_ConversationLost = false;
 
   // Claude Code reports it at the start of every turn.
   m_TurnInFlight = this->IsTurnRunning();
@@ -728,11 +745,24 @@ void QmitkAgentSession::OnInterruptAcknowledged()
 
 void QmitkAgentSession::OnResult(const QJsonObject& message)
 {
-  if (!this->IsTurnRunning())
+  // A process that was started ahead and cannot resume ends with a result
+  // before any turn.
+  if (!this->IsTurnRunning() && m_InitReported)
     MITK_WARN << "Claude Code ended a turn that the Agent view did not count as running.";
 
   m_TurnInFlight = false;
   m_PendingTurns = std::max(0, m_PendingTurns - 1);
+
+  // A process that reports a result before its first init could not take up
+  // the conversation it was asked to resume.
+  if (!m_InitReported && !m_SessionId.isEmpty())
+  {
+    m_SessionId.clear();
+    m_ConversationLost = true;
+    m_ConversationCost = 0.0;
+    emit CostChanged();
+  }
+
   emit TurnStateChanged();
 
   if (!this->IsTurnRunning())
@@ -741,7 +771,13 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
 
     // Later, as the process is still reporting.
     if (m_CheckPending)
+    {
       QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
+    }
+    else if (m_RestartPending)
+    {
+      QTimer::singleShot(0, this, &QmitkAgentSession::RestartIdleProcess);
+    }
   }
 
   const auto subtype = message.value("subtype").toString();
@@ -758,11 +794,21 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
 
   if (subtype == "success")
   {
-    emit NoteAdded(QString("Done in %1 s (API-equivalent cost $%2).").arg(seconds, 0, 'f', 1).arg(cost, 0, 'f', 2));
+    // Claude Code reports a refused model like this, after an assistant message with the reason.
+    if (message.value("is_error").toBool())
+    {
+      emit ErrorAdded("Failed.");
+    }
+    else
+    {
+      emit NoteAdded(QString("Done in %1 s (API-equivalent cost $%2).").arg(seconds, 0, 'f', 1).arg(cost, 0, 'f', 2));
+    }
   }
   else if (subtype == "error_during_execution")
   {
-    emit NoteAdded("Stopped.");
+    // The process says why it ends, see OnProcessFinished().
+    if (!m_ConversationLost)
+      emit NoteAdded("Stopped.");
   }
   else
   {
@@ -792,7 +838,9 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
   if (m_CheckPending)
     QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
 
-  auto text = QString("Claude Code ended (exit code %1).").arg(exitCode);
+  auto text = m_ConversationLost
+    ? QString("Claude Code could not continue the conversation (exit code %1).").arg(exitCode)
+    : QString("Claude Code ended (exit code %1).").arg(exitCode);
 
   if (auto output = errorOutput.simplified(); !output.isEmpty())
   {
@@ -803,5 +851,7 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
     text += " " + output;
   }
 
-  emit ErrorAdded(text + " The next message continues the conversation.");
+  emit ErrorAdded(m_ConversationLost
+    ? text + " Your next message starts a new conversation, in which the agent does not know the earlier messages."
+    : text + " The next message continues the conversation.");
 }

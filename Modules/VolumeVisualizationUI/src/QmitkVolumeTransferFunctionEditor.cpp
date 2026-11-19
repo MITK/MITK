@@ -964,8 +964,8 @@ QmitkVolumeTransferFunctionEditor::QmitkVolumeTransferFunctionEditor(QWidget *pa
     this, &QmitkVolumeTransferFunctionEditor::OnRevertEdit);
 
   // Through a slot of its own rather than SetEditModeActive: leaving is for
-  // ConcludeEdit, which asks first, and only the button may have its request
-  // taken back.
+  // ConcludeEdit, which asks first, and only a request a user can still take
+  // back - this button's, or switching rendering off - offers to continue.
   connect(m_Controls->editModeButton, &QToolButton::toggled,
     this, &QmitkVolumeTransferFunctionEditor::OnEditModeToggled);
 
@@ -1156,11 +1156,12 @@ void QmitkVolumeTransferFunctionEditor::changeEvent(QEvent *event)
   // became worth having: switching volume rendering on deliberately does not
   // re-bind the node.
   //
-  // Being disabled ends nothing. Switching volume rendering off is what grays
-  // the editor out, and an edit in progress then waits, untouchable, for
-  // rendering to come back - or for a selection change to ask about it. An
-  // analysis under way runs on, so that switching back on finds it done rather
-  // than starting it over.
+  // Being disabled ends nothing. The view's own button ends an edit before it
+  // switches volume rendering off; switched off elsewhere, such as in the
+  // Properties view, the editor is grayed out with the edit still in progress,
+  // which then waits, untouchable, for rendering to come back - or for a
+  // selection change to ask about it. An analysis under way runs on, so that
+  // switching back on finds it done rather than starting it over.
   if (this->isEnabled())
     this->RequestAnalysis();
 }
@@ -1924,12 +1925,12 @@ void QmitkVolumeTransferFunctionEditor::OnRevertEdit()
   this->ShowColorStops();
 }
 
-void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
+bool QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
 {
-  if (!m_EditModeActive || !m_CurveEdited)
+  if (!this->HasUnsavedCurve())
   {
     this->SetEditModeActive(false);
-    return;
+    return true;
   }
 
   // Named, because a selection change asks after another image was clicked.
@@ -1947,7 +1948,7 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
   auto *saveButton = question.addButton("Save as preset...", QMessageBox::AcceptRole);
   auto *discardButton = question.addButton("Discard", QMessageBox::DestructiveRole);
   auto *continueButton = mayContinueEditing
-    ? question.addButton("Continue editing", QMessageBox::RejectRole)
+    ? question.addButton(m_EditModeActive ? "Continue editing" : "Cancel", QMessageBox::RejectRole)
     : nullptr;
 
   question.setDefaultButton(saveButton);
@@ -1957,19 +1958,41 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
   // its next selection will rebuild it.
   question.setEscapeButton(continueButton);
 
+  // An earlier question about this same edit is still waiting underneath, and
+  // this one is what concludes it.
+  if (m_EditQuestion != nullptr)
+    m_EditQuestion->reject();
+
   while (true)
   {
+    m_EditQuestion = &question;
     question.exec();
+    m_EditQuestion = nullptr;
+
+    // Closed by a later question about this same edit, which has concluded it by
+    // now, against the node it was made on.
+    if (!this->HasUnsavedCurve())
+      return true;
 
     const auto *answer = question.clickedButton();
 
     if (answer == discardButton)
     {
-      // Before leaving, which makes the drawing the baseline and so leaves
-      // nothing to go back to.
-      this->DiscardEdit();
-      this->SetEditModeActive(false);
-      return;
+      if (m_EditModeActive)
+      {
+        // Before leaving, which makes the drawing the baseline and so leaves
+        // nothing to go back to.
+        this->DiscardEdit();
+        this->SetEditModeActive(false);
+      }
+
+      // What is left may still be a drawing a failed save left behind, from
+      // before this edit or from this very question. The next selection would
+      // rebuild the preset over it, so that is done now, while it is in sight.
+      if (this->HasUnsavedCurve())
+        this->ReplayRecipe(PresetName(this->AppliedPresetItem()));
+
+      return true;
     }
 
     if (answer == saveButton)
@@ -1977,6 +2000,10 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
       // Asked while the edit still runs, so that canceling comes back to the
       // question rather than leaving a drawing nobody saved.
       const auto fileName = this->AskPresetFileName();
+
+      // The file dialog waits the same way.
+      if (!this->HasUnsavedCurve())
+        return true;
 
       if (fileName.isEmpty())
         continue;
@@ -1986,16 +2013,29 @@ void QmitkVolumeTransferFunctionEditor::ConcludeEdit(bool mayContinueEditing)
       // After leaving, for the same reason as discarding before it: the colors
       // are saved from the baseline, and until then that is still the curve from
       // before the edit.
-      this->SaveCustomPreset(fileName);
-      return;
+      //
+      // A failed save leaves its drawing on show and saveable from the preset
+      // grid, so a host that can still wait is told to keep it there.
+      const bool saved = this->SaveCustomPreset(fileName);
+
+      // A selection change cannot be taken back, so a drawing it would lose
+      // unsaved is asked about again.
+      if (!saved && !mayContinueEditing && this->HasUnsavedCurve())
+        continue;
+
+      return saved;
     }
 
     if (mayContinueEditing)
     {
-      // The button that asked has already come up. Only it is put back, since
-      // ShowEditMode would also reset the axis the user may have widened.
-      this->ShowEditModeButton(true);
-      return;
+      // If the edit button asked, it has already come up, and this puts it back
+      // down; for any other caller it is still down and this changes nothing.
+      // Only it is put back, since ShowEditMode would also reset the axis the
+      // user may have widened.
+      if (m_EditModeActive)
+        this->ShowEditModeButton(true);
+
+      return false;
     }
   }
 }
@@ -2345,6 +2385,14 @@ bool QmitkVolumeTransferFunctionEditor::DiffersFromPreset() const
          DiffersFrom(m_Controls->colorWidthSlider, this->NeutralColorWidth());
 }
 
+bool QmitkVolumeTransferFunctionEditor::HasUnsavedCurve() const
+{
+  // A drawing a failed save left behind counts while editing too: entering edit
+  // mode starts m_CurveEdited over, and leaves the drawing no less unsaved.
+  return (m_EditModeActive && m_CurveEdited) ||
+         (m_CurveDrawnOver && this->AppliedPresetItem() != nullptr);
+}
+
 void QmitkVolumeTransferFunctionEditor::OnPickColorStopColor()
 {
   auto *canvas = m_Controls->combinedTfCanvas;
@@ -2507,12 +2555,12 @@ QString QmitkVolumeTransferFunctionEditor::AskPresetFileName()
   return fileName;
 }
 
-void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName)
+bool QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName)
 {
   auto node = m_DataNode.Lock();
 
   if (node.IsNull() || m_AppliedTransferFunction.IsNull() || m_BaseColorFn == nullptr)
-    return;
+    return false;
 
   auto *presetList = m_Controls->presetListWidget;
 
@@ -2542,7 +2590,7 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName
           savedFunction.GetPointer(), blendMode))
     {
       QMessageBox::warning(this, "Save as preset", "Could not write the file.");
-      return;
+      return false;
     }
   }
 
@@ -2560,7 +2608,10 @@ void QmitkVolumeTransferFunctionEditor::SaveCustomPreset(const QString &fileName
   {
     QMessageBox::warning(this, "Save as preset",
       "The file was written, but could not be read back as a preset.");
+    return false;
   }
+
+  return true;
 }
 
 bool QmitkVolumeTransferFunctionEditor::AddPresetFromFile(const QString &presetFile)

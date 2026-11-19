@@ -288,14 +288,25 @@ the same format the built-in catalog uses, then adds it to the grid and
 applies it, so your own functions can be kept and shared and added back with the
 <b>Load preset...</b> entry. Canceling the file dialog brings the question back.
 <li> <b>Discard</b> puts back the curve and the blend mode from before the edit.
-<li> <b>Continue editing</b> takes back the click on <b>Stop editing</b> and
-leaves you editing. ESC answers the same.
+<li> <b>Continue editing</b> takes back the click that asked - on <b>Stop
+editing</b>, or on the button that switches volume rendering off, which then
+stays on - and leaves you editing. ESC answers the same.
 </ul>
 
 Selecting another image while editing, or removing the one being edited, asks
 the same question, only without <b>Continue editing</b>: the selection has
-already moved on. Switching volume rendering off does not end the edit. It
-waits, and carries on when rendering is switched back on.
+already moved on. Switching volume rendering off with the button at the top of
+this view ends the edit the same way, with all three answers. Switched off
+elsewhere, such as in the Properties view, the edit is not ended: it waits, and
+carries on when rendering is switched back on.
+
+If saving fails, for example because the file cannot be written, a warning says
+so. The edit is over, but the drawing stays on show, marked as edited, and can
+still be saved by right-clicking the grid. Until it is, switching volume
+rendering off with the button at the top of this view, selecting another image,
+or ending a later edit, even one that changed nothing, asks about it again. <b>Discard</b> then puts back the preset the drawing
+was made over. Instead of <b>Continue editing</b>, switching rendering off offers
+<b>Cancel</b>, which leaves rendering on.
 
 \note There is no keeping an edited curve without saving it. What the view
 records is the preset a curve was drawn over together with the slider

@@ -269,13 +269,16 @@ and it stays as it is.
   refines the result further. A prompt that made things worse keeps
   influencing the later ones, so undo it right away
   (POST `/api/v1/segmentation/nninteractive/undo`, one step only).
-  POST `.../reset` discards all prompts.
+  POST `.../reset` discards all prompts. Canceling the job of a prompt
+  ends the session: all its prompts and the unconfirmed result are gone,
+  and the next prompt needs a new session.
 - First prompt, in the 2D window with the finest resolution (for most CT
   images the axial one), in the slice where the structure is largest:
   - a box for compact structures, tight around it: two opposite corners.
     Coordinates read off a screenshot are easily off by several pixels:
     check against the grid that every edge lies just outside the structure.
-    A box only works as the first prompt.
+    A box is best as the first prompt: it often takes in surrounding
+    tissue, so correct with points or scribbles rather than another box.
   - a positive scribble along elongated, thin or curved structures, where a
     box would contain a lot of other tissue.
   - a point for tiny structures.

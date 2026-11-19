@@ -222,6 +222,7 @@ public:
     CPPUNIT_ASSERT(!router.Find("GET", "/api/v1/editors").has_value());
     CPPUNIT_ASSERT(!router.Find("GET", "/api/v1/editors/").has_value());
     CPPUNIT_ASSERT(!router.Find("POST", "/api/v1/editors/mxn").has_value());
+    CPPUNIT_ASSERT(router.Find("HEAD", "/api/v1/editors/mxn").has_value());
 
     // Equally many literal segments: the earlier literal wins, not the route added first.
     router.Add(MakeRoute("GET", "/api/v1/things/:id/items", "later literal"));

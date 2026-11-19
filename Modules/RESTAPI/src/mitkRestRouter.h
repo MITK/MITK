@@ -50,6 +50,7 @@ namespace mitk
 
     void Remove(RestRouteId id);
 
+    /** \brief The match for a request; a HEAD request finds the GET route of the path. */
     std::optional<Match> Find(const std::string& method, const std::string& path) const;
 
     /** \brief The routes whose paths start with \p prefix, in the order they were added. */

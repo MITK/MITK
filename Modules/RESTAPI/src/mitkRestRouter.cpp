@@ -21,6 +21,7 @@ found in the LICENSE file.
 namespace
 {
   const std::array<std::string, 5> Methods = { "GET", "POST", "PUT", "PATCH", "DELETE" };
+  const std::string GetMethod = "GET";
 
   /** Splits after the leading slash and keeps empty segments, so "/docs/" and "/docs" differ. */
   std::vector<std::string> Split(const std::string& path)
@@ -138,13 +139,16 @@ std::optional<mitk::RestRouter::Match> mitk::RestRouter::Find(const std::string&
 
   const auto segments = Split(path);
 
+  // httplib hands HEAD requests to the GET handlers and drops the body.
+  const std::string& routeMethod = method == "HEAD" ? GetMethod : method;
+
   std::shared_lock lock(m_Mutex);
 
   const Entry* best = nullptr;
 
   for (const auto& entry : m_Entries)
   {
-    if (entry.Route.Method != method || entry.Segments.size() != segments.size())
+    if (entry.Route.Method != routeMethod || entry.Segments.size() != segments.size())
       continue;
 
     bool matches = true;

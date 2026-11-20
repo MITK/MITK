@@ -362,21 +362,24 @@ namespace
       return "File path is not within any allowed directory: " + filePath;
     }
 
-    const std::string canonicalStr = canonicalPath.string();
-
-    // Check allowed directories
+    // Check allowed directories, by components: the canonical form of a
+    // root, like "E:\" or "/", ends with a separator already.
     for (const auto& allowedDir : allowedDirs)
     {
+      // The standard libraries disagree on canonical(""): an error, the
+      // current directory, or (MSVC) an empty path that matches every path.
+      if (allowedDir.empty())
+      {
+        continue;
+      }
+
       const fs::path canonicalAllowed = fs::canonical(allowedDir, ec);
       if (ec)
       {
         continue;
       }
-      const std::string allowedStr = canonicalAllowed.string();
-      if (canonicalStr.rfind(allowedStr, 0) == 0 &&
-          (canonicalStr.length() == allowedStr.length() ||
-           canonicalStr[allowedStr.length()] == '/' ||
-           canonicalStr[allowedStr.length()] == '\\'))
+
+      if (std::mismatch(canonicalAllowed.begin(), canonicalAllowed.end(), canonicalPath.begin(), canonicalPath.end()).first == canonicalAllowed.end())
       {
         return "";
       }

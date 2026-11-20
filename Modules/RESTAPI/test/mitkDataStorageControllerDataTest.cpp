@@ -82,6 +82,8 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   MITK_TEST(GetDataAsFileNeedsFileAccess);
   MITK_TEST(PutImageDataDirect);
   MITK_TEST(PutImageDataFileReference);
+  MITK_TEST(AllowedRootAllowsFilesBelowIt);
+  MITK_TEST(EmptyAllowedDirectoryAllowsNothing);
 
   // POST /nodes with data transfer
   MITK_TEST(PostNodeWithDataFileReference);
@@ -1087,6 +1089,79 @@ public:
     {
       CPPUNIT_FAIL("Unexpected status code: " + std::to_string(res.status));
     }
+  }
+
+  void AllowedRootAllowsFilesBelowIt()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("EmptyNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    std::string tempFilePath;
+    try
+    {
+      tempFilePath = mitk::IOUtil::CreateTemporaryFile("testimage_XXXXXX.nrrd", m_TempDirectory);
+      mitk::IOUtil::Save(this->CreateTestImage(), tempFilePath);
+    }
+    catch (const std::exception&)
+    {
+      MITK_WARN << "AllowedRootAllowsFilesBelowIt skipped: could not save test image (serializer not available)";
+      return;
+    }
+
+    // Like "E:\" or "/", whose canonical form ends with a separator.
+    const auto root = fs::path(tempFilePath).root_path().string();
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, { root }, m_TempDirectory);
+
+    nlohmann::json body;
+    body["transfer"]["file_path"] = tempFilePath;
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body.dump(), {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+    fs::remove(fs::path(tempFilePath));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(root, 200, res.status);
+  }
+
+  void EmptyAllowedDirectoryAllowsNothing()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("EmptyNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    std::string tempFilePath;
+    try
+    {
+      tempFilePath = mitk::IOUtil::CreateTemporaryFile("testimage_XXXXXX.nrrd", m_TempDirectory);
+      mitk::IOUtil::Save(this->CreateTestImage(), tempFilePath);
+    }
+    catch (const std::exception&)
+    {
+      MITK_WARN << "EmptyAllowedDirectoryAllowsNothing skipped: could not save test image (serializer not available)";
+      return;
+    }
+
+    // A split setting with a trailing separator yields an empty entry.
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, { "" }, m_TempDirectory);
+
+    nlohmann::json body;
+    body["transfer"]["file_path"] = tempFilePath;
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body.dump(), {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+    fs::remove(fs::path(tempFilePath));
+
+    CPPUNIT_ASSERT_EQUAL(403, res.status);
   }
 
   void PutImageDataFileReference()

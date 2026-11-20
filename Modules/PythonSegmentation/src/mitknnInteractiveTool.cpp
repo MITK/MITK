@@ -39,6 +39,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cstdint>
 #include <functional>
 #include <limits>
 
@@ -271,6 +272,10 @@ namespace mitk
     bool PendingPromptApplied = false;
     std::string PendingPromptError;
     std::function<void(std::exception_ptr)> PendingPromptDone;
+
+    // Counts the prompts of AddPrompt(), so that a report posted for one of
+    // them cannot end a later one.
+    std::uint64_t PromptSerial = 0;
 
     // A start or a prompt runs off the GUI thread, during which the tool may be
     // deactivated, the session aborted or the time point changed. Those wait
@@ -1288,7 +1293,7 @@ void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
     mitkThrow() << "nnInteractive has no session. Start one first.";
 
   // The session takes one prompt at a time, as with the mouse.
-  if (this->IsUpdating() || this->IsRunningOffGUIThread())
+  if (this->IsUpdating() || this->IsRunningOffGUIThread() || this->IsPromptPending())
     mitkThrow() << "nnInteractive is still computing a prompt.";
 
   const auto supported = this->GetSupportedInteractions();
@@ -1340,6 +1345,7 @@ void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
   m_Impl->PendingPromptApplied = false;
   m_Impl->PendingPromptError.clear();
   m_Impl->PendingPromptDone = std::move(done);
+  ++m_Impl->PromptSerial;
 
   // As the interactors trigger it.
   try
@@ -1510,9 +1516,15 @@ void mitk::nnInteractiveTool::UpdateCleanUp()
   for (auto& [interactionType, interactor] : m_Impl->Interactors)
     interactor->SetInputSuspended(false);
 
-  // Posted, so that the caller of AddPrompt() finds the update ended.
+  // Posted, so that the caller of AddPrompt() finds the update ended. A
+  // prompt that failed at once has reported before this runs.
   if (m_Impl->PendingPromptDone)
-    this->PostToGUIThread([this]() { this->EndProgramPrompt(); });
+  {
+    this->PostToGUIThread([this, serial = m_Impl->PromptSerial]() {
+      if (serial == m_Impl->PromptSerial)
+        this->EndProgramPrompt();
+    });
+  }
 
   // Posted, as the update has not ended yet. Through AbortSession(), which
   // checks again: a prompt can start before the posted call runs, and then
@@ -1586,6 +1598,11 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
 bool mitk::nnInteractiveTool::IsSessionStarting() const
 {
   return m_Impl->Starting;
+}
+
+bool mitk::nnInteractiveTool::IsPromptPending() const
+{
+  return static_cast<bool>(m_Impl->PendingPromptDone);
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const

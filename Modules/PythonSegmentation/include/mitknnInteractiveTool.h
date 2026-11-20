@@ -516,6 +516,15 @@ namespace mitk
                    const PlaneGeometry* plane,
                    std::function<void(std::exception_ptr error)> done);
 
+    /**
+     * \brief Tells whether a prompt of AddPrompt() has not reported to its \p done yet.
+     *
+     * Also for a moment after the update of the prompt has ended, until the
+     * report runs on the GUI thread. AddPrompt() refuses another prompt
+     * meanwhile.
+     */
+    bool IsPromptPending() const;
+
     /** \brief Event triggered when a session has started, by StartSession()
      *         from whatever caller.
      */

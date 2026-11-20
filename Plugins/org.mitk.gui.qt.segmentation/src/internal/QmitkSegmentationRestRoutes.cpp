@@ -2068,6 +2068,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       ThrowIfBusy(tool, request.Path);
 
+      // For a moment after its update, the last prompt has not reported to its job yet.
+      if (tool->IsPromptPending())
+        mitk::ThrowRestError("BUSY", "Conflict", "nnInteractive is still computing a prompt. Wait for its job to end.", 409, request.Path);
+
       const auto points = GetRestWorldPoints(body, request.Path);
 
       // The prompt is drawn in the plane of the window that the pixels were

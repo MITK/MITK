@@ -127,7 +127,9 @@ mitk::RestScreenshotOptions mitk::ParseRestScreenshotOptions(const RestRequest& 
 
   if (const auto background = request.GetQueryParam("background"); background.has_value())
   {
-    const auto color = ParseRestColor(*background);
+    // A '#' in a query value has to be encoded, which a client library that
+    // encodes values itself does a second time, so the digits alone count, too.
+    const auto color = ParseRestColor(background->size() == 6 ? '#' + *background : *background);
 
     if (*background == "transparent")
     {
@@ -141,7 +143,7 @@ mitk::RestScreenshotOptions mitk::ParseRestScreenshotOptions(const RestRequest& 
     else
     {
       throw RestException(ErrorResponse::InvalidRequest(
-        "background must be transparent or a color like #ffffff.", request.Path));
+        "background must be transparent or a color like ffffff (six hex digits).", request.Path));
     }
   }
 

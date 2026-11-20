@@ -382,6 +382,11 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(170.0 / 255.0, color.BackgroundColor[1], 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, color.BackgroundColor[2], 1e-6);
 
+    // The digits alone, as clients send them whose library encodes a '#'.
+    const auto digits = Parse("background=FFaa00");
+    CPPUNIT_ASSERT(digits.BackgroundMode == mitk::RestScreenshotOptions::Background::Color);
+    CPPUNIT_ASSERT(digits.BackgroundColor == color.BackgroundColor);
+
     for (unsigned int scale = 1; scale <= 4; ++scale)
       CPPUNIT_ASSERT_EQUAL(scale, Parse("scale=" + std::to_string(scale)).Magnification);
 
@@ -401,11 +406,12 @@ public:
       { "max_size=abc", "max_size must be a number of pixels." },
       { "max_size=", "max_size must be a number of pixels." },
       { "max_size=1.5", "max_size must be a number of pixels." },
-      { "background=red", "background must be transparent or a color like #ffffff." },
-      { "background=%23fff", "background must be transparent or a color like #ffffff." },
-      { "background=ffffff", "background must be transparent or a color like #ffffff." },
-      { "background=Transparent", "background must be transparent or a color like #ffffff." },
-      { "background=", "background must be transparent or a color like #ffffff." },
+      { "background=red", "background must be transparent or a color like ffffff (six hex digits)." },
+      { "background=%23fff", "background must be transparent or a color like ffffff (six hex digits)." },
+      { "background=fffff", "background must be transparent or a color like ffffff (six hex digits)." },
+      { "background=%2523ffffff", "background must be transparent or a color like ffffff (six hex digits)." },
+      { "background=Transparent", "background must be transparent or a color like ffffff (six hex digits)." },
+      { "background=", "background must be transparent or a color like ffffff (six hex digits)." },
       { "decorations=0", "decorations must be true or false." },
       { "crop=yes", "crop must be true or false." },
       { "scale=0", "scale must be 1, 2, 3 or 4." },

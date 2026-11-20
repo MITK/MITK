@@ -806,7 +806,7 @@ namespace
     const auto result = QmitkVenvProcess::RunStep(mitk::VoxTell::VENV_NAME, mitk::VoxTell::BuildDownloadStep(displayName, files), &output);
 
     if (result == QmitkVenvProcess::StepResult::Cancelled)
-      mitkThrow() << displayName << " was canceled.";
+      mitkThrow() << displayName << " was canceled in the Workbench.";
 
     if (result == QmitkVenvProcess::StepResult::Failed)
     {
@@ -1004,7 +1004,7 @@ namespace
 
     void OnInitializationFailed(std::string message)
     {
-      this->End(MakeError(message.empty() ? std::string("Starting TotalSegmentator was canceled.") : message));
+      this->End(MakeError(message.empty() ? std::string("Starting TotalSegmentator was canceled in the Workbench.") : message));
     }
 
     // Not from within the event, which goes on to its other listeners, and
@@ -2432,7 +2432,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
             if (tool->WasLastUpdateCancelled())
             {
-              job->Fail("VoxTell was canceled.");
+              job->Fail("VoxTell was canceled in the Workbench.");
               return;
             }
 
@@ -2770,7 +2770,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           WhenToolIdle(tool, [job, tool]() {
             if (!tool->LastRunSucceeded())
             {
-              job->Fail(tool->GetLastErrorMessage().empty() ? "TotalSegmentator was canceled." : tool->GetLastErrorMessage());
+              job->Fail(tool->GetLastErrorMessage().empty() ? "TotalSegmentator was canceled in the Workbench." : tool->GetLastErrorMessage());
               return;
             }
 

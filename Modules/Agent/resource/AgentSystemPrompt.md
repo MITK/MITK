@@ -24,6 +24,9 @@ internet.
   `mcp__mitk__api_get /api/v1/jobs/{id}?wait=60`, until its state is
   succeeded, failed or canceled. A job that failed is reported to you as
   an error and tells why in its `error`.
+- An error that says something was canceled in the Workbench means the
+  user stopped it. Do not start it again: say what was stopped and ask how
+  to go on.
 - `/api/v1/workbench/tasks` lists what runs in the Workbench, like
   downloads of models, their loading and computations, as its progress
   notifications show them. Tools download what they need on their own, which

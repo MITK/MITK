@@ -177,6 +177,9 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodePropertyRefusesOtherType);
   MITK_TEST(SetNodePropertyRefusesUnfittingValue);
   MITK_TEST(SetNodePropertyRefusesIncompleteObject);
+  MITK_TEST(LevelWindowNeedsEveryFieldOfItsDescription);
+  MITK_TEST(PropertyWritesInAContextLeaveTheDefaultListAlone);
+  MITK_TEST(PropertyWritesOnTheDataScopeLeaveTheNodeAlone);
   MITK_TEST(NewUidIsGivenOnTheDispatchThread);
   MITK_TEST(DeleteNodeProperty);
   MITK_TEST(DeleteNodePropertyNotFound);
@@ -1564,6 +1567,186 @@ public:
     mitk::LevelWindow unchanged;
     CPPUNIT_ASSERT(m_Root1->GetLevelWindow(unchanged));
     CPPUNIT_ASSERT(unchanged == levelWindow);
+  }
+
+  void LevelWindowNeedsEveryFieldOfItsDescription()
+  {
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetLevelWindow(100.0, 50.0);
+    m_Root1->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow));
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    // The description that a read gives is complete.
+    const nlohmann::json full = levelWindow;
+
+    // Each field, and each group of them, in turn left out, with the value on its own and typed.
+    const std::vector<std::vector<std::string>> paths = {
+      { "Fixed" }, { "IsFloatingImage" },
+      { "CurrentSettings" }, { "CurrentSettings", "Level" }, { "CurrentSettings", "Window" },
+      { "DefaultSettings" }, { "DefaultSettings", "Level" }, { "DefaultSettings", "Window" },
+      { "CurrentRange" }, { "CurrentRange", "Min" }, { "CurrentRange", "Max" }
+    };
+
+    for (const auto& path : paths)
+    {
+      auto incomplete = full;
+
+      if (path.size() == 1)
+        incomplete.erase(path[0]);
+      else
+        incomplete[path[0]].erase(path[1]);
+
+      const nlohmann::json typed = { { "type", "LevelWindowProperty" }, { "value", incomplete } };
+      const auto name = path.back();
+
+      CPPUNIT_ASSERT_MESSAGE(name, m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", incomplete, params).status ==
+        mitk::DataStorageBridge::OperationStatus::InvalidInput);
+      CPPUNIT_ASSERT_MESSAGE(name, m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", typed, params).status ==
+        mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    }
+
+    // A field of the wrong type is refused as well.
+    auto wrongType = full;
+    wrongType["CurrentSettings"]["Level"] = "high";
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", wrongType, params).status ==
+      mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    mitk::LevelWindow current;
+    CPPUNIT_ASSERT(m_Root1->GetLevelWindow(current));
+    CPPUNIT_ASSERT(current == levelWindow);
+
+    // The complete description is taken.
+    auto changed = full;
+    changed["CurrentSettings"]["Level"] = 120.0;
+
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "levelwindow", changed, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(m_Root1->GetLevelWindow(current));
+    CPPUNIT_ASSERT_EQUAL(120.0, current.GetLevel());
+    CPPUNIT_ASSERT_EQUAL(50.0, current.GetWindow());
+  }
+
+  void PropertyWritesInAContextLeaveTheDefaultListAlone()
+  {
+    const std::string context = "stdmulti.widget0";
+    const ScopedRenderer renderer(context);
+    m_Root1->SetFloatProperty("line.width", 2.0f);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+    params.context = context;
+
+    const auto contextValue = [this, &context](const std::string& key) -> const mitk::FloatProperty* {
+      return dynamic_cast<const mitk::FloatProperty*>(m_Root1->GetConstProperty(key, context, false).GetPointer());
+    };
+
+    float value = 0.0f;
+
+    // Set, in the way that the value of a typed property is.
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(contextValue("line.width") != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, contextValue("line.width")->GetValue());
+    CPPUNIT_ASSERT(m_Root1->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
+
+    // A read in the context finds the value of the context, and a read without one the default.
+    const auto inContext = m_Bridge->GetNodeProperty(m_Root1Uid, "line.width", params);
+    CPPUNIT_ASSERT(inContext.has_value());
+    CPPUNIT_ASSERT_EQUAL(3.0, (*inContext)["line.width"].get<double>());
+
+    mitk::PropertyQueryParams withoutContext;
+    withoutContext.scope = mitk::PropertyScope::Node;
+    const auto byDefault = m_Bridge->GetNodeProperty(m_Root1Uid, "line.width", withoutContext);
+    CPPUNIT_ASSERT(byDefault.has_value());
+    CPPUNIT_ASSERT_EQUAL(2.0, (*byDefault)["line.width"].get<double>());
+
+    // Replace the list of the context: the other values of it go, the default list stays.
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "extra", true, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+
+    const auto replaced = m_Bridge->ReplaceNodeProperties(m_Root1Uid, { { "line.width", 4 }, { "other", 1.5 } }, params);
+    CPPUNIT_ASSERT(replaced.status == mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(std::find(replaced.result["removed"].begin(), replaced.result["removed"].end(), "extra") !=
+      replaced.result["removed"].end());
+    CPPUNIT_ASSERT_EQUAL(4.0f, contextValue("line.width")->GetValue());
+    CPPUNIT_ASSERT(m_Root1->GetConstProperty("extra", context, false).IsNull());
+    CPPUNIT_ASSERT(m_Root1->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
+    CPPUNIT_ASSERT(m_Root1->GetProperty("other") == nullptr);
+
+    // Delete in the context: the default stays.
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "line.width", params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(contextValue("line.width") == nullptr);
+    CPPUNIT_ASSERT(m_Root1->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "line.width", params).status ==
+      mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
+  }
+
+  void PropertyWritesOnTheDataScopeLeaveTheNodeAlone()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("ScopedWrites");
+    node->SetFloatProperty("line.width", 5.0f);
+
+    auto image = mitk::Image::New();
+    unsigned int dims[3] = {5, 5, 5};
+    image->Initialize(mitk::MakeScalarPixelType<short>(), 3, dims);
+    image->SetProperty("line.width", mitk::FloatProperty::New(2.0f));
+    node->SetData(image);
+    m_DataStorage->Add(node);
+
+    const auto uid = FindUidByName("ScopedWrites");
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Data;
+
+    // A simple value takes the type of the property of the data, not of the node.
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(uid, "line.width", 3, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+
+    const auto* dataProperty = dynamic_cast<mitk::FloatProperty*>(image->GetProperty("line.width").GetPointer());
+    CPPUNIT_ASSERT(dataProperty != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, dataProperty->GetValue());
+
+    float value = 0.0f;
+    CPPUNIT_ASSERT(node->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(5.0f, value);
+
+    // A new property takes its type from the value, and the data gets it.
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(uid, "data.flag", true, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(dynamic_cast<mitk::BoolProperty*>(image->GetProperty("data.flag").GetPointer()) != nullptr);
+    CPPUNIT_ASSERT(node->GetProperty("data.flag", nullptr, false) == nullptr);
+
+    // A typed value has to name the type of the property of the data, whatever the node holds.
+    const nlohmann::json asInt = { { "type", "IntProperty" }, { "value", 3 } };
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(uid, "line.width", asInt, params).status ==
+      mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT_EQUAL(3.0f, dynamic_cast<mitk::FloatProperty*>(image->GetProperty("line.width").GetPointer())->GetValue());
+
+    // A value that does not fit is refused.
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(uid, "line.width", "wide", params).status ==
+      mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    // A node without data has none to write to, in this scope only.
+    auto bare = mitk::DataNode::New();
+    bare->SetName("NoData");
+    m_DataStorage->Add(bare);
+    const auto bareUid = FindUidByName("NoData");
+
+    const auto refused = m_Bridge->SetNodeProperty(bareUid, "line.width", 3, params);
+    CPPUNIT_ASSERT(refused.status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+    CPPUNIT_ASSERT(refused.reason.find("no data") != std::string::npos);
+    CPPUNIT_ASSERT(bare->GetProperty("line.width") == nullptr);
+
+    params.scope = mitk::PropertyScope::Node;
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(bareUid, "line.width", 3, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
   }
 
   void DeleteNodeProperty()

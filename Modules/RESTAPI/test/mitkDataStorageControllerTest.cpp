@@ -66,6 +66,7 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PatchNodeProperties);
   MITK_TEST(PutNodeProperties);
   MITK_TEST(RefusedPropertyValuesTellTheReason);
+  MITK_TEST(PutOfTheListWithARefusedValueChangesNothing);
   // Special character tests (percent-encoding)
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
@@ -705,6 +706,44 @@ public:
     CPPUNIT_ASSERT(json["data"].contains("replaced"));
     CPPUNIT_ASSERT(json["meta"].contains("node_uid"));
     CPPUNIT_ASSERT(json["meta"].contains("property_scope"));
+  }
+
+  void PutOfTheListWithARefusedValueChangesNothing()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetFloatProperty("keep.me", 1.0f);
+    node->SetFloatProperty("line.width", 2.0f);
+    node->SetBoolProperty("old", true);
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    // One of the values fits, the other does not, and the list leaves out a property that exists.
+    const nlohmann::json body = { { "keep.me", 5.0 }, { "line.width", "wide" } };
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", body.dump(), {{"uid", uid}});
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_properties(req, res);
+
+    // The client gets a 400 that names the key and the reason; the node is as it was, nothing removed.
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+
+    const auto message = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(message.find("\"line.width\"") != std::string::npos);
+    CPPUNIT_ASSERT(message.find("FloatProperty") != std::string::npos);
+
+    float value = 0.0f;
+    CPPUNIT_ASSERT(node->GetFloatProperty("keep.me", value));
+    CPPUNIT_ASSERT_EQUAL(1.0f, value);
+    CPPUNIT_ASSERT(node->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
+
+    bool old = false;
+    CPPUNIT_ASSERT(node->GetBoolProperty("old", old));
+    CPPUNIT_ASSERT(old);
   }
 
   void RefusedPropertyValuesTellTheReason()

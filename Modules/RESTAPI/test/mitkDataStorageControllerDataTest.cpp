@@ -79,6 +79,7 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   // Full round-trip tests (requires serializers to be available)
   MITK_TEST(GetImageDataDirect);
   MITK_TEST(GetImageDataFileReference);
+  MITK_TEST(GetDataAsFileNeedsFileAccess);
   MITK_TEST(PutImageDataDirect);
   MITK_TEST(PutImageDataFileReference);
 
@@ -878,6 +879,60 @@ public:
     {
       CPPUNIT_FAIL("Unexpected status code: " + std::to_string(res.status));
     }
+  }
+
+  void GetDataAsFileNeedsFileAccess()
+  {
+    auto withData = mitk::DataNode::New();
+    withData->SetName("ImageNode");
+    withData->SetData(this->CreateTestImage());
+    m_DataStorage->Add(withData);
+
+    auto withoutData = mitk::DataNode::New();
+    withoutData->SetName("EmptyNode");
+    m_DataStorage->Add(withoutData);
+
+    const std::string uid = this->GetUid(withData.GetPointer());
+    const std::string emptyUid = this->GetUid(withoutData.GetPointer());
+
+    bool hasFileAccess = false;
+    m_Controller->SetFileAccessCheck([&hasFileAccess](const httplib::Request&) { return hasFileAccess; });
+
+    const auto get = [this](const std::string& nodeUid, const httplib::Headers& headers) {
+      auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + nodeUid + "/data", "", {{"uid", nodeUid}}, {}, headers);
+      httplib::Response res;
+      m_Controller->HandleGET_nodes_uid_data(req, res);
+      return res;
+    };
+
+    const httplib::Headers fileReference = {{"X-MITK-Transfer-Mode", "file-reference"}};
+    const httplib::Headers acceptJson = {{"Accept", "application/json"}};
+
+    // A client without the right to files gets no path of a file, whatever the node holds or whether it exists,
+    // and no file is written for it.
+    for (const auto& headers : { fileReference, acceptJson })
+    {
+      for (const auto& nodeUid : { uid, emptyUid, std::string("unknown") })
+      {
+        const auto res = get(nodeUid, headers);
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(nodeUid, 403, res.status);
+        CPPUNIT_ASSERT_EQUAL(std::string("FILE_ACCESS_DENIED"), nlohmann::json::parse(res.body)["error"]["code"].get<std::string>());
+      }
+    }
+
+    CPPUNIT_ASSERT(m_TempDirectory.empty() || !fs::exists(fs::path(m_TempDirectory)) || fs::is_empty(fs::path(m_TempDirectory)));
+
+    // The data itself is not a file: it is open to them.
+    const auto direct = get(uid, {});
+    CPPUNIT_ASSERT(direct.status == 200 || direct.status == 415);
+
+    hasFileAccess = true;
+    const auto allowed = get(uid, fileReference);
+    CPPUNIT_ASSERT(allowed.status == 200 || allowed.status == 415);
+
+    if (allowed.status == 200)
+      CPPUNIT_ASSERT_EQUAL(std::string("file-reference"), nlohmann::json::parse(allowed.body)["transfer"]["mode"].get<std::string>());
   }
 
   void GetImageDataFileReference()

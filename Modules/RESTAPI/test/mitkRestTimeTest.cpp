@@ -14,9 +14,18 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 
 #include <mitkImage.h>
+#include <mitkLocaleSwitch.h>
+#include <mitkLog.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkRestRoute.h>
 #include <mitkRestTime.h>
+
+#include <cmath>
+#include <limits>
+#include <locale>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
 
 namespace
 {
@@ -28,8 +37,8 @@ namespace
     return request;
   }
 
-  /** An image with four time steps of 100 ms from 0 ms on, or one time step. */
-  mitk::Image::Pointer MakeImage(unsigned int timeSteps)
+  /** An image with time steps of 100 ms (or the given duration) from 0 ms on, or one time step. */
+  mitk::Image::Pointer MakeImage(unsigned int timeSteps, double stepDuration = 100.0)
   {
     unsigned int dimensions[] = { 2, 2, 2, timeSteps };
     auto image = mitk::Image::New();
@@ -40,11 +49,78 @@ namespace
       auto timeGeometry = mitk::ProportionalTimeGeometry::New();
       timeGeometry->Initialize(image->GetGeometry(), timeSteps);
       timeGeometry->SetFirstTimePoint(0.0);
-      timeGeometry->SetStepDuration(100.0);
+      timeGeometry->SetStepDuration(stepDuration);
       image->SetTimeGeometry(timeGeometry);
     }
 
     return image;
+  }
+
+  /** A time point as text that reads back as the same double. */
+  std::string ToQueryValue(double timePoint)
+  {
+    std::ostringstream text;
+    text.imbue(std::locale::classic());
+    text.precision(std::numeric_limits<double>::max_digits10);
+    text << timePoint;
+    return text.str();
+  }
+
+  /** The least double below a value. */
+  double Below(double value)
+  {
+    return std::nextafter(value, -std::numeric_limits<double>::infinity());
+  }
+
+  /** Makes a German locale the one of C and C++ for a while, if the system has one. */
+  class GermanLocale
+  {
+  public:
+    GermanLocale()
+    {
+      for (const char* name : { "de_DE.UTF-8", "de_DE.utf8", "de-DE" })
+      {
+        try
+        {
+          const std::locale german(name);
+          m_Switch = std::make_unique<mitk::LocaleSwitch>(name);
+          m_Previous = std::locale::global(german);
+          m_Installed = true;
+          return;
+        }
+        catch (const std::runtime_error&)
+        {
+        }
+      }
+
+      MITK_INFO << "The system has no German locale; the checks under it are skipped.";
+    }
+
+    ~GermanLocale()
+    {
+      if (m_Installed)
+        std::locale::global(m_Previous);
+    }
+
+    GermanLocale(const GermanLocale&) = delete;
+    GermanLocale& operator=(const GermanLocale&) = delete;
+
+    bool IsInstalled() const
+    {
+      return m_Installed;
+    }
+
+  private:
+    std::unique_ptr<mitk::LocaleSwitch> m_Switch;
+    std::locale m_Previous;
+    bool m_Installed = false;
+  };
+
+  /** Asserts that the steps of the selection of a time point, given as text, are the expected ones. */
+  void AssertSteps(const std::string& timePoint, const mitk::Image* image, const std::vector<mitk::TimeStepType>& expected)
+  {
+    const auto selection = mitk::RestTimeSelection::FromRequest(MakeRequest("/api/v1/x?timepoint_ms=" + timePoint));
+    CPPUNIT_ASSERT_MESSAGE("time point " + timePoint, selection.GetTimeSteps(image) == expected);
   }
 }
 
@@ -56,6 +132,8 @@ class mitkRestTimeTestSuite : public mitk::TestFixture
   MITK_TEST(AllSelectsEveryStep);
   MITK_TEST(InvalidTimePointIsRejected);
   MITK_TEST(StepsAreDescribedAsTimePoints);
+  MITK_TEST(TimePointsAtTheBoundsOfInexactStepsSelectTheirSteps);
+  MITK_TEST(TimePointsAreReadWithoutRegardToTheLocale);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -88,7 +166,7 @@ public:
 
   void InvalidTimePointIsRejected()
   {
-    for (const std::string value : { "soon", "12ms", "nan" })
+    for (const std::string value : { "soon", "12ms", "nan", "250,5", "" })
     {
       try
       {
@@ -114,6 +192,57 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), staticSteps.size());
     CPPUNIT_ASSERT(staticSteps[0]["min_timepoint_ms"].is_null());
     CPPUNIT_ASSERT(staticSteps[0]["max_timepoint_ms"].is_null());
+  }
+
+  void TimePointsAtTheBoundsOfInexactStepsSelectTheirSteps()
+  {
+    // 28 steps of a duration that has no exact binary form, like 28 frames per second.
+    const double duration = 1000.0 / 28;
+    const unsigned int count = 28;
+    const auto image = MakeImage(count, duration);
+    const auto* timeGeometry = image->GetTimeGeometry();
+
+    for (mitk::TimeStepType step = 0; step < count; ++step)
+    {
+      const auto first = timeGeometry->GetMinimumTimePoint(step);
+      const auto end = timeGeometry->GetMaximumTimePoint(step);
+
+      // The lower bound belongs to the step, as the description of the step tells clients.
+      AssertSteps(ToQueryValue(first), image, { step });
+
+      // The upper bound does not: it is the first time point of the next step.
+      if (step + 1 < count)
+        AssertSteps(ToQueryValue(end), image, { step + 1 });
+      else
+        AssertSteps(ToQueryValue(end), image, {});
+
+      if (step > 0)
+        AssertSteps(ToQueryValue(Below(first)), image, { step - 1 });
+      else
+        AssertSteps(ToQueryValue(Below(first)), image, {});
+
+      AssertSteps(ToQueryValue(Below(end)), image, { step });
+    }
+  }
+
+  void TimePointsAreReadWithoutRegardToTheLocale()
+  {
+    const GermanLocale german;
+
+    if (!german.IsInstalled())
+      return;
+
+    const auto image = MakeImage(28, 1000.0 / 28);
+
+    // 250.5 ms is in step 7 (250.0 ms to 285.7 ms), and 1.234 ms in step 0; a dot of thousands would make it 1234 ms.
+    AssertSteps("250.5", image, { 7 });
+    AssertSteps("1.234", image, { 0 });
+    AssertSteps(ToQueryValue(1000.0 / 28 * 13), image, { 13 });
+
+    for (const std::string value : { "250,5", "1.234,5", "1,234" })
+    {
+      CPPUNIT_ASSERT_THROW(mitk::RestTimeSelection::FromRequest(MakeRequest("/api/v1/x?timepoint_ms=" + value)), mitk::RestException);
+    }
   }
 };
 

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 
 #include <mitkActionOriginScope.h>
+#include <mitkErrorResponse.h>
 #include <mitkException.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
@@ -36,10 +37,15 @@ found in the LICENSE file.
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <functional>
 #include <future>
+#include <memory>
 #include <mutex>
 #include <set>
+#include <stdexcept>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace
@@ -105,6 +111,13 @@ namespace
     std::vector<std::function<void()>> m_Tasks;
   };
 
+  /** Runs the tasks that a call from another thread has handed to the dispatcher, once there are some. */
+  void RunDispatched(BusyDispatcher* dispatcher)
+  {
+    CPPUNIT_ASSERT(dispatcher->WaitForTask(std::chrono::seconds(10)));
+    dispatcher->Run();
+  }
+
   /** Joins its threads on every way out of a scope: a failed assertion would end the process otherwise. */
   struct WorkerThreads
   {
@@ -119,6 +132,70 @@ namespace
 
     std::vector<std::thread> Threads;
   };
+
+  /**
+   * A renderer under the name of a render window of the standard display, in a
+   * window that was never shown. Its camera looks down onto the plane z = 0,
+   * with one millimeter to each pixel and the origin in the middle.
+   */
+  class TestWindow
+  {
+  public:
+    TestWindow(const std::string& name, int width, int height)
+      : m_RenderWindow(vtkSmartPointer<vtkRenderWindow>::New())
+    {
+      m_RenderWindow->SetSize(width, height);
+      m_Renderer = mitk::VtkPropRenderer::New(name.c_str(), m_RenderWindow);
+      mitk::BaseRenderer::AddInstance(m_RenderWindow, m_Renderer);
+
+      auto* camera = m_Renderer->GetVtkRenderer()->GetActiveCamera();
+      camera->ParallelProjectionOn();
+      camera->SetPosition(0.0, 0.0, 100.0);
+      camera->SetFocalPoint(0.0, 0.0, 0.0);
+      camera->SetViewUp(0.0, 1.0, 0.0);
+      camera->SetParallelScale(height / 2.0);
+      camera->SetClippingRange(1.0, 1000.0);
+    }
+
+    ~TestWindow()
+    {
+      mitk::BaseRenderer::RemoveInstance(m_RenderWindow);
+    }
+
+    TestWindow(const TestWindow&) = delete;
+    TestWindow& operator=(const TestWindow&) = delete;
+
+    mitk::VtkPropRenderer* GetRenderer() const
+    {
+      return m_Renderer;
+    }
+
+    /** A body that gives pixels of a screenshot of the window as it looks now. */
+    nlohmann::json MakeBody(const std::string& window, const nlohmann::json& pixels, const nlohmann::json& imageSize) const
+    {
+      return { { "window", window }, { "pixels", pixels }, { "image_size", imageSize },
+        { "view_state", mitk::GetRestViewState(m_Renderer) } };
+    }
+
+  private:
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
+    mitk::VtkPropRenderer::Pointer m_Renderer;
+  };
+
+  /** The status and the code of the error that a call throws; 0 and an empty code if it throws none. */
+  std::pair<int, std::string> GetErrorOf(const std::function<void()>& call)
+  {
+    try
+    {
+      call();
+    }
+    catch (const mitk::RestException& e)
+    {
+      return { e.GetError()["error"]["status"].get<int>(), e.GetError()["error"]["code"].get<std::string>() };
+    }
+
+    return { 0, "" };
+  }
 
   mitk::RestServerConfig MakeConfig()
   {
@@ -194,6 +271,13 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(RestColorsAreParsedAndFormatted);
   MITK_TEST(PixelsNeedTheViewStateOfTheirScreenshot);
+  MITK_TEST(PixelsMapOntoTheWindowOfTheirScreenshot);
+  MITK_TEST(PixelsAreRefusedWhereTheyDoNotMapOntoThePlane);
+  MITK_TEST(CallInGuiThreadPassesResultsAndRunsInTheDispatchThread);
+  MITK_TEST(CallInGuiThreadPassesExceptionsOn);
+  MITK_TEST(CallInGuiThreadWithoutDispatcherRunsInTheCallingThread);
+  MITK_TEST(JobsEndingDuringTheWaitAreAnsweredAtOnce);
+  MITK_TEST(WaitIsANumberOfSeconds);
   MITK_TEST(ServerForOneClient);
   MITK_TEST(RemovedNodeHeldByAHandlerDiesInTheDispatchThread);
   CPPUNIT_TEST_SUITE_END();
@@ -847,6 +931,181 @@ public:
     CPPUNIT_ASSERT(mitk::ActionOriginScope::GetCurrent().empty());
   }
 
+  void CallInGuiThreadPassesResultsAndRunsInTheDispatchThread()
+  {
+    auto dispatcher = BusyDispatcher::New();
+
+    mitk::RestServer server;
+    server.SetDispatcher(dispatcher);
+
+    // The dispatch thread is the one that runs the dispatcher's tasks, here the test's.
+    std::thread::id worker;
+    auto threadCall = std::async(std::launch::async, [&]() {
+      worker = std::this_thread::get_id();
+      return mitk::CallInGuiThread(server, []() { return std::this_thread::get_id(); });
+    });
+    RunDispatched(dispatcher);
+
+    const auto ranIn = threadCall.get();
+    CPPUNIT_ASSERT(ranIn == std::this_thread::get_id());
+    CPPUNIT_ASSERT(ranIn != worker);
+
+    // Results of any movable type.
+    auto textCall = std::async(std::launch::async, [&server]() {
+      return mitk::CallInGuiThread(server, []() { return std::string("answer"); });
+    });
+    RunDispatched(dispatcher);
+    CPPUNIT_ASSERT_EQUAL(std::string("answer"), textCall.get());
+
+    auto ownedCall = std::async(std::launch::async, [&server]() {
+      return mitk::CallInGuiThread(server, []() { return std::make_unique<int>(42); });
+    });
+    RunDispatched(dispatcher);
+    const auto owned = ownedCall.get();
+    CPPUNIT_ASSERT(owned != nullptr);
+    CPPUNIT_ASSERT_EQUAL(42, *owned);
+
+    // A function without a result runs, too, and the call returns when it has run.
+    std::thread::id voidRanIn;
+    bool voidRan = false;
+    auto voidCall = std::async(std::launch::async, [&]() {
+      mitk::CallInGuiThread(server, [&]() {
+        voidRanIn = std::this_thread::get_id();
+        voidRan = true;
+      });
+    });
+    RunDispatched(dispatcher);
+    voidCall.get();
+
+    CPPUNIT_ASSERT(voidRan);
+    CPPUNIT_ASSERT(voidRanIn == std::this_thread::get_id());
+  }
+
+  void CallInGuiThreadPassesExceptionsOn()
+  {
+    auto dispatcher = BusyDispatcher::New();
+
+    mitk::RestServer server;
+    server.SetDispatcher(dispatcher);
+
+    const auto call = [&server, &dispatcher](auto function) {
+      auto future = std::async(std::launch::async, [&server, function]() { return mitk::CallInGuiThread(server, function); });
+      RunDispatched(dispatcher);
+      return future;
+    };
+
+    // The exception is thrown again in the calling thread, with its type and message; the dispatch thread sees none.
+    auto failing = call([]() -> int { throw std::runtime_error("no luck"); });
+
+    try
+    {
+      failing.get();
+      CPPUNIT_FAIL("No exception");
+    }
+    catch (const std::runtime_error& e)
+    {
+      CPPUNIT_ASSERT_EQUAL(std::string("no luck"), std::string(e.what()));
+    }
+
+    auto notFound = call([]() { throw mitk::RestException(mitk::ErrorResponse::NodeNotFound("node_9", "/api/v1/x")); });
+    const auto error = GetErrorOf([&notFound]() { notFound.get(); });
+    CPPUNIT_ASSERT_EQUAL(404, error.first);
+    CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), error.second);
+
+    // Later calls are not affected.
+    auto later = call([]() { return 7; });
+    CPPUNIT_ASSERT_EQUAL(7, later.get());
+  }
+
+  void CallInGuiThreadWithoutDispatcherRunsInTheCallingThread()
+  {
+    mitk::RestServer server;
+
+    CPPUNIT_ASSERT(mitk::CallInGuiThread(server, []() { return std::this_thread::get_id(); }) == std::this_thread::get_id());
+    CPPUNIT_ASSERT_THROW(mitk::CallInGuiThread(server, []() -> int { throw std::runtime_error("no luck"); }), std::runtime_error);
+  }
+
+  void JobsEndingDuringTheWaitAreAnsweredAtOnce()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto failing = server.CreateJob("Fails");
+    const auto canceled = server.CreateJob("Is canceled");
+    canceled->SetCancelHandler([]() {});
+
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto wait = [&server](const std::shared_ptr<mitk::RestJob>& job) {
+      return std::async(std::launch::async, [&server, id = job->GetId()]() {
+        return server.HandleRequest(MakeRequest("GET", "/api/v1/jobs/" + id + "?wait=20"));
+      });
+    };
+
+    const auto start = std::chrono::steady_clock::now();
+    auto failedAnswer = wait(failing);
+    auto canceledAnswer = wait(canceled);
+
+    failing->Fail("It broke.");
+    CPPUNIT_ASSERT(canceled->Cancel());
+
+    const auto failedResponse = failedAnswer.get();
+    const auto canceledResponse = canceledAnswer.get();
+    const auto duration = std::chrono::steady_clock::now() - start;
+    server.Stop();
+
+    // The wait lasts up to 20 seconds, the answers do not wait for them to pass.
+    CPPUNIT_ASSERT(duration < std::chrono::seconds(10));
+
+    CPPUNIT_ASSERT_EQUAL(200, failedResponse.Status);
+    CPPUNIT_ASSERT(failedResponse.Headers.count("Location") == 0);
+    const auto failedJob = nlohmann::json::parse(failedResponse.Body)["data"];
+    CPPUNIT_ASSERT_EQUAL(std::string("failed"), failedJob["state"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("It broke."), failedJob["error"].get<std::string>());
+    CPPUNIT_ASSERT(!failedJob.contains("result"));
+
+    CPPUNIT_ASSERT_EQUAL(200, canceledResponse.Status);
+    CPPUNIT_ASSERT(canceledResponse.Headers.count("Location") == 0);
+    const auto canceledJob = nlohmann::json::parse(canceledResponse.Body)["data"];
+    CPPUNIT_ASSERT_EQUAL(std::string("canceled"), canceledJob["state"].get<std::string>());
+    CPPUNIT_ASSERT(!canceledJob.contains("error"));
+    CPPUNIT_ASSERT(!canceledJob.contains("result"));
+  }
+
+  void WaitIsANumberOfSeconds()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto job = server.CreateJob("Keeps running");
+
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto target = "/api/v1/jobs/" + job->GetId();
+
+    for (const std::string value : { "abc", "", "inf", "-inf", "1s", "1,5" })
+    {
+      const auto response = server.HandleRequest(MakeRequest("GET", target + "?wait=" + value));
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("wait=" + value, 400, response.Status);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("wait=" + value, std::string("INVALID_REQUEST"), GetErrorCode(response.Body));
+    }
+
+    // No time to wait, whatever the sign: the job runs, and the answer of the endpoint that started it says where to
+    // follow it. (The job's own resource answers 200 either way.)
+    for (const std::string value : { "0", "-5", "0.0" })
+    {
+      const auto response = mitk::RestJob::Respond(MakeRequest("POST", "/api/v1/work?wait=" + value), job);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("wait=" + value, 202, response.Status);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("wait=" + value, target, response.Headers.at("Location"));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("wait=" + value, std::string("running"),
+        nlohmann::json::parse(response.Body)["data"]["state"].get<std::string>());
+    }
+
+    server.Stop();
+  }
+
   void StopEndsBuiltInRequestsThatWaitForTheDispatchThread()
   {
     auto dispatcher = BusyDispatcher::New();
@@ -966,6 +1225,124 @@ public:
 
     body["view_state"] = state;
     CPPUNIT_ASSERT_EQUAL(409, statusOf());
+  }
+
+  void PixelsMapOntoTheWindowOfTheirScreenshot()
+  {
+    const TestWindow window("stdmulti.widget0", 400, 200);
+
+    const auto expectPoint = [](const mitk::Point3D& point, double x, double y) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(x, point[0], 1e-3);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(y, point[1], 1e-3);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, point[2], 1e-3);
+    };
+
+    // A screenshot in the size of the window: the origin of pixels is the top left corner, the one of the world the middle,
+    // and the y axis of the world points up.
+    auto points = mitk::GetRestWorldPoints(
+      window.MakeBody("axial", { { 0, 0 }, { 400, 200 }, { 200, 100 }, { 100, 50 }, { 200, 0 } }, { 400, 200 }), "/test");
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(5), points.size());
+    expectPoint(points[0], -200.0, 100.0);
+    expectPoint(points[1], 200.0, -100.0);
+    expectPoint(points[2], 0.0, 0.0);
+    expectPoint(points[3], -100.0, 50.0);
+    expectPoint(points[4], 0.0, 100.0);
+
+    // A screenshot that is half as large: its pixels are twice as far apart.
+    points = mitk::GetRestWorldPoints(window.MakeBody("axial", { { 50, 25 }, { 200, 100 } }, { 200, 100 }), "/test");
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), points.size());
+    expectPoint(points[0], -100.0, 50.0);
+    expectPoint(points[1], 200.0, -100.0);
+
+    // The size of a screenshot is rounded to whole pixels, which the proportions tolerate.
+    points = mitk::GetRestWorldPoints(window.MakeBody("axial", { { 0, 0 }, { 201, 100 } }, { 201, 100 }), "/test");
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), points.size());
+    expectPoint(points[0], -200.0, 100.0);
+    expectPoint(points[1], 200.0, -100.0);
+
+    // The least number of points counts for pixels as well.
+    const auto onePixel = window.MakeBody("axial", { { 10, 10 } }, { 400, 200 });
+    CPPUNIT_ASSERT_NO_THROW(mitk::GetRestWorldPoints(onePixel, "/test", 1));
+    CPPUNIT_ASSERT_EQUAL(400, GetErrorOf([&onePixel]() { mitk::GetRestWorldPoints(onePixel, "/test", 2); }).first);
+  }
+
+  void PixelsAreRefusedWhereTheyDoNotMapOntoThePlane()
+  {
+    const TestWindow axial("stdmulti.widget0", 400, 200);
+    const TestWindow threeD("stdmulti.widget3", 400, 200);
+    threeD.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
+
+    const auto statusOf = [](const nlohmann::json& body) {
+      return GetErrorOf([&body]() { mitk::GetRestWorldPoints(body, "/test"); });
+    };
+
+    const auto valid = axial.MakeBody("axial", { { 10, 10 } }, { 400, 200 });
+    CPPUNIT_ASSERT_EQUAL(0, statusOf(valid).first);
+
+    // Parts of the body that are missing or of the wrong type.
+    const std::vector<std::pair<std::string, nlohmann::json>> changes = {
+      { "pixels", "10,10" },
+      { "pixels", nlohmann::json::array() },
+      { "pixels", { { 10, 10, 10 } } },
+      // An array, not an object, although JSON initializers read a list of pairs of a string and a value as one.
+      { "pixels", nlohmann::json::array({ nlohmann::json::array({ "10", 10 }) }) },
+      { "pixels", { 10 } },
+      { "window", 0 },
+      { "image_size", { 0, 200 } },
+      { "image_size", { 400, -200 } },
+      { "image_size", { 400 } },
+      { "image_size", { "400", "200" } },
+      { "image_size", "400x200" },
+      { "view_state", 7 },
+      // Pixels that lie outside of the screenshot; its edges lie within.
+      { "pixels", { { 401, 10 } } },
+      { "pixels", { { -1, 10 } } },
+      { "pixels", { { 10, 201 } } },
+      { "pixels", { { 10, -0.5 } } },
+      // A screenshot that is cropped, or otherwise not of the proportions of the window.
+      { "image_size", { 390, 200 } },
+      { "image_size", { 400, 100 } },
+      { "image_size", { 200, 200 } }
+    };
+
+    for (const auto& [key, value] : changes)
+    {
+      auto body = valid;
+      body[key] = value;
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(key + ": " + value.dump(), 400, statusOf(body).first);
+    }
+
+    for (const std::string key : { "window", "image_size", "view_state" })
+    {
+      auto body = valid;
+      body.erase(key);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("without " + key, 400, statusOf(body).first);
+    }
+
+    // The edges of the screenshot are valid.
+    CPPUNIT_ASSERT_EQUAL(0, statusOf(axial.MakeBody("axial", { { 0, 0 }, { 400, 200 } }, { 400, 200 })).first);
+
+    // Windows that do not exist, or that no renderer stands for.
+    auto body = valid;
+    body["window"] = "lateral";
+    CPPUNIT_ASSERT(statusOf(body) == std::make_pair(404, std::string("RENDER_WINDOW_NOT_FOUND")));
+
+    body["window"] = "sagittal";
+    CPPUNIT_ASSERT(statusOf(body) == std::make_pair(503, std::string("RENDER_WINDOW_NOT_AVAILABLE")));
+
+    // The 3D window has no plane to map onto.
+    CPPUNIT_ASSERT_EQUAL(400, statusOf(threeD.MakeBody("3d", { { 10, 10 } }, { 400, 200 })).first);
+
+    // The view of the screenshot is gone once the camera has moved.
+    auto* camera = axial.GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+    camera->SetFocalPoint(5.0, 0.0, 0.0);
+    CPPUNIT_ASSERT(statusOf(valid) == std::make_pair(409, std::string("VIEW_CHANGED")));
+    CPPUNIT_ASSERT_EQUAL(0, statusOf(axial.MakeBody("axial", { { 10, 10 } }, { 400, 200 })).first);
   }
 
   /** As the Agent view starts it: a free port, only created tokens, no files. */

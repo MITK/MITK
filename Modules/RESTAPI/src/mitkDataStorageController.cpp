@@ -670,8 +670,9 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
     }
   }
 
-  // Context (for renderer-specific properties)
-  if (req.has_param("context"))
+  // Context (for renderer-specific properties). Data has the default context
+  // only, so scope data ignores it, as specified.
+  if (req.has_param("context") && params.propertyScope != PropertyScope::Data)
   {
     params.context = req.get_param_value("context");
   }
@@ -769,8 +770,9 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
     }
   }
 
-  // Context (for renderer-specific properties)
-  if (req.has_param("context"))
+  // Context (for renderer-specific properties). Data has the default context
+  // only, so scope data ignores it, as specified.
+  if (req.has_param("context") && params.scope != PropertyScope::Data)
   {
     params.context = req.get_param_value("context");
   }

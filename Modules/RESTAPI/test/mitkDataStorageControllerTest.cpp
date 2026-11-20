@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorageController.h"
 #include <mitkDataStorageBridge.h>
+#include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
@@ -68,6 +69,7 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(RefusedPropertyValuesTellTheReason);
   MITK_TEST(PutOfTheListWithARefusedValueChangesNothing);
   MITK_TEST(PropertiesInLatin1KeepTheirCharacters);
+  MITK_TEST(ContextIsIgnoredAtDataScope);
   // Special character tests (percent-encoding)
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
@@ -489,6 +491,32 @@ public:
   }
 
   // ===== Property tests =====
+
+  void ContextIsIgnoredAtDataScope()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetData(mitk::PointSet::New());
+    node->GetData()->SetProperty("study", mitk::StringProperty::New("CT"));
+    m_DataStorage->Add(node);
+
+    const auto uid = this->GetFirstNodeUid();
+    const std::multimap<std::string, std::string> query = { { "property_scope", "data" }, { "context", "no window" } };
+
+    httplib::Response read;
+    m_Controller->HandleGET_nodes_uid_properties(
+      this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", "", { { "uid", uid } }, query), read);
+
+    CPPUNIT_ASSERT_EQUAL(200, read.status);
+    CPPUNIT_ASSERT(nlohmann::json::parse(read.body)["data"]["properties"].contains("study"));
+
+    httplib::Response write;
+    m_Controller->HandlePUT_nodes_uid_properties_key(this->CreateRequest("/api/v1/datastorage/nodes/" + uid +
+      "/properties/study", R"({"value": "MR"})", { { "uid", uid }, { "property_key", "study" } }, query), write);
+
+    CPPUNIT_ASSERT_EQUAL(200, write.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("MR"), node->GetData()->GetProperty("study")->GetValueAsString());
+  }
 
   void PropertiesInLatin1KeepTheirCharacters()
   {

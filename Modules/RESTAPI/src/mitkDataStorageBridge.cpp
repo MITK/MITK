@@ -71,6 +71,12 @@ namespace
 
     if (scope == mitk::PropertyScope::All)
     {
+      // The node passes the context on to its data, which has the default one
+      // only, as GetPropertyKeysForScope() lists its keys. Not the node's own
+      // default list, which that does not list for a context.
+      if (allResult.IsNull() && nullptr != node->GetData())
+        allResult = node->GetData()->GetConstProperty(propertyKey);
+
       return allResult;
     }
 

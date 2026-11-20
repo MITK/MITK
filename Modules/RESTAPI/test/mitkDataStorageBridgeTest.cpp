@@ -180,6 +180,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodePropertyRefusesIncompleteObject);
   MITK_TEST(LevelWindowNeedsEveryFieldOfItsDescription);
   MITK_TEST(PropertyWritesInAContextLeaveTheDefaultListAlone);
+  MITK_TEST(DataPropertiesAreReadAtScopeAllInAContext);
   MITK_TEST(PropertyWritesOnTheDataScopeLeaveTheNodeAlone);
   MITK_TEST(NewUidIsGivenOnTheDispatchThread);
   MITK_TEST(DeleteNodeProperty);
@@ -1628,6 +1629,40 @@ public:
     CPPUNIT_ASSERT(m_Root1->GetLevelWindow(current));
     CPPUNIT_ASSERT_EQUAL(120.0, current.GetLevel());
     CPPUNIT_ASSERT_EQUAL(50.0, current.GetWindow());
+  }
+
+  /**
+   * Data has the default context only. At scope all, a context selects the
+   * node's properties of it, while the data's properties are read as the
+   * list of names shows them.
+   */
+  void DataPropertiesAreReadAtScopeAllInAContext()
+  {
+    const std::string context = "stdmulti.widget0";
+    const ScopedRenderer renderer(context);
+
+    auto node = mitk::DataNode::New();
+    node->SetName("WithData");
+    node->SetData(mitk::ImageGenerator::GenerateGradientImage<short>(4, 4, 4));
+    node->GetData()->SetProperty("study.description", mitk::StringProperty::New("MR untere Extremitaeten"));
+    m_DataStorage->Add(node);
+    const auto uid = FindUidByName("WithData");
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::All;
+    params.context = context;
+
+    const auto all = m_Bridge->GetNodeProperties(uid, params);
+    CPPUNIT_ASSERT(all.has_value());
+    CPPUNIT_ASSERT(all->contains("study.description"));
+
+    const auto one = m_Bridge->GetNodeProperty(uid, "study.description", params);
+    CPPUNIT_ASSERT(one.has_value());
+
+    mitk::NodeQueryParams filter;
+    filter.context = context;
+    filter.propertyFilters.push_back({ "study.description", "*Extremit*", false });
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), m_Bridge->GetNodes(filter).nodes.size());
   }
 
   void PropertyWritesInAContextLeaveTheDefaultListAlone()

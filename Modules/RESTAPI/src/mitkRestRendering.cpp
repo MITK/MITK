@@ -289,6 +289,7 @@ void mitk::FocusRestRenderer3D(BaseRenderer* baseRenderer, const std::vector<Poi
   // Lateral extents of the corners and their depth toward the camera, around the center.
   double extent = 0.0;
   double distance = 0.0;
+  double nearest = 0.0;
 
   const auto halfAngle = std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()) / 2.0);
   const auto tanVertical = camera->GetUseHorizontalViewAngle() ? halfAngle / aspect : halfAngle;
@@ -303,14 +304,19 @@ void mitk::FocusRestRenderer3D(BaseRenderer* baseRenderer, const std::vector<Poi
 
     extent = std::max({ extent, y, x / aspect });
     distance = std::max({ distance, depth + y / tanVertical, depth + x / tanHorizontal });
+    nearest = std::max(nearest, depth);
   }
 
-  // Corners that coincide give neither a scale nor a distance, so the camera keeps its own.
+  // Corners without lateral extent, which coincide or lie along the direction
+  // of view, give no scale, so the camera keeps its own, and its distance to
+  // the nearest of them rather than moving onto it.
   if (camera->GetParallelProjection() && extent > 0.0)
     camera->SetParallelScale(extent);
 
-  if (camera->GetParallelProjection() || distance <= 0.0)
+  if (camera->GetParallelProjection())
     distance = camera->GetDistance();
+  else if (extent <= 0.0)
+    distance = camera->GetDistance() + nearest;
 
   camera->SetFocalPoint(center[0], center[1], center[2]);
   camera->SetPosition(center[0] - direction[0] * distance, center[1] - direction[1] * distance, center[2] - direction[2] * distance);

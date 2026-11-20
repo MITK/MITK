@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
@@ -524,6 +525,16 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
           // Point sets compute their bounds only on request, and one without points keeps its initial ones.
           if (data->IsEmptyTimeStep(timeStep))
             continue;
+
+          // The bounds of a point set are at least 1 mm wide, so points that coincide, like a single one,
+          // would frame that much. The points themselves frame no extent then.
+          if (const auto* pointSet = dynamic_cast<const PointSet*>(data); pointSet != nullptr)
+          {
+            for (auto point = pointSet->Begin(timeStep); point != pointSet->End(timeStep); ++point)
+              corners.push_back(pointSet->GetPoint(point.Index(), timeStep));
+
+            continue;
+          }
 
           const auto* geometry = data->GetUpdatedGeometry(timeStep);
 

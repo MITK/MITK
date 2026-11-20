@@ -617,6 +617,20 @@ public:
       CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, camera->GetFocalPoint()[1], 1e-9);
       CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, camera->GetFocalPoint()[2], 1e-9);
     }
+
+    // Points along the direction of view: the camera keeps its distance to the
+    // nearest of them, 100 mm in front of the one at z = 50, instead of moving onto it.
+    const std::vector<mitk::Point3D> alongView = { MakePoint(10.0, 20.0, 30.0), MakePoint(10.0, 20.0, 50.0) };
+
+    PrepareCamera(window.Get(), false);
+    mitk::FocusRestRenderer3D(window.Get(), alongView, 0.2);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(40.0, camera->GetFocalPoint()[2], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(150.0, camera->GetPosition()[2], 1e-6);
+
+    PrepareCamera(window.Get(), true);
+    mitk::FocusRestRenderer3D(window.Get(), alongView, 0.2);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(50.0, camera->GetParallelScale(), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(100.0, camera->GetDistance(), 1e-6);
   }
 
   void ImageValuesAreReadInsideTheImageOnly()

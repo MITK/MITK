@@ -157,12 +157,21 @@ namespace mitk
      * gives, at most 120. Then answers with the job: status 200 if it has
      * ended, 202 and its location if it still runs.
      *
-     * At most four requests wait at the same time, as each one occupies a
-     * thread of the server. A further request does not wait and answers as
-     * if its wait had run out, as does one whose RestRequest::WaitInterruption
-     * is interrupted.
+     * Only so many requests wait at the same time (see
+     * SetMaxConcurrentWaits()), as each one occupies a thread of the server.
+     * A further request does not wait and answers as if its wait had run out,
+     * as does one whose RestRequest::WaitInterruption is interrupted.
      */
     static RestResponse Respond(const RestRequest& request, const std::shared_ptr<RestJob>& job);
+
+    /**
+     * \brief Sets how many requests of the process wait for jobs at the same
+     *        time, at least one; four until it is set.
+     *
+     * The server sets half of its threads, so that waiting requests never
+     * take all of them.
+     */
+    static void SetMaxConcurrentWaits(int count);
 
   private:
     friend class RestWaitInterruption;

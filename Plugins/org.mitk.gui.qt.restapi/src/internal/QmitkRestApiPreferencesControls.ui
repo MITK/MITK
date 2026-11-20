@@ -526,7 +526,7 @@
            <string>Number of worker threads for handling requests</string>
           </property>
           <property name="minimum">
-           <number>1</number>
+           <number>2</number>
           </property>
           <property name="maximum">
            <number>32</number>

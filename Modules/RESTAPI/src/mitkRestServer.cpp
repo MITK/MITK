@@ -368,8 +368,9 @@ RestServer::RestServer()
   job.Path = ApiV1 + "/jobs/:id";
   job.Summary = "Get a job, optionally waiting for it to end";
   job.Description =
-    "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. At most 4 requests wait "
-    "at the same time; a further one answers at once, with 202 while the job runs. Returns {data: job}, "
+    "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. At most half as many "
+    "requests as the server has threads (4 of the default 8) wait at the same time; a further one answers at "
+    "once, with 202 while the job runs. Returns {data: job}, "
     "a job being {id, description, state: running|succeeded|failed|canceled, seconds, and cancelable while it "
     "runs, with cancel_also_discards if a cancel loses more than the work of the job, like a session, result once "
     "it succeeded, error once it failed}.";
@@ -475,8 +476,10 @@ bool RestServer::Start(const RestServerConfig& config, const std::string& starte
     m_Server->set_read_timeout(config.readTimeoutSeconds);
     m_Server->set_write_timeout(config.writeTimeoutSeconds);
 
-    const auto threadPoolSize = static_cast<size_t>(std::max(1, config.threadPoolSize));
+    // With one thread, the one request allowed to wait would take it.
+    const auto threadPoolSize = static_cast<size_t>(std::max(2, config.threadPoolSize));
     m_Server->new_task_queue = [threadPoolSize]() { return new httplib::ThreadPool(threadPoolSize); };
+    RestJob::SetMaxConcurrentWaits(static_cast<int>(threadPoolSize / 2));
 
     // Apply payload size limit
     m_Server->set_payload_max_length(

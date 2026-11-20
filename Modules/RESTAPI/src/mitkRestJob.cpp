@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace
 {
   constexpr double MaxWaitSeconds = 120.0;
-  constexpr int MaxConcurrentWaits = 4;
+  std::atomic<int> MaxConcurrentWaits{ 4 };
 
   std::atomic<int> WaitingRequests{ 0 };
 
@@ -30,7 +30,7 @@ namespace
   class WaitPlace
   {
   public:
-    WaitPlace() : m_Taken(WaitingRequests.fetch_add(1) < MaxConcurrentWaits)
+    WaitPlace() : m_Taken(WaitingRequests.fetch_add(1) < MaxConcurrentWaits.load())
     {
       if (!m_Taken)
         WaitingRequests.fetch_sub(1);
@@ -251,6 +251,11 @@ nlohmann::json mitk::RestJob::ToJson() const
   }
 
   return json;
+}
+
+void mitk::RestJob::SetMaxConcurrentWaits(int count)
+{
+  MaxConcurrentWaits = std::max(1, count);
 }
 
 mitk::RestResponse mitk::RestJob::Respond(const RestRequest& request, const std::shared_ptr<RestJob>& job)

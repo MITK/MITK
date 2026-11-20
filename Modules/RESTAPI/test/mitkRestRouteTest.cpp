@@ -281,6 +281,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(CallInGuiThreadPassesExceptionsOn);
   MITK_TEST(CallInGuiThreadWithoutDispatcherRunsInTheCallingThread);
   MITK_TEST(JobsEndingDuringTheWaitAreAnsweredAtOnce);
+  MITK_TEST(HalfOfTheThreadsWaitForJobs);
   MITK_TEST(WaitIsANumberOfSeconds);
   MITK_TEST(ServerForOneClient);
   MITK_TEST(RemovedNodeHeldByAHandlerDiesInTheDispatchThread);
@@ -1080,6 +1081,52 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("canceled"), canceledJob["state"].get<std::string>());
     CPPUNIT_ASSERT(!canceledJob.contains("error"));
     CPPUNIT_ASSERT(!canceledJob.contains("result"));
+  }
+
+  void HalfOfTheThreadsWaitForJobs()
+  {
+    auto config = MakeConfig();
+    config.threadPoolSize = 2;
+
+    // Tests that answer jobs without a server expect the default.
+    struct RestoreWaits
+    {
+      ~RestoreWaits() { mitk::RestJob::SetMaxConcurrentWaits(4); }
+    } restoreWaits;
+
+    mitk::RestServer server;
+    server.SetConfig(config);
+    const auto job = server.CreateJob("Keeps running");
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto request = MakeRequest("POST", "/api/v1/work?wait=20");
+    const auto startWaiting = [&]() {
+      auto waiting = std::async(std::launch::async, [&]() { return mitk::RestJob::Respond(request, job); });
+      std::this_thread::sleep_for(std::chrono::milliseconds(300));
+      return waiting;
+    };
+    auto first = startWaiting();
+
+    // Once the first request waits, a further one does not. A further one that
+    // came first anyway waits a second instead, and the first one, finding no
+    // place, answers at once and has to wait again.
+    bool answeredAtOnce = false;
+
+    for (int attempt = 0; attempt < 10 && !answeredAtOnce; ++attempt)
+    {
+      if (first.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        first = startWaiting();
+
+      const auto start = std::chrono::steady_clock::now();
+      const auto response = mitk::RestJob::Respond(MakeRequest("POST", "/api/v1/work?wait=1"), job);
+      answeredAtOnce = response.Status == 202 && std::chrono::steady_clock::now() - start < std::chrono::milliseconds(500);
+    }
+
+    job->Succeed({});
+    CPPUNIT_ASSERT_EQUAL(200, first.get().Status);
+    server.Stop();
+
+    CPPUNIT_ASSERT(answeredAtOnce);
   }
 
   void WaitIsANumberOfSeconds()

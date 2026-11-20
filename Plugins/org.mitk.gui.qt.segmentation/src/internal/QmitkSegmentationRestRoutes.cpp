@@ -2319,9 +2319,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         FailJob(*job, error);
       };
 
-      // A cancel between two steps finds no task to stop, so each step looks at the job first.
-      const auto stopIfCanceled = [job, release](const VoxTellTool::Pointer& tool) {
-        if (!job->HasEnded())
+      // A cancel between two steps finds no task to stop, and a deactivation
+      // between them has unloaded what the next step would load again. So
+      // each step looks at the job and at the tool first.
+      const auto stopBeforeStep = [job, release](const VoxTellTool::Pointer& tool) {
+        if (!job->HasEnded() && !FailIfDeactivated(*job, tool))
           return false;
 
         release(tool);
@@ -2347,19 +2349,19 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
         auto filesTask = std::make_shared<ProgressTask>("Preparing VoxTell", ProgressTask::Indeterminate, true);
 
-        tool->GetModelFiles(filesTask, [job, tool, fail, stopIfCanceled](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
+        tool->GetModelFiles(filesTask, [job, tool, fail, stopBeforeStep](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
           try
           {
             if (error != nullptr)
               std::rethrow_exception(error);
 
-            if (stopIfCanceled(tool))
+            if (stopBeforeStep(tool))
               return;
 
             if (!files.empty())
               DownloadForVoxTell("Downloading VoxTell model", files);
 
-            if (stopIfCanceled(tool))
+            if (stopBeforeStep(tool))
               return;
 
             auto loadTask = std::make_shared<ProgressTask>("Loading VoxTell", ProgressTask::Indeterminate, true);
@@ -2536,7 +2538,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
             DownloadForVoxTell("Downloading VoxTell text model", files);
         }
 
-        if (job->HasEnded())
+        // The download runs the event loop, during which the job can be
+        // canceled and the tool deactivated.
+        if (job->HasEnded() || FailIfDeactivated(*job, tool))
           return;
 
         auto task = std::make_shared<ProgressTask>("Processing prompts with the VoxTell text model", ProgressTask::Indeterminate, true);

@@ -17,8 +17,10 @@ found in the LICENSE file.
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
 
+#include <mitkContourModel.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkPlanarFigure.h>
+#include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -58,6 +60,11 @@ class mitknnInteractiveInteractorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitknnInteractiveInteractorTestSuite);
   MITK_TEST(PointsMustLieInOneSlice);
+  MITK_TEST(PointsInNeighboringSlicesAreRefused);
+  MITK_TEST(PlaneLiesAtTheCenterOfTheSliceOfThePoints);
+  MITK_TEST(PointsHalfwayLieInTheSliceTheyRoundTo);
+  MITK_TEST(PointIsDrawnAtTheCenterOfItsVoxel);
+  MITK_TEST(LassoOffTheSliceCenterIsDrawnInItsPlane);
   MITK_TEST(AxialBoxKeepsItsCorners);
   MITK_TEST(SagittalBoxKeepsItsCorners);
   MITK_TEST(ScribbleIsPaintedWithTheBrush);
@@ -138,6 +145,83 @@ public:
   {
     CPPUNIT_ASSERT_THROW(mitk::nnInteractive::CreateSlicePlane(
       { MakePoint(1.0, 1.0, 10.0), MakePoint(5.0, 20.0, 60.0) }, m_Image->GetGeometry()), mitk::Exception);
+  }
+
+  void PointsInNeighboringSlicesAreRefused()
+  {
+    // Slices 10 and 11 along z, and different voxels along x and y.
+    CPPUNIT_ASSERT_THROW(mitk::nnInteractive::CreateSlicePlane(
+      { MakePoint(2.0, 5.0, 20.0), MakePoint(6.5, 12.0, 22.0) }, m_Image->GetGeometry()), mitk::Exception);
+  }
+
+  void PlaneLiesAtTheCenterOfTheSliceOfThePoints()
+  {
+    // Within the voxels of slice 10 along z, whose center is at z = 20.
+    const auto plane = mitk::nnInteractive::CreateSlicePlane(
+      { MakePoint(2.0, 5.0, 20.7), MakePoint(6.5, 12.0, 20.9) }, m_Image->GetGeometry());
+
+    CPPUNIT_ASSERT(plane.IsNotNull());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, plane->SignedDistanceFromPlane(MakePoint(4.0, 8.0, 20.0)), 1e-6);
+  }
+
+  void PointsHalfwayLieInTheSliceTheyRoundTo()
+  {
+    // Halfway between slices 10 and 11, which nnInteractive rounds to 11.
+    const auto plane = mitk::nnInteractive::CreateSlicePlane(
+      { MakePoint(2.0, 5.0, 21.0), MakePoint(6.5, 12.0, 21.0) }, m_Image->GetGeometry());
+
+    CPPUNIT_ASSERT(plane.IsNotNull());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, plane->SignedDistanceFromPlane(MakePoint(4.0, 8.0, 22.0)), 1e-6);
+  }
+
+  void PointIsDrawnAtTheCenterOfItsVoxel()
+  {
+    mitk::nnInteractive::PointInteractor interactor;
+    interactor.SetToolManager(m_ToolManager);
+
+    // In the voxel (4, 5, 10), but not at its center.
+    interactor.AddPoint(MakePoint(2.2, 5.3, 20.7), mitk::nnInteractive::PromptType::Positive);
+
+    const auto point = interactor.GetLastPoint();
+    CPPUNIT_ASSERT(point.has_value());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, (*point)[0], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0, (*point)[1], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, (*point)[2], 1e-6);
+  }
+
+  void LassoOffTheSliceCenterIsDrawnInItsPlane()
+  {
+    mitk::nnInteractive::LassoInteractor interactor;
+    interactor.SetToolManager(m_ToolManager);
+
+    // The rectangle of LassoIsFilled(), 0.9 mm above the center of slice 10.
+    const std::vector<mitk::Point3D> points = {
+      MakePoint(2.0, 5.0, 20.9), MakePoint(6.0, 5.0, 20.9), MakePoint(6.0, 15.0, 20.9), MakePoint(2.0, 15.0, 20.9) };
+
+    const auto plane = mitk::nnInteractive::CreateSlicePlane(points, m_Image->GetGeometry());
+    interactor.AddLasso(plane, points, mitk::nnInteractive::PromptType::Positive);
+
+    const auto mask = interactor.GetLastLassoMask();
+    const auto* box = interactor.GetLastLassoBoundingBox();
+    CPPUNIT_ASSERT(mask.IsNotNull() && box != nullptr);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(1), GetValue(mask, *box, 8, 10, 10));
+
+    // The render windows show the contour only close to their plane.
+    const mitk::ContourModel* contour = nullptr;
+    const auto nodes = m_DataStorage->GetAll();
+
+    for (const auto& node : *nodes)
+    {
+      if (const auto* candidate = dynamic_cast<const mitk::ContourModel*>(node->GetData()); candidate != nullptr)
+        contour = candidate;
+    }
+
+    CPPUNIT_ASSERT(contour != nullptr);
+    CPPUNIT_ASSERT_EQUAL(4, contour->GetNumberOfVertices());
+
+    for (int index = 0; index < contour->GetNumberOfVertices(); ++index)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, contour->GetVertexAt(index)->Coordinates[2], 1e-6);
   }
 
   void AxialBoxKeepsItsCorners()

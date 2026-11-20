@@ -242,6 +242,7 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
     mitkThrow() << "A slice plane needs points and a geometry.";
 
   std::vector<Point3D> indices;
+  std::vector<itk::Index<3>> voxels;
   Vector3D sum;
   sum.Fill(0.0);
 
@@ -250,14 +251,28 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
     Point3D index;
     geometry->WorldToIndex(point, index);
     indices.push_back(index);
-    sum += point.GetVectorFromOrigin();
+
+    itk::Index<3> voxel;
+    geometry->WorldToIndex(point, voxel);
+    voxels.push_back(voxel);
+
+    sum += index.GetVectorFromOrigin();
   }
 
-  int sliceAxis = 2;
+  // nnInteractive takes the voxels that the points lie in, so the points lie
+  // in one slice if their voxels do.
+  int sliceAxis = -1;
   double leastSpread = std::numeric_limits<double>::max();
 
   for (int axis = 2; axis >= 0; --axis)
   {
+    const auto layer = voxels.front()[axis];
+    const bool inOneSlice = std::all_of(voxels.begin(), voxels.end(),
+      [axis, layer](const itk::Index<3>& voxel) { return voxel[axis] == layer; });
+
+    if (!inOneSlice)
+      continue;
+
     const auto spread = GetSpread(indices, axis);
 
     if (spread < leastSpread)
@@ -267,8 +282,8 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
     }
   }
 
-  if (leastSpread > 1.0)
-    mitkThrow() << "The points do not lie in one slice of the image: along each of its axes they spread over more than a voxel.";
+  if (sliceAxis < 0)
+    mitkThrow() << "The points do not lie in one slice of the image: along each of its axes they lie in voxels of different slices.";
 
   // The slices of the image along that axis.
   int axes[3];
@@ -283,9 +298,16 @@ mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::ve
   auto slices = SlicedGeometry3D::New();
   slices->InitializePlanes(geometry, orientation);
 
+  // The center of the points, moved to the center of their slice, which a
+  // plane of the slices lies in. Points halfway between two slices would be
+  // as close to the one as to the other.
+  Point3D centerIndex;
+  centerIndex.Fill(0.0);
+  centerIndex += sum / static_cast<double>(points.size());
+  centerIndex[sliceAxis] = static_cast<ScalarType>(voxels.front()[sliceAxis]);
+
   Point3D center;
-  center.Fill(0.0);
-  center += sum / static_cast<double>(points.size());
+  geometry->IndexToWorld(centerIndex, center);
 
   const PlaneGeometry* nearestPlane = nullptr;
   double leastDistance = std::numeric_limits<double>::max();

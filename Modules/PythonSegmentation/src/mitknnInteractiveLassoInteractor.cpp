@@ -539,12 +539,18 @@ void mitk::nnInteractive::LassoInteractor::AddLasso(const PlaneGeometry* plane, 
 
   const auto timeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(toolManager->GetCurrentTimePoint());
 
-  // As the contour interactor builds one from the positions of the mouse.
+  // As the contour interactor builds one from the positions of the mouse,
+  // which lie in the plane. The render windows draw a contour only close to
+  // their plane, and it is filled only within half a voxel of it.
   auto contour = ContourModel::New();
   contour->SetClosed(true);
 
   for (const auto& point : points)
-    contour->AddVertex(point);
+  {
+    Point3D projected;
+    plane->Project(point, projected);
+    contour->AddVertex(projected);
+  }
 
   AlignContourToTimeStep(contour, referenceImage, timeStep);
 

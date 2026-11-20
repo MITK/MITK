@@ -62,9 +62,12 @@ namespace mitk::nnInteractive
     /** \brief Adds a point to the point set of its prompt type, as a click
      *         with the mouse does.
      *
-     * The point counts among the interactions, and RemoveLastInteraction()
-     * removes it. UpdatePreviewEvent is not emitted. While the interactor is
-     * enabled, the point is the selected one, which the mouse does as well.
+     * The point is drawn at the center of the voxel of the reference image it
+     * lies in, which is what nnInteractive takes, so that the slice of that
+     * voxel shows it. It counts among the interactions, and
+     * RemoveLastInteraction() removes it. UpdatePreviewEvent is not emitted.
+     * While the interactor is enabled, the point is the selected one, which
+     * the mouse does as well.
      *
      * The point must lie inside the reference image: this is not checked here,
      * nnInteractiveTool rejects a prompt with a point outside before it draws it.

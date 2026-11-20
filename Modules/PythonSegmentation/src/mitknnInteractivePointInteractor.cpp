@@ -164,12 +164,23 @@ void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, Prompt
   if (referenceNode == nullptr || referenceNode->GetDataAs<Image>() == nullptr)
     mitkThrow() << "A point needs a reference image.";
 
+  // The render windows show a point only within a fraction of a pixel of
+  // their plane, which lies at the center of a slice. Drawn at the center of
+  // its voxel, which is what nnInteractive is prompted with, a point given
+  // anywhere in the voxel shows in its slice.
+  const auto* geometry = referenceNode->GetDataAs<Image>()->GetGeometry();
+  itk::Index<3> index;
+  geometry->WorldToIndex(point, index);
+
+  Point3D voxelCenter;
+  geometry->IndexToWorld(index, voxelCenter);
+
   m_Impl->CreatePointSetNode(promptType);
 
   // Unlike the point set interactor, this emits no PointSetAddEvent, which
   // would prompt nnInteractive a second time.
   auto* pointSet = m_Impl->PointSetNodes.at(promptType)->GetDataAs<PointSet>();
-  const auto id = pointSet->InsertPoint(point);
+  const auto id = pointSet->InsertPoint(voxelCenter);
 
   // Only the enabled interactor highlights its latest point, and OnDisable()
   // clears that highlight again. Nothing would clear one made while it is off.

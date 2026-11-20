@@ -63,14 +63,16 @@ namespace mitk::nnInteractive
                                            const InteractionBoundingBox& boundingBox);
 
   // Returns the plane of the slice of an image that points in world
-  // coordinates lie in. The slice is along the index axis on which the
-  // points spread least, the last of equal ones, which makes a line along an
-  // axis axial for most images. Only the position of the plane is that of
-  // the slice: its in-plane axes and the direction of its normal can differ
-  // from those of a render window that shows the slice.
+  // coordinates lie in, through the centers of its voxels. The points lie
+  // in one slice along an index axis if their voxels do, as nnInteractive
+  // takes them. Of such axes, the slice is along the one on which the points
+  // spread least, the last of equal ones, which makes a line along an axis
+  // axial for most images. Only the position of the plane is that of the
+  // slice: its in-plane axes and the direction of its normal can differ from
+  // those of a render window that shows the slice.
   //
-  // \throw mitk::Exception if the points do not lie in one slice, i.e. spread
-  //        over more than a voxel along each axis.
+  // \throw mitk::Exception if the points do not lie in one slice, i.e. their
+  //        voxels lie in different slices along each axis.
   MITKPYTHONSEGMENTATION_EXPORT PlaneGeometry::Pointer CreateSlicePlane(const std::vector<Point3D>& points,
                                                                         const BaseGeometry* geometry);
 }

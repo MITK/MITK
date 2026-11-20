@@ -2040,7 +2040,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Needs a running session (409 NOT_INITIALIZED without one). Body: {type: point|box|scribble|lasso, positive: true (the structure, "
     "default) or false (what does not belong to it), and the points: either pixels: [[x, y], ...] of a "
     "screenshot of a 2D window with window, image_size and view_state, as GET /api/v1/rendering/windows/{id}/screenshot "
-    "describes it (409 VIEW_CHANGED if the view has changed since: take a new screenshot), or points: [[x, y, z], ...] in millimeters, all in one slice of the image}. A point "
+    "describes it (409 VIEW_CHANGED if the view has changed since: take a new screenshot), or points: [[x, y, z], ...] in millimeters, all in voxels of one slice of the image, where they are drawn}. A point "
     "needs one point; a box two opposite corners; a scribble a line of points, painted with the brush of "
     "the panel, three pixels wide; a lasso a closed contour of at least three points, whose inside is the "
     "prompt. A scribble or lasso takes at most 100 points; a few points along the structure are enough. "

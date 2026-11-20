@@ -31,11 +31,11 @@ found in the LICENSE file.
 #include <mitkRestJob.h>
 #include <mitkRestPoints.h>
 #include <mitkRestSegmentation.h>
+#include <mitkRestSegmentationJobs.h>
 #include <mitkRestTime.h>
 #include <mitkSegChangeOperationApplier.h>
 #include <mitkSegWithPreviewTool.h>
 #include <mitkSegmentationHelper.h>
-#include <mitkTimeNavigationController.h>
 #include <mitkToolManagerProvider.h>
 
 #if MITK_HAS_PYTHON
@@ -43,6 +43,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkProgressTask.h>
 #include <mitkPythonHelper.h>
+#include <mitkRestPythonSegmentation.h>
 #include <mitkTotalSegmentatorInstall.h>
 #include <mitkTotalSegmentatorTool.h>
 #include <mitkVoxTellInstall.h>
@@ -55,9 +56,7 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 #include <berryPlatformUI.h>
 
-#include <QCoreApplication>
 #include <QString>
-#include <QTimer>
 
 #include <algorithm>
 #include <array>
@@ -125,13 +124,6 @@ namespace
       mitk::ThrowRestError("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Segmentation view is not open.", 503, path);
 
     return view;
-  }
-
-  mitk::RestTimeSelection GetSelectedTime()
-  {
-    mitk::RestTimeSelection selection;
-    selection.TimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    return selection;
   }
 
   /** Whether a tool that runs in a Python environment of its own has it; nothing for other tools. */
@@ -253,182 +245,7 @@ namespace
     }
   }
 
-  /** Ends a job with what an operation threw. */
-  void FailJob(mitk::RestJob& job, std::exception_ptr error)
-  {
-    try
-    {
-      std::rethrow_exception(error);
-    }
-    catch (const mitk::RestException& e)
-    {
-      job.Fail(e.what());
-    }
-    catch (const mitk::Exception& e)
-    {
-      job.Fail(e.GetDescription());
-    }
-    catch (const std::exception& e)
-    {
-      job.Fail(e.what());
-    }
-    catch (...)
-    {
-      job.Fail("An unknown error occurred.");
-    }
-  }
-
-  /**
-   * Runs \p then on the GUI thread once the tool neither updates nor runs
-   * other work off the GUI thread. Polls rather than listening to the end of
-   * the update: a confirmation that follows an update transfers only after
-   * the tool has reported that end.
-   */
-  void WhenToolIdle(const mitk::SegWithPreviewTool::Pointer& tool, std::function<void()> then)
-  {
-    if (!tool->IsUpdating() && !tool->IsRunningOffGUIThread())
-    {
-      then();
-      return;
-    }
-
-    QTimer::singleShot(50, QCoreApplication::instance(), [tool, then = std::move(then)]() mutable {
-      WhenToolIdle(tool, std::move(then));
-    });
-  }
-
-  /** Why the last confirmation of \p tool did not transfer, or empty if it did. */
-  std::string GetConfirmationFailure(const mitk::SegWithPreviewTool& tool)
-  {
-    using Outcome = mitk::SegWithPreviewTool::ConfirmationOutcome;
-    const std::string name = tool.GetName();
-
-    switch (tool.GetLastConfirmationOutcome())
-    {
-      case Outcome::Transferred:
-        return {};
-      case Outcome::Failed:
-        return "The confirmation failed: " + tool.GetLastConfirmationError();
-      case Outcome::Canceled:
-        return name + " was canceled in the Workbench. Nothing was confirmed.";
-      case Outcome::Abandoned:
-        return name + " was deactivated before the result was confirmed. Nothing was confirmed.";
-      case Outcome::None:
-        break;
-    }
-
-    return "The confirmation did not end. Nothing was confirmed.";
-  }
-
-  /** Refuses a request while the tool works, which takes one thing at a time. */
-  void ThrowIfBusy(const mitk::SegWithPreviewTool* tool, const std::string& path)
-  {
-    if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
-      mitk::ThrowRestError("BUSY", "Conflict", std::string(tool->GetName()) + " is still working. Wait for its job to end; "
-        "after a cancel, GET /api/v1/workbench/tasks shows when the work has stopped.", 409, path);
-  }
-
 #if MITK_HAS_PYTHON
-  /**
-   * Runs \p then on the GUI thread once \p isStarting is false, for a start that the panel of a tool began.
-   * Polls as WhenToolIdle() does. Gives up when \p job has ended meanwhile.
-   */
-  void WhenStartEnded(const std::shared_ptr<mitk::RestJob>& job, std::function<bool()> isStarting, std::function<void()> then)
-  {
-    if (job->HasEnded())
-      return;
-
-    if (!isStarting())
-    {
-      then();
-      return;
-    }
-
-    QTimer::singleShot(50, QCoreApplication::instance(), [job, isStarting = std::move(isStarting), then = std::move(then)]() mutable {
-      WhenStartEnded(job, std::move(isStarting), std::move(then));
-    });
-  }
-
-  /**
-   * Fails \p job if \p tool is no longer the active tool. A deactivation ends
-   * the work of a tool without a result, and some tools do not record that as
-   * a failure, so their state would read as a run that found nothing.
-   */
-  bool FailIfDeactivated(mitk::RestJob& job, const mitk::Tool* tool)
-  {
-    if (GetToolManager()->GetActiveTool() == tool)
-      return false;
-
-    job.Fail(std::string(tool->GetName()) + " was deactivated while it worked.");
-    return true;
-  }
-
-  /**
-   * The labels of the preview of a tool that adds labels, as the confirm adds them: with values that only the
-   * confirm gives them, and to the group of the active label, unless the tool transfers all groups of its
-   * preview, which then stand for those of the segmentation. With \a measure, they have voxels, volume_ml and
-   * center at the selected time point.
-   */
-  nlohmann::json DescribePreviewLabels(mitk::SegWithPreviewTool* tool, bool measure)
-  {
-    auto* preview = tool->GetPreviewSegmentation();
-
-    if (preview == nullptr)
-      return nlohmann::json::array();
-
-    const auto* working = GetToolManager()->GetWorkingData(0);
-    const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
-    const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
-
-    auto labels = measure ? mitk::DescribeRestLabels(preview, GetSelectedTime()) : mitk::DescribeRestLabels(preview);
-
-    for (auto& label : labels)
-    {
-      label.erase("value");
-
-      if (!tool->GetTransfersAllPreviewGroups())
-        label["group"] = group;
-    }
-
-    return labels;
-  }
-
-  /** Returns an mitk::Exception with the given message, for a callback. */
-  std::exception_ptr MakeError(const std::string& message)
-  {
-    try
-    {
-      mitkThrow() << message;
-    }
-    catch (...)
-    {
-      return std::current_exception();
-    }
-  }
-
-  /**
-   * How a prompt ended and the job that reports it. The job is made after the tool took the prompt, which can end
-   * before that, so whichever of the two comes second passes the outcome on. Used in the GUI thread only.
-   */
-  struct PromptOutcome
-  {
-    std::shared_ptr<mitk::RestJob> Job;
-    bool Ended = false;
-    std::exception_ptr Error;
-    nlohmann::json Result;
-
-    void ReportToJob() const
-    {
-      if (this->Job == nullptr || !this->Ended)
-        return;
-
-      if (this->Error != nullptr)
-        FailJob(*this->Job, this->Error);
-      else
-        this->Job->Succeed(this->Result);
-    }
-  };
-
   mitk::nnInteractiveTool* GetNNInteractive(const std::string& path)
   {
     auto* tool = dynamic_cast<mitk::nnInteractiveTool*>(GetToolManager()->GetActiveTool());
@@ -440,97 +257,6 @@ namespace
     }
 
     return tool;
-  }
-
-  std::uint64_t CountPreviewVoxels(mitk::SegWithPreviewTool* tool)
-  {
-    auto* preview = tool->GetPreviewSegmentation();
-
-    if (preview == nullptr)
-      return 0;
-
-    const auto timeSteps = GetSelectedTime().GetTimeSteps(preview);
-
-    if (timeSteps.empty())
-      return 0;
-
-    std::uint64_t count = 0;
-
-    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < preview->GetNumberOfGroups(); ++group)
-    {
-      try
-      {
-        for (const auto& [value, measure] : preview->MeasureLabels(group, timeSteps.front()))
-          count += measure.VoxelCount;
-      }
-      catch (const mitk::Exception&)
-      {
-        // A group that a tool writes into is left out: the count never waits for the tool.
-      }
-    }
-
-    return count;
-  }
-
-  nlohmann::json DescribeNNInteractive(mitk::nnInteractiveTool* tool)
-  {
-    const auto supported = tool->GetSupportedInteractions();
-    auto prompts = nlohmann::json::array();
-
-    if (supported.Point)
-      prompts.push_back("point");
-
-    if (supported.Box)
-      prompts.push_back("box");
-
-    if (supported.Scribble)
-      prompts.push_back("scribble");
-
-    if (supported.Lasso)
-      prompts.push_back("lasso");
-
-    const bool running = tool->IsSessionRunning();
-
-    return {
-      { "session_running", running },
-      { "session_starting", tool->IsSessionStarting() },
-      { "remote", tool->IsRemoteSession() },
-      { "prompt_types", prompts },
-      { "can_undo", tool->CanUndo() },
-      { "auto_zoom", tool->GetAutoZoom() },
-      { "auto_refine", tool->GetAutoRefine() },
-      { "preview_voxels", running ? CountPreviewVoxels(tool) : 0 }
-    };
-  }
-
-  /**
-   * Ends the job of a start with the state of the tool once the panel has seeded the session, which it does on
-   * the event that the tool sends after its start has ended. The queued call runs after that event.
-   */
-  void SucceedWhenSessionSeeded(const std::shared_ptr<mitk::RestJob>& job, const mitk::nnInteractiveTool::Pointer& tool)
-  {
-    QTimer::singleShot(0, QCoreApplication::instance(), [job, tool]() {
-      WhenToolIdle(tool, [job, tool]() { job->Succeed(DescribeNNInteractive(tool)); });
-    });
-  }
-
-  mitk::nnInteractive::InteractionType ParseInteractionType(const nlohmann::json& body, const std::string& path)
-  {
-    const auto type = body.value("type", std::string());
-
-    if (type == "point")
-      return mitk::nnInteractive::InteractionType::Point;
-
-    if (type == "box")
-      return mitk::nnInteractive::InteractionType::Box;
-
-    if (type == "scribble")
-      return mitk::nnInteractive::InteractionType::Scribble;
-
-    if (type == "lasso")
-      return mitk::nnInteractive::InteractionType::Lasso;
-
-    throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"type\" must be point, box, scribble or lasso.", path));
   }
 
   mitk::VoxTellTool* GetVoxTell(const std::string& path)
@@ -565,15 +291,12 @@ namespace
   /** \param measure Whether the preview labels have voxels, volume_ml and center, which take a pass over them. */
   nlohmann::json DescribeVoxTell(mitk::VoxTellTool* tool, bool measure = false)
   {
-    return {
-      { "installed", IsInstalled(tool).value_or(false) },
-      { "model_loaded", tool->IsModelLoaded() },
-      { "model_loading", tool->IsInitializing() },
-      { "prompts", tool->GetPrompts() },
-      { "prompts_without_result", tool->GetPromptsWithoutResult() },
-      { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", DescribePreviewLabels(tool, measure) }
-    };
+    return mitk::DescribeRestVoxTell(tool, GetToolManager(), IsInstalled(tool).value_or(false), measure);
+  }
+
+  bool FailIfDeactivated(mitk::RestJob& job, const mitk::Tool* tool)
+  {
+    return mitk::FailRestJobIfDeactivated(job, GetToolManager(), tool);
   }
 
   mitk::TotalSegmentatorTool* GetTotalSegmentator(const std::string& path)
@@ -589,35 +312,6 @@ namespace
     return tool;
   }
 
-  std::string ToJson(mitk::TotalSegmentatorTool::Speed speed)
-  {
-    switch (speed)
-    {
-      case mitk::TotalSegmentatorTool::Speed::Fast:
-        return "fast";
-      case mitk::TotalSegmentatorTool::Speed::Fastest:
-        return "fastest";
-      default:
-        return "standard";
-    }
-  }
-
-  mitk::TotalSegmentatorTool::Speed ParseSpeed(const nlohmann::json& json, const std::string& path)
-  {
-    const auto speed = json.is_string() ? json.get<std::string>() : std::string();
-
-    if (speed == "standard")
-      return mitk::TotalSegmentatorTool::Speed::Standard;
-
-    if (speed == "fast")
-      return mitk::TotalSegmentatorTool::Speed::Fast;
-
-    if (speed == "fastest")
-      return mitk::TotalSegmentatorTool::Speed::Fastest;
-
-    throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"speed\" must be standard, fast or fastest.", path));
-  }
-
   mitk::TotalSegmentatorTool* GetInitializedTotalSegmentator(const std::string& path)
   {
     auto* tool = GetTotalSegmentator(path);
@@ -631,154 +325,14 @@ namespace
     return tool;
   }
 
-  /** \param withClasses Whether to list the classes of the task, which can be many. */
-  nlohmann::json DescribeTotalSegmentatorTask(const mitk::TotalSegmentatorTool::TaskInfo& task, bool withClasses)
-  {
-    auto speeds = nlohmann::json::array();
-
-    for (const auto& speed : task.Speeds)
-    {
-      speeds.push_back({
-        { "name", ToJson(speed.Value) },
-        { "resolution_mm", speed.Resolution > 0 ? nlohmann::json(speed.Resolution) : nlohmann::json() }
-      });
-    }
-
-    nlohmann::json json = {
-      { "name", task.Name },
-      { "modality", task.MR ? "MR" : "CT" },
-      { "licensed", task.Licensed },
-      { "available", !task.Licensed || mitk::TotalSegmentatorTool::HasLicense() },
-      { "speeds", speeds },
-      { "roi_subset", task.SupportsRoiSubset },
-      { "class_count", task.Classes.size() }
-    };
-
-    if (withClasses)
-    {
-      auto classes = nlohmann::json::array();
-
-      for (const auto& [value, name] : task.Classes)
-        classes.push_back(name);
-
-      json["classes"] = classes;
-    }
-
-    return json;
-  }
-
   /**
    * \param withTasks Whether to list the tasks, which only GET does, as there are many.
    * \param measure Whether the preview labels have voxels, volume_ml and center, which take a pass over them.
    */
   nlohmann::json DescribeTotalSegmentator(mitk::TotalSegmentatorTool* tool, bool withTasks, bool measure = false)
   {
-    nlohmann::json state = {
-      { "installed", mitk::TotalSegmentatorTool::IsInstalled() },
-      { "initialized", tool->IsInitialized() },
-      { "has_license", mitk::TotalSegmentatorTool::HasLicense() },
-      { "device", mitk::TotalSegmentatorTool::GetDevice() },
-      { "task", tool->GetTask() },
-      { "speed", ToJson(tool->GetSpeed()) },
-      { "roi_subset", tool->GetRoiSubset() },
-      { "running", tool->IsUpdating() },
-      { "error", tool->GetLastErrorMessage().empty() ? nlohmann::json() : nlohmann::json(tool->GetLastErrorMessage()) },
-      { "preview_labels", DescribePreviewLabels(tool, measure) }
-    };
-
-    if (withTasks && tool->IsInitialized())
-    {
-      auto tasks = nlohmann::json::array();
-
-      for (const auto& task : tool->GetTasks())
-        tasks.push_back(DescribeTotalSegmentatorTask(task, false));
-
-      state["tasks"] = tasks;
-    }
-
-    return state;
+    return mitk::DescribeRestTotalSegmentator(tool, GetToolManager(), withTasks, measure);
   }
-
-  /**
-   * Waits until TotalSegmentator has started, or failed to, whoever started
-   * it, as the tool tells that only by events. Deletes itself afterwards.
-   */
-  class TotalSegmentatorStartListener
-  {
-  public:
-    /**
-     * Starts TotalSegmentator unless it runs or starts already, then calls
-     * \p done on the GUI thread with null, or with why it does not start.
-     */
-    static void Start(mitk::TotalSegmentatorTool* tool, std::function<void(std::exception_ptr)> done)
-    {
-      if (tool->IsInitialized())
-      {
-        done(nullptr);
-        return;
-      }
-
-      // Listens before the start, which can fail at once.
-      auto* listener = new TotalSegmentatorStartListener(tool, std::move(done));
-
-      try
-      {
-        // A start that runs already has its task; another one would only flash.
-        tool->Initialize(tool->IsInitializing()
-          ? nullptr
-          : std::make_shared<mitk::ProgressTask>("Starting TotalSegmentator", mitk::ProgressTask::Indeterminate, true));
-      }
-      catch (...)
-      {
-        // No event follows, so nothing else would end the listener.
-        listener->End(std::current_exception());
-      }
-    }
-
-  private:
-    TotalSegmentatorStartListener(mitk::TotalSegmentatorTool* tool, std::function<void(std::exception_ptr)> done)
-      : m_Tool(tool),
-        m_Done(std::move(done))
-    {
-      m_Tool->InitializedEvent += mitk::MessageDelegate<TotalSegmentatorStartListener>(this, &TotalSegmentatorStartListener::OnInitialized);
-      m_Tool->InitializationFailedEvent += mitk::MessageDelegate1<TotalSegmentatorStartListener, std::string>(this, &TotalSegmentatorStartListener::OnInitializationFailed);
-    }
-
-    void OnInitialized()
-    {
-      this->End(nullptr);
-    }
-
-    void OnInitializationFailed(std::string message)
-    {
-      this->End(MakeError(message.empty() ? std::string("Starting TotalSegmentator was canceled in the Workbench.") : message));
-    }
-
-    // Not from within the event, which goes on to its other listeners, and
-    // after which what follows may run the tool.
-    void End(std::exception_ptr error)
-    {
-      // The events still reach the listener until the queued call has run.
-      if (m_Ended)
-        return;
-
-      m_Ended = true;
-
-      QTimer::singleShot(0, QCoreApplication::instance(), [this, error]() {
-        m_Tool->InitializedEvent -= mitk::MessageDelegate<TotalSegmentatorStartListener>(this, &TotalSegmentatorStartListener::OnInitialized);
-        m_Tool->InitializationFailedEvent -= mitk::MessageDelegate1<TotalSegmentatorStartListener, std::string>(this, &TotalSegmentatorStartListener::OnInitializationFailed);
-
-        const auto done = std::move(m_Done);
-        delete this;
-
-        done(error);
-      });
-    }
-
-    mitk::TotalSegmentatorTool::Pointer m_Tool;
-    std::function<void(std::exception_ptr)> m_Done;
-    bool m_Ended = false;
-  };
 #endif
 }
 
@@ -1462,7 +1016,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     const auto outcome = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       SegWithPreviewTool::Pointer tool = GetPreviewTool(request.Path);
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       // An empty preview would erase the label it is transferred to, for example on a repeated confirm.
       if (!tool->HasResultToConfirm())
@@ -1510,7 +1064,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         restoreOptions();
 
         // An update before the transfer that failed reports it to the user only.
-        if (const auto failure = GetConfirmationFailure(*tool); !failure.empty())
+        if (const auto failure = GetRestConfirmationFailure(*tool); !failure.empty())
           mitk::ThrowRestError("CONFIRM_FAILED", "Internal Server Error", failure, 500, request.Path);
 
         return Outcome{ describe(), nullptr };
@@ -1520,10 +1074,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto job = server->CreateJob("Confirm the result");
       job->SetCancelHandler([name = std::string(tool->GetName())]() { CancelTasks(name); });
 
-      WhenToolIdle(tool, [job, tool, describe, restoreOptions]() {
+      WhenRestToolIdle(tool, [job, tool, describe, restoreOptions]() {
         restoreOptions();
 
-        if (const auto failure = GetConfirmationFailure(*tool); !failure.empty())
+        if (const auto failure = GetRestConfirmationFailure(*tool); !failure.empty())
         {
           job->Fail(failure);
           return;
@@ -1535,7 +1089,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         }
         catch (...)
         {
-          FailJob(*job, std::current_exception());
+          FailRestJob(*job, std::current_exception());
         }
       });
 
@@ -1559,7 +1113,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "prompt_types, can_undo, auto_zoom, auto_refine, preview_voxels}}; session_starting is true while a start "
     "is under way, whoever began it; preview_voxels is the size of the unconfirmed result.";
   nnInteractiveState.Handler = [server](const RestRequest& request) {
-    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeNNInteractive(GetNNInteractive(request.Path)); }));
+    return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeRestNNInteractive(GetNNInteractive(request.Path)); }));
   };
   routes.push_back(nnInteractiveState);
 
@@ -1587,7 +1141,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* tool = GetNNInteractive(request.Path);
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       if (body.contains("auto_zoom"))
       {
@@ -1602,7 +1156,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (body.contains("auto_refine"))
         tool->SetAutoRefine(body["auto_refine"].get<bool>());
 
-      return DescribeNNInteractive(tool);
+      return DescribeRestNNInteractive(tool);
     }));
   };
   routes.push_back(nnInteractiveOptions);
@@ -1643,7 +1197,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
 
       // A new start would end the session and discard its prompts and result.
-      return tool->IsSessionRunning() ? std::optional<nlohmann::json>(DescribeNNInteractive(tool)) : std::nullopt;
+      return tool->IsSessionRunning() ? std::optional<nlohmann::json>(DescribeRestNNInteractive(tool)) : std::nullopt;
     });
 
     if (running.has_value())
@@ -1689,9 +1243,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
         if (tool->IsSessionStarting())
         {
-          WhenStartEnded(job, [tool]() { return tool->IsSessionStarting(); }, [job, tool]() {
+          WhenRestStartEnded(job, [tool]() { return tool->IsSessionStarting(); }, [job, tool]() {
             if (tool->IsSessionRunning())
-              SucceedWhenSessionSeeded(job, tool);
+              SucceedRestJobWhenSessionSeeded(job, tool);
             else
               job->Fail("The start in the panel did not succeed.");
           });
@@ -1702,7 +1256,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // Started meanwhile, in the panel or by another request.
         if (tool->IsSessionRunning())
         {
-          SucceedWhenSessionSeeded(job, tool);
+          SucceedRestJobWhenSessionSeeded(job, tool);
           return;
         }
 
@@ -1716,17 +1270,17 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         tool->StartSession(task, [job, task, tool](std::exception_ptr error) {
           if (error != nullptr)
           {
-            FailJob(*job, error);
+            FailRestJob(*job, error);
             return;
           }
 
           task->Finish();
-          SucceedWhenSessionSeeded(job, tool);
+          SucceedRestJobWhenSessionSeeded(job, tool);
         });
       }
       catch (...)
       {
-        FailJob(*job, std::current_exception());
+        FailRestJob(*job, std::current_exception());
       }
     });
 
@@ -1747,7 +1301,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       ShowView(request.Path);
       auto* tool = GetNNInteractive(request.Path);
       tool->AbortSession();
-      return DescribeNNInteractive(tool);
+      return DescribeRestNNInteractive(tool);
     }));
   };
   routes.push_back(endSession);
@@ -1773,7 +1327,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "result.";
   addPrompt.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    const auto type = ParseInteractionType(body, request.Path);
+    const auto type = ParseRestInteractionType(body, request.Path);
     const auto promptType = body.value("positive", true) ? nnInteractive::PromptType::Positive : nnInteractive::PromptType::Negative;
 
     const auto job = CallInGuiThread(*server, [&]() {
@@ -1786,7 +1340,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           "nnInteractive has no session. Start one with POST /api/v1/segmentation/nninteractive/session.", 409, request.Path);
       }
 
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       // For a moment after its update, the last prompt has not reported to its job yet.
       if (tool->IsPromptPending())
@@ -1802,7 +1356,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         : nullptr;
 
       // The job exists once the tool has taken the prompt, which can have failed by then.
-      const auto outcome = std::make_shared<PromptOutcome>();
+      const auto outcome = std::make_shared<RestPromptOutcome>();
 
       try
       {
@@ -1813,7 +1367,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           outcome->Error = error;
 
           if (error == nullptr)
-            outcome->Result = DescribeNNInteractive(tool);
+            outcome->Result = DescribeRestNNInteractive(tool);
 
           outcome->ReportToJob();
         });
@@ -1847,7 +1401,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto* tool = GetNNInteractive(request.Path);
 
       // The tool ignores an undo while it works, which must not read as done.
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       if (tool->IsSessionRunning() && !tool->SupportsUndo())
         mitk::ThrowRestError("NOT_AVAILABLE", "Conflict", "The nnInteractive session does not support undo.", 409, request.Path);
@@ -1856,7 +1410,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         mitk::ThrowRestError("NOTHING_TO_UNDO", "Conflict", "There is no prompt to undo.", 409, request.Path);
 
       tool->UndoLastInteraction();
-      return DescribeNNInteractive(tool);
+      return DescribeRestNNInteractive(tool);
     }));
   };
   routes.push_back(undoPrompt);
@@ -1872,11 +1426,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto* tool = GetNNInteractive(request.Path);
 
       // The tool ignores a reset while it works, which must not read as done.
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       tool->ResetInteractions();
       RenderingManager::GetInstance()->RequestUpdateAll();
-      return DescribeNNInteractive(tool);
+      return DescribeRestNNInteractive(tool);
     }));
   };
   routes.push_back(reset);
@@ -1949,7 +1503,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
 
       // Asks the worker, whose calls must not overlap with those of a run.
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
 
       return tool->GetKnownPrompts();
     });
@@ -2040,7 +1594,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       const auto fail = [job, release](const VoxTellTool::Pointer& tool, std::exception_ptr error) {
         release(tool);
-        FailJob(*job, error);
+        FailRestJob(*job, error);
       };
 
       // A cancel between two steps finds no task to stop, and a deactivation
@@ -2061,7 +1615,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
         if (tool->IsInitializing())
         {
-          WhenStartEnded(job, [tool]() { return tool->IsInitializing(); }, [job, tool]() {
+          WhenRestStartEnded(job, [tool]() { return tool->IsInitializing(); }, [job, tool]() {
             if (tool->IsModelLoaded())
               job->Succeed(DescribeVoxTell(tool));
             else
@@ -2169,7 +1723,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           "VoxTell has no model loaded. Load it with POST /api/v1/segmentation/voxtell/model.", 409, request.Path);
       }
 
-      ThrowIfBusy(tool, request.Path);
+      ThrowIfRestToolBusy(tool, request.Path);
     });
 
     auto job = server->CreateJob("Segment with VoxTell");
@@ -2187,7 +1741,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
         // The tool may have begun to work since the request was checked, and
         // what follows asks its worker, whose calls must not overlap.
-        ThrowIfBusy(tool, path);
+        ThrowIfRestToolBusy(tool, path);
 
         const auto unknownPrompts = tool->GetPromptsWithoutPrecomputedEmbedding(prompts);
 
@@ -2228,7 +1782,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
             throw;
           }
 
-          WhenToolIdle(tool, [job, tool, userCreatesGroups]() {
+          WhenRestToolIdle(tool, [job, tool, userCreatesGroups]() {
             tool->SetCreateGroupsAsNeeded(userCreatesGroups);
 
             if (FailIfDeactivated(*job, tool))
@@ -2272,7 +1826,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         tool->EmbedPrompts(unknownPrompts, task, [job, run](std::exception_ptr error) {
           if (error != nullptr)
           {
-            FailJob(*job, error);
+            FailRestJob(*job, error);
             return;
           }
 
@@ -2281,7 +1835,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
       catch (...)
       {
-        FailJob(*job, std::current_exception());
+        FailRestJob(*job, std::current_exception());
       }
     });
 
@@ -2355,10 +1909,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // Held, as the tool can be deactivated while it starts.
         TotalSegmentatorTool::Pointer tool(GetTotalSegmentator(path));
 
-        TotalSegmentatorStartListener::Start(tool, [job, tool](std::exception_ptr error) {
+        StartRestTotalSegmentator(tool, [job, tool](std::exception_ptr error) {
           if (error != nullptr)
           {
-            FailJob(*job, error);
+            FailRestJob(*job, error);
             return;
           }
 
@@ -2370,7 +1924,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
       catch (...)
       {
-        FailJob(*job, std::current_exception());
+        FailRestJob(*job, std::current_exception());
       }
     });
 
@@ -2394,7 +1948,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (task == nullptr)
         mitk::ThrowRestError("TOTALSEGMENTATOR_TASK_NOT_FOUND", "Not Found", "TotalSegmentator has no task \"" + name + "\".", 404, request.Path);
 
-      return DescribeTotalSegmentatorTask(*task, true);
+      return DescribeRestTotalSegmentatorTask(*task, true);
     }));
   };
   routes.push_back(totalSegmentatorTaskDetails);
@@ -2480,7 +2034,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       throw RestException(ErrorResponse::InvalidRequest("\"roi_subset\" must be a list of class names.", request.Path));
 
     const auto speed = body.contains("speed")
-      ? std::optional<TotalSegmentatorTool::Speed>(ParseSpeed(body["speed"], request.Path))
+      ? std::optional<TotalSegmentatorTool::Speed>(ParseRestSpeed(body["speed"], request.Path))
       : std::nullopt;
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
@@ -2571,10 +2125,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // Held, as the tool can be deactivated while it runs.
         TotalSegmentatorTool::Pointer tool(GetTotalSegmentator(path));
 
-        TotalSegmentatorStartListener::Start(tool, [job, tool](std::exception_ptr error) {
+        StartRestTotalSegmentator(tool, [job, tool](std::exception_ptr error) {
           if (error != nullptr)
           {
-            FailJob(*job, error);
+            FailRestJob(*job, error);
             return;
           }
 
@@ -2597,7 +2151,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
           tool->UpdatePreview();
 
-          WhenToolIdle(tool, [job, tool]() {
+          WhenRestToolIdle(tool, [job, tool]() {
             if (FailIfDeactivated(*job, tool))
               return;
 
@@ -2613,7 +2167,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
       catch (...)
       {
-        FailJob(*job, std::current_exception());
+        FailRestJob(*job, std::current_exception());
       }
     });
 

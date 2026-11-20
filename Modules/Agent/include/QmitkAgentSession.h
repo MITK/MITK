@@ -74,7 +74,8 @@ public:
   /**
    * \brief The empty directory in which Claude Code runs, created if missing.
    *
-   * Claude Code reads project settings and CLAUDE.md files from there.
+   * Claude Code reads project settings and CLAUDE.md files from there. Its parent, which
+   * holds the agent's token and notes, is made accessible to the current user only.
    */
   static QString GetWorkspaceDirectory();
 

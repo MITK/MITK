@@ -73,7 +73,8 @@ The agent works through the REST API of the Workbench, which the REST API view m
 running when the view starts, the Agent view starts one for itself. It listens on this computer only,
 on a port that the system chooses, requires a token, and gives clients no access to your files. It is
 stopped when the Agent view closes. The token is created for the agent alone and handed to Claude Code
-in a configuration file in the agent's workspace folder; it is removed when the view closes.
+in a configuration file in the Agent folder of the Workbench's local application data, which only you
+can open; the token and the file are removed when the view closes.
 
 If a server is already running, for example one that you started in the REST API view, the Agent view
 uses it, with a token of its own and without access to your files. If that server is open to others,

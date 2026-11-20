@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <mitkLog.h>
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QFutureWatcher>
 #include <QJsonArray>
@@ -32,6 +33,18 @@ namespace
 {
   const QString McpServerName = "mitk";
   const QString ToolPrefix = "mcp__" + McpServerName + "__";
+
+  // Named per process: a Workbench instance that starts its agent at the same time would
+  // otherwise replace the file before this instance's Claude Code has read it.
+  QString GetConfigPath(const QDir& directory)
+  {
+    return directory.filePath(QString("mcp-%1.json").arg(QCoreApplication::applicationPid()));
+  }
+
+  QString GetPromptPath(const QDir& directory)
+  {
+    return directory.filePath(QString("system-prompt-%1.md").arg(QCoreApplication::applicationPid()));
+  }
 
   QString GetToolName(const QString& name)
   {
@@ -151,12 +164,16 @@ QmitkAgentSession::~QmitkAgentSession()
   m_Process->Kill();
 
   m_ToolServer->Withdraw();
+
+  QFile::remove(GetConfigPath(m_Directory));
+  QFile::remove(GetPromptPath(m_Directory));
 }
 
 QString QmitkAgentSession::GetWorkspaceDirectory()
 {
   const QDir directory(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
   directory.mkpath("Agent/workspace");
+  QFile::setPermissions(directory.filePath("Agent"), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
   return directory.filePath("Agent/workspace");
 }
 
@@ -451,10 +468,10 @@ void QmitkAgentSession::StartProcess()
     { "headers", QJsonObject{ { "Authorization", "Bearer " + m_ToolServer->GetToken() } } }
   };
 
-  const auto configPath = m_Directory.filePath("mcp.json");
+  const auto configPath = GetConfigPath(m_Directory);
   QSaveFile config(configPath);
 
-  if (!config.open(QIODevice::WriteOnly))
+  if (!config.open(QIODevice::WriteOnly) || !config.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner))
   {
     emit ErrorAdded(QString("Cannot write %1.").arg(configPath));
     return;
@@ -476,7 +493,7 @@ void QmitkAgentSession::StartProcess()
     return;
   }
 
-  const auto promptPath = m_Directory.filePath("system-prompt.md");
+  const auto promptPath = GetPromptPath(m_Directory);
   QSaveFile prompt(promptPath);
 
   if (!prompt.open(QIODevice::WriteOnly))

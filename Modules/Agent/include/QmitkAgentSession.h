@@ -223,7 +223,6 @@ private:
   void OnAssistantMessage(const QJsonObject& message);
   void OnToolResults(const QJsonObject& message);
   void OnResult(const QJsonObject& message);
-  void OnInterruptAcknowledged();
   void OnProcessFinished(int exitCode, const QString& errorOutput);
 
   std::unique_ptr<QmitkAgentMemory> m_Memory;
@@ -260,14 +259,6 @@ private:
    * afterwards, and an interrupt ends only the running turn.
    */
   int m_PendingTurns;
-
-  /**
-   * \brief Whether Claude Code has reported the start of a turn and not yet its result.
-   *
-   * Tells an interrupt that ends a turn from one that finds none: only the
-   * first is followed by a result.
-   */
-  bool m_TurnInFlight;
 
   /**
    * \brief Whether the running process has reported its first init.

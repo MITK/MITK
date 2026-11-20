@@ -190,9 +190,8 @@ public:
   /**
    * \brief Ask Claude Code to end the running turn.
    *
-   * Claude Code answers with InterruptAcknowledged() at once and ends the
-   * turn with a result message. Without a running turn, only the
-   * acknowledgment comes.
+   * Claude Code ends the turn with a result message, also one whose message
+   * it has not begun yet. Without a message to answer, nothing follows.
    */
   void Interrupt();
 
@@ -218,9 +217,6 @@ signals:
    */
   void DefaultEffortReported(const QString& model, const QString& effort);
 
-  /** \brief Claude Code took the request of Interrupt(). */
-  void InterruptAcknowledged();
-
   /** \brief The process ended. \p errorOutput is the end of what it wrote to stderr. */
   void Finished(int exitCode, const QString& errorOutput);
 
@@ -241,7 +237,6 @@ private:
   unsigned int m_RequestCounter;
   QString m_InitializeRequestId;
   QString m_SettingsRequestId;
-  QString m_InterruptRequestId;
 };
 
 #endif

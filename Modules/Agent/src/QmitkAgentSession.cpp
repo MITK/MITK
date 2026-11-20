@@ -136,7 +136,6 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
     m_RestartPending(false),
     m_AuthQueries(0),
     m_PendingTurns(0),
-    m_TurnInFlight(false),
     m_InitReported(false),
     m_ConversationLost(false),
     m_Stopping(false),
@@ -153,7 +152,6 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
   connect(m_Process, &QmitkClaudeCodeProcess::MessageReceived, this, &QmitkAgentSession::OnMessageReceived);
   connect(m_Process, &QmitkClaudeCodeProcess::Initialized, this, &QmitkAgentSession::ModelsChanged);
   connect(m_Process, &QmitkClaudeCodeProcess::DefaultEffortReported, this, &QmitkAgentSession::DefaultEffortReported);
-  connect(m_Process, &QmitkClaudeCodeProcess::InterruptAcknowledged, this, &QmitkAgentSession::OnInterruptAcknowledged);
   connect(m_Process, &QmitkClaudeCodeProcess::Finished, this, &QmitkAgentSession::OnProcessFinished);
   connect(m_Process, &QmitkClaudeCodeProcess::ErrorOccurred, this, &QmitkAgentSession::ErrorAdded);
 }
@@ -369,7 +367,6 @@ void QmitkAgentSession::Stop()
     this->KillProcess();
 
     m_PendingTurns = 0;
-    m_TurnInFlight = false;
     m_ToolCalls.clear();
 
     emit NoteAdded("Claude Code did not stop and was ended. Your next message continues the conversation.");
@@ -392,7 +389,6 @@ void QmitkAgentSession::StartNewConversation()
 
   m_SessionId.clear();
   m_PendingTurns = 0;
-  m_TurnInFlight = false;
   m_ToolCalls.clear();
   m_ConversationCost = 0.0;
   emit CostChanged();
@@ -592,7 +588,6 @@ void QmitkAgentSession::OnSystemMessage(const QJsonObject& message)
   m_ConversationLost = false;
 
   // Claude Code reports it at the start of every turn.
-  m_TurnInFlight = this->IsTurnRunning();
   m_SessionId = message.value("session_id").toString();
 
   bool serverListed = false;
@@ -746,21 +741,6 @@ void QmitkAgentSession::OnToolResults(const QJsonObject& message)
   }
 }
 
-void QmitkAgentSession::OnInterruptAcknowledged()
-{
-  if (!m_Stopping || m_TurnInFlight || !this->IsTurnRunning())
-    return;
-
-  // Claude Code runs no turn, so no result follows that would end the ones
-  // counted here: the session and Claude Code disagree about them.
-  MITK_WARN << "The Agent view counted " << m_PendingTurns << " running turn(s) that Claude Code does not run.";
-
-  m_PendingTurns = 0;
-  emit NoteAdded("Stopped.");
-  emit TurnStateChanged();
-  emit TurnsFinished();
-}
-
 void QmitkAgentSession::OnResult(const QJsonObject& message)
 {
   // A process that was started ahead and cannot resume ends with a result
@@ -768,7 +748,6 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
   if (!this->IsTurnRunning() && m_InitReported)
     MITK_WARN << "Claude Code ended a turn that the Agent view did not count as running.";
 
-  m_TurnInFlight = false;
   m_PendingTurns = std::max(0, m_PendingTurns - 1);
 
   // Stop ended the turn that ran. One that the user sent after it, often to
@@ -853,7 +832,6 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
   const bool turnWasRunning = this->IsTurnRunning();
 
   m_PendingTurns = 0;
-  m_TurnInFlight = false;
   emit TurnStateChanged();
 
   if (m_Killing)

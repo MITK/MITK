@@ -331,7 +331,7 @@ void QmitkClaudeCodeProcess::SendUserMessage(const QString& text)
 
 void QmitkClaudeCodeProcess::Interrupt()
 {
-  m_InterruptRequestId = this->SendControlRequest({ { "subtype", "interrupt" } });
+  this->SendControlRequest({ { "subtype", "interrupt" } });
 }
 
 void QmitkClaudeCodeProcess::Kill()
@@ -373,13 +373,6 @@ void QmitkClaudeCodeProcess::OnControlResponse(const QJsonObject& message)
 {
   const auto response = message.value("response").toObject();
   const auto requestId = response.value("request_id").toString();
-
-  if (!m_InterruptRequestId.isEmpty() && requestId == m_InterruptRequestId)
-  {
-    m_InterruptRequestId.clear();
-    emit InterruptAcknowledged();
-    return;
-  }
 
   // An older Claude Code answers this request with an error.
   if (!m_SettingsRequestId.isEmpty() && requestId == m_SettingsRequestId)

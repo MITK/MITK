@@ -518,9 +518,6 @@ void mitk::CrashDumpFacility::ClearCrashedLastRun(const std::vector<CrashDumpInf
 {
   s_State.CrashedLastRun = false;
 
-  if (s_State.Active)
-    sentry_clear_crashed_last_run();
-
   if (shownDumps.empty())
     return;
 

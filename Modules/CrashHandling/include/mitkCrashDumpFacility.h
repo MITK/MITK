@@ -185,8 +185,8 @@ namespace mitk
     /** \brief Acknowledge exactly \p shownDumps (dialog "seen"): they will not
      *  be reported by ListUnacknowledgedDumps() again, while dumps newer than
      *  the newest of them still are. The acknowledgment never moves
-     *  backwards. The crashed-last-run marker is cleared; an empty list
-     *  clears only that marker. */
+     *  backwards. CrashedLastRun() returns false afterwards; an empty list
+     *  only resets that flag. */
     static void ClearCrashedLastRun(const std::vector<CrashDumpInfo>& shownDumps);
 
     /** \brief The surfacable dumps the next-start dialog shows, newest

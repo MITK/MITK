@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkImageToSurfaceFilter.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkIOUtil.h>
 #include <mitkLog.h>
 #include <mitkLogBackendBase.h>
 #include <mitkLogMessage.h>
@@ -103,6 +104,7 @@ class mitkStorageThreadDispatcherTestSuite : public mitk::TestFixture
   MITK_TEST(PostFromAnotherThread_RunsAndIsReleasedOnTheOwningThread_Success);
   MITK_TEST(PostWithoutAnOwningThread_IsRefused_Success);
   MITK_TEST(ImageToSurfaceOffTheOwningThread_LeavesTheSharedRepresentationAlone_Success);
+  MITK_TEST(LoadWithoutAStorageOffTheOwningThread_IsNotHandedOver_Success);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -347,6 +349,24 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The filter built the representation that the mappers share",
                                  0,
                                  capture.CountContaining("Building the VTK representation"));
+  }
+
+  void LoadWithoutAStorageOffTheOwningThread_IsNotHandedOver_Success()
+  {
+    std::vector<mitk::BaseData::Pointer> data;
+
+    RunOnWorkerWhileDraining([&data]() { data = mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd")); });
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One image has to be loaded", static_cast<std::size_t>(1), data.size());
+
+    // Nobody else knows the data yet. Waiting for the owning thread would
+    // deadlock a caller that the owning thread waits for, like a REST server
+    // that is being stopped while it loads an upload.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Data read without a storage is not handed over",
+                                 0,
+                                 m_Dispatcher->HandedOver.load());
+
+    CPPUNIT_ASSERT_MESSAGE("The path has to be set all the same", data[0]->GetProperty("path").IsNotNull());
   }
 
 private:

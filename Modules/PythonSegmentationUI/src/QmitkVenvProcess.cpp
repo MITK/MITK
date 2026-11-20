@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkVenvProcess.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkPipPackageInfo.h>
 #include <mitkPostInstallStepProgress.h>
 #include <mitkProgressTask.h>
@@ -99,8 +100,10 @@ QmitkVenvProcess::StepResult QmitkVenvProcess::RunStep(const std::string& venvNa
   QProcess process;
   process.setProcessEnvironment(environment);
 
-  // Created with the first report, so that a step with nothing to do shows nothing.
+  // Created with the first report, so that a step with nothing to do shows
+  // nothing. It belongs to the caller, also when created inside the loop below.
   std::optional<mitk::ProgressTask> task;
+  const auto origin = mitk::ActionOriginScope::GetCurrent();
   constexpr unsigned int PROGRESS_STEPS = 1000;
 
   const auto readOutput = [&]()
@@ -117,7 +120,10 @@ QmitkVenvProcess::StepResult QmitkVenvProcess::RunStep(const std::string& venvNa
       }
 
       if (!task.has_value())
+      {
+        const mitk::ActionOriginScope scope(origin);
         task.emplace(step.displayName, progress->Total > 0 ? PROGRESS_STEPS : mitk::ProgressTask::Indeterminate, true);
+      }
 
       if (progress->Total > 0 && task->GetStepsToDo() > 0)
         task->SetProgress(static_cast<unsigned int>(std::min(progress->Done, progress->Total) * PROGRESS_STEPS / progress->Total));
@@ -155,7 +161,12 @@ QmitkVenvProcess::StepResult QmitkVenvProcess::RunStep(const std::string& venvNa
 
   // A step can end before the loop starts, which then would not see it end.
   if (process.state() != QProcess::NotRunning)
+  {
+    // What the user does meanwhile is the user's, as in the main loop, even if
+    // a REST client runs this step. Work of the client carries its origin.
+    const mitk::ActionOriginScope user("");
     loop.exec();
+  }
 
   cancelTimer.stop();
 

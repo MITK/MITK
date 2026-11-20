@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSegmentationRestRoutes.h"
+#include "QmitkSegmentationView.h"
 
 #include <mitkSegmentationPluginConfig.h>
 
@@ -114,6 +115,17 @@ namespace
   void ShowView(const std::string& path)
   {
     GetPage(path)->ShowView(QString::fromStdString(ViewId), QString(), berry::IWorkbenchPage::VIEW_VISIBLE);
+  }
+
+  /** The Segmentation view, once ShowView() has opened it. */
+  QmitkSegmentationView* GetView(const std::string& path)
+  {
+    auto* view = dynamic_cast<QmitkSegmentationView*>(GetPage(path)->FindView(QString::fromStdString(ViewId)).GetPointer());
+
+    if (view == nullptr)
+      mitk::ThrowRestError("WORKBENCH_NOT_AVAILABLE", "Service Unavailable", "The Segmentation view is not open.", 503, path);
+
+    return view;
   }
 
   nlohmann::json DescribeNode(mitk::DataNode* node, const mitk::IRestServerService& server)
@@ -1088,7 +1100,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "segmentation of that image or null, active_label: value, tool: name or null}. Opens the Segmentation "
     "view if needed and selects there as the user would. A tool needs an image and a segmentation; "
     "changing them ends the active tool, as in the view, and discards results it did not confirm. A node that "
-    "the view does not take is answered with 422 NOT_ACCEPTED and changes nothing. An active_label or tool "
+    "the view does not take is answered with 422 NOT_ACCEPTED and changes nothing. While the view cannot use "
+    "its tools, for example with the segmentation invisible or the render windows not aligned to its slices, "
+    "a tool is answered with 409 TOOLS_NOT_USABLE and the reason. An active_label or tool "
     "that is refused leaves what was applied before it applied. After segmentation: null, "
     "the view selects another segmentation of the image if there is one. Other fields are refused. Returns "
     "{data: session} as GET does.";
@@ -1224,6 +1238,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
           if (tool == nullptr)
             mitk::ThrowRestError("TOOL_NOT_FOUND", "Not Found", "There is no tool \"" + name + "\". GET /api/v1/segmentation/session lists them.", 404, request.Path);
+
+          // The tool manager would make the tool active without setting it up.
+          if (const auto reason = GetView(request.Path)->GetToolsUnusableReason(); !reason.empty())
+            mitk::ThrowRestError("TOOLS_NOT_USABLE", "Conflict", "The tool \"" + name + "\" cannot be activated now. " + reason, 409, request.Path);
 
           if (!toolManager->ActivateTool(toolManager->GetToolID(tool)) || toolManager->GetActiveTool() != tool)
           {

@@ -1222,6 +1222,29 @@ void QmitkSegmentationView::CheckForReferenceVisibilityWarnings() const
   }
 }
 
+std::string QmitkSegmentationView::GetToolsUnusableReason() const
+{
+  if (nullptr == m_Controls)
+    return "The Segmentation view is not set up yet.";
+
+  // The boxes register the clients of the tool manager, so their state is the
+  // gate itself. The overlays only tell why it is closed.
+  if (m_Controls->toolSelectionBox2D->isEnabled() || m_Controls->toolSelectionBox3D->isEnabled())
+    return {};
+
+  if (nullptr == m_RenderWindowPart)
+    return "The render windows are not available, for example while their editor is hidden. Bring the editor to the front first.";
+
+  // Hidden, not invisible: the overlays are invisible while the view is.
+  if (!m_GeometryViolationOverlay->isHidden())
+    return "The render windows are not aligned to the slices of the segmentation. Reinit them on the image of the session alone.";
+
+  if (!m_VisibleSegViolationOverlay->isHidden())
+    return "The segmentation is invisible. Set its visible property to true.";
+
+  return "The Segmentation view needs an image and a segmentation.";
+}
+
 void QmitkSegmentationView::CheckForToolViolations() const
 {
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();

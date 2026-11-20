@@ -629,6 +629,20 @@ namespace
   }
 
   /**
+   * Fails \p job if \p tool is no longer the active tool. A deactivation ends
+   * the work of a tool without a result, and some tools do not record that as
+   * a failure, so their state would read as a run that found nothing.
+   */
+  bool FailIfDeactivated(mitk::RestJob& job, const mitk::Tool* tool)
+  {
+    if (GetToolManager()->GetActiveTool() == tool)
+      return false;
+
+    job.Fail(std::string(tool->GetName()) + " was deactivated while it worked.");
+    return true;
+  }
+
+  /**
    * The labels of the preview of a tool that adds labels, as the confirm adds them: with values that only the
    * confirm gives them, and to the group of the active label, unless the tool transfers all groups of its
    * preview, which then stand for those of the segmentation. With \a measure, they have voxels, volume_ml and
@@ -2456,6 +2470,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           WhenToolIdle(tool, [job, tool, userCreatesGroups]() {
             tool->SetCreateGroupsAsNeeded(userCreatesGroups);
 
+            if (FailIfDeactivated(*job, tool))
+              return;
+
             if (!tool->GetLastErrorMessage().empty())
             {
               job->Fail(tool->GetLastErrorMessage());
@@ -2574,6 +2591,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
             FailJob(*job, error);
             return;
           }
+
+          if (FailIfDeactivated(*job, tool))
+            return;
 
           job->Succeed(DescribeTotalSegmentator(tool, false));
         });
@@ -2800,6 +2820,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           tool->UpdatePreview();
 
           WhenToolIdle(tool, [job, tool]() {
+            if (FailIfDeactivated(*job, tool))
+              return;
+
             if (!tool->LastRunSucceeded())
             {
               job->Fail(tool->GetLastErrorMessage().empty() ? "TotalSegmentator was canceled in the Workbench." : tool->GetLastErrorMessage());

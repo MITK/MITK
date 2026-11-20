@@ -35,6 +35,9 @@ found in the LICENSE file.
  * conversion rescues those. Revisit once std::from_chars for floating-point
  * types is universally available.
  *
+ * A number too large for the floating-point type (e.g. "1e999") becomes
+ * infinity with its sign on every platform.
+ *
  * \ingroup Core
  */
 
@@ -130,6 +133,14 @@ namespace mitk
 
     if (arg.empty() || !stream.eof())
       mitkThrowException(BadLexicalCast) << "Cannot interpret \"" << arg << "\" as a number";
+
+    if constexpr (std::numeric_limits<Target>::has_infinity)
+    {
+      // An overflow sets failbit as well. libstdc++ stores the largest finite
+      // value then (LWG 23), MSVC and libc++ store infinity.
+      if (stream.fail() && (result == std::numeric_limits<Target>::max() || result == std::numeric_limits<Target>::lowest()))
+        return result > 0 ? std::numeric_limits<Target>::infinity() : -std::numeric_limits<Target>::infinity();
+    }
 
     return result;
   }

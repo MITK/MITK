@@ -106,6 +106,10 @@ public:
 
     ConfirmNumberToString(std::numeric_limits<DATATYPE>::infinity(), "inf");
     ConfirmNumberToString(-std::numeric_limits<DATATYPE>::infinity(), "-inf");
+
+    // An overflow, which libstdc++ alone reads as the largest finite value.
+    ConfirmStringToNumber("1e999", std::numeric_limits<DATATYPE>::infinity());
+    ConfirmStringToNumber("-1e999", -std::numeric_limits<DATATYPE>::infinity());
   }
 
   template <typename DATATYPE>
@@ -172,6 +176,7 @@ public:
     // the special values from ConfirmStringValues must work under any locale
     ConfirmStringToNumber("inf", std::numeric_limits<DATATYPE>::infinity());
     ConfirmStringToNumber("-INFINITY", -std::numeric_limits<DATATYPE>::infinity());
+    ConfirmStringToNumber("1e999", std::numeric_limits<DATATYPE>::infinity());
     const auto nan = mitk::LexicalCast<DATATYPE>("nan");
     CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
     ConfirmNumberToString(std::numeric_limits<DATATYPE>::infinity(), "inf");

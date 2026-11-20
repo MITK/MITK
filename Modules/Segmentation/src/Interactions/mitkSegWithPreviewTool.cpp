@@ -920,7 +920,7 @@ void mitk::SegWithPreviewTool::ContinueUpdate()
 {
   auto& pass = *m_UpdatePass;
 
-  while (!pass.Abandoned && pass.NextTimeStep < pass.TimeSteps.size())
+  while (!pass.Abandoned && !pass.Failed && pass.NextTimeStep < pass.TimeSteps.size())
   {
     const auto index = pass.NextTimeStep++;
     const auto timeStep = pass.TimeSteps[index];
@@ -1013,10 +1013,20 @@ void mitk::SegWithPreviewTool::ContinueUpdate()
   if (!pass.Abandoned && !pass.TimeSteps.empty())
   {
     RenderingManager::GetInstance()->RequestUpdateAll();
-    pass.Computed = true;
+    pass.Computed = !pass.Failed;
   }
 
   this->EndUpdate();
+}
+
+void mitk::SegWithPreviewTool::MarkUpdateFailed(std::exception_ptr error)
+{
+  if (m_UpdatePass == nullptr)
+    return;
+
+  m_UpdatePass->Failed = true;
+  m_UpdatePass->Cancelled = m_UpdatePass->Task->IsCancelRequested();
+  m_UpdatePass->Error = DescribeError(error);
 }
 
 void mitk::SegWithPreviewTool::HandleUpdateError(std::exception_ptr error)

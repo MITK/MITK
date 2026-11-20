@@ -481,6 +481,19 @@ namespace mitk
     void RunOffGUIThread(std::function<void()> work, std::function<void(std::exception_ptr)> done);
 
     /**
+     * \brief Ends the running update as failed, for a tool that does not throw its failures.
+     *
+     * For DoUpdatePreview(), or the \p done of its work, when it catches a
+     * failure and reports it its own way instead of through ErrorMessage.
+     * The update then computes no further time steps, and nothing follows it,
+     * like the transfer of a confirmation, which GetLastConfirmationOutcome()
+     * reports as Canceled if the progress task of the update was asked to
+     * stop, else as Failed with the description of \p error. Does nothing
+     * outside an update.
+     */
+    void MarkUpdateFailed(std::exception_ptr error);
+
+    /**
      * \brief Runs a function on the GUI thread, for example to report the progress of work.
      *
      * Callable from any thread. Without a GUI thread poster, \p function runs at once.

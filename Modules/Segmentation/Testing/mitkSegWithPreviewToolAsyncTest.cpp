@@ -116,6 +116,9 @@ namespace
     bool ConfirmCleanUpThrows = false;
     bool Cancelable = false;
 
+    /** Catches what the work throws instead of throwing it, as the tools that report failures their own way. */
+    bool CatchesFailures = false;
+
     bool IsCancelable() const override
     {
       return Cancelable;
@@ -185,6 +188,12 @@ namespace
           ++Dones;
           DoneThread = std::this_thread::get_id();
 
+          if (error != nullptr && CatchesFailures)
+          {
+            this->MarkUpdateFailed(error);
+            return;
+          }
+
           if (error != nullptr)
             std::rethrow_exception(error);
         });
@@ -213,6 +222,8 @@ class mitkSegWithPreviewToolAsyncTestSuite : public mitk::TestFixture
   MITK_TEST(TestFailedConfirmationAfterUpdateIsReported);
   MITK_TEST(TestFailedUpdateOfConfirmationTransfersNothing);
   MITK_TEST(TestCanceledUpdateOfConfirmationTransfersNothing);
+  MITK_TEST(TestCanceledUpdateCaughtByToolTransfersNothing);
+  MITK_TEST(TestFailedUpdateCaughtByToolTransfersNothing);
   MITK_TEST(TestConfirmationWhileUpdatingIsRefused);
   MITK_TEST(TestDeactivationAbandonsUpdate);
   MITK_TEST(TestDeactivationAbandonsConfirmation);
@@ -250,6 +261,42 @@ class mitkSegWithPreviewToolAsyncTestSuite : public mitk::TestFixture
   bool WaitUntilIdle()
   {
     return m_Queue.ProcessUntil([this] { return !m_Tool->IsUpdating(); });
+  }
+
+  /**
+   * Confirms all time steps, which the lazy tool computes first, cancels that
+   * update through the progress service while its work runs, and waits for
+   * the end of the update.
+   */
+  void ConfirmAllTimeStepsAndCancel()
+  {
+    auto* progressService = mitk::CoreServices::GetProgressService();
+    CPPUNIT_ASSERT_MESSAGE("Progress service is registered by the core activator", nullptr != progressService);
+
+    std::atomic<bool> release = false;
+    m_Tool->InWork = [&release] {
+      while (!release)
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+
+    // The filter of a canceled update stops with an exception.
+    m_Tool->Cancelable = true;
+    m_Tool->WorkThrows = true;
+    m_Tool->SetCreateAllTimeSteps(true);
+    m_Tool->ConfirmSegmentation();
+
+    for (const auto& task : progressService->GetActiveTasks())
+    {
+      if (task.Name == m_Tool->GetName())
+        progressService->RequestCancel(task.Id);
+    }
+
+    mitk::CoreServices::Unget(progressService);
+
+    release = true;
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+    m_Queue.ProcessAll();
+    m_Tool->InWork = nullptr;
   }
 
 public:
@@ -460,36 +507,49 @@ public:
     m_Tool->UpdatePreview();
     CPPUNIT_ASSERT(this->WaitUntilIdle());
 
-    auto* progressService = mitk::CoreServices::GetProgressService();
-    CPPUNIT_ASSERT_MESSAGE("Progress service is registered by the core activator", nullptr != progressService);
-
-    std::atomic<bool> release = false;
-    m_Tool->InWork = [&release] {
-      while (!release)
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    };
-
-    // The filter of a canceled update stops with an exception.
-    m_Tool->Cancelable = true;
-    m_Tool->WorkThrows = true;
-    m_Tool->SetCreateAllTimeSteps(true);
-    m_Tool->ConfirmSegmentation();
-
-    for (const auto& task : progressService->GetActiveTasks())
-    {
-      if (task.Name == m_Tool->GetName())
-        progressService->RequestCancel(task.Id);
-    }
-
-    mitk::CoreServices::Unget(progressService);
-
-    release = true;
-    CPPUNIT_ASSERT(this->WaitUntilIdle());
-    m_Queue.ProcessAll();
+    this->ConfirmAllTimeStepsAndCancel();
 
     CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
     CPPUNIT_ASSERT(m_Errors.empty());
     CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Canceled);
+  }
+
+  void TestCanceledUpdateCaughtByToolTransfersNothing()
+  {
+    m_Tool->CatchesFailures = true;
+
+    this->Activate(true);
+    m_Tool->UpdatePreview();
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+
+    this->ConfirmAllTimeStepsAndCancel();
+
+    CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
+    CPPUNIT_ASSERT(m_Errors.empty());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Canceled);
+  }
+
+  void TestFailedUpdateCaughtByToolTransfersNothing()
+  {
+    m_Tool->CatchesFailures = true;
+
+    this->Activate(true);
+    m_Tool->UpdatePreview();
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+
+    m_Tool->WorkThrows = true;
+    m_Tool->SetCreateAllTimeSteps(true);
+    m_Tool->ConfirmSegmentation();
+
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+    m_Queue.ProcessAll();
+
+    // The failed first time step ends the update, the second is not computed.
+    CPPUNIT_ASSERT_EQUAL(2, m_Tool->Updates);
+    CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
+    CPPUNIT_ASSERT(m_Errors.empty());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Failed);
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationError().find("The work failed.") != std::string::npos);
   }
 
   void TestConfirmationWhileUpdatingIsRefused()

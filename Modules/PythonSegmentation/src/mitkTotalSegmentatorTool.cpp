@@ -616,6 +616,8 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
 void mitk::TotalSegmentatorTool::EndFailedRun(std::exception_ptr error, const ProgressTask* task)
 {
+  this->MarkUpdateFailed(error);
+
   // Leave no half-populated preview behind: an empty preview is how the GUI
   // tells a failure apart from a successful run.
   this->RemoveAllPreviewLabels();

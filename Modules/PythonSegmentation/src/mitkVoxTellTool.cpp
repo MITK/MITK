@@ -1047,6 +1047,8 @@ void mitk::VoxTellTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
 
 void mitk::VoxTellTool::EndFailedRun(std::exception_ptr error, const ProgressTask* task)
 {
+  this->MarkUpdateFailed(error);
+
   // Labels without content would let the user confirm nothing, and the
   // preview may be half written.
   this->RemoveAllPreviewLabels();

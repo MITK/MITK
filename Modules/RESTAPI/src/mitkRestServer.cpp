@@ -195,6 +195,17 @@ namespace
     return Name;
   }
 
+  /** Resolved once and only when a request needs it, as it can ask DNS. */
+  const std::string& GetOwnDomainName()
+  {
+    static const std::string Name = []() {
+      itksys::SystemInformation information;
+      return ToLower(information.GetFullyQualifiedDomainName());
+    }();
+
+    return Name;
+  }
+
   /**
    * Why a browser could have sent the request, or an empty string if it
    * could not. Besides the Origin header, which browsers add to requests
@@ -222,7 +233,8 @@ namespace
       const bool isServerHost = !serverHost.empty() && host == ToLower(serverHost);
       const bool isOwnHostName = !GetOwnHostName().empty() && host == GetOwnHostName();
 
-      if (host != "localhost" && !IsIpLiteral(host) && !isServerHost && !isOwnHostName)
+      if (host != "localhost" && !IsIpLiteral(host) && !isServerHost && !isOwnHostName &&
+          (GetOwnDomainName().empty() || host != GetOwnDomainName()))
       {
         return "This endpoint does not accept requests for the host name \"" + host + "\".";
       }

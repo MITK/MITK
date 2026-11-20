@@ -27,6 +27,8 @@ found in the LICENSE file.
 
 #include <httplib.h>
 
+#include <itksys/SystemInformation.hxx>
+
 #include <nlohmann/json.hpp>
 
 #include <vtkCamera.h>
@@ -393,6 +395,10 @@ public:
     const auto sameOrigin = post("Sec-Fetch-Site", "same-origin");
     const auto foreignHost = post("Host", "rebound.example.org:8080");
     const auto localHost = post("Host", "LocalHost:8080");
+
+    // As remote clients in a network address the machine.
+    const auto domainName = itksys::SystemInformation().GetFullyQualifiedDomainName();
+    const auto domainHost = post("Host", domainName + ":8080");
     server.Stop();
 
     CPPUNIT_ASSERT(res != nullptr);
@@ -407,6 +413,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(403, foreignHost->status);
     CPPUNIT_ASSERT(localHost != nullptr);
     CPPUNIT_ASSERT_EQUAL(200, localHost->status);
+    CPPUNIT_ASSERT(domainHost != nullptr);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(domainName, 200, domainHost->status);
   }
 
   void UnknownPathsAreAnsweredWithJson()

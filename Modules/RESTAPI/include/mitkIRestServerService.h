@@ -198,7 +198,8 @@ namespace mitk
      * experimental. Requests that a web page could send are refused: those
      * with an Origin header, with a Sec-Fetch-Site header other than none
      * and same-origin, or with a Host header that names neither localhost,
-     * an IP address, the host of the server nor the host name of the machine.
+     * an IP address, the host of the server nor the host name or fully
+     * qualified domain name of the machine.
      * This keeps web pages from changing state through them. As old browsers
      * send none of these headers with a GET request, GET routes must not
      * change state.

@@ -670,7 +670,7 @@ void QmitkVoxTellToolGUI::OnToolPromptsChanged()
 {
   const auto* tool = this->GetTool();
 
-  if (tool == nullptr)
+  if (tool == nullptr || m_SettingPrompts)
     return;
 
   if (tool->GetPrompts() != this->ReadPrompts())
@@ -913,8 +913,12 @@ void QmitkVoxTellToolGUI::StartRun(const std::vector<std::string>& prompts)
   if (tool == nullptr)
     return;
 
-  tool->SetPrompts(prompts);
+  // The text field keeps prompts that are not part of this run, the ones
+  // VoxTell does not know after "Known prompts only".
+  m_SettingPrompts = true;
   tool->SetCreateGroupsAsNeeded(m_Ui->createGroupsCheckBox->isChecked());
+  tool->SetPrompts(prompts);
+  m_SettingPrompts = false;
 
   this->SetStatus("Segmenting. This can take a while...");
 

@@ -205,6 +205,10 @@ private:
       about the auto-confirmation. */
   bool m_RunPending = false;
 
+  /** Whether this GUI sets the prompts of the tool itself, whose events then
+      must not overwrite what the user entered. */
+  bool m_SettingPrompts = false;
+
   /** The status to show once an auto-confirmation that has to update the
       preview first has ended. */
   std::optional<std::pair<QString, QmitkInfoCard::Severity>> m_PendingConfirmationStatus;

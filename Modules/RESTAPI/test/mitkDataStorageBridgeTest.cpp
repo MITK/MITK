@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkImageGenerator.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkSurface.h>
+#include <mitkTemporoSpatialStringProperty.h>
 #include <mitkVtkPropRenderer.h>
 
 #include <vtkRenderWindow.h>
@@ -195,6 +196,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SingleCharWildcardFilter);
   MITK_TEST(BoolPropertyFilterUsesJsonRepresentation);
   MITK_TEST(NegatedPropertyFilter);
+  MITK_TEST(FiltersReadLatin1AsAnswersShowIt);
   MITK_TEST(TimestampIsInteger);
   MITK_TEST(GetNodeAvailableContexts);
   MITK_TEST(SortByTimestamp);
@@ -2235,6 +2237,33 @@ public:
     result = m_Bridge->GetNodes(params);
     // Should return 0 nodes because "0" doesn't match JSON boolean "false"
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(0), result.nodes.size());
+  }
+
+  void FiltersReadLatin1AsAnswersShowIt()
+  {
+    // As DICOM tags in ISO_IR 100 arrive: Latin-1 bytes, which are no UTF-8.
+    auto node = mitk::DataNode::New();
+    node->SetName("Extremit\xE4ten");
+    node->SetStringProperty("description", "MR untere Extremit\xE4ten");
+    node->SetProperty("DICOM.0008.1030", mitk::TemporoSpatialStringProperty::New("MR untere Extremit\xE4ten"));
+    m_DataStorage->Add(node);
+
+    const auto count = [this](const std::string& key, const std::string& value) {
+      mitk::NodeQueryParams params;
+      params.propertyFilters.push_back({ key, value, false });
+      return m_Bridge->GetNodes(params).nodes.size();
+    };
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), count("name", "Extremit\xC3\xA4ten"));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), count("description", "*Extremit\xC3\xA4ten"));
+
+    // A complex property, which used to fail the whole query.
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), count("DICOM.0008.1030", "*Extremit\xC3\xA4ten*"));
+
+    // The path as the answers show it.
+    mitk::NodeQueryParams byPath;
+    byPath.path = "/Extremit\xC3\xA4ten";
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), m_Bridge->GetNodes(byPath).nodes.size());
   }
 
   void NegatedPropertyFilter()

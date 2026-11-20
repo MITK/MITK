@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkLog.h>
+#include <mitkRestRoute.h>
 
 #include <algorithm>
 #include <regex>
@@ -41,22 +42,21 @@ namespace
    * - JSON string -> the string value
    * - JSON null -> empty string
    * - JSON boolean, number and object/array -> dump() representation
+   *
+   * Text that is no UTF-8, like a DICOM tag in Latin-1, reads as answers
+   * show it (see DumpRestJson()).
    */
   std::string JsonValueToFilterString(const nlohmann::json& json)
   {
-    if (json.is_string())
-    {
-      return json.get<std::string>();
-    }
-    else if (json.is_null())
-    {
+    if (json.is_null())
       return "";
-    }
-    else
-    {
-      // For boolean, numbers and complex types (arrays, objects), use the JSON dump
-      return json.dump();
-    }
+
+    const auto shown = mitk::DumpRestJson(json);
+
+    if (json.is_string())
+      return nlohmann::json::parse(shown).get<std::string>();
+
+    return shown;
   }
 
   mitk::BaseProperty::ConstPointer GetConstProperty(const mitk::DataNode* node, const std::string& propertyKey,
@@ -542,7 +542,7 @@ namespace mitk
       const std::string targetPath = params.path.value();
       auto pathPredicate = NodePredicateFunction::New(
         [this, targetPath](const DataNode* node) -> bool {
-          return this->BuildNodePath(node) == targetPath;
+          return JsonValueToFilterString(this->BuildNodePath(node)) == targetPath;
         });
       predicates.push_back(pathPredicate.GetPointer());
     }
@@ -596,7 +596,7 @@ namespace mitk
           // Handle special fields that aren't stored as properties
           if (propFilter.key == "name")
           {
-            propValue = node->GetName();
+            propValue = JsonValueToFilterString(node->GetName());
           }
           else
           {

@@ -405,6 +405,11 @@ void PlanarFigureMaskGenerator::CalculateMask()
     itk::Image< unsigned short, 3 >::IndexType index;
     imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );
 
+    // The slice would be resliced where the image has no pixels, which gives
+    // the background level of the reslicer as values.
+    if (index[axis] < 0 || index[axis] >= static_cast<itk::IndexValueType>(timePointImage->GetDimension(axis)))
+      mitkThrow() << "The planar figure lies outside the image: its plane cuts no slice of it.";
+
     unsigned int slice = index[axis];
     m_PlanarFigureSlice = slice;
 

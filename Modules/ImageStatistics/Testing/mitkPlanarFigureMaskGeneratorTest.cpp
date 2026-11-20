@@ -88,6 +88,7 @@ class mitkPlanarFigureMaskGeneratorTestSuite : public mitk::TestFixture
   MITK_TEST(Path_CoversEverySegment);
   MITK_TEST(OpenFigure_IsClippedToImage);
   MITK_TEST(OpenFigure_RoundsToNearestVoxel);
+  MITK_TEST(FigureOutsideImage_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -187,6 +188,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(16, static_cast<int>(std::count(onVoxelCenters.begin(), onVoxelCenters.end(), 1)));
     CPPUNIT_ASSERT_MESSAGE("A line below the voxel centers belongs to the nearest row", onVoxelCenters == getLineMask(-0.3));
     CPPUNIT_ASSERT_MESSAGE("A line above the voxel centers belongs to the nearest row", onVoxelCenters == getLineMask(0.3));
+  }
+
+  void FigureOutsideImage_Throws()
+  {
+    // Planes beyond the last and before the first of the three slices.
+    for (const double offset : { 10.0, -5.0 })
+    {
+      auto plane = m_Plane->Clone();
+      auto origin = plane->GetOrigin();
+      origin[2] += offset;
+      plane->SetOrigin(origin);
+
+      auto disc = mitk::PlanarCircle::New();
+      disc->SetPlaneGeometry(plane);
+      disc->SetFromSpan(P(10, 10), P(18, 10));
+
+      CPPUNIT_ASSERT_THROW_MESSAGE("A figure outside the image was measured on the background of the reslicer",
+        CountMaskedPixels(m_Image, disc), mitk::Exception);
+    }
   }
 };
 

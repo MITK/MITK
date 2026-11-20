@@ -29,14 +29,15 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cstdlib>
+#include <memory>
 
 namespace
 {
   /** The scene as it renders now, in RGB32. */
   QImage Capture(QmitkRenderWindow* window, vtkRenderer* renderer, unsigned int magnification)
   {
-    // Also before tiles: mappers that place things by the edges of the
-    // window, like the labels of planar figures, keep what this render decided.
+    // Also before tiles: mappers that place things by the edges of the window,
+    // like the labels of planar figures, keep in tiles what this render decided.
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(window->GetVtkRenderWindow());
 
     if (magnification <= 1)
@@ -55,6 +56,13 @@ namespace
     auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
     magnifier->SetInput(renderer);
     magnifier->SetMagnification(static_cast<int>(magnification));
+
+    // Tells mappers that the renders are tiles, also on the way out by an exception.
+    auto* baseRenderer = window->GetRenderer();
+    baseRenderer->SetTileMagnification(magnification);
+    const std::unique_ptr<mitk::BaseRenderer, void (*)(mitk::BaseRenderer*)> resetMagnification(
+      baseRenderer, [](mitk::BaseRenderer* tiled) { tiled->SetTileMagnification(1); });
+
     magnifier->Update();
 
     auto* output = magnifier->GetOutput();

@@ -309,6 +309,7 @@ mitk::PlanarFigureVtkMapper2D::BuildKey mitk::PlanarFigureVtkMapper2D::GetBuildK
   std::copy_n(camera->GetViewUp(), 3, key.CameraViewUp.begin());
   key.CameraParallelScale = camera->GetParallelScale();
   std::copy_n(camera->GetWindowCenter(), 2, key.CameraWindowCenter.begin());
+  key.TileMagnification = renderer->GetTileMagnification();
   key.ViewportWidth = viewportSize[0];
   key.ViewportHeight = viewportSize[1];
   key.DPI = renderer->GetRenderWindow()->GetDPI();
@@ -362,7 +363,9 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   float logicalLineWidth = 2.0f;
   node->GetFloatProperty("line width", logicalLineWidth, renderer);
 
-  const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer);
+  // Tiles of a magnified image draw everything as much larger as the image is.
+  const auto magnification = renderer->GetTileMagnification();
+  const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer) * magnification;
   const auto lineWidth = logicalLineWidth * scale;
 
   const auto feedback = GetFeedback(node, renderer);
@@ -649,7 +652,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       node->GetIntProperty("font.size", fontSize, renderer);
 
       auto *textProperty = textActor->GetTextProperty();
-      textProperty->SetFontSize(fontSize);
+      textProperty->SetFontSize(fontSize * static_cast<int>(magnification));
       textProperty->SetLineSpacing(Style::LabelLineSpacing);
       textProperty->SetColor(1.0, 1.0, 1.0);
       textProperty->SetOpacity(opacity);
@@ -673,11 +676,10 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       const auto right = (*rightmost)[0] + offset;
       const auto left = (*leftmost)[0] - offset;
 
-      // A magnified image is rendered in tiles, the only renders with a window center other than
-      // (0, 0). A tile would place the label by its own edges, so each tile could put it elsewhere:
-      // tiles keep the placement of the last render of the whole window.
-      const auto *windowCenter = renderer->GetVtkRenderer()->GetActiveCamera()->GetWindowCenter();
-      const bool isTile = 0.0 != windowCenter[0] || 0.0 != windowCenter[1];
+      // A tile of a magnified image would place the label by its own edges, so each tile could put
+      // it elsewhere: tiles keep the placement of the last render of the whole window, which, with
+      // everything magnified alike, is the placement for the whole image as well.
+      const bool isTile = 1 < magnification;
 
       LabelPlacement placement;
 

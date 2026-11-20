@@ -714,6 +714,16 @@ void mitk::BaseRenderer::SetConstrainZoomingAndPanning(bool constrain)
   }
 }
 
+void mitk::BaseRenderer::SetTileMagnification(unsigned int magnification)
+{
+  m_TileMagnification = std::max(1u, magnification);
+}
+
+unsigned int mitk::BaseRenderer::GetTileMagnification() const
+{
+  return m_TileMagnification;
+}
+
 void mitk::BaseRenderer::UpdateCurrentGeometries()
 {
   m_ReferenceGeometryAligned = true;

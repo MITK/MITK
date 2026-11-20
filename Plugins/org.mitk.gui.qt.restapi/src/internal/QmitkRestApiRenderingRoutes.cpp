@@ -17,26 +17,22 @@ found in the LICENSE file.
 #include <QmitkRenderWindowScreenshot.h>
 #include <QmitkStdMultiWidget.h>
 
-#include <mitkCameraController.h>
 #include <mitkErrorResponse.h>
 #include <mitkException.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkIRenderWindowPart.h>
 #include <mitkIRestServerService.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkLabelSetImage.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkPixelTypeMultiplex.h>
 #include <mitkPlanarFigure.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
-#include <mitkRestTime.h>
+#include <mitkRestRendering.h>
 #include <mitkSliceNavigationController.h>
-#include <mitkSliceNavigationHelper.h>
 #include <mitkTimeNavigationController.h>
 
 #include <berryIWorkbench.h>
@@ -44,17 +40,12 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 #include <berryPlatformUI.h>
 
-#include <vtkCamera.h>
-#include <vtkMath.h>
-#include <vtkRenderer.h>
-
 #include <QBuffer>
 #include <QImage>
 #include <QPainter>
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <cstdint>
 #include <limits>
 #include <optional>
@@ -62,8 +53,6 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr int DefaultMaxScreenshotSize = 1000;
-
   /** The editor of the standard display, or nullptr if it is not open. */
   berry::IWorkbenchPart::Pointer FindStdMultiWidgetEditor()
   {
@@ -117,167 +106,47 @@ namespace
   /** Whether the crosshair shows in the 2D windows and in the 3D window, as the render window menus toggle it. */
   nlohmann::json DescribeCrosshair(QmitkStdMultiWidget* multiWidget)
   {
-    const auto isShownIn = [multiWidget](QmitkRenderWindow* window) {
-      const auto* renderer = window->GetRenderer();
-
-      for (const auto& plane : { multiWidget->GetWidgetPlane1(), multiWidget->GetWidgetPlane2(), multiWidget->GetWidgetPlane3() })
-      {
-        if (plane.IsNull() || !plane->IsVisible(renderer))
-          return false;
-      }
-
-      return true;
-    };
-
-    return {
-      { "visible", isShownIn(multiWidget->GetRenderWindow1()) },
-      { "visible_3d", isShownIn(multiWidget->GetRenderWindow4()) }
-    };
+    return mitk::DescribeRestCrosshair(
+      { multiWidget->GetWidgetPlane1().GetPointer(), multiWidget->GetWidgetPlane2().GetPointer(), multiWidget->GetWidgetPlane3().GetPointer() },
+      multiWidget->GetRenderWindow1()->GetRenderer(),
+      multiWidget->GetRenderWindow4()->GetRenderer());
   }
 
   bool Is2D(QmitkRenderWindow* window)
   {
-    return window->GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D;
-  }
-
-  /**
-   * Converts between positions of the stepper and slice indices as the Image
-   * Navigator shows them, which follow the image index. Whether the two run
-   * opposite depends on the orientation of the image. The conversion is its
-   * own inverse.
-   */
-  int ConvertSliceNumber(mitk::BaseRenderer* renderer, int count, int number)
-  {
-    return mitk::SliceNavigationHelper::IsDisplayedSliceInverted(renderer) ? count - 1 - number : number;
+    return mitk::IsRestRenderer2D(window->GetRenderer());
   }
 
   nlohmann::json DescribeWindow(const std::string& id, QmitkRenderWindow* window)
   {
-    auto* renderer = window->GetRenderer();
-
-    nlohmann::json json = {
-      { "id", id },
-      { "kind", Is2D(window) ? "2d" : "3d" },
-      { "size", { renderer->GetSizeX(), renderer->GetSizeY() } },
-      { "timepoint_ms", renderer->GetTime() }
-    };
-
-    if (Is2D(window))
-    {
-      auto* navigation = window->GetSliceNavigationController();
-      const auto* stepper = navigation->GetStepper();
-      const auto count = static_cast<int>(stepper->GetSteps());
-      const auto position = static_cast<int>(stepper->GetPos());
-
-      json["view_direction"] = navigation->GetViewDirectionAsString();
-
-      if (count > 0)
-      {
-        json["slice"] = {
-          { "index", ConvertSliceNumber(renderer, count, position) },
-          { "count", count }
-        };
-      }
-    }
-
-    return json;
-  }
-
-  /**
-   * A query parameter that switches something on or off.
-   *
-   * \throw RestException with status 400 for a value other than true or false.
-   */
-  bool GetQueryFlag(const mitk::RestRequest& request, const std::string& name, bool defaultValue)
-  {
-    const auto value = request.GetQueryParam(name);
-
-    if (!value.has_value())
-      return defaultValue;
-
-    if (*value != "true" && *value != "false")
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(name + " must be true or false.", request.Path));
-
-    return *value == "true";
-  }
-
-  /**
-   * A query parameter that counts pixels.
-   *
-   * \throw RestException with status 400 unless the whole value is a number.
-   */
-  int ParsePixelCount(const std::string& name, const std::string& value, const std::string& path)
-  {
-    std::size_t used = 0;
-    int count = 0;
-
-    try
-    {
-      count = std::stoi(value, &used);
-    }
-    catch (const std::exception&)
-    {
-      used = std::string::npos;
-    }
-
-    if (used != value.size())
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(name + " must be a number of pixels.", path));
-
-    return count;
+    return mitk::DescribeRestWindow(id, window->GetRenderer());
   }
 
   /** The capture options that the query asks for. */
   QmitkRenderWindowScreenshot::Options GetScreenshotOptions(const mitk::RestRequest& request)
   {
+    const auto parsed = mitk::ParseRestScreenshotOptions(request);
+
     QmitkRenderWindowScreenshot::Options options;
-    options.MaxSize = DefaultMaxScreenshotSize;
+    options.MaxSize = parsed.MaxSize;
+    options.Decorations = parsed.Decorations;
+    options.Magnification = parsed.Magnification;
+    options.CropToContent = parsed.CropToContent;
+    options.Padding = parsed.Padding;
 
-    if (const auto value = request.GetQueryParam("max_size"); value.has_value())
-      options.MaxSize = static_cast<unsigned int>(std::clamp(ParsePixelCount("max_size", *value, request.Path), 100, 4000));
-
-    if (const auto background = request.GetQueryParam("background"); background.has_value())
+    switch (parsed.BackgroundMode)
     {
-      const auto color = mitk::ParseRestColor(*background);
+      case mitk::RestScreenshotOptions::Background::AsShown:
+        break;
 
-      if (*background == "transparent")
-      {
+      case mitk::RestScreenshotOptions::Background::Transparent:
         options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Transparent;
-      }
-      else if (color.has_value())
-      {
+        break;
+
+      case mitk::RestScreenshotOptions::Background::Color:
         options.BackgroundMode = QmitkRenderWindowScreenshot::Background::Color;
-        options.BackgroundColor = QColor(QString::fromStdString(*background));
-      }
-      else
-      {
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest(
-          "background must be transparent or a color like #ffffff.", request.Path));
-      }
-    }
-
-    options.Decorations = GetQueryFlag(request, "decorations", options.Decorations);
-
-    if (const auto scale = request.GetQueryParam("scale"); scale.has_value())
-    {
-      if (*scale != "1" && *scale != "2" && *scale != "3" && *scale != "4")
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("scale must be 1, 2, 3 or 4.", request.Path));
-
-      options.Magnification = static_cast<unsigned int>(std::stoi(*scale));
-    }
-
-    options.CropToContent = GetQueryFlag(request, "crop", false);
-
-    if (const auto padding = request.GetQueryParam("padding"); padding.has_value())
-    {
-      if (!options.CropToContent)
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding needs crop=true.", request.Path));
-
-      const auto value = ParsePixelCount("padding", *padding, request.Path);
-
-      if (value < 0 || 2 * value >= static_cast<int>(options.MaxSize))
-        throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("padding must be 0 or more and less than half of max_size.", request.Path));
-
-      options.Padding = static_cast<unsigned int>(value);
+        options.BackgroundColor = QColor(QString::fromStdString(mitk::ToRestColor(parsed.BackgroundColor)));
+        break;
     }
 
     return options;
@@ -294,27 +163,27 @@ namespace
     const QColor faint(255, 255, 0, 40);
     const QColor label(255, 255, 0, 220);
 
-    for (int x = 50; x < image.width(); x += 50)
+    for (const auto& line : mitk::GetRestGridLines(image.width()))
     {
       painter.setPen(faint);
-      painter.drawLine(x, 0, x, image.height());
+      painter.drawLine(line.Position, 0, line.Position, image.height());
 
-      if (x % 100 == 0)
+      if (line.Labeled)
       {
         painter.setPen(label);
-        painter.drawText(x + 2, 12, QString::number(x));
+        painter.drawText(line.Position + 2, 12, QString::number(line.Position));
       }
     }
 
-    for (int y = 50; y < image.height(); y += 50)
+    for (const auto& line : mitk::GetRestGridLines(image.height()))
     {
       painter.setPen(faint);
-      painter.drawLine(0, y, image.width(), y);
+      painter.drawLine(0, line.Position, image.width(), line.Position);
 
-      if (y % 100 == 0)
+      if (line.Labeled)
       {
         painter.setPen(label);
-        painter.drawText(2, y - 2, QString::number(y));
+        painter.drawText(2, line.Position - 2, QString::number(line.Position));
       }
     }
   }
@@ -326,17 +195,8 @@ namespace
    */
   mitk::TimeStepType GetSelectedTimeStep(const mitk::DataNode* node, const std::string& path)
   {
-    mitk::RestTimeSelection selection;
-    selection.TimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    const auto timeSteps = selection.GetTimeSteps(node->GetData());
-
-    if (timeSteps.empty())
-    {
-      throw mitk::RestException(mitk::ErrorResponse::Create("NO_DATA_AT_TIME_POINT", "Unprocessable Content",
-        "\"" + node->GetName() + "\" has no data at the selected time point, " + std::to_string(selection.TimePoint) + " ms.", 422, path));
-    }
-
-    return timeSteps.front();
+    return mitk::GetRestTimeStep(
+      node, mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint(), path);
   }
 
   /** The corners of the box around the voxels of the labels, in world coordinates; empty if they have none. */
@@ -409,145 +269,6 @@ namespace
     return corners;
   }
 
-  mitk::Point3D GetCenter(const std::vector<mitk::Point3D>& corners)
-  {
-    mitk::Point3D lower = corners.front();
-    mitk::Point3D upper = corners.front();
-
-    for (const auto& corner : corners)
-    {
-      for (int axis = 0; axis < 3; ++axis)
-      {
-        lower[axis] = std::min(lower[axis], corner[axis]);
-        upper[axis] = std::max(upper[axis], corner[axis]);
-      }
-    }
-
-    mitk::Point3D center;
-
-    for (int axis = 0; axis < 3; ++axis)
-      center[axis] = (lower[axis] + upper[axis]) / 2.0;
-
-    return center;
-  }
-
-  /** Shows the slice through the center of the corners and zooms so that they fill the window. */
-  void Focus2D(QmitkRenderWindow* window, const std::vector<mitk::Point3D>& corners, double margin)
-  {
-    window->GetSliceNavigationController()->SelectSliceByPoint(GetCenter(corners));
-
-    auto* renderer = window->GetRenderer();
-    const auto* plane = renderer->GetCurrentWorldPlaneGeometry();
-
-    mitk::Point2D lower;
-    plane->Map(corners.front(), lower);
-    mitk::Point2D upper = lower;
-
-    for (const auto& corner : corners)
-    {
-      mitk::Point2D point;
-      plane->Map(corner, point);
-
-      for (int axis = 0; axis < 2; ++axis)
-      {
-        lower[axis] = std::min(lower[axis], point[axis]);
-        upper[axis] = std::max(upper[axis], point[axis]);
-      }
-    }
-
-    const auto viewport = renderer->GetViewportSize();
-    const auto millimetersPerPixel = (1.0 + margin) *
-      std::max((upper[0] - lower[0]) / std::max(viewport[0], 1), (upper[1] - lower[1]) / std::max(viewport[1], 1));
-
-    mitk::Point2D center;
-    center[0] = (lower[0] + upper[0]) / 2.0;
-    center[1] = (lower[1] + upper[1]) / 2.0;
-
-    // Corners that coincide in the plane, like those of a line that runs through it, give no
-    // zoom: a scale of zero would blank the window and leave its mouse zoom without effect.
-    if (millimetersPerPixel > 0.0)
-      renderer->GetCameraController()->SetScaleFactorInMMPerDisplayUnit(millimetersPerPixel);
-
-    renderer->GetCameraController()->MoveCameraToPoint(center);
-  }
-
-  /** Keeps the direction of the camera and moves it so that the corners fill the window. */
-  void Focus3D(QmitkRenderWindow* window, const std::vector<mitk::Point3D>& corners, double margin)
-  {
-    auto* renderer = window->GetRenderer()->GetVtkRenderer();
-    auto* camera = renderer->GetActiveCamera();
-    const auto center = GetCenter(corners);
-
-    double direction[3];
-    camera->GetDirectionOfProjection(direction);
-
-    double up[3];
-    camera->GetViewUp(up);
-
-    double right[3];
-    vtkMath::Cross(direction, up, right);
-    vtkMath::Normalize(right);
-    vtkMath::Cross(right, direction, up);
-    vtkMath::Normalize(up);
-
-    const auto* size = renderer->GetSize();
-    const auto aspect = size[1] > 0 ? static_cast<double>(size[0]) / size[1] : 1.0;
-
-    // Lateral extents of the corners and their depth toward the camera, around the center.
-    double extent = 0.0;
-    double distance = 0.0;
-
-    const auto halfAngle = std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()) / 2.0);
-    const auto tanVertical = camera->GetUseHorizontalViewAngle() ? halfAngle / aspect : halfAngle;
-    const auto tanHorizontal = tanVertical * aspect;
-
-    for (const auto& corner : corners)
-    {
-      const double offset[3] = { corner[0] - center[0], corner[1] - center[1], corner[2] - center[2] };
-      const auto x = std::abs(vtkMath::Dot(offset, right)) * (1.0 + margin);
-      const auto y = std::abs(vtkMath::Dot(offset, up)) * (1.0 + margin);
-      const auto depth = -vtkMath::Dot(offset, direction);
-
-      extent = std::max({ extent, y, x / aspect });
-      distance = std::max({ distance, depth + y / tanVertical, depth + x / tanHorizontal });
-    }
-
-    // Corners that coincide give neither a scale nor a distance, so the camera keeps its own.
-    if (camera->GetParallelProjection() && extent > 0.0)
-      camera->SetParallelScale(extent);
-
-    if (camera->GetParallelProjection() || distance <= 0.0)
-      distance = camera->GetDistance();
-
-    camera->SetFocalPoint(center[0], center[1], center[2]);
-    camera->SetPosition(center[0] - direction[0] * distance, center[1] - direction[1] * distance, center[2] - direction[2] * distance);
-    camera->SetViewUp(up);
-    renderer->ResetCameraClippingRange();
-  }
-
-  std::optional<double> GetImageValue(const mitk::Image* image, const mitk::Point3D& point, mitk::TimePointType timePoint)
-  {
-    const auto* timeGeometry = image->GetTimeGeometry();
-
-    if (!timeGeometry->IsValidTimePoint(timePoint) || image->GetDimension() < 3)
-      return std::nullopt;
-
-    const auto timeStep = timeGeometry->TimePointToTimeStep(timePoint);
-    const auto* geometry = image->GetGeometry(timeStep);
-
-    if (!geometry->IsInside(point))
-      return std::nullopt;
-
-    itk::Index<3> index;
-    geometry->WorldToIndex(point, index);
-
-    mitk::ScalarType value = 0;
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess, image->GetChannelDescriptor().GetPixelType(),
-      mitk::Image::ConstPointer(image), image->GetVolumeData(timeStep), index, value, 0);
-
-    return value;
-  }
-
   /** The gray values and labels under a point, in the data that a window shows. */
   nlohmann::json DescribeData(const mitk::Point3D& point, mitk::BaseRenderer* renderer,
     const mitk::DataStorage* dataStorage, const mitk::IRestServerService* server)
@@ -576,7 +297,7 @@ namespace
 
         for (unsigned int group = 0; group < segmentation->GetNumberOfGroups(); ++group)
         {
-          const auto value = GetImageValue(segmentation->GetGroupImage(group), point, timePoint);
+          const auto value = mitk::GetRestImageValue(segmentation->GetGroupImage(group), point, timePoint);
 
           if (!value.has_value() || *value == 0)
             continue;
@@ -590,7 +311,7 @@ namespace
       }
       else if (const auto* image = dynamic_cast<const mitk::Image*>(node->GetData()); image != nullptr)
       {
-        const auto value = GetImageValue(image, point, timePoint);
+        const auto value = mitk::GetRestImageValue(image, point, timePoint);
 
         if (!value.has_value())
           continue;
@@ -672,7 +393,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
           std::to_string(count - 1) + ".", 422, request.Path));
       }
 
-      stepper->SetPos(static_cast<unsigned int>(ConvertSliceNumber(window->GetRenderer(), count, static_cast<int>(index))));
+      stepper->SetPos(static_cast<unsigned int>(mitk::ConvertRestSliceNumber(window->GetRenderer(), count, static_cast<int>(index))));
       return DescribeWindow(id, window);
     }));
   };
@@ -815,9 +536,9 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
       }
 
       if (Is2D(window))
-        Focus2D(window, corners, margin);
+        mitk::FocusRestRenderer2D(window->GetRenderer(), corners, margin);
       else
-        Focus3D(window, corners, margin);
+        mitk::FocusRestRenderer3D(window->GetRenderer(), corners, margin);
 
       RenderingManager::GetInstance()->RequestUpdate(window->GetVtkRenderWindow());
       return DescribeWindow(id, window);
@@ -976,7 +697,7 @@ std::vector<mitk::RestRoute> mitk::CreateRenderingRoutes(IRestServerService* ser
     "either. They answer 409 VIEW_CHANGED if the view has changed since, for example by scrolling, zooming or "
     "another time point: take a new screenshot then.";
   screenshot.Handler = [server](const RestRequest& request) {
-    const bool grid = GetQueryFlag(request, "grid", false);
+    const bool grid = mitk::GetRestQueryFlag(request, "grid", false);
     const auto options = GetScreenshotOptions(request);
     const auto& id = request.PathParams.at("id");
 

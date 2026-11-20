@@ -5,8 +5,10 @@ set(H_FILES
   include/mitkRestHelpers.h
   include/mitkRestJob.h
   include/mitkRestPoints.h
+  include/mitkRestRendering.h
   include/mitkRestRoute.h
   include/mitkRestTime.h
+  include/mitkRestWorkbench.h
 )
 
 set(CPP_FILES
@@ -15,9 +17,11 @@ set(CPP_FILES
   mitkRestHelpers.cpp
   mitkRestJob.cpp
   mitkRestPoints.cpp
+  mitkRestRendering.cpp
   mitkRestRoute.cpp
   mitkRestRouter.cpp
   mitkRestTime.cpp
+  mitkRestWorkbench.cpp
   mitkRestServer.cpp
   mitkRestStopGate.cpp
   mitkDataStorageBridge.cpp

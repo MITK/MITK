@@ -47,6 +47,8 @@ class QmitkHtmlWidgetSvgCheckTestSuite : public mitk::TestFixture
   MITK_TEST(TestMessageNamesTheSvgThatIsBad);
   MITK_TEST(TestNestedSvgCountsAsPartOfTheOutermost);
   MITK_TEST(TestOtherElementsAreNoSvg);
+  MITK_TEST(TestSvgOutOfLowerCaseIsRefused);
+  MITK_TEST(TestUnclosedSvgIsRefused);
   CPPUNIT_TEST_SUITE_END();
 
   static void AssertDrawable(const QString &html)
@@ -210,13 +212,35 @@ public:
 
   void TestOtherElementsAreNoSvg()
   {
-    // Another element name, a case that XML does not match, and an attribute value that holds a '>'.
+    // Other element names, and an attribute value that holds a '>'.
     AssertDrawable(Page(QStringLiteral("<svg-icon><image href=\"C:\\x.png\"></svg-icon>")));
-    AssertDrawable(Page(QStringLiteral("<SVG><image href=\"C:\\x.png\"/></SVG>")));
     AssertDrawable(Page(QStringLiteral("<svgx>&plusmn;</svgx>")));
 
     AssertDrawable(Page(QStringLiteral("<svg data-note=\"a > b\"><rect/></svg>")));
     AssertRefused(Page(QStringLiteral("<svg data-note=\"a > b\"><image href=\"C:\\x.png\"/></svg>")), 1, QStringLiteral("href=\"C:\\x.png\""));
+  }
+
+  void TestSvgOutOfLowerCaseIsRefused()
+  {
+    // HTML takes these for svg, the XML they become does not, so they would draw nothing.
+    for (const auto &html : { QStringLiteral("<SVG><rect/></SVG>"), QStringLiteral("<Svg width=\"1\"><rect/></Svg>"),
+                              Svg(QStringLiteral("<rect/>")) + QStringLiteral("<SVG/>") })
+    {
+      const auto problem = QmitkHtmlWidget::FindUndrawableSvg(Page(html));
+      CPPUNIT_ASSERT_MESSAGE("Expected a problem for: " + html.toStdString(),
+                             problem.startsWith(QStringLiteral("An inline svg cannot be drawn, as its element is written ")));
+    }
+  }
+
+  void TestUnclosedSvgIsRefused()
+  {
+    const auto good = Svg(QStringLiteral("<rect/>"));
+
+    AssertRefused(Page(QStringLiteral("<svg width=\"1\"><rect/>")), 1, QStringLiteral("it is not closed with </svg>"));
+    AssertRefused(Page(good + QStringLiteral("<p>between</p><svg><rect/>")), 2, QStringLiteral("it is not closed with </svg>"));
+
+    // An inner svg that is closed does not close the outer one.
+    AssertRefused(Page(QStringLiteral("<svg><svg><rect/></svg>")), 1, QStringLiteral("it is not closed with </svg>"));
   }
 };
 

@@ -56,7 +56,8 @@ public:
    * \brief Tells why the first inline &lt;svg&gt; of an HTML text that the widget cannot draw is not drawn.
    *
    * The widget draws an inline SVG as an SVG document, which must be well-formed
-   * XML, unlike in a browser, and must refer to nothing but its own elements.
+   * XML, unlike in a browser, with its tags in lower case and closed, and must
+   * refer to nothing but its own elements.
    *
    * \return A message that counts the inline svg elements from 1 and names the
    *         reason, or an empty string if every one can be drawn.

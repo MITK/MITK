@@ -289,7 +289,31 @@ namespace
     qsizetype Start;
     qsizetype End;
     QString OpenTag;
+
+    /** \brief False for an element without its end tag, which runs to the end of the text. */
+    bool Closed = true;
   };
+
+  /**
+   * \brief The name of the first svg tag that is not written in lower case,
+   *        like SVG, which is no svg element to the XML it becomes.
+   */
+  QString FindMiscasedSvgName(const QString &html)
+  {
+    static const QRegularExpression tag(QStringLiteral("</?(svg)(?=[\\s/>])"), QRegularExpression::CaseInsensitiveOption);
+
+    auto tags = tag.globalMatch(html);
+
+    while (tags.hasNext())
+    {
+      const auto name = tags.next().captured(1);
+
+      if (name != QStringLiteral("svg"))
+        return name;
+    }
+
+    return QString();
+  }
 
   /** \brief The outermost &lt;svg&gt; elements of an HTML text, in order. */
   std::vector<InlineSvg> FindInlineSvg(const QString &html)
@@ -341,6 +365,9 @@ namespace
       result.push_back({ start, tag.capturedEnd(), openTag });
     }
 
+    if (depth > 0)
+      result.push_back({ start, html.size(), openTag, false });
+
     return result;
   }
 
@@ -379,6 +406,9 @@ namespace
    */
   QString replaceInlineSvg(const QString &html)
   {
+    if (const auto name = FindMiscasedSvgName(html); !name.isEmpty())
+      qWarning("QmitkHtmlWidget: an inline SVG is not shown, as its element is written %s instead of svg.", qUtf8Printable(name));
+
     const auto svgs = FindInlineSvg(html);
 
     if (svgs.empty())
@@ -389,6 +419,12 @@ namespace
 
     for (const auto &svg : svgs)
     {
+      if (!svg.Closed)
+      {
+        qWarning("QmitkHtmlWidget: an inline SVG is not shown, as it is not closed with </svg>.");
+        break;
+      }
+
       result += QStringView(html).mid(copied, svg.Start - copied);
       result += svgAsImage(svg.OpenTag, html.mid(svg.Start, svg.End - svg.Start));
       copied = svg.End;
@@ -401,11 +437,18 @@ namespace
 
 QString QmitkHtmlWidget::FindUndrawableSvg(const QString &html)
 {
+  if (const auto name = FindMiscasedSvgName(html); !name.isEmpty())
+    return QStringLiteral("An inline svg cannot be drawn, as its element is written %1 instead of svg.").arg(name);
+
   const auto svgs = FindInlineSvg(html);
 
   for (std::size_t i = 0; i < svgs.size(); ++i)
   {
     const auto &svg = svgs[i];
+
+    if (!svg.Closed)
+      return QStringLiteral("Inline svg %1 cannot be drawn, as it is not closed with </svg>.").arg(i + 1);
+
     const auto document = AsSvgDocument(svg.OpenTag, html.mid(svg.Start, svg.End - svg.Start));
     const auto problem = FindSvgProblem(document.toUtf8());
 

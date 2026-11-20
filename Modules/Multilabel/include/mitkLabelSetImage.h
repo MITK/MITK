@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <cstdint>
 #include <map>
 #include <shared_mutex>
+#include <mitkExceptionMacro.h>
 #include <mitkImage.h>
 #include <mitkLabel.h>
 #include <mitkLookupTable.h>
@@ -27,6 +28,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Thrown when a segmentation has no label value left for a further label. */
+  class LabelValuesExhaustedException : public Exception
+  {
+  public:
+    mitkExceptionClassMacro(LabelValuesExhaustedException, Exception);
+  };
+
   /** \brief MultiLabelSegmentation class for handling labels and layers in a segmentation session.
   *
   * Events that are potentially sent by the class in regard to groups or labels:
@@ -261,6 +269,7 @@ namespace mitk
      * image. Only the label value if it has at most one component at the time step.
      * \pre labelValue must exist.
      * \pre t must be a valid time step.
+     * \throw LabelValuesExhaustedException if the segmentation cannot hold the new instances.
      */
     LabelValueVectorType SplitLabelIntoConnectedComponents(LabelValueType labelValue, TimeStepType t);
 
@@ -439,7 +448,7 @@ namespace mitk
     * before adding it.
     * \return A label value currently not in use: the one after the highest value in use, or, if that is
     * the highest possible value, the lowest unused one.
-    * \remark is no unused label value can be provided an exception will be thrown.*/
+    * \throw LabelValuesExhaustedException if every label value is in use.*/
     LabelValueType GetUnusedLabelValue() const;
 
     itkGetConstMacro(UnlabeledLabelLock, bool);

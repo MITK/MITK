@@ -693,6 +693,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (group >= segmentation->GetNumberOfGroups())
         mitk::ThrowRestError("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(group) + ".", 404, request.Path);
 
+      // Value 0 is no label, so this many labels use every value.
+      if (segmentation->GetTotalNumberOfLabels() >= Label::MAX_LABEL_VALUE)
+        mitk::ThrowRestError("TOO_MANY_LABELS", "Conflict", "The segmentation cannot hold another label.", 409, request.Path);
+
       auto label = LabelSetImageHelper::CreateNewLabel(segmentation);
 
       if (body.contains("name"))
@@ -813,7 +817,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "the time point to split, the selected time point without it; other time steps stay with the label. "
     "Undoable. Returns {data: [label]}, the label and its new instances, largest first, as GET .../labels gives "
     "them without measure, so without their voxels, volumes and centers, which GET .../labels?measure=true tells; "
-    "only the label if it has no separate parts.";
+    "only the label if it has no separate parts. Status 409 TOO_MANY_LABELS if the segmentation cannot hold the "
+    "new instances.";
   splitLabel.Handler = [server](const RestRequest& request) {
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
@@ -837,7 +842,16 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       const auto name = label->GetName();
       SegGroupModifyUndoRedoHelper undoRedo(segmentation, { segmentation->GetGroupIndexOfLabel(label->GetValue()) },
         false, timeSteps.front(), false, false, true);
-      const auto values = segmentation->SplitLabelIntoConnectedComponents(label->GetValue(), timeSteps.front());
+      MultiLabelSegmentation::LabelValueVectorType values;
+
+      try
+      {
+        values = segmentation->SplitLabelIntoConnectedComponents(label->GetValue(), timeSteps.front());
+      }
+      catch (const LabelValuesExhaustedException& e)
+      {
+        mitk::ThrowRestError("TOO_MANY_LABELS", "Conflict", e.GetDescription(), 409, request.Path);
+      }
 
       if (1 < values.size())
         undoRedo.RegisterUndoRedoOperationEvent("Split label \"" + name + "\" into " + std::to_string(values.size()) + " instances");
@@ -1003,7 +1017,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "result was computed, which takes as long as that many runs, the confirm runs as a job: query parameter "
     "wait (seconds) waits for it, and the job's result is the answer. If that computation fails, is canceled in "
     "the Workbench, or the tool is deactivated meanwhile, nothing is confirmed: the confirm answers 500 "
-    "CONFIRM_FAILED, or its job fails, with the reason.";
+    "CONFIRM_FAILED, or its job fails, with the reason. A result whose labels the segmentation cannot hold "
+    "next to its own (at most 65535) answers 409 TOO_MANY_LABELS, with nothing confirmed.";
   confirm.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     const bool allTimeSteps = body.value("all_time_steps", false);
@@ -1053,6 +1068,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       try
       {
         tool->ConfirmSegmentation();
+      }
+      catch (const LabelValuesExhaustedException& e)
+      {
+        // Thrown before anything is transferred.
+        restoreOptions();
+        mitk::ThrowRestError("TOO_MANY_LABELS", "Conflict",
+          std::string("The segmentation cannot hold the labels of the result: ") + e.GetDescription(), 409, request.Path);
       }
       catch (...)
       {

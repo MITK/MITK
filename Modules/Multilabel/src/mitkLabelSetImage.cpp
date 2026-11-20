@@ -1004,7 +1004,7 @@ mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation:
   const auto instanceCount = componentsBySize.size() - 1;
 
   if (this->GetTotalNumberOfLabels() + instanceCount > Label::MAX_LABEL_VALUE)
-    mitkThrow() << "Cannot split label " << labelValue << ". The segmentation cannot hold " << instanceCount << " more labels.";
+    mitkThrowException(LabelValuesExhaustedException) << "Cannot split label " << labelValue << ". The segmentation cannot hold " << instanceCount << " more labels.";
 
   // Observers of the added labels may read the group image, so all labels are added before the write accessor exists.
   for (std::size_t i = 1; i < componentsBySize.size(); ++i)
@@ -1162,7 +1162,7 @@ mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation::GetUn
     ++candidate;
   }
 
-  mitkThrow() << "The segmentation has no unused label value.";
+  mitkThrowException(LabelValuesExhaustedException) << "The segmentation has no unused label value.";
 }
 
 mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)

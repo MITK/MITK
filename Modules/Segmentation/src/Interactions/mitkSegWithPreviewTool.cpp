@@ -623,7 +623,7 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
       while (takenValues.count(candidate) != 0)
       {
         if (candidate == Label::MAX_LABEL_VALUE)
-          mitkThrow() << "The segmentation has no unused label value.";
+          mitkThrowException(LabelValuesExhaustedException) << "The segmentation has no unused label value.";
 
         ++candidate;
       }

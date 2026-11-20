@@ -33,6 +33,120 @@ namespace
 
     return text;
   }
+
+  /** The length of the valid UTF-8 sequence at the position, or 0 if none starts there. */
+  std::size_t GetUtf8SequenceLength(const std::string& text, std::size_t position)
+  {
+    const auto byte = [&text](std::size_t i) { return static_cast<unsigned char>(text[i]); };
+    const auto lead = byte(position);
+
+    if (lead < 0x80)
+      return 1;
+
+    std::size_t length = 0;
+    unsigned char low = 0x80;
+    unsigned char high = 0xBF;
+
+    // The bounds of the second byte rule out overlong forms, surrogates and code points above U+10FFFF.
+    if (lead >= 0xC2 && lead <= 0xDF)
+    {
+      length = 2;
+    }
+    else if (lead >= 0xE0 && lead <= 0xEF)
+    {
+      length = 3;
+      low = lead == 0xE0 ? 0xA0 : 0x80;
+      high = lead == 0xED ? 0x9F : 0xBF;
+    }
+    else if (lead >= 0xF0 && lead <= 0xF4)
+    {
+      length = 4;
+      low = lead == 0xF0 ? 0x90 : 0x80;
+      high = lead == 0xF4 ? 0x8F : 0xBF;
+    }
+    else
+    {
+      return 0;
+    }
+
+    if (position + length > text.size() || byte(position + 1) < low || byte(position + 1) > high)
+      return 0;
+
+    for (std::size_t i = 2; i < length; ++i)
+    {
+      if (byte(position + i) < 0x80 || byte(position + i) > 0xBF)
+        return 0;
+    }
+
+    return length;
+  }
+
+  /** The text with every byte that is no part of a valid UTF-8 sequence read as Latin-1. */
+  std::string ReadInvalidUtf8AsLatin1(const std::string& text)
+  {
+    std::string result;
+    result.reserve(text.size() + text.size() / 4);
+
+    for (std::size_t position = 0; position < text.size();)
+    {
+      if (const auto length = GetUtf8SequenceLength(text, position); length > 0)
+      {
+        result.append(text, position, length);
+        position += length;
+        continue;
+      }
+
+      const auto byte = static_cast<unsigned char>(text[position++]);
+      result += static_cast<char>(0xC0 | (byte >> 6));
+      result += static_cast<char>(0x80 | (byte & 0x3F));
+    }
+
+    return result;
+  }
+
+  nlohmann::json ReadInvalidUtf8AsLatin1(const nlohmann::json& json)
+  {
+    if (json.is_string())
+      return ReadInvalidUtf8AsLatin1(json.get_ref<const std::string&>());
+
+    if (json.is_array())
+    {
+      auto result = nlohmann::json::array();
+
+      for (const auto& item : json)
+        result.push_back(ReadInvalidUtf8AsLatin1(item));
+
+      return result;
+    }
+
+    if (json.is_object())
+    {
+      auto result = nlohmann::json::object();
+
+      for (const auto& [key, value] : json.items())
+        result[ReadInvalidUtf8AsLatin1(key)] = ReadInvalidUtf8AsLatin1(value);
+
+      return result;
+    }
+
+    return json;
+  }
+}
+
+std::string mitk::DumpRestJson(const nlohmann::json& json)
+{
+  try
+  {
+    return json.dump();
+  }
+  catch (const nlohmann::json::type_error& e)
+  {
+    // 316: a string is not valid UTF-8. Only then is the copy worth making.
+    if (e.id != 316)
+      throw;
+
+    return ReadInvalidUtf8AsLatin1(json).dump();
+  }
 }
 
 void mitk::RestRequest::SetTarget(const std::string& target)
@@ -103,7 +217,7 @@ mitk::RestResponse mitk::RestResponse::FromData(const nlohmann::json& data, int 
   RestResponse response;
   response.Status = status;
   response.ContentType = "application/json";
-  response.Body = nlohmann::json{ { "data", data } }.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
+  response.Body = DumpRestJson(nlohmann::json{ { "data", data } });
   return response;
 }
 
@@ -121,7 +235,7 @@ mitk::RestResponse mitk::RestResponse::FromError(const nlohmann::json& error)
       response.Status = status.get<int>();
   }
   response.ContentType = "application/json";
-  response.Body = error.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
+  response.Body = DumpRestJson(error);
   return response;
 }
 
@@ -146,7 +260,7 @@ bool mitk::RestResponse::HasJsonBody() const
 }
 
 mitk::RestException::RestException(const nlohmann::json& error)
-  : std::runtime_error(error.contains("error") ? error["error"].value("message", std::string()) : error.dump()),
+  : std::runtime_error(error.contains("error") ? error["error"].value("message", std::string()) : DumpRestJson(error)),
     m_Error(error)
 {
 }

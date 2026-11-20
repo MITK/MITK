@@ -67,6 +67,7 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutNodeProperties);
   MITK_TEST(RefusedPropertyValuesTellTheReason);
   MITK_TEST(PutOfTheListWithARefusedValueChangesNothing);
+  MITK_TEST(PropertiesInLatin1KeepTheirCharacters);
   // Special character tests (percent-encoding)
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
@@ -488,6 +489,26 @@ public:
   }
 
   // ===== Property tests =====
+
+  void PropertiesInLatin1KeepTheirCharacters()
+  {
+    // As DICOM tags in ISO_IR 100 arrive: Latin-1 bytes, which are no UTF-8.
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetStringProperty("DICOM.0008.1030", "MR untere Extremit\xE4ten");
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", "", {{"uid", uid}});
+    httplib::Response res;
+
+    m_Controller->HandleGET_nodes_uid_properties(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("MR untere Extremit\xC3\xA4ten"), json["data"]["properties"]["DICOM.0008.1030"].get<std::string>());
+  }
 
   void GetNodeProperties()
   {

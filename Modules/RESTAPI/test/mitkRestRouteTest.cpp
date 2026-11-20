@@ -271,6 +271,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(DataStorageIsAvailableWhileARequestWaitsForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(RestColorsAreParsedAndFormatted);
+  MITK_TEST(TextThatIsNoUtf8IsReadAsLatin1);
   MITK_TEST(PixelsNeedTheViewStateOfTheirScreenshot);
   MITK_TEST(PixelsMapOntoTheWindowOfTheirScreenshot);
   MITK_TEST(PixelsAreRefusedWhereTheyDoNotMapOntoThePlane);
@@ -1195,6 +1196,28 @@ private:
   }
 
 public:
+
+  void TextThatIsNoUtf8IsReadAsLatin1()
+  {
+    const auto text = [](const nlohmann::json& json) { return nlohmann::json::parse(mitk::DumpRestJson(json)); };
+
+    // Valid UTF-8 stays as it is, also where it would read as Latin-1 bytes.
+    CPPUNIT_ASSERT_EQUAL(std::string("Gr\xC3\xB6\xC3\x9F" "e \xE2\x9C\x93"), text("Gr\xC3\xB6\xC3\x9F" "e \xE2\x9C\x93").get<std::string>());
+
+    // Latin-1, alone, next to UTF-8, at the end, in keys and nested values.
+    CPPUNIT_ASSERT_EQUAL(std::string("Extremit\xC3\xA4ten"), text("Extremit\xE4ten").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("\xC3\xA4\xC3\xA4"), text("\xC3\xA4\xE4").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Stra\xC3\x9F" "e"), text("Stra\xDF" "e").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("\xC3\xBC"), text("\xFC").get<std::string>());
+
+    const auto nested = text({ { "M\xFC" "ller", { { "a", nlohmann::json::array({ "\xE9t\xE9", 1 }) } } } });
+    CPPUNIT_ASSERT(nested.contains("M\xC3\xBC" "ller"));
+    CPPUNIT_ASSERT_EQUAL(std::string("\xC3\xA9t\xC3\xA9"), nested["M\xC3\xBC" "ller"]["a"][0].get<std::string>());
+
+    // Answers of routes take the same way.
+    const auto response = mitk::RestResponse::FromData({ { "name", "Extremit\xE4ten" } });
+    CPPUNIT_ASSERT_EQUAL(std::string("Extremit\xC3\xA4ten"), nlohmann::json::parse(response.Body)["data"]["name"].get<std::string>());
+  }
 
   void RestColorsAreParsedAndFormatted()
   {

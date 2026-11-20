@@ -107,7 +107,7 @@ namespace
 
     // The tool results may contain arbitrary bytes from widget texts, so
     // replace invalid UTF-8 instead of throwing.
-    response.Body = body.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
+    response.Body = mitk::DumpRestJson(body);
     return response;
   }
 

@@ -82,6 +82,14 @@ namespace mitk
     nlohmann::json GetJsonBody() const;
   };
 
+  /**
+   * \brief JSON as the text of an answer.
+   *
+   * A string that is not valid UTF-8, like a DICOM tag in Latin-1, keeps its
+   * characters: wherever its bytes are no UTF-8, they are read as Latin-1.
+   */
+  MITKRESTAPI_EXPORT std::string DumpRestJson(const nlohmann::json& json);
+
   struct MITKRESTAPI_EXPORT RestResponse
   {
     int Status = 200;

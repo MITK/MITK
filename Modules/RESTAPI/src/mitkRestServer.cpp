@@ -1450,7 +1450,7 @@ bool RestServer::CheckClientAccess(const httplib::Request& req, httplib::Respons
   auto error = ErrorResponse::AccessDenied(
     "Client IP " + SanitizeForLog(req.remote_addr) + " is not allowed", req.path);
   res.status = 403;
-  res.set_content(error.dump(), "application/json");
+  res.set_content(DumpRestJson(error), "application/json");
 
   this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
   return false;
@@ -1540,7 +1540,7 @@ bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& 
     auto error = ErrorResponse::RateLimitExceeded(retryAfterSeconds, req.path);
     res.status = 429;
     res.set_header("Retry-After", std::to_string(retryAfterSeconds));
-    res.set_content(error.dump(), "application/json");
+    res.set_content(DumpRestJson(error), "application/json");
 
     this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     return false;
@@ -1577,7 +1577,7 @@ bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Respo
     auto error = ErrorResponse::Unauthorized("Authentication required. Provide Authorization: Bearer <token> header.", req.path);
     res.status = 401;
     res.set_header("WWW-Authenticate", "Bearer");
-    res.set_content(error.dump(), "application/json");
+    res.set_content(DumpRestJson(error), "application/json");
 
     this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     return false;
@@ -1593,7 +1593,7 @@ bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Respo
     auto error = ErrorResponse::Unauthorized("Invalid authorization format. Expected: Bearer <token>", req.path);
     res.status = 401;
     res.set_header("WWW-Authenticate", "Bearer");
-    res.set_content(error.dump(), "application/json");
+    res.set_content(DumpRestJson(error), "application/json");
 
     this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     return false;
@@ -1613,7 +1613,7 @@ bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Respo
     auto error = ErrorResponse::Unauthorized("Invalid API token", req.path);
     res.status = 401;
     res.set_header("WWW-Authenticate", "Bearer");
-    res.set_content(error.dump(), "application/json");
+    res.set_content(DumpRestJson(error), "application/json");
 
     this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     return false;

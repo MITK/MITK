@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkNodeQueryParams.h>
 #include <mitkExceptionMacro.h>
+#include <mitkRestRoute.h>
 #include <mitkLog.h>
 
 #include <mitkBaseDataSerializer.h>
@@ -787,13 +788,13 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
 void DataStorageController::SendJsonResponse(httplib::Response& res, int status, const nlohmann::json& body)
 {
   res.status = status;
-  res.set_content(body.dump(), "application/json");
+  res.set_content(DumpRestJson(body), "application/json");
 }
 
 void DataStorageController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error)
 {
   res.status = status;
-  res.set_content(error.dump(), "application/json");
+  res.set_content(DumpRestJson(error), "application/json");
 }
 
 DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataPath(

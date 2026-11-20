@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkHealthController.h"
 #include <mitkExceptionMacro.h>
+#include <mitkRestRoute.h>
 #include <mitkRestServerConfig.h>
 #include <mitkVersion.h>
 
@@ -53,7 +54,7 @@ void HealthController::HandleGET_health(const httplib::Request& /*req*/, httplib
   }
 
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(DumpRestJson(response), "application/json");
 }
 
 void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::Response& res)
@@ -72,7 +73,7 @@ void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::
   response["data"]["capabilities"] = capabilities;
 
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(DumpRestJson(response), "application/json");
 }
 
 void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs)
@@ -109,7 +110,7 @@ void HealthController::HandleGET_config_file_access(const httplib::Request& /*re
   response["data"] = data;
 
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(DumpRestJson(response), "application/json");
 }
 
 }

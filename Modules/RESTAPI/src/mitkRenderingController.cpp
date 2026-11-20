@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
+#include <mitkRestRoute.h>
 #include <mitkSlicedData.h>
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
@@ -364,7 +365,7 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
   }
 
   res.status = 200;
-  res.set_content(SerializeSelectedPositionInfoToJson(posInfo).dump(), "application/json");
+  res.set_content(DumpRestJson(SerializeSelectedPositionInfoToJson(posInfo)), "application/json");
 }
 
 void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const
@@ -484,7 +485,7 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
   response["bounds"]["steps"] = steps;
 
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(DumpRestJson(response), "application/json");
 }
 
 void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const
@@ -1028,7 +1029,7 @@ void RenderingController::HandleGET_editors(const httplib::Request& req, httplib
     arr.push_back(EditorInfoToJson(ed, /*includeWindowList=*/false));
 
   res.status = 200;
-  res.set_content(arr.dump(), "application/json");
+  res.set_content(DumpRestJson(arr), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const
@@ -1065,7 +1066,7 @@ void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, ht
       }
       const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
       res.status = 200;
-      res.set_content(j.dump(), "application/json");
+      res.set_content(DumpRestJson(j), "application/json");
       return;
     }
   }
@@ -1109,7 +1110,7 @@ void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req,
   }
 
   res.status = 200;
-  res.set_content(arr.dump(), "application/json");
+  res.set_content(DumpRestJson(arr), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
@@ -1171,7 +1172,7 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
   j["has_selected_slice"] = !is3d;
 
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
@@ -1206,7 +1207,7 @@ void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, 
 
   const auto j = CameraStateToJson(state);
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
@@ -1312,7 +1313,7 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
   const auto j = SliceStateToJson(state);
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
@@ -1643,7 +1644,7 @@ void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib
       }
       const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
       res.status = 200;
-      res.set_content(j.dump(), "application/json");
+      res.set_content(DumpRestJson(j), "application/json");
       return;
     }
   }
@@ -1692,7 +1693,7 @@ void RenderingController::HandleGET_mxnWindows(const httplib::Request& req, http
   }
 
   res.status = 200;
-  res.set_content(MxNWindowInfoToWindowsListJson(windows).dump(), "application/json");
+  res.set_content(DumpRestJson(MxNWindowInfoToWindowsListJson(windows)), "application/json");
 }
 
 void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httplib::Response& res) const
@@ -1788,7 +1789,7 @@ void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httpl
   j["has_selected_position"] = true;
 
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 // ----------------------------------------------------------------------
@@ -1921,7 +1922,7 @@ void RenderingController::HandleGET_mxnCamera(const httplib::Request& req, httpl
   }
 
   res.status = 200;
-  res.set_content(CameraStateToJson(state).dump(), "application/json");
+  res.set_content(DumpRestJson(CameraStateToJson(state)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnCamera(const httplib::Request& req, httplib::Response& res) const
@@ -2033,7 +2034,7 @@ void RenderingController::HandleGET_mxnSelectedSlice(const httplib::Request& req
   }
 
   res.status = 200;
-  res.set_content(SliceStateToJson(state).dump(), "application/json");
+  res.set_content(DumpRestJson(SliceStateToJson(state)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const
@@ -2150,7 +2151,7 @@ void RenderingController::HandleGET_mxnSelectedPosition(const httplib::Request& 
   }
 
   res.status = 200;
-  res.set_content(SerializeSelectedPositionInfoToJson(info).dump(), "application/json");
+  res.set_content(DumpRestJson(SerializeSelectedPositionInfoToJson(info)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const
@@ -2323,7 +2324,7 @@ void RenderingController::SetStopGate(std::shared_ptr<RestStopGate> gate)
 void RenderingController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const
 {
   res.status = status;
-  res.set_content(error.dump(), "application/json");
+  res.set_content(DumpRestJson(error), "application/json");
 }
 
 bool RenderingController::IsValidStdMultiWindowId(const std::string& id)

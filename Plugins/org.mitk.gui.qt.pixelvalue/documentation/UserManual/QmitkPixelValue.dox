@@ -10,6 +10,7 @@ Values of images with integer pixel types are shown as whole numbers; all other 
 The "All pixel values" section lists every visible image and segmentation at the selected position, from the top-most to the bottom-most layer.
 Each row shows a color swatch, the name, and the pixel value.
 The swatch approximates the color the pixel is displayed with, including its transparency; a checkerboard shines through for transparent colors.
+The swatch does not reflect the level window of RGB and RGBA images, the dimming of a segmentation in a single render window, the highlighting of labels, or the outline rendering of binary images.
 For multi-component images, the value of the displayed component is shown.
 Segmentations get one row per label at the position, named after the segmentation and the label, with the label value as value.
 Hidden images and hidden labels are left out, as are segmentations and binary images without a label at the position.

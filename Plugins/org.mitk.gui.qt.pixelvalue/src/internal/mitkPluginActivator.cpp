@@ -13,6 +13,10 @@ found in the LICENSE file.
 #include "mitkPluginActivator.h"
 #include "QmitkPixelValueView.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPixelValueView, context)

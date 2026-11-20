@@ -29,7 +29,7 @@ if(MITK_USE_${proj})
 
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/getsentry/sentry-native.git
-      GIT_TAG fea16b84ef4e723dd3a0e7f5e76f1737973dd349 # 0.15.2
+      GIT_TAG 7afc37457d7fcc37fb0bace9c8045d3fa687717f # 0.17.6
       # Crashpad's Linux HTTP transport hard-requires libcurl; Windows uses
       # WinHTTP and needs nothing. Local-only dumps never upload, so switch
       # Linux to crashpad's curl-free socket transport instead of dragging in

@@ -9,7 +9,12 @@ Every mitk::BaseApplication based application (MITK Workbench, MITK
 FlowBench) arms an out-of-process crash handler at startup: a hard crash
 (access violation, abort, stack overflow) leaves a Crashpad minidump in a
 per-user directory, and the next start of the application offers to keep the
-dump for reporting or to discard it.
+dump for reporting or to discard it. On Windows, sentry reserves stack for its
+crash handler only on the thread that arms the facility (the main thread), and
+only when that thread's stack reserve is large enough (the default 1 MiB is);
+otherwise it silently reserves none, and nothing reaches the MITK log. A stack
+overflow on another thread, or in an application linked with a smaller stack
+reserve, may end the process without a dump.
 
 The facility is built on
 <a href="https://github.com/getsentry/sentry-native">sentry-native</a>
@@ -237,9 +242,9 @@ disk stay listable and deletable in a session that records no new ones.
 If a run crashed, the next start shows QmitkCrashDumpDialog (hooked into the
 workbench window advisors of the Workbench and FlowBench). The trigger is a
 scan for dumps newer than the last acknowledged one - not sentry's
-crashed-last-run marker, which is experimental API and unreliable under the
-single-instance argument forwarding of \c setSingleMode(true); the marker is
-only used as a corroborating signal. Dumps are surfaced exactly once:
+crashed-last-run marker, which whichever process arms next against the shared
+database consumes (including concurrent instances and short-lived processes),
+so it is only used as a corroborating signal. Dumps are surfaced exactly once:
 <i>Keep for later</i>, <i>Remove</i> (also on closing the dialog) and
 <i>File report...</i> all acknowledge them.
 
@@ -343,19 +348,21 @@ that spawn a helper executable (\c mitkCrashDumpCaptureTest). The helper
 really crashes (modes \c segv / \c abort / \c stackoverflow) to assert the
 handler wrote a dump; captures an on-demand snapshot (\c snapshot) to assert
 it is written but excluded from the surfacable set, and two in a row
-(\c snapshot-twice) to assert a session is not limited to one; and drives the
-watchdog
-in both directions (\c freeze / \c freeze-recover) to assert a hard-killed
-freeze leaves a provisional dump while a recovered one leaves none. The suite
-also walks the full facility cycle headlessly after a real crash - arm, list,
-acknowledge, delete - i.e. the operations the next-start dialog drives without
-any UI. Because these tests only pass when arming succeeds, they also pin the
-handler filename: a mismatch between the shipped file and the \c handler_path
-the facility sets would make them fail. Further cases cover the settings
-(an unarmed facility still lists and deletes, <tt>enabled=false</tt> blocks
-arming, retention follows <tt>maxDumpsPerKind</tt>), the dump kinds, the
-exclusion of the running session's provisional snapshots, and the run info a
-real crash dump and a snapshot carry.
+(\c snapshot-twice) to assert a session is not limited to one; queries the
+stack guarantee of the arming thread (\c stackguarantee, Windows only) to
+assert sentry's crash handler has stack left after an overflow; and drives the
+watchdog in both directions (\c freeze / \c freeze-recover) to assert a
+hard-killed freeze leaves a provisional dump while a recovered one leaves
+none. The suite also walks the full facility cycle headlessly after a real
+crash - arm, list, acknowledge, delete - i.e. the operations the next-start
+dialog drives without any UI. Because these tests only pass when arming
+succeeds, they also pin the handler filename: a mismatch between the
+shipped file and the \c handler_path the facility sets would make them
+fail. Further cases cover the settings (an unarmed facility still lists
+and deletes, <tt>enabled=false</tt> blocks arming, retention follows
+<tt>maxDumpsPerKind</tt>), the dump kinds, the exclusion of the running
+session's provisional snapshots, and the run info a real crash dump and a
+snapshot carry.
 
 \c MitkAppUtil adds \c mitkCrashDumpSessionOptionsTest for the start-up
 precedence and \c QmitkCrashDumpUiTest for the list widget, the manager and

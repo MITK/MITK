@@ -106,9 +106,10 @@ namespace mitk
    *
    * Initialize() arms an external crashpad_handler process that writes a
    * minidump into the configured database directory when this process
-   * crashes hard (access violation, abort, stack overflow). Nothing is ever
-   * uploaded: no DSN is compiled in, no API sets one, and sentry's transport
-   * is compiled out, so the handler has no upload endpoint.
+   * crashes hard (access violation, abort, stack overflow; on Windows see
+   * the limits below). Nothing is ever uploaded: no DSN is compiled in, no
+   * API sets one, and sentry's transport is compiled out, so the handler has
+   * no upload endpoint.
    *
    * Contract notes:
    * - Static-only; must be initialized at most once per process, as early
@@ -119,6 +120,14 @@ namespace mitk
    *   diagnostics facility must not break the application it diagnoses.
    *   Failure is reported via return value and MITK_WARN. This is a
    *   deliberate exception to the throw-on-unresolvable-input rule.
+   * - Windows: a stack overflow is guaranteed to leave a dump only on the
+   *   thread that called Initialize(), and only when that thread's stack
+   *   reserve is large enough for sentry to set aside stack for its crash
+   *   handler; the default 1 MiB reserve of the main thread is. Otherwise
+   *   sentry silently sets none aside, Initialize() still reports the
+   *   handler as armed, and a stack overflow may end the process without a
+   *   dump. Call Initialize() on the main thread and do not link the
+   *   executable with a smaller stack reserve.
    */
   class MITKCRASHHANDLING_EXPORT CrashDumpFacility
   {
@@ -175,18 +184,20 @@ namespace mitk
      *  taken (macOS). */
     static bool SupportsSnapshots() noexcept;
 
-    /** \brief True when the previous run of this database's application
-     *  ended in a crash. Value is read once during Initialize() and cached,
-     *  so later runs sharing the database cannot mask it mid-session.
-     *  Corroborating signal only; the robust next-launch trigger is
-     *  ListUnacknowledgedDumps(). */
+    /** \brief True when a crash was recorded in the database since the last
+     *  process armed against it; false when Initialize() did not arm the
+     *  handler. Arming consumes that record, so another process arming first
+     *  (a concurrent instance, a short-lived instance that only forwards its
+     *  arguments) may already have taken it: false does not prove the
+     *  previous run ended cleanly. Corroborating signal only; the robust
+     *  next-launch trigger is ListUnacknowledgedDumps(). */
     static bool CrashedLastRun() noexcept;
 
     /** \brief Acknowledge exactly \p shownDumps (dialog "seen"): they will not
      *  be reported by ListUnacknowledgedDumps() again, while dumps newer than
      *  the newest of them still are. The acknowledgment never moves
-     *  backwards. The crashed-last-run marker is cleared; an empty list
-     *  clears only that marker. */
+     *  backwards. CrashedLastRun() returns false afterwards; an empty list
+     *  only resets that flag. */
     static void ClearCrashedLastRun(const std::vector<CrashDumpInfo>& shownDumps);
 
     /** \brief The surfacable dumps the next-start dialog shows, newest

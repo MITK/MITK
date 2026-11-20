@@ -26,18 +26,53 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 
 #include <vtkActor2D.h>
+#include <vtkImageData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkPropCollection.h>
+#include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
+#include <vtkWindowToImageFilter.h>
+
+#include <algorithm>
+#include <array>
 
 namespace
 {
   const std::vector<std::string> TypeIds = { "line", "arrow", "angle", "four_point_angle", "cross", "circle", "ellipse",
                                              "double_ellipse", "rectangle", "polygon", "path", "subdivision_polygon",
                                              "bezier_curve" };
+
+  /** The bounding box {min x, max x, min y, max y} of the magenta pixels of an image; all -1 without any. */
+  std::array<int, 4> GetBoxOfMagenta(vtkImageData *image)
+  {
+    int dimensions[3];
+    image->GetDimensions(dimensions);
+
+    const auto components = image->GetNumberOfScalarComponents();
+    const auto *pixels = static_cast<const unsigned char *>(image->GetScalarPointer());
+    std::array<int, 4> box = { -1, -1, -1, -1 };
+
+    for (int y = 0; y < dimensions[1]; ++y)
+    {
+      for (int x = 0; x < dimensions[0]; ++x)
+      {
+        const auto *pixel = pixels + (static_cast<std::size_t>(y) * dimensions[0] + x) * components;
+
+        if (pixel[0] < 200 || pixel[1] > 60 || pixel[2] < 200)
+          continue;
+
+        box = box[0] < 0
+          ? std::array<int, 4>{ x, x, y, y }
+          : std::array<int, 4>{ std::min(box[0], x), std::max(box[1], x), std::min(box[2], y), std::max(box[3], y) };
+      }
+    }
+
+    return box;
+  }
 }
 
 class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
@@ -57,6 +92,7 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(Handles_OfSelectedBezierCurves_AreShown);
   MITK_TEST(MovedPlane_IsDrawnAgain);
   MITK_TEST(UnchangedFigure_IsNotDrawnAgain);
+  MITK_TEST(MagnifiedImage_ShowsTheFigureInItsPlace);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -425,6 +461,37 @@ public:
 
     this->GetRenderer()->GetCameraController()->Zoom(2.0, P(5, 0.5, 0.5));
     CPPUNIT_ASSERT_MESSAGE("A zoomed figure is drawn again", drawTime != this->RenderAndGetDrawing(node)->GetMTime());
+  }
+
+  void MagnifiedImage_ShowsTheFigureInItsPlace()
+  {
+    const auto node = this->AddFigure("rectangle", 5);
+    node->SetColor(1.0f, 0.0f, 1.0f);
+    node->SetBoolProperty("planarfigure.drawcontrastoutline", false);
+    m_RenderingTestHelper.Render();
+
+    auto window = vtkSmartPointer<vtkWindowToImageFilter>::New();
+    window->SetInput(m_RenderingTestHelper.GetVtkRenderWindow());
+    window->ReadFrontBufferOff();
+    window->Update();
+    const auto box = GetBoxOfMagenta(window->GetOutput());
+
+    // Tiles the camera, as the magnified screenshots of the Screenshot Maker and the REST API do.
+    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
+    magnifier->SetInput(m_RenderingTestHelper.GetVtkRenderer());
+    magnifier->SetMagnification(2);
+    magnifier->Update();
+    const auto magnifiedBox = GetBoxOfMagenta(magnifier->GetOutput());
+
+    CPPUNIT_ASSERT_MESSAGE("The figure is drawn", box[0] >= 0);
+
+    // A tile that reused the drawing of another one would put the figure in a place of its own, far off. Within a
+    // pixel or two, as drivers rasterize lines differently.
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Side " + std::to_string(i) + " of the box of the figure",
+        2.0 * box[i], static_cast<double>(magnifiedBox[i]), 2.0);
+    }
   }
 
   /** The geometry drawn for a figure. */

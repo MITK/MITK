@@ -308,6 +308,7 @@ mitk::PlanarFigureVtkMapper2D::BuildKey mitk::PlanarFigureVtkMapper2D::GetBuildK
   std::copy_n(camera->GetFocalPoint(), 3, key.CameraFocalPoint.begin());
   std::copy_n(camera->GetViewUp(), 3, key.CameraViewUp.begin());
   key.CameraParallelScale = camera->GetParallelScale();
+  std::copy_n(camera->GetWindowCenter(), 2, key.CameraWindowCenter.begin());
   key.ViewportWidth = viewportSize[0];
   key.ViewportHeight = viewportSize[1];
   key.DPI = renderer->GetRenderWindow()->GetDPI();

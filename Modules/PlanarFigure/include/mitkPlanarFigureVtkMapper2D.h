@@ -97,6 +97,8 @@ namespace mitk
       std::array<double, 3> CameraFocalPoint = {};
       std::array<double, 3> CameraViewUp = {};
       double CameraParallelScale = 0.0;
+      // Tiled rendering, as of magnified screenshots, moves it for each tile.
+      std::array<double, 2> CameraWindowCenter = {};
       int ViewportWidth = 0;
       int ViewportHeight = 0;
       int DPI = 0;

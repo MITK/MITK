@@ -13,9 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkReportStore_h
 #define QmitkReportStore_h
 
+#include <QmitkReport.h>
+#include <QmitkReportImagePool.h>
+
 #include <QByteArray>
-#include <QDateTime>
-#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -23,7 +24,6 @@ found in the LICENSE file.
 #include <deque>
 #include <map>
 #include <memory>
-#include <utility>
 #include <vector>
 
 class QLockFile;
@@ -52,16 +52,7 @@ class QmitkReportStore : public QObject
   Q_OBJECT
 
 public:
-  struct Report
-  {
-    int Id = 0;
-    QString Title;
-    QString Html;
-    QMap<QString, QByteArray> Images;
-    QDateTime Modified;
-    bool Saved = false;
-    bool LossAccepted = false;
-  };
+  using Report = QmitkReport;
 
   explicit QmitkReportStore(QObject* parent = nullptr);
   ~QmitkReportStore() override;
@@ -157,16 +148,12 @@ public:
    */
   QString WriteTemporaryFile(int id);
 
-  /** \brief A file name for the report, without folder and suffix. */
-  static QString GetFileBaseName(const Report& report);
-
 Q_SIGNALS:
   void Changed(int id);
 
 private:
   class WorkbenchListener;
 
-  QMap<QString, QByteArray> CollectImages(const QString& html, const Report* report) const;
   void MarkSaved(int id);
   void AskAboutClosedReports();
   bool ConfirmShutdown(bool forced);
@@ -180,9 +167,8 @@ private:
   bool m_AskingQueued = false;
   bool m_Asking = false;
   std::unique_ptr<WorkbenchListener> m_WorkbenchListener;
-  std::deque<std::pair<QString, QByteArray>> m_Pool;
+  QmitkReportImagePool m_Pool;
   int m_NextReportId = 1;
-  int m_NextImageId = 1;
   std::map<int, QStringList> m_TemporaryFiles;
 
   // The lock is declared after the folder so that it is released before the folder is removed.

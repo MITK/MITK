@@ -2,6 +2,7 @@ project(org_mitk_gui_qt_reports)
 
 set(MODULE_DEPENDS
   MitkQtHtml
+  MitkReports
   MitkQtWidgets
 )
 

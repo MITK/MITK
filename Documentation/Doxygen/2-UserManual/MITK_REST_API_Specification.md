@@ -124,7 +124,7 @@ lists all endpoints with method, path and summary, and marks the experimental on
 
 Experimental endpoints refuse requests that a web page could send (403 `ACCESS_DENIED`): requests that carry an `Origin` header, requests with a `Sec-Fetch-Site` header other than `none` and `same-origin`, and requests whose `Host` header names neither `localhost`, an IP address, the host the server is configured with nor the host name of the machine. Browsers send these headers, other clients do not, so web pages cannot use these endpoints through the user's browser. A request without a `Host` header is not refused.
 
-Long-running work of these endpoints, like running a model, is a job below `/api/v1/jobs`. Jobs are shared by all clients of the server: every client can list and cancel them.
+Long-running work of these endpoints, like running a model, is a job below `/api/v1/jobs`. Jobs are shared by all clients of the server: every client can list and cancel them. A canceled job ends at once, while its work may still finish the step it is in, a download for example; it starts no further step. Until then the tool answers 409 `BUSY`, and `/api/v1/workbench/tasks` shows the work.
 
 ---
 

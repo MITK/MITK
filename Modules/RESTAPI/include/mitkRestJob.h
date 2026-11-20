@@ -72,6 +72,10 @@ namespace mitk
     /**
      * \brief End the job as canceled, after asking its handler to stop the work.
      *
+     * The job ends at once, while the work may still finish the step it is
+     * in. Work of several steps looks at HasEnded() before each further step
+     * and stops there.
+     *
      * \return False if the job has no cancel handler or has ended already.
      */
     bool Cancel();

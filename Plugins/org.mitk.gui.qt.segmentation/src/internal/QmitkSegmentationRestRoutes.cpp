@@ -604,7 +604,8 @@ namespace
   void ThrowIfBusy(const mitk::SegWithPreviewTool* tool, const std::string& path)
   {
     if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
-      mitk::ThrowRestError("BUSY", "Conflict", std::string(tool->GetName()) + " is still working. Wait for its job to end.", 409, path);
+      mitk::ThrowRestError("BUSY", "Conflict", std::string(tool->GetName()) + " is still working. Wait for its job to end; "
+        "after a cancel, GET /api/v1/workbench/tasks shows when the work has stopped.", 409, path);
   }
 
 #if MITK_HAS_PYTHON
@@ -1957,6 +1958,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     });
 
     server->Post([job, start, path = request.Path]() {
+      // Canceled before this ran: the cancel found no task to stop.
+      if (job->HasEnded())
+        return;
+
       try
       {
         // Held, as the tool can be deactivated while the start runs.
@@ -2297,14 +2302,30 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     job->SetCancelHandler([]() { CancelTasks("VoxTell"); });
 
     server->Post([job, path = request.Path]() {
+      // Canceled before this ran: the cancel found no task to stop.
+      if (job->HasEnded())
+        return;
+
       VoxTellTool::Pointer tool;
 
       // A worker that the start left behind holds the imports of VoxTell.
-      const auto fail = [job](const VoxTellTool::Pointer& tool, std::exception_ptr error) {
+      const auto release = [](const VoxTellTool::Pointer& tool) {
         if (tool.IsNotNull() && !tool->IsModelLoaded() && !tool->IsRunningOffGUIThread())
           tool->UnloadModel();
+      };
 
+      const auto fail = [job, release](const VoxTellTool::Pointer& tool, std::exception_ptr error) {
+        release(tool);
         FailJob(*job, error);
+      };
+
+      // A cancel between two steps finds no task to stop, so each step looks at the job first.
+      const auto stopIfCanceled = [job, release](const VoxTellTool::Pointer& tool) {
+        if (!job->HasEnded())
+          return false;
+
+        release(tool);
+        return true;
       };
 
       try
@@ -2326,14 +2347,20 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
         auto filesTask = std::make_shared<ProgressTask>("Preparing VoxTell", ProgressTask::Indeterminate, true);
 
-        tool->GetModelFiles(filesTask, [job, tool, fail](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
+        tool->GetModelFiles(filesTask, [job, tool, fail, stopIfCanceled](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
           try
           {
             if (error != nullptr)
               std::rethrow_exception(error);
 
+            if (stopIfCanceled(tool))
+              return;
+
             if (!files.empty())
               DownloadForVoxTell("Downloading VoxTell model", files);
+
+            if (stopIfCanceled(tool))
+              return;
 
             auto loadTask = std::make_shared<ProgressTask>("Loading VoxTell", ProgressTask::Indeterminate, true);
 
@@ -2423,6 +2450,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     job->SetCancelHandler([]() { CancelTasks("VoxTell"); });
 
     server->Post([job, prompts, createGroups, path = request.Path]() {
+      // Canceled before this ran: the cancel found no task to stop.
+      if (job->HasEnded())
+        return;
+
       try
       {
         // Held, as the tool can be deactivated while the model computes.
@@ -2437,6 +2468,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         // The run, once the prompts are known. The update ends after this
         // has returned.
         const auto run = [job, tool, prompts, createGroups]() {
+          // A cancel between two steps finds no task to stop.
+          if (job->HasEnded())
+            return;
+
           if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
           {
             job->Fail("VoxTell is still working.");
@@ -2500,6 +2535,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           if (const auto files = tool->GetTextModelFiles(); !files.empty())
             DownloadForVoxTell("Downloading VoxTell text model", files);
         }
+
+        if (job->HasEnded())
+          return;
 
         auto task = std::make_shared<ProgressTask>("Processing prompts with the VoxTell text model", ProgressTask::Indeterminate, true);
 
@@ -2580,6 +2618,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     job->SetCancelHandler([]() { CancelTasks("TotalSegmentator"); });
 
     server->Post([job, path = request.Path]() {
+      // Canceled before this ran: the cancel found no task to stop.
+      if (job->HasEnded())
+        return;
+
       try
       {
         // Held, as the tool can be deactivated while it starts.
@@ -2792,6 +2834,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     job->SetCancelHandler([]() { CancelTasks("TotalSegmentator"); });
 
     server->Post([job, path = request.Path]() {
+      // Canceled before this ran: the cancel found no task to stop.
+      if (job->HasEnded())
+        return;
+
       try
       {
         // Held, as the tool can be deactivated while it runs.
@@ -2803,6 +2849,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
             FailJob(*job, error);
             return;
           }
+
+          // Canceled while TotalSegmentator started: the run is a step of its own.
+          if (job->HasEnded())
+            return;
 
           if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
           {

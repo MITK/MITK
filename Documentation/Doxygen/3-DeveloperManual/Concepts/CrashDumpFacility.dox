@@ -10,8 +10,11 @@ FlowBench) arms an out-of-process crash handler at startup: a hard crash
 (access violation, abort, stack overflow) leaves a Crashpad minidump in a
 per-user directory, and the next start of the application offers to keep the
 dump for reporting or to discard it. On Windows, sentry reserves stack for its
-crash handler only on the thread that arms the facility (the main thread), so
-a stack overflow on another thread may end the process without a dump.
+crash handler only on the thread that arms the facility (the main thread), and
+only when that thread's stack reserve is large enough (the default 1 MiB is);
+otherwise it just logs a warning. A stack overflow on another thread, or in an
+application linked with a smaller stack reserve, may end the process without a
+dump.
 
 The facility is built on
 <a href="https://github.com/getsentry/sentry-native">sentry-native</a>

@@ -38,7 +38,13 @@ namespace
     if (magnification <= 1)
     {
       mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(window->GetVtkRenderWindow());
-      return window->grabFramebuffer().convertToFormat(QImage::Format_RGB32);
+      auto image = window->grabFramebuffer().convertToFormat(QImage::Format_RGB32);
+
+      // Qt gives it the screen's ratio, with which painters would draw on and
+      // with it in logical pixels, while this class deals in image pixels.
+      image.setDevicePixelRatio(1.0);
+
+      return image;
     }
 
     // vtkRenderLargeImage tiles the renderer's camera; vtkWindowToImageFilter

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkIOUtil.h>
 #include <mitkMouseMoveEvent.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarFigureVisibilityProperty.h>
@@ -39,6 +40,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <array>
+#include <utility>
 
 namespace
 {
@@ -73,6 +75,37 @@ namespace
 
     return box;
   }
+
+  /** The white pixels of an image left of its magenta box and right of it. */
+  std::pair<int, int> CountLabelPixelsBesideFigure(vtkImageData *image)
+  {
+    const auto box = GetBoxOfMagenta(image);
+
+    int dimensions[3];
+    image->GetDimensions(dimensions);
+
+    const auto components = image->GetNumberOfScalarComponents();
+    const auto *pixels = static_cast<const unsigned char *>(image->GetScalarPointer());
+    std::pair<int, int> counts = { 0, 0 };
+
+    for (int y = 0; y < dimensions[1]; ++y)
+    {
+      for (int x = 0; x < dimensions[0]; ++x)
+      {
+        const auto *pixel = pixels + (static_cast<std::size_t>(y) * dimensions[0] + x) * components;
+
+        if (pixel[0] < 200 || pixel[1] < 200 || pixel[2] < 200)
+          continue;
+
+        if (x < box[0])
+          ++counts.first;
+        else if (x > box[1])
+          ++counts.second;
+      }
+    }
+
+    return counts;
+  }
 }
 
 class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
@@ -93,6 +126,7 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(MovedPlane_IsDrawnAgain);
   MITK_TEST(UnchangedFigure_IsNotDrawnAgain);
   MITK_TEST(MagnifiedImage_ShowsTheFigureInItsPlace);
+  MITK_TEST(MagnifiedImage_ShowsTheLabelOnceOnItsSide);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -492,6 +526,50 @@ public:
       CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Side " + std::to_string(i) + " of the box of the figure",
         2.0 * box[i], static_cast<double>(magnifiedBox[i]), 2.0);
     }
+  }
+
+  void MagnifiedImage_ShowsTheLabelOnceOnItsSide()
+  {
+    // Black around the figure, so that the white of the text is the label's alone.
+    m_RenderingTestHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Image"))->SetVisibility(false);
+
+    // So close to the right edge that the label goes left of the figure, while the last of the tiles
+    // of a fourfold image has room for it on the right.
+    auto figure = mitk::CreatePlanarFigure("rectangle");
+    figure->SetPlaneGeometry(m_Plane);
+    mitk::Point2D first, second;
+    first[0] = 0.70 * m_Plane->GetExtentInMM(0);
+    first[1] = 0.40 * m_Plane->GetExtentInMM(1);
+    second[0] = 0.93 * m_Plane->GetExtentInMM(0);
+    second[1] = 0.60 * m_Plane->GetExtentInMM(1);
+    figure->SetFromSpan(first, second);
+
+    auto node = mitk::DataNode::New();
+    node->SetName("Liver");
+    node->SetData(figure);
+    node->SetColor(1.0f, 0.0f, 1.0f);
+    node->SetBoolProperty("planarfigure.drawcontrastoutline", false);
+    node->SetBoolProperty("planarfigure.drawquantities", false);
+    node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Always));
+    m_RenderingTestHelper.GetDataStorage()->Add(node);
+    m_RenderingTestHelper.Render();
+
+    auto window = vtkSmartPointer<vtkWindowToImageFilter>::New();
+    window->SetInput(m_RenderingTestHelper.GetVtkRenderWindow());
+    window->ReadFrontBufferOff();
+    window->Update();
+
+    const auto [leftOfFigure, rightOfFigure] = CountLabelPixelsBesideFigure(window->GetOutput());
+    CPPUNIT_ASSERT_MESSAGE("In the window, the label is left of the figure", leftOfFigure > 0 && 0 == rightOfFigure);
+
+    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
+    magnifier->SetInput(m_RenderingTestHelper.GetVtkRenderer());
+    magnifier->SetMagnification(4);
+    magnifier->Update();
+
+    const auto [magnifiedLeft, magnifiedRight] = CountLabelPixelsBesideFigure(magnifier->GetOutput());
+    CPPUNIT_ASSERT_MESSAGE("In the magnified image, the label is left of the figure", magnifiedLeft > 0);
+    CPPUNIT_ASSERT_MESSAGE("In the magnified image, no tile puts a label right of the figure", 0 == magnifiedRight);
   }
 
   /** The geometry drawn for a figure. */

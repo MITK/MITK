@@ -108,6 +108,20 @@ namespace mitk
       bool operator==(const BuildKey &) const = default;
     };
 
+    /** \brief Where the label went: beside the figure, or at a point of the world where the viewport ran out. */
+    struct LabelPlacement
+    {
+      enum class Side
+      {
+        Right,
+        Left,
+        Fixed
+      };
+
+      Side Placement = Side::Right;
+      Point3D FixedPlateLeft;
+    };
+
     class LocalStorage : public Mapper::BaseLocalStorage
     {
     public:
@@ -119,6 +133,9 @@ namespace mitk
       vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
       vtkSmartPointer<vtkTextActor> m_TextActor;
       std::optional<BuildKey> m_BuildKey;
+
+      /** \brief The placement of the last render that drew the whole window, which tiles of a magnified image keep. */
+      std::optional<LabelPlacement> m_LabelPlacement;
     };
 
     BuildKey GetBuildKey(BaseRenderer *renderer) const;

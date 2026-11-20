@@ -673,15 +673,53 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       const auto right = (*rightmost)[0] + offset;
       const auto left = (*leftmost)[0] - offset;
 
-      auto plateLeft = right;
-      auto anchorHeight = (*rightmost)[1];
+      // A magnified image is rendered in tiles, the only renders with a window center other than
+      // (0, 0). A tile would place the label by its own edges, so each tile could put it elsewhere:
+      // tiles keep the placement of the last render of the whole window.
+      const auto *windowCenter = renderer->GetVtkRenderer()->GetActiveCamera()->GetWindowCenter();
+      const bool isTile = 0.0 != windowCenter[0] || 0.0 != windowCenter[1];
 
-      if (right + plateWidth > viewportWidth)
+      LabelPlacement placement;
+
+      if (isTile && localStorage->m_LabelPlacement.has_value())
+      {
+        placement = *localStorage->m_LabelPlacement;
+      }
+      else if (right + plateWidth > viewportWidth)
       {
         if (left - plateWidth >= 0.0)
         {
-          plateLeft = left - plateWidth;
-          anchorHeight = (*leftmost)[1];
+          placement.Placement = LabelPlacement::Side::Left;
+        }
+        else
+        {
+          Point2D fixed;
+          fixed[0] = std::max(0.0, viewportWidth - plateWidth);
+          fixed[1] = (*rightmost)[1];
+
+          placement.Placement = LabelPlacement::Side::Fixed;
+          renderer->DisplayToWorld(fixed, placement.FixedPlateLeft);
+        }
+      }
+
+      if (!isTile)
+        localStorage->m_LabelPlacement = placement;
+
+      auto plateLeft = right;
+      auto anchorHeight = (*rightmost)[1];
+
+      if (LabelPlacement::Side::Left == placement.Placement)
+      {
+        plateLeft = left - plateWidth;
+        anchorHeight = (*leftmost)[1];
+      }
+      else if (LabelPlacement::Side::Fixed == placement.Placement)
+      {
+        if (isTile)
+        {
+          Point2D fixed;
+          renderer->WorldToView(placement.FixedPlateLeft, fixed);
+          plateLeft = fixed[0];
         }
         else
         {

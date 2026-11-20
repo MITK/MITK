@@ -35,9 +35,12 @@ namespace
   /** The scene as it renders now, in RGB32. */
   QImage Capture(QmitkRenderWindow* window, vtkRenderer* renderer, unsigned int magnification)
   {
+    // Also before tiles: mappers that place things by the edges of the
+    // window, like the labels of planar figures, keep what this render decided.
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(window->GetVtkRenderWindow());
+
     if (magnification <= 1)
     {
-      mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(window->GetVtkRenderWindow());
       auto image = window->grabFramebuffer().convertToFormat(QImage::Format_RGB32);
 
       // Qt gives it the screen's ratio, with which painters would draw on and

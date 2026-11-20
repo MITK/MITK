@@ -24,13 +24,13 @@ found in the LICENSE file.
 #include <mitkIRestServerService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
-#include <mitkLabelSuggestionHelper.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
 #include <mitkRestJob.h>
 #include <mitkRestPoints.h>
+#include <mitkRestSegmentation.h>
 #include <mitkRestTime.h>
 #include <mitkSegChangeOperationApplier.h>
 #include <mitkSegWithPreviewTool.h>
@@ -56,7 +56,6 @@ found in the LICENSE file.
 #include <berryPlatformUI.h>
 
 #include <QCoreApplication>
-#include <QFileInfo>
 #include <QString>
 #include <QTimer>
 
@@ -128,173 +127,11 @@ namespace
     return view;
   }
 
-  nlohmann::json DescribeNode(mitk::DataNode* node, const mitk::IRestServerService& server)
-  {
-    if (node == nullptr)
-      return nullptr;
-
-    return { { "uid", server.GetNodeUid(node) }, { "name", node->GetName() } };
-  }
-
-  mitk::Color ParseColor(const nlohmann::json& json, const std::string& path)
-  {
-    const auto color = mitk::ParseRestColor(json.is_string() ? json.get<std::string>() : std::string());
-
-    if (!color.has_value())
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("A color must be written like \"#ff8800\".", path));
-
-    return *color;
-  }
-
   mitk::RestTimeSelection GetSelectedTime()
   {
     mitk::RestTimeSelection selection;
     selection.TimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
     return selection;
-  }
-
-  /**
-   * Whether the request asks for the voxels, volumes and centers of labels, which take a pass over the
-   * segmentation.
-   */
-  bool IsMeasureRequested(const mitk::RestRequest& request)
-  {
-    const auto value = request.GetQueryParam("measure");
-
-    if (!value.has_value() || *value == "false")
-      return false;
-
-    if (*value == "true")
-      return true;
-
-    throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"measure\" must be true or false.", request.Path));
-  }
-
-  nlohmann::json DescribeLabel(const mitk::Label* label, mitk::MultiLabelSegmentation::GroupIndexType group)
-  {
-    return {
-      { "value", label->GetValue() },
-      { "name", label->GetName() },
-      { "color", mitk::ToRestColor(label->GetColor()) },
-      { "visible", label->GetVisible() },
-      { "locked", label->GetLocked() },
-      { "group", group }
-    };
-  }
-
-  /**
-   * The labels of the segmentation. With a selection, each also has voxels, volume_ml and center at the time
-   * point of the selection, or time_steps with them for all time steps; that takes a pass over the segmentation.
-   */
-  nlohmann::json DescribeLabels(mitk::MultiLabelSegmentation* segmentation, const std::optional<mitk::RestTimeSelection>& measureAt = std::nullopt)
-  {
-    auto labels = nlohmann::json::array();
-    const auto timeSteps = measureAt.has_value() ? measureAt->GetTimeSteps(segmentation) : std::vector<mitk::TimeStepType>();
-
-    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < segmentation->GetNumberOfGroups(); ++group)
-    {
-      const auto* groupImage = segmentation->GetGroupImage(group);
-      const auto spacing = groupImage->GetGeometry()->GetSpacing();
-      const auto voxelMilliliters = spacing[0] * spacing[1] * spacing[2] / 1000.0;
-
-      // Nothing for a time step at which a tool writes into the segmentation: the measure never waits for it.
-      std::vector<std::optional<mitk::MultiLabelSegmentation::LabelMeasureMapType>> measures;
-
-      for (const auto timeStep : timeSteps)
-      {
-        try
-        {
-          measures.emplace_back(segmentation->MeasureLabels(group, timeStep));
-        }
-        catch (const mitk::Exception&)
-        {
-          measures.emplace_back();
-        }
-      }
-
-      const auto addMeasure = [&](nlohmann::json& json, std::size_t i, mitk::MultiLabelSegmentation::LabelValueType value) {
-        if (measures.size() <= i || !measures[i].has_value())
-        {
-          json["voxels"] = nullptr;
-          return;
-        }
-
-        const auto found = measures[i]->find(value);
-        const std::uint64_t count = found != measures[i]->end() ? found->second.VoxelCount : 0;
-        json["voxels"] = count;
-        json["volume_ml"] = count * voxelMilliliters;
-
-        if (found == measures[i]->end())
-        {
-          json["center"] = nullptr;
-          return;
-        }
-
-        mitk::Point3D center;
-        groupImage->GetGeometry(timeSteps[i])->IndexToWorld(found->second.CentroidIndex, center);
-        json["center"] = mitk::ToRestJson(center);
-      };
-
-      for (const auto value : segmentation->GetLabelValuesByGroup(group))
-      {
-        const auto label = segmentation->GetLabel(value);
-
-        if (label.IsNull())
-          continue;
-
-        auto json = DescribeLabel(label, group);
-
-        if (measureAt.has_value() && measureAt->All)
-        {
-          auto steps = nlohmann::json::array();
-
-          for (std::size_t i = 0; i < timeSteps.size(); ++i)
-          {
-            auto step = mitk::DescribeRestTimeStep(segmentation, timeSteps[i]);
-            addMeasure(step, i, value);
-            steps.push_back(std::move(step));
-          }
-
-          json["time_steps"] = std::move(steps);
-        }
-        else if (measureAt.has_value())
-        {
-          addMeasure(json, 0, value);
-        }
-
-        labels.push_back(std::move(json));
-      }
-    }
-
-    return labels;
-  }
-
-  nlohmann::json DescribeGroup(mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
-  {
-    auto labels = nlohmann::json::array();
-
-    for (const auto value : segmentation->GetLabelValuesByGroup(group))
-    {
-      if (const auto label = segmentation->GetLabel(value); label.IsNotNull())
-        labels.push_back(DescribeLabel(label, group));
-    }
-
-    return {
-      { "index", group },
-      { "name", segmentation->GetGroupName(group) },
-      { "display_name", mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, group) },
-      { "labels", labels }
-    };
-  }
-
-  nlohmann::json DescribeGroups(mitk::MultiLabelSegmentation* segmentation)
-  {
-    auto groups = nlohmann::json::array();
-
-    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < segmentation->GetNumberOfGroups(); ++group)
-      groups.push_back(DescribeGroup(segmentation, group));
-
-    return groups;
   }
 
   /** Whether a tool that runs in a Python environment of its own has it; nothing for other tools. */
@@ -326,53 +163,6 @@ namespace
 #endif
   }
 
-  /**
-   * What the preferences of the Segmentation view demand of its user, which the routes do not enforce. Without
-   * the suggested names, which can be hundreds: the session is asked for often.
-   */
-  nlohmann::json DescribeRestrictions()
-  {
-    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(ViewId);
-    const auto preset = QFileInfo(QString::fromStdString(preferences->Get("label set preset", ""))).fileName().toStdString();
-
-    return {
-      { "label_set_preset", preset.empty() ? nlohmann::json() : nlohmann::json(preset) },
-      { "label_suggestions_enforced", mitk::LabelSuggestionHelper::GetSuggestionPreferences().enforceSuggestions }
-    };
-  }
-
-  /** The label names that the view suggests, and takes alone if the suggestions are enforced. */
-  nlohmann::json DescribeLabelSuggestions()
-  {
-    const auto suggestionPreferences = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
-
-    // Loaded as the view loads them for its label inspector.
-    auto helper = mitk::LabelSuggestionHelper::New();
-    helper->LoadStandardSuggestions();
-
-    if (!suggestionPreferences.externalLabelSuggestionFile.empty())
-    {
-      try
-      {
-        helper->ParseSuggestions(suggestionPreferences.externalLabelSuggestionFile, suggestionPreferences.replaceStandardSuggestions);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "The label suggestions of the preferences cannot be read: " << e.GetDescription();
-      }
-    }
-
-    auto names = nlohmann::json::array();
-
-    for (const auto& suggestion : helper->GetAllSuggestions())
-      names.push_back(suggestion->GetName());
-
-    return {
-      { "names", names },
-      { "enforced", suggestionPreferences.enforceSuggestions }
-    };
-  }
-
   nlohmann::json DescribeSession(const mitk::IRestServerService& server, const std::string& path)
   {
     auto* toolManager = GetToolManager();
@@ -398,7 +188,7 @@ namespace
     }
 
     const auto describeWithTime = [&server](mitk::DataNode* node) {
-      auto json = DescribeNode(node, server);
+      auto json = mitk::DescribeRestNode(node, server);
 
       if (node != nullptr && node->GetData() != nullptr)
         json["time_steps"] = mitk::DescribeRestTimeSteps(node->GetData());
@@ -416,7 +206,7 @@ namespace
       { "tool", activeTool != nullptr ? nlohmann::json(activeTool->GetName()) : nlohmann::json() },
       { "unconfirmed_result", activeTool != nullptr && activeTool->ConfirmBeforeDeactivation() },
       { "tools", tools },
-      { "restrictions", DescribeRestrictions() }
+      { "restrictions", mitk::DescribeRestRestrictions(*mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(ViewId)) }
     };
   }
 
@@ -439,76 +229,6 @@ namespace
       mitk::ThrowRestError("NOT_A_SEGMENTATION", "Unprocessable Content", "The node \"" + node->GetName() + "\" is no segmentation.", 422, path);
 
     return segmentation;
-  }
-
-  /** Refuses a body with a field that \p subject does not have, which a client that misspelled one would read as done. */
-  void ThrowIfUnknownField(const nlohmann::json& body, const std::vector<std::string>& fields, const std::string& subject, const std::string& path)
-  {
-    if (!body.is_object())
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The body must be an object with the fields to change.", path));
-
-    for (const auto& item : body.items())
-    {
-      if (std::find(fields.begin(), fields.end(), item.key()) != fields.end())
-        continue;
-
-      std::string list;
-
-      for (std::size_t i = 0; i < fields.size(); ++i)
-        list += (i == 0 ? "" : i + 1 == fields.size() ? " and " : ", ") + fields[i];
-
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("\"" + item.key() + "\" is no field of " + subject + ". " +
-        (fields.size() == 1 ? "The field is " : "The fields are ") + list + ".", path));
-    }
-  }
-
-  /**
-   * Reads a number of the type \p T that a path names. Unlike std::stoul(),
-   * takes no sign, white space or trailing text, and no value beyond the
-   * type, all of which would name another label or group than the path does.
-   */
-  template <typename T>
-  std::optional<T> ParseNumber(const std::string& text)
-  {
-    T value = 0;
-    const auto* end = text.data() + text.size();
-    const auto [parsed, error] = std::from_chars(text.data(), end, value);
-
-    if (error != std::errc() || parsed != end)
-      return std::nullopt;
-
-    return value;
-  }
-
-  mitk::Label::Pointer GetLabel(mitk::MultiLabelSegmentation* segmentation, const mitk::RestRequest& request)
-  {
-    const auto value = ParseNumber<mitk::MultiLabelSegmentation::LabelValueType>(request.PathParams.at("value"));
-
-    if (!value.has_value())
-    {
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The label value must be a whole number of at most " +
-        std::to_string(std::numeric_limits<mitk::MultiLabelSegmentation::LabelValueType>::max()) + ".", request.Path));
-    }
-
-    auto label = segmentation->GetLabel(*value);
-
-    if (label.IsNull())
-      mitk::ThrowRestError("LABEL_NOT_FOUND", "Not Found", "The segmentation has no label " + std::to_string(*value) + ".", 404, request.Path);
-
-    return label;
-  }
-
-  mitk::MultiLabelSegmentation::GroupIndexType GetGroupIndex(const mitk::MultiLabelSegmentation* segmentation, const mitk::RestRequest& request)
-  {
-    const auto group = ParseNumber<mitk::MultiLabelSegmentation::GroupIndexType>(request.PathParams.at("index"));
-
-    if (!group.has_value())
-      throw mitk::RestException(mitk::ErrorResponse::InvalidRequest("The group index must be a whole number.", request.Path));
-
-    if (!segmentation->ExistGroup(*group))
-      mitk::ThrowRestError("GROUP_NOT_FOUND", "Not Found", "The segmentation has no group " + std::to_string(*group) + ".", 404, request.Path);
-
-    return *group;
   }
 
   mitk::SegWithPreviewTool* GetPreviewTool(const std::string& path)
@@ -660,7 +380,7 @@ namespace
     const auto* segmentation = working != nullptr ? dynamic_cast<const mitk::MultiLabelSegmentation*>(working->GetData()) : nullptr;
     const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
 
-    auto labels = measure ? DescribeLabels(preview, GetSelectedTime()) : DescribeLabels(preview);
+    auto labels = measure ? mitk::DescribeRestLabels(preview, GetSelectedTime()) : mitk::DescribeRestLabels(preview);
 
     for (auto& label : labels)
     {
@@ -1102,7 +822,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "hundreds, and whether the view takes only those. Needed only to follow enforced suggestions, see "
     "restrictions of GET /api/v1/segmentation/session.";
   getLabelSuggestions.Handler = [server](const RestRequest&) {
-    return RestResponse::FromData(CallInGuiThread(*server, []() { return DescribeLabelSuggestions(); }));
+    return RestResponse::FromData(CallInGuiThread(*server, []() { return DescribeRestLabelSuggestions(); }));
   };
   routes.push_back(getLabelSuggestions);
 
@@ -1123,7 +843,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "{data: session} as GET does.";
   patchSession.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    ThrowIfUnknownField(body, { "reference", "segmentation", "active_label", "tool" }, "the session", request.Path);
+    ThrowIfUnknownRestField(body, { "reference", "segmentation", "active_label", "tool" }, "the session", request.Path);
 
     if (body.contains("active_label") && (!body["active_label"].is_number_unsigned() ||
         body["active_label"].get<std::uint64_t>() > std::numeric_limits<MultiLabelSegmentation::LabelValueType>::max()))
@@ -1338,7 +1058,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           label->SetName(name);
 
         if (entry.is_object() && entry.contains("color"))
-          label->SetColor(ParseColor(entry["color"], request.Path));
+          label->SetColor(ParseRestColorOrThrow(entry["color"], request.Path));
 
         segmentation->AddLabel(label, segmentation->GetActiveLayer(), false);
         labels.push_back(label);
@@ -1357,8 +1077,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       SelectInView("referenceNode", reference.get());
       SelectInView("workingNode", newNode);
 
-      auto answer = DescribeNode(newNode, *server);
-      answer["labels"] = DescribeLabels(segmentation);
+      auto answer = DescribeRestNode(newNode, *server);
+      answer["labels"] = DescribeRestLabels(segmentation);
       return answer;
     });
 
@@ -1382,11 +1102,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "segmentation has no data at the time point.";
   labels.Handler = [server](const RestRequest& request) {
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
-    const auto measure = IsMeasureRequested(request);
+    const auto measure = IsRestMeasureRequested(request);
     const auto selection = measure ? std::optional<RestTimeSelection>(RestTimeSelection::FromRequest(request)) : std::nullopt;
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      return DescribeLabels(GetSegmentation(node.get(), request.Path), selection);
+      return DescribeRestLabels(GetSegmentation(node.get(), request.Path), selection);
     }));
   };
   routes.push_back(labels);
@@ -1424,7 +1144,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         label->SetName(body["name"].get<std::string>());
 
       if (body.contains("color"))
-        label->SetColor(ParseColor(body["color"], request.Path));
+        label->SetColor(ParseRestColorOrThrow(body["color"], request.Path));
 
       SegGroupModifyUndoRedoHelper undoRedo(segmentation, { group }, false, 0, false, true, true);
       auto* added = segmentation->AddLabel(label, group, false);
@@ -1436,7 +1156,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       node->Modified();
       RenderingManager::GetInstance()->RequestUpdateAll();
-      return DescribeLabel(added, group);
+      return DescribeRestLabel(added, group);
     }), 201);
   };
   routes.push_back(addLabel);
@@ -1451,7 +1171,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "field of the wrong type, and then nothing changes. Returns {data: label}.";
   changeLabel.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    ThrowIfUnknownField(body, { "name", "color", "visible", "locked" }, "a label", request.Path);
+    ThrowIfUnknownRestField(body, { "name", "color", "visible", "locked" }, "a label", request.Path);
 
     if (body.contains("name") && !body["name"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"name\" must be a string.", request.Path));
@@ -1462,13 +1182,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     if (body.contains("locked") && !body["locked"].is_boolean())
       throw RestException(ErrorResponse::InvalidRequest("\"locked\" must be true or false.", request.Path));
 
-    const auto newColor = body.contains("color") ? std::optional<Color>(ParseColor(body["color"], request.Path)) : std::nullopt;
+    const auto newColor = body.contains("color") ? std::optional<Color>(ParseRestColorOrThrow(body["color"], request.Path)) : std::nullopt;
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      auto label = GetLabel(segmentation, request);
+      auto label = GetRestLabel(segmentation, request);
       const auto group = segmentation->GetGroupIndexOfLabel(label->GetValue());
 
       if (body.contains("name") || newColor.has_value())
@@ -1493,7 +1213,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       node->Modified();
       RenderingManager::GetInstance()->RequestUpdateAll();
-      return DescribeLabel(label, group);
+      return DescribeRestLabel(label, group);
     }));
   };
   routes.push_back(changeLabel);
@@ -1512,7 +1232,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      const auto label = GetLabel(segmentation, request);
+      const auto label = GetRestLabel(segmentation, request);
       const auto name = label->GetName();
 
       SegGroupModifyUndoRedoHelper undoRedo(segmentation, { segmentation->GetGroupIndexOfLabel(label->GetValue()) }, true);
@@ -1521,7 +1241,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       node->Modified();
       RenderingManager::GetInstance()->RequestUpdateAll();
-      return DescribeLabels(segmentation);
+      return DescribeRestLabels(segmentation);
     }));
   };
   routes.push_back(removeLabel);
@@ -1545,7 +1265,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      const auto label = GetLabel(segmentation, request);
+      const auto label = GetRestLabel(segmentation, request);
       const auto selection = RestTimeSelection::FromRequest(request);
 
       if (selection.All)
@@ -1575,7 +1295,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       for (const auto value : values)
       {
         if (const auto instance = segmentation->GetLabel(value); instance.IsNotNull())
-          instances.push_back(DescribeLabel(instance, segmentation->GetGroupIndexOfLabel(value)));
+          instances.push_back(DescribeRestLabel(instance, segmentation->GetGroupIndexOfLabel(value)));
       }
 
       return instances;
@@ -1595,7 +1315,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
-      return DescribeGroups(GetSegmentation(node.get(), request.Path));
+      return DescribeRestGroups(GetSegmentation(node.get(), request.Path));
     }));
   };
   routes.push_back(groups);
@@ -1610,7 +1330,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      return DescribeGroup(segmentation, GetGroupIndex(segmentation, request));
+      return DescribeRestGroup(segmentation, GetRestGroupIndex(segmentation, request));
     }));
   };
   routes.push_back(group);
@@ -1645,7 +1365,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       undoRedo.RegisterUndoRedoOperationEvent("Insert new group \"" + LabelSetImageHelper::CreateDisplayGroupName(segmentation, added) + "\"");
 
       node->Modified();
-      return DescribeGroup(segmentation, added);
+      return DescribeRestGroup(segmentation, added);
     }), 201);
   };
   routes.push_back(addGroup);
@@ -1659,7 +1379,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "Undoable. Returns {data: group}.";
   changeGroup.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    ThrowIfUnknownField(body, { "name" }, "a group", request.Path);
+    ThrowIfUnknownRestField(body, { "name" }, "a group", request.Path);
 
     if (!body.contains("name") || !body["name"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"name\", the new name of the group, is missing.", request.Path));
@@ -1669,14 +1389,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      const auto index = GetGroupIndex(segmentation, request);
+      const auto index = GetRestGroupIndex(segmentation, request);
 
       SegGroupModifyUndoRedoHelper undoRedo(segmentation, { index }, true, 0, true, true);
       segmentation->SetGroupName(index, body["name"].get<std::string>());
       undoRedo.RegisterUndoRedoOperationEvent("Rename group #" + std::to_string(index));
 
       node->Modified();
-      return DescribeGroup(segmentation, index);
+      return DescribeRestGroup(segmentation, index);
     }));
   };
   routes.push_back(changeGroup);
@@ -1695,7 +1415,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
       auto* segmentation = GetSegmentation(node.get(), request.Path);
-      const auto index = GetGroupIndex(segmentation, request);
+      const auto index = GetRestGroupIndex(segmentation, request);
 
       // MultiLabelSegmentation::RemoveGroup() would also remove the last one.
       if (segmentation->GetNumberOfGroups() < 2)
@@ -1709,7 +1429,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       node->Modified();
       RenderingManager::GetInstance()->RequestUpdateAll();
-      return DescribeGroups(segmentation);
+      return DescribeRestGroups(segmentation);
     }));
   };
   routes.push_back(removeGroup);
@@ -1770,8 +1490,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         RenderingManager::GetInstance()->RequestUpdateAll();
 
         return nlohmann::json{
-          { "segmentation", DescribeNode(target, *server) },
-          { "labels", target != nullptr ? DescribeLabels(GetSegmentation(target, path)) : nlohmann::json::array() }
+          { "segmentation", DescribeRestNode(target, *server) },
+          { "labels", target != nullptr ? DescribeRestLabels(GetSegmentation(target, path)) : nlohmann::json::array() }
         };
       };
 
@@ -1856,7 +1576,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "the request gets 409 BUSY. Returns {data: state} as GET does.";
   nnInteractiveOptions.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    ThrowIfUnknownField(body, { "auto_zoom", "auto_refine" }, "the options of nnInteractive", request.Path);
+    ThrowIfUnknownRestField(body, { "auto_zoom", "auto_refine" }, "the options of nnInteractive", request.Path);
 
     for (const auto* key : { "auto_zoom", "auto_refine" })
     {
@@ -2175,7 +1895,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "one, which the confirm creates if the segmentation does not have it, and they get their values with the "
     "confirm. voxels, volume_ml and center are those of GET .../labels at the selected time point.";
   voxTell.Handler = [server](const RestRequest& request) {
-    const auto measure = IsMeasureRequested(request);
+    const auto measure = IsRestMeasureRequested(request);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeVoxTell(GetVoxTell(request.Path), measure); }));
   };
@@ -2586,7 +2306,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "confirm; voxels, volume_ml and center are those of GET .../labels at the selected time point. Device and "
     "license are settings of the user.";
   totalSegmentator.Handler = [server](const RestRequest& request) {
-    const auto measure = IsMeasureRequested(request);
+    const auto measure = IsRestMeasureRequested(request);
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() { return DescribeTotalSegmentator(GetTotalSegmentator(request.Path), true, measure); }));
   };
@@ -2751,7 +2471,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "{data: state} as GET does, without tasks.";
   totalSegmentatorOptions.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
-    ThrowIfUnknownField(body, { "task", "speed", "roi_subset" }, "the options of TotalSegmentator", request.Path);
+    ThrowIfUnknownRestField(body, { "task", "speed", "roi_subset" }, "the options of TotalSegmentator", request.Path);
 
     if (body.contains("task") && !body["task"].is_string())
       throw RestException(ErrorResponse::InvalidRequest("\"task\" must be the name of a task.", request.Path));

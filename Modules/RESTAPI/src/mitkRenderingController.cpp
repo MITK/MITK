@@ -223,28 +223,29 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
   if (!uids.empty())
   {
     // Node-scoped: fit views to the bounding geometry of the specified nodes.
-    // Pre-dispatch: validate all UIDs and capture node pointers (no cloning).
-    std::vector<DataNode::ConstPointer> nodes;
-    nodes.reserve(uids.size());
-    for (const auto& uid : uids)
-    {
-      const auto node = m_Bridge.FindDataNode(uid);
-      if (node == nullptr)
-      {
-        this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
-        return;
-      }
-      nodes.push_back(node);
-    }
-
-    // Dispatch: validate geometry and compute bounding box on the UI thread.
+    // The nodes are looked up and released on the UI thread: a node removed
+    // meanwhile must not be destroyed on this thread.
     const auto dataStorage = m_Bridge.GetDataStorage();
     std::optional<std::pair<int, nlohmann::json>> dispatchError;
 
     try
     {
-      this->Dispatch([dataStorage, nodes, uids, &req, &dispatchError]()
+      this->Dispatch([this, dataStorage, &uids, &req, &dispatchError]()
       {
+        std::vector<DataNode::ConstPointer> nodes;
+        nodes.reserve(uids.size());
+
+        for (const auto& uid : uids)
+        {
+          auto node = m_Bridge.FindNode(uid);
+          if (node.IsNull())
+          {
+            dispatchError = {404, ErrorResponse::NodeNotFound(uid, req.path)};
+            return;
+          }
+          nodes.push_back(node.GetPointer());
+        }
+
         auto nodeSet = DataStorage::ConstSetOfObjects::New();
         for (std::size_t i = 0; i < nodes.size(); ++i)
         {

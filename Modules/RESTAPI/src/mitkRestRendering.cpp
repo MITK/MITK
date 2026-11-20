@@ -166,7 +166,7 @@ mitk::RestScreenshotOptions mitk::ParseRestScreenshotOptions(const RestRequest& 
 
     const auto value = ParseRestPixelCount("padding", *padding, request.Path);
 
-    if (value < 0 || 2 * value >= static_cast<int>(options.MaxSize))
+    if (value < 0 || 2LL * value >= options.MaxSize)
       throw RestException(ErrorResponse::InvalidRequest("padding must be 0 or more and less than half of max_size.", request.Path));
 
     options.Padding = static_cast<unsigned int>(value);

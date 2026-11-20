@@ -423,6 +423,7 @@ public:
       { "crop=true&padding=-1", "padding must be 0 or more and less than half of max_size." },
       { "crop=true&padding=500", "padding must be 0 or more and less than half of max_size." },
       { "crop=true&max_size=100&padding=50", "padding must be 0 or more and less than half of max_size." },
+      { "crop=true&padding=2000000000", "padding must be 0 or more and less than half of max_size." },
       { "crop=true&padding=x", "padding must be a number of pixels." },
       // The first refused parameter in the order that the options are read gives the message.
       { "scale=9&max_size=abc", "max_size must be a number of pixels." },

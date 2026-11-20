@@ -53,8 +53,10 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     "slice inside it, or along it for a line: voxels counts them, and there is no volume_ml, as the figure's area "
     "is among its measurements. A 2D image has no volume_ml either. With all, each entry has time_steps: [{min_timepoint_ms, max_timepoint_ms, "
     "voxels, ...}] instead of the values. Gray values are in the image's unit, Hounsfield units for CT; empty "
-    "labels have none. Status 422 if the image or mask has no data at the time point, with all if a segmentation "
-    "has none at one of the image's time points, or if a planar figure lies tilted to the image's slices.";
+    "labels have none. Status 422 if the image or mask has no data at the time point, if a segmentation has no or "
+    "other data where the image's time step there begins, as statistics take it there (with all, if it has none "
+    "where one of the image's time steps begins, or more than one time step within one of them, as a dynamic "
+    "segmentation on a static image has), or if a planar figure lies tilted to the image's slices.";
   statistics.Handler = [server](const RestRequest& request) {
     const auto imageUid = request.GetQueryParam("image");
     const auto maskUid = request.GetQueryParam("mask");
@@ -137,24 +139,8 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
         maskName = maskNode->GetName();
       }
 
-      // For all time steps, the segmentation is taken at the time point of each time step of the image.
-      if (selection.All && segmentation.IsNotNull())
-      {
-        const auto* imageTime = image->GetTimeGeometry();
-        const auto* maskTime = segmentation->GetTimeGeometry();
-
-        for (mitk::TimeStepType timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
-        {
-          const auto timePoint = imageTime->TimeStepToTimePoint(timeStep);
-
-          if (!maskTime->IsValidTimePoint(timePoint))
-          {
-            mitk::ThrowRestError("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "\"" + maskNode->GetName() + "\" has no data at " +
-              nlohmann::json(timePoint).dump() + " ms, a time point of \"" + imageNode->GetName() + "\". Its time_steps say which "
-              "time points it covers.", 422, request.Path);
-          }
-        }
-      }
+      if (segmentation.IsNotNull())
+        mitk::CheckRestMaskTimeSteps(selection, imageNode.get(), maskNode.get(), timeSteps, request.Path);
 
       // What the answer tells of the nodes is read here, as the user can change them during the measurement below.
       imageName = imageNode->GetName();

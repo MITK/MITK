@@ -50,6 +50,24 @@ namespace mitk
     const RestTimeSelection& selection, const DataNode* node, const std::string& path);
 
   /**
+   * \brief Checks that the statistics measure a segmentation where the
+   *        selection names it.
+   *
+   * The statistics take the segmentation at the time point where each
+   * measured time step of the image begins. For all time steps, the
+   * segmentation needs data there; for a time point, the same data as at the
+   * time point.
+   *
+   * \param imageTimeSteps The measured time steps of the image, as
+   *        GetRestTimeSteps() gives them.
+   * \param path The request path, for errors.
+   * \throw RestException with status 422 and code NO_DATA_AT_TIME_POINT
+   *        otherwise.
+   */
+  MITKMEASUREMENTREST_EXPORT void CheckRestMaskTimeSteps(const RestTimeSelection& selection, const DataNode* imageNode,
+    const DataNode* maskNode, const std::vector<TimeStepType>& imageTimeSteps, const std::string& path);
+
+  /**
    * \brief Adds the measured values of a region to a JSON object: voxels, the
    *        volume in milliliters if the values have one, and, for images with
    *        scalar pixels, mean, median, standard_deviation, min and max.

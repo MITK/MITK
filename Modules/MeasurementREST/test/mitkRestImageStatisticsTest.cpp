@@ -98,8 +98,8 @@ namespace
     return node;
   }
 
-  /** An image with the given number of time steps of 100 ms from 0 ms on. */
-  mitk::Image::Pointer CreateTimeImage(unsigned int timeSteps)
+  /** An image with the given number of time steps of 100 ms from the first time point on. */
+  mitk::Image::Pointer CreateTimeImage(unsigned int timeSteps, double firstTimePoint = 0.0)
   {
     unsigned int dimensions[] = { 2, 2, 2, timeSteps };
     auto image = mitk::Image::New();
@@ -109,7 +109,7 @@ namespace
     {
       auto timeGeometry = mitk::ProportionalTimeGeometry::New();
       timeGeometry->Initialize(image->GetGeometry(), timeSteps);
-      timeGeometry->SetFirstTimePoint(0.0);
+      timeGeometry->SetFirstTimePoint(firstTimePoint);
       timeGeometry->SetStepDuration(100.0);
       image->SetTimeGeometry(timeGeometry);
     }
@@ -249,6 +249,8 @@ class mitkRestImageStatisticsTestSuite : public mitk::TestFixture
   MITK_TEST(TestTimeStepsOfA4DImage);
   MITK_TEST(TestTimeStepsOutsideTheDataAreRefused);
   MITK_TEST(TestTimeStepErrorIsWrittenWithoutRegardToTheLocale);
+  MITK_TEST(TestMaskNeedsDataAtEachTimeStepOfTheImage);
+  MITK_TEST(TestMaskIsTakenWhereTheTimeStepOfTheImageBegins);
   MITK_TEST(TestValuesWithAllStatistics);
   MITK_TEST(TestValuesWithoutScalarStatistics);
   MITK_TEST(TestValuesWithoutVolume);
@@ -387,6 +389,79 @@ public:
 
     const auto failure = GetFailureOf([&]() { mitk::GetRestTimeSteps(At(5000.0), node, "/p"); });
     CPPUNIT_ASSERT(failure.Message.find("has no data at 5000.0 ms.") != std::string::npos);
+  }
+
+  void TestMaskNeedsDataAtEachTimeStepOfTheImage()
+  {
+    const auto image = CreateNode("Series", CreateTimeImage(4));
+    mitk::RestTimeSelection all;
+    all.All = true;
+    const auto steps = mitk::GetRestTimeSteps(all, image, "/p");
+
+    mitk::CheckRestMaskTimeSteps(all, image, CreateNode("Mask", CreateTimeImage(4)), steps, "/p");
+
+    const auto failure = GetFailureOf([&]() {
+      mitk::CheckRestMaskTimeSteps(all, image, CreateNode("Short", CreateTimeImage(2)), steps, "/p");
+    });
+
+    CPPUNIT_ASSERT_EQUAL(422, failure.Status);
+    CPPUNIT_ASSERT_EQUAL(std::string("NO_DATA_AT_TIME_POINT"), failure.Code);
+    CPPUNIT_ASSERT(failure.Message.find("\"Short\" has no data at 200.0 ms, a time point of \"Series\".") == 0);
+
+    // A dynamic segmentation on a static image: only its first time step would be measured.
+    const auto staticImage = CreateNode("Image", CreateTimeImage(1));
+    const auto staticSteps = mitk::GetRestTimeSteps(all, staticImage, "/p");
+    const auto dynamic = GetFailureOf([&]() {
+      mitk::CheckRestMaskTimeSteps(all, staticImage, CreateNode("Lesion", CreateTimeImage(4)), staticSteps, "/p");
+    });
+
+    CPPUNIT_ASSERT_EQUAL(422, dynamic.Status);
+    CPPUNIT_ASSERT(dynamic.Message.find("\"Lesion\" has more than one time step within the time step of \"Image\"") == 0);
+
+    // A static segmentation on a static image is measured as usual.
+    mitk::CheckRestMaskTimeSteps(all, staticImage, CreateNode("Static", CreateTimeImage(1)), staticSteps, "/p");
+
+    // Finer steps of the mask than of the image hide some of them, too.
+    const auto coarse = CreateNode("Coarse", CreateTimeImage(2));
+    auto fineMask = CreateTimeImage(4);
+    auto fineTime = mitk::ProportionalTimeGeometry::New();
+    fineTime->Initialize(fineMask->GetGeometry(), 4);
+    fineTime->SetFirstTimePoint(0.0);
+    fineTime->SetStepDuration(50.0);
+    fineMask->SetTimeGeometry(fineTime);
+    const auto fine = GetFailureOf([&]() {
+      mitk::CheckRestMaskTimeSteps(all, coarse, CreateNode("Fine", fineMask), mitk::GetRestTimeSteps(all, coarse, "/p"), "/p");
+    });
+    CPPUNIT_ASSERT_EQUAL(422, fine.Status);
+  }
+
+  void TestMaskIsTakenWhereTheTimeStepOfTheImageBegins()
+  {
+    const auto staticImage = CreateNode("Image", CreateTimeImage(1));
+    const auto series = CreateNode("Series", CreateTimeImage(4));
+    const auto mask = CreateNode("Mask", CreateTimeImage(4));
+
+    const auto check = [](const mitk::DataNode* image, const mitk::DataNode* mask, double timePoint) {
+      const auto selection = At(timePoint);
+      mitk::CheckRestMaskTimeSteps(selection, image, mask, mitk::GetRestTimeSteps(selection, image, "/p"), "/p");
+    };
+
+    // Where the mask has the data of the time point.
+    check(series, mask, 250.0);
+    check(staticImage, mask, 50.0);
+
+    // A static image is measured at 0 ms, where the mask has other data.
+    auto failure = GetFailureOf([&]() { check(staticImage, mask, 250.0); });
+    CPPUNIT_ASSERT_EQUAL(422, failure.Status);
+    CPPUNIT_ASSERT_EQUAL(std::string("NO_DATA_AT_TIME_POINT"), failure.Code);
+    CPPUNIT_ASSERT_EQUAL(std::string("The statistics take \"Mask\" at 0.0 ms, where the time step of \"Image\" at 250.0 ms "
+      "begins, and \"Mask\" has other data there than at 250.0 ms. Its time_steps say which time points it covers."), failure.Message);
+
+    // A mask that begins later has none there.
+    const auto later = CreateNode("Later", CreateTimeImage(4, 1000.0));
+    failure = GetFailureOf([&]() { check(staticImage, later, 1250.0); });
+    CPPUNIT_ASSERT_EQUAL(422, failure.Status);
+    CPPUNIT_ASSERT(failure.Message.find("\"Later\" has no data there.") != std::string::npos);
   }
 
   void TestTimeStepErrorIsWrittenWithoutRegardToTheLocale()

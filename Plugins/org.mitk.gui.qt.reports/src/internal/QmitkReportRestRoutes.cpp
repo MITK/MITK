@@ -28,6 +28,8 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 #include <berryPlatformUI.h>
 
+#include <QmitkHtmlWidget.h>
+
 #include <QBuffer>
 #include <QFile>
 #include <QImage>
@@ -108,6 +110,10 @@ namespace
 
     if (unquotedSource.match(html).hasMatch())
       throw RestException(ErrorResponse::InvalidRequest("An img tag has a src without quotes. Images need src in quotes, like <img src=\"image-3.png\">.", path));
+
+    // The editor would show an empty box where a browser draws the chart.
+    if (const auto problem = QmitkHtmlWidget::FindUndrawableSvg(html); !problem.isEmpty())
+      throw RestException(ErrorResponse::InvalidRequest(problem.toStdString() + " The report editor draws charts as SVG documents.", path));
   }
 
   nlohmann::json Describe(const QmitkReportStore::Report& report, bool withHtml)

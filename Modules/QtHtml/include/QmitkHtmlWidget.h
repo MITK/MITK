@@ -52,6 +52,17 @@ public:
   /** \brief Parse, lay out and display an HTML document with the given base URL. */
   void SetHtml(const QString &html, const QUrl &baseUrl);
 
+  /**
+   * \brief Tells why the first inline &lt;svg&gt; of an HTML text that the widget cannot draw is not drawn.
+   *
+   * The widget draws an inline SVG as an SVG document, which must be well-formed
+   * XML, unlike in a browser, and must refer to nothing but its own elements.
+   *
+   * \return A message that counts the inline svg elements from 1 and names the
+   *         reason, or an empty string if every one can be drawn.
+   */
+  static QString FindUndrawableSvg(const QString &html);
+
   /** \brief The current document's title (from its &lt;title&gt; element). */
   QString DocumentTitle() const;
 

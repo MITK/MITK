@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <cmath>
 #include <cstring>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -211,16 +212,19 @@ namespace
   }
 
   /**
-   * \brief Whether an SVG refers to nothing outside of itself.
+   * \brief Why an SVG is not drawn, or empty if it is.
    *
-   * Qt SVG opens what an &lt;image&gt; names, unless it is a "data:" URI, and
-   * the style sheet that an xml-stylesheet instruction names, while it parses
-   * and outside of the resource handler, so an SVG of an untrusted page could
-   * read local files or reach network shares. A "data:" image is decoded by
-   * its content, which may be an SVG with references of its own. So only
+   * Qt SVG reads an SVG as XML and gives up on the first error, where a
+   * browser's HTML parser is lenient, for example with HTML's named entities.
+   *
+   * Qt SVG also opens what an &lt;image&gt; names, unless it is a "data:" URI,
+   * and the style sheet that an xml-stylesheet instruction names, while it
+   * parses and outside of the resource handler, so an SVG of an untrusted page
+   * could read local files or reach network shares. A "data:" image is decoded
+   * by its content, which may be an SVG with references of its own. So only
    * references to the SVG's own elements are accepted.
    */
-  bool IsSelfContainedSvg(const QByteArray &svg)
+  QString FindSvgProblem(const QByteArray &svg)
   {
     QXmlStreamReader reader(svg);
 
@@ -229,14 +233,19 @@ namespace
       switch (reader.readNext())
       {
         case QXmlStreamReader::DTD:
+          return QStringLiteral("it has a DOCTYPE");
+
         case QXmlStreamReader::ProcessingInstruction:
-          return false;
+          return QStringLiteral("it has a processing instruction");
 
         case QXmlStreamReader::StartElement:
           for (const auto &attribute : reader.attributes())
           {
             if (attribute.name() == QLatin1String("href") && !attribute.value().startsWith(QLatin1Char('#')))
-              return false;
+            {
+              return QStringLiteral("it refers to something outside of itself (href=\"%1\"); only references to its own "
+                                    "elements, like href=\"#id\", are drawn").arg(attribute.value());
+            }
           }
           break;
 
@@ -245,11 +254,24 @@ namespace
       }
     }
 
-    return !reader.hasError();
+    if (reader.hasError())
+    {
+      auto error = reader.errorString();
+
+      if (error.endsWith(QLatin1Char('.')))
+        error.chop(1);
+
+      return QStringLiteral("it is not well-formed XML: %1 (line %2, column %3)")
+        .arg(error)
+        .arg(reader.lineNumber())
+        .arg(reader.columnNumber());
+    }
+
+    return QString();
   }
 
-  /** \brief An &lt;img&gt; showing the SVG markup, with the attributes that size and style its box. */
-  QString svgAsImage(const QString &openTag, QString svg)
+  /** \brief The markup of an inline &lt;svg&gt; element as a standalone SVG document. */
+  QString AsSvgDocument(const QString &openTag, QString svg)
   {
     // A standalone SVG document needs the namespaces that HTML implies.
     if (!openTag.contains(QStringLiteral("xmlns=")))
@@ -258,43 +280,25 @@ namespace
     if (svg.contains(QStringLiteral("xlink:")) && !openTag.contains(QStringLiteral("xmlns:xlink=")))
       svg.insert(4, QStringLiteral(" xmlns:xlink=\"http://www.w3.org/1999/xlink\""));
 
-    QString image = QStringLiteral("<img src=\"data:image/svg+xml;base64,") + QString::fromLatin1(svg.toUtf8().toBase64()) + QLatin1Char('"');
-
-    static const QRegularExpression attribute(QStringLiteral("([\\w:-]+)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')"));
-    static const QStringList keptAttributes = { "width", "height", "class", "style", "id" };
-
-    auto attributes = attribute.globalMatch(openTag);
-
-    while (attributes.hasNext())
-    {
-      const auto match = attributes.next();
-      const auto name = match.captured(1).toLower();
-
-      if (!keptAttributes.contains(name))
-        continue;
-
-      auto value = match.hasCaptured(2) ? match.captured(2) : match.captured(3);
-      image += QLatin1Char(' ') + name + QStringLiteral("=\"") + value.replace(QLatin1Char('"'), QStringLiteral("&quot;")) + QLatin1Char('"');
-    }
-
-    return image + QLatin1Char('>');
+    return svg;
   }
 
-  /**
-   * \brief The HTML with every outermost &lt;svg&gt; element replaced by an image of it.
-   *
-   * litehtml has no SVG element: inline SVG would be laid out as unknown HTML
-   * and draw nothing. As an image it takes the path of SVG files, drawn as
-   * vectors. Style sheets of the page no longer reach into it.
-   */
-  QString replaceInlineSvg(const QString &html)
+  /** \brief An outermost &lt;svg&gt; element of an HTML text. */
+  struct InlineSvg
+  {
+    qsizetype Start;
+    qsizetype End;
+    QString OpenTag;
+  };
+
+  /** \brief The outermost &lt;svg&gt; elements of an HTML text, in order. */
+  std::vector<InlineSvg> FindInlineSvg(const QString &html)
   {
     // Case-sensitive like the XML that the markup becomes. A quoted attribute
     // value may contain '>', and a name like svg-icon is another element.
     static const QRegularExpression svgTag(QStringLiteral("<(/?)svg(?=[\\s/>])(?:[^>\"']|\"[^\"]*\"|'[^']*')*>"));
 
-    QString result;
-    qsizetype copied = 0;
+    std::vector<InlineSvg> result;
     qsizetype start = 0;
     QString openTag;
     int depth = 0;
@@ -334,18 +338,82 @@ namespace
         continue;
       }
 
-      const auto end = tag.capturedEnd();
-      result += QStringView(html).mid(copied, start - copied);
-      result += svgAsImage(openTag, html.mid(start, end - start));
-      copied = end;
+      result.push_back({ start, tag.capturedEnd(), openTag });
     }
 
-    if (copied == 0)
+    return result;
+  }
+
+  /** \brief An &lt;img&gt; showing the SVG markup, with the attributes that size and style its box. */
+  QString svgAsImage(const QString &openTag, const QString &svg)
+  {
+    QString image = QStringLiteral("<img src=\"data:image/svg+xml;base64,") +
+                    QString::fromLatin1(AsSvgDocument(openTag, svg).toUtf8().toBase64()) + QLatin1Char('"');
+
+    static const QRegularExpression attribute(QStringLiteral("([\\w:-]+)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')"));
+    static const QStringList keptAttributes = { "width", "height", "class", "style", "id" };
+
+    auto attributes = attribute.globalMatch(openTag);
+
+    while (attributes.hasNext())
+    {
+      const auto match = attributes.next();
+      const auto name = match.captured(1).toLower();
+
+      if (!keptAttributes.contains(name))
+        continue;
+
+      auto value = match.hasCaptured(2) ? match.captured(2) : match.captured(3);
+      image += QLatin1Char(' ') + name + QStringLiteral("=\"") + value.replace(QLatin1Char('"'), QStringLiteral("&quot;")) + QLatin1Char('"');
+    }
+
+    return image + QLatin1Char('>');
+  }
+
+  /**
+   * \brief The HTML with every outermost &lt;svg&gt; element replaced by an image of it.
+   *
+   * litehtml has no SVG element: inline SVG would be laid out as unknown HTML
+   * and draw nothing. As an image it takes the path of SVG files, drawn as
+   * vectors. Style sheets of the page no longer reach into it.
+   */
+  QString replaceInlineSvg(const QString &html)
+  {
+    const auto svgs = FindInlineSvg(html);
+
+    if (svgs.empty())
       return html;
+
+    QString result;
+    qsizetype copied = 0;
+
+    for (const auto &svg : svgs)
+    {
+      result += QStringView(html).mid(copied, svg.Start - copied);
+      result += svgAsImage(svg.OpenTag, html.mid(svg.Start, svg.End - svg.Start));
+      copied = svg.End;
+    }
 
     result += QStringView(html).mid(copied);
     return result;
   }
+}
+
+QString QmitkHtmlWidget::FindUndrawableSvg(const QString &html)
+{
+  const auto svgs = FindInlineSvg(html);
+
+  for (std::size_t i = 0; i < svgs.size(); ++i)
+  {
+    const auto &svg = svgs[i];
+    const auto document = AsSvgDocument(svg.OpenTag, html.mid(svg.Start, svg.End - svg.Start));
+    const auto problem = FindSvgProblem(document.toUtf8());
+
+    if (!problem.isEmpty())
+      return QStringLiteral("Inline svg %1 cannot be drawn, as %2.").arg(i + 1).arg(problem);
+  }
+
+  return QString();
 }
 
 // The document_container callbacks are deeply tied to the owning widget (they
@@ -1134,14 +1202,18 @@ private:
     probe.open(QIODevice::ReadOnly);
     QImageReader reader(&probe);
 
-    // An SVG that refers to anything outside of itself is not drawn at all, not
-    // even as a raster image, which Qt's SVG image plugin would parse alike.
-    // The same holds for compressed SVG, which is not checked.
-    if (reader.format().startsWith("svg") && (reader.format() != "svg" || !IsSelfContainedSvg(data)))
+    // An SVG that is not drawn is not drawn as a raster image either, which
+    // Qt's SVG image plugin would parse alike. Compressed SVG is not checked.
+    if (reader.format().startsWith("svg"))
     {
-      qWarning("QmitkHtmlWidget: an SVG image that refers to files or other documents is not shown.");
-      m_Images.insert(key, QImage());
-      return;
+      const auto problem = reader.format() == "svg" ? FindSvgProblem(data) : QStringLiteral("it is compressed");
+
+      if (!problem.isEmpty())
+      {
+        qWarning("QmitkHtmlWidget: an SVG image is not shown, as %s.", qUtf8Printable(problem));
+        m_Images.insert(key, QImage());
+        return;
+      }
     }
 
     // SVGs are kept as a vector renderer so they stay crisp at any display size.

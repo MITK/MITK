@@ -37,8 +37,8 @@ namespace
     return request;
   }
 
-  /** An image with time steps of 100 ms (or the given duration) from 0 ms on, or one time step. */
-  mitk::Image::Pointer MakeImage(unsigned int timeSteps, double stepDuration = 100.0)
+  /** An image with time steps of 100 ms (or the given duration) from 0 ms (or the given time point) on, or one time step. */
+  mitk::Image::Pointer MakeImage(unsigned int timeSteps, double stepDuration = 100.0, double firstTimePoint = 0.0)
   {
     unsigned int dimensions[] = { 2, 2, 2, timeSteps };
     auto image = mitk::Image::New();
@@ -48,7 +48,7 @@ namespace
     {
       auto timeGeometry = mitk::ProportionalTimeGeometry::New();
       timeGeometry->Initialize(image->GetGeometry(), timeSteps);
-      timeGeometry->SetFirstTimePoint(0.0);
+      timeGeometry->SetFirstTimePoint(firstTimePoint);
       timeGeometry->SetStepDuration(stepDuration);
       image->SetTimeGeometry(timeGeometry);
     }
@@ -196,32 +196,37 @@ public:
 
   void TimePointsAtTheBoundsOfInexactStepsSelectTheirSteps()
   {
-    // 28 steps of a duration that has no exact binary form, like 28 frames per second.
+    // 28 steps of a duration that has no exact binary form, like 28 frames per second,
+    // from first time points at which the division alone misses the bounds of steps.
     const double duration = 1000.0 / 28;
     const unsigned int count = 28;
-    const auto image = MakeImage(count, duration);
-    const auto* timeGeometry = image->GetTimeGeometry();
 
-    for (mitk::TimeStepType step = 0; step < count; ++step)
+    for (const double firstTimePoint : { 0.0, 100.5, -37.25 })
     {
-      const auto first = timeGeometry->GetMinimumTimePoint(step);
-      const auto end = timeGeometry->GetMaximumTimePoint(step);
+      const auto image = MakeImage(count, duration, firstTimePoint);
+      const auto* timeGeometry = image->GetTimeGeometry();
 
-      // The lower bound belongs to the step, as the description of the step tells clients.
-      AssertSteps(ToQueryValue(first), image, { step });
+      for (mitk::TimeStepType step = 0; step < count; ++step)
+      {
+        const auto first = timeGeometry->GetMinimumTimePoint(step);
+        const auto end = timeGeometry->GetMaximumTimePoint(step);
 
-      // The upper bound does not: it is the first time point of the next step.
-      if (step + 1 < count)
-        AssertSteps(ToQueryValue(end), image, { step + 1 });
-      else
-        AssertSteps(ToQueryValue(end), image, {});
+        // The lower bound belongs to the step, as the description of the step tells clients.
+        AssertSteps(ToQueryValue(first), image, { step });
 
-      if (step > 0)
-        AssertSteps(ToQueryValue(Below(first)), image, { step - 1 });
-      else
-        AssertSteps(ToQueryValue(Below(first)), image, {});
+        // The upper bound does not: it is the first time point of the next step.
+        if (step + 1 < count)
+          AssertSteps(ToQueryValue(end), image, { step + 1 });
+        else
+          AssertSteps(ToQueryValue(end), image, {});
 
-      AssertSteps(ToQueryValue(Below(end)), image, { step });
+        if (step > 0)
+          AssertSteps(ToQueryValue(Below(first)), image, { step - 1 });
+        else
+          AssertSteps(ToQueryValue(Below(first)), image, {});
+
+        AssertSteps(ToQueryValue(Below(end)), image, { step });
+      }
     }
   }
 

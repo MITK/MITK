@@ -120,11 +120,7 @@ void FitGeneratorDemoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*s
           MITK_INFO <<
                     "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
                     m_selectedMaskNode->GetName() ;
-          mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-          maskedImageTimeSelector->SetInput(this->m_selectedMask);
-          maskedImageTimeSelector->SetTimeNr(0);
-          maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          this->m_selectedMask = maskedImageTimeSelector->GetOutput();
+          this->m_selectedMask = mitk::SelectImageByTimeStep(this->m_selectedMask, 0);
         }
       }
 

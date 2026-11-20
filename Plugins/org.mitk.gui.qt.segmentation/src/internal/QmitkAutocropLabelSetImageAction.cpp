@@ -49,7 +49,7 @@ namespace
     {
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
-        const mitk::Image* image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
+        const auto image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
         mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::LabelValueType, 3> pixelReader(image);
         bool imageIsEmpty = true;
 
@@ -164,7 +164,7 @@ namespace
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
-        const mitk::Image* image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
+        const auto image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
 
         mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::LabelValueType, 3> pixelReader(image);
         auto* croppedVolume = new mitk::MultiLabelSegmentation::LabelValueType[numPixels];

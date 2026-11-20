@@ -245,11 +245,7 @@ mitk::Image::Pointer getMask3D()
     if (mask->GetTimeSteps() > 1)
     {
       MITK_INFO << "Selected mask has multiple timesteps. Only use first timestep to mask model fit.";
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(mask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      result = maskedImageTimeSelector->GetOutput();
+      result = mitk::SelectImageByTimeStep(mask, 0);
     }
   }
 
@@ -278,11 +274,7 @@ void getAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& aif,
     if (aifMask->GetTimeSteps() > 1)
     {
       MITK_INFO << "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit.";
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(aifMask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      aifMask = maskedImageTimeSelector->GetOutput();
+      aifMask = mitk::SelectImageByTimeStep(aifMask, 0);
     }
 
     aifGenerator->SetMask(aifMask);
@@ -321,13 +313,8 @@ void generateDescriptiveBrixModel_PixelBased(mitk::modelFit::ModelFitInfo::Point
   modelParameterizer->SetTau(brixInjectionTime);
   std::cout << "Injection time [min]: " << brixInjectionTime << std::endl;
 
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(0);
-  imageTimeSelector->UpdateLargestPossibleRegion();
-
   mitk::DescriptivePharmacokineticBrixModelParameterizer::BaseImageType::Pointer baseImage;
-  mitk::CastToItkImage(imageTimeSelector->GetOutput(), baseImage);
+  mitk::CastToItkImage(mitk::SelectImageByTimeStep(image, 0), baseImage);
 
   modelParameterizer->SetBaseImage(baseImage);
 

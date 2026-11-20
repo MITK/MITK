@@ -68,15 +68,10 @@ void mitk::ConcentrationCurveGenerator::Convert()
     tempImage->SetTimeGeometry(timeGeometry);
 
     PrepareBaselineImage();
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(this->m_DynamicImage);
 
     for (mitk::TimeStepType i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
     {
-        imageTimeSelector->SetTimeNr(i);
-        imageTimeSelector->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
+        mitk::Image::ConstPointer mitkInputImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, i);
         mitk::Image::Pointer outputImage = mitk::Image::New();
 
         outputImage = ConvertSignalToConcentrationCurve(mitkInputImage,this->m_BaselineImage);
@@ -96,28 +91,19 @@ void mitk::ConcentrationCurveGenerator::Convert()
 void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 {
 
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(this->m_DynamicImage);
-  imageTimeSelector->SetTimeNr(0);
-  imageTimeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer baselineImage;
-  baselineImage = imageTimeSelector->GetOutput();
-  
   if (m_BaselineStartTimeStep == m_BaselineEndTimeStep)
   {
-    this->m_BaselineImage = imageTimeSelector->GetOutput();
+    if (m_BaselineStartTimeStep >= this->m_DynamicImage->GetTimeSteps())
+    {
+      mitkThrow() << "Baseline time step " << m_BaselineStartTimeStep
+                  << " is out of range; the image has "
+                  << this->m_DynamicImage->GetTimeSteps() << " time steps.";
+    }
+    this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, m_BaselineStartTimeStep);
   }
   else
   {
-    try
-    {
-      AccessFixedDimensionByItk(this->m_DynamicImage, mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage, 4);
-    }
-    catch (itk::ExceptionObject & err)
-    {
-      std::cerr << "ExceptionObject in ConcentrationCurveGenerator::CalculateAverageBaselineImage caught!" << std::endl;
-      std::cerr << err << std::endl;
-    }
+    AccessFixedDimensionByItk(this->m_DynamicImage, mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage, 4);
   }
 }
 
@@ -130,7 +116,8 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   }
   if (m_BaselineStartTimeStep > m_BaselineEndTimeStep)
   {
-    mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is before start time point.";
+    mitkThrow() << "Baseline start time step " << m_BaselineStartTimeStep
+                << " is after the end time step " << m_BaselineEndTimeStep << ".";
   }
   
   typedef itk::Image<TPixel, 4> TPixel4DImageType;
@@ -144,9 +131,11 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typename Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
   typename TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
-  if (m_BaselineEndTimeStep > region_input.GetSize()[3])
+  if (m_BaselineEndTimeStep >= region_input.GetSize()[3])
   {
-    mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
+    mitkThrow() << "Baseline end time step " << m_BaselineEndTimeStep
+                << " is out of range; the image has "
+                << region_input.GetSize()[3] << " time steps.";
   }
 
   typename ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();

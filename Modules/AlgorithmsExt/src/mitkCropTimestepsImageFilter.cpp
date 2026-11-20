@@ -72,7 +72,7 @@ found in the LICENSE file.
     delete[] dimensions;
     auto newTimeGeometry = AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, m_UpperBoundaryTimestep);
     output->SetTimeGeometry(newTimeGeometry);
-    output->SetPropertyList(input->GetPropertyList());
+    output->SetPropertyList(input->GetPropertyList()->Clone());
   }
 
   mitk::SlicedData::RegionType mitk::CropTimestepsImageFilter::ComputeDesiredRegion() const
@@ -120,17 +120,12 @@ void mitk::CropTimestepsImageFilter::GenerateData()
   if ((output->IsInitialized() == false))
     return;
 
-  auto timeSelector = mitk::ImageTimeSelector::New();
-
-  timeSelector->SetInput(inputImage);
-
   TimeStepType timeStart = static_cast<TimeStepType>(m_DesiredRegion.GetIndex(3));
   TimeStepType timeEnd = timeStart + m_DesiredRegion.GetSize(3);
   for (TimeStepType timestep = timeStart; timestep < timeEnd; ++timestep)
   {
-    timeSelector->SetTimeNr(timestep);
-    timeSelector->UpdateLargestPossibleRegion();
-    mitk::ImageReadAccessor imageAccessorWithOneTimestep(timeSelector->GetOutput());
+    const auto timestepImage = mitk::SelectImageByTimeStep(inputImage, timestep);
+    mitk::ImageReadAccessor imageAccessorWithOneTimestep(timestepImage);
     output->SetVolume(imageAccessorWithOneTimestep.GetData(), timestep-timeStart);
   }
 }

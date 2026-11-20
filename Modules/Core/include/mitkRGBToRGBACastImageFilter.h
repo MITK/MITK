@@ -74,11 +74,10 @@ namespace mitk
     void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
-    void InternalCast(itk::Image<TPixel, VImageDimension> *itkImage,
+    void InternalCast(const itk::Image<TPixel, VImageDimension> *itkImage,
                       mitk::RGBToRGBACastImageFilter *addComponentFilter,
                       typename TPixel::ComponentType defaultAlpha);
 
-    mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
     mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
     /** \brief Time when the output header was last initialized. */

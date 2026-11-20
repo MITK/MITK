@@ -212,14 +212,9 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
           const auto maxTimestep = image->GetTimeSteps();
           m_Controls->sliderWidget_intensityProfile->setMaximum(static_cast<double>(maxTimestep - 1));
           // Intensity profile can only be calculated on 3D, so extract if 4D
-          mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
           const auto currentTimestep =
             static_cast<mitk::TimeStepType>(m_Controls->sliderWidget_intensityProfile->value());
-          timeSelector->SetInput(image);
-          timeSelector->SetTimeNr(currentTimestep);
-          timeSelector->Update();
-
-          inputImage = timeSelector->GetOutput();
+          inputImage = mitk::SelectImageByTimeStep(image, currentTimestep);
         }
         else
         {

@@ -632,11 +632,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   // check if operation is done on 4D a image time step
   if(newImage->GetDimension() > 3)
   {
-    auto timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr(static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
-    timeSelector->Update();
-    newImage = timeSelector->GetOutput();
+    newImage = mitk::SelectImageByTimeStep(newImage, static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
   }
 
   // check if image or vector image
@@ -1112,29 +1108,15 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   this->BusyCursorOn();
 
-  // check if 4D image and use filter on correct time step
-  if(newImage1->GetDimension() > 3)
-  {
-    auto timeSelector = mitk::ImageTimeSelector::New();
+  // reduce 4D images to the selected time step; 3D images stay as they are
+  auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
+  mitk::TimeStepType time = 0;
 
-    auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
-    mitk::TimeStepType time = 0;
+  if( sn_widget != nullptr )
+    time = static_cast<mitk::TimeStepType>(sn_widget->GetPos());
 
-    if( sn_widget != nullptr )
-      time = static_cast<mitk::TimeStepType>(sn_widget->GetPos());
-
-    timeSelector->SetInput(newImage1);
-    timeSelector->SetTimeNr( time );
-    timeSelector->UpdateLargestPossibleRegion();
-    newImage1 = timeSelector->GetOutput();
-    newImage1->DisconnectPipeline();
-
-    timeSelector->SetInput(newImage2);
-    timeSelector->SetTimeNr( time );
-    timeSelector->UpdateLargestPossibleRegion();
-    newImage2 = timeSelector->GetOutput();
-    newImage2->DisconnectPipeline();
-  }
+  newImage1 = mitk::SelectImageByTimeStep(newImage1, time);
+  newImage2 = mitk::SelectImageByTimeStep(newImage2, time);
 
   auto itkImage1 = ImageType::New();
   auto itkImage2 = ImageType::New();

@@ -33,7 +33,6 @@ found in the LICENSE file.
 #include <usModuleResourceStream.h>
 
 // Includes for 3DSurfaceInterpolation
-#include <mitkImageTimeSelector.h>
 #include <mitkImageToContourFilter.h>
 #include <mitkSurfaceInterpolationController.h>
 
@@ -218,17 +217,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   if (!m_SurfaceInterpolationEnabled)
     return;
 
-  //Remark: the ImageTimeSelector is just needed to extract a timestep/channel of
-  //the image in order to get the image dimension (time dimension and channel dimension
-  //stripped away). Therefore it is OK to always use time step 0 and channel 0
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput(workingImage);
-  timeSelector->SetTimeNr(0);
-  timeSelector->SetChannelNr(0);
-  timeSelector->Update();
-  const auto dimRefImg = timeSelector->GetOutput()->GetDimension();
-
-  if (dimRefImg != 3)
+  // Surface interpolation needs a 3D image. 3D+t images (dimension 4)
+  // are 3D in space as well, so only 2D images are skipped.
+  if (workingImage->GetDimension() < 3)
     return;
 
   std::vector<mitk::Surface::Pointer> contourList;

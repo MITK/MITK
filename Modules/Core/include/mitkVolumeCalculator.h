@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 
 #include <mitkImage.h>
-#include <mitkImageTimeSelector.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
@@ -113,7 +112,6 @@ namespace mitk
     float m_Volume;
     unsigned long int m_VoxelCount;
     std::vector<float> m_Volumes;
-    ImageTimeSelector::Pointer m_TimeSelector;
   };
 
 } // namespace mitk

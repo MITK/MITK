@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkImageCast.h>
 #include <mitkImageDataItem.h>
 #include <mitkImageStatisticsHolder.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkTestingMacros.h>
 
 #include <mitkImageSliceSelector.h>
@@ -468,11 +469,7 @@ int mitkImageTest(int argc, char *argv[])
   // access via itk
   if (image->GetDimension() > 3) // CastToItk only works with 3d images so we need to check for 4d images
   {
-    mitk::ImageTimeSelector::Pointer selector = mitk::ImageTimeSelector::New();
-    selector->SetTimeNr(0);
-    selector->SetInput(image);
-    selector->Update();
-    image = selector->GetOutput();
+    image = mitk::SelectImageByTimeStep(image, 0);
   }
 
   if (image->GetDimension() == 3)

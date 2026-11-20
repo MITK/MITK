@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkHistogramGenerator.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkProperties.h>
 
@@ -180,33 +181,29 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
   TimeStepType t, unsigned int /*component*/)
 {
-  mitk::ImageTimeSelector *timeSelector = this->GetTimeSelector();
-  if (timeSelector != nullptr)
-  {
-    timeSelector->SetTimeNr(t);
-    timeSelector->UpdateLargestPossibleRegion();
+  auto *generator = static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
+  generator->SetImage(SelectImageByTimeStep(m_Image, t));
 
-    auto *generator =
-      static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
-    generator->SetImage(timeSelector->GetOutput());
+  // For a 3D image the generator holds this holder's own image, which owns
+  // this holder. Release it on every path so that the image can still be
+  // deleted.
+  try
+  {
     generator->ComputeHistogram();
-    return static_cast<const mitk::ImageStatisticsHolder::HistogramType *>(generator->GetHistogram());
   }
-  return nullptr;
+  catch (...)
+  {
+    generator->SetImage(nullptr);
+    throw;
+  }
+
+  generator->SetImage(nullptr);
+  return static_cast<const mitk::ImageStatisticsHolder::HistogramType *>(generator->GetHistogram());
 }
 
 bool mitk::ImageStatisticsHolder::IsValidTimeStep(TimeStepType t) const
 {
   return m_Image->IsValidTimeStep(t);
-}
-
-mitk::ImageTimeSelector::Pointer mitk::ImageStatisticsHolder::GetTimeSelector()
-{
-  ImageTimeSelector::Pointer timeSelector =
-    ImageTimeSelector::New();
-  timeSelector->SetInput(m_Image);
-
-  return timeSelector;
 }
 
 void mitk::ImageStatisticsHolder::Expand(TimeStepType timeSteps)
@@ -389,14 +386,8 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(TimeStepType t, unsigne
            (!isOdf || !isOdf->GetValue()) && (!isSh || !isSh->GetValue())) // we have a vector image
   {
     // recompute
-    mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();
-    if (timeSelector.IsNotNull())
-    {
-      timeSelector->SetTimeNr(t);
-      timeSelector->UpdateLargestPossibleRegion();
-      const mitk::Image *image = timeSelector->GetOutput();
-      AccessVectorPixelTypeByItk_n(image, _ComputeExtremaInItkVectorImage, (this, t, component));
-    }
+    const Image::ConstPointer image = SelectImageByTimeStep(m_Image, t);
+    AccessVectorPixelTypeByItk_n(image, _ComputeExtremaInItkVectorImage, (this, t, component));
   }
   else
   {

@@ -261,11 +261,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   // check if operation is done on 4D a image time step
   if(newImage->GetDimension() > 3)
   {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr(static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
-    timeSelector->Update();
-    newImage = timeSelector->GetOutput();
+    newImage = mitk::SelectImageByTimeStep(newImage, static_cast<mitk::TimeStepType>(m_Controls->timeSliceNavigationWidget->GetPos()));
   }
 
   // check if image or vector image

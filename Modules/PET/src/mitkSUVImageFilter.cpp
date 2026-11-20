@@ -1112,11 +1112,7 @@ void mitk::SUVImageFilter::GenerateData()
     {
       for (TimeStepType t = 0; t < inputImage->GetTimeSteps(); ++t)
       {
-        auto sel = ImageTimeSelector::New();
-        sel->SetInput(inputImage);
-        sel->SetTimeNr(t);
-        sel->UpdateLargestPossibleRegion();
-        dispatch(t, sel->GetOutput());
+        dispatch(t, SelectImageByTimeStep(inputImage, t));
       }
     }
   }
@@ -1145,11 +1141,7 @@ void mitk::SUVImageFilter::GenerateData()
     {
       for (TimeStepType t = 0; t < inputImage->GetTimeSteps(); ++t)
       {
-        auto sel = ImageTimeSelector::New();
-        sel->SetInput(inputImage);
-        sel->SetTimeNr(t);
-        sel->UpdateLargestPossibleRegion();
-        ProcessTimeStepRenormalized(sel->GetOutput(), outputImage, t, factor);
+        ProcessTimeStepRenormalized(SelectImageByTimeStep(inputImage, t), outputImage, t, factor);
       }
     }
   }

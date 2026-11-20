@@ -274,11 +274,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     if (inputMitk->GetDimension() == 4)
     {
       // initialize with time step 0
-      m_TimeSelector = mitk::ImageTimeSelector::New();
-      m_TimeSelector->SetInput(inputMitk);
-      m_TimeSelector->SetTimeNr(0);
-      m_TimeSelector->UpdateLargestPossibleRegion();
-      inputMitk = m_TimeSelector->GetOutput();
+      inputMitk = mitk::SelectImageByTimeStep(inputMitk, 0);
     }
 
     ImagePointer inputItk = ImageType::New();
@@ -300,9 +296,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       // if 4D image, update time step and itk image
       if (idx > 0)
       {
-        m_TimeSelector->SetTimeNr(idx);
-        m_TimeSelector->UpdateLargestPossibleRegion();
-        inputMitk = m_TimeSelector->GetOutput();
+        inputMitk = mitk::SelectImageByTimeStep(this->GetInput(), idx);
         mitk::CastToItkImage(inputMitk, inputItk);
       }
 

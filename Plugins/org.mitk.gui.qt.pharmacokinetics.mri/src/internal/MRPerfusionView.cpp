@@ -689,13 +689,8 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
   //Model configuration (static parameters) can be done now
   modelParameterizer->SetTau(m_Controls->injectiontime->value());
 
-  mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(this->m_selectedImage);
-  imageTimeSelector->SetTimeNr(0);
-  imageTimeSelector->UpdateLargestPossibleRegion();
-
   mitk::DescriptivePharmacokineticBrixModelParameterizer::BaseImageType::Pointer baseImage;
-  mitk::CastToItkImage(imageTimeSelector->GetOutput(), baseImage);
+  mitk::CastToItkImage(mitk::SelectImageByTimeStep(this->m_selectedImage, 0), baseImage);
 
   modelParameterizer->SetBaseImage(baseImage);
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);

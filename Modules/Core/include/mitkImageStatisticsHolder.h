@@ -13,7 +13,6 @@ found in the LICENSE file.
 #define mitkImageStatisticsHolder_h
 
 #include <mitkImage.h>
-#include <mitkImageTimeSelector.h>
 #include <MitkCoreExports.h>
 
 #ifndef __itkHistogram_h
@@ -34,6 +33,10 @@ namespace mitk
    * GetStatistics() method in mitk::Image class.
    *
    * Minimum or maximum might be infinite values. 2nd minimum and maximum are guaranteed to be finite values.
+   *
+   * All values, the histogram included, may be cached. They follow changes of the image only once its
+   * modification time moves, so a caller that changes voxels, e.g. through an ImageWriteAccessor, has to
+   * call Modified() on the image afterwards.
    *
    * \sa Image
    * \sa Image::GetStatistics()
@@ -256,13 +259,6 @@ namespace mitk
      * \param timeSteps The number of time steps to support.
      */
     virtual void Expand(TimeStepType timeSteps);
-
-    /**
-     * \brief Get an ImageTimeSelector configured with the associated image as input.
-     *
-     * \return A new ImageTimeSelector instance.
-     */
-    ImageTimeSelector::Pointer GetTimeSelector();
 
     mitk::Image *m_Image;
 

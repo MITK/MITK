@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 
 #include <QCoreApplication>
+#include <QTimer>
 
 #include <algorithm>
 #include <cstdint>
@@ -220,9 +221,15 @@ void QmitkAgentToolServer::Withdraw()
   {
     m_Endpoint->Withdraw();
 
-    // Calls that run may wait for the GUI thread, which is this one.
+    // Calls that run may wait for the GUI thread, which is this one. User
+    // input stays out, as the Agent view may be closing. The timer wakes the
+    // wait, so that the count is looked at again. Not a nested QEventLoop,
+    // whose exec() returns at once while the application quits.
+    QTimer wakeUp;
+    wakeUp.start(10);
+
     while (m_Endpoint->GetRunningCallCount() > 0)
-      QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+      QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 
     m_Endpoint.reset();
   }

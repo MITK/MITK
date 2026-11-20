@@ -889,6 +889,14 @@ void QmitkVoxTellToolGUI::StartRun(const std::vector<std::string>& prompts)
   if (tool == nullptr)
     return;
 
+  // Another run, for example of the REST API, can have started during a
+  // question before this one. Its prompts and result are not this run's.
+  if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
+  {
+    this->SetStatus("VoxTell is busy with another run. Try again when it has finished.", QmitkInfoCard::Severity::Warning);
+    return;
+  }
+
   // The text field keeps prompts that are not part of this run, the ones
   // VoxTell does not know after "Known prompts only".
   m_SettingPrompts = true;

@@ -15,8 +15,10 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 #include <mitkPlanarPolygon.h>
 
+#include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkITKImageImport.h>
+#include <mitkLabelSetImage.h>
 
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
@@ -32,6 +34,7 @@ found in the LICENSE file.
 #include <itkRGBPixel.h>
 #include <itkVectorImage.h>
 
+#include <algorithm>
 #include <cmath>
 #include <numeric>
 #include <sstream>
@@ -168,6 +171,7 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestUS4DCroppedAllTimesteps);
   MITK_TEST(TestUS4DCroppedRestrictedTimeSteps);
   MITK_TEST(TestUS4DCropped3DMask);
+  MITK_TEST(TestMaskWithoutDataAtATimePointOfTheImage);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -221,6 +225,7 @@ public:
   void TestUS4DCroppedAllTimesteps();
   void TestUS4DCroppedRestrictedTimeSteps();
   void TestUS4DCropped3DMask();
+  void TestMaskWithoutDataAtATimePointOfTheImage();
 private:
   mitk::Image::ConstPointer m_TestImage;
 
@@ -2022,6 +2027,41 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
     expected_RMS,
     expected_minIndex,
     expected_maxIndex);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestMaskWithoutDataAtATimePointOfTheImage()
+{
+  // Three time steps, of which the segmentation covers the first two only.
+  unsigned int dimensions[4] = { 4, 4, 4, 3 };
+  auto image = mitk::Image::New();
+  image->Initialize(mitk::MakeScalarPixelType<short>(), 4, dimensions);
+
+  for (mitk::TimeStepType timeStep = 0; timeStep < 3; ++timeStep)
+  {
+    mitk::ImageWriteAccessor accessor(image, image->GetVolumeData(timeStep));
+    std::fill_n(static_cast<short*>(accessor.GetData()), 4 * 4 * 4, short(0));
+  }
+
+  dimensions[3] = 2;
+  auto segmentationTemplate = mitk::Image::New();
+  segmentationTemplate->Initialize(mitk::MakeScalarPixelType<short>(), 4, dimensions);
+
+  auto segmentation = mitk::MultiLabelSegmentation::New();
+  segmentation->Initialize(segmentationTemplate);
+  segmentation->AddLabel(mitk::Label::New(1, "Label"), 0);
+
+  auto* groupImage = segmentation->GetGroupImage(0);
+
+  for (mitk::TimeStepType timeStep = 0; timeStep < 2; ++timeStep)
+  {
+    mitk::ImageWriteAccessor accessor(groupImage, groupImage->GetVolumeData(timeStep));
+    static_cast<mitk::Label::PixelType*>(accessor.GetData())[0] = 1;
+  }
+
+  auto maskGenerator = mitk::MultiLabelMaskGenerator::New();
+  maskGenerator->SetMultiLabelSegmentation(segmentation);
+
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image.GetPointer(), maskGenerator.GetPointer()), mitk::Exception);
 }
 
 mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points)

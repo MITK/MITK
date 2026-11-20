@@ -168,6 +168,10 @@ namespace mitk
             m_MaskGenerator->SetTimePoint(timePoint);
             m_InternalMask = m_MaskGenerator->GetMask(maskID);
 
+            // Like a dynamic segmentation that covers fewer time points than the image.
+            if (m_InternalMask.IsNull())
+              mitkThrow() << "The mask has no data at the time point " << timePoint << " ms of the image.";
+
             const auto referenceImage = m_MaskGenerator->GetReferenceImage();
 
             if (referenceImage.IsNotNull())

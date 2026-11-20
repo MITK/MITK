@@ -120,14 +120,14 @@ namespace mitk
    *   diagnostics facility must not break the application it diagnoses.
    *   Failure is reported via return value and MITK_WARN. This is a
    *   deliberate exception to the throw-on-unresolvable-input rule.
-   * - Windows: a stack overflow leaves a dump only on the thread that called
-   *   Initialize(), and only when that thread's stack reserve is large
-   *   enough for sentry to set aside stack for its crash handler; the
-   *   default 1 MiB reserve of the main thread is. Otherwise sentry only
-   *   logs a warning, Initialize() still reports the handler as armed, and
-   *   a stack overflow ends the process without a dump. Call Initialize()
-   *   on the main thread and do not link the executable with a smaller
-   *   stack reserve.
+   * - Windows: a stack overflow is guaranteed to leave a dump only on the
+   *   thread that called Initialize(), and only when that thread's stack
+   *   reserve is large enough for sentry to set aside stack for its crash
+   *   handler; the default 1 MiB reserve of the main thread is. Otherwise
+   *   sentry silently sets none aside, Initialize() still reports the
+   *   handler as armed, and a stack overflow may end the process without a
+   *   dump. Call Initialize() on the main thread and do not link the
+   *   executable with a smaller stack reserve.
    */
   class MITKCRASHHANDLING_EXPORT CrashDumpFacility
   {

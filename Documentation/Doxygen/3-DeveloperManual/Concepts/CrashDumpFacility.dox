@@ -12,9 +12,9 @@ per-user directory, and the next start of the application offers to keep the
 dump for reporting or to discard it. On Windows, sentry reserves stack for its
 crash handler only on the thread that arms the facility (the main thread), and
 only when that thread's stack reserve is large enough (the default 1 MiB is);
-otherwise it just logs a warning. A stack overflow on another thread, or in an
-application linked with a smaller stack reserve, may end the process without a
-dump.
+otherwise it silently reserves none, and nothing reaches the MITK log. A stack
+overflow on another thread, or in an application linked with a smaller stack
+reserve, may end the process without a dump.
 
 The facility is built on
 <a href="https://github.com/getsentry/sentry-native">sentry-native</a>
@@ -351,17 +351,18 @@ it is written but excluded from the surfacable set, and two in a row
 (\c snapshot-twice) to assert a session is not limited to one; queries the
 stack guarantee of the arming thread (\c stackguarantee, Windows only) to
 assert sentry's crash handler has stack left after an overflow; and drives the
-watchdog in both directions (\c freeze / \c freeze-recover) to assert a hard-killed
-freeze leaves a provisional dump while a recovered one leaves none. The suite
-also walks the full facility cycle headlessly after a real crash - arm, list,
-acknowledge, delete - i.e. the operations the next-start dialog drives without
-any UI. Because these tests only pass when arming succeeds, they also pin the
-handler filename: a mismatch between the shipped file and the \c handler_path
-the facility sets would make them fail. Further cases cover the settings
-(an unarmed facility still lists and deletes, <tt>enabled=false</tt> blocks
-arming, retention follows <tt>maxDumpsPerKind</tt>), the dump kinds, the
-exclusion of the running session's provisional snapshots, and the run info a
-real crash dump and a snapshot carry.
+watchdog in both directions (\c freeze / \c freeze-recover) to assert a
+hard-killed freeze leaves a provisional dump while a recovered one leaves
+none. The suite also walks the full facility cycle headlessly after a real
+crash - arm, list, acknowledge, delete - i.e. the operations the next-start
+dialog drives without any UI. Because these tests only pass when arming
+succeeds, they also pin the handler filename: a mismatch between the
+shipped file and the \c handler_path the facility sets would make them
+fail. Further cases cover the settings (an unarmed facility still lists
+and deletes, <tt>enabled=false</tt> blocks arming, retention follows
+<tt>maxDumpsPerKind</tt>), the dump kinds, the exclusion of the running
+session's provisional snapshots, and the run info a real crash dump and a
+snapshot carry.
 
 \c MitkAppUtil adds \c mitkCrashDumpSessionOptionsTest for the start-up
 precedence and \c QmitkCrashDumpUiTest for the list widget, the manager and

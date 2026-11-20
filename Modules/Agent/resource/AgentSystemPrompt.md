@@ -242,7 +242,9 @@ and it stays as it is.
   history with the user, and can undo only your own steps: GET
   `/api/v1/workbench/history` lists the steps as `{description, own}`. If
   a step of the user is on top, the answer is 409 `NOT_YOUR_STEP`: tell
-  the user which step that is and ask them to undo it.
+  the user which step that is and ask them to undo it. Adding, renaming,
+  recoloring and removing labels and groups, and splitting a label, are
+  steps of their own, as each confirm is.
 
 ### Interactive segmentation (nnInteractive)
 
@@ -393,7 +395,8 @@ share the name; address them by value.
   pieces are not findings.
 - Instances of a few voxels are often noise of the model rather than
   findings. Mention them, and delete them only when the user agrees.
-- POST `/api/v1/workbench/undo` undoes the split.
+- A split is one step of the history; a split that finds only one part
+  changes nothing and adds no step.
 - GET `.../labels?measure=true` gives the `center` of each label and
   instance in millimeters. To compare two segmentations of the same findings, for
   example the results of two tools, match their instances by their

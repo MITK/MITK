@@ -27,6 +27,27 @@ namespace
 
   // Keeps the user's own settings, hooks and plugins away from the agent.
   const QString SettingSources = "--setting-sources=project";
+
+  // What a parent Claude Code session sets for the programs it starts (as of
+  // Claude Code 2.1.329, plus the port of a connected IDE). They would make
+  // the agent's Claude Code act as part of that session. An exact list, as
+  // users and administrators configure Claude Code through many other
+  // CLAUDE_CODE_* variables.
+  const QStringList ParentSessionVariables = {
+    "CLAUDECODE",
+    "CLAUDE_PID",
+    "CLAUDE_EFFORT",
+    "CLAUDE_CODE_ENTRYPOINT",
+    "CLAUDE_CODE_EXECPATH",
+    "CLAUDE_CODE_SESSION_ID",
+    "CLAUDE_CODE_SESSION_ATTENDED",
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_CHILD_NOTES_DIR",
+    "CLAUDE_CODE_BRIDGE_SESSION_ID",
+    "CLAUDE_CODE_MESSAGING_SOCKET",
+    "CLAUDE_CODE_MESSAGING_TOKEN",
+    "CLAUDE_CODE_SSE_PORT"
+  };
 }
 
 QString QmitkClaudeCodeProcess::AuthStatus::Describe() const
@@ -191,18 +212,8 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& option
   if (!options.TrustedCertificateFile.isEmpty() && !environment.contains("NODE_EXTRA_CA_CERTS"))
     environment.insert("NODE_EXTRA_CA_CERTS", QDir::toNativeSeparators(options.TrustedCertificateFile));
 
-  for (const auto& key : environment.keys())
-  {
-    // Git Bash, the token of "claude setup-token", and the provider.
-    const bool setByUser = key == "CLAUDE_CODE_GIT_BASH_PATH" || key == "CLAUDE_CODE_OAUTH_TOKEN" ||
-      key.startsWith("CLAUDE_CODE_USE_");
-
-    const bool setByParentSession = key == "CLAUDECODE" || key == "CLAUDE_PID" || key == "CLAUDE_EFFORT" ||
-      (key.startsWith("CLAUDE_CODE_") && !setByUser);
-
-    if (setByParentSession)
-      environment.remove(key);
-  }
+  for (const auto& name : ParentSessionVariables)
+    environment.remove(name);
 
   // The MCP server listens on this computer, which a configured HTTP proxy
   // would look for on its own host. Which spelling Claude Code reads first

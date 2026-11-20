@@ -103,6 +103,8 @@ class QmitkClaudeCodeProcessTestSuite : public mitk::TestFixture
   MITK_TEST(TestTrustedCertificateDoesNotOverrideEnvironment);
   MITK_TEST(TestExecutableDirectoryComesFirstOnPath);
   MITK_TEST(TestApiKeyVariable);
+  MITK_TEST(TestParentSessionVariablesRemoved);
+  MITK_TEST(TestUserSettingsKept);
   MITK_TEST(TestIsUsableExecutableRefusesNonFiles);
   MITK_TEST(TestIsUsableExecutableAcceptsExecutable);
 #ifdef Q_OS_WIN
@@ -216,6 +218,34 @@ public:
     options.IgnoreApiKeyVariable = true;
 
     CPPUNIT_ASSERT(!QmitkClaudeCodeProcess::GetEnvironment(options).contains("ANTHROPIC_API_KEY"));
+  }
+
+  void TestParentSessionVariablesRemoved()
+  {
+    EnvironmentGuard guard;
+    guard.Set("CLAUDECODE", "1");
+    guard.Set("CLAUDE_CODE_SESSION_ID", "parent");
+    guard.Set("CLAUDE_CODE_MESSAGING_TOKEN", "parent");
+
+    const auto environment = GetEnvironment();
+
+    CPPUNIT_ASSERT(!environment.contains("CLAUDECODE"));
+    CPPUNIT_ASSERT(!environment.contains("CLAUDE_CODE_SESSION_ID"));
+    CPPUNIT_ASSERT(!environment.contains("CLAUDE_CODE_MESSAGING_TOKEN"));
+  }
+
+  void TestUserSettingsKept()
+  {
+    EnvironmentGuard guard;
+    guard.Set("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "1");
+    guard.Set("CLAUDE_CODE_USE_BEDROCK", "1");
+    guard.Set("CLAUDE_CODE_OAUTH_TOKEN", "user");
+
+    const auto environment = GetEnvironment();
+
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), environment.value("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC").toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), environment.value("CLAUDE_CODE_USE_BEDROCK").toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("user"), environment.value("CLAUDE_CODE_OAUTH_TOKEN").toStdString());
   }
 
   void TestIsUsableExecutableRefusesNonFiles()

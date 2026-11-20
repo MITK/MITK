@@ -23,16 +23,20 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QPainter>
 #include <QPixmap>
+#include <QRegularExpression>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QTextBlock>
+#include <QTextDocumentFragment>
 #include <QTextFragment>
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextList>
 #include <QToolTip>
 #include <QVBoxLayout>
+
+#include <utility>
 
 namespace
 {
@@ -74,6 +78,80 @@ namespace
       : QString();
 
     return QString("<span style=\"color: %1;%2\">%3</span>").arg(color.name(), size, text.toHtmlEscaped());
+  }
+
+  void ReplaceImagesByAltText(QTextDocument& document)
+  {
+    std::vector<std::pair<int, QString>> images;
+
+    for (auto block = document.begin(); block.isValid(); block = block.next())
+    {
+      for (auto it = block.begin(); !it.atEnd(); ++it)
+      {
+        const auto fragment = it.fragment();
+        const auto format = fragment.charFormat();
+
+        // Equal images next to each other share a fragment, one character each.
+        if (format.isImageFormat())
+        {
+          for (int i = 0; i < fragment.length(); ++i)
+            images.emplace_back(fragment.position() + i, format.stringProperty(QTextFormat::ImageAltText));
+        }
+      }
+    }
+
+    // Backwards, so that the positions of the images still to come hold.
+    for (auto image = images.rbegin(); image != images.rend(); ++image)
+    {
+      QTextCursor cursor(&document);
+      cursor.setPosition(image->first);
+      cursor.setPosition(image->first + 1, QTextCursor::KeepAnchor);
+      cursor.insertText(image->second, QTextCharFormat());
+    }
+  }
+
+  void ReplaceLineBreakTags(QTextDocument& document)
+  {
+    static const QRegularExpression LineBreakTag("<br\\s*/?>", QRegularExpression::CaseInsensitiveOption);
+
+    for (auto found = document.find(LineBreakTag); !found.isNull(); found = document.find(LineBreakTag, found))
+    {
+      const bool inCode = found.charFormat().fontFixedPitch() ||
+        found.block().blockFormat().hasProperty(QTextFormat::BlockCodeLanguage);
+
+      if (!inCode)
+        found.insertText(QString(QChar::LineSeparator));
+    }
+  }
+
+  /**
+   * Inserts the agent's Markdown like QTextCursor::insertMarkdown() does, but
+   * without HTML and images.
+   *
+   * Qt opens image names as files while it lays out the text it inserts, also
+   * on other hosts (UNC paths), and on high-DPI screens it looks for
+   * name@2x.png before it asks loadResource(). So images become their
+   * alternative text before the text reaches the widget. HTML shows as text,
+   * as the importer holds back all text after a tag that is not closed; only
+   * <br>, with which models break lines in table cells, breaks the line.
+   */
+  void InsertAgentMarkdown(QTextCursor& cursor, const QString& markdown)
+  {
+    // Never laid out, so it loads nothing.
+    QTextDocument document;
+    document.setUndoRedoEnabled(false);
+    document.setMarkdown(markdown, QTextDocument::MarkdownFeatures(QTextDocument::MarkdownDialectGitHub) | QTextDocument::MarkdownNoHTML);
+
+    ReplaceImagesByAltText(document);
+    ReplaceLineBreakTags(document);
+
+    if (markdown.startsWith('\n'))
+      cursor.insertBlock(document.firstBlock().blockFormat());
+
+    cursor.insertFragment(QTextDocumentFragment(&document));
+
+    if (!cursor.atEnd() && markdown.endsWith('\n'))
+      cursor.insertText("\n");
   }
 
   /** \param fontSize In points; 0 for the default font. */
@@ -230,7 +308,7 @@ void QmitkAgentConversationWidget::AppendMarkdown(const QString& markdown)
 {
   auto cursor = this->AppendBlock();
   const auto start = cursor.position();
-  cursor.insertMarkdown(markdown);
+  InsertAgentMarkdown(cursor, markdown);
 
   ColorLinks(this->document(), start, this->document()->characterCount());
   this->ScrollToEnd();
@@ -296,7 +374,7 @@ void QmitkAgentConversationWidget::EndStreamedText(const QString& markdown)
 
   const auto start = cursor.position();
   const auto charactersBefore = document->characterCount();
-  cursor.insertMarkdown(text);
+  InsertAgentMarkdown(cursor, text);
 
   ColorLinks(document, start, start + document->characterCount() - charactersBefore);
 

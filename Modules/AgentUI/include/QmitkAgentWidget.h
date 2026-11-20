@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QmitkAgentSession.h>
 
+#include <QHash>
 #include <QWidget>
 
 #include <memory>
@@ -109,6 +110,7 @@ private:
   void UpdateCostLabel();
 
   void OnModelsChanged(const QList<QmitkClaudeCodeProcess::ModelInfo>& models);
+  void OnDefaultEffortReported(const QString& model, const QString& effort);
   void OnModelSelected();
   void OnEffortSelected();
   void UpdateEffortBox();
@@ -124,6 +126,14 @@ private:
   QString m_StatusLinkText;
 
   QList<QmitkClaudeCodeProcess::ModelInfo> m_Models;
+
+  /**
+   * \brief Claude Code's default effort per resolved model.
+   *
+   * Claude Code names it only while it runs without an effort, so it is kept
+   * for when the user chooses one.
+   */
+  QHash<QString, QString> m_DefaultEfforts;
 };
 
 #endif

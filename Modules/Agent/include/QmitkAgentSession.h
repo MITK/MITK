@@ -177,6 +177,9 @@ signals:
   /** \brief Claude Code started and lists the models that the account can use. */
   void ModelsChanged(const QList<QmitkClaudeCodeProcess::ModelInfo>& models);
 
+  /** \see QmitkClaudeCodeProcess::DefaultEffortReported() */
+  void DefaultEffortReported(const QString& model, const QString& effort);
+
   /** \brief A turn started or ended, or the agent was stopped. */
   void TurnStateChanged();
 

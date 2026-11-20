@@ -33,24 +33,30 @@ found in the LICENSE file.
 
 namespace
 {
+  QString GetEffortName(const QString& level)
+  {
+    return level == "xhigh"
+      ? QString("extra high")
+      : level;
+  }
+
   QString GetEffortText(const QString& level)
   {
-    if (level == "low")
-      return "Low effort";
+    const auto name = GetEffortName(level);
+    return name.left(1).toUpper() + name.mid(1) + " effort";
+  }
 
-    if (level == "medium")
-      return "Medium effort";
+  /** \brief The display name, but with the model that Claude Code's default stands for, like "Default (Opus 5.5)". */
+  QString GetModelText(const QmitkClaudeCodeProcess::ModelInfo& info, const QList<QmitkClaudeCodeProcess::ModelInfo>& models)
+  {
+    if (info.Value != "default" || info.ResolvedModel.isEmpty())
+      return info.DisplayName;
 
-    if (level == "high")
-      return "High effort";
+    const auto model = std::find_if(models.begin(), models.end(), [&info](const auto& other) {
+      return other.Value != info.Value && other.ResolvedModel == info.ResolvedModel;
+    });
 
-    if (level == "xhigh")
-      return "Extra high effort";
-
-    if (level == "max")
-      return "Max effort";
-
-    return level + " effort";
+    return QString("Default (%1)").arg(model != models.end() ? model->DisplayName : info.ResolvedModel);
   }
 }
 
@@ -124,6 +130,7 @@ QmitkAgentWidget::QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreference
 
   connect(m_Session, &QmitkAgentSession::StatusChanged, this, &QmitkAgentWidget::OnStatusChanged);
   connect(m_Session, &QmitkAgentSession::ModelsChanged, this, &QmitkAgentWidget::OnModelsChanged);
+  connect(m_Session, &QmitkAgentSession::DefaultEffortReported, this, &QmitkAgentWidget::OnDefaultEffortReported);
   connect(m_Session, &QmitkAgentSession::TurnStateChanged, this, &QmitkAgentWidget::UpdateControls);
   connect(m_Session, &QmitkAgentSession::ActivityChanged, this, &QmitkAgentWidget::UpdateActivityLabel);
   connect(m_Session, &QmitkAgentSession::CostChanged, this, &QmitkAgentWidget::UpdateCostLabel);
@@ -429,7 +436,7 @@ void QmitkAgentWidget::OnModelsChanged(const QList<QmitkClaudeCodeProcess::Model
 
     for (const auto& info : models)
     {
-      box->addItem(info.DisplayName, info.Value);
+      box->addItem(GetModelText(info, models), info.Value);
       box->setItemData(box->count() - 1, info.Description, Qt::ToolTipRole);
     }
 
@@ -451,6 +458,12 @@ void QmitkAgentWidget::OnModelsChanged(const QList<QmitkClaudeCodeProcess::Model
 
   if (m_Session->GetModel() != model || m_Session->GetEffort() != effort)
     m_Session->RestartIdleProcess();
+}
+
+void QmitkAgentWidget::OnDefaultEffortReported(const QString& model, const QString& effort)
+{
+  m_DefaultEfforts.insert(model, effort);
+  this->UpdateEffortBox();
 }
 
 void QmitkAgentWidget::OnModelSelected()
@@ -476,15 +489,23 @@ void QmitkAgentWidget::OnEffortSelected()
 void QmitkAgentWidget::UpdateEffortBox()
 {
   const auto modelIndex = m_Ui->modelBox->currentIndex();
+  const auto hasModel = modelIndex >= 0 && modelIndex < m_Models.size();
 
-  const auto levels = modelIndex >= 0 && modelIndex < m_Models.size()
+  const auto levels = hasModel
     ? m_Models[modelIndex].EffortLevels
     : QStringList();
+
+  const auto defaultEffort = hasModel
+    ? m_DefaultEfforts.value(m_Models[modelIndex].ResolvedModel)
+    : QString();
 
   auto* box = m_Ui->effortBox;
   const QSignalBlocker blocker(box);
   box->clear();
-  box->addItem("Default effort", QString());
+
+  box->addItem(defaultEffort.isEmpty()
+    ? QString("Default effort")
+    : QString("Default effort (%1)").arg(GetEffortName(defaultEffort)), QString());
 
   for (const auto& level : levels)
     box->addItem(GetEffortText(level), level);

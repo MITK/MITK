@@ -118,6 +118,9 @@ public:
     /** \brief What to pass as Options::Model, for example "opus"; "default" for Claude Code's default. */
     QString Value;
 
+    /** \brief The model that Value stands for, for example "claude-opus-5-5"; empty if Claude Code does not say. */
+    QString ResolvedModel;
+
     QString DisplayName;
     QString Description;
 
@@ -207,6 +210,14 @@ signals:
    */
   void Initialized(const QList<QmitkClaudeCodeProcess::ModelInfo>& models);
 
+  /**
+   * \brief Claude Code runs without Options::Effort and named the effort it chose for \p model.
+   *
+   * \p model is the resolved name, as in ModelInfo::ResolvedModel. Not
+   * emitted with an effort in the options, or if Claude Code does not say.
+   */
+  void DefaultEffortReported(const QString& model, const QString& effort);
+
   /** \brief Claude Code took the request of Interrupt(). */
   void InterruptAcknowledged();
 
@@ -229,6 +240,7 @@ private:
   QByteArray m_ErrorOutput;
   unsigned int m_RequestCounter;
   QString m_InitializeRequestId;
+  QString m_SettingsRequestId;
   QString m_InterruptRequestId;
 };
 

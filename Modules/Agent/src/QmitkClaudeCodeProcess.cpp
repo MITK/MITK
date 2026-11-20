@@ -287,6 +287,12 @@ void QmitkClaudeCodeProcess::Start(const Options& options)
 
   // Like the Agent SDK, open the control channel before the first message.
   m_InitializeRequestId = this->SendControlRequest({ { "subtype", "initialize" }, { "hooks", QJsonValue::Null } });
+
+  // The settings name the effort Claude Code applies, which is its default
+  // only if none was passed.
+  m_SettingsRequestId = options.Effort.isEmpty()
+    ? this->SendControlRequest({ { "subtype", "get_settings" } })
+    : QString();
 }
 
 bool QmitkClaudeCodeProcess::IsRunning() const
@@ -364,6 +370,19 @@ void QmitkClaudeCodeProcess::OnControlResponse(const QJsonObject& message)
     return;
   }
 
+  // An older Claude Code answers this request with an error.
+  if (!m_SettingsRequestId.isEmpty() && requestId == m_SettingsRequestId)
+  {
+    const auto applied = response.value("response").toObject().value("applied").toObject();
+    const auto model = applied.value("model").toString();
+    const auto effort = applied.value("effort").toString();
+
+    if (response.value("subtype").toString() == "success" && !model.isEmpty() && !effort.isEmpty())
+      emit DefaultEffortReported(model, effort);
+
+    return;
+  }
+
   if (requestId != m_InitializeRequestId || response.value("subtype").toString() != "success")
     return;
 
@@ -375,6 +394,7 @@ void QmitkClaudeCodeProcess::OnControlResponse(const QJsonObject& message)
 
     ModelInfo model;
     model.Value = object.value("value").toString();
+    model.ResolvedModel = object.value("resolvedModel").toString();
     model.DisplayName = object.value("displayName").toString();
     model.Description = object.value("description").toString();
 

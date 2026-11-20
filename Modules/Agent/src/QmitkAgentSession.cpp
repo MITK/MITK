@@ -139,6 +139,7 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
 
   connect(m_Process, &QmitkClaudeCodeProcess::MessageReceived, this, &QmitkAgentSession::OnMessageReceived);
   connect(m_Process, &QmitkClaudeCodeProcess::Initialized, this, &QmitkAgentSession::ModelsChanged);
+  connect(m_Process, &QmitkClaudeCodeProcess::DefaultEffortReported, this, &QmitkAgentSession::DefaultEffortReported);
   connect(m_Process, &QmitkClaudeCodeProcess::InterruptAcknowledged, this, &QmitkAgentSession::OnInterruptAcknowledged);
   connect(m_Process, &QmitkClaudeCodeProcess::Finished, this, &QmitkAgentSession::OnProcessFinished);
   connect(m_Process, &QmitkClaudeCodeProcess::ErrorOccurred, this, &QmitkAgentSession::ErrorAdded);

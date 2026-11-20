@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
-#define ENABLE_TIMING
+//#define ENABLE_TIMING
 
 #include <itkTimeProbesCollectorBase.h>
 #include <gdcmUIDs.h>
@@ -462,7 +462,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 
 #if defined( MBILOG_ENABLE_DEBUG ) || defined( ENABLE_TIMING )
   std::cout << "---------------------------------------------------------------" << std::endl;
-  timer.Report( std::cout );
+  timer.Report( std::cout, false );
   std::cout << "---------------------------------------------------------------" << std::endl;
 #endif
 }

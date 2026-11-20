@@ -1270,7 +1270,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     if (dataStorage.IsNull())
       throw RestException(ErrorResponse::DataStorageNotAvailable(request.Path));
 
-    const auto node = CallInGuiThread(*server, [&]() {
+    const auto json = CallInGuiThread(*server, [&]() {
       // Before the node exists, as a request that fails must not leave one behind.
       ShowView(request.Path);
 
@@ -1324,11 +1324,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       SelectInView("referenceNode", reference.get());
       SelectInView("workingNode", newNode);
 
-      return server->HoldNode(newNode);
+      auto answer = DescribeNode(newNode, *server);
+      answer["labels"] = DescribeLabels(segmentation);
+      return answer;
     });
-
-    auto json = DescribeNode(node.get(), *server);
-    json["labels"] = CallInGuiThread(*server, [&]() { return DescribeLabels(GetSegmentation(node.get(), request.Path)); });
 
     return RestResponse::FromData(json, 201);
   };

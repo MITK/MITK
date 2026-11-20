@@ -662,10 +662,6 @@ void QmitkVoxTellToolGUI::OnToolPromptsChanged()
 
     m_Ui->promptsTextEdit->setPlainText(prompts.join('\n'));
   }
-
-  // Shown for this run, not kept as the user's preference.
-  QSignalBlocker blocker(m_Ui->createGroupsCheckBox);
-  m_Ui->createGroupsCheckBox->setChecked(tool->GetCreateGroupsAsNeeded());
 }
 
 void QmitkVoxTellToolGUI::OnModelLoaded(bool loadedHere)

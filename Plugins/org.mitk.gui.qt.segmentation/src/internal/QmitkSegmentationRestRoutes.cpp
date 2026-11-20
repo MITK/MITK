@@ -1726,26 +1726,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
             return;
           }
 
-          // The choice of this run only: left in the tool, its panel would
-          // use it for the next run of the user.
-          const bool userCreatesGroups = tool->GetCreateGroupsAsNeeded();
-
+          // Stays in the tool with the prompts, as a confirm that recomputes
+          // the result places it again. The panel pushes the user's choice
+          // for each run of its own.
           tool->SetPrompts(prompts);
           tool->SetCreateGroupsAsNeeded(createGroups);
+          tool->UpdatePreview();
 
-          try
-          {
-            tool->UpdatePreview();
-          }
-          catch (...)
-          {
-            tool->SetCreateGroupsAsNeeded(userCreatesGroups);
-            throw;
-          }
-
-          WhenRestToolIdle(tool, [job, tool, userCreatesGroups]() {
-            tool->SetCreateGroupsAsNeeded(userCreatesGroups);
-
+          WhenRestToolIdle(tool, [job, tool]() {
             if (FailIfDeactivated(*job, tool))
               return;
 

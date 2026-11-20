@@ -153,7 +153,11 @@ private:
   /** \brief Follows a model that another caller than this GUI loaded, like the REST API. */
   void OnToolModelLoaded();
 
-  /** \brief Shows the prompts and options of the tool, whoever set them. */
+  /** \brief Shows the prompts of the tool, whoever set them.
+   *
+   * Not its options: the check boxes keep the user's choice, which each run of
+   * this GUI hands to the tool.
+   */
   void OnToolPromptsChanged();
 
   /** \brief Brings the controls into the state of a model that is not loaded. */

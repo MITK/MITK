@@ -248,11 +248,12 @@ and it stays as it is.
 
 1. PATCH the session with the image, the segmentation, the active label and
    `"tool": "nnInteractive"`.
-2. Unless GET `/api/v1/segmentation/nninteractive` says that
-   `session_running` is true, start the model with POST
+2. Start the model with POST
    `/api/v1/segmentation/nninteractive/session?wait=120`, the first time
-   after downloading it. If nnInteractive is not installed, ask the user to
-   install it with Initialize in its panel.
+   after downloading it. A session that runs already is kept with its
+   prompts and result, and the answer is its state at once. If nnInteractive
+   is not installed, ask the user to install it with Initialize in its
+   panel.
 3. Prompt with POST `/api/v1/segmentation/nninteractive/prompts?wait=60`: a
    type (`point`, `box`, `scribble`, `lasso`), `"positive": true` for the
    structure or `false` for what does not belong to it, and the pixels of a

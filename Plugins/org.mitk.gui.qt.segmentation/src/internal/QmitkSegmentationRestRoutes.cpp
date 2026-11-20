@@ -1894,17 +1894,25 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "user began in the panel is joined: the job ends with it, and fails if it did not succeed. The job ends "
     "once the session has taken up the content of the active label, if it has any, so the state it gives "
     "includes that. The session works "
-    "on the image and time step chosen now; changing them ends it.";
+    "on the image and time step chosen now; changing them ends it. A session that runs already is kept, with "
+    "its prompts and result: the answer is its state at once. To start anew, DELETE the session first.";
   startSession.Handler = [server, start](const RestRequest& request) {
-    CallInGuiThread(*server, [&]() {
+    const auto running = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
+      auto* tool = GetNNInteractive(request.Path);
 
-      if (!IsInstalled(GetNNInteractive(request.Path)).value_or(false))
+      if (!IsInstalled(tool).value_or(false))
       {
         mitk::ThrowRestError("TOOL_NOT_INSTALLED", "Conflict",
           "nnInteractive is not installed. Ask the user to install it with the Initialize button of the nnInteractive panel.", 409, request.Path);
       }
+
+      // A new start would end the session and discard its prompts and result.
+      return tool->IsSessionRunning() ? std::optional<nlohmann::json>(DescribeNNInteractive(tool)) : std::nullopt;
     });
+
+    if (running.has_value())
+      return RestResponse::FromData(*running);
 
     std::shared_ptr<RestJob> job;
 
@@ -1949,6 +1957,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
               job->Fail("The start in the panel did not succeed.");
           });
 
+          return;
+        }
+
+        // Started meanwhile, in the panel or by another request.
+        if (tool->IsSessionRunning())
+        {
+          SucceedWhenSessionSeeded(job, tool);
           return;
         }
 

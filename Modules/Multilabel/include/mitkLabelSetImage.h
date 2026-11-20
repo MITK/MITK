@@ -257,7 +257,8 @@ namespace mitk
      * \param t The time step whose content is split; the content of other time steps stays with the
      * label. A segmentation with a single time step serves every time step.
      * \return The value of the label followed by the values of the new instances, ordered by voxel
-     * count, largest first. Only the label value if it has at most one component at the time step.
+     * count, largest first; components of equal size keep the order of their first voxels in the
+     * image. Only the label value if it has at most one component at the time step.
      * \pre labelValue must exist.
      * \pre t must be a valid time step.
      */
@@ -436,7 +437,8 @@ namespace mitk
 
     /** Helper that returns an unused label value, that could be used e.g. if one wants to define a label externally
     * before adding it.
-    * \return A label value currently not in use.
+    * \return A label value currently not in use: the one after the highest value in use, or, if that is
+    * the highest possible value, the lowest unused one.
     * \remark is no unused label value can be provided an exception will be thrown.*/
     LabelValueType GetUnusedLabelValue() const;
 

@@ -89,6 +89,10 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestSplitLabelIntoConnectedComponents);
   MITK_TEST(TestSplitLabelIntoConnectedComponents_SingleComponent);
   MITK_TEST(TestSplitLabelIntoConnectedComponents_Dynamic);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents_Static);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents_OtherGroup);
+  MITK_TEST(TestSplitLabelIntoConnectedComponents_HighestLabelValue);
+  MITK_TEST(TestGetUnusedLabelValue_AfterHighestLabelValue);
   MITK_TEST(TestCreateLabelMask);
   MITK_TEST(TestUpdateCenterOfMass);
   MITK_TEST(TestUpdateCenterOfMass_ReusedUntilGroupImageChanges);
@@ -1061,6 +1065,75 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 1, 5));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong instance at time step 1", std::size_t(1000), CountVoxels(groupImage, 1, result[1]));
     CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(5, 2), mitk::Exception);
+  }
+
+  void TestSplitLabelIntoConnectedComponents_Static()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 5);
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 5);
+
+    // As for an image of several time steps, which the single time step serves.
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 3);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 0, 5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong instance", std::size_t(1000), CountVoxels(groupImage, 0, result[1]));
+  }
+
+  void TestSplitLabelIntoConnectedComponents_OtherGroup()
+  {
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    const auto group = segmentation->AddGroup();
+    segmentation->AddLabel(mitk::Label::New(7, "Second group"), group);
+    auto* groupImage = segmentation->GetGroupImage(group);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 7);
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 7);
+
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(7, 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance is in another group", group, segmentation->GetGroupIndexOfLabel(result[1]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 0, 7));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong instance", std::size_t(1000), CountVoxels(groupImage, 0, result[1]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The first group was changed", std::size_t(0), CountVoxels(segmentation->GetGroupImage(0), 0, result[1]));
+  }
+
+  void TestSplitLabelIntoConnectedComponents_HighestLabelValue()
+  {
+    // As a segmentation converted from a 16 bit mask whose foreground is the highest value.
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    segmentation->AddLabel(mitk::Label::New(mitk::Label::MAX_LABEL_VALUE, "Highest"), 0);
+    auto* groupImage = segmentation->GetGroupImage(0);
+
+    PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, mitk::Label::MAX_LABEL_VALUE);
+    PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, mitk::Label::MAX_LABEL_VALUE);
+
+    const auto result = segmentation->SplitLabelIntoConnectedComponents(mitk::Label::MAX_LABEL_VALUE, 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
+    CPPUNIT_ASSERT_MESSAGE("The instance got the unlabeled value", mitk::MultiLabelSegmentation::UNLABELED_VALUE != result[1]);
+    CPPUNIT_ASSERT_MESSAGE("A label with the unlabeled value exists", !segmentation->ExistLabel(mitk::MultiLabelSegmentation::UNLABELED_VALUE));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 0, mitk::Label::MAX_LABEL_VALUE));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Voxels of the instance were lost", std::size_t(1000), CountVoxels(groupImage, 0, result[1]));
+  }
+
+  void TestGetUnusedLabelValue_AfterHighestLabelValue()
+  {
+    // Labels 5 and 6, and the highest value.
+    auto segmentation = CreateCenterOfMassTestSegmentation(1);
+    segmentation->AddLabel(mitk::Label::New(mitk::Label::MAX_LABEL_VALUE, "Highest"), 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The value after the highest one wrapped to an unusable value",
+      mitk::MultiLabelSegmentation::LabelValueType(1), segmentation->GetUnusedLabelValue());
+
+    segmentation->AddLabel(mitk::Label::New(1, "One"), 0);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The lowest unused value was not found",
+      mitk::MultiLabelSegmentation::LabelValueType(2), segmentation->GetUnusedLabelValue());
   }
 };
 

@@ -1141,8 +1141,28 @@ void mitk::MultiLabelSegmentation::EraseLabels(const LabelValueVectorType& label
 
 mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation::GetUnusedLabelValue() const
 {
-  auto usedValues = this->GetUsedLabelValues();
-  return usedValues.back() + 1;
+  // Ascending, starting with the unlabeled value.
+  const auto usedValues = this->GetUsedLabelValues();
+
+  // The value after the highest one keeps new labels in the order they were added.
+  if (usedValues.back() < Label::MAX_LABEL_VALUE)
+    return usedValues.back() + 1;
+
+  // Beyond the highest value, the value type would wrap to the unlabeled value.
+  LabelValueType candidate = UNLABELED_VALUE + 1;
+
+  for (const auto value : usedValues)
+  {
+    if (value == UNLABELED_VALUE)
+      continue;
+
+    if (value != candidate)
+      return candidate;
+
+    ++candidate;
+  }
+
+  mitkThrow() << "The segmentation has no unused label value.";
 }
 
 mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)

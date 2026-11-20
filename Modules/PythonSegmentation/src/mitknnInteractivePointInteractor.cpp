@@ -183,11 +183,12 @@ void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, Prompt
   const auto id = pointSet->InsertPoint(voxelCenter);
 
   // Only the enabled interactor highlights its latest point, and OnDisable()
-  // clears that highlight again. Nothing would clear one made while it is off.
+  // clears that highlight again, in the point set of its prompt type only.
+  // Nothing would clear one made in another.
   for (const auto& [type, node] : m_Impl->PointSetNodes)
     node->GetDataAs<PointSet>()->ClearSelection();
 
-  if (this->IsEnabled())
+  if (this->IsEnabled() && promptType == this->GetCurrentPromptType())
     pointSet->SetSelectInfo(id, true);
 }
 

@@ -771,6 +771,15 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
   m_TurnInFlight = false;
   m_PendingTurns = std::max(0, m_PendingTurns - 1);
 
+  // Stop ended the turn that ran. One that the user sent after it, often to
+  // steer the agent, runs as usual.
+  if (m_Stopping && this->IsTurnRunning())
+  {
+    m_Stopping = false;
+    m_ToolServer->AcceptCalls();
+    m_Activity = "Thinking";
+  }
+
   // A process that reports a result before its first init could not take up
   // the conversation it was asked to resume.
   if (!m_InitReported && !m_SessionId.isEmpty())

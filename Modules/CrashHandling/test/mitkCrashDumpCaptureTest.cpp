@@ -132,6 +132,9 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(CrashBySegvLeavesDump);
   MITK_TEST(CrashByAbortLeavesDump);
   MITK_TEST(CrashByStackOverflowLeavesDump);
+#ifdef _WIN32
+  MITK_TEST(ArmedThreadHasStackGuarantee);
+#endif
   MITK_TEST(DumpsSurviveReinitialization);
   MITK_TEST(FacilityQueryAcknowledgeDeleteCycle);
   MITK_TEST(UnarmedFacilityStillListsAndDeletes);
@@ -275,6 +278,27 @@ public:
     CPPUNIT_ASSERT(dumps.front().SizeInBytes > 0);
 #endif
   }
+
+#ifdef _WIN32
+  /** Whether a stack overflow leaves a dump otherwise depends on how much
+   *  stack the machine happens to have left for sentry's handler, so the
+   *  precondition is checked directly. Only non-zero is asserted: the size
+   *  belongs to sentry. */
+  void ArmedThreadHasStackGuarantee()
+  {
+    const auto result = RunHelper("stackguarantee", m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE("helper must not time out", !result.TimedOut);
+    CPPUNIT_ASSERT_MESSAGE("the arming thread has no stack guarantee, so sentry's crash handler "
+                           "cannot run after a stack overflow (needs sentry-native >= 0.16.0, a "
+                           "main-thread stack reserve >= 10x SENTRY_HANDLER_STACK_SIZE, default "
+                           "1 MiB vs 64 KiB)",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+  }
+#endif
 
   void DumpsSurviveReinitialization()
   {

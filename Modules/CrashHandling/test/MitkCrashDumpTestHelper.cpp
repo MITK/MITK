@@ -19,6 +19,10 @@ found in the LICENSE file.
 #include <string>
 #include <thread>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace
 {
   /* Always zero, but the compiler cannot prove it: the early return keeps
@@ -43,7 +47,8 @@ int main(int argc, char* argv[])
   if (argc != 3)
   {
     std::cerr << "Usage: MitkCrashDumpTestHelper "
-                 "<noop|segv|abort|stackoverflow|snapshot|snapshot-twice|freeze|freeze-recover> "
+                 "<noop|segv|abort|stackoverflow|snapshot|snapshot-twice|freeze|freeze-recover|"
+                 "stackguarantee (Windows only)> "
                  "<database-dir>" << std::endl;
     return EXIT_FAILURE;
   }
@@ -157,6 +162,26 @@ int main(int argc, char* argv[])
 
     return recovered ? EXIT_SUCCESS : EXIT_FAILURE;
   }
+
+#ifdef _WIN32
+  if (mode == "stackguarantee")
+  {
+    // A zero input queries the current guarantee without changing it.
+    ULONG guarantee = 0;
+    const bool queried = SetThreadStackGuarantee(&guarantee) != 0;
+    const auto error = GetLastError();
+    mitk::CrashDumpFacility::Shutdown();
+
+    if (!queried)
+    {
+      std::cerr << "SetThreadStackGuarantee query failed: " << error << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    std::cerr << "Stack guarantee of the arming thread: " << guarantee << " bytes" << std::endl;
+    return guarantee > 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+  }
+#endif
 
   if (mode == "segv")
   {

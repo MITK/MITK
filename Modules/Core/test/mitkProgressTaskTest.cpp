@@ -78,6 +78,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
   MITK_TEST(TaskUnwoundByException_Finishes_Success);
   MITK_TEST(MovedTask_FinishesOnce_Success);
   MITK_TEST(Cancel_OnlyAffectsCancelableTasks_Success);
+  MITK_TEST(CancelOrigin_IsTheOriginOfTheFirstRequestingThread_Success);
   MITK_TEST(ListenerAddedMidFlight_LearnsRunningTasks_Success);
   MITK_TEST(RemovedListener_IsNotNotified_Success);
   MITK_TEST(ConcurrentReporting_KeepsSequencesMonotonic_Success);
@@ -289,6 +290,29 @@ public:
 
     CPPUNIT_ASSERT(m_Listener->GetSnapshots(cancelable.GetId()).back().CancelRequested);
     CPPUNIT_ASSERT(!m_Listener->GetSnapshots(plain.GetId()).back().CancelRequested);
+  }
+
+  void CancelOrigin_IsTheOriginOfTheFirstRequestingThread_Success()
+  {
+    mitk::ProgressTask byClient("By client", 10, true);
+    mitk::ProgressTask byUser("By user", 10, true);
+
+    CPPUNIT_ASSERT(byClient.GetCancelOrigin().empty());
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      m_Service->RequestCancel(byClient.GetId());
+    }
+
+    m_Service->RequestCancel(byUser.GetId());
+
+    // A later request changes nothing.
+    m_Service->RequestCancel(byClient.GetId());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), byClient.GetCancelOrigin());
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), m_Listener->GetSnapshots(byClient.GetId()).back().CancelOrigin);
+    CPPUNIT_ASSERT(byUser.IsCancelRequested());
+    CPPUNIT_ASSERT(byUser.GetCancelOrigin().empty());
   }
 
   void ListenerAddedMidFlight_LearnsRunningTasks_Success()

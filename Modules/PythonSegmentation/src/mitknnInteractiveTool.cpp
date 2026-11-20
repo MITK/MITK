@@ -899,10 +899,12 @@ void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const Pr
     if (m_Impl->AbortRequested)
       return;
 
-    // The cancellation ended the worker and with it the session.
+    // The cancellation ended the worker and with it the session. The user
+    // can cancel the prompt of a program, too.
     if (task != nullptr && task->IsCancelRequested())
     {
-      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription(), byProgram });
+      const bool canceledByProgram = byProgram && !task->GetCancelOrigin().empty();
+      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription(), canceledByProgram });
       return;
     }
 

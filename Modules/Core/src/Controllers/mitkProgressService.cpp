@@ -194,7 +194,9 @@ void mitk::ProgressService::RequestCancel(ProgressTaskId id)
     if (it == m_Tasks.end() || !it->second.Info.Cancelable || it->second.Info.CancelRequested)
       return;
 
-    it->second.State->CancelRequested.store(true, std::memory_order_relaxed);
+    it->second.Info.CancelOrigin = ActionOriginScope::GetCurrent();
+    it->second.State->CancelOrigin = it->second.Info.CancelOrigin;
+    it->second.State->CancelRequested.store(true, std::memory_order_release);
     it->second.Info.CancelRequested = true;
     it->second.Info.Sequence = ++m_NextSequence;
 

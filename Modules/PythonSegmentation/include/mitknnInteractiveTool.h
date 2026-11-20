@@ -95,7 +95,7 @@ namespace mitk
 
       Cause Reason;
       std::string Details; /**< \brief What was reported, e.g. the exit code and last output of the worker. */
-      bool ByProgram = false; /**< \brief The lost session was computing a prompt of AddPrompt(), not one of the user. */
+      bool ByProgram = false; /**< \brief A program canceled a prompt of AddPrompt(); false if the user canceled it or the prompt was the user's. */
     };
 
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)

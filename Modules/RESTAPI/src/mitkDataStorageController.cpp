@@ -272,8 +272,9 @@ namespace
    *
    * Such an upload names files on the server's file system like a file
    * reference does, just out of sight of the checks for those: a detached
-   * NRRD or MetaImage header, whatever the extension is, and the parallel
-   * VTK formats, which list their pieces.
+   * NRRD or MetaImage header, whatever the extension is, the parallel VTK
+   * formats, which list their pieces, and MITK scenes, which name the files
+   * of their data.
    *
    * @param body The uploaded data.
    * @param extension The extension that selects the reader, with its dot.
@@ -283,55 +284,60 @@ namespace
   {
     const auto lowerExtension = ToLower(extension);
 
-    if (lowerExtension == ".pvti" || lowerExtension == ".pvtp")
+    // As the reader is chosen, see CustomMimeType: "x.mha" is read as MetaImage.
+    const auto endsWith = [&lowerExtension](const std::string& suffix) {
+      return lowerExtension.size() >= suffix.size() &&
+        lowerExtension.compare(lowerExtension.size() - suffix.size(), suffix.size(), suffix) == 0;
+    };
+
+    if (endsWith(".pvti") || endsWith(".pvtp"))
       return "Parallel VTK files refer to their pieces by file name.";
 
+    if (endsWith(".mitk") || endsWith(".mitkscene.json"))
+      return "Scene files refer to the files of their data by name.";
+
     const bool isNrrd = body.compare(0, 4, "NRRD") == 0;
-    const bool isMetaImage = lowerExtension == ".mha" || lowerExtension == ".mhd";
+    const bool isMetaImage = endsWith(".mha") || endsWith(".mhd");
 
     if (!isNrrd && !isMetaImage)
       return "";
 
-    // Both headers are lines of text. The NRRD header ends with an empty line,
-    // the MetaImage header with the line looked for.
-    std::istringstream lines(body);
-    std::string line;
+    // The readers do not split their headers into lines as one would expect:
+    // NrrdIO also ends a line at a lone '\r', MetaIO ends a key at '=' or ':'
+    // and reads a value up to '\n'. So the whole body is searched, which may
+    // also refuse an upload that merely mentions a data file.
+    const auto find = [&body](const std::string& lowerText, std::size_t from) {
+      const auto found = std::search(body.begin() + from, body.end(), lowerText.begin(), lowerText.end(),
+        [](char a, char b) { return std::tolower(static_cast<unsigned char>(a)) == b; });
 
-    while (std::getline(lines, line))
+      return found == body.end() ? std::string::npos : static_cast<std::size_t>(found - body.begin());
+    };
+
+    if (isNrrd)
     {
-      if (!line.empty() && line.back() == '\r')
-        line.pop_back();
+      // NrrdIO matches the field name before ": " without case.
+      return find("data file:", 0) != std::string::npos || find("datafile:", 0) != std::string::npos
+        ? "The NRRD header refers to a data file."
+        : "";
+    }
 
-      if (isNrrd)
-      {
-        if (line.empty())
-          break;
+    const std::string key = "elementdatafile";
 
-        const auto field = ToLower(line);
+    for (auto position = find(key, 0); position != std::string::npos; position = find(key, position + key.size()))
+    {
+      const auto separator = body.find_first_not_of(" \t", position + key.size());
 
-        if (field.rfind("data file:", 0) == 0 || field.rfind("datafile:", 0) == 0)
-          return "The NRRD header refers to a data file.";
-      }
-      else
-      {
-        const auto separator = line.find('=');
+      if (separator == std::string::npos || (body[separator] != '=' && body[separator] != ':'))
+        return "The MetaImage header refers to a data file.";
 
-        if (separator == std::string::npos)
-          continue;
+      const auto valueStart = std::min(body.find_first_not_of("=: \t", separator), body.size());
+      const auto valueEnd = std::min(body.find('\n', valueStart), body.size());
+      auto value = body.substr(valueStart, valueEnd - valueStart);
+      value.erase(value.find_last_not_of(" \t\r\v\f") + 1);
 
-        const auto trim = [](const std::string& text) {
-          const auto first = text.find_first_not_of(" \t");
-          const auto last = text.find_last_not_of(" \t");
-          return first == std::string::npos ? std::string() : text.substr(first, last - first + 1);
-        };
-
-        if (ToLower(trim(line.substr(0, separator))) != "elementdatafile")
-          continue;
-
-        return ToLower(trim(line.substr(separator + 1))) == "local"
-          ? ""
-          : "The MetaImage header refers to a data file.";
-      }
+      // The values for which MetaIO reads the pixels from the header's file.
+      if (value != "LOCAL" && value != "Local" && value != "local")
+        return "The MetaImage header refers to a data file.";
     }
 
     return "";

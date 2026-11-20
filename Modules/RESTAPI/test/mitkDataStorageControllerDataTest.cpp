@@ -399,6 +399,27 @@ public:
     CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", completeNrrd));
     CPPUNIT_ASSERT(403 != this->PutData(uid, "mha", completeMeta));
 
+    // Line ends and separators that the readers take as well.
+    const std::string crNrrd = "NRRD0004\rtype: unsigned char\rdimension: 2\rsizes: 2 2\rencoding: raw\rdata file: ../secret.raw\r\r";
+    const std::string colonMeta = metaHeader + "ElementDataFile: ../secret.raw\n";
+    const std::string commentedMeta = metaHeader + "Comment = ElementDataFile = LOCAL\nElementDataFile = ../secret.raw\n";
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", crNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", colonMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", commentedMeta));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "mha", metaHeader + "ElementDataFile: LOCAL\r\n" + std::string(4, '\1')));
+
+    // Scenes name the files of their data.
+    const std::string jsonScene = R"({"type":"org.mitk.scene","version":1,"nodes":[{"uid":"a","transfer":{"mode":"file-reference","file_path":"../secret.nrrd"}}]})";
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mitkscene.json", jsonScene));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "MITK", "PK"));
+
+    // A reader is chosen by the end of the file name.
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.mha", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.pvti", "<VTKFile/>"));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.mitkscene.json", jsonScene));
+
     // A client without the right to name files, on a server without restrictions.
     m_Controller->SetFileAccessConfig(mitk::FileAccessMode::Unrestricted, {}, m_TempDirectory);
     m_Controller->SetFileAccessCheck([](const httplib::Request&) { return false; });

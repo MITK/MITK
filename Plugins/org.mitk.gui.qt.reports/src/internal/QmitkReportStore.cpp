@@ -448,6 +448,13 @@ QString QmitkReportStore::GetDocument(int id, bool forExport) const
 
     inlined += QStringView(body).mid(copied);
     body = inlined;
+
+    // No policy stops the redirect of <meta http-equiv="refresh">, which a browser
+    // follows wherever it stands, and a report needs neither <base> nor <form>.
+    // With the opening bracket escaped, they show as text.
+    static const QRegularExpression tagOpeners(QStringLiteral("<(?=(?:meta|base|form)[\\s/>])"),
+                                               QRegularExpression::CaseInsensitiveOption);
+    body.replace(tagOpeners, QStringLiteral("&lt;"));
   }
 
   const auto title = report->Title.toHtmlEscaped();
@@ -459,8 +466,10 @@ QString QmitkReportStore::GetDocument(int id, bool forExport) const
 
   if (forExport)
   {
+    // form-action and base-uri do not fall back to default-src.
     page += QStringLiteral("<meta http-equiv=\"Content-Security-Policy\" "
-                           "content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">\n");
+                           "content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'; "
+                           "form-action 'none'; base-uri 'none'\">\n");
   }
 
   page += QStringLiteral("<title>") + title + QStringLiteral("</title>\n<style>\n") + styleSheet +

@@ -63,6 +63,9 @@ public:
   /** \brief Whether the part with the id \p partId is locked. */
   bool IsLocked(const QString& partId) const;
 
+  /** \brief The id of the view that stays usable, the holder's own; empty while unlocked. */
+  QString GetExemptPartId() const;
+
   QString GetReason() const;
 
 Q_SIGNALS:

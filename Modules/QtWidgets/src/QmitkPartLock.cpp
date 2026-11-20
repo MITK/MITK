@@ -61,6 +61,11 @@ bool QmitkPartLock::IsLocked(const QString& partId) const
   return m_Locked && partId != m_ExemptPartId;
 }
 
+QString QmitkPartLock::GetExemptPartId() const
+{
+  return m_Locked ? m_ExemptPartId : QString();
+}
+
 QString QmitkPartLock::GetReason() const
 {
   return m_Reason;

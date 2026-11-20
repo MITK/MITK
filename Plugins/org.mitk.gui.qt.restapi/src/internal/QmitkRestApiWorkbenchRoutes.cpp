@@ -33,6 +33,9 @@ found in the LICENSE file.
 #include <berryPlatformUI.h>
 #include <berryQtSelectionProvider.h>
 
+#include <QmitkPartLock.h>
+
+#include <QApplication>
 #include <QItemSelectionModel>
 
 #include <optional>
@@ -86,6 +89,28 @@ namespace
     }
 
     return view;
+  }
+
+  /** Refuses to close a view that something still runs in. In the GUI thread. */
+  void ThrowIfViewMayNotClose(const QString& id, const std::string& path)
+  {
+    // The dialog's event loop, in which this runs, would go on with a view that is gone.
+    if (QApplication::activeModalWidget() != nullptr)
+    {
+      throw mitk::RestException(mitk::ErrorResponse::Create("DIALOG_OPEN", "Conflict",
+        "A dialog of the Workbench is open. Views can be closed once it is closed.", 409, path));
+    }
+
+    // The program that operates the Workbench works through its own view, and
+    // its calls, this one among them, would wait for themselves.
+    const auto* lock = QmitkPartLock::GetInstance();
+
+    if (lock->IsLocked() && lock->GetExemptPartId() == id)
+    {
+      throw mitk::RestException(mitk::ErrorResponse::Create("VIEW_IN_USE", "Conflict",
+        "The view " + id.toStdString() + " cannot be closed while the program that works through it operates "
+        "the Workbench (" + lock->GetReason().toStdString() + ").", 409, path));
+    }
   }
 
   std::vector<mitk::DataNode::Pointer> GetDataManagerSelection(const std::string& path)
@@ -196,7 +221,9 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   openView.Description =
     "Body: {open: true|false}. Opening shows the view in front of the others of its tab group, without "
     "taking the keyboard focus from the user; but if the active view is in that tab group, the active view "
-    "stays in front and visible stays false. Returns {data: view}, as GET does.";
+    "stays in front and visible stays false. Closing answers 409 DIALOG_OPEN while a dialog of the Workbench "
+    "is open, and 409 VIEW_IN_USE for the view of a program that operates the Workbench while it does, like "
+    "the Agent view while the agent works. Returns {data: view}, as GET does.";
   openView.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
 
@@ -215,6 +242,7 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
       }
       else if (const auto reference = page->FindViewReference(descriptor->GetId()); reference.IsNotNull())
       {
+        ThrowIfViewMayNotClose(descriptor->GetId(), request.Path);
         page->HideView(reference);
       }
 

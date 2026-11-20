@@ -657,9 +657,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
   labels.Handler = [server](const RestRequest& request) {
     const auto node = mitk::FindRestNode(*server, request.PathParams.at("uid"), request.Path);
     const auto measure = IsRestMeasureRequested(request);
-    const auto selection = measure ? std::optional<RestTimeSelection>(RestTimeSelection::FromRequest(request)) : std::nullopt;
 
     return RestResponse::FromData(CallInGuiThread(*server, [&]() {
+      // Reads the selected time point without the query parameter.
+      const auto selection = measure ? std::optional<RestTimeSelection>(RestTimeSelection::FromRequest(request)) : std::nullopt;
       return DescribeRestLabels(GetSegmentation(node.get(), request.Path), selection);
     }));
   };

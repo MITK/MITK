@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QScrollBar>
 #include <QSvgRenderer>
+#include <QXmlStreamReader>
 
 #include <algorithm>
 #include <array>
@@ -207,6 +208,44 @@ namespace
       trapezoid.addPolygon(trapezoids[i]);
       painter->fillPath(ring.intersected(trapezoid), toQColor(sides[i]->color));
     }
+  }
+
+  /**
+   * \brief Whether an SVG refers to nothing outside of itself.
+   *
+   * Qt SVG opens what an &lt;image&gt; names, unless it is a "data:" URI, and
+   * the style sheet that an xml-stylesheet instruction names, while it parses
+   * and outside of the resource handler, so an SVG of an untrusted page could
+   * read local files or reach network shares. A "data:" image is decoded by
+   * its content, which may be an SVG with references of its own. So only
+   * references to the SVG's own elements are accepted.
+   */
+  bool IsSelfContainedSvg(const QByteArray &svg)
+  {
+    QXmlStreamReader reader(svg);
+
+    while (!reader.atEnd())
+    {
+      switch (reader.readNext())
+      {
+        case QXmlStreamReader::DTD:
+        case QXmlStreamReader::ProcessingInstruction:
+          return false;
+
+        case QXmlStreamReader::StartElement:
+          for (const auto &attribute : reader.attributes())
+          {
+            if (attribute.name() == QLatin1String("href") && !attribute.value().startsWith(QLatin1Char('#')))
+              return false;
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    return !reader.hasError();
   }
 
   /** \brief An &lt;img&gt; showing the SVG markup, with the attributes that size and style its box. */
@@ -1094,6 +1133,16 @@ private:
     probe.setData(data);
     probe.open(QIODevice::ReadOnly);
     QImageReader reader(&probe);
+
+    // An SVG that refers to anything outside of itself is not drawn at all, not
+    // even as a raster image, which Qt's SVG image plugin would parse alike.
+    // The same holds for compressed SVG, which is not checked.
+    if (reader.format().startsWith("svg") && (reader.format() != "svg" || !IsSelfContainedSvg(data)))
+    {
+      qWarning("QmitkHtmlWidget: an SVG image that refers to files or other documents is not shown.");
+      m_Images.insert(key, QImage());
+      return;
+    }
 
     // SVGs are kept as a vector renderer so they stay crisp at any display size.
     // A GIF with more than one frame (imageCount != 1, treating an unknown 0 as

@@ -955,7 +955,23 @@ void QmitkVoxTellToolGUI::BusyStateChanged(bool isBusy)
     const bool isRunOfPrompts = tool != nullptr && m_Ui->initializeButton->isChecked() && !tool->GetPrompts().empty();
 
     if (isOwnRun || isRunOfPrompts)
-      QTimer::singleShot(0, this, [this, isOwnRun]() { this->ShowRunResult(isOwnRun); });
+    {
+      using Outcome = mitk::SegWithPreviewTool::ConfirmationOutcome;
+      const auto outcome = tool != nullptr ? tool->GetLastConfirmationOutcome() : Outcome::None;
+
+      QTimer::singleShot(0, this, [this, isOwnRun, outcome]() {
+        // A confirmation that waited for this update has transferred its
+        // preview meanwhile, which gave it an outcome of its own. What it
+        // transferred is no run result to show.
+        if (const auto* tool = this->GetTool(); tool != nullptr && tool->GetLastConfirmationOutcome() != outcome)
+        {
+          this->PrepareNextRun();
+          return;
+        }
+
+        this->ShowRunResult(isOwnRun);
+      });
+    }
   }
 }
 

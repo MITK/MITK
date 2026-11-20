@@ -888,6 +888,17 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     }
     m_ToolManager->ActiveWorkingLabelChanged +=
       mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
+
+    // Without a render window part, the inspector and the interpolator did not
+    // follow the active label, which the REST API sets on the segmentation then.
+    // Selecting it in the inspector updates the interpolator, too.
+    const auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+    const auto* segmentation = workingNode.IsNotNull()
+      ? dynamic_cast<const mitk::MultiLabelSegmentation*>(workingNode->GetData())
+      : nullptr;
+
+    if (nullptr != segmentation && nullptr != segmentation->GetActiveLabel())
+      m_Controls->multiLabelWidget->SetSelectedLabel(segmentation->GetActiveLabel()->GetValue());
   }
 }
 

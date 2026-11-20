@@ -359,7 +359,8 @@ RestServer::RestServer()
     "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. At most 4 requests wait "
     "at the same time; a further one answers at once, with 202 while the job runs. Returns {data: job}, "
     "a job being {id, description, state: running|succeeded|failed|canceled, seconds, and cancelable while it "
-    "runs, result once it succeeded, error once it failed}.";
+    "runs, with cancel_also_discards if a cancel loses more than the work of the job, like a session, result once "
+    "it succeeded, error once it failed}.";
   job.Handler = [this](const RestRequest& request) { return this->HandleGET_job(request); };
   m_Router->Add(std::move(job));
 

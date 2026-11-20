@@ -106,6 +106,17 @@ namespace mitk
     void SetCancelHandler(std::function<void()> handler);
 
     /**
+     * \brief Tell clients what a cancel discards beyond the work of the job.
+     *
+     * For work that cannot stop without losing more, like the session it
+     * belongs to. A client that only stops waiting for the job, rather than
+     * wanting its work undone, leaves such a job running.
+     *
+     * \param what Says what is lost, for example "the session".
+     */
+    void SetCancelAlsoDiscards(const std::string& what);
+
+    /**
      * \brief End the job as canceled, after asking its handler to stop the work.
      *
      * The job ends at once, while the work may still finish the step it is
@@ -134,7 +145,8 @@ namespace mitk
 
     /**
      * \brief The job as clients see it: {id, description, state, seconds,
-     *        cancelable while it runs, result | error}.
+     *        cancelable and cancel_also_discards (if set) while it runs,
+     *        result | error}.
      */
     nlohmann::json ToJson() const;
 
@@ -171,6 +183,7 @@ namespace mitk
     std::string m_Error;
     std::chrono::steady_clock::time_point m_End;
     std::function<void()> m_CancelHandler;
+    std::string m_CancelAlsoDiscards;
   };
 }
 

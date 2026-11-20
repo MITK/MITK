@@ -1379,6 +1379,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       outcome->Job = server->CreateJob("Prompt nnInteractive");
       outcome->Job->SetCancelHandler([]() { CancelTasks("nnInteractive"); });
+      outcome->Job->SetCancelAlsoDiscards("the nnInteractive session with all its prompts and the unconfirmed result");
       outcome->ReportToJob();
 
       return outcome->Job;

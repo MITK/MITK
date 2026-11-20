@@ -149,6 +149,12 @@ void mitk::RestJob::SetCancelHandler(std::function<void()> handler)
   m_CancelHandler = std::move(handler);
 }
 
+void mitk::RestJob::SetCancelAlsoDiscards(const std::string& what)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_CancelAlsoDiscards = what;
+}
+
 bool mitk::RestJob::Cancel()
 {
   std::function<void()> handler;
@@ -231,6 +237,9 @@ nlohmann::json mitk::RestJob::ToJson() const
   if (m_State == State::Running)
   {
     json["cancelable"] = static_cast<bool>(m_CancelHandler);
+
+    if (m_CancelHandler && !m_CancelAlsoDiscards.empty())
+      json["cancel_also_discards"] = m_CancelAlsoDiscards;
   }
   else if (m_State == State::Succeeded)
   {

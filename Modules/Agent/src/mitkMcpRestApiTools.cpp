@@ -115,7 +115,9 @@ namespace
    * The answer to a request that the call made, or, if the call was
    * interrupted (the user stopped the agent, or its view closed) and the
    * answer is a job that still runs, the answer to canceling that job: the
-   * work is not wanted any more by whoever waited for it.
+   * work is not wanted any more by whoever waited for it. Unless a cancel
+   * would discard more than that work, like the session of the user that the
+   * work belongs to.
    */
   mitk::RestResponse CancelJobOfInterruptedCall(mitk::IRestServerService& server, const mitk::RestResponse& response, const mitk::RestRequest& call)
   {
@@ -123,6 +125,17 @@ namespace
 
     if (call.WaitInterruption == nullptr || !call.WaitInterruption->IsInterrupted() || !IsJobIn(response, "running", &id))
       return response;
+
+    // Of the form that IsJobIn() has checked.
+    const auto data = nlohmann::json::parse(response.Body)["data"];
+
+    if (const auto discards = data.find("cancel_also_discards"); discards != data.end() && discards->is_string())
+    {
+      MITK_INFO << "Agent: stopped, but its job " << id << " goes on, as canceling it would also discard "
+                << discards->get<std::string>();
+
+      return response;
+    }
 
     const auto canceled = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + id, call));
 

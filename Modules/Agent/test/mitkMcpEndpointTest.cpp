@@ -152,7 +152,10 @@ namespace
     StartsJob,
 
     /** api_get GET /api/v1/jobs/{id} of a job that runs, with ?wait. */
-    FollowsJob
+    FollowsJob,
+
+    /** As StartsJob, for a job whose cancel discards more than its work. */
+    StartsJobWhoseCancelDiscardsMore
   };
 
   /**
@@ -167,9 +170,13 @@ namespace
     std::promise<std::shared_ptr<mitk::RestJob>> started;
     std::atomic<bool> cancelHandlerRan = false;
 
-    const auto createJob = [&server, &cancelHandlerRan]() {
+    const auto createJob = [&server, &cancelHandlerRan, waitingCall]() {
       const auto job = server.CreateJob("Never ends by itself");
       job->SetCancelHandler([&cancelHandlerRan]() { cancelHandlerRan = true; });
+
+      if (waitingCall == WaitingCall::StartsJobWhoseCancelDiscardsMore)
+        job->SetCancelAlsoDiscards("the session");
+
       return job;
     };
 
@@ -191,7 +198,7 @@ namespace
     std::shared_ptr<mitk::RestJob> runningJob;
     nlohmann::json call;
 
-    if (waitingCall == WaitingCall::StartsJob)
+    if (waitingCall != WaitingCall::FollowsJob)
     {
       call = Call("api_call", { { "method", "POST" }, { "path", "/api/v1/test/work?wait=120" } });
     }
@@ -207,7 +214,7 @@ namespace
       return endpoint.HandleMessage(call, mitk::RestRequest());
     });
 
-    const auto job = waitingCall == WaitingCall::StartsJob
+    const auto job = waitingCall != WaitingCall::FollowsJob
       ? started.get_future().get()
       : runningJob;
 
@@ -243,6 +250,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestMalformedMessages);
   MITK_TEST(TestRefuseCalls);
   MITK_TEST(TestRefuseCallsEndsWaitsAndCancelsJobs);
+  MITK_TEST(TestRefuseCallsLeavesJobsWhoseCancelDiscardsMore);
   MITK_TEST(TestWithdrawEndsWaitsAndCancelsJobs);
   MITK_TEST(TestAcceptCallsLetsCallsWaitAgain);
   MITK_TEST(TestUnknownMethod);
@@ -382,6 +390,16 @@ public:
       CPPUNIT_ASSERT(!wait.Answer["result"]["isError"].get<bool>());
       CPPUNIT_ASSERT(GetText(wait.Answer).find("\"canceled\"") != std::string::npos);
     }
+  }
+
+  void TestRefuseCallsLeavesJobsWhoseCancelDiscardsMore()
+  {
+    const auto wait = InterruptWaitingCall(WaitingCall::StartsJobWhoseCancelDiscardsMore, [](mitk::McpEndpoint& endpoint) { endpoint.RefuseCalls("You were stopped."); });
+
+    CPPUNIT_ASSERT(wait.Duration < std::chrono::seconds(60));
+    CPPUNIT_ASSERT(wait.JobState == mitk::RestJob::State::Running);
+    CPPUNIT_ASSERT(!wait.CancelHandlerRan);
+    CPPUNIT_ASSERT(GetText(wait.Answer).find("\"cancel_also_discards\"") != std::string::npos);
   }
 
   void TestWithdrawEndsWaitsAndCancelsJobs()

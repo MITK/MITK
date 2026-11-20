@@ -12,36 +12,24 @@ found in the LICENSE file.
 
 #include "QmitkPlanarFigureRestRoutes.h"
 
+#include <QmitkPulseTimers.h>
+
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 #include <mitkErrorResponse.h>
 #include <mitkImage.h>
 #include <mitkIRestServerService.h>
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkPlanarFigure.h>
-#include <mitkPlanarFigureVisibilityProperty.h>
-#include <mitkPlanarFigureVtkMapper2D.h>
-#include <mitkPlanarFigureVtkMapper3D.h>
 #include <mitkRenderingManager.h>
+#include <mitkRestFigure.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
-#include <mitkWeakPointer.h>
 
-#include <QColor>
 #include <QPointer>
-#include <QTimer>
 
-#include <algorithm>
 #include <array>
-#include <cctype>
-#include <chrono>
 #include <cmath>
-#include <map>
-#include <optional>
 
 using mitk::CallInGuiThread;
 using mitk::ErrorResponse;
@@ -52,418 +40,9 @@ using mitk::RestRoute;
 
 namespace
 {
-  // The properties that the planar figure mappers draw a figure by.
-  constexpr const char* LineWidthProperty = "line width";
-  constexpr const char* LabelProperty = "planarfigure.label";
-  constexpr const char* ShowNameProperty = "planarfigure.drawname";
-  constexpr const char* ShowMeasurementsProperty = "planarfigure.drawquantities";
-  constexpr const char* ShowIn3DProperty = "planarfigure.3drendering";
-  constexpr const char* PulseProperty = "animated.pulse";
-
-  /** The line widths that the Measurement view offers, in pixels. */
-  constexpr double MinimumLineWidth = 1.0;
-  constexpr double MaximumLineWidth = 10.0;
-
-  constexpr double MaximumPulseSeconds = 600.0;
-
-  using Visibility = mitk::PlanarFigureVisibilityProperty::Visibility;
-
-  /** When the label of a figure shows, in the words of the API. */
-  struct LabelVisibility
-  {
-    const char* Name;
-    Visibility Value;
-  };
-
-  constexpr std::array<LabelVisibility, 6> LabelVisibilities = {{
-    { "always", Visibility::Always },
-    { "on_hover", Visibility::OnHover },
-    { "when_selected", Visibility::WhenSelected },
-    { "on_hover_or_when_selected", Visibility::OnHoverOrWhenSelected },
-    { "on_hover_while_selected", Visibility::OnHoverWhileSelected },
-    { "never", Visibility::Never }
-  }};
-
   [[noreturn]] void ThrowInvalid(const std::string& detail, const std::string& path)
   {
     throw RestException(ErrorResponse::InvalidRequest(detail, path));
-  }
-
-  /** The figures of the Measurement view: those of helper objects and contour markers belong to other components. */
-  mitk::NodePredicateBase::Pointer GetFigurePredicate()
-  {
-    auto isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-    auto isContourMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
-
-    return mitk::NodePredicateAnd::New(
-      mitk::TNodePredicateDataType<mitk::PlanarFigure>::New(),
-      mitk::NodePredicateNot::New(isHelperObject),
-      mitk::NodePredicateNot::New(isContourMarker)).GetPointer();
-  }
-
-  /** A figure of the types the API draws, or null for any other type. */
-  mitk::PlanarFigure::Pointer CreateFigure(const std::string& type)
-  {
-    if (type == "line" || type == "circle" || type == "rectangle")
-      return mitk::CreatePlanarFigure(type);
-
-    return nullptr;
-  }
-
-  /** A name like the Measurement view gives, "Circle", "Circle 2", ..., that no data has yet. */
-  std::string CreateName(const mitk::DataStorage* dataStorage, const std::string& type)
-  {
-    auto baseName = type;
-    baseName[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(baseName[0])));
-
-    return dataStorage->GetUniqueName(baseName);
-  }
-
-  /** The look of a figure, as the API shows and changes it. */
-  struct Look
-  {
-    QColor Color;
-    float LineWidth = 0.0f;
-    Visibility Label = Visibility::Never;
-    bool ShowName = false;
-    bool ShowMeasurements = false;
-    bool ShowIn3D = false;
-    bool Pulse = false;
-  };
-
-  /** Reads the look of a node; properties that it lacks keep the values of the given look. */
-  Look ReadLook(const mitk::DataNode* node, Look look)
-  {
-    float color[3];
-
-    if (node->GetColor(color))
-      look.Color = QColor::fromRgbF(color[0], color[1], color[2]);
-
-    node->GetFloatProperty(LineWidthProperty, look.LineWidth);
-
-    if (const auto* label = dynamic_cast<const mitk::PlanarFigureVisibilityProperty*>(node->GetProperty(LabelProperty)); label != nullptr)
-      look.Label = label->GetVisibility();
-
-    node->GetBoolProperty(ShowNameProperty, look.ShowName);
-    node->GetBoolProperty(ShowMeasurementsProperty, look.ShowMeasurements);
-    node->GetBoolProperty(ShowIn3DProperty, look.ShowIn3D);
-    node->GetBoolProperty(PulseProperty, look.Pulse);
-
-    return look;
-  }
-
-  /** The look that the mappers give a figure, for nodes that lack some of its properties. */
-  const Look& GetDefaultLook()
-  {
-    static const auto look = []() {
-      auto defaults = mitk::DataNode::New();
-      mitk::PlanarFigureVtkMapper2D::SetDefaultProperties(defaults);
-      mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(defaults);
-      return ReadLook(defaults, Look());
-    }();
-
-    return look;
-  }
-
-  nlohmann::json ToJson(const Look& look)
-  {
-    const auto label = std::find_if(LabelVisibilities.begin(), LabelVisibilities.end(),
-      [&look](const LabelVisibility& visibility) { return visibility.Value == look.Label; });
-
-    return {
-      { "color", look.Color.name().toStdString() },
-      { "line_width", std::round(look.LineWidth * 1000.0) / 1000.0 },
-      { "label", {
-        { "show", label != LabelVisibilities.end() ? label->Name : "never" },
-        { "name", look.ShowName },
-        { "measurements", look.ShowMeasurements } } },
-      { "show_in_3d", look.ShowIn3D },
-      { "pulse", look.Pulse }
-    };
-  }
-
-  /** What a request changes of the look of a figure. */
-  struct LookChange
-  {
-    std::optional<mitk::Color> Color;
-    std::optional<float> LineWidth;
-    std::optional<Visibility> Label;
-    std::optional<bool> ShowName;
-    std::optional<bool> ShowMeasurements;
-    std::optional<bool> ShowIn3D;
-    std::optional<bool> Pulse;
-
-    /** How long a pulse that is switched on lasts; it lasts until switched off without. */
-    std::optional<std::chrono::milliseconds> PulseDuration;
-  };
-
-  bool IsLookField(const std::string& key)
-  {
-    return key == "color" || key == "line_width" || key == "label" || key == "show_in_3d" || key == "pulse" ||
-      key == "pulse_seconds";
-  }
-
-  bool GetBool(const nlohmann::json& object, const std::string& key, const std::string& field, const std::string& path)
-  {
-    if (!object[key].is_boolean())
-      ThrowInvalid("\"" + field + "\" must be true or false.", path);
-
-    return object[key].get<bool>();
-  }
-
-  /** Reads the look fields of a request body, before anything changes, so that an invalid request changes nothing. */
-  LookChange ParseLookChange(const nlohmann::json& body, const std::string& path)
-  {
-    LookChange change;
-
-    if (body.contains("color"))
-    {
-      change.Color = mitk::ParseRestColor(body["color"].is_string() ? body["color"].get<std::string>() : std::string());
-
-      if (!change.Color.has_value())
-        ThrowInvalid("\"color\" must be written like \"#ff8800\".", path);
-    }
-
-    if (body.contains("line_width"))
-    {
-      const auto& width = body["line_width"];
-
-      if (!width.is_number() || width.get<double>() < MinimumLineWidth || width.get<double>() > MaximumLineWidth)
-        ThrowInvalid("\"line_width\" must be a number of pixels from 1 to 10.", path);
-
-      change.LineWidth = width.get<float>();
-    }
-
-    if (body.contains("label"))
-    {
-      const auto& label = body["label"];
-
-      if (!label.is_object())
-        ThrowInvalid("\"label\" must be an object: {show, name, measurements}, all optional.", path);
-
-      for (const auto& item : label.items())
-      {
-        if (item.key() != "show" && item.key() != "name" && item.key() != "measurements")
-          ThrowInvalid("\"label\" takes show, name and measurements, not \"" + item.key() + "\".", path);
-      }
-
-      if (label.contains("show"))
-      {
-        const auto name = label["show"].is_string() ? label["show"].get<std::string>() : std::string();
-
-        const auto visibility = std::find_if(LabelVisibilities.begin(), LabelVisibilities.end(),
-          [&name](const LabelVisibility& entry) { return name == entry.Name; });
-
-        if (visibility == LabelVisibilities.end())
-        {
-          ThrowInvalid("\"label.show\" must be always, on_hover, when_selected, on_hover_or_when_selected, "
-            "on_hover_while_selected or never.", path);
-        }
-
-        change.Label = visibility->Value;
-      }
-
-      if (label.contains("name"))
-        change.ShowName = GetBool(label, "name", "label.name", path);
-
-      if (label.contains("measurements"))
-        change.ShowMeasurements = GetBool(label, "measurements", "label.measurements", path);
-    }
-
-    if (body.contains("show_in_3d"))
-      change.ShowIn3D = GetBool(body, "show_in_3d", "show_in_3d", path);
-
-    if (body.contains("pulse"))
-      change.Pulse = GetBool(body, "pulse", "pulse", path);
-
-    if (body.contains("pulse_seconds"))
-    {
-      if (!change.Pulse.value_or(false))
-        ThrowInvalid("\"pulse_seconds\" goes with \"pulse\": true.", path);
-
-      const auto& seconds = body["pulse_seconds"];
-
-      if (!seconds.is_number() || seconds.get<double>() <= 0.0 || seconds.get<double>() > MaximumPulseSeconds)
-        ThrowInvalid("\"pulse_seconds\" must be a number of seconds above 0 and up to 600.", path);
-
-      change.PulseDuration = std::chrono::milliseconds(std::lround(seconds.get<double>() * 1000.0));
-    }
-
-    return change;
-  }
-
-  /**
-   * Ends pulses after their duration, with one timer per figure. Lives in the
-   * GUI thread, as a child of the object that the routes were created with.
-   */
-  class QmitkPulseTimers : public QObject
-  {
-  public:
-    explicit QmitkPulseTimers(QObject* parent)
-      : QObject(parent)
-    {
-    }
-
-    /** Ends the pulses that are still timed at once, as no timer would end them anymore. */
-    ~QmitkPulseTimers() override
-    {
-      bool hasEnded = false;
-
-      for (const auto& entry : m_Pulses)
-      {
-        if (auto lockedNode = entry.second.Node.Lock(); lockedNode.IsNotNull())
-        {
-          lockedNode->SetBoolProperty(PulseProperty, false);
-          hasEnded = true;
-        }
-      }
-
-      if (hasEnded)
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-
-    /** Switches the pulse of a figure off after the duration, instead of when an earlier call said. */
-    void EndPulseAfter(mitk::DataNode* node, std::chrono::milliseconds duration)
-    {
-      this->Cancel(node);
-
-      auto* timer = new QTimer(this);
-      timer->setSingleShot(true);
-      m_Pulses[node] = { timer, node };
-
-      // A later call for the figure deletes the timer, so the pulse found here is the one it times.
-      connect(timer, &QTimer::timeout, this, [this, node]() {
-        const auto it = m_Pulses.find(node);
-
-        if (it == m_Pulses.end())
-          return;
-
-        const auto lockedNode = it->second.Node.Lock();
-        it->second.Timer->deleteLater();
-        m_Pulses.erase(it);
-
-        if (lockedNode.IsNotNull())
-        {
-          lockedNode->SetBoolProperty(PulseProperty, false);
-          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        }
-      });
-
-      timer->start(duration);
-    }
-
-    /** Keeps the pulse of a figure as it is, without an end that an earlier call set. */
-    void Cancel(const mitk::DataNode* node)
-    {
-      if (const auto it = m_Pulses.find(node); it != m_Pulses.end())
-      {
-        delete it->second.Timer.data();
-        m_Pulses.erase(it);
-      }
-    }
-
-  private:
-    struct TimedPulse
-    {
-      QPointer<QTimer> Timer;
-
-      /** The figure, which may be deleted before its pulse ends; another node may get its address then. */
-      mitk::WeakPointer<mitk::DataNode> Node;
-    };
-
-    std::map<const mitk::DataNode*, TimedPulse> m_Pulses;
-  };
-
-  /** Runs in the GUI thread. */
-  void ApplyLookChange(mitk::DataNode* node, const LookChange& change, QmitkPulseTimers* pulseTimers)
-  {
-    if (change.Color.has_value())
-      node->SetColor(*change.Color);
-
-    if (change.LineWidth.has_value())
-      node->SetFloatProperty(LineWidthProperty, *change.LineWidth);
-
-    if (change.Label.has_value())
-      node->SetProperty(LabelProperty, mitk::PlanarFigureVisibilityProperty::New(*change.Label));
-
-    if (change.ShowName.has_value())
-      node->SetBoolProperty(ShowNameProperty, *change.ShowName);
-
-    if (change.ShowMeasurements.has_value())
-      node->SetBoolProperty(ShowMeasurementsProperty, *change.ShowMeasurements);
-
-    if (change.ShowIn3D.has_value())
-      node->SetBoolProperty(ShowIn3DProperty, *change.ShowIn3D);
-
-    if (change.Pulse.has_value())
-    {
-      node->SetBoolProperty(PulseProperty, *change.Pulse);
-
-      if (pulseTimers != nullptr)
-      {
-        if (change.PulseDuration.has_value())
-          pulseTimers->EndPulseAfter(node, *change.PulseDuration);
-        else
-          pulseTimers->Cancel(node);
-      }
-    }
-  }
-
-  /**
-   * A figure as the API describes it. The uids are left to ToJson(), as only the
-   * handler's thread may look them up.
-   */
-  struct FigureDescription
-  {
-    mitk::DataNodeHandle Node;
-
-    /** The image that the figure marks, its parent in the Data Manager. */
-    mitk::DataNodeHandle Image;
-
-    nlohmann::json Json;
-  };
-
-  /** Runs in the GUI thread. */
-  FigureDescription DescribeFigure(const mitk::IRestServerService& server, const mitk::DataStorage* dataStorage, mitk::DataNode* node)
-  {
-    const auto* figure = static_cast<const mitk::PlanarFigure*>(node->GetData());
-
-    auto points = nlohmann::json::array();
-
-    for (std::size_t i = 0; i < figure->GetNumberOfControlPoints(); ++i)
-      points.push_back(mitk::ToRestJson(figure->GetWorldControlPoint(i)));
-
-    auto measurements = nlohmann::json::array();
-
-    for (const auto& measurement : figure->GetMeasurements())
-    {
-      measurements.push_back({
-        { "name", mitk::PlanarFigure::GetDisplayName(measurement.Type) },
-        { "value", measurement.Value },
-        { "unit", mitk::PlanarFigure::GetUnitSymbol(measurement.Type) } });
-    }
-
-    const auto images = dataStorage->GetSources(node, mitk::TNodePredicateDataType<mitk::Image>::New(), true);
-
-    nlohmann::json json = {
-      { "name", node->GetName() },
-      { "type", figure->GetTypeId() },
-      { "closed", figure->IsClosed() },
-      { "points", points },
-      { "measurements", measurements }
-    };
-
-    json.update(ToJson(ReadLook(node, GetDefaultLook())));
-
-    return { server.HoldNode(node), server.HoldNode(images->empty() ? nullptr : images->front().GetPointer()), json };
-  }
-
-  nlohmann::json ToJson(const mitk::IRestServerService& server, const FigureDescription& figure)
-  {
-    auto json = figure.Json;
-    json["uid"] = server.GetNodeUid(figure.Node.get());
-    json["image"] = figure.Image != nullptr ? nlohmann::json(server.GetNodeUid(figure.Image.get())) : nlohmann::json(nullptr);
-    return json;
   }
 }
 
@@ -494,13 +73,13 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       throw RestException(ErrorResponse::DataStorageNotAvailable(request.Path));
 
     const auto figures = CallInGuiThread(*server, [&]() {
-      std::vector<FigureDescription> descriptions;
-      const auto nodes = dataStorage->GetSubset(GetFigurePredicate());
+      std::vector<mitk::RestFigureDescription> descriptions;
+      const auto nodes = dataStorage->GetSubset(mitk::GetRestFigurePredicate());
 
       for (const auto& node : *nodes)
       {
         if (static_cast<const mitk::PlanarFigure*>(node->GetData())->IsComplete())
-          descriptions.push_back(DescribeFigure(*server, dataStorage, node));
+          descriptions.push_back(mitk::DescribeRestFigure(*server, dataStorage, node));
       }
 
       return descriptions;
@@ -509,7 +88,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     auto json = nlohmann::json::array();
 
     for (const auto& figure : figures)
-      json.push_back(ToJson(*server, figure));
+      json.push_back(mitk::ToRestJson(*server, figure));
 
     return RestResponse::FromData(json);
   };
@@ -540,7 +119,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     if (!body.contains("window") || !body["window"].is_string())
       ThrowInvalid("\"window\", the 2D window in whose slice to draw, is missing.", request.Path);
 
-    const auto lookChange = ParseLookChange(body, request.Path);
+    const auto lookChange = mitk::ParseRestFigureLookChange(body, request.Path);
     const auto window = body["window"].get<std::string>();
     const auto imageNode = mitk::FindRestNode(*server, body["image"], request.Path);
 
@@ -550,7 +129,7 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       throw RestException(ErrorResponse::DataStorageNotAvailable(request.Path));
 
     const auto figure = CallInGuiThread(*server, [&]() {
-      auto planarFigure = CreateFigure(type);
+      auto planarFigure = mitk::CreateRestFigure(type);
 
       if (planarFigure.IsNull())
         ThrowInvalid("\"type\" must be line, circle or rectangle.", request.Path);
@@ -605,17 +184,17 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
       const auto name = body.value("name", std::string());
 
       auto node = mitk::DataNode::New();
-      node->SetName(name.empty() ? CreateName(dataStorage, type) : name);
+      node->SetName(name.empty() ? mitk::CreateRestFigureName(dataStorage, type) : name);
       node->SetData(planarFigure);
-      ApplyLookChange(node, lookChange, pulseTimers);
+      mitk::ApplyRestFigureLookChange(node, lookChange, pulseTimers);
 
       dataStorage->Add(node, imageNode.get());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return DescribeFigure(*server, dataStorage, node);
+      return mitk::DescribeRestFigure(*server, dataStorage, node);
     });
 
-    return RestResponse::FromData(ToJson(*server, figure), 201);
+    return RestResponse::FromData(mitk::ToRestJson(*server, figure), 201);
   };
   routes.push_back(create);
 
@@ -640,14 +219,14 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
 
     for (const auto& item : body.items())
     {
-      if (!IsLookField(item.key()))
+      if (!mitk::IsRestFigureLookField(item.key()))
       {
         ThrowInvalid("\"" + item.key() + "\" is no field of the look. The fields are color, line_width, label, "
           "show_in_3d, pulse and pulse_seconds.", request.Path);
       }
     }
 
-    const auto lookChange = ParseLookChange(body, request.Path);
+    const auto lookChange = mitk::ParseRestFigureLookChange(body, request.Path);
     const auto& uid = request.PathParams.at("uid");
     const auto node = mitk::FindRestNode(*server, uid, request.Path);
 
@@ -659,19 +238,19 @@ std::vector<RestRoute> CreatePlanarFigureRoutes(mitk::IRestServerService* server
     const auto figure = CallInGuiThread(*server, [&]() {
       const auto* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
 
-      if (planarFigure == nullptr || !planarFigure->IsComplete() || !GetFigurePredicate()->CheckNode(node.get()))
+      if (planarFigure == nullptr || !planarFigure->IsComplete() || !mitk::GetRestFigurePredicate()->CheckNode(node.get()))
       {
         mitk::ThrowRestError("NOT_A_PLANAR_FIGURE", "Unprocessable Content", "\"" + node->GetName() + "\" is no planar figure of "
           "the Measurement view, or is still being drawn.", 422, request.Path);
       }
 
-      ApplyLookChange(node.get(), lookChange, pulseTimers);
+      mitk::ApplyRestFigureLookChange(node.get(), lookChange, pulseTimers);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-      return DescribeFigure(*server, dataStorage, node.get());
+      return mitk::DescribeRestFigure(*server, dataStorage, node.get());
     });
 
-    return RestResponse::FromData(ToJson(*server, figure));
+    return RestResponse::FromData(mitk::ToRestJson(*server, figure));
   };
   routes.push_back(change);
 

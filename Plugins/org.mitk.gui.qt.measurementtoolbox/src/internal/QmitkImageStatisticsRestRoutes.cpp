@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkErrorResponse.h>
 #include <mitkImageStatisticsCalculator.h>
-#include <mitkImageStatisticsConstants.h>
 #include <mitkImageStatisticsPredicateHelper.h>
 #include <mitkIRestServerService.h>
 #include <mitkLabelSetImage.h>
@@ -24,6 +23,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
+#include <mitkRestImageStatistics.h>
 #include <mitkRestTime.h>
 
 using mitk::CallInGuiThread;
@@ -32,62 +32,6 @@ using mitk::RestException;
 using mitk::RestRequest;
 using mitk::RestResponse;
 using mitk::RestRoute;
-
-namespace
-{
-  /** The image a mask belongs to: its source in the data storage. Runs in the GUI thread. */
-  mitk::DataNodeHandle FindReferenceImage(const mitk::IRestServerService& server, const mitk::DataStorage* dataStorage, const mitk::DataNode* mask)
-  {
-    const auto sources = dataStorage->GetSources(mask, nullptr, true);
-
-    for (const auto& source : *sources)
-    {
-      if (dynamic_cast<const mitk::Image*>(source->GetData()) != nullptr)
-        return server.FindNode(server.GetNodeUid(source));
-    }
-
-    return nullptr;
-  }
-
-  /**
-   * The time steps of the data that the selection covers.
-   *
-   * \throw RestException with status 422 if the data has no time step at the selected time point.
-   */
-  std::vector<mitk::TimeStepType> GetTimeSteps(const mitk::RestTimeSelection& selection, const mitk::DataNode* node, const std::string& path)
-  {
-    auto timeSteps = selection.GetTimeSteps(node->GetData());
-
-    if (timeSteps.empty())
-    {
-      // Written as JSON writes the number, which does not depend on the locale.
-      mitk::ThrowRestError("NO_DATA_AT_TIME_POINT", "Unprocessable Content", "\"" + node->GetName() + "\" has no data at " +
-        nlohmann::json(selection.TimePoint).dump() + " ms. Its time_steps say which time points it covers.", 422, path);
-    }
-
-    return timeSteps;
-  }
-
-  /** Adds the measured values of a region; images without scalar pixels have only voxels and volume. */
-  void AddValues(nlohmann::json& json, const mitk::ImageStatisticsContainer::ImageStatisticsObject& values)
-  {
-    using Constants = mitk::ImageStatisticsConstants;
-
-    json["voxels"] = values.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(Constants::NUMBEROFVOXELS());
-
-    if (values.HasStatistic(Constants::VOLUME()))
-      json["volume_ml"] = values.GetValueConverted<double>(Constants::VOLUME()) / 1000.0;
-
-    if (!values.HasStatistic(Constants::MEAN()))
-      return;
-
-    json["mean"] = values.GetValueConverted<double>(Constants::MEAN());
-    json["median"] = values.GetValueConverted<double>(Constants::MEDIAN());
-    json["standard_deviation"] = values.GetValueConverted<double>(Constants::STANDARDDEVIATION());
-    json["min"] = values.GetValueConverted<double>(Constants::MINIMUM());
-    json["max"] = values.GetValueConverted<double>(Constants::MAXIMUM());
-  }
-}
 
 std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* server)
 {
@@ -163,7 +107,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
         }
 
         if (imageNode == nullptr)
-          imageNode = FindReferenceImage(*server, dataStorage, maskNode.get());
+          imageNode = mitk::FindRestReferenceImage(*server, dataStorage, maskNode.get());
 
         if (imageNode == nullptr)
         {
@@ -185,11 +129,11 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
       }
 
       selection = mitk::RestTimeSelection::FromRequest(request);
-      timeSteps = GetTimeSteps(selection, imageNode.get(), request.Path);
+      timeSteps = mitk::GetRestTimeSteps(selection, imageNode.get(), request.Path);
 
       if (maskNode != nullptr)
       {
-        GetTimeSteps(selection, maskNode.get(), request.Path);
+        mitk::GetRestTimeSteps(selection, maskNode.get(), request.Path);
         maskName = maskNode->GetName();
       }
 
@@ -263,7 +207,7 @@ std::vector<RestRoute> CreateImageStatisticsRoutes(mitk::IRestServerService* ser
     const auto addValues = [measured, &figure, &dimensions](nlohmann::json& json, mitk::ImageStatisticsContainer::LabelValueType value, mitk::TimeStepType timeStep) {
       if (measured->StatisticsExist(value, timeStep))
       {
-        AddValues(json, measured->GetStatistics(value, timeStep));
+        mitk::AddRestStatisticsValues(json,measured->GetStatistics(value, timeStep));
       }
       else
       {

@@ -9,8 +9,8 @@ set(MODULE_DEPENDS
   MitkPlanarFigure
 )
 
-if(TARGET MitkRESTAPI)
-  list(APPEND MODULE_DEPENDS MitkRESTAPI)
+if(TARGET MitkRESTAPI AND TARGET MitkMeasurementREST)
+  list(APPEND MODULE_DEPENDS MitkRESTAPI MitkMeasurementREST)
   set(MITK_HAS_RESTAPI 1)
 else()
   set(MITK_HAS_RESTAPI 0)

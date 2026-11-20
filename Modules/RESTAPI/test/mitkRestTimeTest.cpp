@@ -166,7 +166,7 @@ public:
 
   void InvalidTimePointIsRejected()
   {
-    for (const std::string value : { "soon", "12ms", "nan", "250,5", "" })
+    for (const std::string value : { "soon", "12ms", "nan", "250,5", "", "0x10", "1e999" })
     {
       try
       {

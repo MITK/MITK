@@ -1084,7 +1084,7 @@ public:
 
     const auto target = "/api/v1/jobs/" + job->GetId();
 
-    for (const std::string value : { "abc", "", "inf", "-inf", "1s", "1,5" })
+    for (const std::string value : { "abc", "", "inf", "-inf", "1s", "1,5", "0x10", "%205", "5%20" })
     {
       const auto response = server.HandleRequest(MakeRequest("GET", target + "?wait=" + value));
 

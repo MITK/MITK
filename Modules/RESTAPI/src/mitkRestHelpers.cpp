@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkRestHelpers.h>
 
 #include <mitkErrorResponse.h>
+#include <mitkLexicalCast.h>
 
 #include <usModule.h>
 #include <usModuleContext.h>
@@ -22,6 +23,7 @@ found in the LICENSE file.
 #include <cctype>
 #include <cmath>
 #include <cstdio>
+#include <regex>
 
 void mitk::ThrowRestError(const std::string& code, const std::string& title, const std::string& detail, int status, const std::string& path)
 {
@@ -60,6 +62,29 @@ std::optional<mitk::Color> mitk::ParseRestColor(const std::string& text)
     color[i] = std::stoi(text.substr(1 + 2 * i, 2), nullptr, 16) / 255.0f;
 
   return color;
+}
+
+std::optional<double> mitk::ParseRestDecimal(const std::string& text)
+{
+  // The stream behind LexicalCast also reads hexadecimal numbers on some platforms.
+  static const std::regex decimal("[+-]?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+)?");
+
+  if (!std::regex_match(text, decimal))
+    return std::nullopt;
+
+  try
+  {
+    // Not std::stod(), which reads the decimal separator of the C locale.
+    const auto value = LexicalCast<double>(text);
+
+    if (std::isfinite(value))
+      return value;
+  }
+  catch (const BadLexicalCast&)
+  {
+  }
+
+  return std::nullopt;
 }
 
 std::string mitk::ToRestColor(const Color& color)

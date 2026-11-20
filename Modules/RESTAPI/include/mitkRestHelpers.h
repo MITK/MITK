@@ -52,6 +52,13 @@ namespace mitk
   /** \brief A color written as "#rrggbb", digits in either case; no value for any other text. */
   MITKRESTAPI_EXPORT std::optional<Color> ParseRestColor(const std::string& text);
 
+  /**
+   * \brief A decimal number as clients write it in a query, like "12", "-0.5"
+   *        or "1e3", with a dot whatever the locale; no value for any other
+   *        text, also not for hexadecimal numbers, infinity or NaN.
+   */
+  MITKRESTAPI_EXPORT std::optional<double> ParseRestDecimal(const std::string& text);
+
   /** \brief A color as clients read it: "#rrggbb" in lower case. */
   MITKRESTAPI_EXPORT std::string ToRestColor(const Color& color);
 

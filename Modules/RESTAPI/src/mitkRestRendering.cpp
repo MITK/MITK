@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 
 #include <algorithm>
+#include <charconv>
 #include <cmath>
 
 int mitk::ConvertRestSliceNumber(BaseRenderer* renderer, int count, int number)
@@ -106,19 +107,12 @@ bool mitk::GetRestQueryFlag(const RestRequest& request, const std::string& name,
 
 int mitk::ParseRestPixelCount(const std::string& name, const std::string& value, const std::string& path)
 {
-  std::size_t used = 0;
+  // Digits only, with a minus at most: no plus sign, no blanks.
+  const auto* end = value.data() + value.size();
   int count = 0;
+  const auto [last, error] = std::from_chars(value.data(), end, count);
 
-  try
-  {
-    count = std::stoi(value, &used);
-  }
-  catch (const std::exception&)
-  {
-    used = std::string::npos;
-  }
-
-  if (used != value.size())
+  if (value.empty() || error != std::errc() || last != end)
     throw RestException(ErrorResponse::InvalidRequest(name + " must be a number of pixels.", path));
 
   return count;

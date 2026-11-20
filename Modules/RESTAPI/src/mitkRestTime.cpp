@@ -14,8 +14,8 @@ found in the LICENSE file.
 
 #include <mitkBaseData.h>
 #include <mitkErrorResponse.h>
-#include <mitkLexicalCast.h>
 #include <mitkRenderingManager.h>
+#include <mitkRestHelpers.h>
 #include <mitkRestRoute.h>
 #include <mitkTimeNavigationController.h>
 
@@ -53,16 +53,10 @@ mitk::RestTimeSelection mitk::RestTimeSelection::FromRequest(const RestRequest& 
     return selection;
   }
 
-  try
+  if (const auto timePoint = ParseRestDecimal(*value); timePoint.has_value())
   {
-    // Not std::stod(), which reads the decimal separator of the C locale.
-    selection.TimePoint = LexicalCast<double>(*value);
-
-    if (std::isfinite(selection.TimePoint))
-      return selection;
-  }
-  catch (const BadLexicalCast&)
-  {
+    selection.TimePoint = *timePoint;
+    return selection;
   }
 
   throw RestException(ErrorResponse::InvalidRequest("timepoint_ms must be a time point in milliseconds or all.", request.Path));

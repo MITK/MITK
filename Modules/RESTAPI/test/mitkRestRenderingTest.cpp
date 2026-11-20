@@ -331,13 +331,13 @@ public:
   void PixelCountsAreWholeNumbers()
   {
     const std::vector<std::pair<std::string, int>> valid = {
-      { "0", 0 }, { "100", 100 }, { "-5", -5 }, { "+7", 7 }, { "007", 7 }, { " 12", 12 }, { "2147483647", 2147483647 }
+      { "0", 0 }, { "100", 100 }, { "-5", -5 }, { "007", 7 }, { "2147483647", 2147483647 }
     };
 
     for (const auto& [text, count] : valid)
       CPPUNIT_ASSERT_EQUAL_MESSAGE(text, count, mitk::ParseRestPixelCount("size", text, "/p"));
 
-    for (const std::string text : { "", " ", "abc", "12px", "1.5", "1e3", "0x10", "12 ", "--1", "2147483648", "99999999999999999999" })
+    for (const std::string text : { "", " ", "abc", "12px", "1.5", "1e3", "0x10", "12 ", " 12", "+7", "--1", "2147483648", "99999999999999999999" })
     {
       const auto failure = GetFailureOf([&]() { mitk::ParseRestPixelCount("size", text, "/p"); });
       CPPUNIT_ASSERT_EQUAL_MESSAGE("\"" + text + "\"", 400, failure.Status);

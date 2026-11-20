@@ -13,12 +13,11 @@ found in the LICENSE file.
 #include <mitkRestJob.h>
 
 #include <mitkErrorResponse.h>
-#include <mitkLexicalCast.h>
+#include <mitkRestHelpers.h>
 
 #include <algorithm>
 #include <atomic>
 #include <cmath>
-#include <limits>
 
 namespace
 {
@@ -251,20 +250,12 @@ mitk::RestResponse mitk::RestJob::Respond(const RestRequest& request, const std:
 
   if (const auto value = request.GetQueryParam("wait"); value.has_value())
   {
-    try
-    {
-      // Not std::stod(), which reads the decimal separator of the C locale.
-      wait = LexicalCast<double>(*value);
-    }
-    catch (const BadLexicalCast&)
-    {
-      wait = std::numeric_limits<double>::quiet_NaN();
-    }
+    const auto seconds = ParseRestDecimal(*value);
 
-    if (!std::isfinite(wait))
+    if (!seconds.has_value())
       throw RestException(ErrorResponse::InvalidRequest("The query parameter \"wait\" must be a number of seconds.", request.Path));
 
-    wait = std::clamp(wait, 0.0, MaxWaitSeconds);
+    wait = std::clamp(*seconds, 0.0, MaxWaitSeconds);
   }
 
   bool ended = job->HasEnded();

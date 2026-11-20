@@ -73,6 +73,42 @@ namespace
   }
 }
 
+mitk::RestWaitInterruption::RestWaitInterruption()
+  : m_Interrupted(false)
+{
+}
+
+void mitk::RestWaitInterruption::Interrupt()
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_Interrupted = true;
+
+  for (const auto* job : m_Waits)
+    job->WakeWaits();
+}
+
+bool mitk::RestWaitInterruption::IsInterrupted() const
+{
+  return m_Interrupted;
+}
+
+bool mitk::RestWaitInterruption::AddWait(const RestJob* job)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
+  if (m_Interrupted)
+    return false;
+
+  m_Waits.push_back(job);
+  return true;
+}
+
+void mitk::RestWaitInterruption::RemoveWait(const RestJob* job)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_Waits.erase(std::find(m_Waits.begin(), m_Waits.end(), job));
+}
+
 mitk::RestJob::RestJob(const std::string& id, const std::string& description)
   : m_Id(id),
     m_Description(description),
@@ -134,11 +170,39 @@ bool mitk::RestJob::Cancel()
   return true;
 }
 
-bool mitk::RestJob::WaitUntilEnded(std::chrono::milliseconds timeout) const
+bool mitk::RestJob::WaitUntilEnded(std::chrono::milliseconds timeout, RestWaitInterruption* interruption) const
 {
-  std::unique_lock<std::mutex> lock(m_Mutex);
-  m_Ended.wait_for(lock, timeout, [this]() { return m_State != State::Running || m_WaitsInterrupted; });
-  return m_State != State::Running;
+  // Registered before the wait, so that Interrupt() wakes it from then on.
+  if (interruption != nullptr && !interruption->AddWait(this))
+    return this->HasEnded();
+
+  bool ended = false;
+
+  {
+    std::unique_lock<std::mutex> lock(m_Mutex);
+
+    m_Ended.wait_for(lock, timeout, [this, interruption]() {
+      return m_State != State::Running || m_WaitsInterrupted || (interruption != nullptr && interruption->IsInterrupted());
+    });
+
+    ended = m_State != State::Running;
+  }
+
+  if (interruption != nullptr)
+    interruption->RemoveWait(this);
+
+  return ended;
+}
+
+void mitk::RestJob::WakeWaits() const
+{
+  {
+    // A wait that has checked its condition but not yet slept holds the
+    // mutex, so the notification cannot slip in between.
+    std::lock_guard<std::mutex> lock(m_Mutex);
+  }
+
+  m_Ended.notify_all();
 }
 
 void mitk::RestJob::SetWaitsInterrupted(bool interrupted)
@@ -210,7 +274,7 @@ mitk::RestResponse mitk::RestJob::Respond(const RestRequest& request, const std:
     const WaitPlace place;
 
     if (place.IsTaken())
-      ended = job->WaitUntilEnded(std::chrono::milliseconds(static_cast<long long>(wait * 1000.0)));
+      ended = job->WaitUntilEnded(std::chrono::milliseconds(static_cast<long long>(wait * 1000.0)), request.WaitInterruption.get());
   }
 
   auto response = RestResponse::FromData(job->ToJson(), ended ? 200 : 202);

@@ -29,8 +29,13 @@ found in the LICENSE file.
 #include <QFile>
 #include <QTemporaryDir>
 
+#include <atomic>
+#include <chrono>
+#include <functional>
+#include <future>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -130,6 +135,99 @@ namespace
   {
     return response["result"]["content"][0]["text"].get<std::string>();
   }
+
+  /** What became of an api_call that waited for a job when the endpoint ended its wait. */
+  struct InterruptedWait
+  {
+    std::chrono::steady_clock::duration Duration;
+    nlohmann::json Answer;
+    mitk::RestJob::State JobState = mitk::RestJob::State::Running;
+    bool CancelHandlerRan = false;
+  };
+
+  /** How the call waits for a job, as the agent does. */
+  enum class WaitingCall
+  {
+    /** api_call POST of a route that starts the job, with ?wait. */
+    StartsJob,
+
+    /** api_get GET /api/v1/jobs/{id} of a job that runs, with ?wait. */
+    FollowsJob
+  };
+
+  /**
+   * Lets a call wait up to 120 s for a job that never ends by itself, and
+   * calls \p interrupt once the job exists.
+   */
+  InterruptedWait InterruptWaitingCall(WaitingCall waitingCall, const std::function<void(mitk::McpEndpoint&)>& interrupt)
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    std::promise<std::shared_ptr<mitk::RestJob>> started;
+    std::atomic<bool> cancelHandlerRan = false;
+
+    const auto createJob = [&server, &cancelHandlerRan]() {
+      const auto job = server.CreateJob("Never ends by itself");
+      job->SetCancelHandler([&cancelHandlerRan]() { cancelHandlerRan = true; });
+      return job;
+    };
+
+    mitk::RestRoute route;
+    route.Method = "POST";
+    route.Path = "/test/work";
+    route.Handler = [&started, &createJob](const mitk::RestRequest& request) {
+      const auto job = createJob();
+      started.set_value(job);
+      return mitk::RestJob::Respond(request, job);
+    };
+    server.AddRoute(route);
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+
+    std::shared_ptr<mitk::RestJob> runningJob;
+    nlohmann::json call;
+
+    if (waitingCall == WaitingCall::StartsJob)
+    {
+      call = Call("api_call", { { "method", "POST" }, { "path", "/api/v1/test/work?wait=120" } });
+    }
+    else
+    {
+      runningJob = createJob();
+      call = Call("api_get", { { "path", "/api/v1/jobs/" + runningJob->GetId() + "?wait=120" } });
+    }
+
+    const auto start = std::chrono::steady_clock::now();
+
+    auto answer = std::async(std::launch::async, [&endpoint, &call]() {
+      return endpoint.HandleMessage(call, mitk::RestRequest());
+    });
+
+    const auto job = waitingCall == WaitingCall::StartsJob
+      ? started.get_future().get()
+      : runningJob;
+
+    // Interrupts a call that runs, not one that RefuseCalls() keeps out.
+    while (endpoint.GetRunningCallCount() == 0 && answer.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+      std::this_thread::yield();
+
+    interrupt(endpoint);
+
+    InterruptedWait result;
+    result.Answer = answer.get();
+    result.Duration = std::chrono::steady_clock::now() - start;
+    result.JobState = job->GetState();
+    result.CancelHandlerRan = cancelHandlerRan;
+
+    // Only now: stopping the server ends waits as well.
+    server.Stop();
+
+    return result;
+  }
 }
 
 class mitkMcpEndpointTestSuite : public mitk::TestFixture
@@ -144,6 +242,9 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestUnknownTool);
   MITK_TEST(TestMalformedMessages);
   MITK_TEST(TestRefuseCalls);
+  MITK_TEST(TestRefuseCallsEndsWaitsAndCancelsJobs);
+  MITK_TEST(TestWithdrawEndsWaitsAndCancelsJobs);
+  MITK_TEST(TestAcceptCallsLetsCallsWaitAgain);
   MITK_TEST(TestUnknownMethod);
   MITK_TEST(TestNotificationGetsNoAnswer);
   MITK_TEST(TestDuplicateTool);
@@ -267,6 +368,55 @@ public:
 
     CPPUNIT_ASSERT(!response["result"]["isError"].get<bool>());
     CPPUNIT_ASSERT_EQUAL(std::string("hello"), GetText(response));
+  }
+
+  void TestRefuseCallsEndsWaitsAndCancelsJobs()
+  {
+    for (const auto waitingCall : { WaitingCall::StartsJob, WaitingCall::FollowsJob })
+    {
+      const auto wait = InterruptWaitingCall(waitingCall, [](mitk::McpEndpoint& endpoint) { endpoint.RefuseCalls("You were stopped."); });
+
+      CPPUNIT_ASSERT(wait.Duration < std::chrono::seconds(60));
+      CPPUNIT_ASSERT(wait.JobState == mitk::RestJob::State::Canceled);
+      CPPUNIT_ASSERT(wait.CancelHandlerRan);
+      CPPUNIT_ASSERT(!wait.Answer["result"]["isError"].get<bool>());
+      CPPUNIT_ASSERT(GetText(wait.Answer).find("\"canceled\"") != std::string::npos);
+    }
+  }
+
+  void TestWithdrawEndsWaitsAndCancelsJobs()
+  {
+    const auto wait = InterruptWaitingCall(WaitingCall::StartsJob, [](mitk::McpEndpoint& endpoint) { endpoint.Withdraw(); });
+
+    CPPUNIT_ASSERT(wait.Duration < std::chrono::seconds(60));
+    CPPUNIT_ASSERT(wait.JobState == mitk::RestJob::State::Canceled);
+    CPPUNIT_ASSERT(wait.CancelHandlerRan);
+  }
+
+  void TestAcceptCallsLetsCallsWaitAgain()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto job = server.CreateJob("Never ends by itself");
+    job->SetCancelHandler([]() {});
+
+    mitk::McpEndpoint endpoint("test", "1.0");
+    mitk::AddRestApiTools(endpoint, &server);
+
+    CPPUNIT_ASSERT(server.Start());
+
+    endpoint.RefuseCalls("You were stopped.");
+    endpoint.AcceptCalls();
+
+    const auto start = std::chrono::steady_clock::now();
+    endpoint.HandleMessage(Call("api_get", { { "path", "/api/v1/jobs/" + job->GetId() + "?wait=1" } }), mitk::RestRequest());
+    const auto duration = std::chrono::steady_clock::now() - start;
+
+    server.Stop();
+
+    CPPUNIT_ASSERT(duration >= std::chrono::milliseconds(900));
+    CPPUNIT_ASSERT(job->GetState() == mitk::RestJob::State::Running);
   }
 
   void TestUnknownMethod()

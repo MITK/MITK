@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkExceptionMacro.h>
 #include <mitkIRestServerService.h>
+#include <mitkRestJob.h>
 
 #include <algorithm>
 #include <array>
@@ -167,6 +168,7 @@ mitk::McpToolResult mitk::McpToolResult::FromError(const std::string& message)
 mitk::McpEndpoint::McpEndpoint(const std::string& name, const std::string& version)
   : m_Name(name),
     m_Version(version),
+    m_WaitInterruption(std::make_shared<RestWaitInterruption>()),
     m_Server(nullptr),
     m_RunningCalls(0)
 {
@@ -246,6 +248,11 @@ void mitk::McpEndpoint::Offer(IRestServerService* server, const std::string& pat
 
 void mitk::McpEndpoint::Withdraw()
 {
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    m_WaitInterruption->Interrupt();
+  }
+
   if (m_Server == nullptr)
     return;
 
@@ -265,12 +272,17 @@ void mitk::McpEndpoint::RefuseCalls(const std::string& reason)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Refusal = reason;
+  m_WaitInterruption->Interrupt();
 }
 
 void mitk::McpEndpoint::AcceptCalls()
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Refusal.reset();
+
+  // Calls of before keep theirs, which stays interrupted.
+  if (m_WaitInterruption->IsInterrupted())
+    m_WaitInterruption = std::make_shared<RestWaitInterruption>();
 }
 
 void mitk::McpEndpoint::RequireToken(const std::string& token)
@@ -378,6 +390,7 @@ nlohmann::json mitk::McpEndpoint::HandleRequest(const nlohmann::json& message, c
 
     const auto name = params["name"].get<std::string>();
     McpTool tool;
+    auto toolRequest = request;
     std::optional<RunningCall> runningCall;
 
     {
@@ -391,6 +404,7 @@ nlohmann::json mitk::McpEndpoint::HandleRequest(const nlohmann::json& message, c
         return MakeResult(id, ToJson(McpToolResult::FromError(*m_Refusal)));
 
       tool = entry->second;
+      toolRequest.WaitInterruption = m_WaitInterruption;
 
       // Under the lock, so that once RefuseCalls() returns, every call it
       // let through is counted.
@@ -403,7 +417,7 @@ nlohmann::json mitk::McpEndpoint::HandleRequest(const nlohmann::json& message, c
 
     try
     {
-      result = tool.Handler(arguments, request);
+      result = tool.Handler(arguments, toolRequest);
     }
     catch (const std::exception& e)
     {

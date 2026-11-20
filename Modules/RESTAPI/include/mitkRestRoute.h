@@ -20,12 +20,15 @@ found in the LICENSE file.
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
 
 namespace mitk
 {
+  class RestWaitInterruption;
+
   /**
    * \brief A request as route handlers of IRestServerService::AddRoute() see it.
    */
@@ -48,6 +51,13 @@ namespace mitk
 
     /** \brief The address of the client, for logs and per-client limits. */
     std::string ClientAddress;
+
+    /**
+     * \brief Lets the sender of an in-process request end its wait for a job
+     *        early, see RestJob::Respond(). Null: the request waits as long
+     *        as it asks to.
+     */
+    std::shared_ptr<RestWaitInterruption> WaitInterruption;
 
     /**
      * \brief Set Path and QueryParams from a request target like

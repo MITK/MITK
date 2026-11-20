@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkIRestServerService.h>
 #include <mitkLog.h>
 #include <mitkMcpEndpoint.h>
+#include <mitkRestJob.h>
 
 #include <algorithm>
 #include <array>
@@ -48,6 +49,7 @@ namespace
     request.Method = method;
     request.SetTarget(path);
     request.ClientAddress = call.ClientAddress;
+    request.WaitInterruption = call.WaitInterruption;
 
     if (const auto authorization = call.GetHeader("Authorization"); authorization.has_value())
       request.Headers["authorization"] = *authorization;
@@ -75,10 +77,13 @@ namespace
       : std::nullopt;
   }
 
-  /** Whether the answer is a job that has failed, which a client that only looks at the status would take for success. */
-  bool IsFailedJob(const mitk::RestResponse& response)
+  /**
+   * Whether the answer is a job in the given state. The search for the state
+   * spares parsing the many answers that are no job.
+   */
+  bool IsJobIn(const mitk::RestResponse& response, const std::string& state, std::string* id = nullptr)
   {
-    if (response.Status >= 400 || !response.HasJsonBody() || response.Body.find("\"failed\"") == std::string::npos)
+    if (response.Status >= 400 || !response.HasJsonBody() || response.Body.find('"' + state + '"') == std::string::npos)
       return false;
 
     const auto body = nlohmann::json::parse(response.Body, nullptr, false);
@@ -87,11 +92,46 @@ namespace
       return false;
 
     const auto& data = body["data"];
-    const auto state = data.find("state");
-    const auto id = data.find("id");
+    const auto stateEntry = data.find("state");
+    const auto idEntry = data.find("id");
 
-    return state != data.end() && state->is_string() && *state == "failed" &&
-           id != data.end() && id->is_string() && 0 == id->get<std::string>().compare(0, 4, "job_");
+    if (stateEntry == data.end() || !stateEntry->is_string() || *stateEntry != state ||
+        idEntry == data.end() || !idEntry->is_string() || 0 != idEntry->get<std::string>().compare(0, 4, "job_"))
+      return false;
+
+    if (id != nullptr)
+      *id = idEntry->get<std::string>();
+
+    return true;
+  }
+
+  /** Whether the answer is a job that has failed, which a client that only looks at the status would take for success. */
+  bool IsFailedJob(const mitk::RestResponse& response)
+  {
+    return IsJobIn(response, "failed");
+  }
+
+  /**
+   * The answer to a request that the call made, or, if the call was
+   * interrupted (the user stopped the agent, or its view closed) and the
+   * answer is a job that still runs, the answer to canceling that job: the
+   * work is not wanted any more by whoever waited for it.
+   */
+  mitk::RestResponse CancelJobOfInterruptedCall(mitk::IRestServerService& server, const mitk::RestResponse& response, const mitk::RestRequest& call)
+  {
+    std::string id;
+
+    if (call.WaitInterruption == nullptr || !call.WaitInterruption->IsInterrupted() || !IsJobIn(response, "running", &id))
+      return response;
+
+    const auto canceled = server.HandleRequest(MakeRequest("DELETE", "/api/v1/jobs/" + id, call));
+
+    MITK_INFO << "Agent: stopped, so its job " << id
+              << (canceled.Status == 200 ? " was canceled" : " could not be canceled and goes on");
+
+    return canceled.Status == 200
+      ? canceled
+      : response;
   }
 
   mitk::McpToolResult ToToolResult(const mitk::RestResponse& response)
@@ -176,7 +216,7 @@ void mitk::AddRestApiTools(McpEndpoint& endpoint, IRestServerService* server)
   get.ReadOnly = true;
   get.Handler = [server](const nlohmann::json& arguments, const RestRequest& call) {
     const auto path = arguments.value("path", std::string());
-    return ToToolResult(server->HandleRequest(MakeRequest("GET", path, call)));
+    return ToToolResult(CancelJobOfInterruptedCall(*server, server->HandleRequest(MakeRequest("GET", path, call)), call));
   };
   endpoint.AddTool(get);
 
@@ -219,7 +259,7 @@ void mitk::AddRestApiTools(McpEndpoint& endpoint, IRestServerService* server)
     MITK_INFO << "Agent: " << method << " " << request.Path << " -> " << response.Status
               << (nodeName.has_value() ? " \"" + *nodeName + "\"" : std::string());
 
-    return ToToolResult(response);
+    return ToToolResult(CancelJobOfInterruptedCall(*server, response, callRequest));
   };
   endpoint.AddTool(call);
 }

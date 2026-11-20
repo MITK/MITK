@@ -142,6 +142,8 @@ public:
    *        until the next message, so that none still on its way changes the
    *        Workbench after the user stopped the agent.
    *
+   * Calls that wait for a job stop waiting, and the job is canceled.
+   *
    * Called again while the turn still has not ended, ends Claude Code, so
    * that the user always gets out of a turn; the next message continues the
    * conversation in a new process.

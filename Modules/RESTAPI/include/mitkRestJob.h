@@ -15,14 +15,50 @@ found in the LICENSE file.
 
 #include <mitkRestRoute.h>
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 namespace mitk
 {
+  class RestJob;
+
+  /**
+   * \brief Ends the waits for jobs of the requests that carry it in
+   *        RestRequest::WaitInterruption.
+   *
+   * For a client that gives up the work it asked for: once Interrupt() was
+   * called, such requests wait no longer, and later ones do not wait at all.
+   * They answer as if their wait had run out. All methods are thread-safe.
+   */
+  class MITKRESTAPI_EXPORT RestWaitInterruption
+  {
+  public:
+    RestWaitInterruption();
+
+    RestWaitInterruption(const RestWaitInterruption&) = delete;
+    RestWaitInterruption& operator=(const RestWaitInterruption&) = delete;
+
+    void Interrupt();
+    bool IsInterrupted() const;
+
+  private:
+    friend class RestJob;
+
+    /** \return False if the waits are interrupted already. */
+    bool AddWait(const RestJob* job);
+
+    void RemoveWait(const RestJob* job);
+
+    std::mutex m_Mutex;
+    std::atomic<bool> m_Interrupted;
+    std::vector<const RestJob*> m_Waits;
+  };
+
   /**
    * \brief Work that an endpoint started and that takes longer than a
    *        request should, like running a model.
@@ -82,9 +118,10 @@ namespace mitk
 
     /**
      * \return Whether the job has ended within the timeout. The wait also
-     *         ends early while waits are interrupted.
+     *         ends early while waits are interrupted, for all requests
+     *         (SetWaitsInterrupted()) or by the given interruption.
      */
-    bool WaitUntilEnded(std::chrono::milliseconds timeout) const;
+    bool WaitUntilEnded(std::chrono::milliseconds timeout, RestWaitInterruption* interruption = nullptr) const;
 
     /**
      * \brief End the waits for the job that run, and keep later ones from
@@ -110,12 +147,17 @@ namespace mitk
      *
      * At most four requests wait at the same time, as each one occupies a
      * thread of the server. A further request does not wait and answers as
-     * if its wait had run out.
+     * if its wait had run out, as does one whose RestRequest::WaitInterruption
+     * is interrupted.
      */
     static RestResponse Respond(const RestRequest& request, const std::shared_ptr<RestJob>& job);
 
   private:
+    friend class RestWaitInterruption;
+
     bool End(State state, const nlohmann::json& result, const std::string& error);
+
+    void WakeWaits() const;
 
     const std::string m_Id;
     const std::string m_Description;

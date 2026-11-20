@@ -187,6 +187,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(SecondStartKeepsTheRunningConfiguration);
   MITK_TEST(JobsCanBeCanceled);
   MITK_TEST(StopEndsWaitsForJobs);
+  MITK_TEST(InterruptionEndsOnlyTheWaitsOfItsRequests);
   MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
   MITK_TEST(RoutesActUnderTheNameOfTheirClient);
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
@@ -740,6 +741,44 @@ public:
     CPPUNIT_ASSERT(res);
     CPPUNIT_ASSERT_EQUAL(200, res->status);
     CPPUNIT_ASSERT_EQUAL(std::string("running"), nlohmann::json::parse(res->body)["data"]["state"].get<std::string>());
+  }
+
+  void InterruptionEndsOnlyTheWaitsOfItsRequests()
+  {
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+
+    const auto job = server.CreateJob("Never ends by itself");
+
+    CPPUNIT_ASSERT(server.Start());
+
+    const auto target = "/api/v1/jobs/" + job->GetId() + "?wait=20";
+
+    auto interrupted = MakeRequest("GET", target);
+    interrupted.WaitInterruption = std::make_shared<mitk::RestWaitInterruption>();
+
+    auto other = MakeRequest("GET", target);
+    other.WaitInterruption = std::make_shared<mitk::RestWaitInterruption>();
+
+    const auto start = std::chrono::steady_clock::now();
+    auto first = std::async(std::launch::async, [&server, interrupted]() { return server.HandleRequest(interrupted); });
+    auto second = std::async(std::launch::async, [&server, other]() { return server.HandleRequest(other); });
+
+    interrupted.WaitInterruption->Interrupt();
+
+    const auto firstAnswer = first.get();
+    const auto duration = std::chrono::steady_clock::now() - start;
+    const bool secondWaits = second.wait_for(std::chrono::seconds(0)) == std::future_status::timeout;
+
+    job->Succeed();
+    const auto secondAnswer = second.get();
+
+    server.Stop();
+
+    CPPUNIT_ASSERT(duration < std::chrono::seconds(10));
+    CPPUNIT_ASSERT_EQUAL(std::string("running"), nlohmann::json::parse(firstAnswer.Body)["data"]["state"].get<std::string>());
+    CPPUNIT_ASSERT(secondWaits);
+    CPPUNIT_ASSERT_EQUAL(std::string("succeeded"), nlohmann::json::parse(secondAnswer.Body)["data"]["state"].get<std::string>());
   }
 
   void StopEndsCallsThatWaitForTheDispatchThread()

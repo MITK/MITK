@@ -90,7 +90,9 @@ namespace mitk
     /**
      * \param arguments The arguments of the call.
      * \param request The HTTP request that carried the call, for example to
-     *        act with the rights of the client's token.
+     *        act with the rights of the client's token. Its WaitInterruption
+     *        is interrupted when the endpoint refuses calls or is withdrawn;
+     *        requests that the handler makes on its behalf pass it on.
      */
     std::function<McpToolResult(const nlohmann::json& arguments, const RestRequest& request)> Handler;
   };
@@ -134,7 +136,8 @@ namespace mitk
     /**
      * \brief Remove the endpoint from the server.
      *
-     * Calls that run already go on; GetRunningCallCount() tells when they ended.
+     * Calls that run already go on, except that their waits for jobs end;
+     * GetRunningCallCount() tells when they ended.
      */
     void Withdraw();
 
@@ -145,8 +148,8 @@ namespace mitk
      * \brief Answer tool calls with an error result that says \p reason,
      *        instead of running them, until AcceptCalls().
      *
-     * Calls that run already go on. Once this returns, GetRunningCallCount()
-     * counts only those.
+     * Calls that run already go on, except that their waits for jobs end.
+     * Once this returns, GetRunningCallCount() counts only those.
      */
     void RefuseCalls(const std::string& reason);
 
@@ -187,6 +190,7 @@ namespace mitk
     mutable std::mutex m_Mutex;
     std::map<std::string, McpTool> m_Tools;
     std::optional<std::string> m_Refusal;
+    std::shared_ptr<RestWaitInterruption> m_WaitInterruption;
     std::string m_RequiredToken;
 
     IRestServerService* m_Server;

@@ -110,15 +110,15 @@ namespace mitk
    * The typical lifecycle is:
    * -# Check the installation of the virtual environment (GetVirtualEnvName())
    *    with a PythonPackage::PackageProbe
-   * -# Load the model via LoadModel() (downloads it on first use)
+   * -# Load the model via Initialize() (downloads it on first use)
    * -# Set the prompts via SetPrompts() and call UpdatePreview()
    * -# Confirm the preview with ConfirmSegmentation()
    * -# Unload the model via UnloadModel() or by deactivating the tool
    *
    * The calls of the worker that take long run off the GUI thread (see
    * RunOffGUIThread()): UpdatePreview() returns before the model has computed,
-   * and GetModelFiles(), LoadModel() and EmbedPrompts() report their end to a
-   * callback on the GUI thread. A run can be cancelled with the progress
+   * and Initialize() and EmbedPrompts() report their end to a callback on the
+   * GUI thread. A run can be cancelled with the progress
    * notification of the tool. A run that has not stopped seconds after the
    * cancellation is ended with its worker. If the worker ends, the model is no
    * longer loaded (see IsModelLoaded()).
@@ -172,7 +172,7 @@ namespace mitk
     /** \brief The preferences baked into a loaded model, each paired with its
      *         default value (as stored).
      *
-     * LoadModel() seeds these so the stored values match what the model was
+     * Initialize() seeds these so the stored values match what the model was
      * loaded with, and the GUI unloads the model whenever one of them changes.
      */
     static const std::vector<std::pair<std::string, std::string>>& GetSessionDefiningPreferences();
@@ -182,42 +182,43 @@ namespace mitk
      */
     using DoneCallback = std::function<void(std::exception_ptr error)>;
 
-    /** \brief Receives the files of GetModelFiles(), or what it threw. */
-    using ModelFilesCallback = std::function<void(std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files)>;
-
-    /** \brief Asks for the files that LoadModel() loads from the Hugging Face Hub.
+    /** \brief Downloads files of the Hugging Face Hub on the GUI thread, see Initialize().
      *
-     * These are the embeddings of the prompts VoxTell knows and, unless a local
-     * model folder is configured, the model. LoadModel() downloads what is not
-     * cached yet, without telling how far it is, so the caller can download them
-     * up front instead.
-     *
-     * Starts the worker if needed and imports VoxTell there off the GUI thread,
-     * which takes several seconds. Files that VoxTell does not name are left out
-     * and a warning is logged. Cancelling \p task or deactivating the tool ends
-     * the worker right away.
-     *
-     * \param[in] task A cancelable task the user sees, kept until \p done.
-     * \param[in] done Receives the files, or a mitk::Exception if the tool is
-     *            busy, the worker cannot be started, or the call was
-     *            cancelled or aborted.
+     * Throws to end the start, which then fails with what it threw.
      */
-    void GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done);
+    using DownloadCallback = std::function<void(const std::vector<VoxTell::RepoFiles>& files)>;
 
-    /** \brief Loads the model.
+    /** \brief Receives the end of Initialize() on the GUI thread: what it threw,
+     *         or null, and whether the user cancelled it in its progress
+     *         notification.
+     */
+    using InitializeCallback = std::function<void(std::exception_ptr error, bool cancelled)>;
+
+    /** \brief Loads the model, after the files it needs have been downloaded.
      *
-     * Selects the device from the preferences, then loads the model from the
-     * Hugging Face hub (downloading it on first use) or from the configured
-     * local folder, off the GUI thread. A model that is already loaded is
-     * unloaded first. Cancelling \p task or deactivating the tool ends the
-     * loading, which kills the worker right away.
+     * Starts the worker if needed, imports VoxTell there and asks for the files
+     * that loading takes from the Hugging Face Hub: the embeddings of the
+     * prompts VoxTell knows and, unless a local model folder is configured, the
+     * model. VoxTell would download what is not cached yet without telling how
+     * far it is, so \p download gets the files first. Then selects the device
+     * from the preferences and loads the model from the hub or from the local
+     * folder. A model that is already loaded is unloaded first.
      *
-     * \param[in] task A cancelable task the user sees, kept until \p done.
+     * The work of the worker runs off the GUI thread, in two phases with a
+     * cancelable progress notification each. Cancelling one or deactivating the
+     * tool ends the worker right away. IsInitializing() is true from the call
+     * until \p done, the download included, so whoever comes second can tell
+     * that a start is under way.
+     *
+     * \param[in] download Receives the files between the two phases, unless
+     *            there are none.
      * \param[in] done Receives null once the model is loaded, or a
-     *            mitk::Exception if the tool is busy, the model cannot be
-     *            loaded, or the loading was cancelled or aborted.
+     *            mitk::Exception if the tool is busy or initializing already,
+     *            the worker cannot be started, \p download threw, the model
+     *            cannot be loaded, or the start was cancelled or aborted. A
+     *            failed start has ended the worker, unless the tool was busy.
      */
-    void LoadModel(std::shared_ptr<ProgressTask> task, DoneCallback done);
+    void Initialize(DownloadCallback download, InitializeCallback done);
 
     /** \brief Unloads the model and ends the worker.
      *
@@ -425,8 +426,22 @@ namespace mitk
     /** \brief Returns the worker, which is started if it is not running. */
     PythonWorker& GetWorker();
 
-    /** \brief Ends the worker after GetModelFiles() or LoadModel() failed, and
-     *         unloads the model if the tool was deactivated meanwhile.
+    /** \brief Receives the files of GetModelFiles(), or what it threw. */
+    using ModelFilesCallback = std::function<void(std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files)>;
+
+    /** \brief The first phase of Initialize(): asks the worker for the files of the hub.
+     *
+     * Files that VoxTell does not name are left out and a warning is logged.
+     * Leaves IsInitializing() true on success, for the download and LoadModel().
+     */
+    void GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done);
+
+    /** \brief The second phase of Initialize(): selects the device and loads the model. */
+    void LoadModel(std::shared_ptr<ProgressTask> task, DoneCallback done);
+
+    /** \brief Ends the worker after a phase of Initialize() or the download
+     *         failed, and unloads the model if the tool was deactivated
+     *         meanwhile.
      */
     void EndFailedInitialization();
 

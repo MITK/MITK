@@ -1584,34 +1584,10 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (job->HasEnded())
         return;
 
-      VoxTellTool::Pointer tool;
-
-      // A worker that the start left behind holds the imports of VoxTell.
-      const auto release = [](const VoxTellTool::Pointer& tool) {
-        if (tool.IsNotNull() && !tool->IsModelLoaded() && !tool->IsRunningOffGUIThread())
-          tool->UnloadModel();
-      };
-
-      const auto fail = [job, release](const VoxTellTool::Pointer& tool, std::exception_ptr error) {
-        release(tool);
-        FailRestJob(*job, error);
-      };
-
-      // A cancel between two steps finds no task to stop, and a deactivation
-      // between them has unloaded what the next step would load again. So
-      // each step looks at the job and at the tool first.
-      const auto stopBeforeStep = [job, release](const VoxTellTool::Pointer& tool) {
-        if (!job->HasEnded() && !FailIfDeactivated(*job, tool))
-          return false;
-
-        release(tool);
-        return true;
-      };
-
       try
       {
         // Held, as the tool can be deactivated while the worker loads.
-        tool = GetVoxTell(path);
+        VoxTellTool::Pointer tool = GetVoxTell(path);
 
         if (tool->IsInitializing())
         {
@@ -1625,45 +1601,30 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           return;
         }
 
-        auto filesTask = std::make_shared<ProgressTask>("Preparing VoxTell", ProgressTask::Indeterminate, true);
+        tool->Initialize(
+          [job](const std::vector<VoxTell::RepoFiles>& files) {
+            // A cancel between two steps finds no task to stop.
+            if (job->HasEnded())
+              mitkThrow() << "The job has ended.";
 
-        tool->GetModelFiles(filesTask, [job, tool, fail, stopBeforeStep](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
-          try
-          {
+            DownloadForVoxTell("Downloading VoxTell model", files);
+
+            if (job->HasEnded())
+              mitkThrow() << "The job has ended.";
+          },
+          [job, tool](std::exception_ptr error, bool) {
+            if (job->HasEnded() || FailIfDeactivated(*job, tool))
+              return;
+
             if (error != nullptr)
-              std::rethrow_exception(error);
-
-            if (stopBeforeStep(tool))
-              return;
-
-            if (!files.empty())
-              DownloadForVoxTell("Downloading VoxTell model", files);
-
-            if (stopBeforeStep(tool))
-              return;
-
-            auto loadTask = std::make_shared<ProgressTask>("Loading VoxTell", ProgressTask::Indeterminate, true);
-
-            tool->LoadModel(loadTask, [job, tool, fail, loadTask](std::exception_ptr loadError) {
-              if (loadError != nullptr)
-              {
-                fail(tool, loadError);
-                return;
-              }
-
-              loadTask->Finish();
+              FailRestJob(*job, error);
+            else
               job->Succeed(DescribeVoxTell(tool));
-            });
-          }
-          catch (...)
-          {
-            fail(tool, std::current_exception());
-          }
-        });
+          });
       }
       catch (...)
       {
-        fail(tool, std::current_exception());
+        FailRestJob(*job, std::current_exception());
       }
     });
 

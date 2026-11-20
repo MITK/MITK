@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkVoxTellToolGUI.h>
 
 #include <mitkCoreServices.h>
+#include <mitkExceptionMacro.h>
 #include <mitkIPreferencesService.h>
 #include <mitkPipPackageInfo.h>
 #include <mitkProgressTask.h>
@@ -292,6 +293,14 @@ void QmitkVoxTellToolGUI::OnInitializeButtonToggled(bool checked)
     return;
   }
 
+  // Started through the REST API. OnToolModelLoaded() checks the button then.
+  if (this->GetTool()->IsInitializing())
+  {
+    this->UncheckInitializeButton();
+    this->SetStatus("VoxTell is being initialized already, for example by the agent. Wait until it is ready.");
+    return;
+  }
+
   // Installing and loading run event loops, during which the controls must not
   // start anything else, and during which a tool change can delete this GUI.
   m_IsBusy = true;
@@ -383,71 +392,46 @@ void QmitkVoxTellToolGUI::LoadModel()
   // One notice for the whole initialization, a download included.
   auto notice = std::make_shared<Notice>(window, initMessage);
 
-  // The download in between has a cancel of its own, so each of the two
-  // worker phases gets a task of its own.
-  auto task = std::make_shared<mitk::ProgressTask>("Preparing VoxTell", mitk::ProgressTask::Indeterminate, true);
-  mitk::VoxTellTool::Pointer tool = this->GetTool();
+  // A download that did not succeed has told the user already.
+  auto downloadFailed = std::make_shared<bool>(false);
 
-  tool->GetModelFiles(task, [self, window, notice, task, tool](std::exception_ptr error, const std::vector<mitk::VoxTell::RepoFiles>& files)
-  {
-    // A deactivation of the tool meanwhile deleted this GUI.
-    if (self.isNull())
-      return;
-
-    if (error != nullptr)
+  this->GetTool()->Initialize(
+    [self, window, notice, downloadFailed](const std::vector<mitk::VoxTell::RepoFiles>& files)
     {
-      notice->Close();
-      self->OnInitializationFailed(error, task->IsCancelRequested());
-      return;
-    }
+      // A deactivation of the tool meanwhile deleted this GUI.
+      if (self.isNull())
+        mitkThrow() << "VoxTell: aborted.";
 
-    if (!files.empty())
-    {
       QString output;
       const auto result = self->Download("Downloading VoxTell model", files, output);
 
-      if (self.isNull())
+      if (result == QmitkVenvProcess::StepResult::Succeeded)
         return;
 
-      if (result != QmitkVenvProcess::StepResult::Succeeded)
-      {
-        notice->Close();
+      *downloadFailed = true;
+      notice->Close();
 
-        if (result == QmitkVenvProcess::StepResult::Failed)
-        {
-          ShowDownloadError(window, output);
+      if (result == QmitkVenvProcess::StepResult::Failed)
+        ShowDownloadError(window, output);
+      else if (!self.isNull())
+        self->SetStatus("The download was cancelled.");
 
-          if (self.isNull())
-            return;
-        }
-        else
-        {
-          self->SetStatus("The download was cancelled.");
-        }
-
-        self->OnInitializationAborted();
-        return;
-      }
-    }
-
-    auto loadTask = std::make_shared<mitk::ProgressTask>("Loading VoxTell", mitk::ProgressTask::Indeterminate, true);
-
-    tool->LoadModel(loadTask, [self, notice, loadTask](std::exception_ptr loadError)
+      mitkThrow() << "VoxTell: the download did not succeed.";
+    },
+    [self, notice, downloadFailed](std::exception_ptr error, bool cancelled)
     {
       notice->Close();
 
       if (self.isNull())
         return;
 
-      if (loadError != nullptr)
-      {
-        self->OnInitializationFailed(loadError, loadTask->IsCancelRequested());
-        return;
-      }
-
-      self->OnModelLoaded(true);
+      if (error == nullptr)
+        self->OnModelLoaded(true);
+      else if (*downloadFailed)
+        self->OnInitializationAborted();
+      else
+        self->OnInitializationFailed(error, cancelled);
     });
-  });
 }
 
 void QmitkVoxTellToolGUI::OnInitializationFailed(std::exception_ptr error, bool cancelled)
@@ -483,10 +467,6 @@ void QmitkVoxTellToolGUI::OnInitializationFailed(std::exception_ptr error, bool 
 
 void QmitkVoxTellToolGUI::OnInitializationAborted()
 {
-  // Ends a worker that the initialization started, which holds VoxTell's
-  // imports and possibly a model.
-  this->GetTool()->UnloadModel();
-
   m_IsBusy = false;
   this->UncheckInitializeButton();
   this->EnableWidgets(true);

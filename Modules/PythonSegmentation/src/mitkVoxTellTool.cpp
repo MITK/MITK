@@ -225,9 +225,8 @@ namespace mitk
     // Read by the work off the GUI thread, which it stops.
     std::atomic<bool> AbortRequested = false;
 
-    // GetModelFiles(), LoadModel() and EmbedPrompts() run off the GUI thread,
-    // during which the tool may be deactivated. They unload the model once they
-    // have stopped.
+    // Initialize(), the download included, and EmbedPrompts(), during which the
+    // tool may be deactivated. They unload the model once they have stopped.
     bool Initializing = false;
   };
 }
@@ -355,16 +354,61 @@ mitk::PythonWorker& mitk::VoxTellTool::GetWorker()
   return *m_Impl->Worker;
 }
 
-void mitk::VoxTellTool::GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done)
+void mitk::VoxTellTool::Initialize(DownloadCallback download, InitializeCallback done)
 {
   // Before anything changes: the running work still uses the worker and
-  // reads the abort request.
-  if (this->IsUpdating() || this->IsRunningOffGUIThread())
+  // reads the abort request, and a start under way has a caller of its own.
+  if (this->IsUpdating() || this->IsRunningOffGUIThread() || m_Impl->Initializing)
   {
-    done(MakeExceptionPtr("VoxTell is busy."), {});
+    done(MakeExceptionPtr("VoxTell is busy."), false);
     return;
   }
 
+  m_Impl->Initializing = true;
+  m_Impl->AbortRequested = false;
+
+  auto filesTask = std::make_shared<ProgressTask>("Preparing VoxTell", ProgressTask::Indeterminate, true);
+
+  // Held, as the tool can go while the download runs an event loop.
+  this->GetModelFiles(filesTask, [self = Pointer(this), filesTask, download, done](std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files) {
+    const bool cancelled = filesTask->IsCancelRequested();
+
+    // The download shows a progress notification of its own.
+    filesTask->Finish();
+
+    if (error != nullptr)
+    {
+      done(error, cancelled);
+      return;
+    }
+
+    try
+    {
+      if (!files.empty())
+        download(files);
+
+      if (self->m_Impl->AbortRequested)
+        mitkThrow() << "VoxTell: aborted.";
+    }
+    catch (...)
+    {
+      self->EndFailedInitialization();
+      done(std::current_exception(), false);
+      return;
+    }
+
+    auto loadTask = std::make_shared<ProgressTask>("Loading VoxTell", ProgressTask::Indeterminate, true);
+
+    self->LoadModel(loadTask, [loadTask, done](std::exception_ptr loadError) {
+      const bool loadCancelled = loadTask->IsCancelRequested();
+      loadTask->Finish();
+      done(loadError, loadCancelled);
+    });
+  });
+}
+
+void mitk::VoxTellTool::GetModelFiles(std::shared_ptr<ProgressTask> task, ModelFilesCallback done)
+{
   PythonWorker* worker = nullptr;
   std::vector<std::string> functions;
 
@@ -384,9 +428,6 @@ void mitk::VoxTellTool::GetModelFiles(std::shared_ptr<ProgressTask> task, ModelF
     done(std::current_exception(), {});
     return;
   }
-
-  m_Impl->Initializing = true;
-  m_Impl->AbortRequested = false;
 
   const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
   auto files = std::make_shared<std::vector<VoxTell::RepoFiles>>();
@@ -420,7 +461,6 @@ void mitk::VoxTellTool::GetModelFiles(std::shared_ptr<ProgressTask> task, ModelF
         return;
       }
 
-      m_Impl->Initializing = false;
       done(nullptr, *files);
     });
 }
@@ -440,10 +480,11 @@ void mitk::VoxTellTool::EndFailedInitialization()
 
 void mitk::VoxTellTool::LoadModel(std::shared_ptr<ProgressTask> task, DoneCallback done)
 {
-  // Before anything changes: the running work still uses the worker and
-  // reads the abort request.
+  // Work that began during the download, on a model loaded before. It still
+  // uses the worker and reads the abort request, so only the start ends.
   if (this->IsUpdating() || this->IsRunningOffGUIThread())
   {
+    m_Impl->Initializing = false;
     done(MakeExceptionPtr("VoxTell is busy."));
     return;
   }
@@ -475,6 +516,7 @@ void mitk::VoxTellTool::LoadModel(std::shared_ptr<ProgressTask> task, DoneCallba
 
   if (useLocalModel && localModelPath.empty())
   {
+    this->EndFailedInitialization();
     done(MakeExceptionPtr("VoxTell: Local model mode is selected but no model folder is configured. "
                    "Set the path in Preferences -> Segmentation -> VoxTell."));
     return;
@@ -496,9 +538,6 @@ void mitk::VoxTellTool::LoadModel(std::shared_ptr<ProgressTask> task, DoneCallba
   }
 
   const auto gpuDevice = prefs->Get("VoxTell/gpuBackend", "cuda:0");
-
-  m_Impl->Initializing = true;
-  m_Impl->AbortRequested = false;
 
   const auto progress = MakeStopHook(this, task.get(), [this]() { return m_Impl->AbortRequested.load(); });
   auto selection = std::make_shared<Torch::DeviceSelection>();

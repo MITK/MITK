@@ -1227,9 +1227,12 @@ std::string QmitkSegmentationView::GetToolsUnusableReason() const
   if (nullptr == m_Controls)
     return "The Segmentation view is not set up yet.";
 
-  // The boxes register the clients of the tool manager, so their state is the
-  // gate itself. The overlays only tell why it is closed.
-  if (m_Controls->toolSelectionBox2D->isEnabled() || m_Controls->toolSelectionBox3D->isEnabled())
+  // A box registers as client of the tool manager while it is enabled by itself,
+  // so that state is the gate. A disabled parent, like the lock of the view while
+  // the agent works, leaves it open. The overlays only tell why it is closed.
+  const auto isEnabledByItself = [](const QWidget* widget) { return !widget->testAttribute(Qt::WA_ForceDisabled); };
+
+  if (isEnabledByItself(m_Controls->toolSelectionBox2D) || isEnabledByItself(m_Controls->toolSelectionBox3D))
     return {};
 
   if (nullptr == m_RenderWindowPart)

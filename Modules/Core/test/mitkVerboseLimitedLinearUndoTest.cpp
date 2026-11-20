@@ -171,6 +171,53 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
   MITK_TEST_CONDITION_REQUIRED(originModel->GetRedoOrigins().size() == 1 && originModel->GetRedoOrigins()[0].empty(),
                                "checking origin of a redo entry");
 
+  // A client's item and a later one of the user's that share an ObjectEventId.
+  auto mixedModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addItem = [&mixedModel]() {
+      mixedModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+    };
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addItem();
+    }
+
+    addItem();
+    mitk::OperationEvent::IncCurrObjectEventId();
+  }
+
+  MITK_TEST_CONDITION_REQUIRED(mixedModel->GetUndoOrigins().size() == 1 && mixedModel->GetUndoOrigins()[0].empty(),
+                               "checking a mixed undo entry is the user's");
+  mixedModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(mixedModel->GetRedoOrigins().size() == 1 && mixedModel->GetRedoOrigins()[0].empty(),
+                               "checking a mixed redo entry is the user's");
+
+  // The reverse order, where the newest item is the client's.
+  auto reverseModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addItem = [&reverseModel]() {
+      reverseModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+    };
+
+    addItem();
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addItem();
+    }
+
+    mitk::OperationEvent::IncCurrObjectEventId();
+  }
+
+  MITK_TEST_CONDITION_REQUIRED(reverseModel->GetUndoOrigins().size() == 1 && reverseModel->GetUndoOrigins()[0].empty(),
+                               "checking a mixed undo entry with the client's item last is the user's");
+  reverseModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(reverseModel->GetRedoOrigins().size() == 1 && reverseModel->GetRedoOrigins()[0].empty(),
+                               "checking a mixed redo entry with the client's item last is the user's");
+
   // always end with this!
   MITK_TEST_END()
   // operations will be deleted after terminating the application

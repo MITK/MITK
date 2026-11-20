@@ -30,6 +30,11 @@ namespace
         oeid = (*iter)->GetObjectEventId();
         origins.push_back((*iter)->GetOrigin());
       }
+      else if (origins.back() != (*iter)->GetOrigin())
+      {
+        // A client must not take a step of the user's along with its own.
+        origins.back().clear();
+      }
     }
 
     return origins;

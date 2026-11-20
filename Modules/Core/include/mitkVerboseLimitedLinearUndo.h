@@ -80,8 +80,8 @@ namespace mitk
     /**
      * \brief Return who made each entry of the undo stack.
      *
-     * Entries are grouped by ObjectEventId exactly as in GetUndoDescriptions(), and the origin of
-     * an entry is that of its most recent item.
+     * Entries are grouped by ObjectEventId exactly as in GetUndoDescriptions(). The origin of an
+     * entry is that of its items, or the user's if they differ.
      *
      * \return One origin per entry of GetUndoDescriptions(), in the same order; empty for the user.
      * \sa ActionOriginScope

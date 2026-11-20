@@ -18,10 +18,10 @@ found in the LICENSE file.
 
 namespace QmitkReportSource
 {
-  /** src attributes, with the quote in group 1 and the value in group 2. */
+  /** src attributes, with the quote in group 1 and the value in group 2; not data-src and the like. */
   inline const QRegularExpression& GetAttribute()
   {
-    static const QRegularExpression expression(QStringLiteral("\\bsrc\\s*=\\s*([\"'])(.*?)\\1"),
+    static const QRegularExpression expression(QStringLiteral("(?<![\\w-])src\\s*=\\s*([\"'])(.*?)\\1"),
       QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
 
     return expression;

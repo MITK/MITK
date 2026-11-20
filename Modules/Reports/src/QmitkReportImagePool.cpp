@@ -46,7 +46,8 @@ QMap<QString, QByteArray> QmitkReportImagePool::CollectImages(const QString& htm
   {
     const auto source = sources.next().captured(2);
 
-    if (QmitkReportSource::IsDataUri(source) || images.contains(source))
+    // An empty src refers to no image.
+    if (source.isEmpty() || QmitkReportSource::IsDataUri(source) || images.contains(source))
       continue;
 
     if (ownImages.contains(source))

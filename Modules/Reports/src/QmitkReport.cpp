@@ -53,11 +53,27 @@ QString QmitkReport::GetFileBaseName() const
 {
   static const QRegularExpression forbidden(QStringLiteral("[\\\\/:*?\"<>|\\x00-\\x1f]"));
 
+  // Names of devices on Windows, also with a suffix like .html.
+  static const QRegularExpression device(QStringLiteral("^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\\.|$)"),
+    QRegularExpression::CaseInsensitiveOption);
+
   auto name = this->Title;
   name.replace(forbidden, QStringLiteral(" "));
-  name = name.simplified().left(80).trimmed();
+  name = name.simplified().left(80);
 
-  return name.isEmpty() ? QStringLiteral("Report %1").arg(this->Id) : name;
+  if (!name.isEmpty() && name.back().isHighSurrogate())
+    name.chop(1);
+
+  // Windows drops dots and spaces at the end of a file name.
+  while (name.endsWith(QLatin1Char('.')) || name.endsWith(QLatin1Char(' ')))
+    name.chop(1);
+
+  if (name.isEmpty())
+    return QStringLiteral("Report %1").arg(this->Id);
+
+  return device.match(name).hasMatch()
+    ? QStringLiteral("Report ") + name
+    : name;
 }
 
 QString QmitkReport::GetDocument(bool forExport, bool darkTheme) const

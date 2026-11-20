@@ -117,6 +117,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string(""), ErrorOf(pool, QStringLiteral("<p style=\"background:url(image-9.png)\">x</p>")));
     CPPUNIT_ASSERT_EQUAL(std::string(""), ErrorOf(pool, QStringLiteral("<a href=\"image-9.png\">x</a>")));
     CPPUNIT_ASSERT_EQUAL(std::string(""), ErrorOf(pool, QStringLiteral("<img srcset=\"image-9.png 2x\">")));
+    CPPUNIT_ASSERT_EQUAL(std::string(""), ErrorOf(pool, QStringLiteral("<img data-src=\"image-9.png\">")));
+    CPPUNIT_ASSERT_EQUAL(std::string(""), ErrorOf(pool, QStringLiteral("<img src=\"\">")));
   }
 
   void TestDataUrisAreNoPoolImages()

@@ -121,6 +121,12 @@ public:
       { QStringLiteral("<?>"), QStringLiteral("Report 5") },
       { QString(100, 'x'), QString(80, 'x') },
       { QString(79, 'x') + QStringLiteral("/y"), QString(79, 'x') },
+      // A character outside the BMP across the cut is dropped whole.
+      { QString(79, 'x') + QString::fromUtf8("\xF0\x9F\x99\x82"), QString(79, 'x') },
+      { QStringLiteral("Results..."), QStringLiteral("Results") },
+      { QStringLiteral("CON"), QStringLiteral("Report CON") },
+      { QStringLiteral("lpt1.final"), QStringLiteral("Report lpt1.final") },
+      { QStringLiteral("Console"), QStringLiteral("Console") },
     };
 
     for (const auto& [title, expected] : cases)

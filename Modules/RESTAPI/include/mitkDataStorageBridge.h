@@ -368,7 +368,7 @@ namespace mitk
     struct PropertyOperationResult
     {
       OperationStatus status = OperationStatus::InternalError;
-      std::string reason;  /**< Why the request was refused; set for InvalidInput. */
+      std::string reason = {};  /**< Why the request was refused; set for InvalidInput. */
     };
 
     /**
@@ -411,7 +411,7 @@ namespace mitk
     {
       OperationStatus status = OperationStatus::InternalError;
       Json result = {};     /**< {"replaced": [...], "removed": [...]}; valid only on Success. */
-      std::string reason;   /**< Why the request was refused, naming the key of a refused value; set for InvalidInput. */
+      std::string reason = {};  /**< Why the request was refused, naming the key of a refused value; set for InvalidInput. */
     };
 
     /**

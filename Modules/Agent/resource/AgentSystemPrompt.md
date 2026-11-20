@@ -346,10 +346,13 @@ pathology, like `lung_nodules`. The confirm adds each class it found as a
 label. For a structure that no task has, use VoxTell or nnInteractive. Work
 in this order:
 
-1. Make it the tool. Unless GET `/api/v1/segmentation/totalsegmentator`
-   says it is `initialized`, start it with POST
-   `/api/v1/segmentation/totalsegmentator/initialize?wait=60`. If it is not
-   installed, ask the user to install it through its panel.
+1. Make it the tool: PATCH the session with the image, a segmentation and
+   `"tool": "TotalSegmentator"`; the tool can neither be activated nor
+   asked for its tasks without a segmentation, and a new one without
+   labels will do, as the tool adds its own. Unless GET
+   `/api/v1/segmentation/totalsegmentator` says it is `initialized`, start
+   it with POST `/api/v1/segmentation/totalsegmentator/initialize?wait=60`.
+   If it is not installed, ask the user to install it through its panel.
 2. Only now, with the tool active and started, find the task: GET
    `/api/v1/segmentation/totalsegmentator/classes?name=liver`
    (repeat `name` for several) lists the tasks that segment a class; without

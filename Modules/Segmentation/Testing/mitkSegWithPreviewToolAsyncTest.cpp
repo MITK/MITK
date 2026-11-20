@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -228,6 +229,7 @@ class mitkSegWithPreviewToolAsyncTestSuite : public mitk::TestFixture
   MITK_TEST(TestDeactivationAbandonsUpdate);
   MITK_TEST(TestDeactivationAbandonsConfirmation);
   MITK_TEST(TestDestroyedToolIgnoresItsDone);
+  MITK_TEST(TestAddedLabelsAboveTheHighestValueGetUnusedValues);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -346,6 +348,33 @@ public:
     m_Queue.ProcessAll();
     m_ToolManager = nullptr;
     m_DataStorage = nullptr;
+  }
+
+  void TestAddedLabelsAboveTheHighestValueGetUnusedValues()
+  {
+    // Like a converted 16 bit mask. Each label of the preview, a clone, is
+    // added above the highest value 65535.
+    auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(m_ToolManager->GetWorkingData(0)->GetData());
+    segmentation->AddLabel(mitk::Label::New(mitk::Label::MAX_LABEL_VALUE, "Highest"), 0, false, false);
+
+    m_Tool->Async = false;
+    this->Activate(false);
+    m_Tool->UpdatePreview();
+
+    const auto addedLabels = m_Tool->GetPreviewSegmentation()->GetAllLabelValues().size();
+    CPPUNIT_ASSERT(addedLabels > 1);
+
+    m_Tool->ConfirmSegmentation();
+
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Transferred);
+    CPPUNIT_ASSERT(m_Errors.empty());
+
+    // None of them wrapped onto a label that exists.
+    auto values = segmentation->GetAllLabelValues();
+    std::sort(values.begin(), values.end());
+    CPPUNIT_ASSERT_EQUAL(2 + addedLabels, values.size());
+    CPPUNIT_ASSERT_EQUAL(mitk::Label::PixelType(1), values.front());
+    CPPUNIT_ASSERT_EQUAL(mitk::Label::MAX_LABEL_VALUE, values.back());
   }
 
   void TestWithoutPosterWorkRunsAtOnce()

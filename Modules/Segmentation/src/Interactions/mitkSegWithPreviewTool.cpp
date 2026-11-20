@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <optional>
+#include <set>
 #include <utility>
 
 struct mitk::SegWithPreviewTool::UpdatePass
@@ -554,13 +555,23 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
 
   LabelMappingType labelMapping = {};
 
+  // Targets beyond the highest label value would wrap around to used values.
+  std::vector<std::size_t> wrappingTargets;
+
+  const auto addWithOffset = [&labelMapping, &wrappingTargets, offset](Label::PixelType source) {
+    if (static_cast<std::size_t>(source) + offset > Label::MAX_LABEL_VALUE)
+      wrappingTargets.push_back(labelMapping.size());
+
+    labelMapping.push_back({ source, static_cast<Label::PixelType>(source + offset) });
+  };
+
   switch (this->m_LabelTransferScope)
   {
     case LabelTransferScope::SelectedLabels:
       {
         for (auto label : this->m_SelectedLabels)
         {
-          labelMapping.push_back({label, label + offset});
+          addWithOffset(label);
         }
       }
       break;
@@ -573,7 +584,7 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
 
         for (auto labelValue : labelValues)
         {
-        labelMapping.push_back({ labelValue, labelValue + offset});
+          addWithOffset(labelValue);
         }
       }
       break;
@@ -590,6 +601,36 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
         labelMapping.push_back({m_SelectedLabels.front(), this->GetUserDefinedActiveLabel()});
       }
       break;
+  }
+
+  if (!wrappingTargets.empty())
+  {
+    // Those labels get the lowest values that neither the segmentation nor
+    // another target uses, as GetUnusedLabelValue() does above the highest.
+    const auto usedValues = this->GetTargetSegmentation()->GetAllLabelValues();
+    std::set<Label::PixelType> takenValues(usedValues.begin(), usedValues.end());
+
+    for (std::size_t i = 0; i < labelMapping.size(); ++i)
+    {
+      if (std::find(wrappingTargets.begin(), wrappingTargets.end(), i) == wrappingTargets.end())
+        takenValues.insert(labelMapping[i].second);
+    }
+
+    Label::PixelType candidate = MultiLabelSegmentation::UNLABELED_VALUE + 1;
+
+    for (const auto index : wrappingTargets)
+    {
+      while (takenValues.count(candidate) != 0)
+      {
+        if (candidate == Label::MAX_LABEL_VALUE)
+          mitkThrow() << "The segmentation has no unused label value.";
+
+        ++candidate;
+      }
+
+      labelMapping[index].second = candidate;
+      takenValues.insert(candidate);
+    }
   }
 
   return labelMapping;

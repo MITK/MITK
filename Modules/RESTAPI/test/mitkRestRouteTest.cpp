@@ -268,6 +268,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(StopEndsCallsThatWaitForTheDispatchThread);
   MITK_TEST(RoutesActUnderTheNameOfTheirClient);
   MITK_TEST(StopEndsBuiltInRequestsThatWaitForTheDispatchThread);
+  MITK_TEST(DataStorageIsAvailableWhileARequestWaitsForTheDispatchThread);
   MITK_TEST(WorldPointsAreParsed);
   MITK_TEST(RestColorsAreParsedAndFormatted);
   MITK_TEST(PixelsNeedTheViewStateOfTheirScreenshot);
@@ -1104,6 +1105,46 @@ public:
     }
 
     server.Stop();
+  }
+
+  void DataStorageIsAvailableWhileARequestWaitsForTheDispatchThread()
+  {
+    auto dispatcher = BusyDispatcher::New();
+    auto dataStorage = mitk::StandaloneDataStorage::New();
+
+    mitk::RestServer server;
+    server.SetConfig(MakeConfig());
+    server.SetDataStorage(dataStorage);
+    server.SetDispatcher(dispatcher);
+
+    CPPUNIT_ASSERT(server.Start());
+
+    // A built-in request holds the data storage bridge while it waits for the dispatch thread.
+    auto waiting = std::async(std::launch::async, [&server]() {
+      return server.HandleRequest(MakeRequest("GET", "/api/v1/datastorage/nodes"));
+    });
+
+    const bool dispatched = dispatcher->WaitForTask(std::chrono::seconds(10));
+
+    // Meanwhile a route handler asks for the data storage, and the dispatch thread for the
+    // server's state: if the first waited for the request, the second would wait for it.
+    auto asking = std::async(std::launch::async, [&server]() {
+      const auto found = server.GetDataStorage();
+      server.GetRunningConfig();
+      return found;
+    });
+
+    const bool answered = asking.wait_for(std::chrono::seconds(10)) == std::future_status::ready;
+
+    dispatcher->Run();
+    const auto response = waiting.get();
+    const auto found = asking.get();
+    server.Stop();
+
+    CPPUNIT_ASSERT(dispatched);
+    CPPUNIT_ASSERT(answered);
+    CPPUNIT_ASSERT(found.GetPointer() == dataStorage.GetPointer());
+    CPPUNIT_ASSERT_EQUAL(200, response.Status);
   }
 
   void StopEndsBuiltInRequestsThatWaitForTheDispatchThread()

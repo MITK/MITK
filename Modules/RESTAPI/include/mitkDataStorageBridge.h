@@ -483,6 +483,12 @@ namespace mitk
     /** Remark: Important to ensure that this mutex is always acquired before interacting with m_UidMapper
      * (and its mutex).*/
     mutable std::mutex m_Mutex;
+
+    /**
+     * Guards m_DataStorage for readers that do not hold m_Mutex; never held
+     * while waiting for the dispatch thread. A writer takes it inside m_Mutex.
+     */
+    mutable std::mutex m_DataStorageMutex;
   };
 }
 

@@ -177,6 +177,10 @@ namespace mitk
 
     /**
      * \brief Get the currently connected DataStorage.
+     *
+     * Does not wait for requests in flight, so route handlers may call it on
+     * their own thread.
+     *
      * \return The connected DataStorage, or nullptr if none.
      */
     virtual DataStorage::Pointer GetDataStorage() const = 0;

@@ -756,7 +756,8 @@ RenderWindowBridge* RestServer::GetRenderWindowBridge()
 
 DataStorage::Pointer RestServer::GetDataStorage() const
 {
-  std::lock_guard<std::mutex> lock(m_Mutex);
+  // Not under m_Mutex, which the GUI thread takes to read the server's
+  // state: the bridge is the same for the server's life.
   return m_Bridge->GetDataStorage();
 }
 

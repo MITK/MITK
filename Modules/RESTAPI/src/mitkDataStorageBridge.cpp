@@ -477,19 +477,25 @@ namespace mitk
   void DataStorageBridge::SetDataStorage(DataStorage* dataStorage)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    m_DataStorage = dataStorage;
+
+    {
+      std::lock_guard<std::mutex> dataStorageLock(m_DataStorageMutex);
+      m_DataStorage = dataStorage;
+    }
+
     m_UidMapper->SetDataStorage(dataStorage);
   }
 
   DataStorage::Pointer DataStorageBridge::GetDataStorage() const
   {
-    std::lock_guard<std::mutex> lock(m_Mutex);
+    // Not m_Mutex, which requests hold while they wait for the dispatch thread.
+    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
     return m_DataStorage.Lock();
   }
 
   bool DataStorageBridge::HasDataStorage() const
   {
-    std::lock_guard<std::mutex> lock(m_Mutex);
+    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
     return m_DataStorage.Lock().IsNotNull();
   }
 

@@ -66,11 +66,40 @@ namespace mitk
      * the update has run off the GUI thread (see RunOffGUIThread()). A transfer
      * that follows such work reports a failure through ErrorMessage. If the
      * update is cancelled or fails, nothing is transferred.
+     * GetLastConfirmationOutcome() tells how the confirmation ended.
      *
      * \throw mitk::Exception if an update of the preview or other work off the
      *        GUI thread is running.
      */
     void ConfirmSegmentation();
+
+    /** \brief How the last confirmation ended. */
+    enum class ConfirmationOutcome
+    {
+      /** No confirmation has ended since ConfirmSegmentation() was called last. */
+      None,
+      /** The preview was transferred into the segmentation. */
+      Transferred,
+      /** The update before the transfer, or the transfer, failed; see GetLastConfirmationError(). */
+      Failed,
+      /** The update before the transfer was canceled. Nothing was transferred. */
+      Canceled,
+      /** The tool was deactivated during the update before the transfer. Nothing was transferred. */
+      Abandoned
+    };
+
+    /**
+     * \brief Tells how the last confirmation ended.
+     *
+     * For whoever waits for a confirmation whose transfer follows an update,
+     * which reports a failure through ErrorMessage only: once IsUpdating() is
+     * false, this tells whether the transfer took place. Updates that follow
+     * the confirmation leave it unchanged.
+     */
+    ConfirmationOutcome GetLastConfirmationOutcome() const;
+
+    /** \brief Why the last confirmation failed, or empty unless its outcome is Failed. */
+    const std::string& GetLastConfirmationError() const;
 
     /** \brief Tells whether the tool has a result that ConfirmSegmentation() would transfer.
      *
@@ -550,6 +579,8 @@ namespace mitk
      */
     void FinishConfirmation(std::optional<TimePointType> timePoint = {});
 
+    void SetLastConfirmationOutcome(ConfirmationOutcome outcome, const std::string& error = {});
+
     void TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
     /** \param timePoint The time point to transfer instead of the one the tool would choose. */
@@ -609,6 +640,9 @@ namespace mitk
 
     /** The running update, from UpdatePreview() until it has ended. */
     std::unique_ptr<UpdatePass> m_UpdatePass;
+
+    ConfirmationOutcome m_LastConfirmationOutcome = ConfirmationOutcome::None;
+    std::string m_LastConfirmationError;
 
     /** Set while DoUpdatePreview() runs, whose work RunOffGUIThread() defers. */
     bool m_DefersWork = false;

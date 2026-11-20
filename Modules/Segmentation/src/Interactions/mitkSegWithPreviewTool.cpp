@@ -61,11 +61,14 @@ struct mitk::SegWithPreviewTool::UpdatePass
   bool Failed = false;
   bool Computed = false;
 
+  /** Why the update failed. */
+  std::string Error;
+
   /** Set by Deactivated(): the update ends once its running work has, and
       leaves the state of the tool alone, which may be activated anew. */
   bool Abandoned = false;
 
-  /** What follows the update, like the transfer of a confirmation. */
+  /** The transfer of a confirmation that waits for the update. */
   std::function<void()> Then;
 
   /** Who started the update, so that what follows it counts for the same. */
@@ -75,6 +78,29 @@ struct mitk::SegWithPreviewTool::UpdatePass
   std::unique_ptr<ProgressTask> Task;
   std::optional<ScopedProgressTask<ToolCommand>> ScopedTask;
 };
+
+namespace
+{
+  std::string DescribeError(std::exception_ptr error)
+  {
+    try
+    {
+      std::rethrow_exception(error);
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      return e.GetDescription();
+    }
+    catch (const std::exception& e)
+    {
+      return e.what();
+    }
+    catch (...)
+    {
+      return "An unknown error occurred.";
+    }
+  }
+}
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -220,10 +246,7 @@ void mitk::SegWithPreviewTool::Deactivated()
   // true until then, which tells derived tools that the work still uses what
   // they would otherwise release now.
   if (m_UpdatePass != nullptr)
-  {
     m_UpdatePass->Abandoned = true;
-    m_UpdatePass->Then = nullptr;
-  }
 
   try
   {
@@ -251,6 +274,8 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
   if (m_IsUpdating || m_WorkRunning)
     mitkThrow() << this->GetName() << ": the preview cannot be confirmed while the tool is busy.";
 
+  this->SetLastConfirmationOutcome(ConfirmationOutcome::None);
+
   bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
 
   // A lazy tool has computed the current time step only, which is all that is
@@ -272,19 +297,45 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
 
 void mitk::SegWithPreviewTool::FinishConfirmation(std::optional<TimePointType> timePoint)
 {
-  this->CreateResultSegmentationFromPreview(timePoint);
-
-  // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
-  // hook ends up flagged again.
-  m_HasUnconfirmedPreview = false;
-
-  RenderingManager::GetInstance()->RequestUpdateAll();
-
-  if (!m_KeepActiveAfterAccept)
+  try
   {
-    this->GetToolManager()->ActivateTool(-1);
+    this->CreateResultSegmentationFromPreview(timePoint);
+
+    // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
+    // hook ends up flagged again.
+    m_HasUnconfirmedPreview = false;
+
+    RenderingManager::GetInstance()->RequestUpdateAll();
+
+    if (!m_KeepActiveAfterAccept)
+    {
+      this->GetToolManager()->ActivateTool(-1);
+    }
+    this->ConfirmCleanUp();
   }
-  this->ConfirmCleanUp();
+  catch (...)
+  {
+    this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, DescribeError(std::current_exception()));
+    throw;
+  }
+
+  this->SetLastConfirmationOutcome(ConfirmationOutcome::Transferred);
+}
+
+void mitk::SegWithPreviewTool::SetLastConfirmationOutcome(ConfirmationOutcome outcome, const std::string& error)
+{
+  m_LastConfirmationOutcome = outcome;
+  m_LastConfirmationError = error;
+}
+
+mitk::SegWithPreviewTool::ConfirmationOutcome mitk::SegWithPreviewTool::GetLastConfirmationOutcome() const
+{
+  return m_LastConfirmationOutcome;
+}
+
+const std::string& mitk::SegWithPreviewTool::GetLastConfirmationError() const
+{
+  return m_LastConfirmationError;
 }
 
 void  mitk::SegWithPreviewTool::InitiateToolByInput()
@@ -976,6 +1027,7 @@ void mitk::SegWithPreviewTool::HandleUpdateError(std::exception_ptr error)
 
   // Whether cancelled or failed, there is no result to transfer.
   m_UpdatePass->Failed = true;
+  m_UpdatePass->Error = DescribeError(error);
 
   try
   {
@@ -1053,11 +1105,23 @@ void mitk::SegWithPreviewTool::EndUpdate()
   }
 
   // A confirmation of a cancelled or failed update would transfer a preview
-  // that is empty or half written.
-  std::function<void()> then;
+  // that is empty or half written. Whoever waits for the confirmation learns
+  // why it did not take place.
+  std::function<void()> then = std::move(pass->Then);
 
-  if (!pass->Failed)
-    then = std::move(pass->Then);
+  if (then && (pass->Abandoned || pass->Failed || cleanUpError != nullptr))
+  {
+    if (pass->Abandoned)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Abandoned);
+    else if (pass->Cancelled)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Canceled);
+    else if (pass->Failed)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, pass->Error);
+    else
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, DescribeError(cleanUpError));
+
+    then = nullptr;
+  }
 
   const std::string origin = pass->Origin;
 

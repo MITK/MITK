@@ -565,6 +565,29 @@ namespace
     });
   }
 
+  /** Why the last confirmation of \p tool did not transfer, or empty if it did. */
+  std::string GetConfirmationFailure(const mitk::SegWithPreviewTool& tool)
+  {
+    using Outcome = mitk::SegWithPreviewTool::ConfirmationOutcome;
+    const std::string name = tool.GetName();
+
+    switch (tool.GetLastConfirmationOutcome())
+    {
+      case Outcome::Transferred:
+        return {};
+      case Outcome::Failed:
+        return "The confirmation failed: " + tool.GetLastConfirmationError();
+      case Outcome::Canceled:
+        return name + " was canceled in the Workbench. Nothing was confirmed.";
+      case Outcome::Abandoned:
+        return name + " was deactivated before the result was confirmed. Nothing was confirmed.";
+      case Outcome::None:
+        break;
+    }
+
+    return "The confirmation did not end. Nothing was confirmed.";
+  }
+
   /** Refuses a request while the tool works, which takes one thing at a time. */
   void ThrowIfBusy(const mitk::SegWithPreviewTool* tool, const std::string& path)
   {
@@ -1671,7 +1694,9 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "check with GET .../labels?measure=true that the label is filled. If the tool has to compute the result first, for all_time_steps "
     "with a tool that previews only the time step on display, or for an active label that changed since the "
     "result was computed, which takes as long as that many runs, the confirm runs as a job: query parameter "
-    "wait (seconds) waits for it, and the job's result is the answer.";
+    "wait (seconds) waits for it, and the job's result is the answer. If that computation fails, is canceled in "
+    "the Workbench, or the tool is deactivated meanwhile, nothing is confirmed: the confirm answers 500 "
+    "CONFIRM_FAILED, or its job fails, with the reason.";
   confirm.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();
     const bool allTimeSteps = body.value("all_time_steps", false);
@@ -1731,6 +1756,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       if (!tool->IsUpdating())
       {
         restoreOptions();
+
+        // An update before the transfer that failed reports it to the user only.
+        if (const auto failure = GetConfirmationFailure(*tool); !failure.empty())
+          mitk::ThrowRestError("CONFIRM_FAILED", "Internal Server Error", failure, 500, request.Path);
+
         return Outcome{ describe(), nullptr };
       }
 
@@ -1738,8 +1768,14 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       auto job = server->CreateJob("Confirm the result");
       job->SetCancelHandler([name = std::string(tool->GetName())]() { CancelTasks(name); });
 
-      WhenToolIdle(tool, [job, describe, restoreOptions]() {
+      WhenToolIdle(tool, [job, tool, describe, restoreOptions]() {
         restoreOptions();
+
+        if (const auto failure = GetConfirmationFailure(*tool); !failure.empty())
+        {
+          job->Fail(failure);
+          return;
+        }
 
         try
         {

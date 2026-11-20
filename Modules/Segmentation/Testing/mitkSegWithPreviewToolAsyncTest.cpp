@@ -10,7 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkCoreServices.h>
 #include <mitkImage.h>
+#include <mitkIProgressService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkSegWithPreviewTool.h>
 #include <mitkStandaloneDataStorage.h>
@@ -28,6 +30,8 @@ found in the LICENSE file.
 
 namespace
 {
+  using Outcome = mitk::SegWithPreviewTool::ConfirmationOutcome;
+
   // Stands in for the event loop of the GUI thread, which is the thread of the test.
   class GUIThreadQueue
   {
@@ -110,6 +114,12 @@ namespace
     bool Async = true;
     bool WorkThrows = false;
     bool ConfirmCleanUpThrows = false;
+    bool Cancelable = false;
+
+    bool IsCancelable() const override
+    {
+      return Cancelable;
+    }
 
     /** Called by the work, for example to wait for the test. */
     std::function<void()> InWork;
@@ -202,8 +212,10 @@ class mitkSegWithPreviewToolAsyncTestSuite : public mitk::TestFixture
   MITK_TEST(TestConfirmationFollowsUpdate);
   MITK_TEST(TestFailedConfirmationAfterUpdateIsReported);
   MITK_TEST(TestFailedUpdateOfConfirmationTransfersNothing);
+  MITK_TEST(TestCanceledUpdateOfConfirmationTransfersNothing);
   MITK_TEST(TestConfirmationWhileUpdatingIsRefused);
   MITK_TEST(TestDeactivationAbandonsUpdate);
+  MITK_TEST(TestDeactivationAbandonsConfirmation);
   MITK_TEST(TestDestroyedToolIgnoresItsDone);
   CPPUNIT_TEST_SUITE_END();
 
@@ -387,11 +399,18 @@ public:
 
     CPPUNIT_ASSERT(m_Tool->IsUpdating());
     CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::None);
 
     CPPUNIT_ASSERT(m_Queue.ProcessUntil([this] { return m_Tool->Confirmations > 0; }));
     CPPUNIT_ASSERT_EQUAL(3, m_Tool->Updates);
     CPPUNIT_ASSERT_EQUAL(3, m_Tool->DonesBeforeConfirmation);
     CPPUNIT_ASSERT(!m_Tool->IsUpdating());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Transferred);
+
+    // An update after the confirmation does not change how it ended.
+    m_Tool->UpdatePreview();
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Transferred);
   }
 
   void TestFailedConfirmationAfterUpdateIsReported()
@@ -408,6 +427,10 @@ public:
 
     CPPUNIT_ASSERT(m_Queue.ProcessUntil([this] { return m_Tool->Confirmations > 0; }));
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), m_Errors.size());
+
+    // Whoever waits for the confirmation learns that it failed, and why.
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Failed);
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationError().find("The confirmation failed.") != std::string::npos);
   }
 
   void TestFailedUpdateOfConfirmationTransfersNothing()
@@ -427,6 +450,46 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), m_Errors.size());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Failed);
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationError().find("The work failed.") != std::string::npos);
+  }
+
+  void TestCanceledUpdateOfConfirmationTransfersNothing()
+  {
+    this->Activate(true);
+    m_Tool->UpdatePreview();
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+
+    auto* progressService = mitk::CoreServices::GetProgressService();
+    CPPUNIT_ASSERT_MESSAGE("Progress service is registered by the core activator", nullptr != progressService);
+
+    std::atomic<bool> release = false;
+    m_Tool->InWork = [&release] {
+      while (!release)
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+
+    // The filter of a canceled update stops with an exception.
+    m_Tool->Cancelable = true;
+    m_Tool->WorkThrows = true;
+    m_Tool->SetCreateAllTimeSteps(true);
+    m_Tool->ConfirmSegmentation();
+
+    for (const auto& task : progressService->GetActiveTasks())
+    {
+      if (task.Name == m_Tool->GetName())
+        progressService->RequestCancel(task.Id);
+    }
+
+    mitk::CoreServices::Unget(progressService);
+
+    release = true;
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+    m_Queue.ProcessAll();
+
+    CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
+    CPPUNIT_ASSERT(m_Errors.empty());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Canceled);
   }
 
   void TestConfirmationWhileUpdatingIsRefused()
@@ -477,6 +540,35 @@ public:
     CPPUNIT_ASSERT(this->WaitUntilIdle());
     CPPUNIT_ASSERT_EQUAL(2, m_Tool->Updates);
     CPPUNIT_ASSERT(m_Errors.empty());
+  }
+
+  void TestDeactivationAbandonsConfirmation()
+  {
+    this->Activate(true);
+    m_Tool->UpdatePreview();
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+
+    std::atomic<bool> release = false;
+    m_Tool->InWork = [&release] {
+      while (!release)
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+
+    // Deactivated while the update before the transfer computes.
+    m_Tool->SetCreateAllTimeSteps(true);
+    m_Tool->ConfirmSegmentation();
+    m_Tool->Deactivated();
+
+    release = true;
+    CPPUNIT_ASSERT(this->WaitUntilIdle());
+    m_Queue.ProcessAll();
+
+    CPPUNIT_ASSERT_EQUAL(0, m_Tool->Confirmations);
+    CPPUNIT_ASSERT(m_Errors.empty());
+    CPPUNIT_ASSERT(m_Tool->GetLastConfirmationOutcome() == Outcome::Abandoned);
+
+    // As the tool would be after the next activation, for tearDown().
+    m_Tool->Activated();
   }
 
   void TestDestroyedToolIgnoresItsDone()

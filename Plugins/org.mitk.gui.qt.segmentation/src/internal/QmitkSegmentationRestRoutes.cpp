@@ -1207,9 +1207,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "once the session has taken up the content of the active label, if it has any, so the state it gives "
     "includes that. The session works "
     "on the image and time step chosen now; changing them ends it. A session that runs already is kept, with "
-    "its prompts and result: the job has succeeded when the answer comes. To start anew, DELETE the session first.";
+    "its prompts and result: the job succeeds at once, or, while the session takes up the active label or a prompt "
+    "computes, once that has ended; it fails if the session is ended meanwhile. To start anew, DELETE the session "
+    "first.";
   startSession.Handler = [server, start](const RestRequest& request) {
-    const auto running = CallInGuiThread(*server, [&]() {
+    // A running session is kept; ready tells whether its state is final already.
+    const auto kept = CallInGuiThread(*server, [&]() -> std::optional<std::pair<nlohmann::json, bool>> {
       ShowView(request.Path);
       auto* tool = GetNNInteractive(request.Path);
 
@@ -1220,15 +1223,39 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       }
 
       // A new start would end the session and discard its prompts and result.
-      return tool->IsSessionRunning() ? std::optional<nlohmann::json>(DescribeRestNNInteractive(tool)) : std::nullopt;
+      if (!tool->IsSessionRunning())
+        return std::nullopt;
+
+      // Not while the update that seeds it runs, nor while a DELETE waits for a
+      // prompt to stop before it ends the session.
+      const bool ready = !tool->IsUpdating() && !tool->IsRunningOffGUIThread() && !tool->IsSessionEnding();
+      return std::make_pair(DescribeRestNNInteractive(tool), ready);
     });
 
     // A job in any case, so that clients read one answer.
-    if (running.has_value())
+    if (kept.has_value())
     {
-      auto kept = server->CreateJob("Start an nnInteractive session");
-      kept->Succeed(*running);
-      return RestJob::Respond(request, kept);
+      auto keptJob = server->CreateJob("Start an nnInteractive session");
+
+      if (kept->second)
+      {
+        keptJob->Succeed(kept->first);
+      }
+      else
+      {
+        server->Post([keptJob, path = request.Path]() {
+          try
+          {
+            SucceedRestJobWhenSessionSeeded(keptJob, nnInteractiveTool::Pointer(GetNNInteractive(path)));
+          }
+          catch (...)
+          {
+            FailRestJob(*keptJob, std::current_exception());
+          }
+        });
+      }
+
+      return RestJob::Respond(request, keptJob);
     }
 
     std::shared_ptr<RestJob> job;
@@ -1272,10 +1299,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         if (tool->IsSessionStarting())
         {
           WhenRestStartEnded(job, [tool]() { return tool->IsSessionStarting(); }, [job, tool]() {
+            // The panel does not tell a cancel from a failure.
             if (tool->IsSessionRunning())
               SucceedRestJobWhenSessionSeeded(job, tool);
             else
-              job->Fail("The start in the panel did not succeed.");
+              job->Fail("The start in the panel was canceled in the Workbench or failed; ask the user how to go on.");
           });
 
           return;
@@ -1621,10 +1649,11 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         if (tool->IsInitializing())
         {
           WhenRestStartEnded(job, [tool]() { return tool->IsInitializing(); }, [job, tool]() {
+            // The panel does not tell a cancel from a failure.
             if (tool->IsModelLoaded())
               job->Succeed(DescribeVoxTell(tool));
             else
-              job->Fail("The start in the panel did not succeed.");
+              job->Fail("The start in the panel was canceled in the Workbench or failed; ask the user how to go on.");
           });
 
           return;

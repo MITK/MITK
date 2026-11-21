@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveTool.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
@@ -284,6 +285,9 @@ namespace mitk
     bool Starting = false;
     std::atomic<bool> AbortRequested = false;
     bool TimePointChangedMeanwhile = false;
+
+    // Why the session started last was lost, see GetLastSessionLoss().
+    std::optional<SessionLoss> LastSessionLoss;
 
     // Set by the destructor, which must not wait for a server.
     std::atomic<bool> Destroying = false;
@@ -821,7 +825,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       {
         if (!byProgram)
         {
-          this->EndFailedPrompt(error, task, false);
+          this->EndFailedPrompt(error, task);
           return;
         }
 
@@ -831,7 +835,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
         try
         {
-          this->EndFailedPrompt(error, task, true);
+          this->EndFailedPrompt(error, task);
 
           // The user's cancel ends the session as well, which the panel explains.
           m_Impl->PendingPromptError = task != nullptr && task->IsCancelRequested() && task->GetCancelOrigin().empty()
@@ -891,7 +895,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
     });
 }
 
-void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const ProgressTask* task, bool byProgram)
+void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const ProgressTask* task)
 {
   try
   {
@@ -904,11 +908,13 @@ void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const Pr
       return;
 
     // The cancellation ended the worker and with it the session. The user
-    // can cancel the prompt of a program, too.
+    // can cancel the work of a program, too, and a program that of another
+    // one. Only a program that canceled its own work knows already.
     if (task != nullptr && task->IsCancelRequested())
     {
-      const bool canceledByProgram = byProgram && !task->GetCancelOrigin().empty();
-      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription(), canceledByProgram });
+      const auto cancelOrigin = task->GetCancelOrigin();
+      const bool canceledByProgram = !cancelOrigin.empty() && cancelOrigin == ActionOriginScope::GetCurrent();
+      this->ReportSessionLoss({ SessionLoss::Cause::Cancelled, e.GetDescription(), canceledByProgram });
       return;
     }
 
@@ -1115,6 +1121,8 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
 
   if (this->IsSessionRunning())
     this->EndSession();
+
+  m_Impl->LastSessionLoss.reset();
 
   auto prefs = GetPreferences();
 
@@ -1471,9 +1479,15 @@ bool mitk::nnInteractiveTool::HandleSessionError(const Exception& error)
   // Do not tear down here: this runs while an interactor is mid-event, where
   // disabling/resetting interactors is unsafe. Signal the GUI, which calls
   // AbortSession() on the next event-loop tick.
-  this->SessionLostEvent.Send(loss);
+  this->ReportSessionLoss(loss);
 
   return true;
+}
+
+void mitk::nnInteractiveTool::ReportSessionLoss(const SessionLoss& loss)
+{
+  m_Impl->LastSessionLoss = loss;
+  this->SessionLostEvent.Send(loss);
 }
 
 void mitk::nnInteractiveTool::AbortSession()
@@ -1604,6 +1618,16 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
 bool mitk::nnInteractiveTool::IsSessionStarting() const
 {
   return m_Impl->Starting;
+}
+
+bool mitk::nnInteractiveTool::IsSessionEnding() const
+{
+  return m_Impl->AbortRequested;
+}
+
+std::optional<mitk::nnInteractiveTool::SessionLoss> mitk::nnInteractiveTool::GetLastSessionLoss() const
+{
+  return m_Impl->LastSessionLoss;
 }
 
 bool mitk::nnInteractiveTool::IsPromptPending() const

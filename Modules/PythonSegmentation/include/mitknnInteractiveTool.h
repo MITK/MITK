@@ -95,7 +95,7 @@ namespace mitk
 
       Cause Reason;
       std::string Details; /**< \brief What was reported, e.g. the exit code and last output of the worker. */
-      bool ByProgram = false; /**< \brief A program canceled a prompt of AddPrompt(); false if the user canceled it or the prompt was the user's. */
+      bool ByProgram = false; /**< \brief A program canceled its own work, like a prompt of AddPrompt() or the update that seeds a session it started; false if the user or another program canceled it. */
     };
 
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
@@ -423,6 +423,21 @@ namespace mitk
      */
     bool IsSessionStarting() const;
 
+    /** \brief Whether the session was asked to end, by AbortSession() or a
+     *         deactivation, while work still used it.
+     *
+     * IsSessionRunning() stays \c true until the teardown, which follows the
+     * work, in a call posted to the GUI thread.
+     */
+    bool IsSessionEnding() const;
+
+    /** \brief Why the session that StartSession() started last was lost, if it was.
+     *
+     * Set with SessionLostEvent, also when no GUI listens, and kept until the
+     * next StartSession().
+     */
+    std::optional<SessionLoss> GetLastSessionLoss() const;
+
     /** \brief Tells that a prompt can be cancelled, which ends the session. */
     bool IsCancelable() const override;
 
@@ -698,8 +713,13 @@ namespace mitk
 
     /** \brief Reports why a prompt failed: a lost or cancelled session goes to
      *         SessionLostEvent, any other error is rethrown.
+     *
+     * Runs in the scope of the origin of the update, see RunOffGUIThread().
      */
-    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task, bool byProgram);
+    void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task);
+
+    /** \brief Records the loss and sends SessionLostEvent. */
+    void ReportSessionLoss(const SessionLoss& loss);
 
     /** \brief Tells the caller of AddPrompt() what became of its prompt. */
     void EndProgramPrompt();

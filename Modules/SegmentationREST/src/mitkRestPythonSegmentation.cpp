@@ -22,6 +22,24 @@ found in the LICENSE file.
 
 namespace
 {
+  /** Why a session was lost, in the words that tell an agent whether to start it again. */
+  std::string DescribeSessionLoss(const mitk::nnInteractiveTool::SessionLoss& loss)
+  {
+    using Cause = mitk::nnInteractiveTool::SessionLoss::Cause;
+
+    switch (loss.Reason)
+    {
+      case Cause::Cancelled:
+        return loss.ByProgram
+          ? "nnInteractive: cancelled, which ended its session."
+          : "nnInteractive was canceled in the Workbench, which ended its session.";
+      case Cause::RemoteConnection:
+        return "nnInteractive lost its session on the server: " + loss.Details;
+      default:
+        return "nnInteractive stopped unexpectedly: " + loss.Details;
+    }
+  }
+
   /**
    * Waits until TotalSegmentator has started, or failed to, whoever started
    * it, as the tool tells that only by events. Deletes itself afterwards.
@@ -159,7 +177,25 @@ mitk::nnInteractive::InteractionType mitk::ParseRestInteractionType(const nlohma
 void mitk::SucceedRestJobWhenSessionSeeded(const std::shared_ptr<RestJob>& job, const nnInteractiveTool::Pointer& tool)
 {
   QTimer::singleShot(0, QCoreApplication::instance(), [job, tool]() {
-    WhenRestToolIdle(tool, [job, tool]() { job->Succeed(DescribeRestNNInteractive(tool)); });
+    WhenRestToolIdle(tool, [job, tool]() {
+      // After the teardown that a session asked to end posts once its work has stopped.
+      QTimer::singleShot(0, QCoreApplication::instance(), [job, tool]() {
+        if (const auto loss = tool->GetLastSessionLoss(); loss.has_value())
+        {
+          job->Fail(DescribeSessionLoss(*loss));
+          return;
+        }
+
+        if (!tool->IsSessionRunning() || tool->IsSessionEnding())
+        {
+          job->Fail("The nnInteractive session ended before it was ready, as it was ended or the tool deactivated "
+            "meanwhile. Start it again if it is still needed.");
+          return;
+        }
+
+        job->Succeed(DescribeRestNNInteractive(tool));
+      });
+    });
   });
 }
 

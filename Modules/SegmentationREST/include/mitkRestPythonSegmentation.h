@@ -56,7 +56,9 @@ namespace mitk
    *        sends after its start has ended.
    *
    * Queues the call to the event loop of the application, so that it runs
-   * after that event.
+   * after that event. Waits for any work of the tool, also a prompt, and
+   * fails the job if the session was lost meanwhile (a cancel by the user in
+   * the words "canceled in the Workbench") or ended.
    */
   MITKSEGMENTATIONREST_EXPORT void SucceedRestJobWhenSessionSeeded(
     const std::shared_ptr<RestJob>& job, const nnInteractiveTool::Pointer& tool);

@@ -804,13 +804,16 @@ public:
     CPPUNIT_ASSERT(directory.isValid());
     QmitkAgentMemory memory(directory.filePath("memory.json"));
 
-    // The server compares the exact string of the address the agent arrives from.
+    // The server compares the exact string of the address the agent arrives
+    // from. For localhost it listens on one loopback address, the first that
+    // localhost resolves to, which depends on the system. On loopback only, as
+    // a test should not make the firewall ask.
     const auto offer = [&memory](const std::vector<std::string>& allowed) {
       RegisteredRestServer registered;
 
       mitk::RestServerConfig config;
       config.enabled = true;
-      config.host = "0.0.0.0";
+      config.host = "localhost";
       config.port = 0;
       config.clientAccessMode = mitk::ClientAccessMode::Whitelist;
       config.allowedClientIPs = allowed;
@@ -825,10 +828,15 @@ public:
       return refusal;
     };
 
-    const auto refusal = offer({ "::1", "::ffff:127.0.0.1" });
-    CPPUNIT_ASSERT_MESSAGE(refusal, refusal.find("arrive from 127.0.0.1 there") != std::string::npos);
+    const auto listening = mitk::RestServer::GetListeningAddress("localhost");
+    const auto agent = listening.rfind("127.", 0) == 0 ? std::string("127.0.0.1") : listening;
+    const auto other = agent == "::1" ? std::string("127.0.0.1") : std::string("::1");
 
-    CPPUNIT_ASSERT_EQUAL(std::string(), offer({ "127.0.0.1" }));
+    const auto refusal = offer({ other, "::ffff:127.0.0.1" });
+    CPPUNIT_ASSERT_MESSAGE(refusal, refusal.find("arrive from " + agent + " there") != std::string::npos);
+
+    // The other loopback address, on which nothing listens, is not needed.
+    CPPUNIT_ASSERT_EQUAL(std::string(), offer({ agent }));
   }
 };
 

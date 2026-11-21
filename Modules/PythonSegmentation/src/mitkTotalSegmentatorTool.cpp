@@ -322,10 +322,16 @@ void mitk::TotalSegmentatorTool::EndInitialization(std::exception_ptr error, con
       message = e.what();
     }
 
-    // The user stopped it: nothing to report.
-    if (aborted || (task != nullptr && task->IsCancelRequested()))
+    const bool canceled = task != nullptr && task->IsCancelRequested();
+
+    // The user stopped it: nothing to report, and listeners say so in their
+    // words. A program that canceled keeps the message, which says it did, as
+    // does a deactivation, also one that a PATCH of the session undid at once.
+    if (canceled && task->GetCancelOrigin().empty())
       message.clear();
-    else
+    else if (!canceled && aborted)
+      message = "TotalSegmentator was deactivated while it started.";
+    else if (!canceled)
       MITK_ERROR << message;
 
     this->InitializationFailedEvent.Send(message);
@@ -633,9 +639,23 @@ void mitk::TotalSegmentatorTool::EndFailedRun(std::exception_ptr error, const Pr
     // and a failure may have left it in a state not worth keeping.
     m_Impl->Worker.reset();
 
-    // The tool was deactivated, or the user cancelled: nothing to report.
-    if (m_Impl->AbortRequested || (task != nullptr && task->IsCancelRequested()))
+    // The user cancelled: nothing to report, and the routes say so in their
+    // words. A program that canceled keeps the message, which says it did.
+    if (task != nullptr && task->IsCancelRequested())
+    {
+      if (!task->GetCancelOrigin().empty())
+        m_Impl->LastErrorMessage = Description(e);
+
       return;
+    }
+
+    // Deactivated meanwhile, also by a PATCH of the session that activated
+    // the tool again at once.
+    if (m_Impl->AbortRequested)
+    {
+      m_Impl->LastErrorMessage = "TotalSegmentator was deactivated while it ran.";
+      return;
+    }
 
     if (const auto* workerError = dynamic_cast<const PythonWorkerError*>(&e))
       MITK_ERROR << "TotalSegmentator: " << workerError->GetTraceback();

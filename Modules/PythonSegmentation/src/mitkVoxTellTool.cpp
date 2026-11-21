@@ -1109,17 +1109,25 @@ void mitk::VoxTellTool::EndFailedRun(std::exception_ptr error, const ProgressTas
   }
   catch (const Exception& e)
   {
-    // The model was unloaded while it computed, also by deactivating the tool.
-    // There is nobody left to tell.
-    if (m_Impl->AbortRequested)
-      return;
-
     // Let the base class treat it as the cancellation it is, instead of as an
-    // error to report.
+    // error to report. The user's cancel has the routes' words; a program
+    // that canceled keeps the message, which says it did.
     if (task != nullptr && task->IsCancelRequested())
     {
       m_Impl->LastUpdateCancelled = true;
+
+      if (!task->GetCancelOrigin().empty())
+        m_Impl->LastErrorMessage = DescribeFailure(e);
+
       throw;
+    }
+
+    // The model was unloaded while it computed, also by deactivating the tool,
+    // maybe by a PATCH of the session that activated it again at once.
+    if (m_Impl->AbortRequested)
+    {
+      m_Impl->LastErrorMessage = "VoxTell was unloaded while it computed.";
+      return;
     }
 
     if (const auto* workerError = dynamic_cast<const PythonWorkerError*>(&e))

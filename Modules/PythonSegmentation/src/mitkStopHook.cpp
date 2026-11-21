@@ -21,7 +21,14 @@ mitk::PythonWorker::ProgressHook mitk::MakeStopHook(const Tool* tool, const Prog
   return [tool, task, abort = std::move(abort)](const nlohmann::json&)
   {
     if (task != nullptr && task->IsCancelRequested())
+    {
+      // In the words that tell an agent not to start it again. A program that
+      // canceled knows that already.
+      if (task->GetCancelOrigin().empty())
+        mitkThrow() << tool->GetName() << " was canceled in the Workbench.";
+
       mitkThrow() << tool->GetName() << ": cancelled.";
+    }
 
     if (abort && abort())
       mitkThrow() << tool->GetName() << ": aborted.";

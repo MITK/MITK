@@ -33,6 +33,10 @@ namespace mitk
    * The hook runs on the thread of the call, off the GUI thread, so \p abort
    * must be safe to call from there.
    *
+   * The exception of a cancellation by the user says that the tool "was
+   * canceled in the Workbench", the words that tell an agent not to start it
+   * again.
+   *
    * \param[in] tool The tool whose name the exception gives.
    * \param[in] task The task the user can cancel, or \c nullptr.
    * \param[in] abort Tells whether the work is to stop for another reason than

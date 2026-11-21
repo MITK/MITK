@@ -832,7 +832,11 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         try
         {
           this->EndFailedPrompt(error, task, true);
-          m_Impl->PendingPromptError = "nnInteractive: the prompt was cancelled, or the session ended.";
+
+          // The user's cancel ends the session as well, which the panel explains.
+          m_Impl->PendingPromptError = task != nullptr && task->IsCancelRequested() && task->GetCancelOrigin().empty()
+            ? "nnInteractive was canceled in the Workbench, which ended its session."
+            : "nnInteractive: the prompt was cancelled, or the session ended.";
         }
         catch (const Exception& e)
         {

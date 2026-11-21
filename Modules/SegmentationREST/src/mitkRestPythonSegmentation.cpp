@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkRestPythonSegmentation.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkErrorResponse.h>
 #include <mitkProgressTask.h>
 #include <mitkRestSegmentationJobs.h>
@@ -56,7 +57,8 @@ namespace
   private:
     TotalSegmentatorStartListener(mitk::TotalSegmentatorTool* tool, std::function<void(std::exception_ptr)> done)
       : m_Tool(tool),
-        m_Done(std::move(done))
+        m_Done(std::move(done)),
+        m_Origin(mitk::ActionOriginScope::GetCurrent())
     {
       m_Tool->InitializedEvent += mitk::MessageDelegate<TotalSegmentatorStartListener>(this, &TotalSegmentatorStartListener::OnInitialized);
       m_Tool->InitializationFailedEvent += mitk::MessageDelegate1<TotalSegmentatorStartListener, std::string>(this, &TotalSegmentatorStartListener::OnInitializationFailed);
@@ -87,14 +89,19 @@ namespace
         m_Tool->InitializationFailedEvent -= mitk::MessageDelegate1<TotalSegmentatorStartListener, std::string>(this, &TotalSegmentatorStartListener::OnInitializationFailed);
 
         const auto done = std::move(m_Done);
+        const auto origin = m_Origin;
         delete this;
 
+        // What done starts, like the run of a REST client, is the caller's,
+        // as if it had followed the start at once.
+        const mitk::ActionOriginScope scope(origin);
         done(error);
       });
     }
 
     mitk::TotalSegmentatorTool::Pointer m_Tool;
     std::function<void(std::exception_ptr)> m_Done;
+    const std::string m_Origin;
     bool m_Ended = false;
   };
 }

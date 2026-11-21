@@ -108,7 +108,8 @@ namespace mitk
    *        not start.
    *
    * Waits until the tool has started, or failed to, whoever started it, as
-   * the tool tells that only by events.
+   * the tool tells that only by events. \p done runs under the
+   * mitk::ActionOriginScope of the caller.
    */
   MITKSEGMENTATIONREST_EXPORT void StartRestTotalSegmentator(
     TotalSegmentatorTool* tool, std::function<void(std::exception_ptr)> done);

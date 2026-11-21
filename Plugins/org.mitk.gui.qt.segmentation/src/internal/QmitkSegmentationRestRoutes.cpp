@@ -1883,14 +1883,15 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         TotalSegmentatorTool::Pointer tool(GetTotalSegmentator(path));
 
         StartRestTotalSegmentator(tool, [job, tool](std::exception_ptr error) {
+          // A deactivation aborts the start, whose error then reads as a cancel.
+          if (FailIfDeactivated(*job, tool))
+            return;
+
           if (error != nullptr)
           {
             FailRestJob(*job, error);
             return;
           }
-
-          if (FailIfDeactivated(*job, tool))
-            return;
 
           job->Succeed(DescribeTotalSegmentator(tool, false));
         });
@@ -2099,6 +2100,12 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
         TotalSegmentatorTool::Pointer tool(GetTotalSegmentator(path));
 
         StartRestTotalSegmentator(tool, [job, tool](std::exception_ptr error) {
+          // Deactivated while it started, the tool has no segmentation to work
+          // on. The deactivation also aborts the start, whose error then reads
+          // as a cancel.
+          if (FailIfDeactivated(*job, tool))
+            return;
+
           if (error != nullptr)
           {
             FailRestJob(*job, error);
@@ -2112,13 +2119,6 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
           if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
           {
             job->Fail("TotalSegmentator is still working.");
-            return;
-          }
-
-          // Deactivated while it started, the tool has no segmentation to work on.
-          if (GetToolManager()->GetActiveTool() != tool.GetPointer())
-          {
-            job->Fail("TotalSegmentator is no longer the active tool.");
             return;
           }
 

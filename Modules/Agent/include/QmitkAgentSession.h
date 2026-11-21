@@ -214,6 +214,9 @@ private:
 
   void StartProcess();
   void KillProcess();
+
+  /** \brief Runs what waited for the turns to end, later, as their end is still being reported. */
+  void FollowUpEndedTurns();
   void SetStatus(StatusKind kind, const QString& text, bool usesApiKeyVariable = false);
   void SetActivity(const QString& activity);
 

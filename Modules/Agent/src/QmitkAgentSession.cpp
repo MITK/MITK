@@ -372,6 +372,7 @@ void QmitkAgentSession::Stop()
     emit NoteAdded("Claude Code did not stop and was ended. Your next message continues the conversation.");
     emit TurnStateChanged();
     emit TurnsFinished();
+    this->FollowUpEndedTurns();
     return;
   }
 
@@ -521,6 +522,19 @@ void QmitkAgentSession::StartProcess()
   m_ConversationLost = false;
 
   m_Process->Start(options);
+}
+
+void QmitkAgentSession::FollowUpEndedTurns()
+{
+  if (m_CheckPending)
+  {
+    QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
+  }
+  else if (m_RestartPending)
+  {
+    // Returns at once if the process has ended.
+    QTimer::singleShot(0, this, &QmitkAgentSession::RestartIdleProcess);
+  }
 }
 
 void QmitkAgentSession::KillProcess()
@@ -774,16 +788,7 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
   if (!this->IsTurnRunning())
   {
     emit TurnsFinished();
-
-    // Later, as the process is still reporting.
-    if (m_CheckPending)
-    {
-      QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
-    }
-    else if (m_RestartPending)
-    {
-      QTimer::singleShot(0, this, &QmitkAgentSession::RestartIdleProcess);
-    }
+    this->FollowUpEndedTurns();
   }
 
   const auto subtype = message.value("subtype").toString();
@@ -840,8 +845,7 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
   if (turnWasRunning)
     emit TurnsFinished();
 
-  if (m_CheckPending)
-    QTimer::singleShot(0, this, &QmitkAgentSession::CheckClaudeCodeAgain);
+  this->FollowUpEndedTurns();
 
   auto text = m_ConversationLost
     ? QString("Claude Code could not continue the conversation (exit code %1).").arg(exitCode)

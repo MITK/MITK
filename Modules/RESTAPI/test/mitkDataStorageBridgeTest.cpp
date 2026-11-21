@@ -183,6 +183,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(DataPropertiesAreReadAtScopeAllInAContext);
   MITK_TEST(PropertyWritesOnTheDataScopeLeaveTheNodeAlone);
   MITK_TEST(NewUidIsGivenOnTheDispatchThread);
+  MITK_TEST(NodeOutsideOfTheStorageGetsNoUid);
   MITK_TEST(DeleteNodeProperty);
   MITK_TEST(DeleteNodePropertyNotFound);
   MITK_TEST(DeleteNodePropertyWithScope);
@@ -1550,6 +1551,19 @@ public:
 
     node->GetPropertyList()->RemoveObserver(tag);
     m_Bridge->SetDispatcher(nullptr);
+  }
+
+  void NodeOutsideOfTheStorageGetsNoUid()
+  {
+    // Like a node that the user removed while a request held it.
+    auto node = mitk::DataNode::New();
+    node->SetName("Removed");
+
+    CPPUNIT_ASSERT(m_Bridge->GetNodeUid(node).empty());
+    CPPUNIT_ASSERT(node->GetProperty("restapi.uid") == nullptr);
+
+    m_DataStorage->Add(node);
+    CPPUNIT_ASSERT(!m_Bridge->GetNodeUid(node).empty());
   }
 
   void SetNodePropertyRefusesIncompleteObject()

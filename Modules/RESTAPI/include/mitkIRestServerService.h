@@ -278,7 +278,8 @@ namespace mitk
      *
      * Can be called from any thread. A node without a UID gets one in the
      * thread that owns the data storage, for which the call waits then like
-     * Dispatch() does.
+     * Dispatch() does. Empty for a node that is not in the data storage (any
+     * more), which gets none.
      */
     virtual std::string GetNodeUid(DataNode* node) const = 0;
 

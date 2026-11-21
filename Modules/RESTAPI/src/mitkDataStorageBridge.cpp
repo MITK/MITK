@@ -512,7 +512,21 @@ namespace mitk
 
     // A new UID changes the node: it gets a property and an observer. That
     // belongs to the dispatch thread like any other change of a node.
-    return this->DispatchTask<std::string>([this, node]() { return m_UidMapper->GetOrCreateUid(node); });
+    return this->DispatchTask<std::string>([this, node]() {
+      DataStorage::Pointer dataStorage;
+
+      {
+        std::lock_guard<std::mutex> lock(m_DataStorageMutex);
+        dataStorage = m_DataStorage.Lock();
+      }
+
+      // Removed meanwhile, the node would keep its entries in the mapper,
+      // which only a removal from the storage clears.
+      if (dataStorage.IsNull() || !dataStorage->Exists(node))
+        return std::string();
+
+      return m_UidMapper->GetOrCreateUid(node);
+    });
   }
 
   DataNode::Pointer DataStorageBridge::FindNode(const std::string& uid) const

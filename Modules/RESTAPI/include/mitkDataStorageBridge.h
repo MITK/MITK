@@ -172,7 +172,8 @@ namespace mitk
      * then. Can be called from any thread.
      *
      * \param[in] node The node to get the UID for. Must not be \c nullptr.
-     * \return The UID string for this node.
+     * \return The UID string for this node; empty for a node that is not in
+     *         the data storage (any more), which gets none.
      * \throw std::invalid_argument if \p node is \c nullptr.
      */
     std::string GetNodeUid (DataNode* node) const;

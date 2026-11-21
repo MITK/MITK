@@ -370,7 +370,7 @@ RestServer::RestServer()
   job.Description =
     "Query parameter: wait (optional), seconds to wait for the job to end, at most 120. At most half as many "
     "requests as the server has threads (4 of the default 8) wait at the same time; a further one answers at "
-    "once, with 202 while the job runs. Returns {data: job}, "
+    "once. Status 200 in either case: state tells whether the job still runs. Returns {data: job}, "
     "a job being {id, description, state: running|succeeded|failed|canceled, seconds, and cancelable while it "
     "runs, with cancel_also_discards if a cancel loses more than the work of the job, like a session, result once "
     "it succeeded, error once it failed}.";

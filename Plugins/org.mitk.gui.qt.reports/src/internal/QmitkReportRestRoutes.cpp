@@ -104,8 +104,11 @@ namespace
     if (html.toUtf8().size() > MaxHtmlSize)
       mitk::ThrowRestError("REPORT_TOO_LARGE", "Payload Too Large", "The html takes at most 32 MB (33554432 bytes).", 413, path);
 
-    // The store finds images by their quoted src values only.
-    static const QRegularExpression unquotedSource(QStringLiteral("<img\\b[^>]*?(?<![\\w-])src\\s*+=\\s*+(?![\"'])"),
+    // The store finds images by their quoted src values only. Quoted values of
+    // the attributes before src may hold a '>'. As in HTML, a quote opens a
+    // value only right after '=', elsewhere it is an ordinary character.
+    static const QRegularExpression unquotedSource(
+      QStringLiteral("<img\\b(?:[^>\"'=]|=\\s*+(?>\"[^\"]*\"|'[^']*'|[^\\s>]*)|[\"'])*?(?<![\\w-])src\\s*+=\\s*+(?![\"'])"),
       QRegularExpression::CaseInsensitiveOption);
 
     if (unquotedSource.match(html).hasMatch())

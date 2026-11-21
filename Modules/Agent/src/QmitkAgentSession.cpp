@@ -135,7 +135,7 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
     m_CheckPending(false),
     m_RestartPending(false),
     m_AuthQueries(0),
-    m_PendingTurns(0),
+    m_TurnRunning(false),
     m_InitReported(false),
     m_ConversationLost(false),
     m_Stopping(false),
@@ -335,9 +335,21 @@ bool QmitkAgentSession::Send(const QString& text)
 
   emit UserMessageAdded(text);
 
-  // While the stopped turn runs on, its calls stay refused and a further Stop
-  // ends Claude Code. OnResult() ends the stop once this message's turn follows.
-  if (m_Stopping && !this->IsTurnRunning())
+  // Written once the turn has ended, see m_KeptMessages. A stopped turn that
+  // runs on keeps its calls refused, and a further Stop ends Claude Code.
+  if (m_TurnRunning)
+  {
+    m_KeptMessages << text;
+    return true;
+  }
+
+  this->StartTurn(text);
+  return true;
+}
+
+void QmitkAgentSession::StartTurn(const QString& text)
+{
+  if (m_Stopping)
   {
     m_Stopping = false;
     m_ToolServer->AcceptCalls();
@@ -345,16 +357,23 @@ bool QmitkAgentSession::Send(const QString& text)
 
   m_Process->SendUserMessage(text);
 
-  if (!this->IsTurnRunning())
-  {
-    m_TurnTimer.start();
-    m_Activity = "Thinking";
-  }
-
-  ++m_PendingTurns;
+  m_TurnRunning = true;
+  m_TurnTimer.start();
+  m_Activity = "Thinking";
   emit TurnStateChanged();
+}
 
-  return true;
+QString QmitkAgentSession::DropKeptMessages()
+{
+  const auto count = m_KeptMessages.size();
+  m_KeptMessages.clear();
+
+  if (count == 0)
+    return QString();
+
+  return count == 1
+    ? QString(" Your last message did not reach it; send it again.")
+    : QString(" Your last %1 messages did not reach it; send them again.").arg(count);
 }
 
 void QmitkAgentSession::Stop()
@@ -368,10 +387,11 @@ void QmitkAgentSession::Stop()
     // go on, and the session id lets the next message continue.
     this->KillProcess();
 
-    m_PendingTurns = 0;
+    m_TurnRunning = false;
     m_ToolCalls.clear();
 
-    emit NoteAdded("Claude Code did not stop and was ended. Your next message continues the conversation.");
+    emit NoteAdded("Claude Code did not stop and was ended." + this->DropKeptMessages() +
+      " Your next message continues the conversation.");
     emit TurnStateChanged();
     emit TurnsFinished();
     this->FollowUpEndedTurns();
@@ -391,7 +411,8 @@ void QmitkAgentSession::StartNewConversation()
   this->KillProcess();
 
   m_SessionId.clear();
-  m_PendingTurns = 0;
+  m_TurnRunning = false;
+  m_KeptMessages.clear();
   m_ToolCalls.clear();
   m_ConversationCost = 0.0;
   emit CostChanged();
@@ -424,7 +445,7 @@ void QmitkAgentSession::RestartIdleProcess()
 
 bool QmitkAgentSession::IsTurnRunning() const
 {
-  return m_PendingTurns > 0;
+  return m_TurnRunning;
 }
 
 bool QmitkAgentSession::IsStopping() const
@@ -649,9 +670,20 @@ void QmitkAgentSession::OnSystemMessage(const QJsonObject& message)
     return;
 
   emit ErrorAdded(error);
+
+  // The kill reports the end of the process at once, which forgets the turn.
+  const bool turnWasRunning = m_TurnRunning;
   this->KillProcess();
-  m_PendingTurns = 0;
+
+  m_TurnRunning = false;
+  m_KeptMessages.clear();
+
   emit TurnStateChanged();
+
+  if (turnWasRunning)
+    emit TurnsFinished();
+
+  this->FollowUpEndedTurns();
 }
 
 void QmitkAgentSession::OnStreamEvent(const QJsonObject& message)
@@ -761,19 +793,10 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
 {
   // A process that was started ahead and cannot resume ends with a result
   // before any turn.
-  if (!this->IsTurnRunning() && m_InitReported)
+  if (!m_TurnRunning && m_InitReported)
     MITK_WARN << "Claude Code ended a turn that the Agent view did not count as running.";
 
-  m_PendingTurns = std::max(0, m_PendingTurns - 1);
-
-  // Stop ended the turn that ran. One that the user sent after it, often to
-  // steer the agent, runs as usual.
-  if (m_Stopping && this->IsTurnRunning())
-  {
-    m_Stopping = false;
-    m_ToolServer->AcceptCalls();
-    m_Activity = "Thinking";
-  }
+  m_TurnRunning = false;
 
   // A process that reports a result before its first init could not take up
   // the conversation it was asked to resume.
@@ -786,12 +809,8 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
   }
 
   emit TurnStateChanged();
-
-  if (!this->IsTurnRunning())
-  {
-    emit TurnsFinished();
-    this->FollowUpEndedTurns();
-  }
+  emit TurnsFinished();
+  this->FollowUpEndedTurns();
 
   const auto subtype = message.value("subtype").toString();
   const auto seconds = message.value("duration_ms").toDouble() / 1000.0;
@@ -832,13 +851,22 @@ void QmitkAgentSession::OnResult(const QJsonObject& message)
 
     emit ErrorAdded(QString("The agent stopped (%1). %2").arg(subtype, errors.join(' ')));
   }
+
+  // What the user sent during the turn, often to steer the agent after a Stop.
+  // A process that lost the conversation ends, and OnProcessFinished() says so.
+  if (!m_KeptMessages.isEmpty() && !m_ConversationLost)
+  {
+    const auto text = m_KeptMessages.join("\n\n");
+    m_KeptMessages.clear();
+    this->StartTurn(text);
+  }
 }
 
 void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutput)
 {
-  const bool turnWasRunning = this->IsTurnRunning();
+  const bool turnWasRunning = m_TurnRunning;
 
-  m_PendingTurns = 0;
+  m_TurnRunning = false;
   emit TurnStateChanged();
 
   if (m_Killing)
@@ -861,6 +889,8 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
 
     text += " " + output;
   }
+
+  text += this->DropKeptMessages();
 
   emit ErrorAdded(m_ConversationLost
     ? text + " Your next message starts a new conversation, in which the agent does not know the earlier messages."

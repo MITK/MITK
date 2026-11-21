@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QHash>
 #include <QJsonObject>
 #include <QObject>
+#include <QStringList>
 
 #include <memory>
 
@@ -129,7 +130,8 @@ public:
   bool IsSignedIn() const;
 
   /**
-   * \brief Sends a message of the user, which starts a turn or follows the running one.
+   * \brief Sends a message of the user, which starts a turn; during a turn, it
+   *        is kept and sent once that turn has ended.
    *
    * \return Whether the message was taken. It is not without Claude Code,
    *         which an error explains if it cannot be started, or without the
@@ -142,14 +144,14 @@ public:
    *        until the next turn, so that none still on its way changes the
    *        Workbench after the user stopped the agent.
    *
-   * Calls that wait for a job stop waiting, and the job is canceled. A turn
-   * of a message that was sent before or while the agent stops waits behind
-   * the stopped one, runs as usual once that has ended, and can be stopped
-   * in turn.
+   * Calls that wait for a job stop waiting, and the job is canceled. The
+   * messages sent before or while the agent stops are sent once the stopped
+   * turn has ended, and their turn runs as usual and can be stopped in turn.
    *
    * Called again while the turn still has not ended, ends Claude Code, so
-   * that the user always gets out of a turn; the next message continues the
-   * conversation in a new process.
+   * that the user always gets out of a turn. The messages kept for it are not
+   * sent, which a note says; the next message continues the conversation in
+   * a new process.
    */
   void Stop();
 
@@ -171,7 +173,7 @@ public:
   /** \brief What the agent does in the running turn, for example "Thinking". */
   QString GetActivity() const;
 
-  /** \brief Milliseconds since the running turns started. */
+  /** \brief Milliseconds since the running turn started. */
   qint64 GetTurnDuration() const;
 
   /** \brief What the conversation would cost with an API key, in US dollars. */
@@ -189,7 +191,7 @@ signals:
   /** \brief A turn started or ended, or the agent was stopped. */
   void TurnStateChanged();
 
-  /** \brief The last running turn ended. */
+  /** \brief The running turn ended. A turn for the messages kept during it may start right after. */
   void TurnsFinished();
 
   void ActivityChanged();
@@ -215,6 +217,12 @@ private:
 
   void StartProcess();
   void KillProcess();
+
+  /** \brief Writes a message to Claude Code, which starts a turn. */
+  void StartTurn(const QString& text);
+
+  /** \brief Forgets the kept messages; tells the user, if there were any, to send them again. */
+  QString DropKeptMessages();
 
   /** \brief Runs what waited for the turns to end, later, as their end is still being reported. */
   void FollowUpEndedTurns();
@@ -256,13 +264,18 @@ private:
 
   QString m_SessionId;
 
+  /** \brief Whether Claude Code works on a message, from writing it to its result. */
+  bool m_TurnRunning;
+
   /**
-   * \brief The messages sent whose turns have not ended.
+   * \brief The messages the user sent during the running turn, written together once it ends.
    *
-   * Claude Code runs a message sent during a turn as a turn of its own
-   * afterwards, and an interrupt ends only the running turn.
+   * Claude Code may fold a message written during a turn into that turn,
+   * which then ends with one result for both, or run it as a turn of its own
+   * afterwards; which one depends on its version and on whether the turn
+   * calls tools. Kept back, every message written gets a result of its own.
    */
-  int m_PendingTurns;
+  QStringList m_KeptMessages;
 
   /**
    * \brief Whether the running process has reported its first init.
@@ -275,7 +288,7 @@ private:
   /** \brief Whether the running process could not take up the conversation, which was dropped. */
   bool m_ConversationLost;
 
-  /** \brief Whether the user stopped the agent, whose tool calls are refused until the next message. */
+  /** \brief Whether the user stopped the agent, whose tool calls are refused until the next turn starts. */
   bool m_Stopping;
 
   bool m_Killing;

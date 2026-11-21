@@ -102,6 +102,10 @@ private:
 
   void OpenSettings();
   void Send();
+
+  /** \brief Stops the agent, but takes the second click of a double click for no second Stop, which ends Claude Code. */
+  void OnStopClicked();
+
   void StartNewConversation();
   void ShowMemory();
   void ClearMemory();

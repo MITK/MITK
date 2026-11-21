@@ -120,7 +120,8 @@ QmitkAgentWidget::QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreference
   connect(showMemoryAction, &QAction::triggered, this, &QmitkAgentWidget::ShowMemory);
   connect(clearMemoryAction, &QAction::triggered, this, &QmitkAgentWidget::ClearMemory);
   connect(m_Ui->newConversationButton, &QPushButton::clicked, this, &QmitkAgentWidget::StartNewConversation);
-  connect(m_Ui->stopButton, &QPushButton::clicked, m_Session, &QmitkAgentSession::Stop);
+  connect(m_Ui->stopButton, &QPushButton::clicked, this, &QmitkAgentWidget::OnStopClicked);
+  m_Ui->stopButton->installEventFilter(this);
   connect(m_Ui->sendButton, &QPushButton::clicked, this, &QmitkAgentWidget::Send);
   connect(m_Ui->modelBox, &QComboBox::currentIndexChanged, this, &QmitkAgentWidget::OnModelSelected);
   connect(m_Ui->effortBox, &QComboBox::currentIndexChanged, this, &QmitkAgentWidget::OnEffortSelected);
@@ -212,6 +213,12 @@ void QmitkAgentWidget::OnPreferencesChanged()
 
 bool QmitkAgentWidget::eventFilter(QObject* watched, QEvent* event)
 {
+  // A button clicks again on the second press of a double click, and a second
+  // Stop ends Claude Code. Qt tells a double click by the times of the presses,
+  // which a busy GUI thread does not shift.
+  if (watched == m_Ui->stopButton && event->type() == QEvent::MouseButtonDblClick)
+    return true;
+
   if (watched == m_Ui->messageInput && event->type() == QEvent::KeyPress)
   {
     const auto* keyEvent = static_cast<QKeyEvent*>(event);
@@ -382,6 +389,11 @@ void QmitkAgentWidget::ClearMemory()
   }
 
   m_Session->RestartIdleProcess();
+}
+
+void QmitkAgentWidget::OnStopClicked()
+{
+  m_Session->Stop();
 }
 
 void QmitkAgentWidget::UpdateControls()

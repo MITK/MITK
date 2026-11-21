@@ -68,6 +68,13 @@ public:
    */
   void EndStreamedText(const QString& markdown);
 
+  /**
+   * \brief Keeps a streamed text that did not get its complete text as it is, as when its turn ended.
+   *
+   * A complete text that comes later is appended instead of replacing it.
+   */
+  void ForgetStreamedText();
+
   /** \brief Adds a step to the last group of steps, or starts a new group after other content. */
   void AppendStep(const QmitkAgentStep& step);
 

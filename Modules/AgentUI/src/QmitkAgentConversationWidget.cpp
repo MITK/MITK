@@ -396,6 +396,12 @@ void QmitkAgentConversationWidget::EndStreamedText(const QString& markdown)
   this->ScrollToEnd();
 }
 
+void QmitkAgentConversationWidget::ForgetStreamedText()
+{
+  m_StreamBlock = -1;
+  m_StreamLastBlock = -1;
+}
+
 void QmitkAgentConversationWidget::InterruptStreamedText()
 {
   if (m_StreamBlock < 0 || m_StreamLastBlock >= 0)

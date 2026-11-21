@@ -139,6 +139,7 @@ QmitkAgentWidget::QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreference
   connect(m_Session, &QmitkAgentSession::TextStarted, conversation, &QmitkAgentConversationWidget::BeginStreamedText);
   connect(m_Session, &QmitkAgentSession::TextAdded, conversation, &QmitkAgentConversationWidget::AppendStreamedText);
   connect(m_Session, &QmitkAgentSession::TextFinished, conversation, &QmitkAgentConversationWidget::EndStreamedText);
+  connect(m_Session, &QmitkAgentSession::TurnsFinished, conversation, &QmitkAgentConversationWidget::ForgetStreamedText);
   connect(m_Session, &QmitkAgentSession::StepFinished, conversation, &QmitkAgentConversationWidget::AppendStep);
   connect(m_Session, &QmitkAgentSession::NoteAdded, conversation, &QmitkAgentConversationWidget::AppendNote);
   connect(m_Session, &QmitkAgentSession::ErrorAdded, conversation, &QmitkAgentConversationWidget::AppendError);

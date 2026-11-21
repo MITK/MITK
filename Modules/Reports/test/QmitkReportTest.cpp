@@ -175,6 +175,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(document.count(Policy)));
     CPPUNIT_ASSERT(document.indexOf(Policy) < document.indexOf(QStringLiteral("<title>")));
     CPPUNIT_ASSERT(document.indexOf(Policy) > document.indexOf(QStringLiteral("<meta charset")));
+
+    const auto noPrefetch = QStringLiteral("<meta http-equiv=\"x-dns-prefetch-control\" content=\"off\">");
+    CPPUNIT_ASSERT(document.indexOf(noPrefetch) > 0 && document.indexOf(noPrefetch) < document.indexOf(QStringLiteral("<title>")));
   }
 
   void TestExportInlinesQuotedImages()
@@ -211,11 +214,15 @@ public:
     const auto report = MakeReport(QStringLiteral("t"),
       QStringLiteral("<META http-equiv=\"refresh\" content=\"0;url=http://x\"><base href=\"http://x\"><form action=\"x\"></form>"
                      "<FORM\n><meta/><Base/><p>"
+                     "<link rel=\"dns-prefetch\" href=\"//x\"><LINK/><linkage>l</linkage>"
+                     "<iframe srcdoc=\"&lt;link rel=preconnect href=https://x&gt;\"></iframe><IFRAME/><iframes>i</iframes>"
                      "<metadata>m</metadata><formatted>f</formatted><basefont><meta"));
 
     CPPUNIT_ASSERT_EQUAL(
       std::string("&lt;META http-equiv=\"refresh\" content=\"0;url=http://x\">&lt;base href=\"http://x\">&lt;form action=\"x\"></form>"
                   "&lt;FORM\n>&lt;meta/>&lt;Base/><p>"
+                  "&lt;link rel=\"dns-prefetch\" href=\"//x\">&lt;LINK/><linkage>l</linkage>"
+                  "&lt;iframe srcdoc=\"&lt;link rel=preconnect href=https://x&gt;\"></iframe>&lt;IFRAME/><iframes>i</iframes>"
                   "<metadata>m</metadata><formatted>f</formatted><basefont><meta"),
       ToString(GetBody(report.GetDocument(true, false))));
 

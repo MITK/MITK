@@ -48,9 +48,9 @@ struct MITKREPORTS_EXPORT QmitkReport
    * \brief The report as a complete HTML page.
    *
    * \param forExport Whether the page leaves MITK. The images named in the body
-   *        are then part of the page, <meta>, <base> and <form> are shown as
-   *        text, and a content security policy keeps browsers from running
-   *        scripts or loading anything from elsewhere.
+   *        are then part of the page, <meta>, <base>, <form> and <link> are
+   *        shown as text, and a content security policy keeps browsers from
+   *        running scripts or loading anything from elsewhere.
    * \param darkTheme Whether the page uses the dark style.
    */
   QString GetDocument(bool forExport, bool darkTheme) const;

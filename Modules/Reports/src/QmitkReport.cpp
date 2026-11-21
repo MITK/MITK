@@ -104,9 +104,12 @@ QString QmitkReport::GetDocument(bool forExport, bool darkTheme) const
     body = inlined;
 
     // No policy stops the redirect of <meta http-equiv="refresh">, which a browser
-    // follows wherever it stands, and a report needs neither <base> nor <form>.
-    // With the opening bracket escaped, they show as text.
-    static const QRegularExpression tagOpeners(QStringLiteral("<(?=(?:meta|base|form)[\\s/>])"),
+    // follows wherever it stands, nor the resource hints of <link>, like
+    // dns-prefetch, and a report needs neither <base> nor <form>, and brings its
+    // styles inline. The srcdoc of an <iframe> would bring all of them back,
+    // decoded, and the editor draws no frames. With the opening bracket
+    // escaped, they show as text.
+    static const QRegularExpression tagOpeners(QStringLiteral("<(?=(?:meta|base|form|link|iframe)[\\s/>])"),
                                                QRegularExpression::CaseInsensitiveOption);
     body.replace(tagOpeners, QStringLiteral("&lt;"));
   }
@@ -120,10 +123,12 @@ QString QmitkReport::GetDocument(bool forExport, bool darkTheme) const
 
   if (forExport)
   {
-    // form-action and base-uri do not fall back to default-src.
+    // form-action and base-uri do not fall back to default-src. Browsers
+    // resolve the host names of links ahead outside of the policy.
     page += QStringLiteral("<meta http-equiv=\"Content-Security-Policy\" "
                            "content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'; "
-                           "form-action 'none'; base-uri 'none'\">\n");
+                           "form-action 'none'; base-uri 'none'\">\n"
+                           "<meta http-equiv=\"x-dns-prefetch-control\" content=\"off\">\n");
   }
 
   page += QStringLiteral("<title>") + title + QStringLiteral("</title>\n<style>\n") + styleSheet +

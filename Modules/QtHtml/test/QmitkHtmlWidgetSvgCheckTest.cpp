@@ -213,12 +213,11 @@ public:
 
   void TestNestedSvgCountsAsPartOfTheOutermost()
   {
-    const auto nestedGood = QStringLiteral("<svg><svg><rect/></svg><rect/></svg>");
-    const auto nestedBad = QStringLiteral("<svg><svg><image href=\"C:\\x.png\"/></svg><rect/></svg>");
+    // Qt SVG skips the content of a nested svg, so the outermost one is refused, and counted once.
+    const auto nested = QStringLiteral("<svg><svg><rect/></svg><rect/></svg>");
 
-    AssertDrawable(Page(nestedGood));
-    AssertRefused(Page(nestedBad), 1, QStringLiteral("href=\"C:\\x.png\""));
-    AssertRefused(Page(nestedGood + nestedBad), 2, QStringLiteral("it refers to something outside of itself"));
+    AssertRefused(Page(nested), 1, QStringLiteral("it has a nested svg"));
+    AssertRefused(Page(Svg(QStringLiteral("<rect/>")) + nested), 2, QStringLiteral("it has a nested svg"));
   }
 
   void TestOtherElementsAreNoSvg()

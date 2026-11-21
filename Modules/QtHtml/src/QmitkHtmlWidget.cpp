@@ -228,6 +228,7 @@ namespace
   QString FindSvgProblem(const QByteArray &svg)
   {
     QXmlStreamReader reader(svg);
+    bool inRoot = false;
 
     while (!reader.atEnd())
     {
@@ -240,6 +241,12 @@ namespace
           return QStringLiteral("it has a processing instruction");
 
         case QXmlStreamReader::StartElement:
+          // Qt SVG skips the content of an svg inside the root.
+          if (inRoot && reader.name() == QLatin1String("svg"))
+            return QStringLiteral("it has a nested svg, whose content is not drawn; use a g with a transform instead");
+
+          inRoot = true;
+
           for (const auto &attribute : reader.attributes())
           {
             if (attribute.name() != QLatin1String("href"))

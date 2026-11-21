@@ -1604,7 +1604,10 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
       if (viewPart != 0)
       {
         viewsToClose.push_back(viewPart);
-        if (saveParts && reference->IsDirty())
+
+        // The reference of a view does not know whether its part is dirty.
+        const auto saveable = viewPart.Cast<ISaveablePart>();
+        if (saveParts && saveable.IsNotNull() && saveable->IsDirty() && saveable->IsSaveOnCloseNeeded())
         {
           partsToSave.push_back(viewPart);
         }

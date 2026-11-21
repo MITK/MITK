@@ -37,6 +37,7 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QItemSelectionModel>
+#include <QThread>
 
 #include <optional>
 
@@ -94,11 +95,13 @@ namespace
   /** Refuses to close a view that something still runs in. In the GUI thread. */
   void ThrowIfViewMayNotClose(const QString& id, const std::string& path)
   {
-    // The dialog's event loop, in which this runs, would go on with a view that is gone.
-    if (QApplication::activeModalWidget() != nullptr)
+    // The event loop of a dialog or of a menu, in which this runs, would go on
+    // with a view that is gone. A menu's exec() runs one without a modal
+    // widget; the Workbench's own loop is the first one.
+    if (QApplication::activeModalWidget() != nullptr || QThread::currentThread()->loopLevel() > 1)
     {
       throw mitk::RestException(mitk::ErrorResponse::Create("DIALOG_OPEN", "Conflict",
-        "A dialog of the Workbench is open. Views can be closed once it is closed.", 409, path));
+        "A dialog or a menu of the Workbench is open. Views can be closed once it is closed.", 409, path));
     }
 
     // The program that operates the Workbench works through its own view, and
@@ -221,8 +224,8 @@ std::vector<mitk::RestRoute> mitk::CreateWorkbenchRoutes(const IRestServerServic
   openView.Description =
     "Body: {open: true|false}. Opening shows the view in front of the others of its tab group, without "
     "taking the keyboard focus from the user; but if the active view is in that tab group, the active view "
-    "stays in front and visible stays false. Closing answers 409 DIALOG_OPEN while a dialog of the Workbench "
-    "is open, and 409 VIEW_IN_USE for the view of a program that operates the Workbench while it does, like "
+    "stays in front and visible stays false. Closing answers 409 DIALOG_OPEN while a dialog or a menu of the "
+    "Workbench is open, and 409 VIEW_IN_USE for the view of a program that operates the Workbench while it does, like "
     "the Agent view while the agent works. Returns {data: view}, as GET does.";
   openView.Handler = [server](const RestRequest& request) {
     const auto body = request.GetJsonBody();

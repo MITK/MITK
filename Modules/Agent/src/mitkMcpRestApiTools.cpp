@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkIRestServerService.h>
 #include <mitkLog.h>
 #include <mitkMcpEndpoint.h>
+#include <mitkRestGuiThread.h>
 #include <mitkRestJob.h>
 
 #include <algorithm>
@@ -70,11 +71,14 @@ namespace
     if (uid.empty())
       return std::nullopt;
 
-    const auto node = server.FindNode(uid);
+    // Where the node's properties change, and where it is released.
+    return mitk::CallInGuiThread(server, [&server, &uid]() -> std::optional<std::string> {
+      const auto node = server.FindNode(uid);
 
-    return node != nullptr
-      ? std::make_optional(node->GetName())
-      : std::nullopt;
+      return node != nullptr
+        ? std::make_optional(node->GetName())
+        : std::nullopt;
+    });
   }
 
   /**

@@ -4,7 +4,7 @@ mitk_create_module(
     PUBLIC MitkCore MitkRESTAPI
   PACKAGE_DEPENDS
     PUBLIC nlohmann_json Qt6|Core
-    PRIVATE Qt6|Concurrent
+    PRIVATE Qt6|Concurrent OpenSSL|Crypto
 )
 
 if(TARGET ${MODULE_TARGET})

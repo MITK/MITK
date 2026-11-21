@@ -29,10 +29,17 @@ found in the LICENSE file.
 #include <QFile>
 #include <QTemporaryDir>
 
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+
 #include <atomic>
 #include <chrono>
 #include <functional>
 #include <future>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -267,6 +274,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestRestApiToolsEncodeBinaryAnswers);
   MITK_TEST(TestOfferedServerAllowsNoFiles);
   MITK_TEST(TestOfferNeedsTheAgentsAddressOnTheList);
+  MITK_TEST(TestOfferNeedsACertificateThatNamesTheHost);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -837,6 +845,95 @@ public:
 
     // The other loopback address, on which nothing listens, is not needed.
     CPPUNIT_ASSERT_EQUAL(std::string(), offer({ agent }));
+  }
+
+  /**
+   * A key and a certificate that names \p names, like "DNS:localhost", as PEM files in \p directory,
+   * valid from \p validFrom to \p validUntil seconds from now.
+   */
+  static std::pair<std::string, std::string> WriteCertificate(const QTemporaryDir& directory, const std::string& names,
+    long validFrom = 0, long validUntil = 3600)
+  {
+    std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> key(EVP_EC_gen("P-256"), &EVP_PKEY_free);
+    std::unique_ptr<X509, decltype(&X509_free)> certificate(X509_new(), &X509_free);
+    CPPUNIT_ASSERT(key != nullptr && certificate != nullptr);
+
+    X509_set_version(certificate.get(), 2);
+    ASN1_INTEGER_set(X509_get_serialNumber(certificate.get()), 1);
+    X509_gmtime_adj(X509_getm_notBefore(certificate.get()), validFrom);
+    X509_gmtime_adj(X509_getm_notAfter(certificate.get()), validUntil);
+    X509_set_pubkey(certificate.get(), key.get());
+
+    auto* name = X509_get_subject_name(certificate.get());
+    X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, reinterpret_cast<const unsigned char*>("MITK test"), -1, -1, 0);
+    X509_set_issuer_name(certificate.get(), name);
+
+    X509V3_CTX context;
+    X509V3_set_ctx_nodb(&context);
+    X509V3_set_ctx(&context, certificate.get(), certificate.get(), nullptr, nullptr, 0);
+    auto* alternativeNames = X509V3_EXT_conf_nid(nullptr, &context, NID_subject_alt_name, names.c_str());
+    CPPUNIT_ASSERT(alternativeNames != nullptr);
+    X509_add_ext(certificate.get(), alternativeNames, -1);
+    X509_EXTENSION_free(alternativeNames);
+
+    CPPUNIT_ASSERT(X509_sign(certificate.get(), key.get(), EVP_sha256()) > 0);
+
+    const auto keyPath = directory.filePath("key.pem").toStdString();
+    const auto certificatePath = directory.filePath("certificate.pem").toStdString();
+
+    {
+      std::unique_ptr<BIO, decltype(&BIO_free)> file(BIO_new_file(keyPath.c_str(), "w"), &BIO_free);
+      CPPUNIT_ASSERT(file != nullptr && PEM_write_bio_PrivateKey(file.get(), key.get(), nullptr, nullptr, 0, nullptr, nullptr) == 1);
+    }
+
+    {
+      std::unique_ptr<BIO, decltype(&BIO_free)> file(BIO_new_file(certificatePath.c_str(), "w"), &BIO_free);
+      CPPUNIT_ASSERT(file != nullptr && PEM_write_bio_X509(file.get(), certificate.get()) == 1);
+    }
+
+    return { keyPath, certificatePath };
+  }
+
+  void TestOfferNeedsACertificateThatNamesTheHost()
+  {
+    const QTemporaryDir directory;
+    CPPUNIT_ASSERT(directory.isValid());
+    QmitkAgentMemory memory(directory.filePath("memory.json"));
+
+    // The agent connects to 127.0.0.1, which Claude Code checks against the IP entries only.
+    const auto offer = [&](const std::string& names, long validFrom = 0, long validUntil = 3600) {
+      const auto [keyPath, certificatePath] = WriteCertificate(directory, names, validFrom, validUntil);
+      RegisteredRestServer registered;
+
+      mitk::RestServerConfig config;
+      config.enabled = true;
+      config.host = "127.0.0.1";
+      config.port = 0;
+      config.httpsEnabled = true;
+      config.sslCertPath = certificatePath;
+      config.sslKeyPath = keyPath;
+      registered.Server.SetConfig(config);
+      CPPUNIT_ASSERT(registered.Server.Start());
+
+      QmitkAgentToolServer tools(memory);
+      const auto refusal = tools.Offer().toStdString();
+      tools.Withdraw();
+      registered.Server.Stop();
+
+      return refusal;
+    };
+
+    const auto refusal = offer("DNS:localhost");
+    CPPUNIT_ASSERT_MESSAGE(refusal, refusal.find("certificate does not name 127.0.0.1") != std::string::npos);
+
+    CPPUNIT_ASSERT_EQUAL(std::string(), offer("DNS:localhost,IP:127.0.0.1"));
+
+    // Claude Code refuses a certificate outside of its validity, which the server serves anyway.
+    const auto expired = offer("DNS:localhost,IP:127.0.0.1", -7200, -3600);
+    CPPUNIT_ASSERT_MESSAGE(expired, expired.find("has expired") != std::string::npos);
+
+    const auto early = offer("DNS:localhost,IP:127.0.0.1", 3600, 7200);
+    CPPUNIT_ASSERT_MESSAGE(early, early.find("is not valid yet") != std::string::npos);
   }
 };
 

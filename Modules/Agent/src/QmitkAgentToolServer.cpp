@@ -29,9 +29,15 @@ found in the LICENSE file.
 #include <QStringList>
 #include <QTimer>
 
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -67,6 +73,60 @@ namespace
     }
 
     return QString("%1://%2:%3").arg(config.httpsEnabled ? "https" : "http").arg(host).arg(config.port);
+  }
+
+  /**
+   * Why Claude Code would not take the certificate of an HTTPS server for the
+   * host of GetLocalUrl(); empty if it would. Node checks an IP address
+   * against the IP entries of a certificate only, and a name against its
+   * names, as OpenSSL's checks do.
+   */
+  QString GetRefusalOfCertificate(const mitk::RestServerConfig& config)
+  {
+    if (!config.httpsEnabled)
+      return QString();
+
+    const auto host = config.host == "::" || config.host == "0.0.0.0" ? std::string("127.0.0.1") : config.host;
+
+    const std::unique_ptr<BIO, decltype(&BIO_free)> file(BIO_new_file(config.sslCertPath.c_str(), "r"), &BIO_free);
+    const std::unique_ptr<X509, decltype(&X509_free)> certificate(
+      file != nullptr ? PEM_read_bio_X509(file.get(), nullptr, nullptr, nullptr) : nullptr, &X509_free);
+
+    if (certificate == nullptr)
+    {
+      return QString("The agent cannot work in the Workbench: the certificate of the REST API server that runs (%1) "
+        "cannot be read. Stop the server, or start it with a readable certificate, and reopen the Agent view.")
+        .arg(QString::fromStdString(config.sslCertPath));
+    }
+
+    // A self-signed certificate, trusted as it is, still counts only while it
+    // is valid. The server itself serves it at any time.
+    const auto* validity = X509_cmp_current_time(X509_get0_notAfter(certificate.get())) < 0
+      ? "has expired"
+      : X509_cmp_current_time(X509_get0_notBefore(certificate.get())) > 0
+        ? "is not valid yet"
+        : nullptr;
+
+    if (validity != nullptr)
+    {
+      return QString("The agent cannot work in the Workbench: the certificate of the REST API server that runs (%1) "
+        "%2. Restart the server with a valid certificate, or stop it, and reopen the Agent view.")
+        .arg(QString::fromStdString(config.sslCertPath)).arg(validity);
+    }
+
+    // -2: no IP address, so a name.
+    const auto ipMatch = X509_check_ip_asc(certificate.get(), host.c_str(), 0);
+    const bool named = ipMatch == 1 || (ipMatch == -2 && X509_check_host(certificate.get(), host.c_str(), host.size(), 0, nullptr) == 1);
+
+    if (!named)
+    {
+      return QString("The agent cannot work in the Workbench: it connects to the REST API server that runs at %1 over "
+        "HTTPS, but the server's certificate does not name %1. Restart the server with a certificate that names it, or "
+        "on a host that the certificate names, like localhost, or stop the server, and reopen the Agent view.")
+        .arg(QString::fromStdString(host));
+    }
+
+    return QString();
   }
 
   QString GetMcpUrl(const mitk::RestServerConfig& config)
@@ -214,6 +274,9 @@ QString QmitkAgentToolServer::Offer()
   else if (const auto config = m_RestServer->GetRunningConfig(); config.has_value())
   {
     if (const auto refusal = GetRefusalOfThisMachine(*config); !refusal.isEmpty())
+      return refusal;
+
+    if (const auto refusal = GetRefusalOfCertificate(*config); !refusal.isEmpty())
       return refusal;
   }
 

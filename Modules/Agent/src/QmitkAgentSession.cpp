@@ -335,7 +335,9 @@ bool QmitkAgentSession::Send(const QString& text)
 
   emit UserMessageAdded(text);
 
-  if (m_Stopping)
+  // While the stopped turn runs on, its calls stay refused and a further Stop
+  // ends Claude Code. OnResult() ends the stop once this message's turn follows.
+  if (m_Stopping && !this->IsTurnRunning())
   {
     m_Stopping = false;
     m_ToolServer->AcceptCalls();

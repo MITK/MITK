@@ -143,8 +143,9 @@ public:
    *        Workbench after the user stopped the agent.
    *
    * Calls that wait for a job stop waiting, and the job is canceled. A turn
-   * of a message that was sent before and waits behind the stopped one runs
-   * as usual and can be stopped in turn.
+   * of a message that was sent before or while the agent stops waits behind
+   * the stopped one, runs as usual once that has ended, and can be stopped
+   * in turn.
    *
    * Called again while the turn still has not ended, ends Claude Code, so
    * that the user always gets out of a turn; the next message continues the

@@ -31,11 +31,32 @@ found in the LICENSE file.
 #include <QStandardPaths>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
+
+#include <functional>
 
 namespace
 {
   const QString LockFileName = QStringLiteral("lock");
+
+  /**
+   * Calls a function once the event loop at a level runs again: once the close
+   * that asked from there has ended, with the questions of its further parts,
+   * which run event loops of their own, and the Workbench is not closing. Not
+   * if the context is destroyed first.
+   */
+  void WhenLoopRunsAgain(QObject* context, int level, std::function<void()> function, int delay = 0)
+  {
+    QTimer::singleShot(delay, context, [context, level, function = std::move(function)]() mutable {
+      const bool closing = berry::PlatformUI::IsWorkbenchRunning() && berry::PlatformUI::GetWorkbench()->IsClosing();
+
+      if (closing || QThread::currentThread()->loopLevel() > level)
+        WhenLoopRunsAgain(context, level, std::move(function), 100);
+      else
+        function();
+    });
+  }
 
   /** The folder the user saved a report to last, for the session. */
   QString s_LastFolder;
@@ -193,10 +214,16 @@ void QmitkReportStore::MarkSaved(int id)
     report->second.Saved = true;
 }
 
-void QmitkReportStore::AcceptLoss(int id)
+void QmitkReportStore::AcceptLoss(int id, int loopLevel)
 {
   if (const auto report = m_Reports.find(id); report != m_Reports.end())
     report->second.LossAccepted = true;
+
+  // A close that goes ahead removes the report first.
+  WhenLoopRunsAgain(this, loopLevel, [this, id]() {
+    if (const auto report = m_Reports.find(id); report != m_Reports.end())
+      report->second.LossAccepted = false;
+  });
 }
 
 bool QmitkReportStore::SaveReport(int id, QWidget* parent)
@@ -316,11 +343,13 @@ bool QmitkReportStore::ConfirmShutdown(bool forced)
   if (unsaved.empty())
     return true;
 
+  const auto level = QThread::currentThread()->loopLevel();
+
   // A forced shutdown cannot be canceled, so there is nothing to ask.
   if (forced)
   {
     for (const auto id : unsaved)
-      this->AcceptLoss(id);
+      this->AcceptLoss(id, level);
 
     return true;
   }
@@ -350,7 +379,8 @@ bool QmitkReportStore::ConfirmShutdown(bool forced)
     }
     else
     {
-      this->AcceptLoss(id);
+      // A listener asked after this one can still keep the Workbench open.
+      this->AcceptLoss(id, level);
     }
   }
 

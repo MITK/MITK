@@ -66,6 +66,14 @@ private:
 
   int m_ReportId = 0;
   QmitkHtmlWidget* m_View = nullptr;
+
+  /**
+   * Whether the user chose to discard the report in the close under way,
+   * which the destructor applies. Kept here, as a native file dialog of a
+   * later question runs the timers of the store without raising the loop
+   * level, which would take a choice in the store back too early.
+   */
+  bool m_LossAccepted = false;
 };
 
 #endif

@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 #include <mitkException.h>
 
+#include <berryIWorkbench.h>
+#include <berryPlatformUI.h>
 #include <berryUIException.h>
 
 #include <QDesktopServices>
@@ -27,6 +29,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QThread>
 #include <QToolBar>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -42,7 +45,14 @@ QmitkReportEditor::QmitkReportEditor() = default;
 
 QmitkReportEditor::~QmitkReportEditor()
 {
-  if (auto* store = QmitkReportsPluginActivator::GetStore(); store != nullptr)
+  auto* store = QmitkReportsPluginActivator::GetStore();
+
+  if (store == nullptr)
+    return;
+
+  if (m_LossAccepted)
+    store->Remove(m_ReportId);
+  else
     store->CloseReport(m_ReportId);
 }
 
@@ -129,8 +139,12 @@ void QmitkReportEditor::ShowReport(bool keepScrollPosition)
 
 void QmitkReportEditor::OnReportChanged(int id)
 {
-  if (id == m_ReportId)
-    this->ShowReport(true);
+  if (id != m_ReportId)
+    return;
+
+  // What the user gave up is not what there is now.
+  m_LossAccepted = false;
+  this->ShowReport(true);
 }
 
 void QmitkReportEditor::OnLinkClicked(const QUrl& url)
@@ -164,6 +178,9 @@ berry::ISaveablePart::CloseAnswer QmitkReportEditor::PromptToSaveOnClose()
   auto* store = QmitkReportsPluginActivator::GetStore();
   const auto* report = store != nullptr ? store->Get(m_ReportId) : nullptr;
 
+  // A choice of an earlier close that was canceled.
+  m_LossAccepted = false;
+
   if (report == nullptr)
     return CloseAnswer::Discard;
 
@@ -175,6 +192,8 @@ berry::ISaveablePart::CloseAnswer QmitkReportEditor::PromptToSaveOnClose()
   auto* cancel = question.addButton(QMessageBox::Cancel);
   question.setDefaultButton(save);
   question.setEscapeButton(cancel);
+
+  const auto level = QThread::currentThread()->loopLevel();
   question.exec();
 
   if (question.clickedButton() == save)
@@ -183,7 +202,16 @@ berry::ISaveablePart::CloseAnswer QmitkReportEditor::PromptToSaveOnClose()
   if (question.clickedButton() == cancel)
     return CloseAnswer::Cancel;
 
-  store->AcceptLoss(m_ReportId);
+  // A further part of the same close can still cancel it. While the Workbench
+  // closes, the store asks about every report left before the editors go, so
+  // it has to know at once, and IsClosing() keeps the choice there.
+  const bool workbenchClosing = berry::PlatformUI::IsWorkbenchRunning() && berry::PlatformUI::GetWorkbench()->IsClosing();
+
+  if (workbenchClosing)
+    store->AcceptLoss(m_ReportId, level);
+  else
+    m_LossAccepted = true;
+
   return CloseAnswer::Discard;
 }
 

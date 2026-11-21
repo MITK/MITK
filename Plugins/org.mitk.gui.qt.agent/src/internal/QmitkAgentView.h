@@ -62,8 +62,9 @@ private:
   /**
    * \brief Ask whether to stop the working agent, unless the user agreed already.
    *
-   * The consent holds until the turn ends, so that one close does not ask
-   * twice, for example when the Workbench closes and then its views.
+   * The consent holds for the close under way, so that one close does not
+   * ask twice, for example when the Workbench closes and then its views. A
+   * close that a later question cancels leaves nothing agreed.
    *
    * \return Whether the user agrees, or no turn runs.
    */

@@ -101,12 +101,21 @@ public:
   bool SaveReport(int id, QWidget* parent);
 
   /**
-   * \brief Record that the user chose to give up the report without saving it.
+   * \brief Record that the user chose to give up the report without saving it,
+   *        for the close under way.
    *
-   * No question follows when its editor closes or the Workbench shuts down,
-   * until the report changes.
+   * No question follows when its editor closes or the Workbench shuts down.
+   * If the report is still there once the event loop that asked runs again
+   * and the Workbench is not closing, a later question canceled the close,
+   * and the choice is taken back, as it is when the report changes. A native
+   * dialog, like a file dialog of a later question, runs the timers without
+   * raising the loop level, so this suits only the questions of a Workbench
+   * that closes; an editor keeps its own choice otherwise.
+   *
+   * \param loopLevel The level of the event loop that asked, as
+   *        QThread::loopLevel() gives it before the question.
    */
-  void AcceptLoss(int id);
+  void AcceptLoss(int id, int loopLevel);
 
   /**
    * \brief Tell the store that the report's editor was closed.

@@ -29,8 +29,11 @@ found in the LICENSE file.
 #include <berryPlatformUI.h>
 
 #include <QMessageBox>
+#include <QThread>
 #include <QTimer>
 #include <QVBoxLayout>
+
+#include <functional>
 
 const std::string QmitkAgentView::VIEW_ID = "org.mitk.views.agent";
 
@@ -72,6 +75,24 @@ namespace
 
     MITK_WARN << "Cannot start " << symbolicName.toStdString() << ": it is not part of this build.";
     return false;
+  }
+
+  /**
+   * Calls a function once the event loop at a level runs again: once the close
+   * that asked from there has ended, with the questions of its further parts,
+   * which run event loops of their own, and the Workbench is not closing. Not
+   * if the context is destroyed first.
+   */
+  void WhenLoopRunsAgain(QObject* context, int level, std::function<void()> function, int delay = 0)
+  {
+    QTimer::singleShot(delay, context, [context, level, function = std::move(function)]() mutable {
+      const bool closing = berry::PlatformUI::IsWorkbenchRunning() && berry::PlatformUI::GetWorkbench()->IsClosing();
+
+      if (closing || QThread::currentThread()->loopLevel() > level)
+        WhenLoopRunsAgain(context, level, std::move(function), 100);
+      else
+        function();
+    });
   }
 }
 
@@ -169,11 +190,18 @@ bool QmitkAgentView::ConfirmStopping(const QString& question)
   if (m_Session == nullptr || !m_Session->IsTurnRunning() || m_StopAgreed)
     return true;
 
+  const auto level = QThread::currentThread()->loopLevel();
   const auto answer = QMessageBox::question(m_Widget, "Agent", question,
     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
-  m_StopAgreed = answer == QMessageBox::Yes;
-  return m_StopAgreed;
+  if (answer != QMessageBox::Yes)
+    return false;
+
+  m_StopAgreed = true;
+
+  // A close that goes ahead destroys this view first, which drops the call.
+  WhenLoopRunsAgain(this, level, [this]() { m_StopAgreed = false; });
+  return true;
 }
 
 void QmitkAgentView::OnPreferencesChanged(const mitk::IPreferences*)

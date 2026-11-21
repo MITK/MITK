@@ -222,7 +222,8 @@ namespace
    * parses and outside of the resource handler, so an SVG of an untrusted page
    * could read local files or reach network shares. A "data:" image is decoded
    * by its content, which may be an SVG with references of its own. So only
-   * references to the SVG's own elements are accepted.
+   * references to the SVG's own elements are accepted, and none on an
+   * &lt;image&gt;, which takes even a "#" reference as the path of a file.
    */
   QString FindSvgProblem(const QByteArray &svg)
   {
@@ -241,7 +242,18 @@ namespace
         case QXmlStreamReader::StartElement:
           for (const auto &attribute : reader.attributes())
           {
-            if (attribute.name() == QLatin1String("href") && !attribute.value().startsWith(QLatin1Char('#')))
+            if (attribute.name() != QLatin1String("href"))
+              continue;
+
+            // Qt SVG opens what an image names as a file, a "#" reference as
+            // well, so no href helps an image.
+            if (reader.name() == QLatin1String("image"))
+            {
+              return QStringLiteral("it has an image element (href=\"%1\"), which is not drawn; place images with an img "
+                                    "outside of the svg").arg(attribute.value());
+            }
+
+            if (!attribute.value().startsWith(QLatin1Char('#')))
             {
               return QStringLiteral("it refers to something outside of itself (href=\"%1\"); only references to its own "
                                     "elements, like href=\"#id\", are drawn").arg(attribute.value());

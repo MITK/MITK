@@ -142,16 +142,27 @@ public:
 
     for (const auto &reference : references)
     {
-      const auto expected = QStringLiteral("it refers to something outside of itself (href=\"%1\")").arg(reference);
+      const auto outside = QStringLiteral("it refers to something outside of itself (href=\"%1\")").arg(reference);
+      AssertRefused(Page(Svg(QStringLiteral("<use href='%1'/>").arg(reference))), 1, outside);
 
-      AssertRefused(Page(Svg(QStringLiteral("<image href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, expected);
-      AssertRefused(Page(Svg(QStringLiteral("<image xlink:href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, expected);
-      AssertRefused(Page(Svg(QStringLiteral("<use href='%1'/>").arg(reference))), 1, expected);
+      // An image is refused as such, as no reference helps it.
+      const auto image = QStringLiteral("it has an image element (href=\"%1\")").arg(reference);
+      AssertRefused(Page(Svg(QStringLiteral("<image href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, image);
+      AssertRefused(Page(Svg(QStringLiteral("<image xlink:href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, image);
     }
 
     // The declaration of the prefix does not make the reference one to the svg's own elements.
     AssertRefused(Page(Svg(QStringLiteral("<image xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"http://example.com/a.png\"/>"))),
                   1, QStringLiteral("href=\"http://example.com/a.png\""));
+
+    // An image takes a "#" reference as the path of a file, which Windows resolves without a folder "#".
+    for (const auto &reference : { QStringLiteral("#p"), QStringLiteral("#/../../Users/Public/Pictures/x.png") })
+    {
+      const auto expected = QStringLiteral("it has an image element (href=\"%1\")").arg(reference);
+
+      AssertRefused(Page(Svg(QStringLiteral("<path id=\"p\" d=\"M0 0\"/><image href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, expected);
+      AssertRefused(Page(Svg(QStringLiteral("<image xlink:href=\"%1\" width=\"1\" height=\"1\"/>").arg(reference))), 1, expected);
+    }
   }
 
   void TestMalformedXmlIsRefused()
@@ -188,7 +199,7 @@ public:
   void TestMessageNamesTheSvgThatIsBad()
   {
     const auto good = Svg(QStringLiteral("<rect/>"));
-    const auto badReference = Svg(QStringLiteral("<image href=\"http://example.com/a.png\"/>"));
+    const auto badReference = Svg(QStringLiteral("<use href=\"http://example.com/a.png\"/>"));
     const auto badXml = Svg(QStringLiteral("<text>&plusmn;</text>"));
 
     AssertRefused(Page(good + QStringLiteral("<p>between</p>") + badReference), 2, QStringLiteral("href=\"http://example.com/a.png\""));

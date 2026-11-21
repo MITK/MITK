@@ -1207,7 +1207,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "once the session has taken up the content of the active label, if it has any, so the state it gives "
     "includes that. The session works "
     "on the image and time step chosen now; changing them ends it. A session that runs already is kept, with "
-    "its prompts and result: the answer is its state at once. To start anew, DELETE the session first.";
+    "its prompts and result: the job has succeeded when the answer comes. To start anew, DELETE the session first.";
   startSession.Handler = [server, start](const RestRequest& request) {
     const auto running = CallInGuiThread(*server, [&]() {
       ShowView(request.Path);
@@ -1223,8 +1223,13 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
       return tool->IsSessionRunning() ? std::optional<nlohmann::json>(DescribeRestNNInteractive(tool)) : std::nullopt;
     });
 
+    // A job in any case, so that clients read one answer.
     if (running.has_value())
-      return RestResponse::FromData(*running);
+    {
+      auto kept = server->CreateJob("Start an nnInteractive session");
+      kept->Succeed(*running);
+      return RestJob::Respond(request, kept);
+    }
 
     std::shared_ptr<RestJob> job;
 

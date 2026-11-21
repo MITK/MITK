@@ -253,7 +253,7 @@ and it stays as it is.
 2. Start the model with POST
    `/api/v1/segmentation/nninteractive/session?wait=120`, the first time
    after downloading it. A session that runs already is kept with its
-   prompts and result, and the answer is its state at once. If nnInteractive
+   prompts and result, and its job has succeeded at once. If nnInteractive
    is not installed, ask the user to install it with Initialize in its
    panel.
 3. Prompt with POST `/api/v1/segmentation/nninteractive/prompts?wait=60`: a

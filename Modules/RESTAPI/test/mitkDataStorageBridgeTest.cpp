@@ -136,6 +136,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(GetNodeByUid);
   MITK_TEST(GetRootNodeHasNoParent);
   MITK_TEST(GetChildNodeHasParent);
+  MITK_TEST(SourceOutsideTheStorageIsNoParent);
   MITK_TEST(GetNodeWithChildrenReportsChildrenCount);
   MITK_TEST(GetRootNodesOnly);
   MITK_TEST(GetChildrenOfParent);
@@ -455,6 +456,26 @@ public:
     // Double-check in DataStorage that Root1 has no parent
     auto sources = m_DataStorage->GetSources(m_Root1);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), sources->Size());
+  }
+
+  void SourceOutsideTheStorageIsNoParent()
+  {
+    // As a model fit adds its results below an image the user removed
+    // meanwhile: the storage keeps the removed node as their source.
+    auto removed = mitk::DataNode::New();
+    removed->SetName("Removed");
+    m_DataStorage->Add(removed);
+    m_DataStorage->Remove(removed);
+
+    auto derived = mitk::DataNode::New();
+    derived->SetName("Derived");
+    m_DataStorage->Add(derived, removed);
+
+    const auto derivedUid = FindUidByName("Derived");
+    const auto nodeResult = m_Bridge->GetNode(derivedUid);
+    CPPUNIT_ASSERT(nodeResult.has_value());
+    CPPUNIT_ASSERT(nodeResult.value()["parent_uid"].is_null());
+    CPPUNIT_ASSERT_EQUAL(std::string("/Derived"), nodeResult.value()["path"].get<std::string>());
   }
 
   void GetChildNodeHasParent()

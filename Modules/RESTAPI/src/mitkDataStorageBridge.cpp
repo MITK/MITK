@@ -59,6 +59,22 @@ namespace
     return shown;
   }
 
+  /*
+   * The first source of a node, if the storage holds it. A source can be
+   * outside: the storage keeps one that was removed while a node was added
+   * below it. The API must not answer for such a node, so it is no parent.
+   */
+  mitk::DataNode* GetParentInStorage(const mitk::DataStorage* dataStorage, const mitk::DataNode* node)
+  {
+    const auto sources = dataStorage->GetSources(node);
+
+    if (sources->Size() == 0)
+      return nullptr;
+
+    auto* parent = sources->ElementAt(0).GetPointer();
+    return dataStorage->Exists(parent) ? parent : nullptr;
+  }
+
   mitk::BaseProperty::ConstPointer GetConstProperty(const mitk::DataNode* node, const std::string& propertyKey,
     const std::optional<std::string>& context, const mitk::PropertyScope scope)
   {
@@ -550,8 +566,7 @@ namespace mitk
     {
       auto isRootPredicate = NodePredicateFunction::New(
         [dataStorage](const DataNode* node) -> bool {
-          auto sources = dataStorage->GetSources(node);
-          return sources->Size() == 0;
+          return nullptr == GetParentInStorage(dataStorage, node);
         });
       predicates.push_back(isRootPredicate.GetPointer());
     }
@@ -582,26 +597,23 @@ namespace mitk
       const std::string targetParentUid = params.parentUid.value();
       auto parentPredicate = NodePredicateFunction::New(
         [this, dataStorage, targetParentUid](const DataNode* node) -> bool {
-          auto sources = dataStorage->GetSources(node);
-
           if (targetParentUid == "null")
           {
             // Filter for root nodes (no parent)
-            return sources->Size() == 0;
+            return nullptr == GetParentInStorage(dataStorage, node);
           }
-          else
+
+          // Check if parent matches the target UID
+          auto sources = dataStorage->GetSources(node);
+          for (auto srcIt = sources->Begin(); srcIt != sources->End(); ++srcIt)
           {
-            // Check if parent matches the target UID
-            for (auto srcIt = sources->Begin(); srcIt != sources->End(); ++srcIt)
+            auto parentUid = m_UidMapper->GetUid(srcIt->Value().GetPointer());
+            if (parentUid.has_value() && parentUid.value() == targetParentUid)
             {
-              auto parentUid = m_UidMapper->GetUid(srcIt->Value().GetPointer());
-              if (parentUid.has_value() && parentUid.value() == targetParentUid)
-              {
-                return true;
-              }
+              return true;
             }
-            return false;
           }
+          return false;
         });
       predicates.push_back(parentPredicate.GetPointer());
     }
@@ -733,10 +745,10 @@ namespace mitk
             }
             else if (field == "parent_uid")
             {
-              auto sourcesA = dataStorage->GetSources(a);
-              auto sourcesB = dataStorage->GetSources(b);
-              valA = (sourcesA->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesA->ElementAt(0)) : "";
-              valB = (sourcesB->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesB->ElementAt(0)) : "";
+              auto* parentA = GetParentInStorage(dataStorage, a);
+              auto* parentB = GetParentInStorage(dataStorage, b);
+              valA = nullptr != parentA ? m_UidMapper->GetOrCreateUid(parentA) : "";
+              valB = nullptr != parentB ? m_UidMapper->GetOrCreateUid(parentB) : "";
             }
             else if (field == "data_type")
             {
@@ -1538,10 +1550,8 @@ namespace mitk
     result["path"] = this->BuildNodePath(node);
 
     // Get parent UID if exists
-    auto sources = dataStorage->GetSources(node);
-    if (sources->Size() > 0)
+    if (auto* parent = GetParentInStorage(dataStorage, node); nullptr != parent)
     {
-      auto parent = sources->ElementAt(0).GetPointer();
       result["parent_uid"] = m_UidMapper->GetOrCreateUid(parent);
     }
     else
@@ -1580,13 +1590,12 @@ namespace mitk
 
     std::string path = "/" + node->GetName();
 
-    auto sources = dataStorage->GetSources(node);
+    auto* parent = GetParentInStorage(dataStorage, node);
     int depth = 0;
-    while (sources->Size() > 0 && depth < maxDepth)
+    while (nullptr != parent && depth < maxDepth)
     {
-      auto parent = sources->ElementAt(0).GetPointer();
       path = "/" + parent->GetName() + path;
-      sources = dataStorage->GetSources(parent);
+      parent = GetParentInStorage(dataStorage, parent);
       ++depth;
     }
 

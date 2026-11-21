@@ -1115,7 +1115,8 @@ bool QmitkVoxTellToolGUI::ResetIfWorkerStopped()
 {
   auto* tool = this->GetTool();
 
-  if (tool == nullptr || !m_Ui->initializeButton->isChecked() || tool->IsModelLoaded())
+  // A start under way, maybe a REST client's, has no model yet but a worker.
+  if (tool == nullptr || !m_Ui->initializeButton->isChecked() || tool->IsModelLoaded() || tool->IsInitializing())
     return false;
 
   // The process that ran VoxTell ended. MITK is not affected. The first line

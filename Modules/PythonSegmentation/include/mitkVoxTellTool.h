@@ -222,9 +222,10 @@ namespace mitk
 
     /** \brief Unloads the model and ends the worker.
      *
-     * Frees the memory of the device and releases the Python context.
-     *
-     * \pre The preview is not being computed.
+     * Frees the memory of the device and releases the Python context. While
+     * work uses the worker (the preview is computed, or IsInitializing()), for
+     * example work a REST client started, that work is aborted and the model
+     * is unloaded once it has ended.
      */
     void UnloadModel();
 
@@ -425,6 +426,9 @@ namespace mitk
   private:
     /** \brief Returns the worker, which is started if it is not running. */
     PythonWorker& GetWorker();
+
+    /** \brief UnloadModel() without waiting for work, for the end of that work. */
+    void DoUnloadModel();
 
     /** \brief Receives the files of GetModelFiles(), or what it threw. */
     using ModelFilesCallback = std::function<void(std::exception_ptr error, const std::vector<VoxTell::RepoFiles>& files)>;

@@ -207,6 +207,10 @@ QImage QmitkRenderWindowScreenshot::Take(mitk::IRenderWindowPart* renderWindowPa
   if (renderer == nullptr || renderWindow == nullptr)
     mitkThrow() << "The window has no renderer or no render window.";
 
+  // A magnified capture would divide by the size, like one of a window never shown.
+  if (const auto* size = renderWindow->GetSize(); size[0] <= 0 || size[1] <= 0)
+    mitkThrow() << "The window has no size.";
+
   const auto requestedMagnification = std::max(1u, options.Magnification);
   auto magnification = requestedMagnification;
 

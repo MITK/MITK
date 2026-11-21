@@ -153,6 +153,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteNodeWithChildrenNonRecursive);
   MITK_TEST(DeleteNodeWithChildrenRecursive);
   MITK_TEST(DeleteRootNodeWithSubtree);
+  MITK_TEST(DeleteNodeWithADiamondBelowIt);
   // Data operations
   MITK_TEST(FindDataNodeReturnsNodeForKnownUid);
   MITK_TEST(FindDataNodeReturnsNullForUnknownUid);
@@ -891,6 +892,38 @@ public:
     // Verify its children are also still present
     auto children = m_DataStorage->GetDerivations(m_Child2);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), children->Size());
+  }
+
+  void DeleteNodeWithADiamondBelowIt()
+  {
+    // Top -> Left, Right -> Bottom: Bottom has two parents in the subtree.
+    const auto add = [this](const std::string& name, const std::vector<mitk::DataNode*>& parents) {
+      auto node = mitk::DataNode::New();
+      node->SetName(name);
+
+      auto sources = mitk::DataStorage::SetOfObjects::New();
+      for (auto* parent : parents)
+        sources->push_back(parent);
+
+      m_DataStorage->Add(node, sources);
+      return node.GetPointer();
+    };
+
+    auto* top = add("Top", {});
+    auto* left = add("Left", { top });
+    auto* right = add("Right", { top });
+    add("Bottom", { left, right });
+
+    const auto topUid = m_Bridge->GetNodeUid(top);
+    const auto countBefore = m_DataStorage->GetAll()->Size();
+
+    // Only the storage holds Bottom, so its first removal frees it.
+    const auto result = m_Bridge->DeleteNode(topUid, true);
+
+    CPPUNIT_ASSERT(result.success);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), result.deletedChildren.size());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), std::set<std::string>(result.deletedChildren.begin(), result.deletedChildren.end()).size());
+    CPPUNIT_ASSERT_EQUAL(countBefore - 4, m_DataStorage->GetAll()->Size());
   }
 
   void DeleteNodeWithChildrenRecursive()

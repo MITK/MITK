@@ -978,9 +978,15 @@ namespace mitk
       // If recursive, collect and delete all descendants first
       if (recursive && result.childrenCount > 0)
       {
-        // Collect all descendants (depth-first)
-        std::vector<DataNode*> toDelete;
+        // Collect all descendants (depth-first). A node with two parents in the
+        // subtree is reached twice but collected once, and all are held, as
+        // removing one frees it if the storage held it alone.
+        std::vector<DataNode::Pointer> toDelete;
+        std::set<const DataNode*> collected;
         std::function<void(DataNode*)> collectDescendants = [&](DataNode* n) {
+          if (!collected.insert(n).second)
+            return;
+
           auto children = dataStorage->GetDerivations(n);
           for (auto it = children->Begin(); it != children->End(); ++it)
           {
@@ -996,7 +1002,7 @@ namespace mitk
         }
 
         // Delete all descendants (children first, then grandchildren, etc.)
-        for (auto descendant : toDelete)
+        for (const auto& descendant : toDelete)
         {
           // Use GetOrCreateUid to ensure all deleted children have UIDs for reporting
           result.deletedChildren.push_back(m_UidMapper->GetOrCreateUid(descendant));

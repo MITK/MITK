@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkActionOriginScope.h>
 #include <mitkErrorResponse.h>
 #include <mitkException.h>
+#include <mitkIOUtil.h>
 #include <mitkRestGuiThread.h>
 #include <mitkRestHelpers.h>
 #include <mitkRestPoints.h>
@@ -27,7 +28,9 @@ found in the LICENSE file.
 
 #include <httplib.h>
 
-#include <itksys/SystemInformation.hxx>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include <openssl/x509v3.h>
 
 #include <nlohmann/json.hpp>
 
@@ -39,6 +42,7 @@ found in the LICENSE file.
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <future>
 #include <memory>
@@ -253,6 +257,7 @@ class mitkRestRouteTestSuite : public mitk::TestFixture
   MITK_TEST(RouterForgetsRemovedRoutes);
   MITK_TEST(AddedRouteIsServedOverHttp);
   MITK_TEST(AddedRoutesRejectBrowserRequests);
+  MITK_TEST(HttpsAcceptsTheNamesItsCertificateCovers);
   MITK_TEST(UnknownPathsAreAnsweredWithJson);
   MITK_TEST(HandleRequestReachesBuiltInRoutes);
   MITK_TEST(HandleRequestNeedsRunningServer);
@@ -396,10 +401,6 @@ public:
     const auto sameOrigin = post("Sec-Fetch-Site", "same-origin");
     const auto foreignHost = post("Host", "rebound.example.org:8080");
     const auto localHost = post("Host", "LocalHost:8080");
-
-    // As remote clients in a network address the machine.
-    const auto domainName = itksys::SystemInformation().GetFullyQualifiedDomainName();
-    const auto domainHost = post("Host", domainName + ":8080");
     server.Stop();
 
     CPPUNIT_ASSERT(res != nullptr);
@@ -414,8 +415,90 @@ public:
     CPPUNIT_ASSERT_EQUAL(403, foreignHost->status);
     CPPUNIT_ASSERT(localHost != nullptr);
     CPPUNIT_ASSERT_EQUAL(200, localHost->status);
-    CPPUNIT_ASSERT(domainHost != nullptr);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(domainName, 200, domainHost->status);
+  }
+
+  /** A key and a self-signed certificate that names \p names, like "DNS:localhost", as PEM files in \p directory. */
+  static std::pair<std::string, std::string> WriteCertificate(const std::string& directory, const std::string& names)
+  {
+    std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> key(EVP_EC_gen("P-256"), &EVP_PKEY_free);
+    std::unique_ptr<X509, decltype(&X509_free)> certificate(X509_new(), &X509_free);
+    CPPUNIT_ASSERT(key != nullptr && certificate != nullptr);
+
+    X509_set_version(certificate.get(), 2);
+    ASN1_INTEGER_set(X509_get_serialNumber(certificate.get()), 1);
+    X509_gmtime_adj(X509_getm_notBefore(certificate.get()), 0);
+    X509_gmtime_adj(X509_getm_notAfter(certificate.get()), 3600);
+    X509_set_pubkey(certificate.get(), key.get());
+
+    auto* name = X509_get_subject_name(certificate.get());
+    X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, reinterpret_cast<const unsigned char*>("MITK test"), -1, -1, 0);
+    X509_set_issuer_name(certificate.get(), name);
+
+    X509V3_CTX context;
+    X509V3_set_ctx_nodb(&context);
+    X509V3_set_ctx(&context, certificate.get(), certificate.get(), nullptr, nullptr, 0);
+    auto* alternativeNames = X509V3_EXT_conf_nid(nullptr, &context, NID_subject_alt_name, names.c_str());
+    CPPUNIT_ASSERT(alternativeNames != nullptr);
+    X509_add_ext(certificate.get(), alternativeNames, -1);
+    X509_EXTENSION_free(alternativeNames);
+
+    CPPUNIT_ASSERT(X509_sign(certificate.get(), key.get(), EVP_sha256()) > 0);
+
+    const auto keyPath = directory + "/key.pem";
+    const auto certificatePath = directory + "/certificate.pem";
+
+    {
+      std::unique_ptr<BIO, decltype(&BIO_free)> file(BIO_new_file(keyPath.c_str(), "w"), &BIO_free);
+      CPPUNIT_ASSERT(file != nullptr && PEM_write_bio_PrivateKey(file.get(), key.get(), nullptr, nullptr, 0, nullptr, nullptr) == 1);
+    }
+
+    {
+      std::unique_ptr<BIO, decltype(&BIO_free)> file(BIO_new_file(certificatePath.c_str(), "w"), &BIO_free);
+      CPPUNIT_ASSERT(file != nullptr && PEM_write_bio_X509(file.get(), certificate.get()) == 1);
+    }
+
+    return { keyPath, certificatePath };
+  }
+
+  void HttpsAcceptsTheNamesItsCertificateCovers()
+  {
+    const auto directory = mitk::IOUtil::CreateTemporaryDirectory("mitkRestRouteTest-XXXXXX");
+    const auto [keyPath, certificatePath] =
+      WriteCertificate(directory, "DNS:pc123.example.org,DNS:*.lab.example.org,IP:127.0.0.1");
+
+    auto config = MakeConfig();
+    config.httpsEnabled = true;
+    config.sslCertPath = certificatePath;
+    config.sslKeyPath = keyPath;
+
+    mitk::RestServer server;
+    server.SetConfig(config);
+    server.AddRoute(MakeRoute("POST", "/things", "made"));
+    CPPUNIT_ASSERT(server.Start());
+
+    httplib::SSLClient client("127.0.0.1", server.GetRunningConfig()->port);
+    client.enable_server_certificate_verification(false);
+
+    const auto post = [&client](const std::string& host) {
+      const auto res = client.Post("/api/v1/things", httplib::Headers{ { "Host", host } }, "{}", "application/json");
+      return res != nullptr ? res->status : 0;
+    };
+
+    // As clients in a network address the machine, by a name of its certificate.
+    const auto named = post("pc123.example.org:8080");
+    const auto namedInCapitals = post("PC123.Example.org");
+    const auto wildcard = post("pc7.lab.example.org");
+
+    // A rebinding domain, which a browser would not reach over TLS anyway.
+    const auto foreign = post("rebound.example.org");
+
+    server.Stop();
+    std::filesystem::remove_all(directory);
+
+    CPPUNIT_ASSERT_EQUAL(200, named);
+    CPPUNIT_ASSERT_EQUAL(200, namedInCapitals);
+    CPPUNIT_ASSERT_EQUAL(200, wildcard);
+    CPPUNIT_ASSERT_EQUAL(403, foreign);
   }
 
   void UnknownPathsAreAnsweredWithJson()

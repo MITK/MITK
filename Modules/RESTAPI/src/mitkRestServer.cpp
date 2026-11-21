@@ -42,6 +42,7 @@ found in the LICENSE file.
 
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
+#include <openssl/x509v3.h>
 
 #include <algorithm>
 #include <array>
@@ -195,25 +196,15 @@ namespace
     return Name;
   }
 
-  /** Resolved once and only when a request needs it, as it can ask DNS. */
-  const std::string& GetOwnDomainName()
-  {
-    static const std::string Name = []() {
-      itksys::SystemInformation information;
-      return ToLower(information.GetFullyQualifiedDomainName());
-    }();
-
-    return Name;
-  }
-
   /**
    * Why a browser could have sent the request, or an empty string if it
    * could not. Besides the Origin header, which browsers add to requests
    * that can change state, this covers requests for a host name that a web
    * page can only reach through DNS rebinding, and requests that the browser
-   * marks as coming from another site.
+   * marks as coming from another site. \p certificate is the one an HTTPS
+   * server presents, or null.
    */
-  std::string GetBrowserRefusalReason(const httplib::Request& req, const std::string& serverHost)
+  std::string GetBrowserRefusalReason(const httplib::Request& req, const std::string& serverHost, X509* certificate)
   {
     if (req.has_header("Origin"))
       return "This endpoint does not accept requests from web pages.";
@@ -233,8 +224,14 @@ namespace
       const bool isServerHost = !serverHost.empty() && host == ToLower(serverHost);
       const bool isOwnHostName = !GetOwnHostName().empty() && host == GetOwnHostName();
 
-      if (host != "localhost" && !IsIpLiteral(host) && !isServerHost && !isOwnHostName &&
-          (GetOwnDomainName().empty() || host != GetOwnDomainName()))
+      // A browser reaches an HTTPS server only under a name that its
+      // certificate covers, so no rebinding domain gets this far. A name from
+      // DNS, like the machine's own domain name, is no proof: the network
+      // answers it.
+      const bool isCertifiedName = certificate != nullptr &&
+        X509_check_host(certificate, host.c_str(), host.size(), 0, nullptr) == 1;
+
+      if (host != "localhost" && !IsIpLiteral(host) && !isServerHost && !isOwnHostName && !isCertifiedName)
       {
         return "This endpoint does not accept requests for the host name \"" + host + "\".";
       }
@@ -1142,8 +1139,12 @@ void RestServer::HandleRoutedHttp(const httplib::Request& req, httplib::Response
 {
   RestResponse response;
 
-  // Same lock-free read as in CheckClientAccess().
-  const auto refusalReason = GetBrowserRefusalReason(req, m_RunningConfig ? m_RunningConfig->host : std::string());
+  // Same lock-free reads as in CheckClientAccess(): both are set before the
+  // server listens and reset after it stopped.
+  auto* sslServer = dynamic_cast<httplib::SSLServer*>(m_Server.get());
+  auto* certificate = sslServer != nullptr ? SSL_CTX_get0_certificate(sslServer->ssl_context()) : nullptr;
+  const auto refusalReason =
+    GetBrowserRefusalReason(req, m_RunningConfig ? m_RunningConfig->host : std::string(), certificate);
 
   // Rejecting what a browser could send keeps web pages from driving the
   // Workbench through the user's browser, whatever the CORS headers say.

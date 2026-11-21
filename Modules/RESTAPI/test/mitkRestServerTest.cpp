@@ -193,6 +193,7 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   MITK_TEST(StartsAndStops);
   MITK_TEST(ReportsRunningState);
   MITK_TEST(ReportsServerUrl);
+  MITK_TEST(ListeningAddressIsInTheFormOfClientAddresses);
   MITK_TEST(ConfigurationPersists);
   MITK_TEST(PendingVsRunningConfig);
   MITK_TEST(HandlesDataStorageConnection);
@@ -265,6 +266,16 @@ public:
     m_Server->Stop();
 
     CPPUNIT_ASSERT(!m_Server->IsRunning());
+  }
+
+  void ListeningAddressIsInTheFormOfClientAddresses()
+  {
+    // Literals only: a name would ask the resolver, maybe the network.
+    CPPUNIT_ASSERT_EQUAL(std::string("::1"), mitk::RestServer::GetListeningAddress("0:0:0:0:0:0:0:1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("::1"), mitk::RestServer::GetListeningAddress("::1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("::"), mitk::RestServer::GetListeningAddress("::"));
+    CPPUNIT_ASSERT_EQUAL(std::string("127.0.0.1"), mitk::RestServer::GetListeningAddress("127.0.0.1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("0.0.0.0"), mitk::RestServer::GetListeningAddress("0.0.0.0"));
   }
 
   void ReportsServerUrl()

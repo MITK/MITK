@@ -19,18 +19,22 @@ found in the LICENSE file.
 #include <mitkMcpEndpoint.h>
 #include <mitkMcpRestApiTools.h>
 #include <mitkRestGuiThread.h>
+#include <mitkRestServer.h>
 
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleRegistry.h>
 
 #include <QCoreApplication>
+#include <QStringList>
 #include <QTimer>
 
 #include <algorithm>
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace
 {
@@ -70,24 +74,51 @@ namespace
     return GetLocalUrl(config) + "/api/v1" + QString::fromStdString(McpPath);
   }
 
+  /**
+   * The address that the agent's requests to GetLocalUrl() arrive from, as
+   * the server reports it: the one the server listens on, which for a name
+   * like "localhost" is a single one of its addresses. A dual-stack socket
+   * reports 127.0.0.1 as ::ffff:127.0.0.1.
+   */
+  std::string GetAgentAddress(const std::string& host)
+  {
+    std::string address;
+
+    try
+    {
+      address = mitk::RestServer::GetListeningAddress(host);
+    }
+    catch (const mitk::Exception&)
+    {
+      // The server resolved it when it started, so this hardly happens.
+      return host;
+    }
+
+    if (address == "::")
+      return "::ffff:127.0.0.1";
+
+    if (address == "0.0.0.0" || address.rfind("127.", 0) == 0)
+      return "127.0.0.1";
+
+    return address;
+  }
+
   /** Why the server does not accept requests from this machine; empty if it does. */
   QString GetRefusalOfThisMachine(const mitk::RestServerConfig& config)
   {
     if (config.clientAccessMode == mitk::ClientAccessMode::Whitelist)
     {
       // The server compares the client's address as a string, so a name like
-      // "localhost" on the list lets nobody in.
+      // "localhost" on the list lets nobody in, and only the exact spelling of
+      // the agent's address does.
       const auto& allowed = config.allowedClientIPs;
+      const auto address = GetAgentAddress(config.host);
 
-      const bool loopbackAllowed = std::any_of(allowed.begin(), allowed.end(), [](const std::string& address) {
-        return address == "127.0.0.1" || address == "::1" || address == "::ffff:127.0.0.1";
-      });
-
-      if (!loopbackAllowed)
+      if (std::find(allowed.begin(), allowed.end(), address) == allowed.end())
       {
-        return "The agent cannot work in the Workbench: the REST API server that runs accepts only the clients on its "
-          "list, which does not include this computer (127.0.0.1 or ::1). Add 127.0.0.1 to the list in the REST API "
-          "view, or stop the server, and reopen the Agent view.";
+        return QString("The agent cannot work in the Workbench: the REST API server that runs accepts only the clients "
+          "on its list, and the agent's requests from this computer arrive from %1 there. Add %1 to the list in the "
+          "REST API view, or stop the server, and reopen the Agent view.").arg(QString::fromStdString(address));
       }
     }
     else if (config.clientAccessMode == mitk::ClientAccessMode::LocalhostOnly)
@@ -95,8 +126,8 @@ namespace
       // Bound to any other address, requests from this computer arrive from
       // that address, which is not a local one to the server.
       const auto& host = config.host;
-      const bool reachable = host == "localhost" || host == "::1" || host == "::" || host == "0.0.0.0" ||
-        host.rfind("127.", 0) == 0;
+      const auto address = GetAgentAddress(host);
+      const bool reachable = address == "127.0.0.1" || address == "::ffff:127.0.0.1" || address == "::1";
 
       if (!reachable)
       {

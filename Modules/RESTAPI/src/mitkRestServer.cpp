@@ -743,6 +743,32 @@ std::optional<RestServerConfig> RestServer::GetRunningConfig() const
   return m_RunningConfig;
 }
 
+std::string RestServer::GetListeningAddress(const std::string& host)
+{
+  // As httplib's bind_to_port() resolves the host, which takes the first
+  // address it can bind, and as it reports the addresses of clients.
+  addrinfo hints{};
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
+  hints.ai_protocol = IPPROTO_IP;
+
+  addrinfo* result = nullptr;
+  if (getaddrinfo(host.c_str(), nullptr, &hints, &result) != 0 || result == nullptr)
+    mitkThrow() << "The host " << host << " cannot be resolved.";
+
+  const std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addresses(result, &freeaddrinfo);
+
+  std::array<char, NI_MAXHOST> address{};
+  if (getnameinfo(addresses->ai_addr, static_cast<socklen_t>(addresses->ai_addrlen), address.data(),
+        static_cast<socklen_t>(address.size()), nullptr, 0, NI_NUMERICHOST) != 0)
+  {
+    mitkThrow() << "The address of the host " << host << " cannot be written.";
+  }
+
+  return address.data();
+}
+
 void RestServer::SetDataStorage(DataStorage* dataStorage)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);

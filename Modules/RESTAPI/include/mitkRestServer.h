@@ -76,6 +76,18 @@ namespace mitk
     RestServerConfig GetPendingConfig() const override;
     std::optional<RestServerConfig> GetRunningConfig() const override;
 
+    /**
+     * \brief The address that a server started on \p host listens on, in the
+     *        numeric form in which the server reports the addresses of its
+     *        clients, like "::1" for "0:0:0:0:0:0:0:1".
+     *
+     * A name, like "localhost", stands for the first address it resolves to,
+     * which the server binds unless that address cannot be bound.
+     *
+     * \throw mitk::Exception if \p host cannot be resolved.
+     */
+    static std::string GetListeningAddress(const std::string& host);
+
     void SetDataStorage(DataStorage* dataStorage) override;
     DataStorage::Pointer GetDataStorage() const override;
 

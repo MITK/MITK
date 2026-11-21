@@ -266,6 +266,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestRestApiToolsImageLimit);
   MITK_TEST(TestRestApiToolsEncodeBinaryAnswers);
   MITK_TEST(TestOfferedServerAllowsNoFiles);
+  MITK_TEST(TestOfferNeedsTheAgentsAddressOnTheList);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -795,6 +796,39 @@ public:
     CPPUNIT_ASSERT_MESSAGE(response.Body, response.Body.find("FILE_ACCESS_DENIED") != std::string::npos);
     CPPUNIT_ASSERT_MESSAGE(response.Body, response.Body.find("not within any allowed directory") != std::string::npos);
     CPPUNIT_ASSERT(dataStorage->GetNamedNode("loaded") == nullptr);
+  }
+
+  void TestOfferNeedsTheAgentsAddressOnTheList()
+  {
+    const QTemporaryDir directory;
+    CPPUNIT_ASSERT(directory.isValid());
+    QmitkAgentMemory memory(directory.filePath("memory.json"));
+
+    // The server compares the exact string of the address the agent arrives from.
+    const auto offer = [&memory](const std::vector<std::string>& allowed) {
+      RegisteredRestServer registered;
+
+      mitk::RestServerConfig config;
+      config.enabled = true;
+      config.host = "0.0.0.0";
+      config.port = 0;
+      config.clientAccessMode = mitk::ClientAccessMode::Whitelist;
+      config.allowedClientIPs = allowed;
+      registered.Server.SetConfig(config);
+      CPPUNIT_ASSERT(registered.Server.Start());
+
+      QmitkAgentToolServer tools(memory);
+      const auto refusal = tools.Offer().toStdString();
+      tools.Withdraw();
+      registered.Server.Stop();
+
+      return refusal;
+    };
+
+    const auto refusal = offer({ "::1", "::ffff:127.0.0.1" });
+    CPPUNIT_ASSERT_MESSAGE(refusal, refusal.find("arrive from 127.0.0.1 there") != std::string::npos);
+
+    CPPUNIT_ASSERT_EQUAL(std::string(), offer({ "127.0.0.1" }));
   }
 };
 

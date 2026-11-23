@@ -53,6 +53,46 @@
     </layout>
    </item>
    <item>
+    <widget class="ctkCollapsibleGroupBox" name="allValuesGroupBox">
+     <property name="title">
+      <string>All pixel values</string>
+     </property>
+     <property name="collapsed" stdset="0">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="allValuesLayout">
+      <item>
+       <widget class="QTreeWidget" name="allValuesTreeWidget">
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+        </property>
+        <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <column>
+         <property name="text">
+          <string/>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Value</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="ctkCollapsibleGroupBox" name="coordsGroupBox">
      <property name="title">
       <string>Raw coordinates</string>

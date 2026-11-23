@@ -16,7 +16,11 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <mitkITKEventObserverGuard.h>
 #include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace mitk
 {
@@ -53,12 +57,20 @@ private:
   void OnSelectedPositionChanged(const mitk::Point3D& position);
   void OnSelectedTimePointChanged(const mitk::TimePointType& timePoint);
 
+  void NodeAdded(const mitk::DataNode* node) override;
   void NodeChanged(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
   void Clear();
   void ClearCoords();
 
+  /** Schedules a single Update() for when control returns to the event loop; further requests until then are merged. */
+  void RequestUpdate();
   void Update();
+  void UpdateAllPixelValues(const mitk::Point3D& position, mitk::TimePointType timePoint);
+  void AddImageRow(const mitk::DataNode* node, const mitk::Point3D& position, mitk::TimePointType timePoint);
+  void AddSegmentationRows(const mitk::DataNode* node, const mitk::Point3D& position, mitk::TimePointType timePoint);
+  void ReportReadError(const mitk::DataNode* node, const std::exception& e);
   void UpdateCoords(const mitk::Image* image, const itk::Index<3>& index, const mitk::Point3D& position);
   void UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension = 3);
   void UpdateWorldCoord(const mitk::Point3D& position, unsigned int dimension = 3);
@@ -67,6 +79,9 @@ private:
 
   QmitkSliceNavigationListener m_SliceNavigationListener;
   std::unique_ptr<Ui::QmitkPixelValueView> m_Ui;
+  std::vector<mitk::ITKEventObserverGuard> m_DataObservers;
+  std::set<std::string> m_ReportedReadErrors;
+  bool m_IsUpdateRequested = false;
 };
 
 #endif

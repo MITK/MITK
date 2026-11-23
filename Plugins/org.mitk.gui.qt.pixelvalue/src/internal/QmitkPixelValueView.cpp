@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkImage.h>
-#include <mitkCompositePixelValueToString.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
@@ -267,6 +266,45 @@ namespace
     return value;
   }
 
+  struct CompositePixel
+  {
+    QString text;
+    std::optional<QColor> color;
+  };
+
+  /** Reads an RGB(A) pixel of one time step, e.g. "(255, 128, 0)". Only 8-bit components are supported. */
+  CompositePixel ReadCompositePixel(const mitk::Image* image, const mitk::ImageDataItem* volume, const itk::Index<3>& index)
+  {
+    const auto pixelType = image->GetChannelDescriptor().GetPixelType();
+
+    // Composite pixels cannot be read component-wise like vector pixels; MITK supports them with 8 bits only.
+    if (itk::IOComponentEnum::UCHAR != pixelType.GetComponentType())
+      return { QStringLiteral("Unsupported RGB type"), std::nullopt };
+
+    const bool hasAlpha = itk::IOPixelEnum::RGBA == pixelType.GetPixelType();
+    QColor color;
+
+    if (hasAlpha)
+    {
+      mitk::ImagePixelReadAccessor<itk::RGBAPixel<unsigned char>, 3> accessor(image, volume, mitk::ImageAccessorBase::IgnoreLock);
+      const auto& pixel = accessor.GetPixelByIndex(index);
+      color.setRgb(pixel.GetRed(), pixel.GetGreen(), pixel.GetBlue(), pixel.GetAlpha());
+    }
+    else
+    {
+      mitk::ImagePixelReadAccessor<itk::RGBPixel<unsigned char>, 3> accessor(image, volume, mitk::ImageAccessorBase::IgnoreLock);
+      const auto& pixel = accessor.GetPixelByIndex(index);
+      color.setRgb(pixel.GetRed(), pixel.GetGreen(), pixel.GetBlue());
+    }
+
+    QStringList components = { QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()) };
+
+    if (hasAlpha)
+      components << QString::number(color.alpha());
+
+    return { QStringLiteral("(%1)").arg(components.join(", ")), color };
+  }
+
   /** Like mitk::ImageVtkMapper2D, honors "Image.Displayed Component" only for images with more than one component.
    *  \return The displayed component, or nothing if the image has a single component or the property is not set.
    *          Callers then read component 0.
@@ -453,7 +491,7 @@ void QmitkPixelValueView::Update()
     {
       if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
       {
-        m_Ui->pixelValueLineEdit->setText(QString::fromStdString(mitk::ConvertCompositePixelValueToString(image, index)));
+        m_Ui->pixelValueLineEdit->setText(ReadCompositePixel(image, image->GetVolumeData(timeStep), index).text);
       }
       else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
       {
@@ -511,13 +549,24 @@ void QmitkPixelValueView::UpdateAllPixelValues(const mitk::Point3D& position, mi
 
   for (const auto* node : GetVisibleNodesAt(this->GetDataStorage(), position, timePoint))
   {
-    m_DataObservers.emplace_back(node->GetData(), itk::ModifiedEvent(), [this](const itk::EventObject&) {
+    const auto requestUpdate = [this](const itk::EventObject&) {
       this->RequestUpdate();
-    });
+    };
+
+    m_DataObservers.emplace_back(node->GetData(), itk::ModifiedEvent(), requestUpdate);
+
+    const auto* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData());
+
+    // Undo and redo of a slice edit modify only the group image, not the segmentation.
+    if (nullptr != segmentation)
+    {
+      for (mitk::MultiLabelSegmentation::GroupIndexType i = 0; i < segmentation->GetNumberOfGroups(); ++i)
+        m_DataObservers.emplace_back(segmentation->GetGroupImage(i), itk::ModifiedEvent(), requestUpdate);
+    }
 
     try
     {
-      if (nullptr != dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()))
+      if (nullptr != segmentation)
       {
         this->AddSegmentationRows(node, position, timePoint);
       }
@@ -562,7 +611,6 @@ void QmitkPixelValueView::AddImageRow(const mitk::DataNode* node, const mitk::Po
 
   const auto name = QString::fromStdString(node->GetName());
   const auto pixelType = image->GetChannelDescriptor().GetPixelType();
-  const auto componentType = pixelType.GetComponentType();
   const bool isInteger = IsInteger(pixelType);
 
   switch (pixelType.GetPixelType())
@@ -570,35 +618,8 @@ void QmitkPixelValueView::AddImageRow(const mitk::DataNode* node, const mitk::Po
     case itk::IOPixelEnum::RGB:
     case itk::IOPixelEnum::RGBA:
     {
-      // Composite pixels cannot be read component-wise like vector pixels; MITK supports them with 8 bits only.
-      if (itk::IOComponentEnum::UCHAR != componentType)
-      {
-        AddRow(m_Ui->allValuesTreeWidget, node, name, QStringLiteral("Unsupported RGB type"), std::nullopt);
-        return;
-      }
-
-      const bool hasAlpha = itk::IOPixelEnum::RGBA == pixelType.GetPixelType();
-      QColor color;
-
-      if (hasAlpha)
-      {
-        mitk::ImagePixelReadAccessor<itk::RGBAPixel<unsigned char>, 3> accessor(image, volume, mitk::ImageAccessorBase::IgnoreLock);
-        const auto& pixel = accessor.GetPixelByIndex(index);
-        color.setRgb(pixel.GetRed(), pixel.GetGreen(), pixel.GetBlue(), pixel.GetAlpha());
-      }
-      else
-      {
-        mitk::ImagePixelReadAccessor<itk::RGBPixel<unsigned char>, 3> accessor(image, volume, mitk::ImageAccessorBase::IgnoreLock);
-        const auto& pixel = accessor.GetPixelByIndex(index);
-        color.setRgb(pixel.GetRed(), pixel.GetGreen(), pixel.GetBlue());
-      }
-
-      QStringList components = { QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()) };
-
-      if (hasAlpha)
-        components << QString::number(color.alpha());
-
-      AddRow(m_Ui->allValuesTreeWidget, node, name, QStringLiteral("(%1)").arg(components.join(", ")), color);
+      const auto [text, color] = ReadCompositePixel(image, volume, index);
+      AddRow(m_Ui->allValuesTreeWidget, node, name, text, color);
       return;
     }
 

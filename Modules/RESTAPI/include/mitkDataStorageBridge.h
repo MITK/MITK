@@ -375,8 +375,10 @@ namespace mitk
     /**
      * \brief Set a single property on a node.
      *
-     * A context names a render window. An unknown name is refused; for a known
-     * name the node gets its property list, if it has none yet.
+     * A context names a render window, or a property list that the node has
+     * already, like that of a render window that is closed by now. Any other
+     * name is refused; for a render window the node gets its property list,
+     * if it has none yet.
      *
      * \param uid The node UID.
      * \param key The property key.

@@ -1304,7 +1304,7 @@ Replace all properties of a node (full replacement). All or nothing: if a value 
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1357,7 +1357,7 @@ Update multiple properties at once (merge semantics). A refused value is listed 
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window is listed in `failed` with the known ones. |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for is listed in `failed` with the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1483,7 +1483,7 @@ Set a single property value (create or replace). A refused value answers 400 wit
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request (simple property):**
@@ -1538,7 +1538,7 @@ Remove a property from a node.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is not an existing render window answers 400 and lists the known ones. |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Response (200 OK):**

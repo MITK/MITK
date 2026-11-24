@@ -1378,7 +1378,7 @@
           "Properties"
         ],
         "summary": "Replace all properties",
-        "description": "Replaces all properties on a node (PUT semantics).\nExisting properties not in the request are removed (except protected properties).\nAll or nothing: if a value is refused (it does not fit the type of the property it changes, or cannot be converted), the answer is 400 with the key and the reason, and nothing is changed.\nA `context` that is not an existing render window answers 400 and lists the known ones.\nDefault scope is `node`.\n",
+        "description": "Replaces all properties on a node (PUT semantics).\nExisting properties not in the request are removed (except protected properties).\nAll or nothing: if a value is refused (it does not fit the type of the property it changes, or cannot be converted), the answer is 400 with the key and the reason, and nothing is changed.\nA `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "replaceNodeProperties",
         "parameters": [
           {
@@ -1506,7 +1506,7 @@
           "Properties"
         ],
         "summary": "Update properties (merge)",
-        "description": "Updates multiple properties on a node (merge semantics).\nOnly specified properties are modified; others remain unchanged.\nA refused value is listed in `failed` with the reason in `error`; the other values are applied.\nA `context` that is not an existing render window is refused the same way, with the known ones listed.\nDefault scope is `node`.\n",
+        "description": "Updates multiple properties on a node (merge semantics).\nOnly specified properties are modified; others remain unchanged.\nA refused value is listed in `failed` with the reason in `error`; the other values are applied.\nA `context` that is neither an existing render window nor one that the node has properties for is refused the same way, with the known ones listed.\nDefault scope is `node`.\n",
         "operationId": "updateNodeProperties",
         "parameters": [
           {
@@ -1757,7 +1757,7 @@
           "Properties"
         ],
         "summary": "Set a single property",
-        "description": "Sets a single property value. Creates the property if it doesn't exist.\nA refused value answers 400 with the reason in the message. A `context` that is not an existing render window answers 400 and lists the known ones.\nDefault scope is `node`.\n",
+        "description": "Sets a single property value. Creates the property if it doesn't exist.\nA refused value answers 400 with the reason in the message. A `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "setNodeProperty",
         "parameters": [
           {
@@ -1867,7 +1867,7 @@
           "Properties"
         ],
         "summary": "Delete a property",
-        "description": "Deletes a property from a node.\nThe `name` property is protected and cannot be deleted in node scope.\nA `context` that is not an existing render window answers 400 and lists the known ones.\nDefault scope is `node`.\n",
+        "description": "Deletes a property from a node.\nThe `name` property is protected and cannot be deleted in node scope.\nA `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "deleteNodeProperty",
         "parameters": [
           {
@@ -4053,7 +4053,7 @@
       "Context": {
         "name": "context",
         "in": "query",
-        "description": "Renderer context for property lookup (e.g., a specific render window name). Property writes refuse a name that is not an existing render window.",
+        "description": "Renderer context for property lookup (e.g., a specific render window name). Property writes refuse a name that is neither an existing render window nor a context that the node has properties for.",
         "schema": {
           "type": "string"
         }

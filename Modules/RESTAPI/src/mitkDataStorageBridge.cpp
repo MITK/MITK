@@ -400,15 +400,22 @@ namespace
   /**
    * @brief The reason a property context is refused; empty if it is acceptable.
    *
-   * A context is acceptable if none is given or if it names an existing render window.
+   * A context is acceptable if none is given, if it names an existing render window,
+   * or if the node has properties for it already, like those of a render window that
+   * is closed by now: what a client can read, it can change.
    * Must be called in the thread that owns the renderers.
    */
-  std::string UnknownContextReason(const std::optional<std::string>& context)
+  std::string UnknownContextReason(const std::optional<std::string>& context, const mitk::IPropertyProvider& node)
   {
     if (!context.has_value() || context->empty() || mitk::BaseRenderer::GetByName(*context) != nullptr)
       return "";
 
-    std::set<std::string> names;
+    const auto contextsOfNode = node.GetPropertyContextNames();
+
+    if (std::find(contextsOfNode.begin(), contextsOfNode.end(), *context) != contextsOfNode.end())
+      return "";
+
+    std::set<std::string> names(contextsOfNode.begin(), contextsOfNode.end());
     for (const auto& entry : mitk::BaseRenderer::baseRendererMap)
       names.insert(entry.second->GetName());
 
@@ -1241,7 +1248,7 @@ namespace mitk
         return PropertyOperationResult{OperationStatus::NodeNotFound};
       }
 
-      if (auto reason = UnknownContextReason(params.context); !reason.empty())
+      if (auto reason = UnknownContextReason(params.context, *node); !reason.empty())
       {
         return PropertyOperationResult{OperationStatus::InvalidInput, std::move(reason)};
       }
@@ -1321,7 +1328,7 @@ namespace mitk
         return PropertyOperationResult{OperationStatus::NodeNotFound};
       }
 
-      if (auto reason = UnknownContextReason(params.context); !reason.empty())
+      if (auto reason = UnknownContextReason(params.context, *node); !reason.empty())
       {
         return PropertyOperationResult{OperationStatus::InvalidInput, std::move(reason)};
       }
@@ -1394,7 +1401,7 @@ namespace mitk
         return ReplacePropertiesResult{OperationStatus::InvalidInput, {}, "The properties must be a JSON object."};
       }
 
-      if (auto reason = UnknownContextReason(params.context); !reason.empty())
+      if (auto reason = UnknownContextReason(params.context, *node); !reason.empty())
       {
         return ReplacePropertiesResult{OperationStatus::InvalidInput, {}, std::move(reason)};
       }

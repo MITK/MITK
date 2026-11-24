@@ -176,6 +176,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodePropertyKeepsTypeOfSimpleValue);
   MITK_TEST(SetNodePropertyOverrideTakesTypeOfOverriddenProperty);
   MITK_TEST(PropertyWritesRefuseUnknownContext);
+  MITK_TEST(PropertyWritesAcceptContextThatTheNodeHasAListFor);
   MITK_TEST(ReplaceNodePropertiesRefusesAllOrNothing);
   MITK_TEST(SetNodePropertyRefusesOtherType);
   MITK_TEST(SetNodePropertyRefusesUnfittingValue);
@@ -1505,6 +1506,33 @@ public:
     // No list was made for the name
     const auto contexts = m_Root1->GetPropertyContextNames();
     CPPUNIT_ASSERT(std::find(contexts.begin(), contexts.end(), "stdmulti.widget9") == contexts.end());
+  }
+
+  void PropertyWritesAcceptContextThatTheNodeHasAListFor()
+  {
+    const std::string context = "stdmulti.widget0";
+
+    // The list of a render window that is gone, as after closing its editor
+    m_Root1->GetPropertyList(context)->SetFloatProperty("line.width", 2.0f);
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+    params.context = context;
+
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "line.width", 3, params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+
+    const auto property = m_Root1->GetConstProperty("line.width", context, false);
+    const auto* floatProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
+    CPPUNIT_ASSERT(floatProperty != nullptr);
+    CPPUNIT_ASSERT_EQUAL(3.0f, floatProperty->GetValue());
+
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "line.width", params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
+    CPPUNIT_ASSERT(m_Root1->GetConstProperty("line.width", context, false).IsNull());
+
+    CPPUNIT_ASSERT(m_Bridge->ReplaceNodeProperties(m_Root1Uid, nlohmann::json::object(), params).status ==
+      mitk::DataStorageBridge::OperationStatus::Success);
   }
 
   void ReplaceNodePropertiesRefusesAllOrNothing()

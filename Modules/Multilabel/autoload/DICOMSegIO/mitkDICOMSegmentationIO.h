@@ -84,9 +84,9 @@ namespace mitk
      * description), a description or Tracking ID that is no valid ST or UT value without it
      * (non-ASCII characters, or control characters other than TAB, LF, FF, CR and ESC), or a
      * Tracking UID that is no valid UID; only changing the label lets the write succeed.
-     * \throw mitk::Exception if the segmentation has no groups; naming the group for a group without
-     * labels, as a DICOM SEG holds at least one segment; naming the relation for a source-image
-     * relation with per-slice UIDs
+     * \throw mitk::Exception if the segmentation has no groups, or has more than one and is written
+     * to a stream, which takes one file; naming the group for a group without labels, as a DICOM SEG
+     * holds at least one segment; naming the relation for a source-image relation with per-slice UIDs
      * whose source series UID is missing or no valid UID, or one of whose slices has a SOP Instance
      * UID that is no valid UID or lacks a valid SOP Class UID (slices without a SOP Instance UID are
      * skipped); naming the attribute for a patient, study or frame of reference value that is no

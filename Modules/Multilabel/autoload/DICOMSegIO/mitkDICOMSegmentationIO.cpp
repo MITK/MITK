@@ -1028,8 +1028,6 @@ namespace mitk
     ValidateOutputLocation();
 
     mitk::LocaleSwitch localeSwitch("C");
-    LocalFile localFile(this);
-    const std::string path = localFile.GetFileName();
 
     // AbstractFileWriter::GetInput() returns const BaseData*. Synthesis
     // mutates the seg's property list (Complete fills missing identity
@@ -1052,6 +1050,13 @@ namespace mitk
 
     if (0 == input->GetNumberOfGroups())
       mitkThrow() << "Cannot write the segmentation: it has no groups.";
+
+    // A stream takes one file, and each group is a file of its own.
+    if (nullptr != this->GetOutputStream() && input->GetNumberOfGroups() > 1)
+    {
+      mitkThrow() << "Cannot write a DICOM SEG of " << input->GetNumberOfGroups()
+                  << " groups to a stream: each group is written to a file of its own. Write to a file path instead.";
+    }
 
     const std::string synthesisMode = this->GetWriterChoiceOption(OPTION_SYNTHESIS_MODE);
     const std::string encoding = this->GetWriterChoiceOption(OPTION_ENCODING);
@@ -1100,6 +1105,12 @@ namespace mitk
     }
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
+
+    // With a stream, LocalFile creates a temporary file and copies it into the stream when it goes
+    // out of scope, also after a refusal. Created after the checks above, it leaves the stream
+    // untouched when one of them refuses the write.
+    LocalFile localFile(this);
+    const std::string path = localFile.GetFileName();
 
     // The first written group's SeriesDate/SeriesTime are reused for the
     // remaining groups (see the per-group write below): dcmqi stamps these

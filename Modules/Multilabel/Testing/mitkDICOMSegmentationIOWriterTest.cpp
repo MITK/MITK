@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <set>
 #include <sstream>
@@ -626,6 +627,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
   MITK_TEST(WriteRefusesSegmentationWithoutGroups);
   MITK_TEST(WriteRefusesGroupsWithoutLabelsBeforeAnything);
+  MITK_TEST(WriteRefusesMultiGroupSegToStream);
+  MITK_TEST(WriteToStreamDeliversSingleGroupSeg);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1622,6 +1625,64 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("The second group is refused", mitk::IOUtil::Save(laterGroup, laterPath), mitk::Exception);
     CPPUNIT_ASSERT_MESSAGE("The first group has no file", !FileExists(laterPath));
     CPPUNIT_ASSERT_MESSAGE("The second group has no file", !FileExists(GroupFilePath(laterPath, 1)));
+  }
+
+  // A stream takes one file, and the writer writes one file per group, so a segmentation of several
+  // groups is refused before anything is written or stamped.
+  void WriteRefusesMultiGroupSegToStream()
+  {
+    auto seg = BuildSegWithRule(/*stampIdentity=*/false);
+    const auto g1 = seg->AddGroup();
+    auto label2 = mitk::Label::New(2, "L2");
+    label2->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    seg->AddLabel(label2, g1, true, true);
+    {
+      mitk::ImageWriteAccessor writeAccessor(seg->GetGroupImage(g1));
+      static_cast<mitk::Label::PixelType*>(writeAccessor.GetData())[0] = 2;
+    }
+
+    const auto keysBefore = seg->GetPropertyKeys();
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    std::ostringstream stream;
+    std::string message;
+    try
+    {
+      mitk::test::WriteWithWriter(seg, this->GetTempFilePath("stream-two-groups.dcm"), "DICOM Segmentation", options, &stream);
+    }
+    catch (const mitk::DICOMSegStrictModeException& e)
+    {
+      CPPUNIT_FAIL(std::string("The refusal is a strict-mode refusal: ") + e.GetDescription());
+    }
+    catch (const mitk::DICOMSegUnrepresentableValueException& e)
+    {
+      CPPUNIT_FAIL(std::string("The refusal blames a value: ") + e.GetDescription());
+    }
+    catch (const mitk::Exception& e)
+    {
+      message = e.GetDescription();
+    }
+    CPPUNIT_ASSERT_MESSAGE("The writer wrote " + std::to_string(stream.str().size()) + " bytes to the stream instead of refusing",
+                           !message.empty());
+    CPPUNIT_ASSERT_MESSAGE("The refusal names the stream: " + message, message.find("stream") != std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE("Nothing reaches the stream", stream.str().empty());
+    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped", keysBefore == seg->GetPropertyKeys());
+  }
+
+  // One group is one file, which goes to a stream as it goes to a path.
+  void WriteToStreamDeliversSingleGroupSeg()
+  {
+    auto seg = BuildSegWithRule();
+    std::ostringstream stream;
+    mitk::test::WriteWithWriter(seg, this->GetTempFilePath("stream-one-group.dcm"), "DICOM Segmentation", {}, &stream);
+    CPPUNIT_ASSERT_MESSAGE("The stream holds the SEG", !stream.str().empty());
+
+    const auto path = this->GetTempFilePath("stream-one-group-copy.dcm");
+    {
+      std::ofstream file(path, std::ios::binary);
+      file << stream.str();
+    }
+    AssertWrittenSegments(path, *seg, 0, false);
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

@@ -361,12 +361,14 @@ namespace mitk
      * Writes data to path with the registered writer of the given description. Unlike
      * IOUtil::Save, which turns every exception into a plain mitk::Exception, this lets the
      * writer's own exception through, so tests can assert its type. The writer must accept
-     * the data, as with IOUtil::Save.
+     * the data, as with IOUtil::Save. With a stream, the writer writes to it, and path is only
+     * the name it is given.
      */
     inline void WriteWithWriter(const BaseData* data,
                                 const std::string& path,
                                 const std::string& writerDescription,
-                                const IFileWriter::Options& options = {})
+                                const IFileWriter::Options& options = {},
+                                std::ostream* stream = nullptr)
     {
       FileWriterSelector selector(data, std::string(), path);
       for (const auto& item : selector.Get())
@@ -375,7 +377,10 @@ namespace mitk
         {
           auto* writer = item.GetWriter();
           writer->SetInput(data);
-          writer->SetOutputLocation(path);
+          if (nullptr != stream)
+            writer->SetOutputStream(path, stream);
+          else
+            writer->SetOutputLocation(path);
           writer->SetOptions(options);
           writer->Write();
           return;

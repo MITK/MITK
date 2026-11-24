@@ -101,6 +101,12 @@ namespace mitk
   {
     ValidateOutputLocation();
 
+    if (nullptr != this->GetOutputStream())
+    {
+      mitkThrow() << "Cannot write a segmentation stack to a stream: it consists of a meta file and one image "
+                  << "per group or label. Write to a file path instead.";
+    }
+
     auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
     if (0 == input->GetNumberOfGroups())

@@ -24,6 +24,8 @@ found in the LICENSE file.
 
 #include <filesystem>
 #include <optional>
+#include <sstream>
+#include <string>
 
 class mitkMultiLabelSegmentationStackWriterTestSuite : public mitk::TestFixture
 {
@@ -45,6 +47,7 @@ class mitkMultiLabelSegmentationStackWriterTestSuite : public mitk::TestFixture
   MITK_TEST(TestWriteWithoutMatchingExtensionFails);
   MITK_TEST(TestWrite4DFails);
   MITK_TEST(TestWriteWithoutGroupsFails);
+  MITK_TEST(TestWriteToStreamFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -365,6 +368,30 @@ public:
     AssertExceptionMentions(
       [&]() { mitk::IOUtil::Save(segmentation, this->GetTempFilePath("no-groups.mitklabel.json"), GroupStrategy()); },
       { "no groups" });
+  }
+
+  // A stack is a meta file and several images, and a stream takes one file.
+  void TestWriteToStreamFails()
+  {
+    for (const std::string name : { "stream.nii.gz", "stream.mitklabel.json" })
+    {
+      std::ostringstream stream;
+      std::string message;
+      try
+      {
+        mitk::test::WriteWithWriter(BuildRich3D(), this->GetTempFilePath(name), "MITK ML Segmentation NIFTI Stack",
+                                    GroupStrategy(), &stream);
+      }
+      catch (const mitk::Exception& e)
+      {
+        message = e.GetDescription();
+      }
+      CPPUNIT_ASSERT_MESSAGE(name + ": the writer wrote " + std::to_string(stream.str().size()) +
+                               " bytes to the stream instead of refusing",
+                             !message.empty());
+      CPPUNIT_ASSERT_MESSAGE(name + ": the refusal names the stream: " + message, message.find("stream") != std::string::npos);
+      CPPUNIT_ASSERT_MESSAGE(name + ": nothing reaches the stream", stream.str().empty());
+    }
   }
 };
 

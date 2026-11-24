@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 namespace
@@ -64,6 +65,10 @@ class mitkFileReaderWriterChoiceOptionTestSuite : public mitk::TestFixture
   MITK_TEST(OptionsHandedBackKeepTheDefault);
   MITK_TEST(ForeignListIsRefused);
   MITK_TEST(OptionWithoutChoicesIsRefused);
+  MITK_TEST(CStringValueIsResolved);
+  MITK_TEST(UnknownCStringValueIsRefused);
+  MITK_TEST(NullCStringIsRefused);
+  MITK_TEST(ValueOfOtherTypeIsRefusedReadably);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -113,6 +118,56 @@ public:
     ChoiceOptionReader reader;
     RefusalMessage(reader, "Flag");
     RefusalMessage(reader, "Unregistered");
+  }
+
+  // C++ callers name a choice by a constant or by a command-line argument as often as by a std::string.
+  void CStringValueIsResolved()
+  {
+    ChoiceOptionReader reader;
+    const char* constant = "second";
+    reader.SetOption("Mode", constant);
+    CPPUNIT_ASSERT_EQUAL(std::string("second"), reader.GetChoiceOption("Mode"));
+
+    char argument[] = "second";
+    char* mutableText = argument;
+    ChoiceOptionReader other;
+    other.SetOption("Mode", mutableText);
+    CPPUNIT_ASSERT_EQUAL(std::string("second"), other.GetChoiceOption("Mode"));
+  }
+
+  void UnknownCStringValueIsRefused()
+  {
+    ChoiceOptionReader reader;
+    const char* constant = "Second";
+    reader.SetOption("Mode", constant);
+    const auto message = RefusalMessage(reader, "Mode");
+    CPPUNIT_ASSERT_MESSAGE("The refusal names the value and the choices: " + message,
+                           message.find("\"Second\"") != std::string::npos && message.find("first, second") != std::string::npos);
+  }
+
+  void NullCStringIsRefused()
+  {
+    ChoiceOptionReader reader;
+    reader.SetOption("Mode", static_cast<const char*>(nullptr));
+    const auto message = RefusalMessage(reader, "Mode");
+    CPPUNIT_ASSERT_MESSAGE("The refusal asks for a string and names the choices: " + message,
+                           message.find("as a string") != std::string::npos && message.find("first, second") != std::string::npos);
+
+    ChoiceOptionReader other;
+    other.SetOption("Mode", static_cast<char*>(nullptr));
+    RefusalMessage(other, "Mode");
+  }
+
+  // The refusal names what is expected; the compiler's name of the type held is meaningless to users.
+  void ValueOfOtherTypeIsRefusedReadably()
+  {
+    ChoiceOptionReader reader;
+    reader.SetOption("Mode", std::vector<int>{ 1 });
+    const auto message = RefusalMessage(reader, "Mode");
+    CPPUNIT_ASSERT_MESSAGE("The refusal asks for a string and names the choices: " + message,
+                           message.find("as a string") != std::string::npos && message.find("first, second") != std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE("The refusal names no compiler type name: " + message,
+                           message.find(typeid(std::vector<int>).name()) == std::string::npos);
   }
 };
 

@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <usLDAPProp.h>
 
 #include <algorithm>
+#include <optional>
 #include <vector>
 
 namespace
@@ -32,6 +33,25 @@ namespace
     for (const auto &choice : choices)
       result += (result.empty() ? "" : ", ") + choice;
     return result;
+  }
+
+  // The option dialogs, the Python bindings and MitkFileConverter store a std::string; C++ callers
+  // often pass a constant or a command-line argument.
+  std::optional<std::string> GetChoiceText(const us::Any &value)
+  {
+    if (value.Type() == typeid(std::string))
+      return us::ref_any_cast<std::string>(value);
+    if (value.Type() == typeid(const char *))
+    {
+      if (const auto *text = us::any_cast<const char *>(value); nullptr != text)
+        return std::string(text);
+    }
+    if (value.Type() == typeid(char *))
+    {
+      if (const auto *text = us::any_cast<char *>(value); nullptr != text)
+        return std::string(text);
+    }
+    return std::nullopt;
   }
 }
 
@@ -89,15 +109,14 @@ namespace mitk
       return choices.front();
 
     const auto &value = iter->second;
-    if (value.Type() == typeid(std::string))
+    if (const auto chosen = GetChoiceText(value); chosen.has_value())
     {
-      const auto &chosen = us::ref_any_cast<std::string>(value);
-      if (std::find(choices.begin(), choices.end(), chosen) == choices.end())
+      if (std::find(choices.begin(), choices.end(), *chosen) == choices.end())
       {
-        mitkThrow() << "Unknown value \"" << chosen << "\" of the option \"" << name
+        mitkThrow() << "Unknown value \"" << *chosen << "\" of the option \"" << name
                     << "\". Valid values: " << JoinChoices(choices) << ".";
       }
-      return chosen;
+      return *chosen;
     }
 
     // GetOptions() reports an unset choice as its list, and IOUtil hands those options to the
@@ -106,8 +125,8 @@ namespace mitk
         us::ref_any_cast<std::vector<std::string>>(value) == choices)
       return choices.front();
 
-    mitkThrow() << "The option \"" << name << "\" holds a value of type " << value.Type().name()
-                << " instead of one of its choices: " << JoinChoices(choices) << ".";
+    mitkThrow() << "The option \"" << name << "\" must name one of its choices as a string: " << JoinChoices(choices)
+                << ".";
   }
 
   void FileReaderWriterBase::SetOptions(const FileReaderWriterBase::Options &options)

@@ -596,6 +596,7 @@ Args:
 Raises:
     ValueError: If the image is null or the format is not writable.
     TypeError: If a writer option has an unsupported type.
+    OverflowError: If an int writer option does not fit a C++ int.
     mitk.Exception: If a writer option has a value the writer does not
         know.
 )");

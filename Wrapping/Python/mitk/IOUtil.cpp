@@ -139,6 +139,7 @@ Args:
 Raises:
     TypeError: If ``data`` is not a supported type, or a writer option has
         an unsupported type.
+    OverflowError: If an int writer option does not fit a C++ int.
     ValueError: If ``data`` is null.
     mitk.Exception: If a writer option has a value the writer does not
         know, or writing fails.

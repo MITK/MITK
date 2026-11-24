@@ -26,6 +26,8 @@ namespace py = pybind11;
  * or str, the value types MitkFileConverter accepts as well. None means no options.
  *
  * \throw py::type_error naming the option for any other name or value type.
+ * \throw py::error_already_set holding an OverflowError naming the option for an int that does not
+ * fit a C++ int.
  * \pre The caller holds the GIL.
  */
 mitk::IFileWriter::Options ToWriterOptions(const std::optional<py::dict>& writerOptions);

@@ -1082,6 +1082,21 @@ class TestSaveWriterOptions:
         with pytest.raises(TypeError, match="Save strategy"):
             seg.save(str(tmp_path / "seg.mitklabel.json"), writer_options={"Save strategy": ["instance"]})
 
+    @pytest.mark.parametrize("value", [2**31, -2**31 - 1, 2**70])
+    def test_option_value_out_of_int_range_raises(self, ref_image, tmp_path, value):
+        seg, _ = self._painted(ref_image)
+        path = tmp_path / "seg.mitklabel.json"
+        with pytest.raises(OverflowError, match="Some option"):
+            seg.save(str(path), writer_options={"Some option": value})
+        assert not path.exists()
+
+    @pytest.mark.parametrize("value", [2**31 - 1, -2**31])
+    def test_option_value_at_int_range_limits_is_accepted(self, ref_image, tmp_path, value):
+        seg, _ = self._painted(ref_image)
+        path = tmp_path / "seg.mitklabel.json"
+        seg.save(str(path), writer_options={"Some option": value})
+        assert path.exists()
+
 
 class TestErrorPaths:
 

@@ -1100,6 +1100,7 @@ Args:
 
 Raises:
     TypeError: If a writer option has an unsupported type.
+    OverflowError: If an int writer option does not fit a C++ int.
     mitk.Exception: If a writer option has a value the writer does not
         know, or writing fails.
 )")

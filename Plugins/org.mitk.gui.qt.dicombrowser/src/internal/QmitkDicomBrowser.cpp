@@ -16,20 +16,13 @@ found in the LICENSE file.
 #include "mitkPluginActivator.h"
 
 #include <mitkBaseDICOMReaderService.h>
-#include <mitkContourModelSet.h>
 #include <mitkCoreServices.h>
 #include <mitkDICOMRTMimeTypes.h>
-#include <mitkDoseNodeHelper.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIOUtil.h>
-#include <mitkIPreferences.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIsoLevelsGenerator.h>
 #include <mitkMimeType.h>
-#include <mitkPropertyNameHelper.h>
 #include <mitkRenderingManager.h>
-#include <mitkRTUIConstants.h>
 
 #include <QMessageBox>
 
@@ -49,7 +42,7 @@ namespace
     }
   }
 
-  std::vector<mitk::BaseData::Pointer> Read(const std::string& filename, const mitk::CustomMimeType& mimeType)
+  bool ReadIntoDataStorage(const std::string& filename, const mitk::CustomMimeType& mimeType, mitk::DataStorage* dataStorage)
   {
     mitk::FileReaderRegistry readerRegistry;
     mitk::IFileReader* reader = nullptr;
@@ -63,94 +56,20 @@ namespace
       const std::string message = "Cannot find " + mimeType.GetCategory() + "( " + mimeType.GetComment() + ") file reader.";
       MITK_ERROR << message;
       QMessageBox::critical(nullptr, "View DICOM series", QString::fromStdString(message));
-      return {};
+      return false;
     }
 
     reader->SetInput(filename);
-    return reader->Read();
-  }
 
-  bool AddRTDoseToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
-  {
-    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE());
-
-    if (!readerOutput.empty())
+    try
     {
-      mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.front().GetPointer());
-
-      auto doseImageNode = mitk::DataNode::New();
-      doseImageNode->SetData(doseImage);
-      doseImageNode->SetName("RTDose");
-
-      if (doseImage.IsNotNull())
-      {
-        std::string sopUID;
-
-        if (mitk::GetBackwardsCompatibleDICOMPropertyValue(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
-          doseImageNode->SetName(sopUID);
-
-        auto prefService = mitk::CoreServices::GetPreferencesService();
-        auto prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
-
-        if (prefNode == nullptr)
-          mitkThrow() << "Error in preference interface. Cannot find preset node with name \"" << prefNode << '"';
-
-        double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
-        bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true);
-
-        mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GenerateIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
-
-        dataStorage->Add(doseImageNode);
-        return true;
-      }
+      return !reader->Read(*dataStorage)->empty();
     }
-
-    return false;
-  }
-
-  bool AddRTStructToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
-  {
-    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE());
-
-    if (readerOutput.empty())
+    catch (const std::exception& e)
     {
-      MITK_ERROR << "No structure sets were created";
-    }
-    else
-    {
-      for (const auto& aStruct : readerOutput)
-      {
-        mitk::ContourModelSet::Pointer countourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
-
-        auto structNode = mitk::DataNode::New();
-        structNode->SetData(countourModelSet);
-        structNode->SetProperty("name", aStruct->GetProperty("name"));
-        structNode->SetProperty("color", aStruct->GetProperty("color"));
-        structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-
-        dataStorage->Add(structNode);
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-
-  void AddRTPlanToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
-  {
-    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE());
-
-    if (!readerOutput.empty())
-    {
-      // There is no image, only the properties are of interest.
-      mitk::Image::Pointer planDummyImage = dynamic_cast<mitk::Image*>(readerOutput.front().GetPointer());
-
-      auto planImageNode = mitk::DataNode::New();
-      planImageNode->SetData(planDummyImage);
-      planImageNode->SetName("RTPlan");
-
-      dataStorage->Add(planImageNode);
+      MITK_ERROR << e.what();
+      QMessageBox::critical(nullptr, "View DICOM series", e.what());
+      return false;
     }
   }
 }
@@ -230,17 +149,17 @@ void QmitkDicomBrowser::OnViewSeries(const std::vector<std::pair<std::string, st
     {
       if (modality == "RTDOSE")
       {
-        reinit |= AddRTDoseToDataStorage(filename, dataStorage);
+        reinit |= ReadIntoDataStorage(filename, mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE(), dataStorage);
         continue;
       }
       else if (modality == "RTSTRUCT")
       {
-        reinit |= AddRTStructToDataStorage(filename, dataStorage);
+        reinit |= ReadIntoDataStorage(filename, mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE(), dataStorage);
         continue;
       }
       else if (modality == "RTPLAN")
       {
-        AddRTPlanToDataStorage(filename, dataStorage);
+        reinit |= ReadIntoDataStorage(filename, mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE(), dataStorage);
         continue;
       }
     }
@@ -267,10 +186,10 @@ void QmitkDicomBrowser::OnViewSeries(const std::vector<std::pair<std::string, st
       dataStorage->Add(node);
       reinit = true;
     }
-
-    if (reinit)
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
   }
+
+  if (reinit)
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 }
 
 void QmitkDicomBrowser::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)

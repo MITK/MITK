@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define mitkRTUIConstants_h
 
 #include <string>
-#include <mitkDoseValueType.h>
 
 #include <MitkRTUIExports.h>
 
@@ -70,9 +69,6 @@ struct MITKRTUI_EXPORT RTUIConstants
   static const std::string ISO_LEVEL_VISIBILITY_ISOLINES_ID;
   /** ID for the visibility switch for color wash visualization.  */
   static const std::string ISO_LEVEL_VISIBILITY_COLORWASH_ID;
-
-  /** Default value used as reference_dose_if not defined by application or data node*/
-  static const DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE;
 };
 
 /**

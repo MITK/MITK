@@ -33,8 +33,6 @@ const std::string mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID = "color_B";
 const std::string mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID = "visibleIsoLines";
 const std::string mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID = "visibleColorWash";
 
-const mitk::DoseValueAbs mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE = 40.0;
-
 const std::string mitk::RTCTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS = "org/mitk/rt/dosevisualization/presets";
 const std::string mitk::RTCTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED = "org/mitk/rt/dosevisualization/presets/CHANGED";
 const std::string mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE = "org/mitk/rt/dosevisualization/referenceDose";

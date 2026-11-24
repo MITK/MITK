@@ -62,6 +62,14 @@ namespace mitk
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
+    /**
+     * \brief Excludes the node from the bounding box.
+     *
+     * The placeholder image carries only the plan's DICOM properties and has
+     * no meaningful position, so it must not affect fitting the views.
+     */
+    void SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath) override;
+
   private:
     RTPlanReaderService* Clone() const override;
 

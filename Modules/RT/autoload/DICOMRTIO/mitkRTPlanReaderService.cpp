@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkIDICOMTagsOfInterest.h>
 #include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 #include <mitkDICOMRTMimeTypes.h>
+#include <mitkBaseDICOMReaderService.h>
+#include <mitkProperties.h>
 
 
 namespace mitk
@@ -69,9 +71,22 @@ namespace mitk
     dummyImage->Initialize(pt, 2, dim);
     DICOMIOHelper::SetProperties(dummyImage, findings);
 
+    auto name = GenerateNameFromDICOMProperties(dummyImage.GetPointer());
+
+    if (name == DataNode::NO_NAME_VALUE())
+      name = "RT Plan";
+
+    dummyImage->SetProperty("name", StringProperty::New(name));
+
     result.push_back(dummyImage.GetPointer());
 
     return result;
+  }
+
+  void RTPlanReaderService::SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath)
+  {
+    AbstractFileReader::SetDefaultDataNodeProperties(node, filePath);
+    node->SetProperty("includeInBoundingBox", BoolProperty::New(false));
   }
 
   RTPlanReaderService* RTPlanReaderService::Clone() const

@@ -155,7 +155,12 @@ public:
    */
   void Stop();
 
-  /** \brief Ends the conversation; the next message starts a new one. */
+  /**
+   * \brief Ends the conversation; the next message starts a new one.
+   *
+   * A running turn ends with its process. Its tool calls are refused, and
+   * those that wait for a job stop waiting, as with Stop().
+   */
   void StartNewConversation();
 
   /**
@@ -216,7 +221,15 @@ private:
   QmitkClaudeCodeProcess::Options GetBaseOptions() const;
 
   void StartProcess();
+
+  /** \brief Ends the process. A turn that runs loses it, see RefuseCallsOfLostTurn(). */
   void KillProcess();
+
+  /**
+   * \brief Refuses the tool calls of a turn whose process has ended or is
+   *        about to, and ends their waits for jobs, until the next turn starts.
+   */
+  void RefuseCallsOfLostTurn();
 
   /** \brief Writes a message to Claude Code, which starts a turn. */
   void StartTurn(const QString& text);
@@ -288,7 +301,10 @@ private:
   /** \brief Whether the running process could not take up the conversation, which was dropped. */
   bool m_ConversationLost;
 
-  /** \brief Whether the user stopped the agent, whose tool calls are refused until the next turn starts. */
+  /**
+   * \brief Whether the tool calls of the agent are refused until the next
+   *        turn starts: the user stopped it, or a turn lost its process.
+   */
   bool m_Stopping;
 
   bool m_Killing;

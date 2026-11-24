@@ -560,8 +560,22 @@ void QmitkAgentSession::FollowUpEndedTurns()
   }
 }
 
+void QmitkAgentSession::RefuseCallsOfLostTurn()
+{
+  if (m_Stopping)
+    return;
+
+  // A call of the turn may still wait for a job. Nobody takes its answer any
+  // more, and the Workbench stays locked while it runs.
+  m_Stopping = true;
+  m_ToolServer->RefuseCalls("Claude Code has ended, so this call did nothing.");
+}
+
 void QmitkAgentSession::KillProcess()
 {
+  if (m_TurnRunning)
+    this->RefuseCallsOfLostTurn();
+
   m_RestartPending = false;
   m_Killing = true;
   m_Process->Kill();
@@ -873,7 +887,10 @@ void QmitkAgentSession::OnProcessFinished(int exitCode, const QString& errorOutp
     return;
 
   if (turnWasRunning)
+  {
+    this->RefuseCallsOfLostTurn();
     emit TurnsFinished();
+  }
 
   this->FollowUpEndedTurns();
 

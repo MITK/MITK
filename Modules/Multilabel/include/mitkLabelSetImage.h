@@ -659,7 +659,8 @@ namespace mitk
     /**
      * \brief Counts the pixels of all labels of a group at one time step and locates their centroids in a single pass.
      *
-     * Does not touch the stored centers of mass of the labels. Use GetGeometry(timeStep)->IndexToWorld() to
+     * The stored centers of mass of the labels stay as they are: they have no time step, and storing them
+     * would modify the labels and with them the segmentation. Use GetGeometry(timeStep)->IndexToWorld() to
      * convert a centroid index into world coordinates.
      * \param groupIndex The group whose labels are measured.
      * \param timeStep The time step whose pixels are considered.

@@ -111,7 +111,7 @@ namespace
     return response;
   }
 
-  /** Counts a call for GetRunningCallCount() while it runs. */
+  /** Counts a call or a request while it runs. */
   class RunningCall
   {
   public:
@@ -165,12 +165,24 @@ mitk::McpToolResult mitk::McpToolResult::FromError(const std::string& message)
   return result;
 }
 
+/**
+ * What the route handlers share with the endpoint. A request that took its
+ * handler out of the router before Withdraw() removed the route still holds
+ * this, and learns from it that the endpoint is gone.
+ */
+struct mitk::McpEndpoint::RequestState
+{
+  std::atomic<int> Running = 0;
+  std::atomic<bool> Withdrawn = false;
+};
+
 mitk::McpEndpoint::McpEndpoint(const std::string& name, const std::string& version)
   : m_Name(name),
     m_Version(version),
     m_WaitInterruption(std::make_shared<RestWaitInterruption>()),
     m_Server(nullptr),
-    m_RunningCalls(0)
+    m_RunningCalls(0),
+    m_Requests(std::make_shared<RequestState>())
 {
 }
 
@@ -205,7 +217,19 @@ void mitk::McpEndpoint::Offer(IRestServerService* server, const std::string& pat
   post.Description =
     "The request-response part of the MCP Streamable HTTP transport: POST JSON-RPC messages, get the "
     "answers as JSON. Its tools act with the rights of the token the request carries.";
-  post.Handler = [this](const RestRequest& request) { return this->HandlePost(request); };
+  post.Handler = [this, requests = m_Requests](const RestRequest& request) {
+    // Counted before the flag is read: Withdraw() sets the flag before its
+    // caller reads the count, so one of the two sees the other.
+    const RunningCall running(requests->Running);
+
+    if (requests->Withdrawn)
+    {
+      return RestResponse::FromError(ErrorResponse::Create("NOT_FOUND", "Not Found",
+        "The MCP endpoint is not offered any more.", 404, request.Path));
+    }
+
+    return this->HandlePost(request);
+  };
 
   // No server-initiated stream and no sessions to end.
   const auto notAllowed = [](const RestRequest&) {
@@ -228,6 +252,7 @@ void mitk::McpEndpoint::Offer(IRestServerService* server, const std::string& pat
   del.Handler = notAllowed;
 
   std::vector<RestRouteId> routes;
+  m_Requests->Withdrawn = false;
 
   try
   {
@@ -236,6 +261,8 @@ void mitk::McpEndpoint::Offer(IRestServerService* server, const std::string& pat
   }
   catch (...)
   {
+    m_Requests->Withdrawn = true;
+
     for (const auto id : routes)
       server->RemoveRoute(id);
 
@@ -248,6 +275,9 @@ void mitk::McpEndpoint::Offer(IRestServerService* server, const std::string& pat
 
 void mitk::McpEndpoint::Withdraw()
 {
+  // Removing a route does not reach the requests that hold its handler already.
+  m_Requests->Withdrawn = true;
+
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
     m_WaitInterruption->Interrupt();
@@ -261,6 +291,11 @@ void mitk::McpEndpoint::Withdraw()
 
   m_Routes.clear();
   m_Server = nullptr;
+}
+
+int mitk::McpEndpoint::GetRunningRequestCount() const
+{
+  return m_Requests->Running;
 }
 
 int mitk::McpEndpoint::GetRunningCallCount() const

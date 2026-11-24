@@ -74,9 +74,10 @@ public:
    * \brief Withdraws the tools and stops the server that Offer() started.
    *
    * Ends the waits of the calls that run for jobs, and the jobs (see
-   * mitk::AddRestApiTools()). Waits for the calls by running the event loop
-   * of the GUI thread, which they may wait for, without user input. Call it
-   * from the GUI thread.
+   * mitk::AddRestApiTools()). Waits for the requests that the agent's
+   * endpoint still answers by running the event loop of the GUI thread,
+   * which their calls may wait for, without user input. Call it from the GUI
+   * thread.
    */
   void Withdraw();
 

@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -72,6 +73,19 @@ namespace
 
   private:
     us::ServiceRegistration<mitk::IRestServerService> m_Registration;
+  };
+
+  /** A REST server that keeps the routes it is given, as a request keeps the handler of its route while it runs. */
+  class RouteKeepingRestServer : public mitk::RestServer
+  {
+  public:
+    mitk::RestRouteId AddRoute(mitk::RestRoute route) override
+    {
+      Routes.push_back(route);
+      return mitk::RestServer::AddRoute(std::move(route));
+    }
+
+    std::vector<mitk::RestRoute> Routes;
   };
 
   void AddResponseRoute(mitk::RestServer& server, const std::string& path, const mitk::RestResponse& response)
@@ -265,6 +279,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestDuplicateTool);
   MITK_TEST(TestParseError);
   MITK_TEST(TestOfferedOnRestServer);
+  MITK_TEST(TestWithdrawnEndpointRefusesRequestsThatHoldItsRoute);
   MITK_TEST(TestRequiredToken);
   MITK_TEST(TestRestApiTools);
   MITK_TEST(TestRestApiToolsFlagFailedJobs);
@@ -522,6 +537,68 @@ public:
 
     CPPUNIT_ASSERT(withdrawn);
     CPPUNIT_ASSERT_EQUAL(404, withdrawn->status);
+  }
+
+  void TestWithdrawnEndpointRefusesRequestsThatHoldItsRoute()
+  {
+    RouteKeepingRestServer server;
+    auto endpoint = MakeEndpoint();
+
+    std::promise<void> called;
+    std::promise<void> released;
+
+    mitk::McpTool waiting;
+    waiting.Name = "waiting";
+    waiting.Description = "Returns when it is released.";
+    waiting.Handler = [&called, release = released.get_future().share()](const nlohmann::json&, const mitk::RestRequest&) {
+      called.set_value();
+      release.wait();
+      return mitk::McpToolResult::FromText("done");
+    };
+    endpoint->AddTool(waiting);
+    endpoint->Offer(&server, "/mcp");
+
+    const auto route = std::find_if(server.Routes.begin(), server.Routes.end(), [](const mitk::RestRoute& kept) {
+      return kept.Method == "POST";
+    });
+
+    CPPUNIT_ASSERT(route != server.Routes.end());
+
+    // What a request holds that found the route before it was removed.
+    const auto handler = route->Handler;
+
+    mitk::RestRequest echo;
+    echo.Body = Call("echo", { { "text", "hello" } }).dump();
+
+    mitk::RestRequest wait;
+    wait.Body = Call("waiting").dump();
+
+    const auto offered = handler(echo).Status;
+    const auto idle = endpoint->GetRunningRequestCount();
+
+    auto answer = std::async(std::launch::async, [&handler, &wait]() { return handler(wait); });
+    called.get_future().wait();
+
+    endpoint->Withdraw();
+
+    const auto withdrawn = handler(echo).Status;
+    const auto running = endpoint->GetRunningRequestCount();
+
+    released.set_value();
+
+    const auto finished = answer.get().Status;
+    const auto ended = endpoint->GetRunningRequestCount();
+
+    endpoint.reset();
+    const auto destroyed = handler(echo).Status;
+
+    CPPUNIT_ASSERT_EQUAL(200, offered);
+    CPPUNIT_ASSERT_EQUAL(0, idle);
+    CPPUNIT_ASSERT_EQUAL(404, withdrawn);
+    CPPUNIT_ASSERT_EQUAL(1, running);
+    CPPUNIT_ASSERT_EQUAL(200, finished);
+    CPPUNIT_ASSERT_EQUAL(0, ended);
+    CPPUNIT_ASSERT_EQUAL(404, destroyed);
   }
 
   void TestRequiredToken()

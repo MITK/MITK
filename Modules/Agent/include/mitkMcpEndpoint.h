@@ -136,10 +136,18 @@ namespace mitk
     /**
      * \brief Remove the endpoint from the server.
      *
-     * Calls that run already go on, except that their waits for jobs end;
-     * GetRunningCallCount() tells when they ended.
+     * Requests that have reached the endpoint already go on, except that the
+     * waits of their tool calls for jobs end. The endpoint must not be
+     * destroyed before GetRunningRequestCount() is 0. A request that reaches
+     * it later is answered with status 404, as by the server.
      */
     void Withdraw();
+
+    /**
+     * \brief The number of requests that the endpoint answers for the server
+     *        at the moment, those that call tools among them.
+     */
+    int GetRunningRequestCount() const;
 
     /** \brief The number of tool calls that run at the moment. */
     int GetRunningCallCount() const;
@@ -180,6 +188,8 @@ namespace mitk
     nlohmann::json HandleMessage(const nlohmann::json& message, const RestRequest& request);
 
   private:
+    struct RequestState;
+
     nlohmann::json HandleRequest(const nlohmann::json& message, const RestRequest& request);
     nlohmann::json Initialize(const nlohmann::json& params) const;
     nlohmann::json ListTools() const;
@@ -197,6 +207,7 @@ namespace mitk
     std::vector<RestRouteId> m_Routes;
 
     std::atomic<int> m_RunningCalls;
+    std::shared_ptr<RequestState> m_Requests;
   };
 }
 

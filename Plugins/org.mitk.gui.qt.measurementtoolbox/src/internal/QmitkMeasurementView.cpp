@@ -891,6 +891,7 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
   }
 
+  interactor->SetBoundToImage(false);
   interactor->SetDataNode(nonConstNode);
 
   auto& figure = d->m_Figures[node];

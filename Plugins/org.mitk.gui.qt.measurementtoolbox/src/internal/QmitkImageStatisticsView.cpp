@@ -56,18 +56,33 @@ namespace {
     if (!planarFigure->IsComplete())
       return false;
 
-    if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry))
+    const auto* plane = planarFigure->GetPlaneGeometry();
+
+    if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(plane, imageGeometry))
       return false;
 
-    // The rest from here on is only needed until T30279 has been solved.
-    if (planarFigure->IsClosed())
-      return true;
+    // The figure has to lie on a slice of the image, while its points may stick out sideways.
+    mitk::Point3D centerOnPlane;
+    plane->Project(imageGeometry->GetCenter(), centerOnPlane);
 
-    const auto numControlPoints = planarFigure->GetNumberOfControlPoints();
-    for (std::size_t i = 0; i < numControlPoints; ++i)
+    return imageGeometry->IsInside(centerOnPlane);
+  }
+
+  /** The intensity profile reads the pixels along the outline without bounds checks. */
+  bool IsInsideImage(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry)
+  {
+    const auto* plane = planarFigure->GetPlaneGeometry();
+
+    for (const auto& contour : planarFigure->GetContours())
     {
-      if (!imageGeometry->IsInside(planarFigure->GetWorldControlPoint(i)))
-        return false;
+      for (const auto& point : contour.Points)
+      {
+        mitk::Point3D worldPoint;
+        plane->Map(point, worldPoint);
+
+        if (!imageGeometry->IsInside(worldPoint))
+          return false;
+      }
     }
 
     return true;
@@ -205,6 +220,18 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
     {
       if (!maskPlanarFigure->IsClosed())
       {
+        // Lines sticking out of the image stay selected for their statistics, but get no profile.
+        const auto isInsideImage = IsInsideImage(maskPlanarFigure, image->GetGeometry());
+        m_Controls->widget_intensityProfile->setVisible(isInsideImage);
+        m_Controls->label_intensityProfileHint->setVisible(!isInsideImage);
+
+        if (!isInsideImage)
+        {
+          m_Controls->sliderWidget_intensityProfile->setVisible(false);
+          m_Controls->groupBox_intensityProfile->setVisible(true);
+          return;
+        }
+
         mitk::Image::Pointer inputImage;
         if (image->GetDimension() == 4)
         {

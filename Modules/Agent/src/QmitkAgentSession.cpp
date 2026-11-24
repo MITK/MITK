@@ -133,6 +133,7 @@ QmitkAgentSession::QmitkAgentSession(QObject* parent)
     m_IgnoreApiKeyVariable(false),
     m_SignedIn(false),
     m_CheckPending(false),
+    m_AccountChanged(false),
     m_RestartPending(false),
     m_AuthQueries(0),
     m_TurnRunning(false),
@@ -291,7 +292,27 @@ void QmitkAgentSession::CheckClaudeCodeAgain()
   m_SignedIn = false;
 
   this->KillProcess();
+
+  if (m_AccountChanged)
+  {
+    m_AccountChanged = false;
+
+    // Resumed, it would go on under the new account with all that the other one put into it.
+    if (!m_SessionId.isEmpty())
+    {
+      this->ForgetConversation();
+      emit ConversationEnded();
+      emit NoteAdded("The account of Claude Code changed, so a new conversation was started.");
+    }
+  }
+
   this->CheckClaudeCode();
+}
+
+void QmitkAgentSession::CheckClaudeCodeOfNewAccount()
+{
+  m_AccountChanged = true;
+  this->CheckClaudeCodeAgain();
 }
 
 void QmitkAgentSession::PrepareForMessages()
@@ -406,16 +427,21 @@ void QmitkAgentSession::Stop()
   emit TurnStateChanged();
 }
 
+void QmitkAgentSession::ForgetConversation()
+{
+  m_SessionId.clear();
+  m_ConversationCost = 0.0;
+  emit CostChanged();
+}
+
 void QmitkAgentSession::StartNewConversation()
 {
   this->KillProcess();
 
-  m_SessionId.clear();
   m_TurnRunning = false;
   m_KeptMessages.clear();
   m_ToolCalls.clear();
-  m_ConversationCost = 0.0;
-  emit CostChanged();
+  this->ForgetConversation();
   emit TurnStateChanged();
 
   if (m_CheckPending)

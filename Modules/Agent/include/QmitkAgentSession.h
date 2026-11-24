@@ -127,6 +127,15 @@ public:
    */
   void CheckClaudeCodeAgain();
 
+  /**
+   * \brief Like CheckClaudeCodeAgain(), after an account signed in or out.
+   *
+   * Also ends the conversation, which ConversationEnded() and a note tell:
+   * continued, it would go on under the new account. A running turn keeps
+   * its conversation until it ends.
+   */
+  void CheckClaudeCodeOfNewAccount();
+
   bool IsSignedIn() const;
 
   /**
@@ -211,6 +220,9 @@ signals:
 
   void StepFinished(const QmitkAgentStep& step);
 
+  /** \brief The conversation ended without StartNewConversation(), and what was shown of it is of no use any more. */
+  void ConversationEnded();
+
   /** \brief Something about the conversation that the user should know. */
   void NoteAdded(const QString& text);
 
@@ -230,6 +242,9 @@ private:
    *        about to, and ends their waits for jobs, until the next turn starts.
    */
   void RefuseCallsOfLostTurn();
+
+  /** \brief Forgets which conversation to continue, and what it has cost. */
+  void ForgetConversation();
 
   /** \brief Writes a message to Claude Code, which starts a turn. */
   void StartTurn(const QString& text);
@@ -268,6 +283,9 @@ private:
 
   /** \brief Whether CheckClaudeCodeAgain() waits for the running turn to end. */
   bool m_CheckPending;
+
+  /** \brief Whether the next check follows a change of the account, see CheckClaudeCodeOfNewAccount(). */
+  bool m_AccountChanged;
 
   /** \brief Whether RestartIdleProcess() waits for the running turn to end. */
   bool m_RestartPending;

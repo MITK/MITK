@@ -30,7 +30,8 @@ The preference page "Agent" has these settings:
   your web browser; if no browser opens, the dialog offers the address of the sign-in page, and if the
   page shows a code, you paste it into the dialog. "Sign Out"
   ends the sign-in with a subscription or a Console account. It does not remove an API key that is set
-  in the environment.
+  in the environment. Signing in or out ends the conversation of an open Agent view, so that it does
+  not go on under another account; while the agent works, this follows when it is done.
 - <b>Ignore ANTHROPIC_API_KEY</b>: Claude Code prefers an API key in the environment variable
   <tt>ANTHROPIC_API_KEY</tt> over a Claude subscription, and the key is billed per token. If you want
   the agent to use your subscription although the variable is set, check this box: the agent does not

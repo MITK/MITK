@@ -156,9 +156,9 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteRootNodeWithSubtree);
   MITK_TEST(DeleteNodeWithADiamondBelowIt);
   // Data operations
-  MITK_TEST(FindDataNodeReturnsNodeForKnownUid);
-  MITK_TEST(FindDataNodeReturnsNullForUnknownUid);
-  MITK_TEST(FindDataNodeReturnsSameNode);
+  MITK_TEST(FindNodeReturnsNodeForKnownUid);
+  MITK_TEST(FindNodeReturnsNullForUnknownUid);
+  MITK_TEST(FindNodeReturnsSameNode);
   MITK_TEST(GetNodeDataReturnsClone);
   MITK_TEST(GetNodeDataWithNoData);
   MITK_TEST(GetNodeDataWithNonExistentNode);
@@ -1055,29 +1055,28 @@ public:
 
   // ===== Data operation tests =====
 
-  void FindDataNodeReturnsNodeForKnownUid()
+  void FindNodeReturnsNodeForKnownUid()
   {
-    // Root1 is a known node — FindDataNode must return a non-null pointer.
-    const auto node = m_Bridge->FindDataNode(m_Root1Uid);
+    const auto node = m_Bridge->FindNode(m_Root1Uid);
 
     CPPUNIT_ASSERT(node.IsNotNull());
   }
 
-  void FindDataNodeReturnsNullForUnknownUid()
+  void FindNodeReturnsNullForUnknownUid()
   {
-    const auto node = m_Bridge->FindDataNode("non-existent-uid");
+    const auto node = m_Bridge->FindNode("non-existent-uid");
 
     CPPUNIT_ASSERT(node.IsNull());
   }
 
-  void FindDataNodeReturnsSameNode()
+  void FindNodeReturnsSameNode()
   {
     // The returned pointer must refer to the actual node in the DataStorage,
     // not a clone. Verify by comparing against the raw pointer of m_Root1.
-    const auto node = m_Bridge->FindDataNode(m_Root1Uid);
+    const auto node = m_Bridge->FindNode(m_Root1Uid);
 
     CPPUNIT_ASSERT(node.IsNotNull());
-    CPPUNIT_ASSERT_EQUAL(m_Root1.GetPointer(), const_cast<mitk::DataNode*>(node.GetPointer()));
+    CPPUNIT_ASSERT_EQUAL(m_Root1.GetPointer(), node.GetPointer());
   }
 
   void GetNodeDataReturnsClone()

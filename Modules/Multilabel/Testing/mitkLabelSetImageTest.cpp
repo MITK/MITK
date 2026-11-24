@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -1008,7 +1009,7 @@ public:
     PaintBox(groupImage, 0, { 10, 20, 25 }, { 19, 29, 44 }, 5);
     PaintBox(groupImage, 0, { 70, 20, 10 }, { 75, 29, 19 }, 6); // Touches the medium component, but belongs to another label.
 
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 0);
+    const auto result = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,5, 0);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(3), result.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The split label does not come first", mitk::Label::PixelType(5), result[0]);
@@ -1038,12 +1039,12 @@ public:
     PaintBox(groupImage, 0, { 20, 30, 25 }, { 20, 30, 25 }, 5); // Touches the box at a corner only.
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A label connected at a corner was split",
-      mitk::MultiLabelSegmentation::LabelValueVectorType({ 5 }), segmentation->SplitLabelIntoConnectedComponents(5, 0));
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 5 }), mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,5, 0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("An empty label was split",
-      mitk::MultiLabelSegmentation::LabelValueVectorType({ 6 }), segmentation->SplitLabelIntoConnectedComponents(6, 0));
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 6 }), mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,6, 0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Labels were added", 2u, segmentation->GetNumberOfLabels(0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The label content changed", std::size_t(2001), CountVoxels(groupImage, 0, 5));
-    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(7, 0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,7, 0), mitk::Exception);
   }
 
   void TestSplitLabelIntoConnectedComponents_Dynamic()
@@ -1057,14 +1058,14 @@ public:
       PaintBox(groupImage, timeStep, { 60, 20, 35 }, { 69, 29, 44 }, 5);
     }
 
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 1);
+    const auto result = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,5, 1);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Time step 0 was split", std::size_t(3000), CountVoxels(groupImage, 0, 5));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance has content at time step 0", std::size_t(0), CountVoxels(groupImage, 0, result[1]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 1, 5));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong instance at time step 1", std::size_t(1000), CountVoxels(groupImage, 1, result[1]));
-    CPPUNIT_ASSERT_THROW(segmentation->SplitLabelIntoConnectedComponents(5, 2), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,5, 2), mitk::Exception);
   }
 
   void TestSplitLabelIntoConnectedComponents_Static()
@@ -1076,7 +1077,7 @@ public:
     PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 5);
 
     // As for an image of several time steps, which the single time step serves.
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(5, 3);
+    const auto result = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,5, 3);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The label does not keep the largest component", std::size_t(2000), CountVoxels(groupImage, 0, 5));
@@ -1093,7 +1094,7 @@ public:
     PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, 7);
     PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, 7);
 
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(7, 0);
+    const auto result = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,7, 0);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Instance is in another group", group, segmentation->GetGroupIndexOfLabel(result[1]));
@@ -1112,7 +1113,7 @@ public:
     PaintBox(groupImage, 0, { 10, 20, 5 }, { 19, 29, 24 }, mitk::Label::MAX_LABEL_VALUE);
     PaintBox(groupImage, 0, { 60, 20, 35 }, { 69, 29, 44 }, mitk::Label::MAX_LABEL_VALUE);
 
-    const auto result = segmentation->SplitLabelIntoConnectedComponents(mitk::Label::MAX_LABEL_VALUE, 0);
+    const auto result = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation,mitk::Label::MAX_LABEL_VALUE, 0);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of instances", std::size_t(2), result.size());
     CPPUNIT_ASSERT_MESSAGE("The instance got the unlabeled value", mitk::MultiLabelSegmentation::UNLABELED_VALUE != result[1]);

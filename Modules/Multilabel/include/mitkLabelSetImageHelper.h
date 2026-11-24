@@ -139,6 +139,30 @@ namespace mitk
     */
     MITKMULTILABEL_EXPORT std::string CreateHTMLLabelDetails(const mitk::Label* label, const MultiLabelSegmentation* segmentation = nullptr);
 
+    /**
+     * \brief Splits the content of a label into its connected components.
+     *
+     * The label keeps its largest component. Every further component moves to a new instance of the
+     * label in the same group: a clone with the same name and color, but without center of mass and
+     * without DICOM tracking ID and UID, because these identify a single finding. Voxels connect via
+     * faces, edges and corners (26-neighborhood). No voxel is added or removed. Locks are not regarded:
+     * a locked label is split as well, and the new instances are locked like it.
+     *
+     * \param segmentation The segmentation of the label.
+     * \param labelValue The value of the label that should be split.
+     * \param t The time step whose content is split; the content of other time steps stays with the
+     * label. A segmentation with a single time step serves every time step.
+     * \return The value of the label followed by the values of the new instances, ordered by voxel
+     * count, largest first; components of equal size keep the order of their first voxels in the
+     * image. Only the label value if it has at most one component at the time step.
+     * \pre segmentation must not be null.
+     * \pre labelValue must exist.
+     * \pre t must be a valid time step.
+     * \throw LabelValuesExhaustedException if the segmentation cannot hold the new instances.
+     */
+    MITKMULTILABEL_EXPORT MultiLabelSegmentation::LabelValueVectorType SplitLabelIntoConnectedComponents(MultiLabelSegmentation* segmentation,
+      MultiLabelSegmentation::LabelValueType labelValue, TimeStepType t);
+
   } // namespace LabelSetImageHelper
 } // namespace mitk
 

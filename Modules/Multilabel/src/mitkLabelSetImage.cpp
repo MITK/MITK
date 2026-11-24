@@ -27,9 +27,6 @@ found in the LICENSE file.
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
 
-#include <mitkImageToItk.h>
-
-#include <itkBinaryImageToLabelMapFilter.h>
 #include <itkCommand.h>
 #include <itkMultiThreaderBase.h>
 
@@ -950,101 +947,6 @@ void mitk::MultiLabelSegmentation::MergeLabels(LabelValueType targetLabelValue, 
   this->InvokeEvent(LabelsChangedEvent(modifiedValues));
 
   Modified();
-}
-
-mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::SplitLabelIntoConnectedComponents(
-  LabelValueType labelValue, TimeStepType t)
-{
-  const auto label = this->GetLabel(labelValue);
-  if (label.IsNull())
-    mitkThrow() << "Cannot split label. Label value (" << labelValue << ") does not exist.";
-
-  // A static segmentation serves every time step, like in IsEmpty().
-  const auto timeStep = 1 == this->GetTimeSteps() ? TimeStepType(0) : t;
-
-  if (!this->GetTimeGeometry()->IsValidTimeStep(timeStep))
-    mitkThrow() << "Cannot split label " << labelValue << ". Invalid time step: " << t;
-
-  const auto groupID = this->GetGroupIndexOfLabel(labelValue);
-  auto* groupImage = this->GetGroupImage(groupID);
-
-  using VolumeType = itk::Image<LabelValueType, 3>;
-  using ComponentFilterType = itk::BinaryImageToLabelMapFilter<VolumeType>;
-
-  ComponentFilterType::OutputImageType::Pointer components;
-
-  {
-    // The ITK view holds a read accessor until it is destroyed, and the write accessor below would wait for it forever.
-    const auto volume = SelectImageByTimeStep(static_cast<const Image*>(groupImage), timeStep);
-
-    auto filter = ComponentFilterType::New();
-    filter->SetInput(ImageToItkImage<LabelValueType, 3>(volume.GetPointer()));
-    filter->SetInputForegroundValue(labelValue);
-    filter->FullyConnectedOn();
-    filter->Update();
-
-    components = filter->GetOutput();
-    components->DisconnectPipeline();
-  }
-
-  using ComponentType = ComponentFilterType::OutputImageType::LabelObjectType;
-  std::vector<std::pair<const ComponentType*, itk::SizeValueType>> componentsBySize;
-
-  for (const auto& component : components->GetLabelObjects())
-    componentsBySize.emplace_back(component.GetPointer(), component->Size());
-
-  std::stable_sort(componentsBySize.begin(), componentsBySize.end(),
-    [](const auto& a, const auto& b) { return a.second > b.second; });
-
-  LabelValueVectorType result = { labelValue };
-
-  if (componentsBySize.size() < 2)
-    return result;
-
-  const auto instanceCount = componentsBySize.size() - 1;
-
-  if (this->GetTotalNumberOfLabels() + instanceCount > Label::MAX_LABEL_VALUE)
-    mitkThrowException(LabelValuesExhaustedException) << "Cannot split label " << labelValue << ". The segmentation cannot hold " << instanceCount << " more labels.";
-
-  // Observers of the added labels may read the group image, so all labels are added before the write accessor exists.
-  for (std::size_t i = 1; i < componentsBySize.size(); ++i)
-  {
-    auto instance = label->Clone();
-    instance->ResetCenterOfMass();
-    instance->RemoveProperty("tracking_id");
-    instance->RemoveProperty("tracking_uid");
-
-    result.push_back(this->AddLabel(instance, groupID, false)->GetValue());
-  }
-
-  {
-    ImageWriteAccessor accessor(groupImage, groupImage->GetVolumeData(timeStep));
-    auto* pixels = static_cast<LabelValueType*>(accessor.GetData());
-
-    const auto sizeX = static_cast<std::size_t>(groupImage->GetDimension(0));
-    const auto sizeY = static_cast<std::size_t>(groupImage->GetDimension(1));
-
-    for (std::size_t i = 1; i < componentsBySize.size(); ++i)
-    {
-      for (ComponentType::ConstLineIterator line(componentsBySize[i].first); !line.IsAtEnd(); ++line)
-      {
-        const auto& index = line.GetLine().GetIndex();
-        const auto offset = static_cast<std::size_t>(index[0]) + sizeX * (static_cast<std::size_t>(index[1]) + sizeY * static_cast<std::size_t>(index[2]));
-        std::fill_n(pixels + offset, line.GetLine().GetLength(), result[i]);
-      }
-    }
-  }
-
-  groupImage->Modified();
-
-  for (const auto value : result)
-    this->InvokeEvent(LabelModifiedEvent(value));
-
-  this->InvokeEvent(LabelsChangedEvent(result));
-
-  this->Modified();
-
-  return result;
 }
 
 void mitk::MultiLabelSegmentation::RemoveLabel(LabelValueType pixelValue)

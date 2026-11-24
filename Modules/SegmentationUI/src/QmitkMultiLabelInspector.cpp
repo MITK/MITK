@@ -1547,7 +1547,7 @@ void QmitkMultiLabelInspector::OnSplitLabel()
 
   try
   {
-    instances = m_Segmentation->SplitLabelIntoConnectedComponents(labelValue, timeStep);
+    instances = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(m_Segmentation, labelValue, timeStep);
   }
   catch (const std::exception& e)
   {

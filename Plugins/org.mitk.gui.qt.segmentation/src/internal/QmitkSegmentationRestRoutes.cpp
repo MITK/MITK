@@ -846,7 +846,7 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
 
       try
       {
-        values = segmentation->SplitLabelIntoConnectedComponents(label->GetValue(), timeSteps.front());
+        values = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(segmentation, label->GetValue(), timeSteps.front());
       }
       catch (const LabelValuesExhaustedException& e)
       {

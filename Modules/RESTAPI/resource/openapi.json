@@ -4073,7 +4073,7 @@
       "DataFormat": {
         "name": "X-MITK-Data-Format",
         "in": "header",
-        "description": "File format extension (without leading dot) for binary uploads.\nAlternative to providing a filename via Content-Disposition.\nExamples: `nrrd`, `nii.gz`, `stl`, `vtp`\n",
+        "description": "File format extension (without leading dot) for binary uploads.\nAlternative to providing a filename via Content-Disposition.\nExamples: `nrrd`, `nii.gz`, `stl`, `vtp`\nAnything that is no file extension answers 400.\n",
         "schema": {
           "type": "string"
         },
@@ -4297,7 +4297,7 @@
         }
       },
       "AccessDenied": {
-        "description": "Client IP is not allowed to access the server. Applied by pre-routing middleware to all endpoints when clientAccessMode is LocalhostOnly or Whitelist.",
+        "description": "Client IP is not allowed to access the server. Applied by pre-routing middleware to all endpoints when clientAccessMode is LocalhostOnly or Whitelist. The endpoints that plugins add also answer it to a request that a web page could send (an Origin header, a cross-site Sec-Fetch-Site header, or a Host header that names no accepted host). The data endpoints answer 403 with the code FILE_ACCESS_DENIED as well, see the response FileAccessDenied.",
         "content": {
           "application/json": {
             "schema": {
@@ -4358,7 +4358,7 @@
         }
       },
       "FileAccessDenied": {
-        "description": "File path is outside allowed directories. Applied by middleware when fileAccessMode=AllowedDirectories and the requested path is not under an allowed directory.",
+        "description": "The client may not use files this way: a referenced file path is outside the allowed directories (fileAccessMode=AllowedDirectories), the client's token has no file access, or a direct upload refers to other files (an NRRD or MetaImage header with a detached data file, .pvti, .pvtp, .mitk, .mitkscene.json) without unrestricted file access. Checked before the file is looked for.",
         "content": {
           "application/json": {
             "schema": {

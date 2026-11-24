@@ -480,6 +480,8 @@ X-MITK-Transfer-Mode: file-reference
 
 **Use case:** Large data, co-located processes, existing file I/O workflows.
 
+**File access:** File references need file access, in both directions. A path outside the allowed directories (see `GET /api/v1/config/file-access`) answers 403 `FILE_ACCESS_DENIED`. So does every file reference of a client that the server gave a token without file access, like the agent of the Agent view; such a client uses the direct mode. Access is checked before the file is looked for: 422 `FILE_NOT_FOUND` only tells a client with access that a file is missing.
+
 **File lifetime and per-client quota:** Exported files are stored in a server-managed temporary directory. Each client (identified by its IP address) may hold at most **N active file-reference results simultaneously** (default: 5; configurable by the server operator). When a client exceeds this limit, the server automatically deletes its *oldest* active temp directory to make room for the new one. Files are additionally cleaned up when the server stops.
 
 > **Implication for clients:** Fetch or copy the file referenced by `transfer.file_path` before issuing more than N subsequent file-reference requests from the same IP. Clients from different IP addresses do not affect each other's quotas.
@@ -550,6 +552,8 @@ Content-Type: application/json
 **File ownership:** When uploading via file-reference mode, the sender (client) always retains ownership of the source file. The server reads the file but does not delete it. The sender can assume the file is no longer needed by the server after receiving the response, and is responsible for cleanup if desired.
 
 The server accepts any file format supported by MITK I/O. Format detection is based on file extension.
+
+**Uploads that refer to other files:** Some data makes its reader open further files: an NRRD or MetaImage header with a detached data file, the parallel VTK formats (`.pvti`, `.pvtp`) and MITK scenes (`.mitk`, `.mitkscene.json`). Such a direct upload names files on the server like a file reference does. It answers 403 `FILE_ACCESS_DENIED` unless file access is unrestricted and the client has file access. Upload data that is complete in one file instead.
 
 ---
 
@@ -824,7 +828,8 @@ If some properties in the request could not be deserialized, the node is still c
 | Status | Code | Description |
 |--------|------|-------------|
 | 201 | — | Node created |
-| 400 | `INVALID_REQUEST` | Malformed JSON body or invalid parameters |
+| 400 | `INVALID_REQUEST` | Malformed JSON body or invalid parameters, or an `X-MITK-Data-Format` that is no file extension |
+| 403 | `FILE_ACCESS_DENIED` | The client may not use the referenced file path, or the upload refers to other files (see [Section 7.3](#sec-73-mode-file-reference) and Section 7.6) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 415 | `UNSUPPORTED_FORMAT` | Content-Type or data format not supported |
 | 422 | `FILE_NOT_FOUND` / `FILE_READ_ERROR` | Referenced file path could not be loaded |
@@ -996,7 +1001,7 @@ Replace or set node data. This endpoint can be used on nodes that currently have
 |--------|----------|-------------|
 | `Content-Type` | Yes | `application/json` for file-reference, `application/octet-stream` for direct |
 | `Content-Disposition` | For direct | Filename with extension for format detection |
-| `X-MITK-Data-Format` | No | Explicit format identifier (optional) |
+| `X-MITK-Data-Format` | No | File extension of the format, like `nrrd` or `nii.gz`, for a direct upload without a filename; anything else answers 400 `INVALID_REQUEST` |
 
 **Request (file reference):**
 ```http
@@ -2616,8 +2621,8 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 400 | `INVALID_REQUEST` | Malformed request body or parameters |
 | 400 | `PROPERTY_PROTECTED` | Cannot modify/delete protected property |
 | 401 | `UNAUTHORIZED` | Missing or invalid authentication |
-| 403 | `ACCESS_DENIED` | Client IP not permitted to access the server |
-| 403 | `FILE_ACCESS_DENIED` | Requested file path is outside the allowed directories |
+| 403 | `ACCESS_DENIED` | Client IP not permitted to access the server, or a request to a plugin endpoint that a web page could send (see [Plugin Endpoints](#sec-3-base-url-and-versioning)) |
+| 403 | `FILE_ACCESS_DENIED` | Requested file path is outside the allowed directories, the client has no file access, or an upload refers to other files |
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
@@ -2627,7 +2632,7 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
 | 415 | `UNSUPPORTED_FORMAT` | Data format not supported |
-| 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
+| 422 | `FILE_NOT_FOUND` | Referenced file path does not exist; told only to clients that may use the path, others get 403 `FILE_ACCESS_DENIED` |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
 | 422 | `NO_GEOMETRY` | Node data has no usable time geometry |
 | 422 | `RENDERING_ERROR` | Rendering the requested view failed |

@@ -29,6 +29,7 @@ set(MODULE_TESTS
   mitkDisplayActionEventFunctionsTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkFileReaderRegistryTest.cpp
+  mitkFileReaderWriterChoiceOptionTest.cpp
   #mitkFileWriterRegistryTest.cpp
   mitkFloatToStringTest.cpp
   mitkGenericPropertyTest.cpp

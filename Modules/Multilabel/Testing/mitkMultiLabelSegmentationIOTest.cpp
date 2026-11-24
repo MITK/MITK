@@ -16,10 +16,14 @@ found in the LICENSE file.
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkCoreServices.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkPropertyPersistenceInfo.h>
+#include <mitkSegIOTestCapabilities.h>
+#include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkSegTestSourceImageFactory.h>
 #include <mitkTestFixture.h>
@@ -35,52 +39,97 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestReadEmptyMultiLabelSegmentation_withNoMetaInformation_butContent);
   MITK_TEST(TestDicomDerivedSegSurvivesNativeNrrdRoundTrip);
   MITK_TEST(TestNativeNrrdReloadCanBeReSavedAsDicomSegStrict);
+  MITK_TEST(TestRoundTrip3D);
+  MITK_TEST(TestRoundTrip4D);
+  MITK_TEST(TestRoundTripWithEmptyLabel);
+  MITK_TEST(TestRoundTripWithEmptyGroup);
+  MITK_TEST(TestRoundTripMaxLabelValue);
+  MITK_TEST(TestCustomPropertyWithoutPersistenceInfoIsDropped);
+  MITK_TEST(TestReadKeepsNamesakesOfFormatKeys);
+  MITK_TEST(TestWriteLeavesOutPropertiesNamedLikeFormatKeys);
+  MITK_TEST(TestReadVersion1);
+  MITK_TEST(TestReadVersion2With4D);
+  MITK_TEST(TestReadOutdatedLabelPropertiesAreDiscarded);
+  MITK_TEST(TestReadVersionAbove4Fails);
+  MITK_TEST(TestReadGroupCountMismatchFails);
+  MITK_TEST(TestReadMalformedLabelGroupsFails);
+  MITK_TEST(TestReadWithoutLabelGroupsFails);
+  MITK_TEST(TestReadLabelCustomPropertyOfWrongTypeFails);
+  MITK_TEST(TestWriteWithoutGroupsFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet1;
-  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2;
-  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2_adapted;
+  std::string m_TempDir;
+  bool m_AddedModalityPersistence = false;
 
-public:
-  mitk::Label::Pointer GenerateLabel(mitk::Label::PixelType value, const std::string& name, float r, float g, float b) const
+  static const std::string& ReaderDescription()
   {
-    auto label = mitk::Label::New(value, name);
-    mitk::Color color;
-    color.SetRed(r);
-    color.SetGreen(g);
-    color.SetBlue(b);
-    label->SetColor(color);
-
-    return label;
+    static const std::string description = "MITK Multilabel Segmentation";
+    return description;
   }
 
+  static const std::string& LabelGroupsKey()
+  {
+    static const std::string key = "org.mitk.multilabel.segmentation.labelgroups";
+    return key;
+  }
+
+  std::string TempPath(const std::string& fileName) const
+  {
+    return (std::filesystem::path(m_TempDir) / fileName).string();
+  }
+
+  mitk::MultiLabelSegmentation::Pointer SaveAndReload(const mitk::MultiLabelSegmentation* segmentation)
+  {
+    const auto path = this->TempPath("roundtrip.nrrd");
+    mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*segmentation), path);
+    return mitk::test::LoadSingleSegmentation(path);
+  }
+
+  void AssertRoundTrip(const mitk::MultiLabelSegmentation* original)
+  {
+    const auto reloaded = this->SaveAndReload(original);
+    mitk::test::AssertReloadMatchesCapabilities({ original }, { reloaded.GetPointer() },
+                                                mitk::test::NativeNrrdCapabilities());
+  }
+
+  /** Saves the 3D rich fixture and returns its path, as a valid file to corrupt. */
+  std::string SaveValidFile()
+  {
+    const auto path = this->TempPath("valid.nrrd");
+    mitk::IOUtil::Save(mitk::test::BuildRichSegmentation({ false, false, false, false }), path);
+    return path;
+  }
+
+public:
   void setUp() override
   {
-    auto label = GenerateLabel(1, "Label 1", 0.745098054f, 0.f, 0.196078435f);
-    auto label2 = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0);
-    m_labelSet1 = { label, label2 };
+    m_TempDir = mitk::IOUtil::CreateTemporaryDirectory("mitkMultiLabelSegmentationIOTest_XXXXXX");
 
-    label = GenerateLabel(1, "Label 3", 0.552941203, 0.713725507, 0);
-    label2 = GenerateLabel(2, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    auto label3 = GenerateLabel(3, "Label 5", 0.639215708, 0.250980407, 0.725490212);
-    m_labelSet2 = { label, label2, label3 };
-
-    label = GenerateLabel(3, "Label 3", 0.552941203, 0.713725507, 0);
-    label2 = GenerateLabel(4, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    label3 = GenerateLabel(5, "Label 5", 0.639215708, 0.250980407, 0.725490212);
-    m_labelSet2_adapted = { label, label2, label3 };
+    // A custom segmentation property reaches the NRRD header only through a persistence
+    // info, and readers register infos process-wide. Registering it here keeps every test
+    // independent of what an earlier test of the suite read.
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    auto info = mitk::PropertyPersistenceInfo::New();
+    info->SetNameAndKey(mitk::test::RichFixtureCustomPropertyName(), "mitk_test_custom");
+    persistence->AddInfo(info, true);
   }
 
   void tearDown() override
   {
-    m_labelSet1.clear();
-    m_labelSet2.clear();
-    m_labelSet2_adapted.clear();
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    persistence->RemoveInfo(mitk::test::RichFixtureCustomPropertyName());
+    persistence->RemoveInfo("modality.source");
+    if (m_AddedModalityPersistence)
+    {
+      persistence->RemoveInfo("modality");
+      m_AddedModalityPersistence = false;
+    }
+
     std::error_code ec;
-    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "mitkMultiLabelSegmentationIOTest", ec);
+    std::filesystem::remove_all(m_TempDir, ec);
   }
-  
+
   void TestReadEmptyMultiLabelSegmentation()
   {
     auto testImages = mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation_labels_meta.nrrd"));
@@ -172,8 +221,7 @@ public:
   // Save a DICOM-derived seg as a native Multi-Label NRRD; reload it;
   // verify the IOD-mandated identity properties survive the round trip.
   // The native serialisation goes through MultiLabelIOHelper's JSON
-  // sidecar; this also covers Multi-Label Stack format transitively
-  // since it uses the same helper.
+  // sidecar.
   void TestDicomDerivedSegSurvivesNativeNrrdRoundTrip()
   {
     const std::string sourcePatientID = "Native-PID-001";
@@ -183,12 +231,10 @@ public:
       "Native^Patient", sourcePatientID, "Native-Study",
       sourceStudyUID, "1.2.826.0.1.3680043.10.999.20.2", sourceForUID);
 
-    auto seg = BuildSegFromDicomSource(source);
-    const auto preSaveSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
+    auto seg = this->BuildSegFromDicomSource(source);
+    const auto preSaveSeriesUID = this->ReadStringProp(seg, 0x0020, 0x000E);
 
-    const auto tempDir = std::filesystem::temp_directory_path() / "mitkMultiLabelSegmentationIOTest";
-    std::filesystem::create_directories(tempDir);
-    const std::string path = (tempDir / "native-roundtrip.nrrd").string();
+    const std::string path = this->TempPath("native-roundtrip.nrrd");
     mitk::IOUtil::Save(seg, path);
 
     const auto loaded = mitk::IOUtil::Load(path);
@@ -199,15 +245,15 @@ public:
                            loadedSeg != nullptr);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("PatientID survives native NRRD round trip",
-                                 sourcePatientID, ReadStringProp(loadedSeg, 0x0010, 0x0020));
+                                 sourcePatientID, this->ReadStringProp(loadedSeg, 0x0010, 0x0020));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("StudyInstanceUID survives native NRRD round trip",
-                                 sourceStudyUID, ReadStringProp(loadedSeg, 0x0020, 0x000D));
+                                 sourceStudyUID, this->ReadStringProp(loadedSeg, 0x0020, 0x000D));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("StudyID survives native NRRD round trip",
-                                 std::string("Native-Study"), ReadStringProp(loadedSeg, 0x0020, 0x0010));
+                                 std::string("Native-Study"), this->ReadStringProp(loadedSeg, 0x0020, 0x0010));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("FrameOfReferenceUID survives native NRRD round trip",
-                                 sourceForUID, ReadStringProp(loadedSeg, 0x0020, 0x0052));
+                                 sourceForUID, this->ReadStringProp(loadedSeg, 0x0020, 0x0052));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("SeriesInstanceUID (seg's own, minted at construction) survives native NRRD round trip",
-                                 preSaveSeriesUID, ReadStringProp(loadedSeg, 0x0020, 0x000E));
+                                 preSaveSeriesUID, this->ReadStringProp(loadedSeg, 0x0020, 0x000E));
   }
 
   // Load a DICOM-derived seg from native NRRD; re-save as DICOM SEG in
@@ -217,11 +263,9 @@ public:
   void TestNativeNrrdReloadCanBeReSavedAsDicomSegStrict()
   {
     auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
-    auto seg = BuildSegFromDicomSource(source);
+    auto seg = this->BuildSegFromDicomSource(source);
 
-    const auto tempDir = std::filesystem::temp_directory_path() / "mitkMultiLabelSegmentationIOTest";
-    std::filesystem::create_directories(tempDir);
-    const auto nrrdPath = (tempDir / "native-then-seg.nrrd").string();
+    const auto nrrdPath = this->TempPath("native-then-seg.nrrd");
     mitk::IOUtil::Save(seg, nrrdPath);
 
     const auto loaded = mitk::IOUtil::Load(nrrdPath);
@@ -245,10 +289,268 @@ public:
     // - that is covered by mitkSegSourceImageRelationRoundTripTest.
     mitk::SegSourceImageRelationRule::Connect(reloadedSeg, source.GetPointer());
 
-    const auto dcmPath = (tempDir / "native-then-seg.dcm").string();
+    const auto dcmPath = this->TempPath("native-then-seg.dcm");
     CPPUNIT_ASSERT_NO_THROW_MESSAGE(
       "Re-saving the native-reloaded seg as DICOM SEG in strict mode must succeed",
       mitk::IOUtil::Save(reloadedSeg, dcmPath));
+  }
+
+  void TestRoundTrip3D()
+  {
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, false }));
+  }
+
+  void TestRoundTrip4D()
+  {
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ true, false, false, false }));
+  }
+
+  void TestRoundTripWithEmptyLabel()
+  {
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, true, false }));
+  }
+
+  void TestRoundTripWithEmptyGroup()
+  {
+    this->AssertRoundTrip(mitk::test::BuildRichSegmentation({ false, false, false, true }));
+  }
+
+  void TestRoundTripMaxLabelValue()
+  {
+    auto segmentation = mitk::test::BuildRichSegmentation({ false, false, false, false });
+    segmentation->AddLabel(mitk::Label::New(mitk::Label::MAX_LABEL_VALUE, "Maximum value"), 1, true, false);
+    {
+      // Index 0 lies outside every box of group 1.
+      mitk::ImageWriteAccessor accessor(segmentation->GetGroupImage(1));
+      static_cast<mitk::Label::PixelType*>(accessor.GetData())[0] = mitk::Label::MAX_LABEL_VALUE;
+    }
+    this->AssertRoundTrip(segmentation);
+  }
+
+  void TestCustomPropertyWithoutPersistenceInfoIsDropped()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    persistence->RemoveInfo(mitk::test::RichFixtureCustomPropertyName());
+
+    const auto reloaded = this->SaveAndReload(mitk::test::BuildRichSegmentation({ false, false, false, false }));
+    CPPUNIT_ASSERT_MESSAGE("A custom property without persistence info is not written to the NRRD header",
+                           reloaded->GetConstProperty(mitk::test::RichFixtureCustomPropertyName()).IsNull());
+  }
+
+  // "modality" is a key of the format; a key merely starting with it is user content, which the
+  // next save keeps, too.
+  void TestReadKeepsNamesakesOfFormatKeys()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    persistence->RemoveInfo("modality.source");
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) { lines.push_back("modality_source:=CT"); });
+
+    const auto segmentation = mitk::test::LoadSingleSegmentation(path);
+    const auto read = segmentation->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("The read keeps modality.source", read.IsNotNull() && read->GetValueAsString() == "CT");
+    CPPUNIT_ASSERT_MESSAGE("The format key is no property", segmentation->GetConstProperty("modality").IsNull());
+
+    const auto saved = this->SaveAndReload(segmentation)->GetConstProperty("modality.source");
+    CPPUNIT_ASSERT_MESSAGE("The next save keeps modality.source", saved.IsNotNull() && saved->GetValueAsString() == "CT");
+  }
+
+  // A property named like a key of the format, e.g. "modality" from a stack, reaches the header
+  // through a persistence info, such as the one a plain NRRD read registers. It must not overwrite
+  // the writer's own key, or the file reads back as a plain image.
+  void TestWriteLeavesOutPropertiesNamedLikeFormatKeys()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistence(mitk::CoreServices::GetPropertyPersistence());
+    if (persistence->GetInfo("modality", false).empty())
+    {
+      auto info = mitk::PropertyPersistenceInfo::New();
+      info->SetNameAndKey("modality", "modality");
+      persistence->AddInfo(info);
+      m_AddedModalityPersistence = true;
+    }
+
+    auto segmentation = mitk::test::BuildRichSegmentation({ false, false, false, false });
+    segmentation->SetProperty("modality", mitk::StringProperty::New("CT"));
+    const auto path = this->TempPath("format-key.nrrd");
+    mitk::IOUtil::Save(segmentation, path);
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), loaded.size());
+    const auto readerDescription = loaded.front()->GetConstProperty(
+      mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()));
+    CPPUNIT_ASSERT(readerDescription.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The saved file is read as a native one", ReaderDescription(),
+                                 readerDescription->GetValueAsString());
+  }
+
+  void TestReadVersion1()
+  {
+    const auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd"));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("39335359-5483-4572-a38a-0d38a068de14"), segmentation->GetUID());
+    CPPUNIT_ASSERT_EQUAL(1u, segmentation->GetNumberOfGroups());
+    CPPUNIT_ASSERT(mitk::MultiLabelSegmentation::LabelValueVectorType({ 1, 2 }) == segmentation->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT(!segmentation->GetUnlabeledLabelLock());
+
+    // Version 1 wrote colours as self-contained ColorProperty JSON.
+    for (const auto& [value, name] : { std::pair<mitk::Label::PixelType, std::string>{ 1, "Label1" }, { 2, "Label2" } })
+    {
+      const auto label = segmentation->GetLabel(value);
+      CPPUNIT_ASSERT_EQUAL(name, label->GetName());
+      CPPUNIT_ASSERT_EQUAL(0.f, label->GetColor().GetRed());
+      CPPUNIT_ASSERT_EQUAL(0.f, label->GetColor().GetGreen());
+      CPPUNIT_ASSERT_EQUAL(0.f, label->GetColor().GetBlue());
+      CPPUNIT_ASSERT_EQUAL(0.6f, label->GetOpacity());
+      CPPUNIT_ASSERT(label->GetLocked());
+      CPPUNIT_ASSERT(label->GetVisible());
+    }
+
+    // The file carries the IO bookkeeping of an earlier read by the legacy reader; it must not
+    // surface as if this reader had produced it.
+    const auto description = segmentation->GetConstProperty(
+      mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()));
+    CPPUNIT_ASSERT(description.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL(ReaderDescription(), description->GetValueAsString());
+    const auto legacyOption = mitk::IOMetaInformationPropertyConstants::READER_OPTION_ROOT().AddElement("Multi layer handling");
+    CPPUNIT_ASSERT(segmentation->GetConstProperty(mitk::PropertyKeyPathToPropertyName(legacyOption)).IsNull());
+  }
+
+  void TestReadVersion2With4D()
+  {
+    const auto segmentation = mitk::test::LoadSingleSegmentation(GetTestDataFilePath("Multilabel/MultilabelSegmentation3DplusT.nrrd"));
+
+    CPPUNIT_ASSERT_EQUAL(std::string("a9e8b2e6-8e63-4eb3-882a-a4e248273b4f"), segmentation->GetUID());
+    CPPUNIT_ASSERT_EQUAL(3u, segmentation->GetNumberOfGroups());
+    CPPUNIT_ASSERT_EQUAL(std::string(""), segmentation->GetGroupName(0));
+    CPPUNIT_ASSERT_EQUAL(std::string("Custom Name"), segmentation->GetGroupName(1));
+    CPPUNIT_ASSERT_EQUAL(std::string(""), segmentation->GetGroupName(2));
+    CPPUNIT_ASSERT(mitk::MultiLabelSegmentation::LabelValueVectorType({ 1, 2, 3, 4, 5 }) == segmentation->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT(mitk::MultiLabelSegmentation::LabelValueVectorType({ 6, 7 }) == segmentation->GetLabelValuesByGroup(1));
+    CPPUNIT_ASSERT(mitk::MultiLabelSegmentation::LabelValueVectorType({ 8 }) == segmentation->GetLabelValuesByGroup(2));
+
+    // Version 2 wrote colours as plain float arrays.
+    struct Expected { mitk::Label::PixelType value; std::string name; float r, g, b; };
+    const std::vector<Expected> expectedLabels = {
+      { 1, "Label 1", 0.7450980544090271f, 0.f, 0.19607843458652496f },
+      { 2, "Label 2", 0.9529411792755127f, 0.7647058963775635f, 0.f },
+      { 3, "Label 3", 0.5529412031173706f, 0.7137255072593689f, 0.f },
+      { 4, "Label 3", 0.5529412031173706f, 0.7137255072593689f, 0.f },
+      { 5, "Label 4", 0.6313725709915161f, 0.7921568751335144f, 0.9450980424880981f },
+      { 6, "Label 5", 0.6392157077789307f, 0.250980406999588f, 0.7254902124404907f },
+      { 7, "Label 6", 0.f, 0.40392157435417175f, 0.6470588445663452f },
+      { 8, "Label 7", 0.9529411792755127f, 0.5176470875740051f, 0.f },
+    };
+    for (const auto& expected : expectedLabels)
+    {
+      const auto label = segmentation->GetLabel(expected.value);
+      const auto context = "label " + std::to_string(expected.value);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(context, expected.name, label->GetName());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(context, expected.r, label->GetColor().GetRed());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(context, expected.g, label->GetColor().GetGreen());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(context, expected.b, label->GetColor().GetBlue());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(context, std::to_string(expected.value), label->GetTrackingID());
+    }
+
+    const auto* timeGeometry = dynamic_cast<const mitk::ArbitraryTimeGeometry*>(segmentation->GetTimeGeometry());
+    CPPUNIT_ASSERT_MESSAGE("The time geometry stays arbitrary", nullptr != timeGeometry);
+    const std::vector<mitk::TimePointType> timePoints = { 0, 0.5, 1, 2, 5.5 };
+    CPPUNIT_ASSERT_EQUAL(timePoints.size() - 1, static_cast<std::size_t>(timeGeometry->CountTimeSteps()));
+    for (mitk::TimeStepType step = 0; step < timeGeometry->CountTimeSteps(); ++step)
+    {
+      CPPUNIT_ASSERT_EQUAL(timePoints[step], timeGeometry->GetMinimumTimePoint(step));
+      CPPUNIT_ASSERT_EQUAL(timePoints[step + 1], timeGeometry->GetMaximumTimePoint(step));
+    }
+  }
+
+  void TestReadOutdatedLabelPropertiesAreDiscarded()
+  {
+    // Every label of this version 2 file carries the segment number, label and algorithm type
+    // that MITK stamped under DICOM.0062.0002. before 2025.12.
+    const auto path = GetTestDataFilePath("Multilabel/MultilabelSegmentation3DplusT.nrrd");
+    mitk::MultiLabelSegmentation::Pointer segmentation;
+    std::vector<std::string> readWarnings;
+    {
+      mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+      segmentation = mitk::test::LoadSingleSegmentation(path);
+      readWarnings = warnings.GetWarnings();
+    }
+    const auto outdated = mitk::test::FindOutdatedLabelProperties(*segmentation);
+    CPPUNIT_ASSERT_MESSAGE("Outdated label properties survived the read:" + mitk::test::JoinDifferences(outdated),
+                           outdated.empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("One warning per file", std::size_t(1), readWarnings.size());
+    CPPUNIT_ASSERT_MESSAGE("The warning names the file: " + readWarnings.front(),
+                           readWarnings.front().find("MultilabelSegmentation3DplusT.nrrd") != std::string::npos);
+    CPPUNIT_ASSERT_MESSAGE("The warning counts the labels: " + readWarnings.front(),
+                           readWarnings.front().find("labels affected: 8") != std::string::npos);
+
+    mitk::test::WarningRecorder warnings("DICOM.0062.0002.");
+    const auto reloaded = this->SaveAndReload(segmentation);
+    CPPUNIT_ASSERT_MESSAGE("Saving again removes the cause of the warning", warnings.GetWarnings().empty());
+    CPPUNIT_ASSERT(mitk::test::FindOutdatedLabelProperties(*reloaded).empty());
+  }
+
+  void TestReadVersionAbove4Fails()
+  {
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, "org.mitk.multilabel.segmentation.version", "5");
+    });
+    mitk::test::AssertReadFails(path, ReaderDescription(), "unsupported version");
+  }
+
+  void TestReadGroupCountMismatchFails()
+  {
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":[]},{"labels":[]},{"labels":[]}])");
+    });
+    mitk::test::AssertReadFails(path, ReaderDescription(), "does not match");
+  }
+
+  void TestReadMalformedLabelGroupsFails()
+  {
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(), R"([{"labels":)");
+    });
+    mitk::test::AssertReadFails(path, ReaderDescription(), LabelGroupsKey());
+  }
+
+  void TestReadWithoutLabelGroupsFails()
+  {
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::RemoveNrrdHeaderKey(lines, LabelGroupsKey());
+    });
+    mitk::test::AssertReadFails(path, ReaderDescription(), LabelGroupsKey());
+  }
+
+  void TestReadLabelCustomPropertyOfWrongTypeFails()
+  {
+    const auto path = this->SaveValidFile();
+    mitk::test::EditNrrdHeader(path, [](std::vector<std::string>& lines) {
+      mitk::test::SetNrrdHeaderValue(lines, LabelGroupsKey(),
+        R"([{"labels":[{"value":7,"name":"Liver","mitk.test.label.custom":{"type":5,"value":70}}]},{"labels":[]}])");
+    });
+    mitk::test::AssertReadFails(path, ReaderDescription(), "mitk.test.label.custom");
+  }
+
+  void TestWriteWithoutGroupsFails()
+  {
+    auto segmentation = mitk::test::BuildRichSegmentation({ false, false, false, false });
+    while (segmentation->GetNumberOfGroups() > 0)
+      segmentation->RemoveGroup(0);
+
+    try
+    {
+      mitk::IOUtil::Save(segmentation, this->TempPath("no-groups.nrrd"));
+      CPPUNIT_FAIL("Saving a segmentation without groups did not fail");
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("The error should say that there are no groups; got: ") + e.GetDescription(),
+                             std::string(e.GetDescription()).find("no groups") != std::string::npos);
+    }
   }
 };
 

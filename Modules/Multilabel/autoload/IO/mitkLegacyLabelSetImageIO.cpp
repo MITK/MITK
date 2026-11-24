@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
@@ -80,7 +81,8 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<mitk::MultiLabelSegmentation::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
+  std::vector<mitk::MultiLabelSegmentation::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary,
+    std::size_t& numberOfLabelsWithOutdatedProperties)
   {
     std::vector<mitk::MultiLabelSegmentation::LabelVectorType> result;
 
@@ -107,13 +109,16 @@ namespace mitk
 
         auto* labelElem = doc.FirstChildElement("Label");
         if (labelElem == nullptr)
-          mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage legacy IO";
+          mitkThrow() << "Cannot read the definition of label '" << keybuffer << "' from the NRRD header of the legacy segmentation.";
 
-        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
+        bool hadOutdatedProperties = false;
+        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem, &hadOutdatedProperties);
 
         if (label->GetValue() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {
           labelSet.push_back(label);
+          if (hadOutdatedProperties)
+            ++numberOfLabelsWithOutdatedProperties;
         }
         else
         {
@@ -142,18 +147,17 @@ namespace mitk
       groupImages = SplitVectorImage(rawimage);
     }
 
-    auto labelsets = ExtractLabelSetsFromMetaData(dictionary);
+    std::size_t numberOfLabelsWithOutdatedProperties = 0;
+    auto labelsets = ExtractLabelSetsFromMetaData(dictionary, numberOfLabelsWithOutdatedProperties);
 
     if (labelsets.size() != groupImages.size())
     {
       mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << groupImages.size() << "; found labelsets: " << labelsets.size();
     }
 
-    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    auto props = ExtractSegmentationPropertiesFromNrrdHeader(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
 
-    const Options userOptions = this->GetOptions();
-
-    const auto multiLayerStrategy = userOptions.find(OPTION_NAME_MULTI_LAYER)->second.ToString();
+    const auto multiLayerStrategy = this->GetChoiceOption(OPTION_NAME_MULTI_LAYER);
 
     if (multiLayerStrategy == OPTION_NAME_MULTI_LAYER_SPLIT)
     { //just split layers in different multi label images
@@ -245,6 +249,8 @@ namespace mitk
       result.push_back(output.GetPointer());
     }
 
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), numberOfLabelsWithOutdatedProperties);
+
     MITK_INFO << "...finished!";
     return result;
   }
@@ -253,17 +259,7 @@ namespace mitk
 
   void LegacyLabelSetImageIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys.push_back("NRRD.space");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
-    this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("label.");
-    this->m_DefaultMetaDataKeys.push_back("layer.");
-    this->m_DefaultMetaDataKeys.push_back("layers");
-    this->m_DefaultMetaDataKeys.push_back("modality");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
-    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
+    this->m_DefaultMetaDataKeys = GetLegacyLabelSetReservedKeys();
   }
 
 } // namespace

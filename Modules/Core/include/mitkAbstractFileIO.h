@@ -238,6 +238,12 @@ namespace mitk
     Options GetDefaultReaderOptions() const;
 
     /**
+     * \brief Get the selected entry of a choice option of the reader part.
+     * \sa AbstractFileReader::GetChoiceOption()
+     */
+    std::string GetReaderChoiceOption(const std::string &name) const;
+
+    /**
      * \brief Set default options for the writer part.
      * \param[in] defaultOptions A map of option names to default values.
      */
@@ -248,6 +254,12 @@ namespace mitk
      * \return A map of option names to default values.
      */
     Options GetDefaultWriterOptions() const;
+
+    /**
+     * \brief Get the selected entry of a choice option of the writer part.
+     * \sa AbstractFileWriter::GetChoiceOption()
+     */
+    std::string GetWriterChoiceOption(const std::string &name) const;
 
     /**
      * \brief Set the service ranking for the reader part.

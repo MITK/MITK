@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkDICOMSegFileContentTestHelpers.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkImageWriteAccessor.h>
@@ -126,12 +127,18 @@ private:
     return seg;
   }
 
+  /** Writes seg in the binary encoding and checks every item of the Segment Sequence of its one file. */
   std::string WriteSeg(const mitk::MultiLabelSegmentation* seg,
                        const mitk::IFileWriter::Options& options,
                        const std::string& nameHint) const
   {
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Precondition: the seg has one group, so the writer writes one file",
+                                 1u, seg->GetNumberOfGroups());
     const std::string path = (std::filesystem::path(m_TempPath) / (nameHint + ".dcm")).string();
     mitk::IOUtil::Save(seg, path, options);
+
+    const auto differences = mitk::test::CompareWrittenSegments(path, *seg, 0, false);
+    CPPUNIT_ASSERT_MESSAGE(path + " differs on the wire:" + mitk::test::JoinDifferences(differences), differences.empty());
     return path;
   }
 

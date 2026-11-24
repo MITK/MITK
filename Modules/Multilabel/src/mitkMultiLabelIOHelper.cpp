@@ -23,8 +23,31 @@ found in the LICENSE file.
 
 #include <tinyxml2.h>
 
+#include <string_view>
+
 namespace
 {
+  /**
+   * MITK versions before 2025.12 stamped every label with copies of its number and name, a
+   * SEMIAUTOMATIC algorithm type and codes looked up by label name, under the DICOM tag paths
+   * of the segment sequence. The DICOM SEG reader of that time wrote the file's algorithm type
+   * and codes to the same keys, though only for the first segment. The label attributes have
+   * their own keys now, and most of these values are stamps rather than information, so they
+   * are dropped instead of translated; the codes imported that way are lost with them.
+   */
+  const std::string& GetOutdatedLabelPropertyPrefix()
+  {
+    static const std::string prefix =
+      mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_SEQUENCE_PATH()) + ".";
+    return prefix;
+  }
+
+  bool IsOutdatedLabelProperty(const std::string& key)
+  {
+    const auto& prefix = GetOutdatedLabelPropertyPrefix();
+    return 0 == key.compare(0, prefix.size(), prefix);
+  }
+
   bool LoadLegacyLabelSetImagePreset(const std::string& presetFilename,
     mitk::MultiLabelSegmentation* inputImage)
   {
@@ -264,7 +287,15 @@ bool mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(const std::strin
   if (!result)
   { // try to load with legacy format
     MITK_INFO << "Try to load as legacy xml preset.";
-    return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
+    try
+    {
+      return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
+    }
+    catch (const Exception& e)
+    {
+      MITK_WARN << "Cannot load label set preset \"" << presetFilename << "\": " << e.what();
+      return false;
+    }
   }
 
   return true;
@@ -291,18 +322,41 @@ tinyxml2::XMLElement *mitk::MultiLabelIOHelper::GetLabelAsXMLElement(tinyxml2::X
   return labelElem;
 }
 
-mitk::Label::Pointer mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem)
+mitk::Label::Pointer mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem,
+  bool* hadOutdatedProperties)
 {
+  if (nullptr != hadOutdatedProperties)
+    *hadOutdatedProperties = false;
+
   // reread
   auto *propElem = labelElem->FirstChildElement("property");
-
-  std::string name;
-  mitk::BaseProperty::Pointer prop;
 
   mitk::Label::Pointer label = mitk::Label::New();
   while (propElem)
   {
-    MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem);
+    // Checked before deserializing, so that a property that is dropped anyway cannot fail the read.
+    const char* key = propElem->Attribute("key");
+    if (nullptr != key && IsOutdatedLabelProperty(key))
+    {
+      if (nullptr != hadOutdatedProperties)
+        *hadOutdatedProperties = true;
+      propElem = propElem->NextSiblingElement("property");
+      continue;
+    }
+
+    // The layer of the XML format is the group of the label now. Kept as a property, every later
+    // save would write it back, and after splitting the layers it would be stale.
+    if (nullptr != key && std::string_view(key) == "layer")
+    {
+      propElem = propElem->NextSiblingElement("property");
+      continue;
+    }
+
+    std::string name;
+    mitk::BaseProperty::Pointer prop;
+    if (!MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem))
+      mitkThrow() << "Cannot load the label property '" << name << "' from XML: its value cannot be deserialized.";
+
     if (name == "value")
     {
       auto castedProp = dynamic_cast<mitk::UShortProperty*>(prop.GetPointer());
@@ -440,7 +494,7 @@ std::string mitk::MultiLabelIOHelper::GetStringByKey(const itk::MetaDataDictiona
       return metaString;
     }
   }
-  return metaString;
+  return "";
 }
 
 mitk::MultiLabelIOHelper::LabelGroupMetaData::LabelGroupMetaData() : properties(PropertyList::New())
@@ -511,8 +565,12 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
   return result;
 };
 
-std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups)
+std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups,
+  std::vector<Label::PixelType>* labelsWithOutdatedProperties)
 {
+  if (nullptr != labelsWithOutdatedProperties)
+    labelsWithOutdatedProperties->clear();
+
   std::vector<LabelGroupMetaData> result;
 
   for (const auto& jLabelGroup : listOfLabelGroups)
@@ -529,7 +587,11 @@ std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelp
 
         for (const auto& jlabel : jlabels)
         {
-          labels.push_back(DeserializeLabelFromJSON(jlabel));
+          bool hadOutdatedProperties = false;
+          auto label = DeserializeLabelFromJSON(jlabel, &hadOutdatedProperties);
+          if (hadOutdatedProperties && nullptr != labelsWithOutdatedProperties)
+            labelsWithOutdatedProperties->push_back(label->GetValue());
+          labels.push_back(label);
         }
       }
       else if (key=="name")
@@ -556,8 +618,8 @@ std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelp
         }
         else
         {
-          MITK_ERROR << "Unable to read custom group property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
-          mitkThrow() << "Unable to read custom group property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
+          MITK_ERROR << "Unable to read group key from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
+          mitkThrow() << "Unable to read group key from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
         }
       }
     }
@@ -579,9 +641,7 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
     "name", "locked", "opacity", "visible", "color", "value",
     "tracking_id", "tracking_uid", "description",
     //the following keys will be ignored on purpose
-    "center.coordinates", "center.index",
-    "DICOM.0062.0002.0062.0005", //covered by "name"
-    "DICOM.0062.0002.0062.0004" //set automatically
+    "center.coordinates", "center.index"
   };
 
   for (const auto& [key, property] : *propMap)
@@ -589,6 +649,15 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
     // Skip reserved keys
     if (reservedKeys.find(key) != reservedKeys.end())
       continue;
+
+    // Readers ignore these, so writing them would only defer the loss; such a property was set
+    // deliberately, since loaded labels never carry one.
+    if (IsOutdatedLabelProperty(key))
+    {
+      MITK_WARN << "The property \"" << key << "\" of label " << label->GetValue() << " is not written: readers ignore"
+                << " label properties under \"" << GetOutdatedLabelPropertyPrefix() << "\" as outdated.";
+      continue;
+    }
 
     // Try to serialize the property to JSON
     j[key] = mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(property);
@@ -638,32 +707,6 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
 
 namespace
 {
-  const std::map<std::string, std::string>& GetDeprecatedNameLookup()
-  {
-    static const std::map<std::string, std::string> lookup = {
-      // Mapping for legacy label properties that were wrong and therefore deprecated
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetValuePropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()),
-        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName() }
-    };
-    return lookup;
-  }
-
   const std::map<std::string, std::string>& GetConvinienceNameLookup()
   {
     static const std::map<std::string, std::string> lookup = {
@@ -685,34 +728,51 @@ namespace
   }
   std::string EnsureCorrectPropertyName(const std::string& externalName)
   {
-    auto mapping = GetDeprecatedNameLookup();
+    const auto& mapping = GetConvinienceNameLookup();
     auto finding = mapping.find(externalName);
 
     if (finding != mapping.end())
     {
-      MITK_DEBUG << "Deserialized label used deprecated property names. Converted deprecated name into valid name. Deprecated name: \"" << externalName << "\"; new name: \"" << finding->second << "\"";
+      MITK_DEBUG << "Deserialized label used a simplified index-less name. Converted name into valid name. Original name: \"" << externalName << "\"; new name: \"" << finding->second << "\"";
       return finding->second;
-    }
-
-    auto mapping2 = GetConvinienceNameLookup();
-    auto finding2 = mapping2.find(externalName);
-
-    if (finding2 != mapping2.end())
-    {
-      MITK_DEBUG << "Deserialized label used a simplified index-less name. Converted name into valid name. Original name: \"" << externalName << "\"; new name: \"" << finding2->second << "\"";
-      return finding2->second;
     }
 
     return externalName;
   }
 }
 
-mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nlohmann::json& labelJson)
+void mitk::MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(const std::string& location, std::size_t numberOfLabels)
 {
+  if (0 == numberOfLabels)
+    return;
+
+  MITK_WARN << "The segmentation \"" << location << "\" carries outdated label properties (keys starting with \""
+            << GetOutdatedLabelPropertyPrefix() << "\"; labels affected: " << numberOfLabels
+            << "). They were ignored. Mostly they are defaults that MITK versions before 2025.12 stamped on"
+               " every label, and that MITK 2025.12 to 2026.06 kept when saving the file again. If a version"
+               " before 2025.12 imported the segmentation from DICOM SEG, they may hold codes of that file"
+               " (segment category, type, modifier, anatomic region) that the label now lacks; to keep them,"
+               " import the original DICOM SEG again, because saving this segmentation removes them for good."
+               " Ignoring these properties is deprecated and may be removed in a future version.";
+}
+
+mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nlohmann::json& labelJson,
+  bool* hadOutdatedProperties)
+{
+  if (nullptr != hadOutdatedProperties)
+    *hadOutdatedProperties = false;
+
   Label::Pointer resultLabel = Label::New();
 
   for (const auto& [key, jValue] : labelJson.items())
   {
+    if (IsOutdatedLabelProperty(key))
+    {
+      if (nullptr != hadOutdatedProperties)
+        *hadOutdatedProperties = true;
+      continue;
+    }
+
     auto internalKey = EnsureCorrectPropertyName(key);
 
     if (internalKey == "name")
@@ -806,6 +866,10 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
       {
         MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
         mitkReThrow(e) << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
+      }
+      catch (const nlohmann::json::exception& e)
+      {
+        mitkThrow() << "Unable to read custom label property from JSON. Failed key: " << internalKey << "; invalid value: " << jValue.dump() << "; reason: " << e.what();
       }
     }
   }

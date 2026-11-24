@@ -71,6 +71,22 @@ namespace mitk
     us::Any GetOption(const std::string &name) const;
 
     /**
+     * \brief Get the selected entry of an option registered with a \c std::vector<std::string> of
+     *        choices as default value.
+     *
+     * Unset, the option resolves to its first choice, which the option dialogs preselect. The list
+     * itself counts as unset too: GetOptions() reports an unset choice that way, and callers may
+     * hand those options back through SetOptions().
+     *
+     * \param[in] name The option name.
+     * \return The chosen entry, or the first one.
+     * \throw mitk::Exception if no option of that name is registered with a non-empty list of
+     *        choices, or if its value is neither one of the choices nor the list itself. The
+     *        message names the choices.
+     */
+    std::string GetChoiceOption(const std::string &name) const;
+
+    /**
      * \brief Set multiple options at once.
      *
      * Each option is validated against the default options. Unknown options

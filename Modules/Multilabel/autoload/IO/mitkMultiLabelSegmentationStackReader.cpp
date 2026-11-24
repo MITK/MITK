@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -198,129 +199,140 @@ namespace
     std::ifstream input(this->GetLocalFileName());
     if (!input.is_open())
     {
-      return result;
+      mitkThrow() << "Cannot open the segmentation stack file \"" << this->GetInputLocation() << "\".";
     }
 
     auto filePathBase = itksys::SystemTools::GetFilenamePath(this->GetLocalFileName());
 
-    nlohmann::json fileContent;
+    auto segmentation = MultiLabelSegmentation::New();
+    std::vector<Label::PixelType> labelsWithOutdatedProperties;
     try
     {
+      nlohmann::json fileContent;
       input >> fileContent;
-    }
-    catch (const nlohmann::json::parse_error& e)
-    {
-      MITK_ERROR << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
-      throw;
-    }
 
-    //check version
-    int version = 0;
+      //check version
+      int version = 0;
 
-    if (!MultiLabelIOHelper::GetValueFromJson<int>(fileContent, "version", version))
-    {
-      MITK_INFO << "Data has unknown version. Assuming that it can be read. Result might be invalid.";
-    }
-
-    if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
-    {
-      mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
-    }
-
-    auto segmentation = MultiLabelSegmentation::New();
-    bool segInitialized = false;
-
-    //get pixel content
-    auto groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"]);
-
-    for (const auto& groupInfo : groupInfos)
-    {
-      auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
-      auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels));
-
-      if (!segInitialized)
+      if (!MultiLabelIOHelper::GetValueFromJson<int>(fileContent, "version", version))
       {
-        //this is the first group, we need to initialize the segmentation first to ensure the
-        //correct geometry.
-        mitk::Image::Pointer initImage = groupImage;
-        if (initImage.IsNull())
-        {
-          //seems to be a stack only defined with label images
-          //search for the first defined file and use it for initialization.
-          //not the most efficient way, but it is robust.
-          auto firstFileName = FindFirstFileInJson(fileContent["groups"]);
-          if (!firstFileName.empty())
-          {
-            initImage = LoadImageBasedOnFileName(firstFileName, filePathBase);
-          }
-        }
-
-        if (initImage.IsNull())
-        {
-          mitkThrow() << "Meta seems in an invalid state. No import image was referenced to initialize the segmentation.";
-        }
-
-        segmentation->Initialize(initImage, true, false);
-        segInitialized = true;
+        MITK_INFO << "Data has unknown version. Assuming that it can be read. Result might be invalid.";
       }
 
-      auto groupIndex = segmentation->AddGroup(cleanedLabels);
-
-      if (groupImage.IsNotNull())
+      if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
       {
-        //transfer content of the labels that have no dedicated defined import image
-        auto groupMapping = MakeLabelsGroupMapping(groupInfo.labels);
-        TransferLabelContent(groupImage, segmentation->GetGroupImage(groupIndex),
-          segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(groupIndex)),
-          MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, groupMapping,
-          MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+        mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
       }
 
-      for (const auto& label : groupInfo.labels)
+      if (!fileContent.contains("groups") || !fileContent["groups"].is_array() || fileContent["groups"].empty())
       {
-        mitk::Image::Pointer labelImage = LoadImageBasedOnFileProperty(label, filePathBase);
-        if (labelImage.IsNotNull())
+        mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" defines no groups.";
+      }
+
+      bool segInitialized = false;
+
+      //get pixel content
+      const auto groupInfos = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"],
+        &labelsWithOutdatedProperties);
+
+      for (const auto& groupInfo : groupInfos)
+      {
+        auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
+        auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels));
+
+        if (!segInitialized)
         {
-          if (!segInitialized)
+          //this is the first group, we need to initialize the segmentation first to ensure the
+          //correct geometry.
+          mitk::Image::Pointer initImage = groupImage;
+          if (initImage.IsNull())
           {
-            //this is the first group, we need to initialize the segmentation first to ensure the
-            //correct geometry.
-            segmentation->Initialize(labelImage, false);
-            segInitialized = true;
+            //seems to be a stack only defined with label images
+            //search for the first defined file and use it for initialization.
+            //not the most efficient way, but it is robust.
+            auto firstFileName = FindFirstFileInJson(fileContent["groups"]);
+            if (!firstFileName.empty())
+            {
+              initImage = LoadImageBasedOnFileName(firstFileName, filePathBase);
+            }
           }
 
+          if (initImage.IsNull())
+          {
+            mitkThrow() << "Meta seems in an invalid state. No import image was referenced to initialize the segmentation.";
+          }
+
+          segmentation->Initialize(initImage, true, false);
+          segInitialized = true;
+        }
+
+        auto groupIndex = segmentation->AddGroup(cleanedLabels);
+        if (!groupInfo.name.empty())
+          segmentation->SetGroupName(groupIndex, groupInfo.name);
+
+        if (groupImage.IsNotNull())
+        {
           //transfer content of the labels that have no dedicated defined import image
-          auto labelMapping = MakeLabelMapping(label);
-          TransferLabelContent(labelImage, segmentation->GetGroupImage(groupIndex),
+          auto groupMapping = MakeLabelsGroupMapping(groupInfo.labels);
+          TransferLabelContent(groupImage, segmentation->GetGroupImage(groupIndex),
             segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(groupIndex)),
-            MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { labelMapping },
+            MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, groupMapping,
             MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
         }
 
+        for (const auto& label : groupInfo.labels)
+        {
+          mitk::Image::Pointer labelImage = LoadImageBasedOnFileProperty(label, filePathBase);
+          if (labelImage.IsNotNull())
+          {
+            if (!segInitialized)
+            {
+              //this is the first group, we need to initialize the segmentation first to ensure the
+              //correct geometry.
+              segmentation->Initialize(labelImage, false);
+              segInitialized = true;
+            }
+
+            //transfer content of the labels that have no dedicated defined import image
+            auto labelMapping = MakeLabelMapping(label);
+            TransferLabelContent(labelImage, segmentation->GetGroupImage(groupIndex),
+              segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(groupIndex)),
+              MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { labelMapping },
+              MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+          }
+
+        }
       }
-    }
 
-    //meta data handling
-    if (fileContent.contains("properties"))
-    {
-      auto loadedProperties = mitk::PropertyList::New();
-      loadedProperties->FromJSON(fileContent["properties"]);
-
-      EnsurePropertyPersistance(loadedProperties);
-
-      segmentation->GetPropertyList()->ConcatenatePropertyList(loadedProperties, true);
-    }
-
-    // Handle UID
-    if (fileContent.contains("uid"))
-    {
-      auto uid = fileContent["uid"].get<std::string>();
-      if (!uid.empty())
+      //meta data handling
+      if (fileContent.contains("properties"))
       {
-        mitk::UIDManipulator uidManipulator(segmentation);
-        uidManipulator.SetUID(uid);
+        auto loadedProperties = mitk::PropertyList::New();
+        loadedProperties->FromJSON(fileContent["properties"]);
+        RemoveReservedProperties(loadedProperties, GetMultiLabelReservedKeys());
+
+        EnsurePropertyPersistance(loadedProperties);
+
+        segmentation->GetPropertyList()->ConcatenatePropertyList(loadedProperties, true);
+      }
+
+      // Handle UID
+      if (fileContent.contains("uid"))
+      {
+        auto uid = fileContent["uid"].get<std::string>();
+        if (!uid.empty())
+        {
+          mitk::UIDManipulator uidManipulator(segmentation);
+          uidManipulator.SetUID(uid);
+        }
       }
     }
+    catch (const nlohmann::json::exception& e)
+    {
+      mitkThrow() << "The segmentation stack file \"" << this->GetInputLocation() << "\" is invalid: " << e.what();
+    }
+
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), labelsWithOutdatedProperties.size());
 
     result.push_back(segmentation.GetPointer());
     return result;

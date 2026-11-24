@@ -65,17 +65,27 @@ namespace mitk
      * This functions supports the new format (.multilabel.json) and the legacy format (*.lpset)
      * \param presetFilename the filename of the preset including the file system path
      * \param inputSegmentation the image to which the loaded preset will be applied
-     * \return true if the deserilization was successful and false otherwise
+     * \return true if the preset was loaded and applied, false otherwise. If a legacy preset fails
+     *         partway, the groups and labels applied up to the failure stay in inputSegmentation.
      */
     static bool LoadMultiLabelSegmentationPreset(const std::string &presetFilename,
                                         mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**
      * \brief Creates a mitk::Label from an XML element
+     *
+     * Outdated label properties are ignored, as described for DeserializeLabelFromJSON().
+     * The property "layer", the layer index of the XML format, is dropped too: the group of the
+     * label holds it now. The JSON formats keep a "layer" property, which is an ordinary custom
+     * property there.
      * \param labelElem the xml element from which a mitk::Label will be created
+     * \param hadOutdatedProperties Optional. If provided, it is set to whether the element
+     * carried outdated label properties.
      * \return the created mitk::Label
+     * \throw mitk::Exception if a property of the label cannot be deserialized
      */
-    static itk::SmartPointer<mitk::Label> LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem);
+    static itk::SmartPointer<mitk::Label> LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem,
+      bool* hadOutdatedProperties = nullptr);
 
     /**
      * \brief Creates an XML element from a mitk::Label
@@ -112,13 +122,15 @@ namespace mitk
     static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
 
     /**
-     * \brief Structure to hold label group metadata including labels and group properties
+     * \brief Name, labels and remaining keys of a label group in the JSON format
      */
     struct MITKMULTILABEL_EXPORT LabelGroupMetaData
     {
       std::string name;
       LabelVector labels;
-      PropertyList::Pointer properties; // For custom group properties
+      /** The group's keys other than "name" and "labels". Groups have no custom properties; these
+       * are meta keys such as "_file", the group image of a segmentation stack. */
+      PropertyList::Pointer properties;
 
       LabelGroupMetaData();
       LabelGroupMetaData(const std::string& groupName, const LabelVector& groupLabels);
@@ -149,13 +161,21 @@ namespace mitk
 
     /**
      * \brief Deserialize meta data of multilabel groups from JSON format (v2)
+     *
+     * Outdated label properties are ignored, as described for DeserializeLabelFromJSON().
      * \param listOfLabelGroups JSON representation of label groups
+     * \param labelsWithOutdatedProperties Optional. If provided, it is set to the values of
+     * the labels that carried outdated label properties, in the order of the JSON.
      * \return vector of label group metadata
      */
-    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups);
+    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups,
+      std::vector<Label::PixelType>* labelsWithOutdatedProperties = nullptr);
 
     /**
      * \brief Serialize a single label to JSON
+     *
+     * Outdated label properties (see DeserializeLabelFromJSON()) are not written, with one
+     * warning each, since readers would ignore them.
      * \param label the label to serialize
      * \return JSON representation of the label
      */
@@ -163,10 +183,26 @@ namespace mitk
 
     /**
      * \brief Deserialize a single label from JSON
+     *
+     * Label properties whose keys start with "DICOM.0062.0002." are outdated and ignored.
+     * MITK versions before 2025.12 stamped them on every label, and versions 2025.12 to
+     * 2026.06 kept them when such a file was saved again. Ignoring them is deprecated: the
+     * segmentation readers report them so that users save their files again, and a
+     * future version may stop ignoring them.
      * \param labelJson JSON representation of the label
+     * \param hadOutdatedProperties Optional. If provided, it is set to whether labelJson
+     * carried outdated label properties.
      * \return pointer to the deserialized label
      */
-    static mitk::Label::Pointer DeserializeLabelFromJSON(const nlohmann::json& labelJson);
+    static mitk::Label::Pointer DeserializeLabelFromJSON(const nlohmann::json& labelJson,
+      bool* hadOutdatedProperties = nullptr);
+
+    /**
+     * \brief Logs one warning that the file at location carries outdated label properties
+     * (see DeserializeLabelFromJSON()) on numberOfLabels labels, and that saving it again
+     * removes them. Does nothing if numberOfLabels is 0.
+     */
+    static void WarnAboutOutdatedLabelProperties(const std::string& location, std::size_t numberOfLabels);
 
     /**
      * \brief Serialize the property of a label to JSON

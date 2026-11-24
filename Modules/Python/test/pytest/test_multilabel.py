@@ -1042,6 +1042,62 @@ class TestBoundButUntestedAPI:
         assert result  # not empty / truthy
 
 
+class TestSaveWriterOptions:
+    """save() hands writer options to the writer, e.g. the strategy of a segmentation stack."""
+
+    @staticmethod
+    def _painted(ref_image):
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        values = []
+        for index, name in enumerate(("A", "B")):
+            label = seg.add_label(name, (1.0, 0.0, 0.0), 0)
+            arr[index, index, index] = label.value
+            values.append(label.value)
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), time_step=0, source_time_step=0)
+        return seg, values
+
+    def test_without_options_writes_group_images(self, ref_image, tmp_path):
+        seg, _ = self._painted(ref_image)
+        seg.save(str(tmp_path / "seg.mitklabel.json"))
+        assert (tmp_path / "seg_group_0.nii.gz").exists()
+
+    def test_instance_strategy_writes_label_images(self, ref_image, tmp_path):
+        seg, values = self._painted(ref_image)
+        path = tmp_path / "seg.mitklabel.json"
+        seg.save(str(path), writer_options={"Save strategy": "instance"})
+        for value in values:
+            assert (tmp_path / f"seg_label_{value}.nii.gz").exists()
+        assert not (tmp_path / "seg_group_0.nii.gz").exists()
+        reloaded = mitk.MultiLabelSegmentation(str(path))
+        assert sorted(reloaded.label_values) == sorted(values)
+
+    def test_unknown_option_value_raises(self, ref_image, tmp_path):
+        seg, _ = self._painted(ref_image)
+        with pytest.raises(mitk.Exception):
+            seg.save(str(tmp_path / "seg.mitklabel.json"), writer_options={"Save strategy": "Instance"})
+
+    def test_option_value_of_unsupported_type_raises(self, ref_image, tmp_path):
+        seg, _ = self._painted(ref_image)
+        with pytest.raises(TypeError, match="Save strategy"):
+            seg.save(str(tmp_path / "seg.mitklabel.json"), writer_options={"Save strategy": ["instance"]})
+
+    @pytest.mark.parametrize("value", [2**31, -2**31 - 1, 2**70])
+    def test_option_value_out_of_int_range_raises(self, ref_image, tmp_path, value):
+        seg, _ = self._painted(ref_image)
+        path = tmp_path / "seg.mitklabel.json"
+        with pytest.raises(OverflowError, match="Some option"):
+            seg.save(str(path), writer_options={"Some option": value})
+        assert not path.exists()
+
+    @pytest.mark.parametrize("value", [2**31 - 1, -2**31])
+    def test_option_value_at_int_range_limits_is_accepted(self, ref_image, tmp_path, value):
+        seg, _ = self._painted(ref_image)
+        path = tmp_path / "seg.mitklabel.json"
+        seg.save(str(path), writer_options={"Some option": value})
+        assert path.exists()
+
+
 class TestErrorPaths:
 
     # Lookup failures follow Python container idioms: a group index is
@@ -1613,3 +1669,22 @@ class TestHtmlRepr:
         assert "Organs" in html
         assert "Liver" in html
         assert "Kidney" in html
+
+
+# ---------------------------------------------------------------------------
+# DICOM identity inheritance
+# ---------------------------------------------------------------------------
+
+class TestInheritBodyPartExamined:
+
+    def test_copies_body_part_examined(self, seg, ref_image):
+        # Set after the seg exists, so only the call under test can copy it.
+        ref_image.set_property("DICOM.0018.0015", "CHEST")
+        mitk.dicom.segmentation.inherit_body_part_examined_from_source(seg, ref_image)
+        assert seg.get_property("DICOM.0018.0015") == "CHEST"
+
+    def test_keeps_existing_value_without_overwrite(self, seg, ref_image):
+        ref_image.set_property("DICOM.0018.0015", "CHEST")
+        seg.set_property("DICOM.0018.0015", "HEAD")
+        mitk.dicom.segmentation.inherit_body_part_examined_from_source(seg, ref_image, overwrite=False)
+        assert seg.get_property("DICOM.0018.0015") == "HEAD"

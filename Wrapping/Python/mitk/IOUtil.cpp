@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "IOHelpers.h"
 #include "SmartPointer.h"
 
 #include <mitkIOUtil.h>
@@ -109,7 +110,7 @@ Examples:
     >>> objs = mitk.IOUtil.load("DICOMSeries/")
 )")
     .def_static("save",
-      [](py::object data, const std::filesystem::path& path) {
+      [](py::object data, const std::filesystem::path& path, std::optional<py::dict> writer_options) {
         const BaseData* base = nullptr;
         if (py::isinstance<MultiLabelSegmentation>(data))
           base = data.cast<MultiLabelSegmentation*>();
@@ -119,9 +120,9 @@ Examples:
           throw py::type_error("data must be an mitk.Image or mitk.MultiLabelSegmentation");
         if (base == nullptr)
           throw py::value_error("Cannot save a null object");
-        IOUtil::Save(base, path.string());
+        IOUtil::Save(base, path.string(), ToWriterOptions(writer_options));
       },
-      py::arg("data"), py::arg("path"),
+      py::arg("data"), py::arg("path"), py::arg("writer_options") = py::none(),
       R"(Save an MITK object to disk.
 
 The output format is inferred from the file extension.
@@ -130,9 +131,17 @@ Args:
     data: An :py:class:`Image` or :py:class:`MultiLabelSegmentation`.
     path: Output file path. Accepts ``str``, ``pathlib.Path``, or any
         object with a ``__fspath__`` method.
+    writer_options: Optional dict of options for the writer, with ``str``,
+        ``bool``, ``int`` or ``float`` values. The segmentation writers'
+        options are listed at :py:meth:`MultiLabelSegmentation.save`. A
+        name the writer does not know is ignored with a warning.
 
 Raises:
-    TypeError: If ``data`` is not a supported type.
+    TypeError: If ``data`` is not a supported type, or a writer option has
+        an unsupported type.
+    OverflowError: If an int writer option does not fit a C++ int.
     ValueError: If ``data`` is null.
+    mitk.Exception: If a writer option has a value the writer does not
+        know, or writing fails.
 )");
 }

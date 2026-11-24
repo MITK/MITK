@@ -130,6 +130,16 @@ namespace mitk
     return this->AbstractFileWriter::GetDefaultOptions();
   }
 
+  std::string AbstractFileIO::GetReaderChoiceOption(const std::string &name) const
+  {
+    return this->AbstractFileReader::GetChoiceOption(name);
+  }
+
+  std::string AbstractFileIO::GetWriterChoiceOption(const std::string &name) const
+  {
+    return this->AbstractFileWriter::GetChoiceOption(name);
+  }
+
   void AbstractFileIO::SetReaderRanking(int ranking) { this->AbstractFileReader::SetRanking(ranking); }
   int AbstractFileIO::GetReaderRanking() const { return this->AbstractFileReader::GetRanking(); }
   void AbstractFileIO::SetWriterRanking(int ranking) { this->AbstractFileWriter::SetRanking(ranking); }

@@ -18,7 +18,7 @@ Use case specific details will be explained in the use case sections.
 
 ```json
 {
-  "version": 3,
+  "version": 4,
   "type": "org.mitk.multilabel.segmentation.stack",
   "uid": "optional-unique-id",
   "groups": [ ... ],
@@ -42,9 +42,8 @@ Each entry in `"groups"` defines a group of labels:
 ```json
 {
   "name": "Custom Group Name",
-  "_file": "./Group_0.nrrd",
-  "labels": [ ... ],
-  "myCustomGroupProperty": "value"
+  "_file": "./MySegmentation_group_0.nii.gz",
+  "labels": [ ... ]
 }
 ```
 
@@ -52,8 +51,9 @@ Each entry in `"groups"` defines a group of labels:
 |----------|----------|-------------------------------------------|
 | `name`   | ❌        | Optional group name                       |
 | `_file`  | ❌        | Path to the group image file (only use case 1) |
-| `labels` | ✅        | Array of labels in the group              |
-| *(any)*  | ❌        | Any additional key is stored as a custom property |
+| `labels` | ❌        | Array of labels in the group. MITK writes it only for a group that has labels. |
+
+Groups have no custom properties. Any other key with a string, number or boolean value is ignored; any other key with an object, array or `null` value makes reading fail.
 
 
 
@@ -74,14 +74,13 @@ Each label includes visual and semantic metadata, and optionally its own image f
   "tracking_id": "1",
   "tracking_uid": "uuid",
   "description": "Optional text",
-  "DICOM.0062.0002.0062.0008": { ... },
   "custom_property": "value"
 }
 ```
 
 | Key           | Import/ Export | Suggestion | Preset |Description                                            |
 |----------------|----------------|------------|--------|--------------------------------------------------------|
-| `name`         | ✅ | ✅ | ✅ | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
+| `name`         | ✅ | ✅ | ✅ | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)`; a label without a name gets its description there, and without one the meaning of its segmented property type; a name or description of spaces only counts as none |
 | `value`        | ✅ | ⭕ | ✅ | Unique label value (*it has to be unique for the whole segmentation not just the group!*) |
 | `color`        | ⭕ | ⭕ | ⭕ | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
 | `opacity`      | ⭕ | ⭕ | ⭕ | Opacity; default is 1 (0.0–1.0)                                      |
@@ -98,6 +97,8 @@ Each label includes visual and semantic metadata, and optionally its own image f
 | `_max_instance_occurrence` | ⭕ | | | If not set or `null`: unlimited instances allowed. If set to integer N: label can only be instantiated N times. |
 
 Legend: ✅: required | ⭕: optional | `empty cell`: not supported/ignored
+
+Label properties under `DICOM.0062.0002.`, which MITK versions before 2025.12 stamped on every label and MITK 2025.12 to 2026.06 kept when saving the file again, are discarded on reading in all three use cases, and are not written. Reading a segmentation logs one warning per file; presets and label suggestions discard them without a warning. If a version before 2025.12 imported the segmentation from DICOM SEG, these properties may hold codes of that file (segment category, type, modifier, anatomic region) that the label now lacks; to keep them, import the original DICOM SEG again. Otherwise, save the segmentation again to remove the properties from the file.
 ### Meta keys/properties
 Some keys on group and label level are not supposed to be converted into regular properties, but the are supposed as meta information that control the way labels are processed/handled.
 Those meta keys will not be "imported", thus transformed into properties of the label data structure. Those keys are indicated by a "_" prefix. The most regular seen keys of that type are `_file` and `_file_value`.
@@ -124,9 +125,9 @@ Saved under `"properties"`:
 
 These can store standard metadata (e.g., DICOM attributes) or user-defined content. On this level (which resembles the level of a data instance (like an image)) the properties are stored in the same format like any node or data properties in MITK.
 
-### Label/Group Custom Properties
+### Label Custom Properties
 
-Labels and groups may contain custom tags/properties.
+Labels may contain custom properties; groups may not (see Group Structure).
 For simplicity/readablility reasons simple types are directly stored as simple key/value pairs.
 
 Supported types:
@@ -150,11 +151,11 @@ Structured properties (representing more complex properties (e.g. `TemporoSpatia
 - \<property_class_name\>: Name of the property class that is persisted here
 - \<property_content\>: JSON content of the property
 
-Example for a structured property stored at group or label level:
+Example for a structured property stored at label level:
 ```json
-"DICOM.0062.0002.0062.0008": {
+"custom.observation": {
   "type": "TemporoSpatialStringProperty",
-  "value": { "values": [{"t": 0, "value": "SEMIAUTOMATIC", "z": 0}]}
+  "value": { "values": [{"t": 0, "value": "stable", "z": 0}]}
 }
 ```
 
@@ -172,14 +173,15 @@ Convert between a unified `MultiLabelSegmentation` and a stack of individual lab
 A typical stack includes:
 ```
 MySegmentation/
-├── MySegmentation_Group_0.nrrd             # optional group image ( (multiple) label values in one image)
-├── MySegmentation_Label_1.nii.gz           # optional label image (per label)
+├── MySegmentation_group_0.nii.gz           # optional group image ( (multiple) label values in one image)
+├── MySegmentation_label_1.nii.gz           # optional label image (per label)
 ├── ...
 └── MySegmentation.mitklabel.json           # required JSON meta file
 ```
 
 The `.json` file determines how image files are interpreted and combined into a `mitk::MultiLabelSegmentation`.
-The images can have any format that is supported by MITK.
+The reader loads the images through ITK, so they can have any format ITK reads, e.g. NIfTI or NRRD; MITK writes NIfTI.
+A path in `_file` is either absolute or relative to the directory of the `.json` file; MITK writes relative paths.
 **IMPORTANT**: The images of one segmentation stack have to have the same image geometry!
 
 
@@ -191,11 +193,15 @@ Segmentations are organized into **label groups**. Each group may:
 - Reference a single **group image** (multi-label voxel values)
 - Or contain multiple **label-specific binary masks**
 
-This is configured by the `save_strategy`:
-- `group`: Saves one image per group
-- `label`: Saves one image per label
+When writing, the option `Save strategy` selects the variant:
+- `group` (default): saves one image per group, `<name>_group_<index>.nii.gz`.
+- `instance`: saves one image per label, `<name>_label_<value>.nii.gz`. A group without labels gets a group image instead, so that the stack still carries the geometry when no group has labels.
 
-MITK handles both variants at import/export.
+With the `instance` strategy, the option `Instance value` selects the voxel values of the label images:
+- `original` (default): the voxels carry the label value.
+- `binary`: the voxels carry 1, and `_file_value` maps it to the label value.
+
+The writer refuses any other value of these options. MITK reads both variants.
 
 ### Mapping Image Voxel Values
 

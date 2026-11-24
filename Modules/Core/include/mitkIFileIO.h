@@ -77,7 +77,10 @@ namespace mitk
      * is treated as a finite enumeration of values where the values are contained
      * in a corresponding \c std::vector<std::string> value. The same option key
      * without the "enum" segment is considered to hold the current selection from
-     * the enumeration.
+     * the enumeration. An option whose default value is a \c std::vector<std::string>
+     * is a choice from that list as well: a choice sets the chosen \c std::string, and
+     * the first entry is the default. Readers and writers get the selection through
+     * AbstractFileReader::GetChoiceOption() and AbstractFileWriter::GetChoiceOption().
      */
     typedef std::map<std::string, us::Any> Options;
 

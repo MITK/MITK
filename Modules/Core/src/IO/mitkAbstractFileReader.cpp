@@ -280,6 +280,7 @@ namespace mitk
   MimeType AbstractFileReader::GetRegisteredMimeType() const { return d->GetRegisteredMimeType(); }
   IFileReader::Options AbstractFileReader::GetOptions() const { return d->GetOptions(); }
   us::Any AbstractFileReader::GetOption(const std::string &name) const { return d->GetOption(name); }
+  std::string AbstractFileReader::GetChoiceOption(const std::string &name) const { return d->GetChoiceOption(name); }
   void AbstractFileReader::SetOptions(const Options &options) { d->SetOptions(options); }
   void AbstractFileReader::SetOption(const std::string &name, const us::Any &value) { d->SetOption(name, value); }
   ////////////////// MISC //////////////////

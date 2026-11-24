@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
+#include <mitkMultiLabelNrrdMetaData.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
@@ -69,6 +70,11 @@ namespace mitk
 
     auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
+    if (0 == input->GetNumberOfGroups())
+    {
+      mitkThrow() << "Cannot write the segmentation: it has no groups.";
+    }
+
     mitk::LocaleSwitch localeSwitch("C");
 
     mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);
@@ -106,8 +112,11 @@ namespace mitk
       itk::EncapsulateMetaData<std::string>(
         nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY), std::to_string(input->GetUnlabeledLabelLock()));
 
-      // Handle properties
-      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), input->GetPropertyList(), this->GetMimeType()->GetName());
+      // Handle properties. A property named like a key of the format, e.g. "modality" from a
+      // stack, would overwrite that key, and the file would read back as another type of data.
+      auto properties = input->GetPropertyList()->Clone();
+      RemoveReservedProperties(properties, GetMultiLabelReservedKeys());
+      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), properties, this->GetMimeType()->GetName());
 
       // Handle UID
       itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), PROPERTY_KEY_UID, input->GetUID());
@@ -166,9 +175,23 @@ namespace mitk
     auto output = ConvertImageToLabelSetImage(rawimage);
 
     //get label groups definitions
-    auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
-    nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
+    const auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
+    if (jsonStr.empty())
+    {
+      mitkThrow() << "The NRRD header lacks the label group information (" << MULTILABEL_SEGMENTATION_LABELS_INFO_KEY << ").";
+    }
+
+    std::vector<MultiLabelIOHelper::LabelGroupMetaData> labelGroups;
+    std::vector<Label::PixelType> labelsWithOutdatedProperties;
+    try
+    {
+      labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(nlohmann::json::parse(jsonStr),
+        &labelsWithOutdatedProperties);
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+      mitkThrow() << "The label group information (" << MULTILABEL_SEGMENTATION_LABELS_INFO_KEY << ") in the NRRD header is invalid: " << e.what();
+    }
 
     if (labelGroups.empty() && output->GetNumberOfGroups()==1)
     {
@@ -196,23 +219,10 @@ namespace mitk
     output->SetUnlabeledLabelLock(unlabeledLock);
 
     //meta data handling
-    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    auto props = ExtractSegmentationPropertiesFromNrrdHeader(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
     for (auto& [name, prop] : *(props->GetMap()))
     {
-      bool addProp = true;
-      for (auto unwantedName : m_DefaultMetaDataKeys)
-      {
-        // Only add properties that are not default meta information
-        if (name.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
-        {
-          addProp = false;
-          break;
-        }
-      }
-      if (addProp)
-      {
-        output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
-      }
+      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
     }
 
     // Handle UID
@@ -233,6 +243,8 @@ namespace mitk
     // post-rework.
     DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesToRelation(output);
 
+    MultiLabelIOHelper::WarnAboutOutdatedLabelProperties(this->GetInputLocation(), labelsWithOutdatedProperties.size());
+
     result.push_back(output.GetPointer());
 
     MITK_INFO << "...finished!";
@@ -243,15 +255,7 @@ namespace mitk
 
   void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
   {
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.uid");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.space");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
-    this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.multilabel.");
-    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
-    this->m_DefaultMetaDataKeys.push_back(MULTILABEL_SEGMENTATION_MODALITY_KEY);
+    this->m_DefaultMetaDataKeys = GetMultiLabelReservedKeys();
   }
 
 } // namespace

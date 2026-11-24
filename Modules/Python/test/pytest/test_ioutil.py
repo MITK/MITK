@@ -87,4 +87,23 @@ class TestIOUtilSave:
     def test_save_wrong_type_raises(self, tmp_path):
         with pytest.raises(TypeError):
             mitk.IOUtil.save(object(), str(tmp_path / "bad.nrrd"))
+
+    def test_save_segmentation_stack_with_writer_options(self, tmp_path):
+        arr = np.zeros((4, 8, 8), dtype=np.uint16)
+        ref = mitk.Image.from_numpy(arr, spacing=(1.0, 1.0, 1.0))
+        seg = mitk.MultiLabelSegmentation(ref)
+        label = seg.add_label("Liver", (1.0, 0.0, 0.0), 0)
+        group_image = seg.get_group_image(0).as_numpy().copy()
+        group_image[0, 0, 0] = label.value
+        seg.update_group_image(0, mitk.Image.from_numpy(group_image), time_step=0, source_time_step=0)
+
+        mitk.IOUtil.save(seg, str(tmp_path / "seg.mitklabel.json"), writer_options={"Save strategy": "instance"})
+        assert (tmp_path / f"seg_label_{label.value}.nii.gz").exists()
+        assert not (tmp_path / "seg_group_0.nii.gz").exists()
+
+    def test_save_image_with_writer_options(self, tmp_path):
+        img = mitk.Image.from_numpy(np.zeros((4, 8, 8), dtype=np.uint16), spacing=(1.0, 1.0, 1.0))
+        path = tmp_path / "image.nrrd"
+        img.save(str(path), writer_options={})
+        assert path.exists()
     

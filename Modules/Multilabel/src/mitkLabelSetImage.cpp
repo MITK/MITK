@@ -290,6 +290,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
 
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(templateImage, this);
+  DICOMSegmentationPropertyHelper::InheritBodyPartExaminedFromSource(this, templateImage, /*overwrite=*/false);
 
   // Add an initial LabelSet and corresponding image data to the stack
   if (ensure1stGroup && this->GetNumberOfGroups() == 0)

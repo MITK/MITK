@@ -42,6 +42,22 @@ namespace mitk
   };
 
   /**
+   * \brief Thrown when a DICOM SEG write is rejected because a label cannot be represented
+   *        in the format: a Segment Label or Segment Algorithm Name with a backslash, non-ASCII
+   *        or control characters, a Segment Description or Tracking ID with non-ASCII characters
+   *        or control characters other than TAB, LF, FF, CR and ESC, an invalid Tracking UID, or
+   *        a label value above 32767.
+   *
+   * Only changing the label lets the write succeed; unlike after a
+   * DICOMSegStrictModeException, a retry in synthetic mode does not.
+   */
+  class MITKMULTILABEL_EXPORT DICOMSegUnrepresentableValueException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(DICOMSegUnrepresentableValueException, mitk::Exception);
+  };
+
+  /**
    * \brief Helpers around the DICOM SEG property contract on MultiLabelSegmentation.
    *
    * Validate and Complete are deliberately split into a pure-inspection and
@@ -66,6 +82,8 @@ namespace mitk
    *   copies Patient + Study UIDs + StudyID + FrameOfReferenceUID from
    *   the source. This function is shared with parametric maps via
    *   ModelFitResultHelper, which is why it lives in MitkDICOMQI.
+   *   \c InheritBodyPartExaminedFromSource then adds Body Part Examined.
+   *   Both keep the values the seg already carries.
    * - <b>Setup-time, explicit.</b>
    *   \c mitkLabelSetImageHelper::SetupDerivedSegmentation calls
    *   \c SegSourceImageRelationRule::Connect plus the InheritXxxFromSource
@@ -75,8 +93,9 @@ namespace mitk
    *   \c StampSegIdentityOnSourceItem to copy the seg's identity onto
    *   dcmqi's synthetic source DcmItem so dcmqi can produce a valid SEG
    *   file. The tag list mirrors what DeriveDICOMSourceProperties
-   *   produces, but the direction is opposite (seg -> source-item, not
-   *   source -> seg). Not a duplicated responsibility.
+   *   produces, plus Body Part Examined (0018,0015), but the direction is
+   *   opposite (seg -> source-item, not source -> seg). Not a duplicated
+   *   responsibility.
    *
    * \sa SegSourceImageRelationRule
    * \sa MultiLabelSegmentation
@@ -134,8 +153,13 @@ namespace mitk
      * \brief Reports what is missing from the seg's DICOM SEG contract
      *        without mutating it.
      *
-     * Empty result means the seg is writable in strict mode without
-     * further synthesis.
+     * An empty result means the DICOM SEG property contract is complete,
+     * so a strict-mode write needs no synthesis. The write can still be
+     * refused: strict mode also requires a source-image relation with
+     * per-slice source UIDs, and DICOMSegmentationIO::Write refuses, in
+     * either mode, labels, source-image relations and patient, study and
+     * frame of reference values that DICOM SEG cannot represent. Validate
+     * checks only that the identifying tags are present, not their values.
      *
      * \pre seg must be a valid pointer.
      */
@@ -220,6 +244,24 @@ namespace mitk
      * \pre source must be a valid pointer.
      */
     static void InheritFrameOfReferenceFromSource(MultiLabelSegmentation* seg,
+                                                  const IPropertyProvider* source,
+                                                  bool overwrite = true);
+
+    /**
+     * \brief Copy Body Part Examined (0018,0015) from source to seg, if the
+     *        source carries it.
+     *
+     * The attribute describes the examination of the series. A segmentation
+     * examines nothing of its own; its series covers the body part of the
+     * series it is derived from. The DICOM SEG writer takes BodyPartExamined
+     * only from this property.
+     *
+     * Default semantics: overwrite. See InheritPatientFromSource.
+     *
+     * \pre seg must be a valid pointer.
+     * \pre source must be a valid pointer.
+     */
+    static void InheritBodyPartExaminedFromSource(MultiLabelSegmentation* seg,
                                                   const IPropertyProvider* source,
                                                   bool overwrite = true);
 

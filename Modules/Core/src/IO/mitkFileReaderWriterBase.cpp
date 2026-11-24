@@ -13,12 +13,47 @@ found in the LICENSE file.
 #include "mitkFileReaderWriterBase.h"
 
 #include <mitkCoreServices.h>
+#include <mitkExceptionMacro.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkLog.h>
 
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>
+
+#include <algorithm>
+#include <optional>
+#include <vector>
+
+namespace
+{
+  std::string JoinChoices(const std::vector<std::string> &choices)
+  {
+    std::string result;
+    for (const auto &choice : choices)
+      result += (result.empty() ? "" : ", ") + choice;
+    return result;
+  }
+
+  // The option dialogs, the Python bindings and MitkFileConverter store a std::string; C++ callers
+  // often pass a constant or a command-line argument.
+  std::optional<std::string> GetChoiceText(const us::Any &value)
+  {
+    if (value.Type() == typeid(std::string))
+      return us::ref_any_cast<std::string>(value);
+    if (value.Type() == typeid(const char *))
+    {
+      if (const auto *text = us::any_cast<const char *>(value); nullptr != text)
+        return std::string(text);
+    }
+    if (value.Type() == typeid(char *))
+    {
+      if (const auto *text = us::any_cast<char *>(value); nullptr != text)
+        return std::string(text);
+    }
+    return std::nullopt;
+  }
+}
 
 namespace mitk
 {
@@ -57,6 +92,41 @@ namespace mitk
       return iter->second;
     }
     return us::Any();
+  }
+
+  std::string FileReaderWriterBase::GetChoiceOption(const std::string &name) const
+  {
+    const auto defaultIter = m_DefaultOptions.find(name);
+    if (defaultIter == m_DefaultOptions.end() || defaultIter->second.Type() != typeid(std::vector<std::string>))
+      mitkThrow() << "\"" << name << "\" is no option with a list of choices.";
+
+    const auto &choices = us::ref_any_cast<std::vector<std::string>>(defaultIter->second);
+    if (choices.empty())
+      mitkThrow() << "The option \"" << name << "\" offers no choices.";
+
+    const auto iter = m_Options.find(name);
+    if (iter == m_Options.end())
+      return choices.front();
+
+    const auto &value = iter->second;
+    if (const auto chosen = GetChoiceText(value); chosen.has_value())
+    {
+      if (std::find(choices.begin(), choices.end(), *chosen) == choices.end())
+      {
+        mitkThrow() << "Unknown value \"" << *chosen << "\" of the option \"" << name
+                    << "\". Valid values: " << JoinChoices(choices) << ".";
+      }
+      return *chosen;
+    }
+
+    // GetOptions() reports an unset choice as its list, and IOUtil hands those options to the
+    // reader or writer of the next object of a multi-object load or save.
+    if (value.Type() == typeid(std::vector<std::string>) &&
+        us::ref_any_cast<std::vector<std::string>>(value) == choices)
+      return choices.front();
+
+    mitkThrow() << "The option \"" << name << "\" must name one of its choices as a string: " << JoinChoices(choices)
+                << ".";
   }
 
   void FileReaderWriterBase::SetOptions(const FileReaderWriterBase::Options &options)

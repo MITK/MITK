@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkPlaneGeometry.h>
+#include <mitkPropertyKeyPath.h>
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
@@ -37,13 +38,21 @@ found in the LICENSE file.
 #include <dcmqi/Itk2DicomConverter.h>
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
+#include <dcmtk/dcmdata/dcdatset.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcsequen.h>
+#include <dcmtk/dcmdata/dcvrlo.h>
+#include <dcmtk/dcmdata/dcvrst.h>
+#include <dcmtk/dcmdata/dcvrui.h>
+#include <dcmtk/dcmdata/dcvrut.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
 #include <dcmtk/dcmfg/fgplanpo.h>
 #include <dcmtk/dcmfg/fgtypes.h>
 #include <dcmtk/dcmseg/segdoc.h>
 
+#include <algorithm>
+#include <cmath>
 #include <initializer_list>
 #include <iomanip>
 #include <limits>
@@ -60,33 +69,6 @@ namespace
   constexpr const char *OPTION_ENCODING = "Segmentation encoding";
   constexpr const char *OPTION_ENCODING_LABELMAP = "labelmap";
   constexpr const char *OPTION_ENCODING_BINARY = "binary";
-
-  // Resolve an enum-style writer option to its selected string value.
-  // The option's default is registered as std::vector<std::string> (the
-  // shape MITK's QmitkFileReaderWriterOptionsWidget renders as a combo
-  // box); once the user picks an entry the Any holds a std::string. When
-  // the writer is invoked without a UI (programmatic IOUtil::Save with
-  // empty options or unset enum), the Any still holds the registered
-  // vector and the first entry is the default by convention. ToString()
-  // on a vector<string> returns "[a,b,...]", so a direct string compare
-  // against the expected choice silently misses the default - handle
-  // both shapes explicitly here.
-  std::string ResolveEnumOption(const mitk::IFileWriter::Options &options,
-                                const std::string &name,
-                                const std::string &fallback)
-  {
-    const auto it = options.find(name);
-    if (it == options.end() || it->second.Empty())
-      return fallback;
-    if (it->second.Type() == typeid(std::string))
-      return us::any_cast<std::string>(it->second);
-    if (it->second.Type() == typeid(std::vector<std::string>))
-    {
-      const auto &vec = us::ref_any_cast<std::vector<std::string>>(it->second);
-      return vec.empty() ? fallback : vec.front();
-    }
-    return fallback;
-  }
 
   // Format one MissingItem to human-readable for exception messages. The
   // structured shape (Scope, identifier, description) is preserved for
@@ -109,32 +91,217 @@ namespace
     return out.str();
   }
 
-  // Decide whether the writer can apply dcmqi's useLabelIDAsSegmentNumber.
-  // dcmqi requires the label values within one group to be a monotonic
-  // 1..N with no gaps; the writer mirrors that precondition rather than
-  // letting dcmqi fail late. When the labels satisfy it, the labelmap pixel
-  // values (= MITK label values) are written as the DICOM segment numbers,
-  // so the values survive a round trip. Otherwise the writer falls back to
-  // dcmqi's default 1..N-in-encounter-order segment numbering: on read dcmqi
-  // sets each segment's labelID to its DICOM segment number, so MITK label
-  // values are renumbered to 1..N and the original values are NOT preserved.
-  // Segment name, tracking ID/UID and the property codes do round-trip; the
-  // numeric label value does not.
+  // The labels of a group in the order the writer hands them to dcmqi. dcmqi numbers the segments
+  // 1..N in that order, skipping a label without voxels because it creates segments only for values
+  // present in the image, and the reader takes the segment number as label value. Ascending value
+  // order thus gives every label with voxels its rank among them: if these have values 1..N, they
+  // keep them, in both encodings. The segment images and the segment metadata are paired by
+  // position, so both are built from this one order.
+  mitk::MultiLabelSegmentation::LabelValueVectorType GetLabelValuesInSegmentOrder(
+    const mitk::MultiLabelSegmentation *seg, unsigned int layer)
+  {
+    auto labelValues = seg->GetLabelValuesByGroup(layer);
+    std::sort(labelValues.begin(), labelValues.end());
+    return labelValues;
+  }
+
+  // Whether the label values of a group are 1..N, which a round trip keeps if every label has
+  // voxels. The labelmap encoding then lets dcmqi take the values as segment numbers directly
+  // (useLabelIDAsSegmentNumber), which dcmqi allows only if the values present in the image are 1..N.
   bool LabelsAreMonotonicOneToN(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
-    const auto labelValues = seg->GetLabelValuesByGroup(layer);
+    const auto labelValues = GetLabelValuesInSegmentOrder(seg, layer);
     if (labelValues.empty())
       return false;
 
-    std::vector<mitk::MultiLabelSegmentation::LabelValueType> sorted(labelValues.begin(), labelValues.end());
-    std::sort(sorted.begin(), sorted.end());
-
-    for (size_t i = 0; i < sorted.size(); ++i)
+    for (size_t i = 0; i < labelValues.size(); ++i)
     {
-      if (sorted[i] != static_cast<mitk::MultiLabelSegmentation::LabelValueType>(i + 1))
+      if (labelValues[i] != static_cast<mitk::MultiLabelSegmentation::LabelValueType>(i + 1))
         return false;
     }
     return true;
+  }
+
+  // dcmqi takes label values as short (Itk2DicomConverter), and so does the writer's internal
+  // image type; a larger value would turn negative and its segment would be dropped silently.
+  constexpr auto MAX_WRITABLE_LABEL_VALUE =
+    std::numeric_limits<mitk::DICOMSegmentationIO::itkInternalImageType::PixelType>::max();
+
+  // SEG requires a Segmented Property Type (0062,000F). The writer writes the label's own if it is
+  // complete, else a stand-in with this meaning.
+  constexpr const char *STAND_IN_TYPE_MEANING = "Morphologically altered structure";
+
+  bool HasCompleteSegmentedPropertyType(const mitk::Label &label)
+  {
+    const auto type = label.GetSegmentedPropertyType();
+    return type.has_value() && !type->GetValue().empty() && !type->GetScheme().empty() && !type->GetMeaning().empty();
+  }
+
+  // DICOM counts a text value of spaces only as empty, and DCMTK refuses it where the value is Type 1.
+  // A backslash, which DCMTK also strips from an LO value, does not count: the LO check refuses it.
+  bool IsBlank(const std::string &value)
+  {
+    return value.find_first_not_of(' ') == std::string::npos;
+  }
+
+  // Segment Label (0062,0005) is Type 1. For a label without a name dcmqi takes the description,
+  // else the meaning of the Segmented Property Type, past the writer's checks and uncut. The writer
+  // makes that choice itself, so that the value written is the one checked and fitted into LO. A name
+  // or description of spaces only counts as none.
+  std::string SegmentLabelOf(const mitk::Label &label)
+  {
+    if (auto name = label.GetName(); !IsBlank(name))
+      return name;
+    if (auto description = label.GetDescription(); !IsBlank(description))
+      return description;
+    return HasCompleteSegmentedPropertyType(label) ? label.GetSegmentedPropertyType()->GetMeaning()
+                                                   : std::string(STAND_IN_TYPE_MEANING);
+  }
+
+  // The writer writes no Specific Character Set, so the default repertoire applies to the text dcmqi
+  // takes from a label, and DCMTK refuses other values inside dcmqi: the Segment Label (0062,0005)
+  // and the Segment Algorithm Name (0062,0009), which are LO and in which a backslash would separate
+  // two values, when dcmqi sets them; the Segment Description (0062,0006, ST) and the Tracking ID
+  // (0062,0020, UT) only when dcmqi writes the file of the group. An invalid Tracking UID (0062,0021)
+  // dcmqi leaves out silently. Checking each value with DCMTK's own rule names label and attribute.
+  void CheckWritableLabel(const mitk::Label &label, mitk::MultiLabelSegmentation::GroupIndexType group)
+  {
+    const auto refuse = [&label, group](const std::string &reason) {
+      mitkThrowException(mitk::DICOMSegUnrepresentableValueException)
+        << "Cannot write label " << label.GetValue() << " (\"" << label.GetName() << "\") of group " << group
+        << " as DICOM SEG: " << reason;
+    };
+    const std::string loRule = "\" may hold only printable ASCII characters and no backslash.";
+    const std::string textRule = "\" may hold only ASCII characters and no control characters other than tab, "
+                                 "line feed, form feed, carriage return and escape.";
+
+    if (label.GetValue() > MAX_WRITABLE_LABEL_VALUE)
+      refuse("label values above " + std::to_string(MAX_WRITABLE_LABEL_VALUE) + " are not supported.");
+
+    const std::string segmentLabel = SegmentLabelOf(label);
+    std::string origin;
+    if (IsBlank(label.GetName()))
+      origin = IsBlank(label.GetDescription())
+                 ? " It is the meaning of its Segmented Property Type, as the label has neither name nor description."
+                 : " It is its description, as the label has no name.";
+    if (IsBlank(segmentLabel))
+      refuse("its Segment Label \"" + segmentLabel + "\" holds only spaces, which DICOM counts as empty." + origin);
+    if (DcmLongString::checkStringValue(segmentLabel.c_str(), "1").bad())
+      refuse("its Segment Label \"" + segmentLabel + loRule + origin);
+
+    // dcmqi writes the algorithm name of these types only; the writer writes an undefined type as
+    // MANUAL.
+    const auto algorithmType = label.GetAlgorithmType();
+    if (algorithmType == mitk::Label::AlgorithmType::AUTOMATIC ||
+        algorithmType == mitk::Label::AlgorithmType::SEMIAUTOMATIC)
+    {
+      const std::string algorithmName = label.GetAlgorithmName();
+      if (DcmLongString::checkStringValue(algorithmName.c_str(), "1").bad())
+        refuse("its Segment Algorithm Name \"" + algorithmName + loRule);
+    }
+
+    // For ST and UT the second argument of checkStringValue is the character set, not the value
+    // multiplicity; passing one would switch the check off.
+    const std::string description = label.GetDescription();
+    if (DcmShortText::checkStringValue(description.c_str()).bad())
+      refuse("its Segment Description \"" + description + textRule);
+
+    const std::string trackingID = label.GetTrackingID();
+    if (DcmUnlimitedText::checkStringValue(trackingID.c_str()).bad())
+      refuse("its Tracking ID \"" + trackingID + textRule);
+
+    const std::string trackingUID = label.GetTrackingUID();
+    if (!trackingUID.empty() && DcmUniqueIdentifier::checkStringValue(trackingUID.c_str(), "1").bad())
+      refuse("its Tracking UID \"" + trackingUID + "\" is no valid DICOM UID.");
+  }
+
+  // These refusals depend on the labels alone and no mode avoids them, so they are checked for all
+  // groups before anything else: the strict-mode refusal promises that synthetic mode can succeed,
+  // synthetic mode changes the segmentation, and the groups are written one after the other.
+  void CheckWritableLabels(const mitk::MultiLabelSegmentation &seg)
+  {
+    for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg.GetNumberOfGroups(); ++group)
+    {
+      const auto labelValues = seg.GetLabelValuesByGroup(group);
+      // A SEG holds at least one segment (the Segment Sequence is Type 1), and dcmqi reads the
+      // image of the first one without checking that there is one.
+      if (labelValues.empty())
+      {
+        mitkThrow() << "Cannot write group " << group << " as DICOM SEG: it has no labels, and a DICOM SEG needs "
+                    << "at least one segment. Add a label to the group or remove the group.";
+      }
+      for (const auto &label : seg.GetConstLabelsByValue(labelValues))
+        CheckWritableLabel(*label, group);
+    }
+  }
+
+  // Each Referenced Series item names its series, so every relation with per-slice source
+  // references must name a valid source series, although dcmqi today files all references under the
+  // series of the first item (see BuildSourceItemsFromProperties). dcmqi also needs the SOP Instance
+  // and SOP Class UIDs of each source image it references; DCMTK refuses an invalid UID inside dcmqi.
+  // Relations without per-slice UIDs, such as those to images without DICOM tags, contribute no
+  // references. No mode can make these UIDs up, so they are checked before anything else, for the
+  // reasons given at CheckWritableLabels.
+  void CheckWritableSourceRelations(const mitk::MultiLabelSegmentation &seg)
+  {
+    for (const auto &relation : mitk::SegSourceImageRelationRule::GetSourceImageRelations(&seg))
+    {
+      if (relation.instanceUIDsPerSlice.IsNull() || relation.classUIDsPerSlice.IsNull())
+        continue;
+
+      const auto refuse = [&relation](const std::string &reason) {
+        mitkThrow() << "Cannot write the source-image relation " << relation.relationUID << " as DICOM SEG: " << reason;
+      };
+
+      const auto &seriesUID = relation.sourceSeriesInstanceUID;
+      if (seriesUID.empty())
+        refuse("it names no source series (0020,000E).");
+      if (DcmUniqueIdentifier::checkStringValue(seriesUID.c_str(), "1").bad())
+        refuse("its source series UID \"" + seriesUID + "\" (0020,000E) is no valid DICOM UID.");
+
+      // The slices BuildSourceItemsFromProperties takes references from.
+      for (const auto slice : relation.instanceUIDsPerSlice->GetAvailableSlices(0))
+      {
+        const auto instanceUID = relation.instanceUIDsPerSlice->GetValue(0, slice);
+        if (instanceUID.empty())
+          continue;
+        if (DcmUniqueIdentifier::checkStringValue(instanceUID.c_str(), "1").bad())
+          refuse("the SOP Instance UID \"" + instanceUID + "\" (0008,0018) of slice " + std::to_string(slice) +
+                 " is no valid DICOM UID.");
+
+        const auto classUID = relation.classUIDsPerSlice->GetValue(0, slice);
+        if (classUID.empty())
+          refuse("slice " + std::to_string(slice) + " names no SOP Class UID (0008,0016).");
+        if (DcmUniqueIdentifier::checkStringValue(classUID.c_str(), "1").bad())
+          refuse("the SOP Class UID \"" + classUID + "\" (0008,0016) of slice " + std::to_string(slice) +
+                 " is no valid DICOM UID.");
+      }
+    }
+  }
+
+  // A value of VR LO has at most 64 characters, which DCMTK does not check on write. Longer values
+  // are cut and marked, so the exported value shows that it is incomplete. The cut never splits a
+  // UTF-8 sequence.
+  std::string FitIntoLO(const std::string &value, const std::string &description)
+  {
+    constexpr std::string::size_type maxLOLength = 64;
+    if (value.length() <= maxLOLength)
+      return value;
+
+    const std::string truncationIndicator = "[...]";
+    auto cut = maxLOLength - truncationIndicator.length();
+    while (cut > 0 && (static_cast<unsigned char>(value[cut]) & 0xC0) == 0x80)
+      --cut;
+
+    MITK_WARN << description << " exceeds the DICOM LO limit of " << maxLOLength
+              << " characters and is truncated for export. Full value: " << value;
+    return value.substr(0, cut) + truncationIndicator;
+  }
+
+  // dcmqi computes the CIELab value from 8 bit sRGB.
+  unsigned int ToEightBit(float colorComponent)
+  {
+    return static_cast<unsigned int>(std::lround(colorComponent * 255.f));
   }
 
   // Copy one top-level DICOM tag from seg's property list into dst if the
@@ -158,10 +325,12 @@ namespace
   }
 
   // Stamp the Patient / Study / Frame-of-Reference identifying tags from
-  // the seg onto the source DcmItem dcmqi treats as dcmDatasets[0].
-  // The tag set mirrors what DICOMQIPropertyHelper::DeriveDICOMSourceProperties
-  // historically copied from the source image, so a round trip preserves
-  // the same identifying information that the legacy path would have.
+  // the seg onto the source DcmItem dcmqi treats as dcmDatasets[0], plus
+  // the body part examined, which dcmqi inherits from that item. Apart from
+  // the body part, the tag set mirrors what
+  // DICOMQIPropertyHelper::DeriveDICOMSourceProperties historically copied
+  // from the source image, so a round trip preserves the same identifying
+  // information that the legacy path would have.
   void StampSegIdentityOnSourceItem(const mitk::MultiLabelSegmentation *seg, DcmItem &dst)
   {
     // Patient module
@@ -180,6 +349,56 @@ namespace
     // Frame of Reference module
     CopyTopLevelDICOMTagToItem(seg, 0x0020, 0x0052, DCM_FrameOfReferenceUID, dst);
     CopyTopLevelDICOMTagToItem(seg, 0x0020, 0x1040, DCM_PositionReferenceIndicator, dst);
+    // Body part examined describes the series, so dcmqi inherits it from the source; the
+    // segmentation's own property is its only source. The codes of a label describe one segment.
+    CopyTopLevelDICOMTagToItem(seg, 0x0018, 0x0015, DCM_BodyPartExamined, dst);
+  }
+
+  // dcmqi takes the patient, study and frame of reference over from the first source item, and
+  // DCMTK checks them when it writes the SEG, which then fails without naming the value. The item
+  // checked is the one the writer hands to dcmqi, with the rule DCMTK applies; of the lengths, it
+  // checks those of UI, CS and TM values, not those of PN, LO and SH. Body Part Examined is left
+  // out: dcmqi copies it into the SEG after that check. Synthetic mode keeps a value that is
+  // present, so no mode avoids these refusals, and they are checked before anything else, for the
+  // reasons given at CheckWritableLabels.
+  void CheckWritableIdentity(const mitk::MultiLabelSegmentation &seg)
+  {
+    // DCMTK looks the character set of a value up in the surrounding dataset. The writer writes
+    // none, so the default repertoire applies, which DCMTK also takes from "ISO_IR 6".
+    DcmDataset item;
+    item.putAndInsertString(DCM_SpecificCharacterSet, "ISO_IR 6");
+    StampSegIdentityOnSourceItem(&seg, item);
+    for (unsigned long i = 0; i < item.card(); ++i)
+    {
+      auto *element = item.getElement(i);
+      DcmTag tag = element->getTag();
+      if (tag == DCM_SpecificCharacterSet || tag == DCM_BodyPartExamined)
+        continue;
+
+      std::ostringstream tagText;
+      tagText << '(' << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << tag.getGroup() << ','
+              << std::setw(4) << tag.getElement() << ')';
+
+      // DCMTK's write refuses an empty Type 1 value before it checks the value. Of the Type 1
+      // attributes on the item, DCMTK invents an empty Study Instance UID, but dcmqi mints a Frame of
+      // Reference UID only if the item has none, not if it is empty.
+      if (tag == DCM_FrameOfReferenceUID && element->isEmpty())
+        mitkThrow() << "Cannot write the segmentation as DICOM SEG: its " << tag.getTagName() << " " << tagText.str()
+                    << " is empty, which DICOM does not allow. Remove the property so that synthetic mode mints "
+                    << "one, or set a valid UID.";
+
+      // DCMTK's write treats only these results as errors.
+      const auto check = element->checkValue("1", OFTrue);
+      if (check != EC_InvalidCharacter && check != EC_ValueRepresentationViolated &&
+          check != EC_ValueMultiplicityViolated && check != EC_MaximumLengthViolated)
+        continue;
+
+      OFString value;
+      element->getOFStringArray(value);
+      mitkThrow() << "Cannot write the segmentation as DICOM SEG: its " << tag.getTagName() << " " << tagText.str()
+                  << " \"" << value.c_str() << "\" is no valid " << DcmVR(element->getVR()).getVRName()
+                  << " value without Specific Character Set (" << check.text() << ").";
+    }
   }
 
   // Format a double as a DICOM Decimal String (DS). DS is capped at 16
@@ -238,28 +457,26 @@ namespace
     dst.putAndInsertString(DCM_ImageOrientationPatient, iop.c_str());
   }
 
-  // Format an IPP value for one slice of a group image from the slice plane's
-  // origin. The group geometry is an image geometry, whose plane origins are
-  // centre-based and therefore coincide with DICOM's ImagePositionPatient
-  // convention (the centre of the upper-left voxel). The -0.5 voxel adjustments
-  // in mitkBaseGeometry apply only to corner / bounding-box queries
-  // (GetCornerPoint), not to the plane origin or to WorldToIndex, so no
-  // half-voxel correction is applied here. dcmqi parses the formatted IPP back
-  // into a Point3D and resolves the matching slice via the seg's own geometry
-  // (TransformPhysicalPointToIndex on the ITK image it builds), so the
-  // requirement on this string is "round-trips through the seg's geometry," not
-  // exact string equality.
+  // Format an IPP value for one slice of a group image: the centre of its first
+  // voxel, which is DICOM's ImagePositionPatient convention. dcmqi places the
+  // frames of the SEG through the index-to-world transform of the ITK image it
+  // builds from the group image, and maps each source item to the slice its IPP
+  // falls into (TransformPhysicalPointToIndex). The position therefore comes
+  // from the same transform, not from the slice planes, which setting the
+  // transform of a sliced geometry leaves unchanged. The requirement on this
+  // string is "round-trips through the seg's geometry," not exact string
+  // equality. A slice outside the image yields a position dcmqi maps to no frame.
   std::string FormatIPPForSlice(const mitk::Image *groupImage,
                                 mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex)
   {
-    const auto *slicedGeometry = groupImage->GetSlicedGeometry();
-    if (slicedGeometry == nullptr)
+    const auto *geometry = groupImage->GetGeometry();
+    if (geometry == nullptr)
       return {};
-    const auto *plane = slicedGeometry->GetPlaneGeometry(static_cast<int>(sliceIndex));
-    if (plane == nullptr)
-      return {};
-    const auto origin = plane->GetOrigin();
-    return JoinDicomDS({origin[0], origin[1], origin[2]});
+    mitk::Point3D index;
+    mitk::FillVector3D(index, 0.0, 0.0, static_cast<mitk::ScalarType>(sliceIndex));
+    mitk::Point3D position;
+    geometry->IndexToWorld(index, position);
+    return JoinDicomDS({position[0], position[1], position[2]});
   }
 
   // Read SegmentsOverlap (0062,0013) and decide if the reader must assume
@@ -613,6 +830,7 @@ namespace
   //
   // \pre seg must be a valid pointer.
   // \pre layer must be a valid group index of seg.
+  // \pre CheckWritableSourceRelations(*seg) passed.
   std::vector<std::unique_ptr<DcmItem>>
   BuildSourceItemsFromProperties(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
@@ -655,14 +873,12 @@ namespace
 
         auto item = std::make_unique<DcmItem>();
         item->putAndInsertString(DCM_SOPInstanceUID, sopInstance.c_str());
-        if (!sopClass.empty())
-          item->putAndInsertString(DCM_SOPClassUID, sopClass.c_str());
+        item->putAndInsertString(DCM_SOPClassUID, sopClass.c_str());
         item->putAndInsertString(DCM_ImagePositionPatient, ipp.c_str());
 
         if (isFirst)
         {
-          if (!relation.sourceSeriesInstanceUID.empty())
-            item->putAndInsertString(DCM_SeriesInstanceUID, relation.sourceSeriesInstanceUID.c_str());
+          item->putAndInsertString(DCM_SeriesInstanceUID, relation.sourceSeriesInstanceUID.c_str());
           StampSegIdentityOnSourceItem(seg, *item);
           StampImageOrientationOnSourceItem(groupImage, *item);
           isFirst = false;
@@ -812,8 +1028,6 @@ namespace mitk
     ValidateOutputLocation();
 
     mitk::LocaleSwitch localeSwitch("C");
-    LocalFile localFile(this);
-    const std::string path = localFile.GetFileName();
 
     // AbstractFileWriter::GetInput() returns const BaseData*. Synthesis
     // mutates the seg's property list (Complete fills missing identity
@@ -834,13 +1048,24 @@ namespace mitk
       mitkThrow() << "Cannot write non-MultiLabelSegmentation data via DICOM SEG.";
     auto *input = const_cast<MultiLabelSegmentation *>(constInput);
 
-    const auto options = this->AbstractFileWriter::GetOptions();
-    const std::string synthesisMode = ResolveEnumOption(options, OPTION_SYNTHESIS_MODE,
-                                                        OPTION_SYNTHESIS_MODE_STRICT);
-    const std::string encoding = ResolveEnumOption(options, OPTION_ENCODING,
-                                                   OPTION_ENCODING_BINARY);
+    if (0 == input->GetNumberOfGroups())
+      mitkThrow() << "Cannot write the segmentation: it has no groups.";
+
+    // A stream takes one file, and each group is a file of its own.
+    if (nullptr != this->GetOutputStream() && input->GetNumberOfGroups() > 1)
+    {
+      mitkThrow() << "Cannot write a DICOM SEG of " << input->GetNumberOfGroups()
+                  << " groups to a stream: each group is written to a file of its own. Write to a file path instead.";
+    }
+
+    const std::string synthesisMode = this->GetWriterChoiceOption(OPTION_SYNTHESIS_MODE);
+    const std::string encoding = this->GetWriterChoiceOption(OPTION_ENCODING);
 
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
+
+    CheckWritableLabels(*input);
+    CheckWritableSourceRelations(*input);
+    CheckWritableIdentity(*input);
 
     // Synthesis runs once before the per-group loop. The alternative
     // (per-group) would invite divergence across groups when the
@@ -859,19 +1084,33 @@ namespace mitk
     }();
     if (!missing.empty())
     {
-      std::ostringstream msg;
-      msg << "DICOM SEG write blocked by strict mode: the segmentation is "
-          << "missing " << missing.size() << " contract item(s) required to "
-          << "produce a valid SEG. Set the writer option \""
-          << OPTION_SYNTHESIS_MODE << "\" to \"" << OPTION_SYNTHESIS_MODE_SYNTHETIC
-          << "\" to fill these automatically, or populate them explicitly. "
-          << "Missing items:";
+      std::ostringstream items;
       for (const auto &m : missing)
-        msg << "\n  - " << FormatMissingItem(m);
-      mitkThrowException(DICOMSegStrictModeException) << msg.str();
+        items << "\n  - " << FormatMissingItem(m);
+
+      // Synthesis has already run, so switching modes cannot help. Only the strict-mode
+      // refusal is a DICOMSegStrictModeException, which tells callers that a retry in
+      // synthetic mode can succeed.
+      if (isSynthetic)
+        mitkThrow() << "DICOM SEG write failed: synthetic mode cannot fill " << missing.size()
+                    << " contract item(s) required to produce a valid SEG. Missing items:" << items.str();
+
+      mitkThrowException(DICOMSegStrictModeException)
+        << "DICOM SEG write blocked by strict mode: the segmentation is "
+        << "missing " << missing.size() << " contract item(s) required to "
+        << "produce a valid SEG. Set the writer option \""
+        << OPTION_SYNTHESIS_MODE << "\" to \"" << OPTION_SYNTHESIS_MODE_SYNTHETIC
+        << "\" to fill these automatically, or populate them explicitly. "
+        << "Missing items:" << items.str();
     }
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
+
+    // With a stream, LocalFile creates a temporary file and copies it into the stream when it goes
+    // out of scope, also after a refusal. Created after the checks above, it leaves the stream
+    // untouched when one of them refuses the write.
+    LocalFile localFile(this);
+    const std::string path = localFile.GetFileName();
 
     // The first written group's SeriesDate/SeriesTime are reused for the
     // remaining groups (see the per-group write below): dcmqi stamps these
@@ -882,15 +1121,16 @@ namespace mitk
     std::string sharedSeriesTime;
 
     // Multi-group segs are written one file per group below. There is no
-    // cross-group rollback: if a later group throws (e.g. no usable source
-    // image, or a dcmqi/DCMTK failure), files already written for earlier
-    // groups stay on disk. Confined to the multi-group case; a subsequent
-    // successful write overwrites them. Kept simple deliberately - a
-    // temp-then-rename or cleanup-on-failure scheme is not warranted for
-    // this rare path.
+    // cross-group rollback: the labels of all groups were checked above, so
+    // what can still fail in a later group is ITK, dcmqi or DCMTK, or saving
+    // the file, and the files already written for earlier groups then stay
+    // on disk. Confined to the multi-group case; a subsequent successful
+    // write overwrites them. Kept simple deliberately - a temp-then-rename
+    // or cleanup-on-failure scheme is not warranted for these rare failures.
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       std::vector<itkInternalImageType::ConstPointer> segmentations;
+      const auto labelSet = input->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(input, layer));
 
       try
       {
@@ -905,8 +1145,6 @@ namespace mitk
 
         itkInternalImageType::Pointer itkLabelImage = castFilter->GetOutput();
         itkLabelImage->DisconnectPipeline();
-
-        auto labelSet = input->GetConstLabelsByValue(input->GetLabelValuesByGroup(layer));
 
         for (const auto &label : labelSet)
         {
@@ -934,30 +1172,32 @@ namespace mitk
       auto sourceItems = BuildSourceItemsFromProperties(input, layer);
       if (sourceItems.empty())
       {
-        if (isSynthetic)
+        if (!isSynthetic)
         {
-          // Synthetic mode safety net: no real source-image relation is
-          // attached, so emit a minimal phantom-source set so dcmqi's
-          // dcmDatasets[0] anchor is well-formed. The resulting SEG's
-          // ReferencedSeriesSequence points at a synthesised series in
-          // the seg's own FoR; downstream tooling that recognises
-          // MITK-minted UIDs can treat them as such.
-          sourceItems = BuildSyntheticSourceItems(input, layer);
+          mitkThrowException(DICOMSegStrictModeException)
+            << "DICOM SEG write requires at least one source-image"
+            << " reference for group " << layer << ", but the"
+            << " segmentation carries no SegSourceImageRelationRule"
+            << " connection with usable per-slice SOPInstance UIDs."
+            << " Attach a real source via"
+            << " LabelSetImageHelper::SetupDerivedSegmentation"
+            << " (or SegSourceImageRelationRule::Connect directly),"
+            << " or set the writer option \""
+            << OPTION_SYNTHESIS_MODE << "\" to \""
+            << OPTION_SYNTHESIS_MODE_SYNTHETIC
+            << "\" to synthesise a placeholder source series.";
         }
+
+        // Synthetic mode safety net: no real source-image relation is
+        // attached, so emit a minimal phantom-source set so dcmqi's
+        // dcmDatasets[0] anchor is well-formed. The resulting SEG's
+        // ReferencedSeriesSequence points at a synthesised series in
+        // the seg's own FoR; downstream tooling that recognises
+        // MITK-minted UIDs can treat them as such.
+        sourceItems = BuildSyntheticSourceItems(input, layer);
         if (sourceItems.empty())
-        {
-          mitkThrow() << "DICOM SEG write requires at least one source-image"
-                      << " reference for group " << layer << ", but the"
-                      << " segmentation carries no SegSourceImageRelationRule"
-                      << " connection with usable per-slice SOPInstance UIDs."
-                      << " Attach a real source via"
-                      << " LabelSetImageHelper::SetupDerivedSegmentation"
-                      << " (or SegSourceImageRelationRule::Connect directly),"
-                      << " or set the writer option \""
-                      << OPTION_SYNTHESIS_MODE << "\" to \""
-                      << OPTION_SYNTHESIS_MODE_SYNTHETIC
-                      << "\" to synthesise a placeholder source series.";
-        }
+          mitkThrow() << "DICOM SEG write failed: synthetic mode cannot build source-image"
+                      << " references for group " << layer << ", because its group image has no slices.";
       }
       // dcmqi's API takes a raw pointer vector; unique_ptr ownership stays
       // on the stack in sourceItems and outlives the converter call.
@@ -969,30 +1209,34 @@ namespace mitk
       const bool labelsAreMonotonicOneToN = LabelsAreMonotonicOneToN(input, layer);
       const bool useLabelIDAsSegmentNumber = wantLabelmap && labelsAreMonotonicOneToN;
 
-      // Warn when the written segment numbers will not preserve the MITK
-      // label values. dcmqi only keeps label values as segment numbers in
-      // the labelmap encoding with a monotonic 1..N label set; otherwise
-      // (the default binary encoding, or a non-1..N labelmap) it assigns
-      // segment numbers 1..N in encounter order and the values are lost on
-      // round trip. Suppressed when the labels already are 1..N (the
-      // renumbering is then a no-op).
-      if (!useLabelIDAsSegmentNumber && !labelsAreMonotonicOneToN)
+      // Segment numbers run 1..N in ascending value order, so values other
+      // than 1..N become their rank within the group.
+      if (!labelsAreMonotonicOneToN)
         MITK_WARN << "DICOM SEG group " << layer << ": label values will be "
-                  << "renumbered to 1..N in the written SEG and will not "
-                  << "survive a round trip. Use the \"" << OPTION_ENCODING
-                  << "\" option \"" << OPTION_ENCODING_LABELMAP << "\" with a "
-                  << "monotonic 1..N label set to preserve label values.";
+                  << "renumbered to 1..N in ascending order in the written SEG "
+                  << "and will not survive a round trip.";
 
       // Per-layer output path, also used by the log line so the message
-      // names the file actually being written. Follows the MITK
-      // multi-output naming convention (see the MitkFileConverter app): the
-      // first group writes the requested "<stem>.dcm" so the caller's path
-      // always exists, and additional groups append "_<groupIndex>"
-      // ("<stem>_1.dcm", "<stem>_2.dcm", ...).
-      const std::string stem = path.substr(0, path.find_last_of("."));
-      std::string filePath = stem + ".dcm";
+      // names the file actually being written. The first group writes the
+      // requested path; additional groups insert "_<groupIndex>" before the
+      // last dot of the file name, or append it if the file name has none.
+      // Every file thus has the form the caller chose; whether an extension
+      // is added is IOUtil's decision. A dot in a directory name belongs to
+      // the stem. A file name of digits and dots only is taken for a UID,
+      // which has no extension; IOUtil adds none to it either, since it takes
+      // everything from the first dot for one.
+      std::string filePath = path;
       if (layer != 0)
-        filePath = stem + "_" + std::to_string(layer) + ".dcm";
+      {
+        const auto fileNameStart = path.find_last_of("/\\");
+        const auto fileName = fileNameStart == std::string::npos ? path : path.substr(fileNameStart + 1);
+        const bool isUID = fileName.find_first_not_of("0123456789.") == std::string::npos;
+        const auto extensionStart = path.find_last_of('.');
+        const bool hasExtension = !isUID && extensionStart != std::string::npos &&
+                                  (fileNameStart == std::string::npos || extensionStart > fileNameStart);
+        const auto stemLength = hasExtension ? extensionStart : path.size();
+        filePath = path.substr(0, stemLength) + "_" + std::to_string(layer) + path.substr(stemLength);
+      }
 
       MITK_INFO << "Writing DICOM SEG group " << layer << " to " << filePath;
       try
@@ -1021,6 +1265,15 @@ namespace mitk
 
         if (result == nullptr)
           mitkThrow() << "dcmqi failed to convert the segmentation to DICOM SEG for group " << layer << ".";
+
+        // dcmqi skips source items whose position falls on no frame without failing, and lists
+        // only the instances it placed. A SEG naming no source would misstate its provenance.
+        DcmSequenceOfItems *referencedSeries = nullptr;
+        if (result->findAndGetSequence(DCM_ReferencedSeriesSequence, referencedSeries).bad() ||
+            referencedSeries == nullptr || referencedSeries->card() == 0)
+          mitkThrow() << "None of the " << sourceItems.size() << " source-image references of DICOM SEG group "
+                      << layer << " lies on a slice of the segmentation, so the SEG would name no source. "
+                      << "The source-image relations do not match the segmentation's geometry.";
 
         // Within one MITK group labels are non-overlapping by construction,
         // so the SEG-level SegmentsOverlap tag is "NO" regardless of
@@ -1097,6 +1350,12 @@ namespace mitk
         mitkThrow() << "Error while writing DICOM SEG group " << layer
                     << ": " << e.what();
       }
+      catch (...)
+      {
+        // dcmqi reports some failures, e.g. a value DCMTK's checks reject, by throwing an int.
+        mitkThrow() << "dcmqi failed to write DICOM SEG group " << layer << " to " << filePath
+                    << "; its console output names the cause.";
+      }
     }
   }
 
@@ -1129,14 +1388,13 @@ namespace mitk
     mitk::LocaleSwitch localeSwitch("C");
 
     MultiLabelSegmentation::Pointer labelSetImage;
-    std::vector<BaseData::Pointer> result;
 
     const std::string path = this->GetLocalFileName();
 
     MITK_INFO << "loading " << path << std::endl;
 
     if (path.empty())
-      mitkThrow() << "Empty filename in mitk::ItkImageIO ";
+      mitkThrow() << "The DICOM SEG reader was given no file to read.";
 
     try
     {
@@ -1144,11 +1402,18 @@ namespace mitk
       DcmFileFormat dcmFileFormat;
       OFCondition status = dcmFileFormat.loadFile(path.c_str());
       if (status.bad())
-        mitkThrow() << "Can't read the input file!";
+        mitkThrow() << "DCMTK cannot read the file: " << status.text();
 
       DcmDataset *dataSet = dcmFileFormat.getDataset();
       if (dataSet == nullptr)
-        mitkThrow() << "Can't read data from input file!";
+        mitkThrow() << "DCMTK read no dataset from the file.";
+
+      // FRACTIONAL shares the SOP class with BINARY, and dcmqi dispatches on the SOP class
+      // only, so it would pass the fractional values on as if they were label values.
+      OFString segmentationType;
+      dataSet->findAndGetOFString(DCM_SegmentationType, segmentationType);
+      if (segmentationType == "FRACTIONAL")
+        mitkThrow() << "FRACTIONAL segmentations are not supported.";
 
       //=============================== dcmqi part ====================================
       // getConverter() is a SOP-Class-specific factory: UID_SegmentationStorage
@@ -1160,7 +1425,11 @@ namespace mitk
       std::unique_ptr<dcmqi::Dicom2ItkConverterBase> converter(
         dcmqi::Dicom2ItkConverter::getConverter(dataSet));
       if (converter == nullptr)
-        mitkThrow() << "Unsupported DICOM SEG SOP Class; cannot read.";
+      {
+        OFString sopClassUID;
+        dataSet->findAndGetOFString(DCM_SOPClassUID, sopClassUID);
+        mitkThrow() << "The SOP class " << sopClassUID << " is no DICOM SEG class the reader supports.";
+      }
 
       std::string metaInfoString;
       auto convertCondition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
@@ -1187,6 +1456,14 @@ namespace mitk
       if (labelSetImage.IsNull())
         mitkThrow() << "No valid segments found in DICOM SEG file.";
 
+      // DICOM SEG carries no opacity. The labels InitializeByLabeledImage made carry the
+      // lookup table's alpha, the others the label default, so every label gets the default.
+      // This precedes SetAllLabelsVisible, which writes the labels into the lookup table that
+      // the mappers render.
+      const auto defaultOpacity = Label::New()->GetOpacity();
+      for (const auto& label : labelSetImage->GetLabels())
+        label->SetOpacity(defaultOpacity);
+
       labelSetImage->SetAllLabelsVisible(true);
 
       if (labelSetImage->GetTotalNumberOfLabels() > 0)
@@ -1206,17 +1483,16 @@ namespace mitk
         tagsOfInterestList.push_back(tag.first);
       }
 
+      // The scan reads the local file, which differs from the input location when the
+      // input is a stream.
       mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-      scanner->SetInputFiles({ GetInputLocation() });
+      scanner->SetInputFiles({ path });
       scanner->AddTagPaths(tagsOfInterestList);
       scanner->Scan();
 
       mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
       if (frames.empty())
-      {
-        MITK_ERROR << "Error reading the DICOM Seg file" << std::endl;
-        return result;
-      }
+        mitkThrow() << "The DICOM tag scanner found no frames in the file.";
 
       auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
       DICOMIOHelper::SetProperties(labelSetImage, findings);
@@ -1230,9 +1506,9 @@ namespace mitk
       //
       // Source-image relations are optional provenance (SEG IOD type 1C), so
       // failing to attach them must not fail an otherwise-complete load. The
-      // enclosing catch turns any throw into an empty result, hence the
-      // dedicated guard here (e.g. for DcmSegmentation::loadDataset rejecting
-      // a dataset dcmqi already decoded), which degrades to a warning. Mirrors
+      // enclosing catch fails the whole read, hence the dedicated guard here
+      // (e.g. for DcmSegmentation::loadDataset rejecting a dataset dcmqi
+      // already decoded), which degrades to a warning. Mirrors
       // MigrateLegacyReferenceFilesToRelation.
       try
       {
@@ -1258,19 +1534,23 @@ namespace mitk
                   << "returned without source-image provenance.";
       }
     }
+    catch (mitk::Exception &e)
+    {
+      // throw; keeps a subclass of mitk::Exception, which mitkReThrow would slice to its static type.
+      e.SetDescription("Cannot read the DICOM SEG file \"" + this->GetInputLocation() + "\": " + e.GetDescription());
+      throw;
+    }
     catch (const std::exception &e)
     {
-      MITK_ERROR << "An error occurred while reading the DICOM Seg file: " << e.what();
-      return result;
+      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": " << e.what();
     }
     catch (...)
     {
-      MITK_ERROR << "An error occurred in dcmqi while reading the DICOM Seg file";
-      return result;
+      // dcmqi reports some failures by throwing an int.
+      mitkThrow() << "Cannot read the DICOM SEG file \"" << this->GetInputLocation() << "\": dcmqi failed.";
     }
 
-    result.push_back(labelSetImage.GetPointer());
-    return result;
+    return { labelSetImage.GetPointer() };
   }
 
   mitk::MultiLabelSegmentation::Pointer DICOMSegmentationIO::ReadBinarySegmentation(
@@ -1520,6 +1800,13 @@ namespace mitk
       this->SetLabelProperties(label, segmentAttribute);
     }
 
+    // InitializeByLabeledImage adds the labels in the order their values first occur in the
+    // voxels. Like the binary branch, the group lists them by segment number.
+    MultiLabelSegmentation::LabelVectorType labelsBySegmentNumber;
+    for (const auto &entry : attributesByLabelValue)
+      labelsBySegmentNumber.push_back(labelSetImage->GetLabel(entry.first));
+    labelSetImage->ReplaceGroupLabels(0, labelsBySegmentNumber);
+
     return labelSetImage;
   }
 
@@ -1561,10 +1848,12 @@ namespace mitk
     if (GetDICOMPropertyValue(0x0012, 0x0060, image->GetPropertyList(), clinicalTrialCoordinatingCenterName))
       handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
-    std::string seriesDescription;
-    if (!image->GetPropertyList()->GetStringProperty("name", seriesDescription))
-      seriesDescription = "MITK Segmentation";
-    handler.setSeriesDescription(seriesDescription);
+    // Validate requires (0008,103E) in strict mode, and Complete stamps it in synthetic mode. Like
+    // Validate, an intentionally empty value counts as present.
+    const auto seriesDescription = image->GetConstProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x103E));
+    if (seriesDescription.IsNull())
+      mitkThrow() << "BuildMetaInfoHandler: the segmentation has no Series Description (0008,103E).";
+    handler.setSeriesDescription(seriesDescription->GetValueAsString());
 
     // All per-group SEG files of one seg form a single DICOM series (shared
     // SeriesInstanceUID stamped at the write loop), so SeriesNumber is
@@ -1573,9 +1862,9 @@ namespace mitk
     // group its own series with a colliding InstanceNumber.
     handler.setSeriesNumber("1");
     handler.setInstanceNumber(std::to_string(layer + 1));
-    handler.setBodyPartExamined("");
 
-    auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
+    // The segment metadata must pair with the segment images in Write by position.
+    auto labelSet = image->GetConstLabelsByValue(GetLabelValuesInSegmentOrder(image, layer));
 
     unsigned int segmentNumber = 0;
 
@@ -1588,7 +1877,8 @@ namespace mitk
 
         if (segmentAttribute != nullptr)
         {
-          segmentAttribute->setSegmentLabel(label->GetName());
+          const auto labelDescription = "of label " + std::to_string(label->GetValue());
+          segmentAttribute->setSegmentLabel(FitIntoLO(SegmentLabelOf(*label), "Segment Label (0062,0005) " + labelDescription));
           segmentAttribute->setSegmentDescription(label->GetDescription());
           std::string algorithmType = label->GetAlgorithmTypeStr();
           if (algorithmType.empty())
@@ -1598,32 +1888,31 @@ namespace mitk
           // Only emit (0062,0009) when the label actually carries a recorded name. GetAlgorithmName()
           // would otherwise fall back to the bare "MITK Segmentation" prefix and fabricate a name for a
           // segment MITK never generated (e.g. a vendor SEG loaded without an algorithm name).
+          // The provenance chain can exceed the LO limit in routine AI-then-correct sessions.
           if (label->HasAlgorithmName())
           {
-            std::string algorithmName = label->GetAlgorithmName();
-            // Segment Algorithm Name has VR LO (max 64 chars). DCMTK does not enforce the limit on write,
-            // so bound it here; the growing provenance chain can exceed 64 in routine AI-then-correct
-            // sessions. The indicator marks that the recorded chain was longer than the exported value.
-            constexpr std::string::size_type maxLOLength = 64;
-            const std::string truncationIndicator = "[...]";
-            if (algorithmName.length() > maxLOLength)
-            {
-              MITK_WARN << "Segment Algorithm Name (0062,0009) exceeds the DICOM LO limit (" << maxLOLength
-                        << " chars) and is truncated for export. Full provenance: " << algorithmName;
-              algorithmName = algorithmName.substr(0, maxLOLength - truncationIndicator.length()) + truncationIndicator;
-            }
-            segmentAttribute->setSegmentAlgorithmName(algorithmName);
+            segmentAttribute->setSegmentAlgorithmName(
+              FitIntoLO(label->GetAlgorithmName(), "Segment Algorithm Name (0062,0009) " + labelDescription));
           }
 
-          if (label->GetAnatomicRegionCount()>0)
+          // dcmqi takes one anatomic region; the indices of a label's regions can be sparse. A region
+          // without a value is incomplete and not written; Label refuses to return one whose value,
+          // scheme and meaning are all empty.
+          PropertyKeyPath regionPath;
+          regionPath.AddAnySelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
+          regionPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+          const auto regionNames = FindIndexedPropertyNames(label.GetPointer(), regionPath);
+          std::string lowestRegionValue;
+          if (!regionNames.empty() &&
+              label->GetStringProperty(regionNames.begin()->second.c_str(), lowestRegionValue) &&
+              !lowestRegionValue.empty())
           { //Anatomic region
-            auto anatomicRegion = label->GetAnatomicRegion(0); //currently DCMQI only supports one anatomic region code
+            auto anatomicRegion = label->GetAnatomicRegion(regionNames.begin()->first);
 
             if (!anatomicRegion.GetValue().empty() && !anatomicRegion.GetScheme().empty() && !anatomicRegion.GetMeaning().empty())
             {
               segmentAttribute->setAnatomicRegionSequence(anatomicRegion.GetValue(),
                 anatomicRegion.GetScheme(), anatomicRegion.GetMeaning());
-              handler.setBodyPartExamined(anatomicRegion.GetMeaning());
             }
 
             if (anatomicRegion.GetModifierCount() > 0)
@@ -1647,7 +1936,6 @@ namespace mitk
             {
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(segCat->GetValue(),
                 segCat->GetScheme(), segCat->GetMeaning());
-              handler.setBodyPartExamined(segCat->GetMeaning());
             }
             else
             {
@@ -1656,9 +1944,7 @@ namespace mitk
               // semantics. The same SCT base code is intentionally reused as
               // the Type fallback below (paired there with an "Unknown"
               // modifier); Category and Type sharing one base code is accepted
-              // for the no-real-semantics case. BodyPartExamined is
-              // deliberately not stamped here; an "Unknown" body part is worse
-              // than the field staying empty.
+              // for the no-real-semantics case.
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
                 "49755003", "SCT", "Morphologically altered structure");
             }
@@ -1667,7 +1953,7 @@ namespace mitk
           {
             auto segType = label->GetSegmentedPropertyType();
 
-            if (segType.has_value() && !segType->GetValue().empty() && !segType->GetScheme().empty() && !segType->GetMeaning().empty())
+            if (HasCompleteSegmentedPropertyType(*label))
             {
               segmentAttribute->setSegmentedPropertyTypeCodeSequence(segType->GetValue(),
                 segType->GetScheme(), segType->GetMeaning());
@@ -1683,7 +1969,7 @@ namespace mitk
               // intent wins), so the fallback modifier here is only the final
               // value when the label has no modifier of its own.
               segmentAttribute->setSegmentedPropertyTypeCodeSequence(
-                "49755003", "SCT", "Morphologically altered structure");
+                "49755003", "SCT", STAND_IN_TYPE_MEANING);
               segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
                 "261665006", "SCT", "Unknown (qualifier value)");
             }
@@ -1702,7 +1988,7 @@ namespace mitk
           }
 
           Color color = label->GetColor();
-          segmentAttribute->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
+          segmentAttribute->setRecommendedDisplayRGBValue(ToEightBit(color[0]), ToEightBit(color[1]), ToEightBit(color[2]));
 
           if (!label->GetTrackingID().empty())
             segmentAttribute->setTrackingIdentifier(label->GetTrackingID());

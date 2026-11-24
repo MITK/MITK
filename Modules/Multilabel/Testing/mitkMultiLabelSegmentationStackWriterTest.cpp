@@ -10,15 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
+#include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
+#include <mitkSegIOTestCapabilities.h>
+#include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
+#include <mitkStringProperty.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-#include <mitkArbitraryTimeGeometry.h>
-#include <mitkCoreServices.h>
-#include <mitkPropertyPersistenceInfo.h>
-#include <mitkIPropertyPersistence.h>
+
+#include <filesystem>
+#include <optional>
+#include <sstream>
+#include <string>
 
 class mitkMultiLabelSegmentationStackWriterTestSuite : public mitk::TestFixture
 {
@@ -26,21 +33,43 @@ class mitkMultiLabelSegmentationStackWriterTestSuite : public mitk::TestFixture
   MITK_TEST(Test3D_Group_based);
   MITK_TEST(Test3D_Label_based);
   MITK_TEST(Test3D_Label_binary_based);
-  MITK_TEST(Test3D_Group_roundtrip);
-  MITK_TEST(Test3D_Label_roundtrip);
-  MITK_TEST(Test3D_Label_binary_roundtrip);
+  MITK_TEST(TestRoundTrip3D);
+  MITK_TEST(TestRoundTripWithEmptyLabel);
+  MITK_TEST(TestRoundTripWithEmptyGroup);
+  MITK_TEST(TestRoundTripWithoutLabels);
+  MITK_TEST(TestRoundTripMaxLabelValue);
+  MITK_TEST(TestRoundTripKeepsNamesakesOfFilteredKeys);
+  MITK_TEST(TestWriteWithoutOptionsUsesGroupStrategy);
+  MITK_TEST(TestWriteUnknownSaveStrategyFails);
+  MITK_TEST(TestWriteUnknownInstanceValueFails);
+  MITK_TEST(TestWriteRelativePath);
+  MITK_TEST(TestWriteDottedStemKeepsDots);
+  MITK_TEST(TestWriteWithoutMatchingExtensionFails);
+  MITK_TEST(TestWrite4DFails);
+  MITK_TEST(TestWriteWithoutGroupsFails);
+  MITK_TEST(TestWriteToStreamFails);
   CPPUNIT_TEST_SUITE_END();
 
 private:
   using FilePathVectorType = std::vector<std::string>;
-  using ImageVectorType = std::vector<mitk::Image::Pointer>;
+
+  struct Strategy
+  {
+    std::string name;
+    mitk::IFileWriter::Options options;
+  };
 
   std::string m_TempPath;
-  mitk::MultiLabelSegmentation::Pointer m_Segmentation;
+  std::optional<std::filesystem::path> m_PreviousWorkingDirectory;
 
   std::string GetTempFilePath(const std::string& fileName)
   {
     return m_TempPath + mitk::IOUtil::GetDirectorySeparator() + fileName;
+  }
+
+  bool TempFileExists(const std::string& fileName)
+  {
+    return std::filesystem::exists(this->GetTempFilePath(fileName));
   }
 
   mitk::MultiLabelSegmentation::Pointer LoadSegmentation(const std::string& path)
@@ -73,32 +102,94 @@ private:
     return result;
   }
 
+  static mitk::IFileWriter::Options GroupStrategy()
+  {
+    return { { "Save strategy", us::Any(std::string("group")) } };
+  }
+
+  static std::vector<Strategy> Strategies()
+  {
+    return {
+      { "group", GroupStrategy() },
+      { "instance, original values",
+        { { "Save strategy", us::Any(std::string("instance")) }, { "Instance value", us::Any(std::string("original")) } } },
+      { "instance, binary values",
+        { { "Save strategy", us::Any(std::string("instance")) }, { "Instance value", us::Any(std::string("binary")) } } },
+    };
+  }
+
+  static mitk::MultiLabelSegmentation::Pointer BuildRich3D()
+  {
+    return mitk::test::BuildRichSegmentation({ false, false, false, false });
+  }
+
+  void AssertRoundTrip(const mitk::MultiLabelSegmentation* original, const Strategy& strategy, const std::string& path)
+  {
+    mitk::IOUtil::Save(mitk::test::CloneKeepingUID(*original), path, strategy.options);
+    const auto reloaded = mitk::test::LoadSingleSegmentation(path);
+
+    auto capabilities = mitk::test::StackCapabilities();
+    capabilities.formatName += " (" + strategy.name + ")";
+    mitk::test::AssertReloadMatchesCapabilities({ original }, { reloaded.GetPointer() }, capabilities);
+  }
+
+  void AssertRoundTripInEveryStrategy(const mitk::MultiLabelSegmentation* original)
+  {
+    const auto strategies = Strategies();
+    for (std::size_t i = 0; i < strategies.size(); ++i)
+      this->AssertRoundTrip(original, strategies[i], this->GetTempFilePath("roundtrip_" + std::to_string(i) + ".mitklabel.json"));
+  }
+
+  static void AssertExceptionMentions(const std::function<void()>& action, const std::vector<std::string>& texts)
+  {
+    try
+    {
+      action();
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string message = e.GetDescription();
+      for (const auto& text : texts)
+      {
+        CPPUNIT_ASSERT_MESSAGE("The error should mention \"" + text + "\"; got: " + message,
+                               message.find(text) != std::string::npos);
+      }
+      return;
+    }
+    CPPUNIT_FAIL("No mitk::Exception was thrown");
+  }
+
 public:
 
   void setUp() override
   {
     m_TempPath = mitk::IOUtil::CreateTemporaryDirectory("mitk-SegmentationStackWriterTest-XXXXXX");
-    m_Segmentation = LoadSegmentation("Multilabel/MultilabelSegmentation.nrrd");
   }
 
   void tearDown() override
   {
+    if (m_PreviousWorkingDirectory.has_value())
+    {
+      std::filesystem::current_path(*m_PreviousWorkingDirectory);
+      m_PreviousWorkingDirectory.reset();
+    }
+
     itksys::SystemTools::RemoveADirectory(m_TempPath);
   }
-  
+
   void Test3D_Group_based()
   {
     mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("group"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack_groupbased.mitklabel.json"), options);
+    mitk::IOUtil::Save(this->LoadSegmentation("Multilabel/MultilabelSegmentation.nrrd"), this->GetTempFilePath("stack_groupbased.mitklabel.json"), options);
 
     FilePathVectorType refFiles = { GetTestDataFilePath("Multilabel/MultilabelSegmentation_group_0.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_group_1.nii.gz"),
-                                    GetTestDataFilePath("Multilabel/MultilabelSegmentation_group_0.nii.gz") };
-    FilePathVectorType testFiles = { GetTempFilePath("stack_groupbased_group_0.nii.gz"),
-                                    GetTempFilePath("stack_groupbased_group_1.nii.gz"),
-                                    GetTempFilePath("stack_groupbased_group_0.nii.gz") };
+                                    GetTestDataFilePath("Multilabel/MultilabelSegmentation_group_2.nii.gz") };
+    FilePathVectorType testFiles = { this->GetTempFilePath("stack_groupbased_group_0.nii.gz"),
+                                    this->GetTempFilePath("stack_groupbased_group_1.nii.gz"),
+                                    this->GetTempFilePath("stack_groupbased_group_2.nii.gz") };
 
-    auto imagesAreEqual = CheckStackFilesForEquality(refFiles, testFiles);
+    auto imagesAreEqual = this->CheckStackFilesForEquality(refFiles, testFiles);
 
     CPPUNIT_ASSERT_MESSAGE("Error stack of group based saved segmentation stack is not equal.", imagesAreEqual);
   }
@@ -107,7 +198,7 @@ public:
   {
     mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("instance"))},
                                            {"Instance value", us::Any(std::string("original"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack_labelbased.mitklabel.json"), options);
+    mitk::IOUtil::Save(this->LoadSegmentation("Multilabel/MultilabelSegmentation.nrrd"), this->GetTempFilePath("stack_labelbased.mitklabel.json"), options);
 
     FilePathVectorType refFiles = { GetTestDataFilePath("Multilabel/MultilabelSegmentation_label_1.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_label_2.nii.gz"),
@@ -117,16 +208,16 @@ public:
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_label_6.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_label_7.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_label_8.nii.gz") };
-    FilePathVectorType testFiles = { GetTempFilePath("stack_labelbased_label_1.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_2.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_3.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_4.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_5.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_6.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_7.nii.gz"),
-                                    GetTempFilePath("stack_labelbased_label_8.nii.gz") };
+    FilePathVectorType testFiles = { this->GetTempFilePath("stack_labelbased_label_1.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_2.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_3.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_4.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_5.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_6.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_7.nii.gz"),
+                                    this->GetTempFilePath("stack_labelbased_label_8.nii.gz") };
 
-    auto imagesAreEqual = CheckStackFilesForEquality(refFiles, testFiles);
+    auto imagesAreEqual = this->CheckStackFilesForEquality(refFiles, testFiles);
 
     CPPUNIT_ASSERT_MESSAGE("Error stack of group based saved segmentation stack is not equal.", imagesAreEqual);
   }
@@ -135,7 +226,7 @@ public:
   {
     mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("instance"))},
                                            {"Instance value", us::Any(std::string("binary"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack_binarybased.mitklabel.json"), options);
+    mitk::IOUtil::Save(this->LoadSegmentation("Multilabel/MultilabelSegmentation.nrrd"), this->GetTempFilePath("stack_binarybased.mitklabel.json"), options);
 
     FilePathVectorType refFiles = { GetTestDataFilePath("Multilabel/MultilabelSegmentation_binary_label_1.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_binary_label_2.nii.gz"),
@@ -145,52 +236,163 @@ public:
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_binary_label_6.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_binary_label_7.nii.gz"),
                                     GetTestDataFilePath("Multilabel/MultilabelSegmentation_binary_label_8.nii.gz") };
-    FilePathVectorType testFiles = { GetTempFilePath("stack_binarybased_label_1.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_2.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_3.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_4.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_5.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_6.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_7.nii.gz"),
-                                    GetTempFilePath("stack_binarybased_label_8.nii.gz") };
+    FilePathVectorType testFiles = { this->GetTempFilePath("stack_binarybased_label_1.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_2.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_3.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_4.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_5.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_6.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_7.nii.gz"),
+                                    this->GetTempFilePath("stack_binarybased_label_8.nii.gz") };
 
-    auto imagesAreEqual = CheckStackFilesForEquality(refFiles, testFiles);
+    auto imagesAreEqual = this->CheckStackFilesForEquality(refFiles, testFiles);
 
     CPPUNIT_ASSERT_MESSAGE("Error stack of group based saved segmentation stack is not equal.", imagesAreEqual);
   }
 
-  void Test3D_Group_roundtrip()
+  void TestRoundTrip3D()
   {
-    mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("group"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack.mitklabel.json"), options);
-
-    auto tempSeg = LoadSegmentation(GetTempFilePath("stack.mitklabel.json"));
-
-    CPPUNIT_ASSERT_MESSAGE("Error saved and loaded segmentation stack is not equal.", mitk::Equal(*m_Segmentation, *tempSeg, mitk::eps, true));
+    this->AssertRoundTripInEveryStrategy(BuildRich3D());
   }
 
-  void Test3D_Label_roundtrip()
+  void TestRoundTripWithEmptyLabel()
   {
-    mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("instance"))},
-                                           {"Instance value", us::Any(std::string("original"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack.mitklabel.json"), options);
-
-    auto tempSeg = LoadSegmentation(GetTempFilePath("stack.mitklabel.json"));
-
-    CPPUNIT_ASSERT_MESSAGE("Error saved and loaded segmentation stack is not equal.", mitk::Equal(*m_Segmentation, *tempSeg, mitk::eps, true));
+    this->AssertRoundTripInEveryStrategy(mitk::test::BuildRichSegmentation({ false, false, true, false }));
   }
 
-  void Test3D_Label_binary_roundtrip()
+  void TestRoundTripWithEmptyGroup()
   {
-    mitk::IFileWriter::Options options = { {"Save strategy", us::Any(std::string("instance"))},
-                                           {"Instance value", us::Any(std::string("binary"))} };
-    mitk::IOUtil::Save(m_Segmentation, GetTempFilePath("stack.mitklabel.json"), options);
-
-    auto tempSeg = LoadSegmentation(GetTempFilePath("stack.mitklabel.json"));
-
-    CPPUNIT_ASSERT_MESSAGE("Error saved and loaded segmentation stack is not equal.", mitk::Equal(*m_Segmentation, *tempSeg, mitk::eps, true));
+    this->AssertRoundTripInEveryStrategy(mitk::test::BuildRichSegmentation({ false, false, false, true }));
   }
 
+  void TestRoundTripWithoutLabels()
+  {
+    // Without labels, the instance strategy has no label image to initialise the reload from.
+    auto segmentation = BuildRich3D();
+    for (const auto value : segmentation->GetAllLabelValues())
+      segmentation->RemoveLabel(value);
+    this->AssertRoundTripInEveryStrategy(segmentation);
+  }
+
+  void TestRoundTripMaxLabelValue()
+  {
+    auto segmentation = BuildRich3D();
+    segmentation->AddLabel(mitk::Label::New(mitk::Label::MAX_LABEL_VALUE, "Maximum value"), 1, true, false);
+    {
+      // Index 0 lies outside every box of group 1.
+      mitk::ImageWriteAccessor accessor(segmentation->GetGroupImage(1));
+      static_cast<mitk::Label::PixelType*>(accessor.GetData())[0] = mitk::Label::MAX_LABEL_VALUE;
+    }
+    this->AssertRoundTripInEveryStrategy(segmentation);
+  }
+
+  void TestRoundTripKeepsNamesakesOfFilteredKeys()
+  {
+    // The writer leaves out "path", "modality" and "org.mitk.uid"; other keys merely starting
+    // with them are user content.
+    auto segmentation = BuildRich3D();
+    segmentation->SetProperty("pathology.grade", mitk::StringProperty::New("G2"));
+    segmentation->SetProperty("pathologist", mitk::StringProperty::New("unknown"));
+    segmentation->SetProperty("modality.source", mitk::StringProperty::New("CT"));
+    this->AssertRoundTrip(segmentation, Strategies().front(), this->GetTempFilePath("namesakes.mitklabel.json"));
+  }
+
+  void TestWriteWithoutOptionsUsesGroupStrategy()
+  {
+    mitk::IOUtil::Save(BuildRich3D(), this->GetTempFilePath("default.mitklabel.json"));
+
+    CPPUNIT_ASSERT_MESSAGE("The default strategy writes group images", this->TempFileExists("default_group_0.nii.gz"));
+    CPPUNIT_ASSERT_MESSAGE("The default strategy writes group images", this->TempFileExists("default_group_1.nii.gz"));
+    CPPUNIT_ASSERT_MESSAGE("The default strategy writes no label images", !this->TempFileExists("default_label_7.nii.gz"));
+  }
+
+  void TestWriteUnknownSaveStrategyFails()
+  {
+    const mitk::IFileWriter::Options options = { { "Save strategy", us::Any(std::string("label")) } };
+    AssertExceptionMentions([&]() { mitk::IOUtil::Save(BuildRich3D(), this->GetTempFilePath("unknown.mitklabel.json"), options); },
+                            { "Unknown value \"label\" of the option \"Save strategy\"" });
+  }
+
+  void TestWriteUnknownInstanceValueFails()
+  {
+    const mitk::IFileWriter::Options options = { { "Save strategy", us::Any(std::string("instance")) },
+                                                 { "Instance value", us::Any(std::string("mask")) } };
+    AssertExceptionMentions([&]() { mitk::IOUtil::Save(BuildRich3D(), this->GetTempFilePath("unknown.mitklabel.json"), options); },
+                            { "Unknown value \"mask\" of the option \"Instance value\"" });
+  }
+
+  void TestWriteRelativePath()
+  {
+    m_PreviousWorkingDirectory = std::filesystem::current_path();
+    std::filesystem::current_path(m_TempPath);
+
+    mitk::IOUtil::Save(BuildRich3D(), "relative.mitklabel.json", GroupStrategy());
+
+    CPPUNIT_ASSERT_MESSAGE("The meta file lands in the working directory", this->TempFileExists("relative.mitklabel.json"));
+    CPPUNIT_ASSERT_MESSAGE("The group images land in the working directory", this->TempFileExists("relative_group_0.nii.gz"));
+  }
+
+  void TestWriteDottedStemKeepsDots()
+  {
+    const auto original = BuildRich3D();
+    this->AssertRoundTrip(original, Strategies().front(), this->GetTempFilePath("case.001.mitklabel.json"));
+
+    CPPUNIT_ASSERT_MESSAGE("The group images keep the dotted stem", this->TempFileExists("case.001_group_0.nii.gz"));
+    CPPUNIT_ASSERT_MESSAGE("Nothing is written under the stem cut at the first dot", !this->TempFileExists("case_group_0.nii.gz"));
+  }
+
+  void TestWriteWithoutMatchingExtensionFails()
+  {
+    // An explicit mime type without adding its extension hands the writer a path whose
+    // file name has none of the stack's extensions, so there is no stem to derive.
+    const auto mimeType = mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".multilabel.segmentation.stack.nifti";
+    AssertExceptionMentions(
+      [&]() { mitk::IOUtil::Save(BuildRich3D(), mimeType, this->GetTempFilePath("stack"), GroupStrategy(), false); },
+      { "has none of the extensions" });
+  }
+
+  void TestWrite4DFails()
+  {
+    const auto segmentation = mitk::test::BuildRichSegmentation({ true, false, false, false });
+    AssertExceptionMentions(
+      [&]() { mitk::IOUtil::Save(segmentation, this->GetTempFilePath("dynamic.mitklabel.json"), GroupStrategy()); },
+      { "No suitable writer" });
+  }
+
+  void TestWriteWithoutGroupsFails()
+  {
+    auto segmentation = BuildRich3D();
+    while (segmentation->GetNumberOfGroups() > 0)
+      segmentation->RemoveGroup(0);
+
+    AssertExceptionMentions(
+      [&]() { mitk::IOUtil::Save(segmentation, this->GetTempFilePath("no-groups.mitklabel.json"), GroupStrategy()); },
+      { "no groups" });
+  }
+
+  // A stack is a meta file and several images, and a stream takes one file.
+  void TestWriteToStreamFails()
+  {
+    for (const std::string name : { "stream.nii.gz", "stream.mitklabel.json" })
+    {
+      std::ostringstream stream;
+      std::string message;
+      try
+      {
+        mitk::test::WriteWithWriter(BuildRich3D(), this->GetTempFilePath(name), "MITK ML Segmentation NIFTI Stack",
+                                    GroupStrategy(), &stream);
+      }
+      catch (const mitk::Exception& e)
+      {
+        message = e.GetDescription();
+      }
+      CPPUNIT_ASSERT_MESSAGE(name + ": the writer wrote " + std::to_string(stream.str().size()) +
+                               " bytes to the stream instead of refusing",
+                             !message.empty());
+      CPPUNIT_ASSERT_MESSAGE(name + ": the refusal names the stream: " + message, message.find("stream") != std::string::npos);
+      CPPUNIT_ASSERT_MESSAGE(name + ": nothing reaches the stream", stream.str().empty());
+    }
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkMultiLabelSegmentationStackWriter)

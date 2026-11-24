@@ -12,6 +12,8 @@ set(mitk_binding_sources
   GeometryHelpers.cpp
   GeometryHelpers.h
   Image.cpp
+  IOHelpers.cpp
+  IOHelpers.h
   IOUtil.cpp
   Module.cpp
   MultiLabelSegmentation.cpp

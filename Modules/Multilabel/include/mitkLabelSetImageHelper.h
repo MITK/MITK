@@ -55,7 +55,8 @@ namespace mitk
     /**
      * \brief Apply the typical defaults for a segmentation derived from a
      *        source image: establish the source-image relation and inherit
-     *        the source's patient, study, and frame-of-reference identity.
+     *        the source's patient, study, and frame-of-reference identity
+     *        and its body part examined.
      *
      * Single source of truth for "what makes a freshly-created seg behave
      * as a typical derived seg" so the C++ factory (CreateNewSegmentationNode)

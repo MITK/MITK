@@ -257,6 +257,7 @@ namespace mitk
   IFileWriter::Options AbstractFileWriter::GetDefaultOptions() const { return d->GetDefaultOptions(); }
   IFileWriter::Options AbstractFileWriter::GetOptions() const { return d->GetOptions(); }
   us::Any AbstractFileWriter::GetOption(const std::string &name) const { return d->GetOption(name); }
+  std::string AbstractFileWriter::GetChoiceOption(const std::string &name) const { return d->GetChoiceOption(name); }
   void AbstractFileWriter::SetOption(const std::string &name, const us::Any &value) { d->SetOption(name, value); }
   void AbstractFileWriter::SetOptions(const Options &options) { d->SetOptions(options); }
   ////////////////// MISC //////////////////

@@ -12,6 +12,10 @@ found in the LICENSE file.
 
 #include "mitkDICOMSegPropertyTestHelpers.h"
 
+#include <mitkDICOMSegFileContentTestHelpers.h>
+#include <mitkSegIOTestComparator.h>
+#include <mitkSegIOTestFixtures.h>
+
 #include <mitkBaseProperty.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
@@ -20,8 +24,6 @@ found in the LICENSE file.
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestingMacros.h>
-
-#include <filesystem>
 
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
@@ -40,15 +42,15 @@ found in the LICENSE file.
 #include <string>
 #include <vector>
 
-// Regression guard for the binary-DICOM-SEG reader, including the
-// source-image relations the reader populates from the SEG's per-frame
-// and top-level reference structures. A binary DICOM SEG input fixture
-// is loaded through MITK's autoload path and the resulting
-// MultiLabelSegmentation is compared against a reference segmentation
-// that was generated against an earlier reader version and checked into
-// MITK-Data. Any drift in voxel layout or label metadata (geometry,
-// group images, label names/colours/codes, tracking IDs) lands on the
-// drifting commit during bisect rather than silently shipping.
+// Regression guard for the binary DICOM SEG reader, including the
+// source-image relations it builds from the SEG's per-frame and top-level
+// reference structures. The attributes and voxels of every segment are
+// checked against the fixture's own content, read with DCMTK.
+//
+// The reference segmentation in MITK-Data is an export of MITK's own
+// reader (MITK-Data 0b3a8b4, updated in a1e677b), so it is no oracle for
+// attributes. It pins the group images, geometry and voxels to what
+// earlier reader versions yielded.
 
 namespace
 {
@@ -169,8 +171,19 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(referenceSeg != nullptr,
     "Reference is a MultiLabelSegmentation");
 
-  MITK_TEST_CONDITION(mitk::Equal(*loadedSeg, *referenceSeg, mitk::eps, true),
-    "Loaded DICOM SEG matches the reference MultiLabelSegmentation");
+  const auto differences = mitk::test::CompareWithDICOMSegFile(*loadedSeg, fixturePath);
+  MITK_TEST_CONDITION(differences.empty(),
+    "Loaded DICOM SEG matches the fixture's content" << mitk::test::JoinDifferences(differences));
+
+  MITK_TEST_CONDITION_REQUIRED(loadedSeg->GetNumberOfGroups() == referenceSeg->GetNumberOfGroups(),
+    "Loaded DICOM SEG has as many groups as the reference");
+  for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < loadedSeg->GetNumberOfGroups(); ++group)
+  {
+    MITK_TEST_CONDITION(loadedSeg->GetLabelValuesByGroup(group) == referenceSeg->GetLabelValuesByGroup(group),
+      "Group " << group << " has the label values of the reference");
+    MITK_TEST_CONDITION(mitk::Equal(*loadedSeg->GetGroupImage(group), *referenceSeg->GetGroupImage(group), mitk::eps, true),
+      "Group " << group << " matches the reference in geometry and voxels");
+  }
 
   // The loaded seg carries the same shape of source-image relation that
   // the producer path would have written. Both the set of source series
@@ -253,12 +266,10 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
   // possible follow-up.) The on-the-wire SOP class on output is the writer's
   // default (legacy binary Segmentation Storage, 1.2.840.10008.5.1.4.1.1.66.4);
   // a dedicated writer-side test pins the SOP class value, so this round
-  // trip is encoding-agnostic. Voxel-level equivalence is pinned by the
-  // per-segment hash baseline above; this assertion only adds the
-  // write+reload survivability that was impossible before this stage.
-  const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegRegressionRoundTrip";
-  std::filesystem::create_directories(tempDir);
-  const auto roundTripPath = (tempDir / "roundtrip.dcm").string();
+  // trip is encoding-agnostic. Attributes and voxels are checked above;
+  // this only adds that a loaded SEG can be written and read again.
+  const mitk::test::ScopedTemporaryDirectory tempDir("mitkDICOMSegmentationIORegressionTest-XXXXXX");
+  const auto roundTripPath = tempDir.GetFilePath("roundtrip.dcm");
   mitk::IFileWriter::Options roundTripOptions;
   roundTripOptions["Strict / synthetic mode"] = std::string("synthetic");
   try

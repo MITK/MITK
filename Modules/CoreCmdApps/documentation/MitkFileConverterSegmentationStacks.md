@@ -23,8 +23,8 @@ Convert a multi-label segmentation (e.g. `input_segmentation.nrrd`) into
 Output example:
 
 ```
-MySegmentation_Label_1.nii.gz
-MySegmentation_Label_2.nii.gz
+MySegmentation_label_1.nii.gz
+MySegmentation_label_2.nii.gz
 MySegmentation.mitklabel.json
 ```
 
@@ -38,10 +38,10 @@ MitkFileConverter -i input_segmentation.nrrd -o ./MySegmentation.nii.gz --output
 
 | Option | Value | Description |
 |--------|-------|-------------|
-| `Save strategy` | `instance` | Save one image per label. |
-| `Save strategy` | `group` | Save one image per label group instead of one per label. |
-| `Instance value` | `original` | Voxels carry the label value of the segmentation. |
-| `Instance value` | `binary` | Voxels carry the value 1 (binary masks). |
+| `Save strategy` | `group` (default) | Save one image per label group, `<name>_group_<index>.nii.gz`. |
+| `Save strategy` | `instance` | Save one image per label, `<name>_label_<value>.nii.gz`. A group without labels gets a group image. |
+| `Instance value` | `original` (default) | With `instance`: voxels carry the label value of the segmentation. |
+| `Instance value` | `binary` | With `instance`: voxels carry the value 1 (binary masks). |
 
 ## Use case 2: Import a stack and convert it to a multi-label segmentation
 
@@ -52,8 +52,8 @@ Convert a segmentation stack described by a `.mitklabel.json` file into a single
 Input example:
 
 ```
-MySegmentation_Label_1.nii.gz
-MySegmentation_Label_2.nii.gz
+MySegmentation_label_1.nii.gz
+MySegmentation_label_2.nii.gz
 MySegmentation.mitklabel.json
 ```
 
@@ -67,5 +67,5 @@ The reader combines the label images according to the metadata in the JSON file.
 
 ## Notes
 
-- Any image format MITK can write is possible for the stack images, e.g. `.nii.gz` or `.nrrd`.
-- To export group images instead of per-label images use `--output-options '{"Save strategy": "group"}'`.
+- MITK writes the stack images as NIfTI (`.nii.gz`). When reading, the stack images can have any format ITK reads, e.g. `.nii.gz` or `.nrrd`.
+- Without `--output-options`, MitkFileConverter writes one image per label group (`MySegmentation_group_0.nii.gz`, ...) instead of one per label.

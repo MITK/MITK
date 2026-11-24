@@ -43,7 +43,11 @@ namespace mitk
     MultiLabelSegmentationStackWriterBase(const CustomMimeType& mimeType,
       const std::string& description);
 
-    /** \brief Write the MultiLabelSegmentation as a stack of image files plus metadata. */
+    /**
+     * \brief Write the MultiLabelSegmentation as a stack of image files plus metadata.
+     * \throw mitk::Exception if an output stream is set: a stack consists of several files, and a
+     * stream takes one.
+     */
     void Write() override;
 
     /** \brief Return the confidence level for writing the given data. */

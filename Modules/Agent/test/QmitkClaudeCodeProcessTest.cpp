@@ -99,6 +99,7 @@ class QmitkClaudeCodeProcessTestSuite : public mitk::TestFixture
 #ifndef Q_OS_WIN
   MITK_TEST(TestNoProxyMergesDifferentSpellings);
 #endif
+  MITK_TEST(TestNoProxyForDirectHost);
   MITK_TEST(TestTrustedCertificate);
   MITK_TEST(TestTrustedCertificateDoesNotOverrideEnvironment);
   MITK_TEST(TestExecutableDirectoryComesFirstOnPath);
@@ -164,6 +165,28 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(expected.toStdString(), environment.value("no_proxy").toStdString());
     CPPUNIT_ASSERT_EQUAL(expected.toStdString(), environment.value("NO_PROXY").toStdString());
+  }
+
+  void TestNoProxyForDirectHost()
+  {
+    EnvironmentGuard guard;
+    guard.Unset("no_proxy");
+    guard.Unset("NO_PROXY");
+
+    QmitkClaudeCodeProcess::Options options;
+    options.DirectHost = "192.168.1.5";
+
+    auto environment = QmitkClaudeCodeProcess::GetEnvironment(options);
+    const auto expected = Loopback + ",192.168.1.5";
+
+    CPPUNIT_ASSERT_EQUAL(expected.toStdString(), environment.value("no_proxy").toStdString());
+    CPPUNIT_ASSERT_EQUAL(expected.toStdString(), environment.value("NO_PROXY").toStdString());
+
+    // A loopback name is listed once.
+    options.DirectHost = "localhost";
+    environment = QmitkClaudeCodeProcess::GetEnvironment(options);
+
+    CPPUNIT_ASSERT_EQUAL(Loopback.toStdString(), environment.value("no_proxy").toStdString());
   }
 
   void TestTrustedCertificate()

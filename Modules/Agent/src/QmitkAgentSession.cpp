@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QUrl>
 #include <QtConcurrent>
 
 #include <algorithm>
@@ -565,6 +566,9 @@ void QmitkAgentSession::StartProcess()
   options.Effort = m_Effort;
   options.ResumeSessionId = m_SessionId;
   options.TrustedCertificateFile = m_ToolServer->GetCertificateFile();
+
+  // Without brackets around an IPv6 address, as the loopback names are listed.
+  options.DirectHost = QUrl(m_ToolServer->GetUrl()).host();
 
   m_RestartPending = false;
   m_InitReported = false;

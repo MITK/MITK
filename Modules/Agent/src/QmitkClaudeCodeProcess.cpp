@@ -229,6 +229,9 @@ QProcessEnvironment QmitkClaudeCodeProcess::GetEnvironment(const Options& option
 
   exempt << "127.0.0.1" << "localhost" << "::1";
 
+  if (!options.DirectHost.isEmpty() && !exempt.contains(options.DirectHost))
+    exempt << options.DirectHost;
+
   const auto noProxy = exempt.join(',');
   environment.insert("no_proxy", noProxy);
   environment.insert("NO_PROXY", noProxy);

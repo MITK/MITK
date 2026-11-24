@@ -87,6 +87,14 @@ public:
      * the environment takes precedence.
      */
     QString TrustedCertificateFile;
+
+    /**
+     * \brief A host of this computer, other than the loopback names, that
+     *        Claude Code reaches without an HTTP proxy; empty for none.
+     *
+     * For an MCP server that listens on an address or a name of the machine.
+     */
+    QString DirectHost;
   };
 
   struct MITKAGENT_EXPORT AuthStatus
@@ -168,7 +176,8 @@ public:
    *
    * The current environment without the variables a parent Claude Code
    * session sets, which would otherwise make the child behave as nested,
-   * with this computer exempt from any HTTP proxy, with the directory of
+   * with this computer (the loopback names and Options::DirectHost) exempt
+   * from any HTTP proxy, with the directory of
    * Options::Executable in front of the PATH, and with
    * Options::TrustedCertificateFile as NODE_EXTRA_CA_CERTS unless that is set.
    */

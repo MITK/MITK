@@ -1895,12 +1895,17 @@ namespace mitk
               FitIntoLO(label->GetAlgorithmName(), "Segment Algorithm Name (0062,0009) " + labelDescription));
           }
 
-          // dcmqi takes one anatomic region; the indices of a label's regions can be sparse.
+          // dcmqi takes one anatomic region; the indices of a label's regions can be sparse. A region
+          // without a value is incomplete and not written; Label refuses to return one whose value,
+          // scheme and meaning are all empty.
           PropertyKeyPath regionPath;
           regionPath.AddAnySelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
           regionPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
           const auto regionNames = FindIndexedPropertyNames(label.GetPointer(), regionPath);
-          if (!regionNames.empty())
+          std::string lowestRegionValue;
+          if (!regionNames.empty() &&
+              label->GetStringProperty(regionNames.begin()->second.c_str(), lowestRegionValue) &&
+              !lowestRegionValue.empty())
           { //Anatomic region
             auto anatomicRegion = label->GetAnatomicRegion(regionNames.begin()->first);
 

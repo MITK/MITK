@@ -1196,9 +1196,10 @@ public:
   }
 
   // The writer passes the anatomic region with the lowest index only if its value, scheme and meaning
-  // are all set, and its first modifier likewise; it does not fall back to a later region. dcmqi
-  // writes a region modifier only together with its region. WriteSegToTempFile checks the expectation
-  // it derives; the literal values pin the writer independently of it.
+  // are all set, and its first modifier likewise; it does not fall back to a later region, also not
+  // when the lowest one is entirely empty. dcmqi writes a region modifier only together with its
+  // region. WriteSegToTempFile checks the expectation it derives; the literal values pin the writer
+  // independently of it.
   void WriteLeavesOutIncompleteAnatomicRegions()
   {
     struct Case
@@ -1225,6 +1226,22 @@ public:
       { "incomplete-lowest-region",
         [](mitk::Label& label) {
           label.SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("", "SCT", "Liver"), 0);
+          label.SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("10200004", "SCT", "Liver"), 1);
+        },
+        "" },
+      { "empty-lowest-region",
+        [](mitk::Label& label) {
+          mitk::DICOMCodeSequenceWithModifiers empty("", "", "");
+          empty.AddModifier(mitk::DICOMCodeSequence("7771000", "SCT", "Left"));
+          label.SetAnatomicRegion(empty, 0);
+          mitk::DICOMCodeSequenceWithModifiers later("10200004", "SCT", "Liver");
+          later.AddModifier(mitk::DICOMCodeSequence("7771000", "SCT", "Left"));
+          label.SetAnatomicRegion(later, 1);
+        },
+        "" },
+      { "value-only-lowest-region",
+        [](mitk::Label& label) {
+          label.SetStringProperty("anatomic_region.[0].value", "");
           label.SetAnatomicRegion(mitk::DICOMCodeSequenceWithModifiers("10200004", "SCT", "Liver"), 1);
         },
         "" },

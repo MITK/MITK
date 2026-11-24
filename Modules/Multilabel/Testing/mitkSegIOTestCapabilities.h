@@ -130,6 +130,20 @@ namespace mitk
         return indices;
       }
 
+      /** The value of a label's code at index under baseName; empty if the code has none. */
+      inline std::string GetLabelCodeValue(const Label& label,
+                                           const std::string& baseName,
+                                           PropertyKeyPath::ItemSelectionIndex index)
+      {
+        PropertyKeyPath path;
+        path.AddSelection(baseName, index);
+        path.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+        std::string value;
+        label.GetStringProperty(PropertyKeyPathToPropertyName(path).c_str(), value);
+        return value;
+      }
+
       /**
        * The label keys the DICOM SEG custom-property loss keeps: the attributes the format carries
        * and the prefixes of their codes, and opacity, visible and locked, which the format has no
@@ -360,12 +374,15 @@ namespace mitk
 
       // The writer passes the region with the lowest index only if it is complete, with no fallback
       // to a later one, and its first modifier likewise; dcmqi writes a region modifier only together
-      // with its region.
-      const auto regionIndices =
-        detail::FindLabelCodeIndices(label, LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
+      // with its region. Label refuses to return a region whose value, scheme and meaning are all
+      // empty; like any region without a value, it is incomplete.
+      const auto& regionBaseName = LabelPropertyConstants::GetAnatomicRegionPropertyBaseName();
+      const auto regionIndices = detail::FindLabelCodeIndices(label, regionBaseName);
       if (!regionIndices.empty())
       {
-        auto region = label.GetAnatomicRegion(regionIndices.front());
+        auto region = detail::GetLabelCodeValue(label, regionBaseName, regionIndices.front()).empty()
+                        ? DICOMCodeSequenceWithModifiers()
+                        : label.GetAnatomicRegion(regionIndices.front());
         if (!detail::IsCompleteCode(region))
         {
           for (const auto index : regionIndices)

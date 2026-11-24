@@ -109,7 +109,8 @@ namespace mitk
 
   /**
    * \brief Thrown by bridge callbacks when the requested sub-resource does not
-   *        apply to the addressed window (e.g. selected-slice on a 3D window).
+   *        apply to the addressed editor or window (e.g. a screenshot of an
+   *        editor without a render window canvas).
    *
    * Mapped by the controller layer to HTTP 404 UNSUPPORTED_OPERATION.
    */

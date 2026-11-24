@@ -2247,7 +2247,6 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | The bridge callback is not registered (headless / Qt plugin not loaded), or the registered editor list does not expose the `mxn` alias |
 | 400 | `INVALID_REQUEST` | The cell `{id}` is malformed — does not match the canonical fully-qualified form `<prefix>__<bare>` with URL-segment-safe characters. Rejected controller-side before any bridge dispatch |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | The cell `id` is well-formed but unknown to the editor |
-| 404 | `UNSUPPORTED_OPERATION` | The sub-resource does not apply to this cell (reserved for future 3D MxN cells on `/selected-slice`) |
 
 Per-endpoint error tables list any additional codes (400 for bad bodies, 422 for engine-side rendering failures, etc.).
 

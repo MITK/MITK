@@ -2569,8 +2569,11 @@
               }
             }
           },
-          "400": { "description": "The window is the 3D window, which has no slices." },
-          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "400": {
+            "description": "The window is the 3D window, which has no slices.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "500": { "$ref": "#/components/responses/InternalError" },
           "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
           "401": {
@@ -2627,7 +2630,7 @@
               }
             }
           },
-          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "422": {
             "description": "MITK rendering framework raised an error while applying the step.",
             "content": {

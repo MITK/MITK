@@ -222,16 +222,26 @@ namespace
   {
     for (mitk::MultiLabelSegmentation::GroupIndexType group = 0; group < seg.GetNumberOfGroups(); ++group)
     {
-      for (const auto &label : seg.GetConstLabelsByValue(seg.GetLabelValuesByGroup(group)))
+      const auto labelValues = seg.GetLabelValuesByGroup(group);
+      // A SEG holds at least one segment (the Segment Sequence is Type 1), and dcmqi reads the
+      // image of the first one without checking that there is one.
+      if (labelValues.empty())
+      {
+        mitkThrow() << "Cannot write group " << group << " as DICOM SEG: it has no labels, and a DICOM SEG needs "
+                    << "at least one segment. Add a label to the group or remove the group.";
+      }
+      for (const auto &label : seg.GetConstLabelsByValue(labelValues))
         CheckWritableLabel(*label, group);
     }
   }
 
-  // dcmqi needs the source series of every relation with per-slice source references for the
-  // Referenced Series Sequence, and the SOP Instance and SOP Class UIDs of each source image it
-  // references; DCMTK refuses an invalid one inside dcmqi. Relations without per-slice UIDs, such as
-  // those to images without DICOM tags, contribute no references. No mode can make these UIDs up,
-  // so they are checked before anything else, for the reasons given at CheckWritableLabels.
+  // Each Referenced Series item names its series, so every relation with per-slice source
+  // references must name a valid source series, although dcmqi today files all references under the
+  // series of the first item (see BuildSourceItemsFromProperties). dcmqi also needs the SOP Instance
+  // and SOP Class UIDs of each source image it references; DCMTK refuses an invalid UID inside dcmqi.
+  // Relations without per-slice UIDs, such as those to images without DICOM tags, contribute no
+  // references. No mode can make these UIDs up, so they are checked before anything else, for the
+  // reasons given at CheckWritableLabels.
   void CheckWritableSourceRelations(const mitk::MultiLabelSegmentation &seg)
   {
     for (const auto &relation : mitk::SegSourceImageRelationRule::GetSourceImageRelations(&seg))
@@ -1039,6 +1049,9 @@ namespace mitk
     if (constInput == nullptr)
       mitkThrow() << "Cannot write non-MultiLabelSegmentation data via DICOM SEG.";
     auto *input = const_cast<MultiLabelSegmentation *>(constInput);
+
+    if (0 == input->GetNumberOfGroups())
+      mitkThrow() << "Cannot write the segmentation: it has no groups.";
 
     const std::string synthesisMode = this->GetWriterChoiceOption(OPTION_SYNTHESIS_MODE);
     const std::string encoding = this->GetWriterChoiceOption(OPTION_ENCODING);

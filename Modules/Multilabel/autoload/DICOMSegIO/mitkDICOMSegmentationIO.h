@@ -84,7 +84,9 @@ namespace mitk
      * description), a description or Tracking ID that is no valid ST or UT value without it
      * (non-ASCII characters, or control characters other than TAB, LF, FF, CR and ESC), or a
      * Tracking UID that is no valid UID; only changing the label lets the write succeed.
-     * \throw mitk::Exception naming the relation for a source-image relation with per-slice UIDs
+     * \throw mitk::Exception if the segmentation has no groups; naming the group for a group without
+     * labels, as a DICOM SEG holds at least one segment; naming the relation for a source-image
+     * relation with per-slice UIDs
      * whose source series UID is missing or no valid UID, or one of whose slices has a SOP Instance
      * UID that is no valid UID or lacks a valid SOP Class UID (slices without a SOP Instance UID are
      * skipped); naming the attribute for a patient, study or frame of reference value that is no
@@ -95,9 +97,9 @@ namespace mitk
      * lies on a slice of the segmentation, or if dcmqi fails. A failure of ITK, of dcmqi or of saving
      * in a later group leaves the files of the earlier groups.
      *
-     * The labels, the UIDs of the relations and the patient, study and frame of reference values are
-     * checked first: before the strict-mode refusal, before synthetic mode changes the segmentation,
-     * and before any file is written.
+     * The groups and their labels, the UIDs of the relations and the patient, study and frame of
+     * reference values are checked first: before the strict-mode refusal, before synthetic mode
+     * changes the segmentation, and before any file is written.
      */
     void Write() override;
 

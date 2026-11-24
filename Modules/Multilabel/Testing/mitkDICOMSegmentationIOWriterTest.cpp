@@ -624,6 +624,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(WriteRefusesUnnamedLabelWithoutVoxelsWhoseDescriptionIsNoLOValue);
   MITK_TEST(WriteRefusesUnknownOptionValues);
   MITK_TEST(WriteRefusesUnwritableLabelBeforeTheContractCheck);
+  MITK_TEST(WriteRefusesSegmentationWithoutGroups);
+  MITK_TEST(WriteRefusesGroupsWithoutLabelsBeforeAnything);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1556,6 +1558,70 @@ public:
     auto strict = BuildSegWithRule(/*stampIdentity=*/false);
     strict->GetLabel(1)->SetName("Left\\Right");
     this->AssertWriteRefused(strict, {}, "unwritable-strict", Refusal::UnrepresentableValue, {"Left\\Right"});
+  }
+
+  // A segmentation without groups has nothing to write. It is refused before synthetic mode stamps
+  // it, and in strict mode before the refusal of an incomplete contract, which would promise that
+  // synthetic mode succeeds.
+  void WriteRefusesSegmentationWithoutGroups()
+  {
+    const auto withoutGroups = [](bool stampIdentity) {
+      auto seg = BuildSegWithRule(stampIdentity);
+      while (seg->GetNumberOfGroups() > 0)
+        seg->RemoveGroup(0);
+      return seg;
+    };
+
+    auto synthetic = withoutGroups(/*stampIdentity=*/false);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Patient ID", ReadStringProp(synthetic, 0x0010, 0x0020).empty());
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    const auto path = this->GetTempFilePath("no-groups-synthetic.dcm");
+    CPPUNIT_ASSERT_THROW_MESSAGE("Synthetic mode refuses the segmentation",
+                                 mitk::test::WriteWithWriter(synthetic, path, "DICOM Segmentation", options),
+                                 mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("No file is written", !FileExists(path));
+    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped",
+                           ReadStringProp(synthetic, 0x0010, 0x0020).empty() &&
+                             ReadStringProp(synthetic, 0x0020, 0x000D).empty());
+
+    this->AssertWriteRefused(withoutGroups(/*stampIdentity=*/false), {}, "no-groups-incomplete", Refusal::Plain, {"no groups"});
+    this->AssertWriteRefused(withoutGroups(/*stampIdentity=*/true), {}, "no-groups", Refusal::Plain, {"no groups"});
+  }
+
+  // A DICOM SEG holds at least one segment, so a group without labels is refused, before synthetic
+  // mode stamps the segmentation, before the strict-mode refusal and before any file is written. A
+  // new segmentation has one such group.
+  void WriteRefusesGroupsWithoutLabelsBeforeAnything()
+  {
+    auto geometryImage = mitk::Image::New();
+    unsigned int dim[3] = {4u, 4u, 3u};
+    geometryImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
+    auto fresh = mitk::MultiLabelSegmentation::New();
+    fresh->Initialize(geometryImage);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: one group without labels",
+                           1 == fresh->GetNumberOfGroups() && fresh->GetLabelValuesByGroup(0).empty());
+    CPPUNIT_ASSERT_MESSAGE("Precondition: the segmentation has no Patient ID", ReadStringProp(fresh, 0x0010, 0x0020).empty());
+
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    const auto path = this->GetTempFilePath("no-labels-synthetic.dcm");
+    CPPUNIT_ASSERT_THROW_MESSAGE("Synthetic mode refuses the group",
+                                 mitk::test::WriteWithWriter(fresh, path, "DICOM Segmentation", options),
+                                 mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("No file is written", !FileExists(path));
+    CPPUNIT_ASSERT_MESSAGE("The refused write leaves the segmentation unstamped",
+                           ReadStringProp(fresh, 0x0010, 0x0020).empty() &&
+                             ReadStringProp(fresh, 0x0020, 0x000D).empty());
+
+    this->AssertWriteRefused(fresh, {}, "no-labels-strict", Refusal::Plain, {"group 0", "no labels"});
+
+    auto laterGroup = BuildSegWithRule();
+    laterGroup->AddGroup();
+    const auto laterPath = this->GetTempFilePath("no-labels-later-group.dcm");
+    CPPUNIT_ASSERT_THROW_MESSAGE("The second group is refused", mitk::IOUtil::Save(laterGroup, laterPath), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("The first group has no file", !FileExists(laterPath));
+    CPPUNIT_ASSERT_MESSAGE("The second group has no file", !FileExists(GroupFilePath(laterPath, 1)));
   }
 
   void PropertyDrivenWriteSucceedsAndReloads()

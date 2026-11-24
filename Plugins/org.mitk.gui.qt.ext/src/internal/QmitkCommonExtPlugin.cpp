@@ -82,7 +82,7 @@ ctkPluginContext* QmitkCommonExtPlugin::getContext()
   return _context;
 }
 
-void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool globalReinit)
+void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool atStartup)
 {
   if (!arguments.empty())
   {
@@ -126,9 +126,16 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
              const std::string path(arguments[i].toStdString());
              auto addedNodes = mitk::IOUtil::Load(path, *dataStorage);
 
-             for (const auto& node : *addedNodes )
+             // At startup the Data Manager does not exist yet and later orders the
+             // nodes it finds by layer. Later loads are left to the Data Manager, as
+             // with File > Open; with the Data Manager closed, they keep their default
+             // layer.
+             if (atStartup)
              {
-               node->SetIntProperty("layer", argumentsAdded);
+               for (const auto& node : *addedNodes)
+               {
+                 node->SetIntProperty("layer", argumentsAdded);
+               }
              }
 
              argumentsAdded++;
@@ -143,7 +150,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
 
        mitk::RecentData::Add(recentData);
 
-       if (argumentsAdded > 0 && globalReinit)
+       if (argumentsAdded > 0 && atStartup)
        {
          // calculate bounding geometry
          mitk::RenderingManager::GetInstance()->InitializeViews(dataStorage->ComputeBoundingGeometry3D());

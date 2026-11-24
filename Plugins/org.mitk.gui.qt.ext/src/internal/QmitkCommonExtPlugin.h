@@ -31,7 +31,7 @@ public:
 
 private:
 
-  void loadDataFromDisk(const QStringList& args, bool globalReinit);
+  void loadDataFromDisk(const QStringList& args, bool atStartup);
   void startNewInstance(const QStringList& args, const QStringList &files);
 
 private Q_SLOTS:

@@ -346,7 +346,8 @@ RestServer::RestServer()
     "Query parameters: path (optional) lists only endpoints whose path starts with it, like "
     "/api/v1/manual; details=true adds what each endpoint takes and returns. "
     "Returns {data: [{method, path, summary, description?, experimental?}]}. Path parameters are written {name}. "
-    "Experimental endpoints may still change; the others are those of the REST API specification.";
+    "The endpoints marked experimental are those that plugins add; the others are those of the REST API "
+    "specification. Both may change with a release of MITK.";
   endpoints.Handler = [this](const RestRequest& request) { return this->HandleGET_endpoints(request); };
   m_Router->Add(std::move(endpoints));
 

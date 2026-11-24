@@ -2,6 +2,7 @@
 
 **Version:** 1.2.0
 **Date:** May 2, 2026
+**Status:** Experimental, see [Versioning Strategy](#sec-3-base-url-and-versioning)
 
 ---
 
@@ -100,9 +101,8 @@ http(s)://{host}:{port}/api/v{major}
 ### Versioning Strategy
 
 - Major version in URL path: `/api/v1/`, `/api/v2/`
-- Minor/patch versions are backwards-compatible (no URL change)
-- Breaking changes require new major version
-- Deprecation period: minimum 6 months
+- The API is experimental in this release of MITK: endpoints, answers and error codes may change from one MITK release to the next without a new major version and without a deprecation period
+- The release notes of MITK list such changes
 
 ### Version Discovery
 
@@ -112,17 +112,17 @@ GET /api/v1/info
 
 Returns API metadata including supported versions and deprecation notices.
 
-### Experimental Endpoints
+### Plugin Endpoints
 
-Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. They are experimental: until this specification documents them, they may change or go away without a new major version. The plugins offer these prefixes: Segmentation `/segmentation`, Measurement Toolbox `/statistics` and `/planar-figures`, Reports `/reports`, the REST API plugin `/workbench`, `/manual` and the window, crosshair and layout endpoints below `/rendering`. The endpoints of a prefix exist once their plugin is active, so a prefix can be missing from a Workbench that has not activated the plugin yet. An open Agent view adds `/mcp` for its own agent, which only that agent's token can use. They describe themselves:
+Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. This specification does not describe them, and like its own endpoints they may change or go away without a new major version. The plugins offer these prefixes: Segmentation `/segmentation`, Measurement Toolbox `/statistics` and `/planar-figures`, Reports `/reports`, the REST API plugin `/workbench`, `/manual` and the window, crosshair and layout endpoints below `/rendering`. The endpoints of a prefix exist once their plugin is active, so a prefix can be missing from a Workbench that has not activated the plugin yet. An open Agent view adds `/mcp` for its own agent, which only that agent's token can use. They describe themselves:
 
 ```http
 GET /api/v1/endpoints
 ```
 
-lists all endpoints with method, path and summary, and marks the experimental ones with `"experimental": true`. The query parameter `path` limits the list to paths that start with it; `details=true` adds what each endpoint takes and returns.
+lists all endpoints with method, path and summary, and marks the plugin endpoints, those that this specification does not describe, with `"experimental": true`. The query parameter `path` limits the list to paths that start with it; `details=true` adds what each endpoint takes and returns.
 
-Experimental endpoints refuse requests that a web page could send (403 `ACCESS_DENIED`): requests that carry an `Origin` header, requests with a `Sec-Fetch-Site` header other than `none` and `same-origin`, and requests whose `Host` header names neither `localhost`, an IP address, the host the server is configured with, the host name of the machine nor, over HTTPS, a name that the server's certificate covers (a browser reaches an HTTPS server only under such a name). Over HTTP, address the machine by its IP address or host name, or configure the server with its domain name as host. Browsers send these headers, other clients do not, so web pages cannot use these endpoints through the user's browser. A request without a `Host` header is not refused.
+Plugin endpoints refuse requests that a web page could send (403 `ACCESS_DENIED`): requests that carry an `Origin` header, requests with a `Sec-Fetch-Site` header other than `none` and `same-origin`, and requests whose `Host` header names neither `localhost`, an IP address, the host the server is configured with, the host name of the machine nor, over HTTPS, a name that the server's certificate covers (a browser reaches an HTTPS server only under such a name). Over HTTP, address the machine by its IP address or host name, or configure the server with its domain name as host. Browsers send these headers, other clients do not, so web pages cannot use these endpoints through the user's browser. A request without a `Host` header is not refused.
 
 Long-running work of these endpoints, like running a model, is a job below `/api/v1/jobs`. Jobs are shared by all clients of the server: every client can list and cancel them. A canceled job ends at once, while its work may still finish the step it is in, a download for example; it starts no further step. Until then the tool answers 409 `BUSY`, and `/api/v1/workbench/tasks` shows the work.
 
@@ -2052,7 +2052,7 @@ Content-Type: application/json
 
 Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. The 3D window has no slices and is answered with 400.
 
-The step is the position of the window's slice stepper. Depending on the orientation of the image, it can run opposite to the slice index that the Image Navigator shows. The experimental `/api/v1/rendering/windows` endpoints count slices like the Image Navigator.
+The step is the position of the window's slice stepper. Depending on the orientation of the image, it can run opposite to the slice index that the Image Navigator shows. The plugin endpoints below `/api/v1/rendering/windows` count slices like the Image Navigator.
 
 **Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 400 `INVALID_REQUEST`).
 

@@ -174,7 +174,11 @@ namespace mitk
      */
     void RequireToken(const std::string& token);
 
-    /** \brief Answer a POST of JSON-RPC messages as the endpoint does. */
+    /**
+     * \brief Answer a POST of JSON-RPC messages as the endpoint does.
+     *
+     * A body that is nested deeper than 64 levels is refused.
+     */
     RestResponse HandlePost(const RestRequest& request);
 
     /**

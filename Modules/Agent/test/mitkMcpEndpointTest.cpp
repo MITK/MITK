@@ -278,6 +278,7 @@ class mitkMcpEndpointTestSuite : public mitk::TestFixture
   MITK_TEST(TestNotificationGetsNoAnswer);
   MITK_TEST(TestDuplicateTool);
   MITK_TEST(TestParseError);
+  MITK_TEST(TestDeeplyNestedMessages);
   MITK_TEST(TestOfferedOnRestServer);
   MITK_TEST(TestWithdrawnEndpointRefusesRequestsThatHoldItsRoute);
   MITK_TEST(TestRequiredToken);
@@ -501,6 +502,39 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(400, response.Status);
     CPPUNIT_ASSERT_EQUAL(-32700, nlohmann::json::parse(response.Body)["error"]["code"].get<int>());
+  }
+
+  void TestDeeplyNestedMessages()
+  {
+    const auto endpoint = MakeEndpoint();
+
+    const auto nest = [](std::size_t depth) { return std::string(depth, '[') + std::string(depth, ']'); };
+    const auto ping = [](const std::string& params) {
+      return R"({"jsonrpc":"2.0","id":1,"method":"ping","params":{"value":)" + params + "}}";
+    };
+
+    mitk::RestRequest post;
+    post.Body = ping(nest(60));
+    CPPUNIT_ASSERT_EQUAL(200, endpoint->HandlePost(post).Status);
+
+    // Deep enough to exhaust the stack of what handles a message by recursion:
+    // a batch of batches, and the copy of the parameters of a request.
+    for (const auto& body : { nest(200000), ping(nest(200000)) })
+    {
+      post.Body = body;
+      const auto response = endpoint->HandlePost(post);
+
+      CPPUNIT_ASSERT_EQUAL(400, response.Status);
+      CPPUNIT_ASSERT_EQUAL(-32600, nlohmann::json::parse(response.Body)["error"]["code"].get<int>());
+    }
+
+    const auto batchInBatch = nlohmann::json::array({ nlohmann::json::array({ Request(1, "ping") }), Request(2, "ping") });
+    const auto responses = endpoint->HandleMessage(batchInBatch, mitk::RestRequest());
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), responses.size());
+    CPPUNIT_ASSERT_EQUAL(-32600, responses[0]["error"]["code"].get<int>());
+    CPPUNIT_ASSERT_EQUAL(2, responses[1]["id"].get<int>());
+    CPPUNIT_ASSERT(responses[1].contains("result"));
   }
 
   void TestOfferedOnRestServer()

@@ -30,6 +30,11 @@ namespace
   constexpr int MethodNotFound = -32601;
   constexpr int InvalidParams = -32602;
 
+  // Far deeper than the messages of the protocol and the bodies of the REST
+  // API go, and shallow enough for what handles a message by recursion:
+  // batches, and the copies and dumps of nlohmann::json.
+  constexpr int MaxNestingDepth = 64;
+
   nlohmann::json MakeError(const nlohmann::json& id, int code, const std::string& message)
   {
     return { { "jsonrpc", "2.0" }, { "id", id }, { "error", { { "code", code }, { "message", message } } } };
@@ -345,14 +350,25 @@ mitk::RestResponse mitk::McpEndpoint::HandlePost(const RestRequest& request)
   }
 
   nlohmann::json message;
+  bool tooDeep = false;
 
   try
   {
-    message = nlohmann::json::parse(request.Body);
+    // What is not kept is not built, however deep the body goes on.
+    message = nlohmann::json::parse(request.Body, [&tooDeep](int depth, nlohmann::json::parse_event_t, nlohmann::json&) {
+      tooDeep = tooDeep || depth > MaxNestingDepth;
+      return !tooDeep;
+    });
   }
   catch (const nlohmann::json::exception& e)
   {
     return MakeJsonResponse(MakeError(nullptr, ParseError, e.what()), 400);
+  }
+
+  if (tooDeep)
+  {
+    return MakeJsonResponse(MakeError(nullptr, InvalidRequest,
+      "The message is nested deeper than " + std::to_string(MaxNestingDepth) + " levels"), 400);
   }
 
   const auto answer = this->HandleMessage(message, request);
@@ -378,7 +394,10 @@ nlohmann::json mitk::McpEndpoint::HandleMessage(const nlohmann::json& message, c
 
     for (const auto& item : message)
     {
-      auto response = this->HandleMessage(item, request);
+      // A batch holds messages, no further batches.
+      auto response = item.is_array()
+        ? MakeError(nullptr, InvalidRequest, "Expected a JSON-RPC object")
+        : this->HandleMessage(item, request);
 
       if (!response.is_null())
         responses.push_back(std::move(response));

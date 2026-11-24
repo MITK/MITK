@@ -304,6 +304,15 @@ namespace mitk
      * Returns null if the node is not set or does not contain an image.*/
     MultiLabelSegmentation* GetPreviewSegmentation();
     const MultiLabelSegmentation* GetPreviewSegmentation() const;
+
+    /**
+     * \brief The time point that the preview is for, which a confirmation transfers.
+     *
+     * A lazy tool that ignores time point changes holds the preview of the
+     * time point of its last update only, wherever the user has gone since.
+     * For any other tool it is the selected time point.
+     */
+    TimePointType GetTimePointOfPreview() const;
     DataNode* GetPreviewSegmentationNode();
 
     /** Sets the opacity (0.0 - 1.0) used to render the preview

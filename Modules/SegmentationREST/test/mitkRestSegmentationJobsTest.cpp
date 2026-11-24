@@ -14,10 +14,12 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkLabelSetImage.h>
+#include <mitkRenderingManager.h>
 #include <mitkRestSegmentationJobs.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkToolManager.h>
 
 #include <QCoreApplication>
@@ -63,9 +65,10 @@ namespace
       this->WaitForWorkOffGUIThread();
     }
 
-    void DoUpdatePreview(const mitk::Image*, const mitk::Image*, mitk::MultiLabelSegmentation* preview, mitk::TimeStepType) override
+    void DoUpdatePreview(const mitk::Image*, const mitk::Image*, mitk::MultiLabelSegmentation* preview, mitk::TimeStepType timeStep) override
     {
-      mitk::ImageWriteAccessor accessor(preview->GetGroupImage(0));
+      auto* image = preview->GetGroupImage(0);
+      mitk::ImageWriteAccessor accessor(image, image->GetVolumeData(timeStep));
       auto* pixels = static_cast<mitk::MultiLabelSegmentation::LabelValueType*>(accessor.GetData());
       std::fill(pixels, pixels + 5, preview->GetAllLabelValues().back());
 
@@ -85,6 +88,7 @@ class mitkRestSegmentationJobsTestSuite : public mitk::TestFixture
   MITK_TEST(TestWaitingForAStartToEnd);
   MITK_TEST(TestDeactivatedToolFailsItsJob);
   MITK_TEST(TestPreviewLabelsAndVoxels);
+  MITK_TEST(TestPreviewIsMeasuredAtItsTimePoint);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -106,9 +110,15 @@ public:
     static char* argv[] = { name, nullptr };
     static QCoreApplication application(argc, argv);
 
-    unsigned int dimensions[] = { 4, 4, 4 };
+    this->StartTool(1);
+  }
+
+  /** Activates the tool for a new image and segmentation with the given number of time steps. */
+  void StartTool(unsigned int timeSteps)
+  {
+    unsigned int dimensions[] = { 4, 4, 4, timeSteps };
     auto reference = mitk::Image::New();
-    reference->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dimensions);
+    reference->Initialize(mitk::MakeScalarPixelType<unsigned char>(), timeSteps > 1 ? 4 : 3, dimensions);
     auto segmentation = mitk::MultiLabelSegmentation::New();
     segmentation->Initialize(reference);
     segmentation->AddLabel("Label", mitk::Color(), 0);
@@ -255,6 +265,30 @@ public:
     // The groups of the preview stand for those of the segmentation, so each label keeps its own.
     m_Tool->SetTransfersAllPreviewGroups(true);
     CPPUNIT_ASSERT_EQUAL(0, mitk::DescribeRestPreviewLabels(m_Tool, m_ToolManager, false)[1]["group"].get<int>());
+  }
+
+  void TestPreviewIsMeasuredAtItsTimePoint()
+  {
+    // A tool that keeps the preview of its last update when the time point changes.
+    m_Tool->Deactivated();
+    this->StartTool(3);
+    m_Tool->IsTimePointChangeAwareOff();
+
+    auto* navigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    navigation->SetInputWorldTimeGeometry(m_ToolManager->GetReferenceData(0)->GetData()->GetTimeGeometry());
+    navigation->Update();
+
+    m_Tool->UpdatePreview();
+    navigation->GetStepper()->SetPos(2);
+
+    const auto voxels = mitk::CountRestPreviewVoxels(m_Tool);
+    const auto labels = mitk::DescribeRestPreviewLabels(m_Tool, m_ToolManager, true);
+
+    navigation->GetStepper()->SetPos(0);
+    navigation->SetInputWorldTimeGeometry(nullptr);
+
+    CPPUNIT_ASSERT_EQUAL(std::uint64_t(5), voxels);
+    CPPUNIT_ASSERT_EQUAL(5, labels.at(1)["voxels"].get<int>());
   }
 };
 

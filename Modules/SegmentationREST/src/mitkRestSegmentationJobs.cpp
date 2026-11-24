@@ -14,11 +14,9 @@ found in the LICENSE file.
 
 #include <mitkException.h>
 #include <mitkLabelSetImage.h>
-#include <mitkRenderingManager.h>
 #include <mitkRestHelpers.h>
 #include <mitkRestSegmentation.h>
 #include <mitkRestTime.h>
-#include <mitkTimeNavigationController.h>
 #include <mitkToolManager.h>
 
 #include <QCoreApplication>
@@ -26,10 +24,10 @@ found in the LICENSE file.
 
 namespace
 {
-  mitk::RestTimeSelection GetSelectedTime()
+  mitk::RestTimeSelection GetTimeOfPreview(const mitk::SegWithPreviewTool* tool)
   {
     mitk::RestTimeSelection selection;
-    selection.TimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    selection.TimePoint = tool->GetTimePointOfPreview();
     return selection;
   }
 }
@@ -148,7 +146,7 @@ nlohmann::json mitk::DescribeRestPreviewLabels(SegWithPreviewTool* tool, ToolMan
   const auto* segmentation = working != nullptr ? dynamic_cast<const MultiLabelSegmentation*>(working->GetData()) : nullptr;
   const auto group = segmentation != nullptr ? nlohmann::json(segmentation->GetActiveLayer()) : nlohmann::json(nullptr);
 
-  auto labels = measure ? DescribeRestLabels(preview, GetSelectedTime()) : DescribeRestLabels(preview);
+  auto labels = measure ? DescribeRestLabels(preview, GetTimeOfPreview(tool)) : DescribeRestLabels(preview);
 
   for (auto& label : labels)
   {
@@ -168,7 +166,7 @@ std::uint64_t mitk::CountRestPreviewVoxels(SegWithPreviewTool* tool)
   if (preview == nullptr)
     return 0;
 
-  const auto timeSteps = GetSelectedTime().GetTimeSteps(preview);
+  const auto timeSteps = GetTimeOfPreview(tool).GetTimeSteps(preview);
 
   if (timeSteps.empty())
     return 0;

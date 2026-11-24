@@ -100,14 +100,16 @@ namespace mitk
    *        preview, which then stand for those of the segmentation.
    *
    * \param measure Whether the labels have voxels, volume_ml and center at
-   *                the selected time point.
+   *                the time point of the preview
+   *                (SegWithPreviewTool::GetTimePointOfPreview()).
    * \return An empty array while the tool has no preview.
    */
   MITKSEGMENTATIONREST_EXPORT nlohmann::json DescribeRestPreviewLabels(
     SegWithPreviewTool* tool, ToolManager* toolManager, bool measure);
 
   /**
-   * \brief The voxels of all labels of the preview at the selected time point.
+   * \brief The voxels of all labels of the preview at its time point
+   *        (SegWithPreviewTool::GetTimePointOfPreview()).
    *
    * A group that a tool writes into is left out: the count never waits for
    * the tool. 0 without a preview or without a time step at the time point.

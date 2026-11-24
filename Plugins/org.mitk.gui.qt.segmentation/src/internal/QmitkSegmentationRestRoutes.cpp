@@ -1504,7 +1504,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "unconfirmed result, one label per prompt, as GET .../labels describes labels but without value: group is the "
     "group that the confirm adds them to, that of the active label unless create_groups put a label into another "
     "one, which the confirm creates if the segmentation does not have it, and they get their values with the "
-    "confirm. voxels, volume_ml and center are those of GET .../labels at the selected time point.";
+    "confirm. voxels, volume_ml and center are those of GET .../labels at the time point of the run, which the "
+    "confirm transfers, also after another time point was selected.";
   voxTell.Handler = [server](const RestRequest& request) {
     const auto measure = IsRestMeasureRequested(request);
 
@@ -1864,7 +1865,8 @@ std::vector<mitk::RestRoute> mitk::CreateSegmentationRoutes(IRestServerService* 
     "false for licensed tasks without a license. The tasks are there once TotalSegmentator has started (initialized). "
     "preview_labels are the unconfirmed result of the last run, as GET .../labels describes labels but without "
     "value: group is the group of the active label, where the confirm adds them, and they get their values with the "
-    "confirm; voxels, volume_ml and center are those of GET .../labels at the selected time point. Device and "
+    "confirm; voxels, volume_ml and center are those of GET .../labels at the time point of the run, which the "
+    "confirm transfers, also after another time point was selected. Device and "
     "license are settings of the user.";
   totalSegmentator.Handler = [server](const RestRequest& request) {
     const auto measure = IsRestMeasureRequested(request);

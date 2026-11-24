@@ -365,6 +365,13 @@ const mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetPreviewSegmenta
   return dynamic_cast<MultiLabelSegmentation*>(m_PreviewSegmentationNode->GetData());
 }
 
+mitk::TimePointType mitk::SegWithPreviewTool::GetTimePointOfPreview() const
+{
+  return m_LazyDynamicPreviews && !m_IsTimePointChangeAware
+    ? m_LastTimePointOfUpdate
+    : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+}
+
 mitk::DataNode* mitk::SegWithPreviewTool::GetPreviewSegmentationNode()
 {
   return m_PreviewSegmentationNode;
@@ -703,14 +710,8 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview(std::optional
 
     if (resultSegmentationNode.IsNotNull())
     {
-      // A lazy tool that ignores time point changes holds the preview of the
-      // time point of its last update only, wherever the user has gone since.
       if (!timePoint.has_value())
-      {
-        timePoint = m_LazyDynamicPreviews && !m_IsTimePointChangeAware
-          ? m_LastTimePointOfUpdate
-          : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-      }
+        timePoint = this->GetTimePointOfPreview();
 
       auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
       if (nullptr == resultSegmentation)

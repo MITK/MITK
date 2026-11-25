@@ -252,15 +252,24 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     return;
   }
 
+  const float layerDepth = this->CalculateLayerDepth(renderer);
+  const bool layerDepthChanged = layerDepth != localStorage->m_LastLayerDepth;
+
+  if (layerDepthChanged && 0.0f == layerDepth)
+    MITK_WARN << "Layer value exceeds clipping range. Set to minimum instead.";
+
+  localStorage->m_LastLayerDepth = layerDepth;
+
   std::vector<mitk::MultiLabelSegmentation::GroupIndexType> outdatedGroups;
   auto currentTimestep = this->GetTimestep();
   if (isGeometryModified ||
       contentBecameValid ||
       localStorage->m_LastTimeStep!= currentTimestep ||
-      localStorage->m_NumberOfLayers != segmentation->GetNumberOfGroups())
+      localStorage->m_NumberOfLayers != segmentation->GetNumberOfGroups() ||
+      layerDepthChanged)
   {
     //if geometry is outdated or we have valid content again
-    // or a new time step or the number of groups where changed
+    // or a new time step or the number of groups or the layer depth were changed
     // -> all groups need regeneration
     outdatedGroups.resize(segmentation->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
@@ -774,7 +783,6 @@ float mitk::LabelSetImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *re
   if (depth > 0.0f)
   {
     depth = 0.0f;
-    MITK_WARN << "Layer value exceeds clipping range. Set to minimum instead.";
   }
   return depth;
 }

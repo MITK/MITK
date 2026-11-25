@@ -26,6 +26,9 @@ found in the LICENSE file.
 // VTK
 #include <vtkSmartPointer.h>
 
+// STL
+#include <optional>
+
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkPlaneSource;
@@ -170,6 +173,11 @@ namespace mitk
       /** \brief The PROPERTY_NAME_2D_OPACITY_SCALE() value baked into the current LUT, compared by value for the same
        * reason as m_LastNodeOpacity. */
       float m_LastOpacityScale = 1.0f;
+
+      /** \brief The layer depth of the last update with valid content, empty before the
+       * first one. Compared by value, as the depth depends on the "layer" property and
+       * on the camera clipping range. */
+      std::optional<float> m_LastLayerDepth;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

@@ -22,10 +22,12 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <vtkCamera.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 
 namespace
@@ -64,6 +66,7 @@ class mitkLabelSetImageVtkMapper2DTimeStepTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkLabelSetImageVtkMapper2DTimeStepTestSuite);
   MITK_TEST(TimeStepChanges_ReslicesNewTimeStep);
   MITK_TEST(PastDataEnd_BlanksAndBack_RegeneratesSlice);
+  MITK_TEST(LayerChanges_MovesPlane);
   CPPUNIT_TEST_SUITE_END();
 
   vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
@@ -190,6 +193,22 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The layer shows the textured plane again back at time step 2",
                            localStorage->m_Plane.GetPointer() ==
                              localStorage->m_LayerMapperVector.at(0)->GetInputAlgorithm());
+  }
+
+  void LayerChanges_MovesPlane()
+  {
+    // The 2D clipping range of CameraController::Fit(). Under VTK's default range,
+    // layer 5 would already be clamped.
+    m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(0.1, 1000000);
+    this->CreateUpdatedMapper();
+    auto* plane = m_Mapper->GetLocalStorage(m_Renderer)->m_Plane.GetPointer();
+    const double depth = plane->GetOrigin()[2];
+
+    m_Node->SetIntProperty("layer", 5);
+    m_Mapper->Update(m_Renderer);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The plane moves up by 10 per layer",
+                                         depth + 50.0, plane->GetOrigin()[2], mitk::eps);
   }
 };
 

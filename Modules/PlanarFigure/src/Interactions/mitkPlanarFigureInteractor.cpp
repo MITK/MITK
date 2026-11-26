@@ -341,7 +341,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("is_on_flat_plane", IsOnFlatPlane);
   CONNECT_CONDITION("is_placed_by_span", IsPlacedBySpan);
   CONNECT_CONDITION("is_stamp", IsStamp);
-  CONNECT_CONDITION("is_inside_slice", IsInsideSlice);
+  CONNECT_CONDITION("can_drop_stamp_here", CanDropStampHere);
   CONNECT_CONDITION("is_complete", IsComplete);
   CONNECT_CONDITION("is_hit", IsHit);
   CONNECT_CONDITION("is_beyond_drag_threshold", IsBeyondDragThreshold);
@@ -401,6 +401,25 @@ bool mitk::PlanarFigureInteractor::FilterEvents(InteractionEvent *interactionEve
 mitk::PlanarFigureInteractor::Feedback mitk::PlanarFigureInteractor::GetFeedback(const BaseRenderer *renderer) const
 {
   return renderer == m_Feedback.Renderer ? m_Feedback : Feedback{};
+}
+
+void mitk::PlanarFigureInteractor::SetBoundToImage(bool isBound)
+{
+  m_IsBoundToImage = isBound;
+}
+
+mitk::Point2D mitk::PlanarFigureInteractor::ClampIfBound(const PlanarFigure &figure, const Point2D &point) const
+{
+  return m_IsBoundToImage
+    ? ClampToPlane(figure.GetPlaneGeometry(), point)
+    : point;
+}
+
+mitk::Vector2D mitk::PlanarFigureInteractor::ClampOffsetIfBound(const PlanarFigure &figure, const Vector2D &offset) const
+{
+  return m_IsBoundToImage
+    ? ClampOffsetToPlane(figure.GetPlaneGeometry(), GetPositionsBoundToPlane(figure), offset)
+    : offset;
 }
 
 void mitk::PlanarFigureInteractor::SetFeedback(const Feedback &feedback, vtkRenderWindow *renderWindow)
@@ -672,7 +691,7 @@ bool mitk::PlanarFigureInteractor::IsStamp(const InteractionEvent *)
   return nullptr != figure && figure->IsBeingPlaced() && figure->IsShapeLocked() && figure->GetNumberOfControlPoints() > 0;
 }
 
-bool mitk::PlanarFigureInteractor::IsInsideSlice(const InteractionEvent *interactionEvent)
+bool mitk::PlanarFigureInteractor::CanDropStampHere(const InteractionEvent *interactionEvent)
 {
   const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
 
@@ -687,7 +706,7 @@ bool mitk::PlanarFigureInteractor::IsInsideSlice(const InteractionEvent *interac
   Point2D position;
   plane->Map(positionEvent->GetPositionInWorld(), position);
 
-  return ClampToPlane(plane, position) == position;
+  return !m_IsBoundToImage || ClampToPlane(plane, position) == position;
 }
 
 bool mitk::PlanarFigureInteractor::IsComplete(const InteractionEvent *)
@@ -724,7 +743,7 @@ bool mitk::PlanarFigureInteractor::IsValidPoint(const InteractionEvent *interact
   // The last point follows the mouse; the others are placed.
   const auto *plane = figure->GetPlaneGeometry();
   const auto *renderer = interactionEvent->GetSender();
-  const auto newPoint = PlanarFigureViewHelpers::ToDisplay(ClampToPlane(plane, *position), plane, renderer);
+  const auto newPoint = PlanarFigureViewHelpers::ToDisplay(this->ClampIfBound(*figure, *position), plane, renderer);
   const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer);
 
   for (std::size_t i = 0; i + 1 < numberOfControlPoints; ++i)
@@ -822,7 +841,6 @@ void mitk::PlanarFigureInteractor::Drag(StateMachineAction *, InteractionEvent *
   if (nullptr == figure || !position.has_value() || HitKind::None == m_Grab.Kind)
     return;
 
-  const auto *plane = figure->GetPlaneGeometry();
   const auto target = *position + m_GrabOffset;
 
   if (m_Grab.Handle.has_value())
@@ -833,11 +851,11 @@ void mitk::PlanarFigureInteractor::Drag(StateMachineAction *, InteractionEvent *
     if (*m_Grab.Handle >= handles.size())
       return;
 
-    figure->MoveHandle(*m_Grab.Handle, IsBoundToPlane(handles[*m_Grab.Handle].Role) ? ClampToPlane(plane, target) : target);
+    figure->MoveHandle(*m_Grab.Handle, IsBoundToPlane(handles[*m_Grab.Handle].Role) ? this->ClampIfBound(*figure, target) : target);
   }
   else
   {
-    figure->Translate(ClampOffsetToPlane(plane, GetPositionsBoundToPlane(*figure), target - figure->GetControlPoint(0)));
+    figure->Translate(this->ClampOffsetIfBound(*figure, target - figure->GetControlPoint(0)));
   }
 
   this->SetFeedback(GetHoverFeedback(interactionEvent, m_Grab.Handle), GetRenderWindow(interactionEvent));
@@ -914,7 +932,7 @@ void mitk::PlanarFigureInteractor::BeginPlacement(StateMachineAction *, Interact
     return;
 
   m_PressPosition = GetDisplayPosition(interactionEvent);
-  m_SpanStart = ClampToPlane(figure->GetPlaneGeometry(), *position);
+  m_SpanStart = this->ClampIfBound(*figure, *position);
 
   figure->BeginPlacement();
 
@@ -937,16 +955,14 @@ void mitk::PlanarFigureInteractor::MoveFloatingPoint(StateMachineAction *, Inter
   if (nullptr == figure || !position.has_value() || 0 == figure->GetNumberOfControlPoints())
     return;
 
-  const auto *plane = figure->GetPlaneGeometry();
-
   if (PlanarFigure::PlacementKind::Span == figure->GetPlacementKind())
   {
-    figure->SetFromSpan(m_SpanStart, IsSpanEndBoundToPlane(*figure) ? ClampToPlane(plane, *position) : *position);
+    figure->SetFromSpan(m_SpanStart, IsSpanEndBoundToPlane(*figure) ? this->ClampIfBound(*figure, *position) : *position);
   }
   else
   {
     auto points = figure->GetControlPoints();
-    points.back() = ClampToPlane(plane, *position);
+    points.back() = this->ClampIfBound(*figure, *position);
     figure->SetControlPoints(points);
   }
 
@@ -961,7 +977,7 @@ void mitk::PlanarFigureInteractor::AppendPoint(StateMachineAction *, Interaction
   if (nullptr == figure || !position.has_value() || 0 == figure->GetNumberOfControlPoints())
     return;
 
-  const auto point = ClampToPlane(figure->GetPlaneGeometry(), *position);
+  const auto point = this->ClampIfBound(*figure, *position);
 
   auto points = figure->GetControlPoints();
   points.back() = point;
@@ -1021,8 +1037,8 @@ void mitk::PlanarFigureInteractor::MoveStamp(StateMachineAction *, InteractionEv
   if (nullptr == figure || !this->IsOnFlatPlane(interactionEvent))
     return;
 
-  // A stamp is placed where the mouse is, so it is not offered beside the image.
-  if (!this->IsInsideSlice(interactionEvent))
+  // A bound stamp is placed where the mouse is, so it is not offered beside the image.
+  if (!this->CanDropStampHere(interactionEvent))
   {
     this->ShowStampIn(nullptr);
     return;
@@ -1036,7 +1052,7 @@ void mitk::PlanarFigureInteractor::MoveStamp(StateMachineAction *, InteractionEv
   if (!position.has_value())
     return;
 
-  figure->Translate(ClampOffsetToPlane(figure->GetPlaneGeometry(), GetPositionsBoundToPlane(*figure), *position - figure->GetControlPoint(0)));
+  figure->Translate(this->ClampOffsetIfBound(*figure, *position - figure->GetControlPoint(0)));
 
   this->ShowStampIn(renderer);
 }

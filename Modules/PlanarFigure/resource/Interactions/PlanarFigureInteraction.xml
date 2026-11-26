@@ -6,11 +6,11 @@
     </transition>
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="AwaitRelease">
       <condition name="is_stamp" />
-      <condition name="is_inside_slice" />
+      <condition name="can_drop_stamp_here" />
       <action name="move_stamp" />
       <action name="end_placement" />
     </transition>
-    <!-- Beside the image, a press places no stamp, and the armed stamp keeps it from other interaction. -->
+    <!-- Where the stamp cannot be dropped, a press places none, and the armed stamp keeps it from other interaction. -->
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Idle">
       <condition name="is_stamp" />
     </transition>

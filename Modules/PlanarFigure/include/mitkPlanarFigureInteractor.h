@@ -62,14 +62,16 @@ namespace mitk
    * by a span; one point per click for the others, finished by a double
    * click or Enter, where Backspace or Delete removes the last point. A
    * figure whose shape is locked follows the mouse until it is dropped by a
-   * click; beside the image it is hidden, and a click does not drop it.
+   * click; beside the image it is hidden, and a click does not drop it,
+   * unless the figure is unbound.
    *
    * Placed figures show their handles while hovered. Dragging a handle moves
    * it, dragging the stroke or the inside moves the whole figure. Pressing a
    * figure selects it. Centers and vertices stay within the bounds of the
-   * plane, extents of round figures may leave them. Figures that can insert
-   * control points take a new one by Ctrl+click on their stroke, which can be
-   * dragged right away, and lose one by Ctrl+click on it.
+   * plane, extents of round figures may leave them; SetBoundToImage(false)
+   * lifts this restriction. Figures that can insert control points take a
+   * new one by Ctrl+click on their stroke, which can be dragged right away,
+   * and lose one by Ctrl+click on it.
    *
    * The cursor of the render window shows what a press would do: a pointing
    * hand on handles, a move cursor on strokes and insides, and a crosshair
@@ -118,6 +120,13 @@ namespace mitk
     /** \brief The feedback for a render window; empty for other windows than the one interacted in. */
     Feedback GetFeedback(const BaseRenderer *renderer) const;
 
+    /**
+     * \brief Whether centers and vertices are kept within the bounds of the plane, true by default.
+     *
+     * Unbound figures can be placed, moved and dropped anywhere, also beside the image.
+     */
+    void SetBoundToImage(bool isBound);
+
   protected:
     PlanarFigureInteractor();
     ~PlanarFigureInteractor() override;
@@ -155,6 +164,12 @@ namespace mitk
     /** \brief Position of the event in plane coordinates of the figure, or nothing if the event is not in its plane. */
     std::optional<Point2D> GetPlanePosition(const InteractionEvent *interactionEvent) const;
 
+    /** \brief The point, pushed into the bounds of the plane of the figure if it is bound to the image. */
+    Point2D ClampIfBound(const PlanarFigure &figure, const Point2D &point) const;
+
+    /** \brief The offset, shortened if the figure is bound so that moving by it keeps the figure inside, or no further out. */
+    Vector2D ClampOffsetIfBound(const PlanarFigure &figure, const Vector2D &offset) const;
+
     /** \brief Where the position hits the figure, regardless of other figures. Held Ctrl turns hits into insertions and removals. */
     Hit HitTest(const InteractionPositionEvent *positionEvent, bool isControlHeld) const;
 
@@ -179,7 +194,7 @@ namespace mitk
     bool IsOnFlatPlane(const InteractionEvent *interactionEvent);
     bool IsPlacedBySpan(const InteractionEvent *interactionEvent);
     bool IsStamp(const InteractionEvent *interactionEvent);
-    bool IsInsideSlice(const InteractionEvent *interactionEvent);
+    bool CanDropStampHere(const InteractionEvent *interactionEvent);
     bool IsComplete(const InteractionEvent *interactionEvent);
     bool IsHit(const InteractionEvent *interactionEvent);
     bool IsBeyondDragThreshold(const InteractionEvent *interactionEvent);
@@ -214,6 +229,7 @@ namespace mitk
 
     double m_HitTolerance = DefaultHitTolerance;
     double m_DragThreshold = DefaultDragThreshold;
+    bool m_IsBoundToImage = true;
 
     Feedback m_Feedback;
 

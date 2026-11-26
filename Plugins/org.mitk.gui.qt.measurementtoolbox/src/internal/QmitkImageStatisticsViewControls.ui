@@ -186,6 +186,19 @@
               <item>
                <widget class="QmitkIntensityProfileVisualizationWidget" name="widget_intensityProfile" native="true"/>
               </item>
+              <item>
+               <widget class="QLabel" name="label_intensityProfileHint">
+                <property name="text">
+                 <string>The intensity profile needs the figure to lie completely inside the image.</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>

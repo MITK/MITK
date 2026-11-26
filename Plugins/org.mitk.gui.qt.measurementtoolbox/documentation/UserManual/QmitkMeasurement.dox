@@ -61,7 +61,7 @@ Measurements are placed on the slices of the reference image, so the render wind
 
 <h2>Fixed size</h2>
 
-Circles and rings can be placed with a fixed size, e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. While the circle or ring tool is active, check <i>Fixed size</i> below the tools and set the radius, and for rings the thickness. The measurement then follows the mouse over the image and is dropped by a click; beside the image it is hidden. The tool stays active, so you can place several measurements of the same size in a row; press Esc or click the tool again to stop. Their shape stays locked, so they can only be moved.
+Circles and rings can be placed with a fixed size, e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region. While the circle or ring tool is active, check <i>Fixed size</i> below the tools and set the radius, and for rings the thickness. The measurement then follows the mouse and is dropped by a click, also beside the image. The tool stays active, so you can place several measurements of the same size in a row; press Esc or click the tool again to stop. Their shape stays locked, so they can only be moved.
 
 <h2>Appearance</h2>
 
@@ -79,7 +79,7 @@ Further properties of a measurement can be changed in the Properties view.
 
 <h2>Modify measurements</h2>
 
-Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. The handles of a Bezier curve lie off the curve, so they are shown while it is selected as well. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Points and centers stay within the image; the size of circles and ellipses may exceed it. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open. The same holds for hovering: while the view is closed, neither handles nor labels that are shown on hover appear.
+Moving the mouse over a measurement shows its handles, and the cursor shows what a press would do. The handles of a Bezier curve lie off the curve, so they are shown while it is selected as well. Drag a handle to change the measurement, and drag its outline or its inside to move the whole measurement. Measurements can be drawn, changed and moved beyond the border of the image. Ctrl+click on the outline of a polygon or path inserts a point that can be dragged right away, and Ctrl+click on one of its points removes it. When a measurement is selected, the hint below the tools summarizes what can be done with it. Note that measurements can only be modified while the view is open. The same holds for hovering: while the view is closed, neither handles nor labels that are shown on hover appear.
 
 <h2>List of measurements</h2>
 

@@ -300,8 +300,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   }
 
   assert(positionEvent->GetSender()); // sure, right?
-  return GetAffectedImageSliceAs2DImageByTimePoint(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(),
-                                                   image, positionEvent->GetSender()->GetTime(), component);
+  // Same conversion as the mappers, so that tools edit the time step the views show.
+  const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
+  return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep,
+                                        component);
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry, const Image* image, TimePointType timePoint, unsigned int component /*= 0*/)

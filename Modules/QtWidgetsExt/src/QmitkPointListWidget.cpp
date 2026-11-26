@@ -222,7 +222,7 @@ void QmitkPointListWidget::OnBtnSavePoints()
 {
   if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData())) == nullptr)
     return; // don't write empty point sets. If application logic requires something else then do something else.
-  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData()))->GetSize() == 0)
+  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData()))->IsEmpty())
     return;
 
   // take the previously defined name of node as proposal for filename

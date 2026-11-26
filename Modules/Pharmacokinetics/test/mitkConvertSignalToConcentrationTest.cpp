@@ -26,6 +26,7 @@ class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkConvertSignalToConcentrationTestSuite);
   MITK_TEST(GetConvertedImageAbsoluteEnhancementTest);
   MITK_TEST(GetConvertedImageAbsoluteEnhancementAveragedBaselineTest);
+  MITK_TEST(GetConvertedImageAbsoluteEnhancementSingleLaterBaselineTest);
   MITK_TEST(GetConvertedImageRelativeEnhancementTest);
   MITK_TEST(GetConvertedImageturboFLASHTest);
   MITK_TEST(GetConvertedImageVFATest);
@@ -107,6 +108,30 @@ public:
       CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
     }
  }
+
+  void GetConvertedImageAbsoluteEnhancementSingleLaterBaselineTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(2);
+    m_concentrationGen->SetBaselineEndTimeStep(2);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(30.0);
+    refValues.push_back(280.0);
+    refValues.push_back(0.0);
+    refValues.push_back(80.0);
+
+    std::stringstream ss;
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using absolute enhancement with a single later baseline time step at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+  }
 
   void GetConvertedImageRelativeEnhancementTest()
   {

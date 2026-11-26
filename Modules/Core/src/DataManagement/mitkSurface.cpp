@@ -449,8 +449,8 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
   {
     const vtkPoints *pointsRight = rightHandSide.GetPoints();
     const vtkPoints *pointsLeft = leftHandSide.GetPoints();
-    unsigned int numberOfPointsRight = nullptr != pointsRight ? pointsRight->GetNumberOfPoints() : 0;
-    unsigned int numberOfPointsLeft = nullptr != pointsLeft ? pointsLeft->GetNumberOfPoints() : 0;
+    const vtkIdType numberOfPointsRight = nullptr != pointsRight ? pointsRight->GetNumberOfPoints() : 0;
+    const vtkIdType numberOfPointsLeft = nullptr != pointsLeft ? pointsLeft->GetNumberOfPoints() : 0;
     if (numberOfPointsLeft != numberOfPointsRight)
     {
       if (verbose)
@@ -460,13 +460,13 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
     }
     else
     {
-      for (unsigned int i(0); i < numberOfPointsRight; i++)
+      for (vtkIdType i(0); i < numberOfPointsRight; i++)
       {
         bool pointFound = false;
         double pointOne[3];
         rightHandSide.GetPoints()->GetPoint(i, pointOne);
 
-        for (unsigned int j(0); j < numberOfPointsLeft; j++)
+        for (vtkIdType j(0); j < numberOfPointsLeft; j++)
         {
           double pointTwo[3];
           leftHandSide.GetPoints()->GetPoint(j, pointTwo);

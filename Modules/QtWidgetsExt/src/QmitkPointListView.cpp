@@ -78,7 +78,7 @@ void QmitkPointListView::SetPointSetNode(mitk::DataNode *pointSetNode)
 
   const auto timeStep = m_PointListModel->GetTimeStep();
   this->setToolTip(TimeStepToolTip(timeStep));
-  emit SignalTimeStepChanged(static_cast<int>(timeStep));
+  emit this->SignalTimeStepChanged(static_cast<int>(timeStep));
 }
 
 const mitk::PointSet *QmitkPointListView::GetPointSet() const

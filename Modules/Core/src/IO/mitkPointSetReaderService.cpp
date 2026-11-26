@@ -190,10 +190,7 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
   }
   else
   {
-    if (currentTimeStep != newPointSet->GetTimeSteps() + 1)
-    {
-      newPointSet->Expand(currentTimeStep + 1); // expand time step series with empty time step
-    }
+    newPointSet->Expand(currentTimeStep + 1); // expand time step series with empty time step
   }
   return newPointSet;
 }

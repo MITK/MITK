@@ -203,7 +203,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   tabs->addTab(m_RecentDataPage, "Recent data");
 
   // Never selected automatically: it is an invitation, not a starting point.
-  tabs->addTab(m_ContributePage, "Contribute");
+  tabs->addTab(m_ContributePage, "Feedback && Contribution");
 
   // New users see the settings first, everyone else can pick up their work.
   // A few early starts bring up the tips instead.

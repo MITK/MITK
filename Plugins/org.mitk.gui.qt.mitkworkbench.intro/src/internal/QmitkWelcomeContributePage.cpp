@@ -58,12 +58,13 @@ QmitkWelcomeContributePage::QmitkWelcomeContributePage(const QmitkWelcomePalette
       { "https://github.com/MITK/MITK/blob/master/CONTRIBUTING.md", "Contribution guide" },
       { "https://docs.mitk.org/nightly/DeveloperManualPortal.html", "Developer manual" } })));
 
-  // GitHub renders the repository's CITATION.cff as "Cite this repository".
+  // The Zenodo concept DOI always resolves to the newest archived release and
+  // lists every version, so the link never needs updating per release.
   cards.push_back(this->CreateCard(":/org.mitk.gui.qt.welcomescreen/img/contribute/cite.svg", "Cite MITK",
     "Does MITK support your research? A citation helps us keep it going.",
     this->CreateLinks({
-      { "https://doi.org/10.1007/s11548-013-0840-8", "Paper (IJCARS 2013)" },
-      { "https://github.com/MITK/MITK", "Software citation" } })));
+      { "https://doi.org/10.5281/zenodo.1303375", "Software citation" },
+      { "https://doi.org/10.1007/s11548-013-0840-8", "Paper (IJCARS 2013)" } })));
 
   auto* grid = new QGridLayout;
   grid->setSpacing(16);

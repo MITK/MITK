@@ -61,7 +61,7 @@ The four window view of the standard display is the heart of the MITK image view
 
 \section MITKWorkbenchManualPage_Feedback Reporting a Problem
 
-<i>Help > Report a Problem / Send Feedback...</i> opens a dialog in which you can report a bug, request a feature, or share an idea. The <i>Contribute</i> tab of the welcome screen leads there as well.
+<i>Help > Report a Problem / Send Feedback...</i> opens a dialog in which you can report a bug, request a feature, or share an idea. The <i>Feedback &amp; Contribution</i> tab of the welcome screen leads there as well.
 
 The dialog guides you through three steps, shown at its top: <i>Describe</i>, <i>Include</i>, and <i>Send</i>. <i>Next</i> and <i>Back</i> below the steps move between them, and clicking a step goes there directly; the steps after <i>Describe</i> open once you have written a description. The report is assembled on your computer, and the dialog previews it next to the steps throughout; in a narrow window, <i>Show preview</i> brings it up. Nothing is sent automatically.
 

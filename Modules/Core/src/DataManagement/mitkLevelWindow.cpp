@@ -16,20 +16,35 @@ found in the LICENSE file.
 #include <mitkImageStatisticsHolder.h>
 
 #include <algorithm>
+#include <limits>
 #include <nlohmann/json.hpp>
 #include <utility>
 
 namespace
 {
-  std::pair<mitk::ScalarType, mitk::ScalarType> GetFiniteMinMax(const mitk::Image *image, mitk::TimeStepType t)
+  /* Extrema over the given time steps, an infinite extremum of a step replaced by its
+     second one. A step without a finite value needs no special case: ImageStatisticsHolder
+     leaves its second extrema at their initial values, the largest number for the minimum
+     and the lowest for the maximum, so they never win against a value of another step. */
+  std::pair<mitk::ScalarType, mitk::ScalarType> GetFiniteMinMax(const mitk::Image *image,
+                                                                 mitk::TimeStepType firstTimeStep,
+                                                                 mitk::TimeStepType timeStepCount)
   {
-    auto minValue = image->GetStatistics()->GetScalarValueMin(t);
-    if (!std::isfinite(minValue))
-      minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
+    auto minValue = std::numeric_limits<mitk::ScalarType>::infinity();
+    auto maxValue = -std::numeric_limits<mitk::ScalarType>::infinity();
 
-    auto maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
-    if (!std::isfinite(maxValue))
-      maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+    for (auto t = firstTimeStep; t < firstTimeStep + timeStepCount; ++t)
+    {
+      auto stepMin = image->GetStatistics()->GetScalarValueMin(t);
+      if (!std::isfinite(stepMin))
+        stepMin = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
+      minValue = std::min(minValue, stepMin);
+
+      auto stepMax = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
+      if (!std::isfinite(stepMax))
+        stepMax = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+      maxValue = std::max(maxValue, stepMax);
+    }
 
     return {minValue, maxValue};
   }
@@ -426,13 +441,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
 
   if (!std::isfinite(minValue) || !std::isfinite(maxValue))
   {
-    auto [finiteMin, finiteMax] = GetFiniteMinMax(image, firstCountedTimeStep);
-    for (auto t = firstCountedTimeStep + 1; t < firstCountedTimeStep + countedTimeSteps; ++t)
-    {
-      const auto [stepMin, stepMax] = GetFiniteMinMax(image, t);
-      finiteMin = std::min(finiteMin, stepMin);
-      finiteMax = std::max(finiteMax, stepMax);
-    }
+    const auto [finiteMin, finiteMax] = GetFiniteMinMax(image, firstCountedTimeStep, countedTimeSteps);
     if (!std::isfinite(minValue))
       minValue = finiteMin;
     if (!std::isfinite(maxValue))
@@ -498,13 +507,7 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  auto [minValue, maxValue] = GetFiniteMinMax(image, 0);
-  for (TimeStepType t = 1; t < image->GetDimension(3); ++t)
-  {
-    const auto [stepMinValue, stepMaxValue] = GetFiniteMinMax(image, t);
-    minValue = std::min(minValue, stepMinValue);
-    maxValue = std::max(maxValue, stepMaxValue);
-  }
+  const auto [minValue, maxValue] = GetFiniteMinMax(image, 0, image->GetDimension(3));
 
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);

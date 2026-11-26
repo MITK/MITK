@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkMitkWorkbenchIntroPart.h"
 
 #include "QmitkMitkWorkbenchIntroPlugin.h"
+#include "QmitkWelcomeContributePage.h"
 #include "QmitkWelcomePalette.h"
 #include "QmitkWelcomePersonalizationPage.h"
 #include "QmitkWelcomeRecentDataPage.h"
@@ -58,9 +59,9 @@ namespace
       "#welcomeContent #cardTitle { font-size: 20px; font-weight: bold; }"
       "#welcomeContent #tipsBox, #welcomeContent #welcomeCard { background-color: %2; border-radius: 16px; }"
       "#welcomeContent #optionList { background-color: %6; border-radius: 8px; }"
-      "#welcomeContent #nextTipButton { background-color: %2; border: 2px solid %3;"
+      "#welcomeContent #nextTipButton, #welcomeContent #cardButton { background-color: %2; border: 2px solid %3;"
       " color: %3; font-size: 18px; padding: 6px 14px; }"
-      "#welcomeContent #nextTipButton:hover { background-color: %3; color: %2; }"
+      "#welcomeContent #nextTipButton:hover, #welcomeContent #cardButton:hover { background-color: %3; color: %2; }"
       "#welcomeContent #clearButton { border: 1px solid %4; border-radius: 4px; color: %4;"
       " font-size: 14px; padding: 2px 10px; }"
       "#welcomeContent #clearButton:hover { border-color: %3; color: %3; }"
@@ -130,7 +131,8 @@ QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
   : m_Content(nullptr),
     m_Links(nullptr),
     m_TipsPage(nullptr),
-    m_RecentDataPage(nullptr)
+    m_RecentDataPage(nullptr),
+    m_ContributePage(nullptr)
 {
   auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
@@ -180,23 +182,28 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   m_Links = CreateLabel(QString());
   m_Links->setTextFormat(Qt::RichText);
   m_Links->setOpenExternalLinks(true);
+  QmitkWelcomeShowLinkTargets(m_Links);
   columnLayout->addWidget(m_Links);
 
   m_TipsPage = new QmitkWelcomeTipsPage(palette);
   auto* personalizationPage = new QmitkWelcomePersonalizationPage;
   m_RecentDataPage = new QmitkWelcomeRecentDataPage(this->GetIntroSite()->GetWorkbenchWindow(), palette);
+  m_ContributePage = new QmitkWelcomeContributePage(palette);
 
   // The size matches the aspect ratio of the light bulb, which is the only tab icon.
   auto* tabs = new QTabWidget;
   tabs->setIconSize(QSize(14, 20));
 
-  for (auto* page : std::initializer_list<QWidget*>{ m_TipsPage, personalizationPage, m_RecentDataPage })
+  for (auto* page : std::initializer_list<QWidget*>{ m_TipsPage, personalizationPage, m_RecentDataPage, m_ContributePage })
     page->setContentsMargins(0, 16, 0, 0);
 
   // The tips are rarely shown first, so their tab gets an eye-catching icon.
   tabs->addTab(m_TipsPage, QmitkIconTheme::GetIcon(QStringLiteral(":/org.mitk.gui.qt.welcomescreen/img/tips/lightbulb.svg")), "Tips");
   tabs->addTab(personalizationPage, "Personalization");
   tabs->addTab(m_RecentDataPage, "Recent data");
+
+  // Never selected automatically: it is an invitation, not a starting point.
+  tabs->addTab(m_ContributePage, "Feedback && Contribution");
 
   // New users see the settings first, everyone else can pick up their work.
   // A few early starts bring up the tips instead.
@@ -254,4 +261,5 @@ void QmitkMitkWorkbenchIntroPart::ApplyTheme()
   m_Links->setText(CreateLinksText(palette));
   m_TipsPage->SetPalette(palette);
   m_RecentDataPage->SetPalette(palette);
+  m_ContributePage->SetPalette(palette);
 }

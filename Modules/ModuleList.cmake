@@ -23,6 +23,7 @@ set(MITK_MODULES
   PlanarFigure
   ImageDenoising
   SceneSerialization
+  UserFeedback
   Gizmo
   GraphAlgorithms
   Multilabel

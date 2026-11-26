@@ -44,6 +44,13 @@ found in the LICENSE file.
 
 #include <usModuleInitialization.h>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include "QmitkCrashReportService.h"
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#endif
+
 US_INITIALIZE_MODULE
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = nullptr;
@@ -61,6 +68,14 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)
 
+#ifdef MITK_HAS_CRASHHANDLING
+  // Registered before any window advisor runs PostWindowOpen, so that the
+  // next-start crash dialog already offers "File report...".
+  m_CrashReportService = std::make_unique<QmitkCrashReportService>();
+  m_CrashReportRegistration =
+    us::GetModuleContext()->RegisterService<mitk::ICrashReportService>(m_CrashReportService.get());
+#endif
+
   if (qApp->metaObject()->indexOfSignal("messageReceived(QByteArray)") > -1)
   {
     connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
@@ -73,6 +88,14 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+#ifdef MITK_HAS_CRASHHANDLING
+  if (m_CrashReportRegistration)
+    m_CrashReportRegistration.Unregister();
+
+  m_CrashReportRegistration = {};
+  m_CrashReportService.reset();
+#endif
 
   this->_context = nullptr;
 }

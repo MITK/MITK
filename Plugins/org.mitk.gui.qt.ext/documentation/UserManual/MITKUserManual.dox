@@ -34,6 +34,7 @@ The Preferences dialogue allows you to adjust and save your general and view-spe
 
 This dialogue contains the user manuals view with the view-specific documentation, the welcome screen and information about MITK.
 "Diagnostic Data..." opens the list of saved crash dumps and diagnostic snapshots (see \ref MITKWorkbenchManualPage_CrashDumpDialog).
+"Report a Problem / Send Feedback..." lets you report a bug, request a feature, or share an idea (see \ref MITKWorkbenchManualPage_Feedback).
 
 \section MITKWorkbenchManualPage_Views Views
 
@@ -58,6 +59,40 @@ For a detailed description of the Image Navigator please be referred to the Imag
 
 The four window view of the standard display is the heart of the MITK image viewing. For a detailed description of the four window view and the levelwindow please be referred to the standard display view documentation:   \ref org_mitk_editors_stdmultiwidget.
 
+\section MITKWorkbenchManualPage_Feedback Reporting a Problem
+
+<i>Help > Report a Problem / Send Feedback...</i> opens a dialog in which you can report a bug, request a feature, or share an idea. The <i>Feedback &amp; Contribution</i> tab of the welcome screen leads there as well.
+
+The dialog guides you through three steps, shown at its top: <i>Describe</i>, <i>Include</i>, and <i>Send</i>. <i>Next</i> and <i>Back</i> below the steps move between them, and clicking a step goes there directly; the steps after <i>Describe</i> open once you have written a description. The report is assembled on your computer, and the dialog previews it next to the steps throughout; in a narrow window, <i>Show preview</i> brings it up. Nothing is sent automatically.
+
+<b>Describe:</b> choose whether you report a bug, request a feature, or share an idea, and describe it. The description is required.
+
+<b>Include:</b> choose what else goes into the report; <i>Details</i> lists the environment items and shows the log excerpts.
+
+<ul>
+  <li><b>System information</b> - the MITK version and revision, the build type, the versions of Qt, VTK and ITK, the operating system, the processor architecture, the language of the user interface, and the graphics adapter, if a display that has been shown in this session is open. You can leave out each of them. The name of your computer is never collected.</li>
+  <li><b>Log</b> - off by default. The end of the log of this session, at most its last 1000 lines and at most 512 KB. You can edit the excerpt before including it; an edited excerpt is marked as such in the report.</li>
+  <li><b>Screenshot</b> - off by default. Of the application window or of the display area, taken just before the dialog opened.</li>
+  <li><b>Images from files</b> - images of your own, for example a screenshot of something you saw earlier. Each is shown as a thumbnail and can be removed again. An image is read from its file when the report is saved; if the file changed since you added it, the dialog reloads it, returns to this step, and asks you to confirm sharing again, and if the file is gone or can no longer be read, the image is removed from the report. Adding a listed file again reloads it as well.</li>
+  <li><b>Crash dumps</b> - off by default, and offered only if crash dumps are saved on your computer (see below).</li>
+</ul>
+
+<b>Send:</b> logs, screenshots, images, and crash dumps can contain patient-related information, such as file paths, names, images, or parts of the application's memory. As soon as one of them is included, this step asks you to confirm that you are permitted to share it before the report can be handed off. Then hand off the report by a program of your choice:
+
+<ul>
+  <li><b>Email to the MITK team</b> (<i>Send email...</i>) saves the report as a .zip file and opens your mail program with a message to the MITK team, and the folder that contains the file. Mail programs cannot be handed a file this way, so drag the .zip file into the message before sending it; a note at the top of the message reminds you and can then be deleted.</li>
+  <li><b>GitHub issue</b> (<i>Open issue...</i>) saves the .zip file and opens a prefilled issue on GitHub in your web browser. It also opens the folder that contains the file: drag the .zip file into the issue text before submitting. GitHub issues are public, so this is only available without crash dumps, and an included log, screenshot, or image needs your additional confirmation, shown in this row, that it may be published.</li>
+  <li><b>Report file only</b> (<i>Show file</i>) saves the .zip file and shows it in your file manager, so you can pass it on in any other way.</li>
+</ul>
+
+The .zip file is saved in a temporary folder and is kept when the dialog closes; the system may clean up temporary folders later, so move the file if you want to keep it. Saving again replaces the previous file. Prefilled messages and issues name it by file name only. If your mail program or web browser cannot be started, for example without a network connection, the file is saved anyway and you can show it in your file manager. For files larger than 25 MB the dialog warns that GitHub and many mail servers reject attachments of that size.
+
+\subsection MITKWorkbenchManualPage_Feedback_CrashDumps Reports with crash dumps
+
+A report filed with <i>File report...</i> from the crash dump dialogs is a bug report that includes the passed dumps; you can uncheck any of them. A report started from the Help menu or the welcome screen offers all saved dumps instead: on the <i>Include</i> step, check <i>Crash dumps</i> and then the dumps that belong to the problem. For each included dump, a copy of the log of the session that produced it is offered as a further log excerpt. A crash dump is a snapshot of parts of the application's memory that you cannot review before sending it, so a report with crash dumps is sent by email to the MITK team and never to the public issue tracker. GitHub remains available for feature requests, ideas, and bugs without crash dumps.
+
+You can choose to delete the included dumps from this computer when you close the dialog. Only dumps in a saved .zip file that still exists at that point are deleted; if the file is gone, the dumps are kept and the dialog tells you so. The .zip file is then the only copy of the deleted dumps, and it lies in a temporary folder that the system may clean up, so pass it on or move it first. The copy of the session log that is kept with a dump is deleted too; the .zip file contains at most an excerpt of it, and only if you included that log.
+
 \section MITKWorkbenchManualPage_CrashDumpDialog Diagnostic Data After a Crash
 
 If MITK closed unexpectedly, or had to be terminated while it was not responding, a diagnostic snapshot (crash dump) of that session is saved on your computer. On the next start, a dialog lists the saved dumps with their kind and the MITK version that produced them, and asks what to do with them:
@@ -65,7 +100,7 @@ If MITK closed unexpectedly, or had to be terminated while it was not responding
 <ul>
   <li><b>Keep for later</b> keeps the dumps, so you can hand them in with a problem report. They can be found later under <i>Help > Diagnostic Data...</i>.</li>
   <li><b>Remove</b> (the default, also chosen when you simply close the dialog) deletes them immediately.</li>
-  <li><b>File report...</b> appears only when a problem-report feature is installed. It keeps the dumps and passes them on to that feature.</li>
+  <li><b>File report...</b> keeps the dumps and opens a problem report that includes them (see \ref MITKWorkbenchManualPage_Feedback). There you can also choose to delete the dumps once they are in a saved report.</li>
 </ul>
 
 Either way, the dialog does not show these dumps again.
@@ -74,7 +109,7 @@ A crash dump contains parts of the application's memory from the crashed session
 
 \subsection MITKWorkbenchManualPage_CrashDumpDialog_Manager Diagnostic Data
 
-<i>Help > Diagnostic Data...</i> lists all saved dumps: crash dumps, dumps of terminated unresponsive sessions, and snapshots captured with "Capture diagnostics" from an error message. For each dump it shows when it was written, its size, the MITK version, whether a copy of that session's log file was kept with it, and whether it is new or was already shown. You can show a dump in the file manager, open its log, copy its path, and delete selected or all dumps. Deleting cannot be undone.
+<i>Help > Diagnostic Data...</i> lists all saved dumps: crash dumps, dumps of terminated unresponsive sessions, and snapshots captured with "Capture diagnostics" from an error message. For each dump it shows when it was written, its size, the MITK version, whether a copy of that session's log file was kept with it, and whether it is new or was already shown. You can show a dump in the file manager, open its log, copy its path, file a report with the selected dumps, and delete selected or all dumps. Deleting cannot be undone.
 
 \subsection MITKWorkbenchManualPage_CrashDumpDialog_Preferences Preferences
 

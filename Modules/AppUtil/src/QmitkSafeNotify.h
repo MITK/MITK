@@ -120,13 +120,35 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
       }
       else if (reportButton != nullptr && resultBox.clickedButton() == reportButton)
       {
-        for (const auto &dump : mitk::CrashDumpFacility::ListAllDumps())
+        const auto reportFailed = [](const QString &reason)
         {
-          if (dump.Path == *snapshot)
+          MITK_ERROR << "The report could not be started: " << reason.toStdString();
+
+          QMessageBox failureBox;
+          failureBox.setIcon(QMessageBox::Warning);
+          failureBox.setText("The report could not be started.");
+          failureBox.setDetailedText(reason);
+          failureBox.exec();
+        };
+
+        try
+        {
+          for (const auto &dump : mitk::CrashDumpFacility::ListAllDumps())
           {
-            mitk::FileCrashReport({ dump }, nullptr);
-            break;
+            if (dump.Path == *snapshot)
+            {
+              mitk::FileCrashReport({ dump }, nullptr);
+              break;
+            }
           }
+        }
+        catch (const std::exception &e)
+        {
+          reportFailed(e.what());
+        }
+        catch (...)
+        {
+          reportFailed("Unknown exception");
         }
       }
     }

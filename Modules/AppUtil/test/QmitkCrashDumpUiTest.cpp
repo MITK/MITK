@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <usServiceRegistration.h>
 
 #include <QDialog>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QPointer>
 #include <QPushButton>
@@ -43,14 +44,33 @@ namespace
   class TestReportService : public mitk::ICrashReportService
   {
   public:
-    void FileReport(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget*) override
+    void FileReport(const std::vector<mitk::CrashDumpInfo>& dumps, QWidget* parent) override
     {
       Received = dumps;
       ++Calls;
+
+      if (DeleteReceived)
+      {
+        for (const auto& dump : dumps)
+          mitk::CrashDumpFacility::DeleteDump(dump.Path);
+
+        QmitkCrashDumpManagerDialog::RefreshIfOpen();
+      }
+
+      if (OnReport)
+        OnReport(parent);
     }
 
     std::vector<mitk::CrashDumpInfo> Received;
     int Calls = 0;
+
+    /** Like a report flow whose user asked to delete the reported dumps: it
+     *  deletes them and refreshes an open manager, as QmitkRunFeedbackDialog does. */
+    bool DeleteReceived = false;
+
+    /** Runs at the end of FileReport() with the widget the caller passed as
+     *  parent; stands in for a report flow that opens a dialog of its own. */
+    std::function<void(QWidget*)> OnReport;
   };
 
   std::vector<QWidget*> VisibleManagers()
@@ -89,9 +109,17 @@ class QmitkCrashDumpUiTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkCrashDumpUiTestSuite);
   MITK_TEST(ListWidgetShowsColumnsAndSelection);
+  MITK_TEST(ListWidgetCheckableMode);
+  MITK_TEST(ListWidgetFocusFollowsInteraction);
+  MITK_TEST(ListWidgetKeyboardTogglesWithoutSelection);
+  MITK_TEST(ListWidgetArrowKeysMoveTheCurrentRowWithoutSelection);
   MITK_TEST(NoReportServiceMeansNoReportButton);
   MITK_TEST(ManagerIsSingleInstanceAndReportsTheSelection);
   MITK_TEST(ManagerReturnsToItsParentWhenTheModalFinishes);
+  MITK_TEST(ManagerIsNotReparentedUnderItsOwnReportDialog);
+  MITK_TEST(ManagerRefreshesWhenTheReportFlowDeletes);
+  MITK_TEST(ManagerKeepsItsSelectionWhenTheReportDeletesNothing);
+  MITK_TEST(RefreshIfOpenUpdatesAnOpenManager);
   MITK_TEST(NextStartDialogKeepAcknowledges);
   MITK_TEST(NextStartDialogCloseRemoves);
   MITK_TEST(NextStartDialogFileReportKeepsTheDumps);
@@ -211,6 +239,134 @@ public:
     CPPUNIT_ASSERT(m_CrashDump == selected[1].Path);
   }
 
+  void ListWidgetCheckableMode()
+  {
+    QmitkCrashDumpListWidget widget;
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+    CPPUNIT_ASSERT_MESSAGE("not checkable by default", widget.GetCheckedDumps().empty());
+
+    int checkedChanges = 0;
+    QObject::connect(&widget, &QmitkCrashDumpListWidget::CheckedChanged, [&checkedChanges] { ++checkedChanges; });
+
+    widget.SetCheckable(true);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), widget.GetCheckedDumps().size());
+
+    auto* tree = widget.findChild<QTreeWidget*>("crashDumpTree");
+    checkedChanges = 0;
+    tree->topLevelItem(1)->setCheckState(QmitkCrashDumpListWidget::KindColumn, Qt::Unchecked);
+    CPPUNIT_ASSERT_EQUAL(1, checkedChanges);
+
+    const auto checked = widget.GetCheckedDumps();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), checked.size());
+    CPPUNIT_ASSERT(m_FreezeDump == checked[0].Path);
+    CPPUNIT_ASSERT(m_CrashDump == checked[1].Path);
+
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("new dumps start checked", std::size_t(3), widget.GetCheckedDumps().size());
+
+    checkedChanges = 0;
+    widget.SetAllChecked(false);
+    CPPUNIT_ASSERT(widget.GetCheckedDumps().empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("one notification for all rows", 1, checkedChanges);
+    widget.SetAllChecked(true);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), widget.GetCheckedDumps().size());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Crash"), QmitkCrashDumpListWidget::KindLabel(mitk::DumpKind::Crash).toStdString());
+  }
+
+  void ListWidgetFocusFollowsInteraction()
+  {
+    // A checkable list is operated from the keyboard (the arrow keys move
+    // between the rows, Space toggles a check box), so it takes focus even
+    // when it does not select.
+    const auto focusPolicy = [](const QmitkCrashDumpListWidget& widget) {
+      return static_cast<int>(widget.findChild<QTreeWidget*>("crashDumpTree")->focusPolicy());
+    };
+    const int strongFocus = static_cast<int>(Qt::StrongFocus);
+    const int noFocus = static_cast<int>(Qt::NoFocus);
+
+    const QmitkCrashDumpListWidget selectable;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("a selectable list takes focus", strongFocus, focusPolicy(selectable));
+
+    QmitkCrashDumpListWidget readOnly;
+    readOnly.SetSelectionEnabled(false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("a read-only list takes no focus", noFocus, focusPolicy(readOnly));
+
+    QmitkCrashDumpListWidget checkableThenReadOnly;
+    checkableThenReadOnly.SetCheckable(true);
+    checkableThenReadOnly.SetSelectionEnabled(false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("checkable, then selection disabled", strongFocus, focusPolicy(checkableThenReadOnly));
+
+    QmitkCrashDumpListWidget readOnlyThenCheckable;
+    readOnlyThenCheckable.SetSelectionEnabled(false);
+    readOnlyThenCheckable.SetCheckable(true);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("selection disabled, then checkable", strongFocus, focusPolicy(readOnlyThenCheckable));
+
+    readOnlyThenCheckable.SetCheckable(false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("a list that is neither selectable nor checkable takes no focus", noFocus,
+      focusPolicy(readOnlyThenCheckable));
+  }
+
+  void ListWidgetKeyboardTogglesWithoutSelection()
+  {
+    QmitkCrashDumpListWidget widget;
+    widget.SetCheckable(true);
+    widget.SetSelectionEnabled(false);
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), widget.GetCheckedDumps().size());
+
+    auto* tree = widget.findChild<QTreeWidget*>("crashDumpTree");
+    tree->setCurrentItem(tree->topLevelItem(0));
+
+    QKeyEvent down(QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier);
+    QApplication::sendEvent(tree, &down);
+    CPPUNIT_ASSERT_MESSAGE("the arrow keys move the current row", tree->currentItem() == tree->topLevelItem(1));
+
+    // The item delegate toggles the check box on the key press of Space.
+    QKeyEvent space(QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier);
+    QApplication::sendEvent(tree, &space);
+
+    const auto checked = widget.GetCheckedDumps();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Space unchecks the current row only", std::size_t(2), checked.size());
+    CPPUNIT_ASSERT(m_FreezeDump == checked[0].Path);
+    CPPUNIT_ASSERT(m_CrashDump == checked[1].Path);
+    CPPUNIT_ASSERT_MESSAGE("operating the check boxes selects nothing", tree->selectedItems().isEmpty());
+  }
+
+  void ListWidgetArrowKeysMoveTheCurrentRowWithoutSelection()
+  {
+    QmitkCrashDumpListWidget widget;
+    widget.SetCheckable(true);
+    widget.SetSelectionEnabled(false);
+    widget.SetDumps(mitk::CrashDumpFacility::ListAllDumps());
+
+    auto* tree = widget.findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+    tree->setCurrentItem(nullptr);
+
+    const auto press = [tree](Qt::Key key) {
+      QKeyEvent event(QEvent::KeyPress, key, Qt::NoModifier);
+      QApplication::sendEvent(tree, &event);
+    };
+
+    press(Qt::Key_Down);
+    CPPUNIT_ASSERT_MESSAGE("Down without a current row goes to the first", tree->currentItem() == tree->topLevelItem(0));
+
+    press(Qt::Key_Down);
+    CPPUNIT_ASSERT_MESSAGE("Down", tree->currentItem() == tree->topLevelItem(1));
+
+    press(Qt::Key_Up);
+    CPPUNIT_ASSERT_MESSAGE("Up", tree->currentItem() == tree->topLevelItem(0));
+
+    press(Qt::Key_End);
+    CPPUNIT_ASSERT_MESSAGE("End", tree->currentItem() == tree->topLevelItem(2));
+
+    press(Qt::Key_Home);
+    CPPUNIT_ASSERT_MESSAGE("Home", tree->currentItem() == tree->topLevelItem(0));
+
+    CPPUNIT_ASSERT_MESSAGE("moving the current row selects nothing", tree->selectedItems().isEmpty());
+  }
+
   void NoReportServiceMeansNoReportButton()
   {
     CPPUNIT_ASSERT(!mitk::IsCrashReportServiceAvailable());
@@ -277,6 +433,109 @@ public:
 
     manager->close();
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+  }
+
+  void ManagerIsNotReparentedUnderItsOwnReportDialog()
+  {
+    bool becameChild = false;
+
+    // The report dialog is a child of the manager that started it.
+    m_Service.OnReport = [&becameChild](QWidget* parent) {
+      QDialog reportDialog(parent);
+
+      auto* timer = WhenModalDialogShows([&](QWidget*) {
+        QmitkCrashDumpManagerDialog::ShowManager();
+        becameChild = parent->parentWidget() == &reportDialog;
+
+        // A parent cycle would delete the manager together with the dialog.
+        // Breaking it makes the assertion below fail instead of crashing the
+        // test driver; the manager is shown again for tearDown to close it.
+        if (becameChild)
+        {
+          parent->setParent(nullptr, parent->windowFlags());
+          parent->show();
+        }
+
+        reportDialog.close();
+      });
+
+      reportDialog.exec();
+      delete timer;
+    };
+
+    this->RegisterService();
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* manager = VisibleManagers().front();
+
+    auto* tree = manager->findChild<QTreeWidget*>("crashDumpTree");
+    tree->topLevelItem(1)->setSelected(true);
+
+    manager->findChild<QPushButton*>("fileReportButton")->click();
+
+    CPPUNIT_ASSERT_EQUAL(1, m_Service.Calls);
+    CPPUNIT_ASSERT_MESSAGE("the manager must not become a child of the dialog it opened", !becameChild);
+  }
+
+  void ManagerRefreshesWhenTheReportFlowDeletes()
+  {
+    m_Service.DeleteReceived = true;
+    this->RegisterService();
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* manager = VisibleManagers().front();
+
+    auto* tree = manager->findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+    tree->topLevelItem(1)->setSelected(true);
+
+    manager->findChild<QPushButton*>("fileReportButton")->click();
+
+    CPPUNIT_ASSERT(!std::filesystem::exists(m_OnDemandDump));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("dumps the report flow deleted leave the open manager", 2, tree->topLevelItemCount());
+  }
+
+  void ManagerKeepsItsSelectionWhenTheReportDeletesNothing()
+  {
+    m_Service.DeleteReceived = false;
+    this->RegisterService();
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* manager = VisibleManagers().front();
+
+    auto* tree = manager->findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+    tree->topLevelItem(1)->setSelected(true);
+
+    auto* reportButton = manager->findChild<QPushButton*>("fileReportButton");
+    auto* deleteButton = manager->findChild<QPushButton*>("deleteButton");
+    CPPUNIT_ASSERT(reportButton->isEnabled());
+    CPPUNIT_ASSERT(deleteButton->isEnabled());
+
+    reportButton->click();
+
+    CPPUNIT_ASSERT_EQUAL(1, m_Service.Calls);
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+    CPPUNIT_ASSERT_MESSAGE("a report that deleted nothing leaves the selection", tree->topLevelItem(1)->isSelected());
+    CPPUNIT_ASSERT_MESSAGE("the selection keeps the report button enabled", reportButton->isEnabled());
+    CPPUNIT_ASSERT_MESSAGE("the selection keeps the delete button enabled", deleteButton->isEnabled());
+  }
+
+  void RefreshIfOpenUpdatesAnOpenManager()
+  {
+    CPPUNIT_ASSERT_MESSAGE("no manager is open", VisibleManagers().empty());
+    QmitkCrashDumpManagerDialog::RefreshIfOpen();
+    CPPUNIT_ASSERT(VisibleManagers().empty());
+
+    QmitkCrashDumpManagerDialog::ShowManager();
+    auto* tree = VisibleManagers().front()->findChild<QTreeWidget*>("crashDumpTree");
+    CPPUNIT_ASSERT_EQUAL(3, tree->topLevelItemCount());
+
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::DeleteDump(m_OnDemandDump));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("the list is not live", 3, tree->topLevelItemCount());
+
+    QmitkCrashDumpManagerDialog::RefreshIfOpen();
+    CPPUNIT_ASSERT_EQUAL(2, tree->topLevelItemCount());
   }
 
   void NextStartDialogKeepAcknowledges()

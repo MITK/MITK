@@ -2,6 +2,17 @@
     <qresource prefix="/org.mitk.gui.qt.ext">
         <file>dicom.svg</file>
         <file>Editor.svg</file>
+        <file>feedback/bug.svg</file>
+        <file>feedback/diagnostics.svg</file>
+        <file>feedback/email.svg</file>
+        <file>feedback/feature.svg</file>
+        <file>feedback/file.svg</file>
+        <file>feedback/idea.svg</file>
+        <file>feedback/images.svg</file>
+        <file>feedback/log.svg</file>
+        <file>feedback/public.svg</file>
+        <file>feedback/screenshot.svg</file>
+        <file>feedback/system.svg</file>
         <file>image_navigator.svg</file>
         <file>index.html</file>
         <file>toolbar_extension_horizontal.svg</file>

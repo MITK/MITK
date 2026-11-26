@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 class QLabel;
 class QWidget;
+class QmitkWelcomeContributePage;
 class QmitkWelcomeRecentDataPage;
 class QmitkWelcomeTipsPage;
 
@@ -27,8 +28,9 @@ class QmitkWelcomeTipsPage;
  * \ingroup org_mitk_gui_qt_welcomescreen_internal
  * \brief Welcome screen shown in the editor area of the MITK Workbench.
  *
- * Introduces the Workbench with a short description above three tabs: usage
- * tips, the most common settings, and recently opened data. A few early starts
+ * Introduces the Workbench with a short description above four tabs: usage
+ * tips, the most common settings, recently opened data, and ways to
+ * contribute to MITK. A few early starts
  * of the Workbench show a particular tip first. Otherwise, the recent data is
  * shown first if there is any, else the settings, so that new users see them
  * first. The screen follows the application theme at runtime.
@@ -56,6 +58,7 @@ private:
   QLabel* m_Links;
   QmitkWelcomeTipsPage* m_TipsPage;
   QmitkWelcomeRecentDataPage* m_RecentDataPage;
+  QmitkWelcomeContributePage* m_ContributePage;
 };
 
 #endif

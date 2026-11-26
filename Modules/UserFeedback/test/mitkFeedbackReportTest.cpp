@@ -1,0 +1,230 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include <mitkFeedbackBundle.h>
+#include <mitkFeedbackReport.h>
+
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+
+class mitkFeedbackReportTestSuite : public mitk::TestFixture
+{
+  CPPUNIT_TEST_SUITE(mitkFeedbackReportTestSuite);
+  MITK_TEST(ReportTextHasDescriptionAndIncludedItemsOnly);
+  MITK_TEST(ReportTextListsIncludedLogsWithEditedNote);
+  MITK_TEST(ReportTextListsAttachmentsByDescriptionNeverByPath);
+  MITK_TEST(ReportTextStatesTheConfirmationOnlyWhenGiven);
+  MITK_TEST(DescriptionHtmlIsEscapedInTheReport);
+  MITK_TEST(DescriptionEscapingKeepsCodeAndExistingEscapes);
+  MITK_TEST(SharingConfirmationIsNeededForEveryPhiCapableItem);
+  MITK_TEST(PublicTrackerGate);
+  MITK_TEST(UserImagesAreReviewableScreenshots);
+  CPPUNIT_TEST_SUITE_END();
+
+  static mitk::FeedbackReport TextOnlyReport()
+  {
+    mitk::FeedbackReport report;
+    report.description = "The viewer freezes when scrolling.";
+    report.environment = { { mitk::EnvironmentField::MitkVersion, "2026.06", true },
+                          { mitk::EnvironmentField::OperatingSystem, "Test OS", false } };
+    return report;
+  }
+
+  static mitk::FeedbackLog Log(bool included, bool edited = false)
+  {
+    return { "logs/current-session.log", "This session", "a log line\n", included, edited };
+  }
+
+  static mitk::FeedbackAttachment Attachment(bool included)
+  {
+    return { "C:/Users/someone/dumps/crash.dmp", "dumps/crash.dmp", "Crash, 2026-10-06 12:00, 1.2 MB, MITK Test 1.0",
+      included };
+  }
+
+  static bool Contains(const std::string& text, const std::string& part)
+  {
+    return text.find(part) != std::string::npos;
+  }
+
+public:
+  void ReportTextHasDescriptionAndIncludedItemsOnly()
+  {
+    const auto text = mitk::BuildReportText(TextOnlyReport());
+
+    CPPUNIT_ASSERT(Contains(text, "The viewer freezes when scrolling."));
+    CPPUNIT_ASSERT(Contains(text, "Bug report"));
+    CPPUNIT_ASSERT(Contains(text, "MITK version: 2026.06"));
+    CPPUNIT_ASSERT(!Contains(text, "Test OS"));
+    CPPUNIT_ASSERT(!Contains(text, "## Logs"));
+    CPPUNIT_ASSERT(!Contains(text, "## Screenshot"));
+    CPPUNIT_ASSERT_EQUAL(text, mitk::BuildReportText(TextOnlyReport()));
+  }
+
+  void ReportTextListsIncludedLogsWithEditedNote()
+  {
+    auto report = TextOnlyReport();
+    report.logs = { Log(false) };
+    CPPUNIT_ASSERT(!Contains(mitk::BuildReportText(report), "This session"));
+
+    report.logs = { Log(true) };
+    auto text = mitk::BuildReportText(report);
+    CPPUNIT_ASSERT(Contains(text, "This session"));
+    CPPUNIT_ASSERT(!Contains(text, "edited"));
+    CPPUNIT_ASSERT_MESSAGE("the log text itself goes to the bundle, not the report", !Contains(text, "a log line"));
+
+    report.logs = { Log(true, true) };
+    CPPUNIT_ASSERT(Contains(mitk::BuildReportText(report), "edited"));
+  }
+
+  void ReportTextListsAttachmentsByDescriptionNeverByPath()
+  {
+    auto report = TextOnlyReport();
+    report.attachments = { Attachment(true) };
+
+    const auto text = mitk::BuildReportText(report);
+    CPPUNIT_ASSERT(Contains(text, "Crash, 2026-10-06 12:00, 1.2 MB, MITK Test 1.0"));
+    CPPUNIT_ASSERT(Contains(text, "dumps/crash.dmp"));
+    CPPUNIT_ASSERT(!Contains(text, "someone"));
+
+    report.attachments = { Attachment(false) };
+    CPPUNIT_ASSERT(!Contains(mitk::BuildReportText(report), "crash.dmp"));
+  }
+
+  void ReportTextStatesTheConfirmationOnlyWhenGiven()
+  {
+    auto report = TextOnlyReport();
+    report.logs = { Log(true) };
+    CPPUNIT_ASSERT(!Contains(mitk::BuildReportText(report), mitk::GetSharingConfirmationStatement()));
+
+    report.sharingConfirmed = true;
+    const auto text = mitk::BuildReportText(report);
+    CPPUNIT_ASSERT(Contains(text, mitk::GetSharingConfirmationStatement()));
+    CPPUNIT_ASSERT(!Contains(text, mitk::GetPublicSharingConfirmationStatement()));
+
+    report.publicSharingConfirmed = true;
+    CPPUNIT_ASSERT(Contains(mitk::BuildReportText(report), mitk::GetPublicSharingConfirmationStatement()));
+  }
+
+  void DescriptionHtmlIsEscapedInTheReport()
+  {
+    // A '<' before a letter, '/', '!' or '?' starts HTML in Markdown; inline
+    // code spans and fenced blocks are literal, and a '<' before anything
+    // else is plain text.
+    auto report = TextOnlyReport();
+    report.description = "crash in std::vector<int> and `std::map<int, int>` here\n"
+                         "```\nvector<int> v;\n```\n"
+                         "<!-- note\n"
+                         "a < b and x<3";
+
+    const auto text = mitk::BuildReportText(report);
+
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "std::vector\\<int>"));
+    CPPUNIT_ASSERT_MESSAGE(text, !Contains(text, "std::vector<int>"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "`std::map<int, int>`"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\nvector<int> v;\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\\<!-- note"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "a < b and x<3"));
+  }
+
+  void DescriptionEscapingKeepsCodeAndExistingEscapes()
+  {
+    // Line ends as a Windows text box may deliver them, a tilde fence, a code
+    // span delimited by two backticks around single ones, and a '<' the user
+    // escaped already.
+    auto report = TextOnlyReport();
+    report.description = "see <b>\r\n"
+                         "~~~\r\n"
+                         "<i>\r\n"
+                         "~~~\r\n"
+                         "``a `<c>` b`` and \\<div> and \\\\<p>";
+
+    const auto text = mitk::BuildReportText(report);
+
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "see \\<b>\r\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "~~~\r\n<i>\r\n~~~\r\n"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "``a `<c>` b``"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, " and \\<div> and "));
+    CPPUNIT_ASSERT_MESSAGE(text, !Contains(text, "\\\\<div>"));
+    CPPUNIT_ASSERT_MESSAGE(text, Contains(text, "\\\\\\<p>"));
+  }
+
+  void SharingConfirmationIsNeededForEveryPhiCapableItem()
+  {
+    auto report = TextOnlyReport();
+    CPPUNIT_ASSERT(!report.NeedsSharingConfirmation());
+
+    report.logs = { Log(false) };
+    report.attachments = { Attachment(false) };
+    CPPUNIT_ASSERT(!report.NeedsSharingConfirmation());
+
+    report.logs = { Log(true) };
+    CPPUNIT_ASSERT(report.NeedsSharingConfirmation());
+
+    report.logs = { Log(false) };
+    report.attachments = { Attachment(true) };
+    CPPUNIT_ASSERT(report.NeedsSharingConfirmation());
+
+    report.attachments = { Attachment(false) };
+    report.includeScreenshot = true;
+    CPPUNIT_ASSERT(report.NeedsSharingConfirmation());
+  }
+
+  void PublicTrackerGate()
+  {
+    auto report = TextOnlyReport();
+    CPPUNIT_ASSERT(report.CanUsePublicTracker());
+
+    report.logs = { Log(true) };
+    CPPUNIT_ASSERT(!report.CanUsePublicTracker());
+    report.publicSharingConfirmed = true;
+    CPPUNIT_ASSERT(report.CanUsePublicTracker());
+
+    report.logs.clear();
+    report.publicSharingConfirmed = false;
+    report.includeScreenshot = true;
+    CPPUNIT_ASSERT(!report.CanUsePublicTracker());
+    report.publicSharingConfirmed = true;
+    CPPUNIT_ASSERT(report.CanUsePublicTracker());
+
+    report.includeScreenshot = false;
+    report.attachments = { Attachment(true) };
+    report.sharingConfirmed = true;
+    CPPUNIT_ASSERT_MESSAGE("no confirmation makes an attachment publishable", !report.CanUsePublicTracker());
+
+    report.attachments = { Attachment(false) };
+    CPPUNIT_ASSERT(report.CanUsePublicTracker());
+  }
+
+  void UserImagesAreReviewableScreenshots()
+  {
+    auto report = TextOnlyReport();
+    report.images = { { "C:/Users/someone/Pictures/wrong-overlay.png", "images/1-wrong-overlay.png", "wrong-overlay.png",
+      false } };
+    CPPUNIT_ASSERT(!report.NeedsSharingConfirmation());
+    CPPUNIT_ASSERT(!Contains(mitk::BuildReportText(report), "wrong-overlay"));
+
+    report.images.front().included = true;
+    CPPUNIT_ASSERT_MESSAGE("an image can show patient data", report.NeedsSharingConfirmation());
+    CPPUNIT_ASSERT_MESSAGE("an image needs the public confirmation", !report.CanUsePublicTracker());
+
+    report.publicSharingConfirmed = true;
+    CPPUNIT_ASSERT_MESSAGE("unlike a dump, a reviewed image may be published", report.CanUsePublicTracker());
+
+    const auto text = mitk::BuildReportText(report);
+    CPPUNIT_ASSERT(Contains(text, "## Screenshots"));
+    CPPUNIT_ASSERT(Contains(text, "images/1-wrong-overlay.png"));
+    CPPUNIT_ASSERT_MESSAGE("never the source path", !Contains(text, "someone"));
+    CPPUNIT_ASSERT_MESSAGE("images are not diagnostic data", !Contains(text, "## Diagnostic Data"));
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkFeedbackReport)

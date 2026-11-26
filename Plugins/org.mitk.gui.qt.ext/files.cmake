@@ -2,6 +2,7 @@ set(SRC_CPP_FILES
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
+  QmitkFeedback.cpp
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenMxNMultiWidgetEditorAction.cpp
   QmitkOpenStdMultiWidgetEditorAction.cpp
@@ -13,9 +14,15 @@ set(INTERNAL_CPP_FILES
   QmitkAppInstancesPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
   QmitkCrashDumpsPreferencePage.cpp
+  QmitkFeedbackDialog.cpp
+  QmitkFeedbackInput.cpp
   QmitkModuleView.cpp
   QmitkReportsAndDiagnosticsPreferencePage.cpp
 )
+
+if(MITK_USE_sentry)
+  list(APPEND INTERNAL_CPP_FILES QmitkCrashReportService.cpp)
+endif()
 
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
@@ -30,6 +37,7 @@ set(MOC_H_FILES
   src/internal/QmitkCommonExtPlugin.h
   src/internal/QmitkCrashDumpsPreferencePage.h
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
+  src/internal/QmitkFeedbackDialog.h
   src/internal/QmitkModuleView.h
   src/internal/QmitkReportsAndDiagnosticsPreferencePage.h
   src/QmitkOpenDicomEditorAction.h

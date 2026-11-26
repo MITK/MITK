@@ -1,0 +1,321 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitkFeedbackDialog_h
+#define QmitkFeedbackDialog_h
+
+#include <mitkEnvironmentInfo.h>
+#include <mitkFeedbackReport.h>
+
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkCrashDumpFacility.h>
+#endif
+
+#include <QDateTime>
+#include <QDialog>
+#include <QFutureWatcher>
+#include <QPixmap>
+
+#include <filesystem>
+#include <functional>
+#include <map>
+#include <vector>
+
+class QAbstractButton;
+class QButtonGroup;
+class QCheckBox;
+class QComboBox;
+class QLabel;
+class QPlainTextEdit;
+class QProgressBar;
+class QPushButton;
+class QStackedWidget;
+class QTextBrowser;
+class QToolButton;
+class QVBoxLayout;
+class QmitkCrashDumpListWidget;
+
+/**
+ * \brief Lets the user assemble, review, and hand off a feedback report.
+ *
+ * The user describes the report, chooses what to include, and picks how to
+ * send it, in three steps; throughout, the preview shows the report text that
+ * a hand-off emits. A hand-off writes the bundle to a temporary folder and
+ * opens the user's mail program, web browser, or file manager; the dialog
+ * itself sends nothing.
+ */
+class QmitkFeedbackDialog : public QDialog
+{
+  Q_OBJECT
+
+public:
+  /** \brief A log excerpt the user may include. */
+  struct LogSource
+  {
+    /** Initially not included; text starts with a line naming the source. */
+    mitk::FeedbackLog log;
+
+    /** Shown instead of the text when there is no log to offer. */
+    QString unavailableReason;
+
+    /** The crash dump whose session wrote this log, empty for the log of
+     *  this session. Such a log is offered only while its dump is included. */
+    std::filesystem::path dump;
+  };
+
+  /** \brief Everything gathered before the dialog is shown. */
+  struct Input
+  {
+    mitk::EnvironmentInfo environment;
+    std::vector<LogSource> logs;
+
+    /** Captured before the dialog is shown, so it never shows the dialog. */
+    QPixmap windowShot;
+
+    /** Null when no multi-widget editor is active. */
+    QPixmap editorShot;
+
+#ifdef MITK_HAS_CRASHHANDLING
+    /** Offered for inclusion; their session logs are among the log sources. */
+    std::vector<mitk::CrashDumpInfo> dumps;
+
+    /** Whether the dumps start included, as when the report was filed for
+     *  them, or are left for the user to pick. */
+    bool dumpsIncluded = true;
+#endif
+  };
+
+  explicit QmitkFeedbackDialog(const Input& input, QWidget* parent = nullptr);
+  ~QmitkFeedbackDialog() override;
+
+  void done(int result) override;
+
+  /** \brief The crash dumps in the last successfully written bundle that are
+   *  still included, if the user asked to delete them and that bundle file
+   *  still exists, else none. Deleting is left to the caller after the dialog
+   *  has closed, because later hand-offs from the same dialog may write the
+   *  bundle again from the same dumps. */
+  std::vector<std::filesystem::path> GetDumpsToDelete() const;
+
+protected:
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
+private:
+  enum class Step
+  {
+    Describe,
+    Include,
+    Send
+  };
+
+  struct LogRow
+  {
+    QWidget* row = nullptr;
+    std::filesystem::path dump;
+    QCheckBox* include = nullptr;
+    QPlainTextEdit* text = nullptr;
+    QLabel* summary = nullptr;
+    QString originalText;
+    QString originalSummary;
+  };
+
+  QWidget* CreateHeader();
+  QWidget* CreateWizard();
+  QWidget* CreateDescribePage();
+  QWidget* CreateIncludePage();
+  QWidget* CreateSendPage();
+  QWidget* CreateNavigation();
+  QWidget* CreatePreview();
+  void SetPreviewVisible(bool visible);
+  QWidget* CreateFooter();
+
+  void SetStep(Step step);
+
+  /** Steps after the description are open once there is one; the hint says
+   *  what keeps the user from going on. */
+  void UpdateNavigation(const mitk::FeedbackReport& report);
+
+  /** A row of a list of items or ways to send: the themed \p glyph (a
+   *  resource path) beside \p title (a check box or a label) with \p summary
+   *  below it, an optional \p trailing widget, and, if given, \p details that
+   *  a Details button shows and hides. */
+  QWidget* CreateItemRow(const QString& glyph, QWidget* title, QWidget* summary, QWidget* trailing, QWidget* details,
+    bool detailsShown = false);
+
+  /** A framed panel with a check box for \p statement and an explanatory
+   *  \p note below it. Clicking the statement toggles the check box. */
+  QWidget* CreateConfirmation(QCheckBox* checkBox, const QString& statement, const QString& note);
+
+  /** \p checkBox (without text of its own) followed by \p text, which wraps
+   *  where a check box text would widen the form. */
+  QWidget* CreateWrappingCheckBox(QCheckBox* checkBox, const QString& text);
+
+  /** A word-wrapped label that clicks \p button when clicked and names it for
+   *  assistive technology. */
+  QLabel* CreateClickableLabel(const QString& text, QAbstractButton* button);
+
+  void AddEnvironmentRow(QVBoxLayout* layout);
+  void AddLogRows(QVBoxLayout* layout);
+  void AddScreenshotRow(QVBoxLayout* layout);
+  void AddDumpsRow(QVBoxLayout* layout);
+  void AddImagesRow(QVBoxLayout* layout);
+
+  /** Exactly what the preview shows and a hand-off emits. */
+  mitk::FeedbackReport AssembleReport() const;
+
+  void OnReportChanged();
+  void OnPhiItemIncluded(bool included);
+  void OnPublicItemChanged();
+  void OnScreenshotTargetChanged();
+  void OnDumpsChanged();
+  void OnEnvironmentClicked();
+  void OnAddImages();
+  void OnRemoveImage(const QString& path);
+
+  /** The dumps the report includes: checked in the list while the dumps
+   *  row is checked. */
+  std::vector<std::filesystem::path> GetIncludedDumps() const;
+
+  /** The included dumps that are in the last successfully written bundle,
+   *  whether or not that file still exists. */
+  std::vector<std::filesystem::path> GetIncludedBundledDumps() const;
+
+  /** Shows the dump list and the logs of the included dumps only. */
+  void UpdateDumpRows();
+
+  void UpdateHeaderIcon();
+  void UpdateImageList();
+
+  /** Re-reads every listed image whose file differs in size or modification
+   *  time from when it was read; an image whose file is gone or can no
+   *  longer be read as an image is removed, with a warning. If any image
+   *  changed, the sharing confirmations are withdrawn, the dialog returns to
+   *  the step that lists the images, and the status line asks the user to
+   *  review them. Returns whether any image changed. */
+  bool ReloadChangedImages();
+
+  void UpdateSummaries();
+  void UpdateConfirmations(const mitk::FeedbackReport& report);
+  void UpdateHandoffEnabled(const mitk::FeedbackReport& report);
+  void UpdateScreenshotPreview();
+
+  using Handoff = std::function<void(const QString& zipPath, const mitk::FeedbackReport& report)>;
+
+  /** Writes the bundle off the UI thread (a long write would look like a
+   *  freeze to the UI-freeze watchdog), then runs \p handoff. A bundle
+   *  written for the unchanged report is reused. Nothing is handed off if an
+   *  image file changed on disk, before or during the write, or if the report
+   *  changed while the bundle was being written; the status line says so, and
+   *  the user uses the button again. */
+  void WriteBundleThen(Handoff handoff);
+  void OnBundleWritten();
+
+  void OnOpenIssue();
+  void OnOpenEmail();
+  void OnShowBundle();
+
+  /** Opens the folder of the bundle at \p zipPath and adds \p instruction
+   *  to the status line. */
+  void ShowBundleForAttaching(const QString& zipPath, const QString& instruction);
+
+  /** Tells the user that \p application could not be started and offers to
+   *  show the bundle instead. */
+  void OfferShowBundle(const QString& application, const QString& zipPath);
+
+  Input m_Input;
+
+  QLabel* m_HeaderIcon = nullptr;
+  QButtonGroup* m_CategoryGroup = nullptr;
+  QPlainTextEdit* m_Description = nullptr;
+
+  QCheckBox* m_EnvironmentInclude = nullptr;
+  QLabel* m_EnvironmentSummary = nullptr;
+  std::vector<std::pair<QCheckBox*, mitk::FeedbackItem>> m_EnvironmentItems;
+
+  std::vector<LogRow> m_LogRows;
+
+  struct UserImage
+  {
+    QString path;
+    QPixmap thumbnail;
+
+    /** State of the file when it was read, to notice a later edit. */
+    qint64 size = 0;
+    QDateTime modified;
+  };
+
+  /** Image files the user added, all included. */
+  std::vector<UserImage> m_Images;
+  QLabel* m_ImagesSummary = nullptr;
+  QVBoxLayout* m_ImageList = nullptr;
+  QString m_ImageDirectory;
+
+  QCheckBox* m_ScreenshotInclude = nullptr;
+  QComboBox* m_ScreenshotTarget = nullptr;
+  QLabel* m_ScreenshotPreview = nullptr;
+  mutable std::vector<unsigned char> m_WindowPng;
+  mutable std::vector<unsigned char> m_EditorPng;
+
+  QCheckBox* m_DumpsInclude = nullptr;
+  QWidget* m_DumpDetails = nullptr;
+  QmitkCrashDumpListWidget* m_DumpList = nullptr;
+  QLabel* m_DumpSummary = nullptr;
+  QCheckBox* m_DeleteDumps = nullptr;
+  std::size_t m_IncludedDumpCount = 0;
+
+  QWidget* m_SharingPanel = nullptr;
+  QCheckBox* m_SharingConfirmation = nullptr;
+  QWidget* m_PublicPanel = nullptr;
+  QCheckBox* m_PublicConfirmation = nullptr;
+
+  /** Labels and panels that click a button when clicked. */
+  std::map<QObject*, QAbstractButton*> m_ClickTargets;
+
+  /** The click target on which the left button went down and has not come
+   *  up, else null. A release clicks only on the target it started on. */
+  QObject* m_PressTarget = nullptr;
+
+  QButtonGroup* m_StepGroup = nullptr;
+  QStackedWidget* m_Steps = nullptr;
+
+  QWidget* m_PreviewPane = nullptr;
+  QTextBrowser* m_Preview = nullptr;
+  QToolButton* m_PreviewToggle = nullptr;
+
+  QLabel* m_GitHubReason = nullptr;
+  QPushButton* m_EmailButton = nullptr;
+  QPushButton* m_IssueButton = nullptr;
+  QPushButton* m_ShowBundleButton = nullptr;
+
+  QProgressBar* m_BusyIndicator = nullptr;
+  QLabel* m_Status = nullptr;
+  QLabel* m_Hint = nullptr;
+  QPushButton* m_BackButton = nullptr;
+  QPushButton* m_NextButton = nullptr;
+  QPushButton* m_CloseButton = nullptr;
+
+  /** Incremented on every change of the report; a bundle is reusable only
+   *  for the generation it was written for. */
+  unsigned int m_Generation = 0;
+  unsigned int m_BundleGeneration = 0;
+  QString m_BundlePath;
+  QString m_BundleStatus;
+  std::vector<std::filesystem::path> m_BundleAttachments;
+
+  QFutureWatcher<QString> m_BundleWatcher;
+  QString m_PendingZipPath;
+  unsigned int m_PendingGeneration = 0;
+  mitk::FeedbackReport m_PendingReport;
+  Handoff m_PendingHandoff;
+};
+
+#endif

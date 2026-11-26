@@ -26,6 +26,7 @@ class QTreeWidget;
 namespace mitk
 {
   struct CrashDumpInfo;
+  enum class DumpKind;
 }
 
 /**
@@ -66,8 +67,25 @@ public:
   std::vector<mitk::CrashDumpInfo> GetDumps() const;
   std::vector<mitk::CrashDumpInfo> GetSelectedDumps() const;
 
-  /** \brief Multi-selection (default) or a read-only list. */
+  /** \brief Multi-selection (default) or a read-only list. A list that is
+   *  selectable or checkable takes keyboard focus; without selection, the arrow
+   *  keys, Home and End still move the current row. */
   void SetSelectionEnabled(bool enabled);
+
+  /** \brief Show a check box per dump, for a list that picks the dumps an
+   *  action applies to. Off by default; SetDumps() checks every dump. A
+   *  checkable list takes keyboard focus whether or not it selects, so that
+   *  Space toggles the check box of the current row. */
+  void SetCheckable(bool checkable);
+
+  /** \brief The checked dumps in table order; empty unless checkable. */
+  std::vector<mitk::CrashDumpInfo> GetCheckedDumps() const;
+
+  /** \brief Check or uncheck every dump of a checkable list. */
+  void SetAllChecked(bool checked);
+
+  /** \brief How the kind column names \p kind. */
+  static QString KindLabel(mitk::DumpKind kind);
 
   /** \brief Hide or show \p column, e.g. one that says the same in every row. */
   void SetColumnHidden(Column column, bool hidden);
@@ -78,12 +96,26 @@ public:
    *  version column. */
   void FitToContents();
 
+  /** \brief Like FitToContents(), but for a list that has to fit the width
+   *  it gets: the version column elides instead of widening the list. */
+  void FitHeightToContents();
+
 signals:
   void SelectionChanged();
+  void CheckedChanged();
 
 private:
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
+  void ApplyCheckable();
+  void UpdateFocusPolicy();
+
+  /** Fits the columns and the height; returns the width of all columns. */
+  int FitColumnsAndHeight();
+
   QTreeWidget* m_Tree;
   std::vector<mitk::CrashDumpInfo> m_Dumps;
+  bool m_Checkable;
 };
 
 #endif

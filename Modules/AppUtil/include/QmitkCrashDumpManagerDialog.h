@@ -45,8 +45,14 @@ public:
    *  raising it otherwise. \p parent is used only when no modal dialog is
    *  active; otherwise the manager is parented to the modal dialog, so that
    *  it can be used from it (e.g. from the preferences). An already open
-   *  manager returns to its previous parent when that modal dialog finishes. */
+   *  manager returns to its previous parent when that modal dialog finishes.
+   *  A modal dialog that is itself inside the manager (e.g. the report dialog
+   *  opened by <i>File report...</i>) is never made its parent; the manager
+   *  then keeps its parent. */
   static void ShowManager(QWidget* parent = nullptr);
+
+  /** \brief Re-read the dumps if the manager is open; does nothing otherwise. */
+  static void RefreshIfOpen();
 
   /** \brief Re-read the dumps from disk. */
   void Refresh();

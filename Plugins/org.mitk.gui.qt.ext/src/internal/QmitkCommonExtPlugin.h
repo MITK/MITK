@@ -16,6 +16,13 @@ found in the LICENSE file.
 
 #include <ctkPluginActivator.h>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkICrashReportService.h>
+#include <usServiceRegistration.h>
+
+#include <memory>
+#endif
+
 class QmitkCommonExtPlugin : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
@@ -41,6 +48,11 @@ private Q_SLOTS:
 private:
 
   static ctkPluginContext* _context;
+
+#ifdef MITK_HAS_CRASHHANDLING
+  std::unique_ptr<mitk::ICrashReportService> m_CrashReportService;
+  us::ServiceRegistration<mitk::ICrashReportService> m_CrashReportRegistration;
+#endif
 
 };
 

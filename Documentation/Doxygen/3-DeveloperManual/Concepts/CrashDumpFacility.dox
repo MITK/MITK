@@ -295,9 +295,18 @@ The crash-dump UI does not send anything itself. A report feature registers an
 mitk::ICrashReportService micro service; while one is registered, the
 next-start dialog, the diagnostic data manager and the "Capture diagnostics"
 result offer <i>File report...</i>, which hands the chosen dumps to the
-service and leaves them on disk. Without a registered service the button is
+service; they stay on disk unless the user chooses to delete them in the
+report flow. Without a registered service the button is
 not shown anywhere. The interface lives in \c MitkAppUtil rather than in the
 Qt-free \c MitkCrashHandling because it takes a parent widget.
+
+The plugin \c org.mitk.gui.qt.ext registers the implementation, which opens
+the feedback dialog of <i>Help > Report a Problem / Send Feedback...</i> with
+the dumps. Its flow is modal and complete when \c FileReport() returns: dumps
+the user chose to delete are already deleted then. A flow that deletes dumps
+calls QmitkCrashDumpManagerDialog::RefreshIfOpen() afterwards, so an open
+manager shows the change; the manager itself does not refresh after the call,
+which would clear the user's selection even when nothing was deleted.
 
 \section CrashDumpFacilityPage_Processes The handler process and multiple instances
 
@@ -367,7 +376,8 @@ snapshot carry.
 \c MitkAppUtil adds \c mitkCrashDumpSessionOptionsTest for the start-up
 precedence and \c QmitkCrashDumpUiTest for the list widget, the manager and
 the next-start dialog, including the <i>File report...</i> button with and
-without a registered mitk::ICrashReportService.
+without a registered mitk::ICrashReportService, the open manager's refresh
+after a report flow that deleted dumps and its selection after one that did not.
 
 Those tests spawn a plain helper executable, so what they pin is the runtime
 output directory. Each application additionally gets a

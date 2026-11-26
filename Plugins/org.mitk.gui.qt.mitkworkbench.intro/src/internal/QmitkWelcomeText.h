@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <QString>
 
+class QLabel;
+
 /**
  * \brief Wraps HTML into a single paragraph with the line height of the welcome screen.
  *
@@ -22,5 +24,13 @@ found in the LICENSE file.
  * by style sheets.
  */
 QString QmitkWelcomeTextWithLineHeight(QString html);
+
+/**
+ * \brief Shows the target of the link under the mouse as the tooltip of \p label.
+ *
+ * Link texts name what they lead to, not where; the tooltip lets users see
+ * the address before they open it in their browser.
+ */
+void QmitkWelcomeShowLinkTargets(QLabel* label);
 
 #endif

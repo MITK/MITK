@@ -31,6 +31,9 @@ class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
   MITK_TEST(GetConvertedImageturboFLASHTest);
   MITK_TEST(GetConvertedImageVFATest);
   MITK_TEST(GetConvertedImageT2Test);
+  MITK_TEST(GetConvertedImageBaselineEndPastLastTimeStepTest);
+  MITK_TEST(GetConvertedImageBaselineStartAfterEndTest);
+  MITK_TEST(GetConvertedImageSingleBaselinePastLastTimeStepTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -240,6 +243,36 @@ public:
       CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
     }
  }
+
+  void GetConvertedImageBaselineEndPastLastTimeStepTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(10);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+  }
+
+  void GetConvertedImageBaselineStartAfterEndTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(3);
+    m_concentrationGen->SetBaselineEndTimeStep(1);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+  }
+
+  void GetConvertedImageSingleBaselinePastLastTimeStepTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(10);
+    m_concentrationGen->SetBaselineEndTimeStep(10);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+  }
 
 };
 MITK_TEST_SUITE_REGISTRATION(mitkConvertSignalToConcentration)

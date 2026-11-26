@@ -93,9 +93,9 @@ namespace mitk
 
   bool ClippingProperty::FromJSON(const nlohmann::json& j)
   {
-    this->SetClippingEnabled(j["Enabled"].get<bool>());
-    this->SetOrigin(j["Origin"].get<Point3D>());
-    this->SetNormal(j["Normal"].get<Vector3D>());
+    this->SetClippingEnabled(j.at("Enabled").get<bool>());
+    this->SetOrigin(j.at("Origin").get<Point3D>());
+    this->SetNormal(j.at("Normal").get<Vector3D>());
 
     return true;
   }

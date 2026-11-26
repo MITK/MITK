@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <MitkRESTAPIExports.h>
 
 #include <deque>
+#include <functional>
 #include <mutex>
 #include <unordered_map>
 
@@ -77,13 +78,22 @@ namespace mitk
      * \brief Configure file access restrictions.
      *
      * \pre \a mode must be a valid FileAccessMode value.
-     * \pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
      *
      * \param mode The file access mode (Unrestricted or AllowedDirectories).
+     *        AllowedDirectories without directories allows no files at all.
      * \param allowedDirs List of allowed directory paths (only used in AllowedDirectories mode).
      * \param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory);
+
+    /**
+     * \brief Set what decides whether a request may name files on the server's
+     *        file system at all, before the file access config applies.
+     *
+     * Requests that may not get 403 for file-reference transfers in both
+     * directions. Without a check, all requests may.
+     */
+    void SetFileAccessCheck(std::function<bool(const httplib::Request&)> check);
 
     /**
      * \brief Set the maximum number of concurrently active file-reference temp
@@ -341,6 +351,7 @@ eturn Path to the newly created temp directory.
     std::string m_TempDirectory;
     FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
     std::vector<std::string> m_AllowedFileDirectories;
+    std::function<bool(const httplib::Request&)> m_FileAccessCheck;
 
     // Per-IP bounded temp-directory quota.
     // Map key: client IP string.  Value: deque of active dirs ordered by creation time (oldest first).

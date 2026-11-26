@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveTool.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
@@ -31,6 +32,7 @@ found in the LICENSE file.
 
 #include "mitkPythonWorkerModules.h"
 #include "mitkStopHook.h"
+#include "mitknnInteractiveBoundingBoxHelpers.h"
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
@@ -38,11 +40,17 @@ found in the LICENSE file.
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cstdint>
+#include <functional>
+#include <limits>
 
 using namespace mitk::nnInteractive;
 
 namespace
 {
+  // Every point of a scribble is stamped into the slice on the GUI thread.
+  constexpr std::size_t MAX_STROKE_PROMPT_POINTS = 100;
+
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
@@ -162,12 +170,30 @@ namespace mitk
       m_Backend.reset();
     }
 
+    /** A prompt of AddPrompt(), from geometry instead of an interactor. */
+    struct GeometricPrompt
+    {
+      nnInteractive::InteractionType Type;
+      nnInteractive::PromptType PromptType;
+      std::vector<Point3D> Points;
+      PlaneGeometry::ConstPointer Plane;
+    };
+
+    /** What the session gets for a prompt, prepared on the GUI thread. */
+    struct PromptCall
+    {
+      std::string Method;
+      nlohmann::json Params;
+      std::shared_ptr<SharedBuffer> Mask;
+    };
+
     // Methods that call the worker or prepare its calls are defined at the
     // bottom of this file.
     void SetAutoZoom() const;
-    nlohmann::json GetPointParams(const Point3D& point, const Image* inputAtTimeStep) const;
-    nlohmann::json GetBoxParams(const PlanarFigure* box, const Image* inputAtTimeStep) const;
-    nlohmann::json GetMaskParams(const InteractionBoundingBox* boundingBox) const;
+    nlohmann::json GetPointParams(const Point3D& point, const Image* inputAtTimeStep, bool include) const;
+    nlohmann::json GetBoxParams(const Point3D& corner, const Point3D& oppositeCorner, const Image* inputAtTimeStep, bool include) const;
+    nlohmann::json GetMaskParams(const InteractionBoundingBox* boundingBox, bool include) const;
+    PromptCall DrawPrompt(const GeometricPrompt& prompt, const Image* inputAtTimeStep);
     void ResetInteractions() const;
     bool Undo() const;
 
@@ -194,6 +220,7 @@ namespace mitk
       LastInteractionType.reset();
       LastInteractionPromptType.reset();
       LastInteractionWasMask = false;
+      LastInteractionByProgram = false;
     }
 
     void ClearInteractions()
@@ -226,14 +253,30 @@ namespace mitk
     TimeStepType SessionWorkingDataTimeStep = 0;
 
     // Single-level undo bookkeeping. nnInteractive can undo only the last
-    // interaction, so one record of what it was (an interactor prompt, or the
+    // interaction, so one record of what it was (a prompt, or the
     // initial-segmentation mask) is enough to remove the right visualization
-    // on undo. UndoRefreshPending makes DoUpdatePreview repaint the preview
-    // from the restored target buffer instead of adding an interaction.
+    // on undo. A prompt is shown by the interactor of its type, whether it
+    // came from there or from AddPrompt(). UndoRefreshPending makes
+    // DoUpdatePreview repaint the preview from the restored target buffer
+    // instead of adding an interaction.
     std::optional<nnInteractive::InteractionType> LastInteractionType;
     std::optional<nnInteractive::PromptType> LastInteractionPromptType;
     bool LastInteractionWasMask = false;
+    bool LastInteractionByProgram = false;
     bool UndoRefreshPending = false;
+
+    // The prompt of AddPrompt() for DoUpdatePreview(), what became of it, and
+    // who waits for that. UpdatePreview() reports errors as messages to the
+    // user instead of throwing them, so DoUpdatePreview() keeps them for the
+    // caller of AddPrompt().
+    std::optional<GeometricPrompt> PendingPrompt;
+    bool PendingPromptApplied = false;
+    std::string PendingPromptError;
+    std::function<void(std::exception_ptr)> PendingPromptDone;
+
+    // Counts the prompts of AddPrompt(), so that a report posted for one of
+    // them cannot end a later one.
+    std::uint64_t PromptSerial = 0;
 
     // A start or a prompt runs off the GUI thread, during which the tool may be
     // deactivated, the session aborted or the time point changed. Those wait
@@ -242,6 +285,9 @@ namespace mitk
     bool Starting = false;
     std::atomic<bool> AbortRequested = false;
     bool TimePointChangedMeanwhile = false;
+
+    // Why the session started last was lost, see GetLastSessionLoss().
+    std::optional<SessionLoss> LastSessionLoss;
 
     // Set by the destructor, which must not wait for a server.
     std::atomic<bool> Destroying = false;
@@ -388,6 +434,10 @@ void mitk::nnInteractiveTool::ResetInteractions()
   if (this->IsUpdating())
     return;
 
+  // An interactor that stays enabled would have the preview update below
+  // read its last prompt, which no longer exists.
+  this->DisableInteractor();
+
   m_Impl->ClearInteractions();
 
   if (this->IsSessionRunning())
@@ -409,6 +459,12 @@ void mitk::nnInteractiveTool::ResetInteractions()
   }
 
   this->UpdatePreview();
+  this->InteractionsChangedEvent.Send();
+}
+
+bool mitk::nnInteractiveTool::HasResultToConfirm() const
+{
+  return this->IsSessionRunning() && this->HasInteractions();
 }
 
 bool mitk::nnInteractiveTool::HasInteractions() const
@@ -452,6 +508,7 @@ void mitk::nnInteractiveTool::UndoLastInteraction()
   {
     // The session reports nothing to undo; resync our record and stop.
     m_Impl->ClearLastInteraction();
+    this->InteractionsChangedEvent.Send();
     return;
   }
 
@@ -481,11 +538,21 @@ void mitk::nnInteractiveTool::UndoLastInteraction()
   // reaching DoUpdatePreview (no input or preview image), a stale true would
   // make the next interaction take the refresh branch and be dropped silently.
   m_Impl->UndoRefreshPending = false;
+
+  this->InteractionsChangedEvent.Send();
 }
 
 bool mitk::nnInteractiveTool::CanUndo() const
 {
   return this->IsSessionRunning() && m_Impl->HasUndoableInteraction();
+}
+
+std::optional<mitk::nnInteractiveTool::Prompt> mitk::nnInteractiveTool::GetLastProgramPrompt() const
+{
+  if (!m_Impl->LastInteractionByProgram)
+    return std::nullopt;
+
+  return Prompt{ m_Impl->LastInteractionType.value(), m_Impl->LastInteractionPromptType.value() };
 }
 
 bool mitk::nnInteractiveTool::GetAutoZoom() const
@@ -495,7 +562,11 @@ bool mitk::nnInteractiveTool::GetAutoZoom() const
 
 void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
 {
+  if (m_Impl->AutoZoom == autoZoom)
+    return;
+
   m_Impl->AutoZoom = autoZoom;
+  this->OptionsChangedEvent.Send();
 
   // A prompt still uses the worker. The panel offers no change meanwhile.
   if (this->IsSessionRunning() && !this->IsUpdating())
@@ -523,7 +594,11 @@ bool mitk::nnInteractiveTool::GetAutoRefine() const
 
 void mitk::nnInteractiveTool::SetAutoRefine(bool autoRefine)
 {
+  if (m_Impl->AutoRefine == autoRefine)
+    return;
+
   m_Impl->AutoRefine = autoRefine;
+  this->OptionsChangedEvent.Send();
 }
 
 std::optional<Backend> mitk::nnInteractiveTool::GetBackend() const
@@ -616,10 +691,43 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
   nlohmann::json params;
   std::shared_ptr<SharedBuffer> mask;
   std::optional<InteractionType> interactionType;
+  auto promptType = m_Impl->PromptType;
+  bool byProgram = false;
 
-  if (interactor != nullptr)
+  // A prompt of AddPrompt() takes precedence over an interactor that may be
+  // enabled as well. Its errors go back to the caller of AddPrompt() rather
+  // than to the user.
+  if (m_Impl->PendingPrompt.has_value())
+  {
+    const auto prompt = std::move(m_Impl->PendingPrompt.value());
+    m_Impl->PendingPrompt.reset();
+
+    try
+    {
+      auto call = m_Impl->DrawPrompt(prompt, inputAtTimeStep);
+      method = std::move(call.Method);
+      params = std::move(call.Params);
+      mask = std::move(call.Mask);
+    }
+    catch (const Exception& e)
+    {
+      m_Impl->PendingPromptError = e.GetDescription();
+      return;
+    }
+    catch (const std::exception& e)
+    {
+      m_Impl->PendingPromptError = e.what();
+      return;
+    }
+
+    interactionType = prompt.Type;
+    promptType = prompt.PromptType;
+    byProgram = true;
+  }
+  else if (interactor != nullptr)
   {
     interactionType = interactor->GetType();
+    const bool include = promptType == PromptType::Positive;
 
     switch (*interactionType)
     {
@@ -627,14 +735,14 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       {
         auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
         method = "add_point";
-        params = m_Impl->GetPointParams(point.value(), inputAtTimeStep);
+        params = m_Impl->GetPointParams(point.value(), inputAtTimeStep, include);
         break;
       }
       case InteractionType::Box:
       {
         auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
         method = "add_bbox";
-        params = m_Impl->GetBoxParams(box, inputAtTimeStep);
+        params = m_Impl->GetBoxParams(box->GetWorldControlPoint(0), box->GetWorldControlPoint(1), inputAtTimeStep, include);
         break;
       }
       case InteractionType::Scribble:
@@ -647,7 +755,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
           return;
         }
         method = "add_scribble";
-        params = m_Impl->GetMaskParams(scribbleInteractor->GetLastScribbleBoundingBox());
+        params = m_Impl->GetMaskParams(scribbleInteractor->GetLastScribbleBoundingBox(), include);
         mask = SharedBuffer::CopyOf(scribbleMask.GetPointer());
         break;
       }
@@ -661,7 +769,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
           return;
         }
         method = "add_lasso";
-        params = m_Impl->GetMaskParams(lassoInteractor->GetLastLassoBoundingBox());
+        params = m_Impl->GetMaskParams(lassoInteractor->GetLastLassoBoundingBox(), include);
         mask = SharedBuffer::CopyOf(lassoMask.GetPointer());
         break;
       }
@@ -684,6 +792,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
   {
     this->ResetPreviewContentAtTimeStep(timeStep);
     m_Impl->ClearLastInteraction();
+    this->InteractionsChangedEvent.Send();
     return;
   }
 
@@ -699,8 +808,6 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
     return m_Impl->Destroying.load() || (!remote && m_Impl->AbortRequested.load());
   });
 
-  const auto promptType = m_Impl->PromptType;
-
   // Held for the result, as the tool can be deactivated meanwhile.
   const MultiLabelSegmentation::Pointer preview = previewImage;
 
@@ -713,16 +820,48 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
       worker->Call("nninteractive_worker." + method, params, buffers, progress);
     },
-    [this, task, preview, timeStep, interactionType, promptType](std::exception_ptr error) {
+    [this, task, preview, timeStep, interactionType, promptType, byProgram](std::exception_ptr error) {
       if (error != nullptr)
       {
-        this->EndFailedPrompt(error, task);
+        if (!byProgram)
+        {
+          this->EndFailedPrompt(error, task);
+          return;
+        }
+
+        // The model did not take the prompt of the program, so its drawing
+        // goes again, and the caller of AddPrompt() learns why.
+        m_Impl->Interactors.at(*interactionType)->RemoveLastInteraction(promptType);
+
+        try
+        {
+          this->EndFailedPrompt(error, task);
+
+          // The user's cancel ends the session as well, which the panel explains.
+          m_Impl->PendingPromptError = task != nullptr && task->IsCancelRequested() && task->GetCancelOrigin().empty()
+            ? "nnInteractive was canceled in the Workbench, which ended its session."
+            : "nnInteractive: the prompt was cancelled, or the session ended.";
+        }
+        catch (const Exception& e)
+        {
+          m_Impl->PendingPromptError = e.GetDescription();
+        }
+        catch (const std::exception& e)
+        {
+          m_Impl->PendingPromptError = e.what();
+        }
+
         return;
       }
 
       // Deactivated or aborted meanwhile, which ends the session in UpdateCleanUp().
       if (m_Impl->AbortRequested)
+      {
+        if (byProgram)
+          m_Impl->PendingPromptError = "nnInteractive: the session ended while the prompt computed.";
+
         return;
+      }
 
       if (interactionType.has_value())
       {
@@ -730,11 +869,16 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
         // Record this interaction so UndoLastInteraction() knows which prompt
         // to remove: the prompt type the enabled interactor was activated with
-        // when the interaction was made.
+        // when the interaction was made, or the one of AddPrompt().
         m_Impl->LastInteractionType = interactionType;
         m_Impl->LastInteractionPromptType = promptType;
         m_Impl->LastInteractionWasMask = false;
+        m_Impl->LastInteractionByProgram = byProgram;
 
+        if (byProgram)
+          m_Impl->PendingPromptApplied = true;
+
+        this->InteractionsChangedEvent.Send();
         this->PreviewUpdatedEvent.Send();
       }
       else
@@ -743,9 +887,10 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
         // The initial-segmentation mask is one undoable step (the session
         // snapshots before applying it); it has no prompt node to remove.
-        m_Impl->LastInteractionType.reset();
-        m_Impl->LastInteractionPromptType.reset();
+        m_Impl->ClearLastInteraction();
         m_Impl->LastInteractionWasMask = true;
+
+        this->InteractionsChangedEvent.Send();
       }
     });
 }
@@ -762,10 +907,14 @@ void mitk::nnInteractiveTool::EndFailedPrompt(std::exception_ptr error, const Pr
     if (m_Impl->AbortRequested)
       return;
 
-    // The cancellation ended the worker and with it the session.
+    // The cancellation ended the worker and with it the session. The user
+    // can cancel the work of a program, too, and a program that of another
+    // one. Only a program that canceled its own work knows already.
     if (task != nullptr && task->IsCancelRequested())
     {
-      this->SessionLostEvent.Send({ SessionLoss::Cause::Cancelled, e.GetDescription() });
+      const auto cancelOrigin = task->GetCancelOrigin();
+      const bool canceledByProgram = !cancelOrigin.empty() && cancelOrigin == ActionOriginScope::GetCurrent();
+      this->ReportSessionLoss({ SessionLoss::Cause::Cancelled, e.GetDescription(), canceledByProgram });
       return;
     }
 
@@ -973,6 +1122,8 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
   if (this->IsSessionRunning())
     this->EndSession();
 
+  m_Impl->LastSessionLoss.reset();
+
   auto prefs = GetPreferences();
 
   // Materialize the session-defining preferences with their effective values so a
@@ -1112,6 +1263,8 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
         MITK_INFO << "Connected to the nnInteractive server directly, bypassing the configured HTTP proxy.";
 
       m_Impl->SetCapabilities(start->Capabilities);
+
+      const bool autoZoomChanged = m_Impl->AutoZoom != start->AutoZoom;
       m_Impl->AutoZoom = start->AutoZoom;
 
       if (start->SelectedBackend.has_value())
@@ -1127,6 +1280,9 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
       m_Impl->ClearLastInteraction();
       m_Impl->UndoRefreshPending = false;
 
+      if (autoZoomChanged)
+        this->OptionsChangedEvent.Send();
+
       done(nullptr);
 
       if (m_Impl->TimePointChangedMeanwhile)
@@ -1134,7 +1290,115 @@ void mitk::nnInteractiveTool::StartSession(std::shared_ptr<ProgressTask> task, s
         m_Impl->TimePointChangedMeanwhile = false;
         this->OnTimePointChanged();
       }
+
+      // Whoever started it, a GUI can follow.
+      if (this->IsSessionRunning())
+        this->SessionStartedEvent.Send();
     });
+}
+
+void mitk::nnInteractiveTool::AddPrompt(InteractionType interactionType,
+                                        const std::vector<Point3D>& points,
+                                        PromptType promptType,
+                                        const PlaneGeometry* plane,
+                                        std::function<void(std::exception_ptr error)> done)
+{
+  if (!this->IsSessionRunning())
+    mitkThrow() << "nnInteractive has no session. Start one first.";
+
+  // The session takes one prompt at a time, as with the mouse.
+  if (this->IsUpdating() || this->IsRunningOffGUIThread() || this->IsPromptPending())
+    mitkThrow() << "nnInteractive is still computing a prompt.";
+
+  const auto supported = this->GetSupportedInteractions();
+  std::size_t minCount = 1;
+  std::size_t maxCount = 1;
+  bool isSupported = false;
+
+  switch (interactionType)
+  {
+    case InteractionType::Point:
+      isSupported = supported.Point;
+      break;
+    case InteractionType::Box:
+      isSupported = supported.Box;
+      minCount = maxCount = 2;
+      break;
+    case InteractionType::Scribble:
+      isSupported = supported.Scribble;
+      minCount = 2;
+      maxCount = MAX_STROKE_PROMPT_POINTS;
+      break;
+    case InteractionType::Lasso:
+      isSupported = supported.Lasso;
+      minCount = 3;
+      maxCount = MAX_STROKE_PROMPT_POINTS;
+      break;
+  }
+
+  if (!isSupported)
+    mitkThrow() << "The model of this session does not support " << GetInteractionTypeAsString(interactionType) << " prompts.";
+
+  if ((InteractionType::Scribble == interactionType || InteractionType::Lasso == interactionType)
+      && points.size() > maxCount)
+  {
+    mitkThrow() << "A " << GetInteractionTypeAsString(interactionType) << " prompt takes at most "
+      << MAX_STROKE_PROMPT_POINTS << " points. A few points along the structure are enough.";
+  }
+
+  if (points.size() < minCount || points.size() > maxCount)
+  {
+    mitkThrow() << "A " << GetInteractionTypeAsString(interactionType) << " prompt needs "
+      << (minCount == maxCount ? std::to_string(minCount) : "at least " + std::to_string(minCount))
+      << (minCount == 1 ? " point." : " points.");
+  }
+
+  // Cloned, as the plane of a render window changes with its slice.
+  m_Impl->PendingPrompt = Impl::GeometricPrompt{ interactionType, promptType, points,
+    plane != nullptr ? plane->Clone().GetPointer() : nullptr };
+  m_Impl->PendingPromptApplied = false;
+  m_Impl->PendingPromptError.clear();
+  m_Impl->PendingPromptDone = std::move(done);
+  ++m_Impl->PromptSerial;
+
+  // As the interactors trigger it.
+  try
+  {
+    this->UpdatePreview(false);
+  }
+  catch (...)
+  {
+    // The update did not start, so nothing takes the prompt or calls done,
+    // and the next update of anybody must not find them.
+    m_Impl->PendingPrompt.reset();
+    m_Impl->PendingPromptDone = nullptr;
+    throw;
+  }
+
+  // The update ended already, without work off the GUI thread: it did not
+  // reach DoUpdatePreview(), or that failed before.
+  if (!this->IsUpdating())
+    this->EndProgramPrompt();
+}
+
+void mitk::nnInteractiveTool::EndProgramPrompt()
+{
+  m_Impl->PendingPrompt.reset();
+
+  auto done = std::exchange(m_Impl->PendingPromptDone, nullptr);
+
+  if (!done)
+    return;
+
+  if (m_Impl->PendingPromptApplied)
+  {
+    done(nullptr);
+    return;
+  }
+
+  done(MakeExceptionPtr(m_Impl->PendingPromptError.empty()
+    ? std::string("The prompt was not applied, as the tool has no image or preview to work on.")
+    : m_Impl->PendingPromptError));
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -1215,9 +1479,15 @@ bool mitk::nnInteractiveTool::HandleSessionError(const Exception& error)
   // Do not tear down here: this runs while an interactor is mid-event, where
   // disabling/resetting interactors is unsafe. Signal the GUI, which calls
   // AbortSession() on the next event-loop tick.
-  this->SessionLostEvent.Send(loss);
+  this->ReportSessionLoss(loss);
 
   return true;
+}
+
+void mitk::nnInteractiveTool::ReportSessionLoss(const SessionLoss& loss)
+{
+  m_Impl->LastSessionLoss = loss;
+  this->SessionLostEvent.Send(loss);
 }
 
 void mitk::nnInteractiveTool::AbortSession()
@@ -1247,6 +1517,8 @@ void mitk::nnInteractiveTool::TearDownSession()
   this->ResetPreviewContent();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  this->InteractionsChangedEvent.Send();
 }
 
 void mitk::nnInteractiveTool::UpdatePrepare()
@@ -1263,6 +1535,16 @@ void mitk::nnInteractiveTool::UpdateCleanUp()
 {
   for (auto& [interactionType, interactor] : m_Impl->Interactors)
     interactor->SetInputSuspended(false);
+
+  // Posted, so that the caller of AddPrompt() finds the update ended. A
+  // prompt that failed at once has reported before this runs.
+  if (m_Impl->PendingPromptDone)
+  {
+    this->PostToGUIThread([this, serial = m_Impl->PromptSerial]() {
+      if (serial == m_Impl->PromptSerial)
+        this->EndProgramPrompt();
+    });
+  }
 
   // Posted, as the update has not ended yet. Through AbortSession(), which
   // checks again: a prompt can start before the posted call runs, and then
@@ -1338,29 +1620,44 @@ bool mitk::nnInteractiveTool::IsSessionStarting() const
   return m_Impl->Starting;
 }
 
+bool mitk::nnInteractiveTool::IsSessionEnding() const
+{
+  return m_Impl->AbortRequested;
+}
+
+std::optional<mitk::nnInteractiveTool::SessionLoss> mitk::nnInteractiveTool::GetLastSessionLoss() const
+{
+  return m_Impl->LastSessionLoss;
+}
+
+bool mitk::nnInteractiveTool::IsPromptPending() const
+{
+  return static_cast<bool>(m_Impl->PendingPromptDone);
+}
+
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
 {
   this->Worker->Call("nninteractive_worker.set_autozoom", { { "enabled", this->AutoZoom } });
 }
 
-nlohmann::json mitk::nnInteractiveTool::Impl::GetPointParams(const Point3D& point, const Image* inputAtTimeStep) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetPointParams(const Point3D& point, const Image* inputAtTimeStep, bool include) const
 {
   itk::Index<3> index;
   inputAtTimeStep->GetGeometry()->WorldToIndex(point, index);
 
   return {
     { "coordinates", { index[2], index[1], index[0] } },
-    { "include", this->PromptType == PromptType::Positive }
+    { "include", include }
   };
 }
 
-nlohmann::json mitk::nnInteractiveTool::Impl::GetBoxParams(const PlanarFigure* box, const Image* inputAtTimeStep) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetBoxParams(const Point3D& corner, const Point3D& oppositeCorner, const Image* inputAtTimeStep, bool include) const
 {
   const auto* geometry = inputAtTimeStep->GetGeometry();
 
   std::array<itk::Index<3>, 2> indices;
-  geometry->WorldToIndex(box->GetWorldControlPoint(0), indices[0]);
-  geometry->WorldToIndex(box->GetWorldControlPoint(1), indices[1]);
+  geometry->WorldToIndex(corner, indices[0]);
+  geometry->WorldToIndex(oppositeCorner, indices[1]);
 
   auto bbox = nlohmann::json::array();
 
@@ -1373,18 +1670,78 @@ nlohmann::json mitk::nnInteractiveTool::Impl::GetBoxParams(const PlanarFigure* b
 
   return {
     { "bbox", bbox },
-    { "include", this->PromptType == PromptType::Positive }
+    { "include", include }
   };
 }
 
-nlohmann::json mitk::nnInteractiveTool::Impl::GetMaskParams(const InteractionBoundingBox* boundingBox) const
+nlohmann::json mitk::nnInteractiveTool::Impl::GetMaskParams(const InteractionBoundingBox* boundingBox, bool include) const
 {
-  nlohmann::json params = { { "include", this->PromptType == PromptType::Positive } };
+  nlohmann::json params = { { "include", include } };
 
   if (boundingBox != nullptr)
     params["bbox"] = ToJson(*boundingBox);
 
   return params;
+}
+
+mitk::nnInteractiveTool::Impl::PromptCall mitk::nnInteractiveTool::Impl::DrawPrompt(const GeometricPrompt& prompt, const Image* inputAtTimeStep)
+{
+  const bool include = prompt.PromptType == PromptType::Positive;
+  const auto* geometry = inputAtTimeStep->GetGeometry();
+
+  for (const auto& point : prompt.Points)
+  {
+    if (!geometry->IsInside(point))
+      mitkThrow() << "The point " << point << " lies outside the image.";
+  }
+
+  // Without the plane of a render window, the prompt lies in the slice of
+  // the image that its points lie in. A point is not drawn in a plane.
+  auto plane = prompt.Plane;
+
+  if (plane.IsNull() && prompt.Type != InteractionType::Point)
+    plane = PlaneGeometry::ConstPointer(CreateSlicePlane(prompt.Points, geometry));
+
+  // The interactor of the prompt's type draws it as it draws one of the
+  // mouse, and the model gets what that drawing gives, as from the prompts
+  // of the user.
+  auto* interactor = this->Interactors.at(prompt.Type).get();
+
+  switch (prompt.Type)
+  {
+    case InteractionType::Point:
+    {
+      const auto& point = prompt.Points.front();
+      static_cast<PointInteractor*>(interactor)->AddPoint(point, prompt.PromptType);
+      return { "add_point", this->GetPointParams(point, inputAtTimeStep, include), nullptr };
+    }
+
+    case InteractionType::Box:
+    {
+      const auto* box = static_cast<BoxInteractor*>(interactor)->AddBox(plane, prompt.Points[0], prompt.Points[1], prompt.PromptType);
+      return { "add_bbox", this->GetBoxParams(box->GetWorldControlPoint(0), box->GetWorldControlPoint(1), inputAtTimeStep, include), nullptr };
+    }
+
+    case InteractionType::Scribble:
+    {
+      auto* scribbleInteractor = static_cast<ScribbleInteractor*>(interactor);
+      scribbleInteractor->AddScribble(plane, prompt.Points, prompt.PromptType);
+
+      const auto mask = scribbleInteractor->GetLastScribbleMask();
+      return { "add_scribble", this->GetMaskParams(scribbleInteractor->GetLastScribbleBoundingBox(), include), SharedBuffer::CopyOf(mask.GetPointer()) };
+    }
+
+    case InteractionType::Lasso:
+    {
+      auto* lassoInteractor = static_cast<LassoInteractor*>(interactor);
+      lassoInteractor->AddLasso(plane, prompt.Points, prompt.PromptType);
+
+      const auto mask = lassoInteractor->GetLastLassoMask();
+      return { "add_lasso", this->GetMaskParams(lassoInteractor->GetLastLassoBoundingBox(), include), SharedBuffer::CopyOf(mask.GetPointer()) };
+    }
+  }
+
+  mitkThrow() << "Unknown interaction type of a prompt.";
 }
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const

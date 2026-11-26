@@ -469,6 +469,11 @@ for (auto* slicer : m_ControllerToSliceObserverTag.keys())
   m_ActionToSlicerMap.clear();
   m_ToolManager = nullptr;
 
+  // Until the next Initialize(), nothing follows the windows (their delete
+  // observers are gone) or the working data, which may be destroyed meanwhile.
+  m_LastSNC = nullptr;
+  m_Segmentation = nullptr;
+
   m_Initialized = false;
 }
 
@@ -1413,6 +1418,11 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
 void QmitkSlicesInterpolator::Start3DInterpolation()
 {
+  // Uninitialized while no render window part is open; Initialize() and the
+  // next change start it again.
+  if (m_ToolManager.IsNull())
+    return;
+
   auto workingNode = m_ToolManager->GetWorkingData(0);
 
   if (workingNode == nullptr)
@@ -1709,7 +1719,8 @@ void QmitkSlicesInterpolator::OnActiveLabelChanged(mitk::Label::PixelType)
     m_FeedbackNode->SetData(nullptr);
     this->OnInterpolationActivated(true);
 
-    m_LastSNC->SendSlice();
+    if (nullptr != m_LastSNC)
+      m_LastSNC->SendSlice();
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->UpdateVisibleSuggestion();

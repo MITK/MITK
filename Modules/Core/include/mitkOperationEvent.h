@@ -91,6 +91,12 @@ namespace mitk
      */
     std::string GetDescription();
 
+    /**
+     * \brief Get who made this entry.
+     * \return The ActionOriginScope name that was current at construction; empty for the user.
+     */
+    const std::string& GetOrigin() const;
+
     /** \brief Swap the do/undo operations (toggle reversed state). */
     virtual void ReverseOperations();
 
@@ -141,6 +147,8 @@ namespace mitk
     int m_GroupEventId;
 
     std::string m_Description;
+
+    std::string m_Origin;
 
     UndoStackItem(UndoStackItem &);        // hide copy constructor
     void operator=(const UndoStackItem &); // hide operator=

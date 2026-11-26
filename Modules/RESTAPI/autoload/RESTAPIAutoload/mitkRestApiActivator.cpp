@@ -75,12 +75,14 @@ public:
 
   void Unload(us::ModuleContext* /*context*/) override
   {
-    this->StopServiceTracking();
-
+    // Stopped before the dispatcher goes: a request in flight would run its
+    // work for the GUI thread on its own thread without one.
     if (m_RestServer)
     {
       m_RestServer->Stop();
     }
+
+    this->StopServiceTracking();
 
     if (m_RestServerRegistration)
     {
@@ -224,7 +226,9 @@ private:
     config.host = restApiPrefs->Get("host", defaults.host);
     config.port = restApiPrefs->GetInt("port", defaults.port);
     config.enabled = restApiPrefs->GetBool("enabled", defaults.enabled);
-    config.threadPoolSize = restApiPrefs->GetInt("threadPoolSize", defaults.threadPoolSize);
+    // Not "threadPoolSize": what is stored under that key was never applied,
+    // and is mostly the default of 4 that the preference page had then.
+    config.threadPoolSize = restApiPrefs->GetInt("workerThreads", defaults.threadPoolSize);
     config.readTimeoutSeconds = restApiPrefs->GetInt("readTimeoutSeconds", defaults.readTimeoutSeconds);
     config.writeTimeoutSeconds = restApiPrefs->GetInt("writeTimeoutSeconds", defaults.writeTimeoutSeconds);
 

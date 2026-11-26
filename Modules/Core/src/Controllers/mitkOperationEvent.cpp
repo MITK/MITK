@@ -11,12 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkOperationEvent.h>
+#include <mitkActionOriginScope.h>
 #include <itkCommand.h>
 
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;
 int mitk::UndoStackItem::m_CurrGroupEventId = 0;
 
-mitk::UndoStackItem::UndoStackItem(std::string description) : m_Reversed(false), m_Description(description)
+mitk::UndoStackItem::UndoStackItem(std::string description)
+  : m_Reversed(false), m_Description(description), m_Origin(ActionOriginScope::GetCurrent())
 {
   m_ObjectEventId = GetCurrObjectEventId();
   m_GroupEventId = GetCurrGroupEventId();
@@ -60,6 +62,11 @@ int mitk::UndoStackItem::GetGroupEventId()
 std::string mitk::UndoStackItem::GetDescription()
 {
   return m_Description;
+}
+
+const std::string& mitk::UndoStackItem::GetOrigin() const
+{
+  return m_Origin;
 }
 
 void mitk::UndoStackItem::ReverseOperations()

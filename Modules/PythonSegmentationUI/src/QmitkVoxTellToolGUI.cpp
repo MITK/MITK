@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkVoxTellToolGUI.h>
 
 #include <mitkCoreServices.h>
+#include <mitkExceptionMacro.h>
 #include <mitkIPreferencesService.h>
 #include <mitkPipPackageInfo.h>
 #include <mitkProgressTask.h>
@@ -163,12 +164,7 @@ QmitkVoxTellToolGUI::QmitkVoxTellToolGUI()
   {
     auto* tool = this->GetTool();
 
-    if (tool == nullptr)
-      return false;
-
-    const auto* preview = tool->GetPreviewSegmentation();
-
-    if (preview == nullptr || preview->GetAllLabelValues().empty())
+    if (tool == nullptr || !tool->HasResultToConfirm())
       return false;
 
     return scopeFunction(enabled);
@@ -177,6 +173,12 @@ QmitkVoxTellToolGUI::QmitkVoxTellToolGUI()
 
 QmitkVoxTellToolGUI::~QmitkVoxTellToolGUI()
 {
+  if (auto* tool = this->GetTool(); tool != nullptr)
+  {
+    tool->ModelLoadedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+
   if (m_Preferences != nullptr)
   {
     m_Preferences->OnPropertyChanged -=
@@ -291,6 +293,14 @@ void QmitkVoxTellToolGUI::OnInitializeButtonToggled(bool checked)
     return;
   }
 
+  // Started through the REST API. OnToolModelLoaded() checks the button then.
+  if (this->GetTool()->IsInitializing())
+  {
+    this->UncheckInitializeButton();
+    this->SetStatus("VoxTell is being initialized already, for example by the agent. Wait until it is ready.");
+    return;
+  }
+
   // Installing and loading run event loops, during which the controls must not
   // start anything else, and during which a tool change can delete this GUI.
   m_IsBusy = true;
@@ -382,71 +392,46 @@ void QmitkVoxTellToolGUI::LoadModel()
   // One notice for the whole initialization, a download included.
   auto notice = std::make_shared<Notice>(window, initMessage);
 
-  // The download in between has a cancel of its own, so each of the two
-  // worker phases gets a task of its own.
-  auto task = std::make_shared<mitk::ProgressTask>("Preparing VoxTell", mitk::ProgressTask::Indeterminate, true);
-  mitk::VoxTellTool::Pointer tool = this->GetTool();
+  // A download that did not succeed has told the user already.
+  auto downloadFailed = std::make_shared<bool>(false);
 
-  tool->GetModelFiles(task, [self, window, notice, task, tool](std::exception_ptr error, const std::vector<mitk::VoxTell::RepoFiles>& files)
-  {
-    // A deactivation of the tool meanwhile deleted this GUI.
-    if (self.isNull())
-      return;
-
-    if (error != nullptr)
+  this->GetTool()->Initialize(
+    [self, window, notice, downloadFailed](const std::vector<mitk::VoxTell::RepoFiles>& files)
     {
-      notice->Close();
-      self->OnInitializationFailed(error, task->IsCancelRequested());
-      return;
-    }
+      // A deactivation of the tool meanwhile deleted this GUI.
+      if (self.isNull())
+        mitkThrow() << "VoxTell: aborted.";
 
-    if (!files.empty())
-    {
       QString output;
       const auto result = self->Download("Downloading VoxTell model", files, output);
 
-      if (self.isNull())
+      if (result == QmitkVenvProcess::StepResult::Succeeded)
         return;
 
-      if (result != QmitkVenvProcess::StepResult::Succeeded)
-      {
-        notice->Close();
+      *downloadFailed = true;
+      notice->Close();
 
-        if (result == QmitkVenvProcess::StepResult::Failed)
-        {
-          ShowDownloadError(window, output);
+      if (result == QmitkVenvProcess::StepResult::Failed)
+        ShowDownloadError(window, output);
+      else if (!self.isNull())
+        self->SetStatus("The download was cancelled.");
 
-          if (self.isNull())
-            return;
-        }
-        else
-        {
-          self->SetStatus("The download was cancelled.");
-        }
-
-        self->OnInitializationAborted();
-        return;
-      }
-    }
-
-    auto loadTask = std::make_shared<mitk::ProgressTask>("Loading VoxTell", mitk::ProgressTask::Indeterminate, true);
-
-    tool->LoadModel(loadTask, [self, notice, loadTask](std::exception_ptr loadError)
+      mitkThrow() << "VoxTell: the download did not succeed.";
+    },
+    [self, notice, downloadFailed](std::exception_ptr error, bool cancelled)
     {
       notice->Close();
 
       if (self.isNull())
         return;
 
-      if (loadError != nullptr)
-      {
-        self->OnInitializationFailed(loadError, loadTask->IsCancelRequested());
-        return;
-      }
-
-      self->OnModelLoaded();
+      if (error == nullptr)
+        self->OnModelLoaded(true);
+      else if (*downloadFailed)
+        self->OnInitializationAborted();
+      else
+        self->OnInitializationFailed(error, cancelled);
     });
-  });
 }
 
 void QmitkVoxTellToolGUI::OnInitializationFailed(std::exception_ptr error, bool cancelled)
@@ -482,10 +467,6 @@ void QmitkVoxTellToolGUI::OnInitializationFailed(std::exception_ptr error, bool 
 
 void QmitkVoxTellToolGUI::OnInitializationAborted()
 {
-  // Ends a worker that the initialization started, which holds VoxTell's
-  // imports and possibly a model.
-  this->GetTool()->UnloadModel();
-
   m_IsBusy = false;
   this->UncheckInitializeButton();
   this->EnableWidgets(true);
@@ -629,7 +610,61 @@ void QmitkVoxTellToolGUI::EmbedUnknownPrompts(const std::vector<std::string>& pr
   });
 }
 
-void QmitkVoxTellToolGUI::OnModelLoaded()
+void QmitkVoxTellToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  if (auto* tool = dynamic_cast<mitk::VoxTellTool*>(newTool); tool != nullptr)
+  {
+    tool->ModelLoadedEvent += mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent += mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+}
+
+void QmitkVoxTellToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
+{
+  if (auto* tool = dynamic_cast<mitk::VoxTellTool*>(oldTool); tool != nullptr)
+  {
+    tool->ModelLoadedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolModelLoaded);
+    tool->PromptsChangedEvent -= mitk::MessageDelegate<QmitkVoxTellToolGUI>(this, &QmitkVoxTellToolGUI::OnToolPromptsChanged);
+  }
+
+  Superclass::DisconnectOldTool(oldTool);
+}
+
+void QmitkVoxTellToolGUI::OnToolModelLoaded()
+{
+  // The initialization of this GUI finishes on its own.
+  if (m_IsBusy)
+    return;
+
+  {
+    QSignalBlocker blocker(m_Ui->initializeButton);
+    m_Ui->initializeButton->setChecked(true);
+  }
+
+  this->OnModelLoaded(false);
+}
+
+void QmitkVoxTellToolGUI::OnToolPromptsChanged()
+{
+  const auto* tool = this->GetTool();
+
+  if (tool == nullptr || m_SettingPrompts)
+    return;
+
+  if (tool->GetPrompts() != this->ReadPrompts())
+  {
+    QStringList prompts;
+
+    for (const auto& prompt : tool->GetPrompts())
+      prompts << QString::fromStdString(prompt);
+
+    m_Ui->promptsTextEdit->setPlainText(prompts.join('\n'));
+  }
+}
+
+void QmitkVoxTellToolGUI::OnModelLoaded(bool loadedHere)
 {
   m_IsBusy = false;
   m_SettingsChanged = false;
@@ -639,6 +674,11 @@ void QmitkVoxTellToolGUI::OnModelLoaded()
   this->UpdatePromptCompletions();
   this->EnableWidgets(true);
   this->SetStatus("Ready. Enter one prompt per line and click Segment.");
+
+  // Who loaded it elsewhere, like the agent, does not need the focus here nor
+  // a dialog that waits for the user.
+  if (!loadedHere)
+    return;
 
   // Typing the prompts is all there is to do next. A warning shown below hands
   // the focus back when it closes.
@@ -849,8 +889,20 @@ void QmitkVoxTellToolGUI::StartRun(const std::vector<std::string>& prompts)
   if (tool == nullptr)
     return;
 
-  tool->SetPrompts(prompts);
+  // Another run, for example of the REST API, can have started during a
+  // question before this one. Its prompts and result are not this run's.
+  if (tool->IsUpdating() || tool->IsRunningOffGUIThread())
+  {
+    this->SetStatus("VoxTell is busy with another run. Try again when it has finished.", QmitkInfoCard::Severity::Warning);
+    return;
+  }
+
+  // The text field keeps prompts that are not part of this run, the ones
+  // VoxTell does not know after "Known prompts only".
+  m_SettingPrompts = true;
   tool->SetCreateGroupsAsNeeded(m_Ui->createGroupsCheckBox->isChecked());
+  tool->SetPrompts(prompts);
+  m_SettingPrompts = false;
 
   this->SetStatus("Segmenting. This can take a while...");
 
@@ -900,14 +952,38 @@ void QmitkVoxTellToolGUI::BusyStateChanged(bool isBusy)
       this->PrepareNextRun();
     });
   }
-  else if (m_RunPending)
+  else
   {
-    m_RunPending = false;
-    QTimer::singleShot(0, this, &Self::ShowRunResult);
+    const bool isOwnRun = std::exchange(m_RunPending, false);
+    const auto* tool = this->GetTool();
+
+    // An update without prompts only clears the preview. The Initialize button
+    // tells whether the model is loaded, also if its worker has stopped
+    // meanwhile, which ShowRunResult() notices.
+    const bool isRunOfPrompts = tool != nullptr && m_Ui->initializeButton->isChecked() && !tool->GetPrompts().empty();
+
+    if (isOwnRun || isRunOfPrompts)
+    {
+      using Outcome = mitk::SegWithPreviewTool::ConfirmationOutcome;
+      const auto outcome = tool != nullptr ? tool->GetLastConfirmationOutcome() : Outcome::None;
+
+      QTimer::singleShot(0, this, [this, isOwnRun, outcome]() {
+        // A confirmation that waited for this update has transferred its
+        // preview meanwhile, which gave it an outcome of its own. What it
+        // transferred is no run result to show.
+        if (const auto* tool = this->GetTool(); tool != nullptr && tool->GetLastConfirmationOutcome() != outcome)
+        {
+          this->PrepareNextRun();
+          return;
+        }
+
+        this->ShowRunResult(isOwnRun);
+      });
+    }
   }
 }
 
-void QmitkVoxTellToolGUI::ShowRunResult()
+void QmitkVoxTellToolGUI::ShowRunResult(bool confirmAutomatically)
 {
   QPointer<QmitkVoxTellToolGUI> self(this);
   auto* tool = this->GetTool();
@@ -928,7 +1004,7 @@ void QmitkVoxTellToolGUI::ShowRunResult()
 
     // Only what the Confirm button would transfer: with "Transfer selected
     // labels", the user picks the labels first.
-    if (m_Ui->autoConfirmCheckBox->isChecked() && m_EnableConfirmSegBtnFnc(true))
+    if (confirmAutomatically && m_Ui->autoConfirmCheckBox->isChecked() && m_EnableConfirmSegBtnFnc(true))
     {
       try
       {
@@ -1039,7 +1115,8 @@ bool QmitkVoxTellToolGUI::ResetIfWorkerStopped()
 {
   auto* tool = this->GetTool();
 
-  if (tool == nullptr || !m_Ui->initializeButton->isChecked() || tool->IsModelLoaded())
+  // A start under way, maybe a REST client's, has no model yet but a worker.
+  if (tool == nullptr || !m_Ui->initializeButton->isChecked() || tool->IsModelLoaded() || tool->IsInitializing())
     return false;
 
   // The process that ran VoxTell ended. MITK is not affected. The first line

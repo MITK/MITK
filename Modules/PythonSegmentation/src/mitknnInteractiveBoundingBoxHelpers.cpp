@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitknnInteractiveBoundingBoxHelpers.h"
 
 #include <mitkBaseGeometry.h>
+#include <mitkExceptionMacro.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkLog.h>
 #include <mitkPixelType.h>
@@ -23,6 +24,17 @@ found in the LICENSE file.
 #include <array>
 #include <cmath>
 #include <limits>
+
+namespace
+{
+  double GetSpread(const std::vector<mitk::Point3D>& indices, int axis)
+  {
+    const auto [min, max] = std::minmax_element(indices.begin(), indices.end(),
+      [axis](const mitk::Point3D& a, const mitk::Point3D& b) { return a[axis] < b[axis]; });
+
+    return (*max)[axis] - (*min)[axis];
+  }
+}
 
 bool mitk::nnInteractive::ComputeStrokeBoundingBox(const Image* paintingSlice2D,
                                                     const Image* referenceImage,
@@ -221,4 +233,99 @@ mitk::Image::Pointer mitk::nnInteractive::BuildBoundingBoxMaskImage(const Image*
   SegTool2D::WriteSliceToVolume(out, slicingPlane, paintingSlice2D, 0);
 
   return out;
+}
+
+mitk::PlaneGeometry::Pointer mitk::nnInteractive::CreateSlicePlane(const std::vector<Point3D>& points,
+                                                                   const BaseGeometry* geometry)
+{
+  if (points.empty() || geometry == nullptr)
+    mitkThrow() << "A slice plane needs points and a geometry.";
+
+  std::vector<Point3D> indices;
+  std::vector<itk::Index<3>> voxels;
+  Vector3D sum;
+  sum.Fill(0.0);
+
+  for (const auto& point : points)
+  {
+    Point3D index;
+    geometry->WorldToIndex(point, index);
+    indices.push_back(index);
+
+    itk::Index<3> voxel;
+    geometry->WorldToIndex(point, voxel);
+    voxels.push_back(voxel);
+
+    sum += index.GetVectorFromOrigin();
+  }
+
+  // nnInteractive takes the voxels that the points lie in, so the points lie
+  // in one slice if their voxels do.
+  int sliceAxis = -1;
+  double leastSpread = std::numeric_limits<double>::max();
+
+  for (int axis = 2; axis >= 0; --axis)
+  {
+    const auto layer = voxels.front()[axis];
+    const bool inOneSlice = std::all_of(voxels.begin(), voxels.end(),
+      [axis, layer](const itk::Index<3>& voxel) { return voxel[axis] == layer; });
+
+    if (!inOneSlice)
+      continue;
+
+    const auto spread = GetSpread(indices, axis);
+
+    if (spread < leastSpread)
+    {
+      leastSpread = spread;
+      sliceAxis = axis;
+    }
+  }
+
+  if (sliceAxis < 0)
+    mitkThrow() << "The points do not lie in one slice of the image: along each of its axes they lie in voxels of different slices.";
+
+  // The slices of the image along that axis.
+  int axes[3];
+  geometry->MapAxesToOrientations(axes);
+
+  const auto orientation = axes[0] == sliceAxis
+    ? AnatomicalPlane::Sagittal
+    : axes[1] == sliceAxis
+      ? AnatomicalPlane::Coronal
+      : AnatomicalPlane::Axial;
+
+  auto slices = SlicedGeometry3D::New();
+  slices->InitializePlanes(geometry, orientation);
+
+  // The center of the points, moved to the center of their slice, which a
+  // plane of the slices lies in. Points halfway between two slices would be
+  // as close to the one as to the other.
+  Point3D centerIndex;
+  centerIndex.Fill(0.0);
+  centerIndex += sum / static_cast<double>(points.size());
+  centerIndex[sliceAxis] = static_cast<ScalarType>(voxels.front()[sliceAxis]);
+
+  Point3D center;
+  geometry->IndexToWorld(centerIndex, center);
+
+  const PlaneGeometry* nearestPlane = nullptr;
+  double leastDistance = std::numeric_limits<double>::max();
+
+  for (unsigned int slice = 0; slice < slices->GetSlices(); ++slice)
+  {
+    const auto* slicePlane = slices->GetPlaneGeometry(slice);
+    const auto distance = std::abs(slicePlane->SignedDistanceFromPlane(center));
+
+    if (distance < leastDistance)
+    {
+      leastDistance = distance;
+      nearestPlane = slicePlane;
+    }
+  }
+
+  if (nearestPlane == nullptr)
+    return nullptr;
+
+  return nearestPlane->Clone();
 }

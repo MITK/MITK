@@ -153,11 +153,8 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
-    if (auto tool = this->GetTool(); tool != nullptr)
-    {
-      if (!tool->IsSessionRunning() || !tool->HasInteractions())
-        return false;
-    }
+    if (auto tool = this->GetTool(); tool != nullptr && !tool->HasResultToConfirm())
+      return false;
 
     return enabled;
   };
@@ -173,23 +170,7 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
   // in a partially-destructed state during application shutdown, which
   // causes crashes when segmentation events fan out to dead observers.
 
-  if (auto* tool = this->GetTool())
-  {
-    tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
-
-    tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnSessionEnded);
-
-    tool->SessionLostEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
-      this, &QmitknnInteractiveToolGUI::OnSessionLost);
-
-    tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
-
-    tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-  }
+  this->UnsubscribeFromTool(this->GetTool());
 
   if (m_Preferences != nullptr)
   {
@@ -225,21 +206,6 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
   connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
 
-  this->GetTool()->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-
-  this->GetTool()->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
-
-  this->GetTool()->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
-
-  this->GetTool()->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
-    this, &QmitknnInteractiveToolGUI::OnSessionEnded);
-
-  this->GetTool()->SessionLostEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
-    this, &QmitknnInteractiveToolGUI::OnSessionLost);
-
   this->UpdateModelLicenseDisplay(std::nullopt);
 
   Superclass::InitializeUI(mainLayout);
@@ -248,6 +214,22 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   // should be moved to the base class.
 
   auto confirmButton = this->GetConfirmSegmentationButton();
+
+  // Tells the confirms of this GUI from those of other callers, see
+  // OnConfirmCleanUp().
+  disconnect(confirmButton, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()));
+  connect(confirmButton, &QPushButton::clicked, this, [this]() {
+    m_ConfirmingFromPanel = true;
+
+    // A confirmation that updates the preview first transfers after this
+    // returns, see BusyStateChanged().
+    const auto restore = qScopeGuard([this] {
+      if (const auto* tool = this->GetTool(); tool == nullptr || !tool->IsUpdating())
+        m_ConfirmingFromPanel = false;
+    });
+
+    this->OnAcceptPreview();
+  });
 
   BindShortcut(this, RESET_KEY, m_Ui->resetButton, "Press %1 to reset all interactions");
   BindShortcut(this, UNDO_KEY, m_Ui->undoButton, "Press %1 to undo the last interaction");
@@ -665,13 +647,29 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
       }
 
       task->Finish();
-      self->OnSessionStarted();
+
+      // After SessionStartedEvent, which sets up the controls whoever
+      // started the session. Only a start of this GUI waits for the user.
+      QTimer::singleShot(0, self, [self]() {
+        if (!self.isNull())
+          self->WarnAboutCpuBackend();
+      });
     });
   });
 }
 
 void QmitknnInteractiveToolGUI::OnSessionStarted()
 {
+  m_SessionLabelValue.reset();
+
+  // The session may have been started by another caller than the Initialize
+  // button, like the REST API, so the button is checked here, without
+  // re-entering OnInitializeButtonToggled().
+  {
+    QSignalBlocker blocker(m_Ui->initializeButton);
+    m_Ui->initializeButton->setChecked(true);
+  }
+
   // Keep the Initialize button enabled so a second click uninitializes the
   // session; its label flips to "Uninitialize" while a session is running
   // (see UpdateInitializeButtonText). Re-enable the settings button too so the
@@ -711,17 +709,31 @@ void QmitknnInteractiveToolGUI::OnSessionStarted()
       this->OnActiveLabelChanged({ activeLabel->GetValue() });
   }
 
-  auto backend = this->GetTool()->GetBackend();
+  const auto backend = this->GetTool()->GetBackend();
+  const bool isAutoZoomAvailable = !backend.has_value() || backend == mitk::nnInteractive::Backend::CUDA;
 
-  if (!backend.has_value())
+  // In both directions: an earlier session on the CPU has disabled it, and
+  // only a start by the Initialize button enables it on its own.
+  m_Ui->autoZoomCheckBox->setEnabled(isAutoZoomAvailable);
+
+  if (isAutoZoomAvailable)
     return;
 
-  if (backend == mitk::nnInteractive::Backend::CUDA)
-    return;
-
-  m_Ui->autoZoomCheckBox->setEnabled(false);
   m_Ui->autoZoomCheckBox->setChecked(false);
   m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
+}
+
+void QmitknnInteractiveToolGUI::WarnAboutCpuBackend()
+{
+  const auto* tool = this->GetTool();
+
+  if (tool == nullptr || !tool->IsSessionRunning())
+    return;
+
+  const auto backend = tool->GetBackend();
+
+  if (!backend.has_value() || backend == mitk::nnInteractive::Backend::CUDA)
+    return;
 
 #if defined(__APPLE__)
   // On macOS nnInteractive has no GPU acceleration and always runs on the CPU,
@@ -791,9 +803,6 @@ void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
   // Reset any interactions.
   this->GetTool()->ResetInteractions();
 
-  // Nothing is undoable after a reset.
-  this->UpdateUndoButtonState();
-
   // Switch to positive prompt type.
   m_Ui->positiveButton->click();
 }
@@ -806,7 +815,6 @@ void QmitknnInteractiveToolGUI::OnUndoButtonClicked()
     return;
 
   tool->UndoLastInteraction();
-  this->UpdateUndoButtonState();
 }
 
 void QmitknnInteractiveToolGUI::UpdateUndoButtonState()
@@ -924,6 +932,75 @@ mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
   return this->GetConnectedToolAs<mitk::nnInteractiveTool>();
 }
 
+void QmitknnInteractiveToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  if (auto* tool = dynamic_cast<mitk::nnInteractiveTool*>(newTool); tool != nullptr)
+  {
+    tool->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+
+    tool->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+    tool->InteractionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
+
+    tool->OptionsChangedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
+
+    tool->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+    tool->SessionStartedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionStarted);
+
+    tool->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionEnded);
+
+    tool->SessionLostEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
+      this, &QmitknnInteractiveToolGUI::OnSessionLost);
+  }
+}
+
+void QmitknnInteractiveToolGUI::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
+{
+  this->UnsubscribeFromTool(dynamic_cast<mitk::nnInteractiveTool*>(oldTool));
+
+  Superclass::DisconnectOldTool(oldTool);
+}
+
+void QmitknnInteractiveToolGUI::UnsubscribeFromTool(mitk::nnInteractiveTool* tool)
+{
+  if (tool == nullptr)
+    return;
+
+  tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+  tool->SessionStartedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionStarted);
+
+  tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionEnded);
+
+  tool->SessionLostEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::nnInteractiveTool::SessionLoss&>(
+    this, &QmitknnInteractiveToolGUI::OnSessionLost);
+
+  tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+  tool->InteractionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnInteractionsChanged);
+
+  tool->OptionsChangedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolOptionsChanged);
+
+  tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+}
+
 void QmitknnInteractiveToolGUI::OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels)
 {
   // AutoCreateAndSelectNewLabel() drives the inspector's selection itself and
@@ -978,6 +1055,9 @@ void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSeg
   if (tool == nullptr || !tool->IsSessionRunning())
     return;
 
+  if (m_SessionLabelValue == labelValue)
+    return;
+
   auto* segmentation = tool->GetTargetSegmentation();
 
   if (segmentation == nullptr)
@@ -987,6 +1067,8 @@ void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSeg
 
   if (label.IsNull())
     return;
+
+  m_SessionLabelValue = labelValue;
 
   // Switching the target label discards the previous label's interactions and
   // preview, so the new label starts from a clean slate; in particular a stale
@@ -1004,10 +1086,6 @@ void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSeg
   if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)) &&
       tool->GetSupportedInteractions().Mask)
     tool->InitializeSessionWithMask(mitk::CreateLabelMask(segmentation, labelValue));
-
-  // The mask initialization is one undoable step (no PreviewUpdatedEvent is
-  // emitted for it), so refresh the button state here.
-  this->UpdateUndoButtonState();
 }
 
 void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
@@ -1017,8 +1095,8 @@ void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
 
   // Read flags fresh so a mid-session preference change takes effect
   // on the next Confirm without requiring tool reactivation.
-  const bool autoCreate = this->IsAutoCreateNextLabelEnabled();
-  const bool autoConfirm = this->IsAutoConfirmEnabled();
+  const bool autoCreate = m_ConfirmingFromPanel && this->IsAutoCreateNextLabelEnabled();
+  const bool autoConfirm = m_ConfirmingFromPanel && this->IsAutoConfirmEnabled();
 
   this->OnResetInteractionsButtonClicked();
 
@@ -1125,6 +1203,7 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
 {
   // Teardown is complete; re-arm the loss handler for a future session.
   m_SessionLossHandled = false;
+  m_SessionLabelValue.reset();
 
   // Clear the model license now that no session is bound.
   this->UpdateModelLicenseDisplay(std::nullopt);
@@ -1136,6 +1215,7 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
 
   m_Ui->resetButton->setEnabled(false);
   m_Ui->undoButton->setEnabled(false);
+  m_Ui->programPromptLabel->setVisible(false);
   m_SupportsUndo = false;
   m_Ui->promptTypeGroupBox->setEnabled(false);
   m_Ui->interactionToolsGroupBox->setEnabled(false);
@@ -1207,6 +1287,7 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
 
   const auto cause = loss.Reason;
   const auto details = QString::fromStdString(loss.Details);
+  const bool cancelledByProgram = cause == Cause::Cancelled && loss.ByProgram;
 
   // Tear the session down on the next event-loop tick rather than now: this
   // fires from within an interactor's event handling, where disabling and
@@ -1214,12 +1295,16 @@ void QmitknnInteractiveToolGUI::OnSessionLost(const mitk::nnInteractiveTool::Ses
   // clears all prompts and the preview, and -- via SessionEndedEvent ->
   // OnSessionEnded -- reverts the widget to its pre-init state, so the user just
   // clicks Initialize to start over.
-  QTimer::singleShot(0, this, [this, cause, details]() {
+  QTimer::singleShot(0, this, [this, cause, details, cancelledByProgram]() {
     if (QCoreApplication::closingDown())
       return;
 
     if (auto* tool = this->GetTool())
       tool->AbortSession();
+
+    // Whoever cancelled the prompt of a program is not the user at this panel.
+    if (cancelledByProgram)
+      return;
 
     QString message;
 
@@ -1275,6 +1360,11 @@ void QmitknnInteractiveToolGUI::BusyStateChanged(bool isBusy)
   if (isBusy)
     return;
 
+  // After the transfer of a confirmation that followed this update, which
+  // runs right after the tool reported the end of it.
+  if (m_ConfirmingFromPanel)
+    QTimer::singleShot(0, this, [this]() { m_ConfirmingFromPanel = false; });
+
   // An initial mask is undoable as well, but sends no PreviewUpdatedEvent.
   this->UpdateUndoButtonState();
 
@@ -1324,10 +1414,6 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()
 {
-  // A prompt interaction just landed, so it is now undoable. Update before the
-  // auto-confirm early-outs below so the Undo button reflects every interaction.
-  this->UpdateUndoButtonState();
-
   if (m_AutoConfirmInProgress)
     return;
 
@@ -1340,7 +1426,7 @@ void QmitknnInteractiveToolGUI::OnPreviewUpdated()
     return;
 
   auto tool = this->GetTool();
-  if (tool == nullptr || !tool->HasInteractions())
+  if (tool == nullptr || !tool->HasInteractions() || tool->GetLastProgramPrompt().has_value())
     return;
 
   auto confirmButton = this->GetConfirmSegmentationButton();
@@ -1355,6 +1441,48 @@ void QmitknnInteractiveToolGUI::OnPreviewUpdated()
     confirmButton->click();
     m_AutoConfirmInProgress = false;
   });
+}
+
+void QmitknnInteractiveToolGUI::OnInteractionsChanged()
+{
+  this->UpdateUndoButtonState();
+
+  auto* tool = this->GetTool();
+
+  // The tool disables the interactor on a reset, also on one by a program.
+  if (tool != nullptr)
+  {
+    for (const auto& [interactionType, button] : m_InteractorButtons)
+    {
+      if (button->isChecked() && !tool->GetInteractor(interactionType)->IsEnabled())
+        button->setChecked(false);
+    }
+  }
+
+  const auto prompt = tool != nullptr ? tool->GetLastProgramPrompt() : std::nullopt;
+
+  if (prompt.has_value())
+  {
+    m_Ui->programPromptLabel->setText(QString("Last prompt by a program: %1 %2")
+      .arg(QString::fromStdString(mitk::nnInteractive::GetPromptTypeAsString(prompt->PromptType)).toLower())
+      .arg(QString::fromStdString(mitk::nnInteractive::GetInteractionTypeAsString(prompt->InteractionType)).toLower()));
+  }
+
+  m_Ui->programPromptLabel->setVisible(prompt.has_value());
+}
+
+void QmitknnInteractiveToolGUI::OnToolOptionsChanged()
+{
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  const QSignalBlocker autoRefineBlocker(m_Ui->autoRefineCheckBox);
+  m_Ui->autoRefineCheckBox->setChecked(tool->GetAutoRefine());
+
+  const QSignalBlocker autoZoomBlocker(m_Ui->autoZoomCheckBox);
+  m_Ui->autoZoomCheckBox->setChecked(tool->GetAutoZoom());
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoCreateNextLabelEnabled() const
@@ -1532,6 +1660,7 @@ bool QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
     return false;
 
   m_AutoCreatedLabelValue = addedLabel->GetValue();
+  m_SessionLabelValue = addedLabel->GetValue();
   m_PreviousActiveLabelValue = previousActiveValue;
   m_AutoCreatedLabelSegmentation = segmentation;
   m_AutoCreatedLabelSegmentation.SetDeleteEventCallback(

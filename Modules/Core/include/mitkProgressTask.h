@@ -132,6 +132,15 @@ namespace mitk
     bool IsCancelRequested() const;
 
     /**
+     * \brief Who asked for this task to stop.
+     *
+     * \return The ActionOriginScope name of the thread that requested the
+     *         cancellation; empty for the user, and while none was requested.
+     * \sa IsCancelRequested()
+     */
+    std::string GetCancelOrigin() const;
+
+    /**
      * \brief End the task before the handle goes out of scope.
      *
      * Calling this more than once has no effect.

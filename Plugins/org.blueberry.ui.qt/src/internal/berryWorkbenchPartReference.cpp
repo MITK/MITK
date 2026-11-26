@@ -54,6 +54,7 @@ void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
 WorkbenchPartReference::WorkbenchPartReference()
   : state(STATE_LAZY)
   , pinned(false)
+  , queueEvents(false)
   , propertyChangeListener(new PropertyChangeListener(this))
 {
 }
@@ -198,14 +199,15 @@ void WorkbenchPartReference::RefreshFromPart()
   SetPartName(ComputePartName());
   SetContentDescription(ComputeContentDescription());
   SetToolTip(GetRawToolTip());
-  //SetImageDescriptor(ComputeImageDescriptor());
+  SetImageDescriptor(ComputeImageDescriptor());
 
   this->DeferEvents(false);
 }
 
 QIcon WorkbenchPartReference::ComputeImageDescriptor()
 {
-  if (part)
+  // A part without an image of its own shows the one of its descriptor.
+  if (part && !part->GetTitleImage().isNull())
   {
     return part->GetTitleImage();
   }
@@ -374,7 +376,7 @@ void WorkbenchPartReference::DeferEvents(bool shouldQueue)
     while (iter != queuedEvents.end())
     {
       this->FirePropertyChange(*iter);
-      queuedEvents.erase(iter++);
+      iter = queuedEvents.erase(iter);
     }
   }
 }

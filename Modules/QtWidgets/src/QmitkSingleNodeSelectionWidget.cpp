@@ -39,6 +39,10 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   this->UpdateInfo();
 
   connect(m_Controls->btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
+
+  // Unlike a mouse event, clicked() also comes from the keyboard and from
+  // assistive technology.
+  connect(m_Controls->btnSelect, &QAbstractButton::clicked, this, &QmitkSingleNodeSelectionWidget::EditSelection);
 }
 
 QmitkSingleNodeSelectionWidget::~QmitkSingleNodeSelectionWidget()
@@ -100,15 +104,7 @@ bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
         return false;
       }
 
-      if (mouseEv->button() == Qt::LeftButton)
-      {
-        if (this->isEnabled())
-        {
-          this->EditSelection();
-          return true;
-        }
-      }
-      else
+      if (mouseEv->button() != Qt::LeftButton)
       {
         auto selection = this->CompileEmitSelection();
         if (!selection.empty())

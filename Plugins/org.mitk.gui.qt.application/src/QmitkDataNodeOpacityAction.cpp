@@ -39,6 +39,7 @@ void QmitkDataNodeOpacityAction::InitializeAction()
   m_Slider->setMinimum(0);
   m_Slider->setMaximum(100);
   m_Slider->setOrientation(Qt::Horizontal);
+  m_Slider->setAccessibleName(tr("Opacity"));
 
   auto layout = new QHBoxLayout;
   layout->setContentsMargins(4, 4, 4, 4);

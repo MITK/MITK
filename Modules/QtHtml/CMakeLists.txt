@@ -5,3 +5,5 @@ mitk_create_module(
     PUBLIC Qt6|Widgets
     PRIVATE Qt6|Svg litehtml
 )
+
+add_subdirectory(test)

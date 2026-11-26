@@ -352,22 +352,29 @@ public:
   bool SaveAll(bool confirm, bool closing, bool addNonPartSources);
 
   /**
-   * Saves the given dirty editors and views, optionally prompting the user.
+   * Lets the dirty parts ask the user what to do with them, and saves those
+   * for which the user chooses to save.
+   *
+   * Each dirty ISaveablePart is asked through PromptToSaveOnClose() if
+   * <code>confirm</code> is set. Cancel stops at once and returns false.
+   * Save saves the part with DoSave(); if it is still dirty afterwards, the
+   * save failed or was canceled, and the result is false. Discard leaves the
+   * part unsaved and goes on. So does NotAsked, the answer of a part that
+   * has no question: this function shows no dialog of its own.
    *
    * @param dirtyParts
    *            the dirty views and editors
    * @param confirm
-   *            <code>true</code> to prompt whether to save, <code>false</code>
-   *            to save without prompting
+   *            <code>true</code> to let the parts ask the user, <code>false</code>
+   *            to do nothing
    * @param closing
-   *            <code>true</code> if the parts are being closed,
-   *            <code>false</code> if just being saved without closing
-   * @param addNonPartSources true if non-part sources should be saved too
+   *            not used
+   * @param addNonPartSources
+   *            not used
    * @param window
-   *            the window to use as the parent for the dialog that prompts to
-   *            save multiple dirty editors and views
-   * @return <code>true</code> on success, <code>false</code> if the user
-   *         canceled the save or an error occurred while saving
+   *            not used
+   * @return <code>false</code> if a part answered CANCEL or was not saved
+   *         after the user asked for it, <code>true</code> otherwise
    */
 public:
   static bool SaveAll(const QList<IWorkbenchPart::Pointer>& dirtyParts,

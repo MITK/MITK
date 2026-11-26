@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "QmitkDataNodeSelectionProvider.h"
 #include "internal/QmitkCommonActivator.h"
 #include "internal/QmitkDataNodeItemModel.h"
+#include "internal/QmitkPartLockFollower.h"
 
 // mitk Includes
 #include <mitkLog.h>
@@ -38,6 +39,8 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QScrollArea>
 #include <QVBoxLayout>
+
+#include <memory>
 
 class QmitkAbstractViewPrivate
 {
@@ -191,6 +194,8 @@ public:
    */
   bool m_InDataStorageChanged;
 
+  std::unique_ptr<QmitkPartLockFollower> m_LockFollower;
+
 };
 
 QmitkAbstractView::QmitkAbstractView()
@@ -230,6 +235,11 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
 
   // finally set the layout containing the scroll area to the parent widget (= show it)
   parentQWidget->setLayout(parentLayout);
+
+  d->m_LockFollower = std::make_unique<QmitkPartLockFollower>(this, scrollArea, [this](const QIcon& image, const QString& toolTip) {
+    this->SetTitleImage(image);
+    this->SetTitleToolTip(toolTip);
+  });
 
   this->AfterCreateQtPartControl();
 }

@@ -93,7 +93,7 @@ namespace mitk
     tf->ClearScalarOpacityPoints();
     tf->GetScalarOpacityFunction()->SetClamping(j.value("ScalarOpacityClamping", true));
 
-    for (const auto& opacity : j["ScalarOpacity"])
+    for (const auto& opacity : j.at("ScalarOpacity"))
     {
       opacity.get_to(point);
       tf->AddScalarOpacityPoint(point.first, point.second);
@@ -102,7 +102,7 @@ namespace mitk
     tf->ClearGradientOpacityPoints();
     tf->GetGradientOpacityFunction()->SetClamping(j.value("GradientOpacityClamping", true));
 
-    for (const auto& opacity : j["GradientOpacity"])
+    for (const auto& opacity : j.at("GradientOpacity"))
     {
       opacity.get_to(point);
       tf->AddGradientOpacityPoint(point.first, point.second);
@@ -131,7 +131,7 @@ namespace mitk
 
     std::array<double, 6> value;
 
-    for (const auto& color : j["Color"])
+    for (const auto& color : j.at("Color"))
     {
       color.get_to(value);
       ctf->AddRGBPoint(value[0], value[1], value[2], value[3], value[4], value[5]);

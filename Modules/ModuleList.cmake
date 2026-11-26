@@ -67,4 +67,9 @@ set(MITK_MODULES
   PythonSegmentation
   PythonSegmentationUI
   RESTAPI
+  SegmentationREST
+  MeasurementREST
+  Reports
+  Agent
+  AgentUI
 )

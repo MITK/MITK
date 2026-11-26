@@ -14,10 +14,12 @@ found in the LICENSE file.
 #define mitknnInteractiveBoxInteractor_h
 
 #include <mitknnInteractiveInteractor.h>
+#include <mitkPoint.h>
 
 namespace mitk
 {
   class PlanarFigure;
+  class PlaneGeometry;
 }
 
 namespace mitk::nnInteractive
@@ -61,6 +63,28 @@ namespace mitk::nnInteractive
      * \sa GetCurrentPromptType()
      */
     const PlanarFigure* GetLastBox() const;
+
+    /** \brief Places a box from given corners as the mouse places one in a
+     *         render window that shows \p plane.
+     *
+     * The box counts among the interactions, and RemoveLastInteraction()
+     * removes it. UpdatePreviewEvent is not emitted.
+     *
+     * \param[in] plane The plane the box lies in, like that of a render window.
+     * \param[in] corner, oppositeCorner In world coordinates, projected onto
+     *            \p plane. They must lie inside the reference image: this is
+     *            not checked here, nnInteractiveTool rejects a prompt with
+     *            a point outside before it draws it.
+     * \param[in] promptType The prompt type of the box.
+     *
+     * \return The box, whose corners nnInteractive gets. Its node owns it,
+     *         so it lives until RemoveLastInteraction() removes the box or
+     *         the interactor is reset.
+     *
+     * \throw mitk::Exception if \p plane is null or the tool manager has no
+     *        reference image.
+     */
+    const PlanarFigure* AddBox(const PlaneGeometry* plane, const Point3D& corner, const Point3D& oppositeCorner, PromptType promptType);
 
     /** \brief Removes the most recently completed box for the given prompt type.
      *

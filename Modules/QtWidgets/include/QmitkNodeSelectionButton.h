@@ -75,6 +75,9 @@ protected:
 
   unsigned long m_NodeModifiedObserverTag;
   bool m_NodeObserved;
+
+private:
+  void UpdateAccessibleName();
 };
 
 #endif

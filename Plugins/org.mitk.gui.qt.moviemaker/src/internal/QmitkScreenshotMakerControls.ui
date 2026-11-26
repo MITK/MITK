@@ -158,60 +158,89 @@
           </property>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item row="0" column="2">
+       <spacer name="optionsSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelCrop">
+        <property name="text">
+         <string>Crop:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="cropLayout">
         <item>
-         <spacer name="backgroundSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QCheckBox" name="checkCropToContent">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
+          <property name="toolTip">
+           <string>Cut the screenshot down to the part of the scene that is not background.</string>
           </property>
-         </spacer>
+          <property name="text">
+           <string>To content</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinCropPadding">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Background kept around the content, in pixels of the screenshot.</string>
+          </property>
+          <property name="prefix">
+           <string>Padding: </string>
+          </property>
+          <property name="suffix">
+           <string> px</string>
+          </property>
+          <property name="maximum">
+           <number>500</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="labelHighRes">
         <property name="text">
          <string>High resolution:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout" name="highResLayout">
-        <item>
-         <widget class="QSpinBox" name="m_MagFactor">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>10</number>
-          </property>
-          <property name="value">
-           <number>1</number>
-          </property>
-          <property name="suffix">
-           <string>x</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="highResSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+      <item row="2" column="1" alignment="Qt::AlignLeft">
+       <widget class="QSpinBox" name="m_MagFactor">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+        <property name="suffix">
+         <string>x</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

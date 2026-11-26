@@ -32,7 +32,10 @@ found in the LICENSE file.
  * JavaScript). It is a pure renderer: there is no text selection or find. The
  * page and its referenced resources (images, style sheets) are fetched through
  * a resource handler set by the owner, so any URL scheme (e.g. qthelp://) can
- * be served without a global URL scheme handler.
+ * be served without a global URL scheme handler. Inline SVG is drawn like an
+ * SVG image, so style sheets of the page do not reach into it. While the mouse
+ * is over a link, its tool tip shows where the link leads: the target resolved
+ * against the page's base URL, as linkClicked() reports it.
  */
 class MITKQTHTML_EXPORT QmitkHtmlWidget : public QAbstractScrollArea
 {
@@ -48,6 +51,18 @@ public:
 
   /** \brief Parse, lay out and display an HTML document with the given base URL. */
   void SetHtml(const QString &html, const QUrl &baseUrl);
+
+  /**
+   * \brief Tells why the first inline &lt;svg&gt; of an HTML text that the widget cannot draw is not drawn.
+   *
+   * The widget draws an inline SVG as an SVG document, which must be well-formed
+   * XML, unlike in a browser, with its tags in lower case and closed, and must
+   * refer to nothing but its own elements.
+   *
+   * \return A message that counts the inline svg elements from 1 and names the
+   *         reason, or an empty string if every one can be drawn.
+   */
+  static QString FindUndrawableSvg(const QString &html);
 
   /** \brief The current document's title (from its &lt;title&gt; element). */
   QString DocumentTitle() const;

@@ -193,6 +193,7 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   MITK_TEST(StartsAndStops);
   MITK_TEST(ReportsRunningState);
   MITK_TEST(ReportsServerUrl);
+  MITK_TEST(ListeningAddressIsInTheFormOfClientAddresses);
   MITK_TEST(ConfigurationPersists);
   MITK_TEST(PendingVsRunningConfig);
   MITK_TEST(HandlesDataStorageConnection);
@@ -267,6 +268,16 @@ public:
     CPPUNIT_ASSERT(!m_Server->IsRunning());
   }
 
+  void ListeningAddressIsInTheFormOfClientAddresses()
+  {
+    // Literals only: a name would ask the resolver, maybe the network.
+    CPPUNIT_ASSERT_EQUAL(std::string("::1"), mitk::RestServer::GetListeningAddress("0:0:0:0:0:0:0:1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("::1"), mitk::RestServer::GetListeningAddress("::1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("::"), mitk::RestServer::GetListeningAddress("::"));
+    CPPUNIT_ASSERT_EQUAL(std::string("127.0.0.1"), mitk::RestServer::GetListeningAddress("127.0.0.1"));
+    CPPUNIT_ASSERT_EQUAL(std::string("0.0.0.0"), mitk::RestServer::GetListeningAddress("0.0.0.0"));
+  }
+
   void ReportsServerUrl()
   {
     // Not running - should return nullopt
@@ -293,7 +304,7 @@ public:
     config.host = "0.0.0.0";
     config.port = 9999;
     config.enabled = false;
-    config.threadPoolSize = 8;
+    config.threadPoolSize = 6;
     config.readTimeoutSeconds = 60;
     config.writeTimeoutSeconds = 60;
 
@@ -303,7 +314,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("0.0.0.0"), retrievedConfig.host);
     CPPUNIT_ASSERT_EQUAL(9999, retrievedConfig.port);
     CPPUNIT_ASSERT_EQUAL(false, retrievedConfig.enabled);
-    CPPUNIT_ASSERT_EQUAL(8, retrievedConfig.threadPoolSize);
+    CPPUNIT_ASSERT_EQUAL(6, retrievedConfig.threadPoolSize);
     CPPUNIT_ASSERT_EQUAL(60, retrievedConfig.readTimeoutSeconds);
     CPPUNIT_ASSERT_EQUAL(60, retrievedConfig.writeTimeoutSeconds);
   }

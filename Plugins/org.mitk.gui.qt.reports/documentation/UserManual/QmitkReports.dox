@@ -1,0 +1,39 @@
+/**
+\page org_mitk_editors_report The Report Editor
+
+A report is a document about the data of the session, with text, tables, charts and images of
+the display windows. Programs that work with the Workbench through its REST API create reports,
+for example the Agent view after a segmentation. Each report opens in an editor of its own, next
+to the Standard Display; its tab shows the report's title.
+
+Reports follow the Workbench's theme: a dark page in the dark theme, a light one otherwise. A
+report that is saved or opened in the web browser keeps the theme the editor shows, and looks
+there as it does in the editor. Printed pages are always light. The editor shows the report but
+does not let you select or copy its text; open it in the web browser for that.
+
+\section org_mitk_editors_reportSave Saving a report
+
+"Save as HTML..." saves the report as a single HTML file. Its images are part of the file, so
+it can be passed on as it is and opened in any web browser. The file contains no scripts, and a
+content security policy keeps browsers from loading anything from elsewhere.
+
+"Open in Browser" shows the report in the web browser, for example to print it or to save it as
+a PDF. The browser opens a copy in a temporary folder; the Workbench removes the copy when the
+report is closed, so save the report if you want to keep the page.
+
+\section org_mitk_editors_reportLifetime Closing a report
+
+A report exists only as long as its editor, and reports are not restored when the Workbench
+starts again. A report that was not saved, or that changed since you saved it, is not lost
+without asking:
+
+- When you close the editor's tab, the editor asks before it closes:
+  "Save as HTML..." saves the report and closes the editor, "Discard" closes it without saving,
+  and "Cancel" keeps it open. If you cancel the file dialog, the editor stays open. Where an
+  editor closes without asking, the question follows the close instead and has the same two
+  choices; if you cancel the file dialog there, the question comes again.
+- When you close the Workbench while reports are unsaved, the Workbench asks once for all of
+  them: "Save as HTML..." saves each one, "Discard" discards them, and "Cancel" keeps the
+  Workbench open.
+
+*/

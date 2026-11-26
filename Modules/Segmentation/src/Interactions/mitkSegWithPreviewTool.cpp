@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkSegTool2D.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkProgressTask.h>
 #include <mitkScopedProgressTask.h>
 #include <mitkSegChangeOperationApplier.h>
@@ -37,6 +38,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <map>
 #include <optional>
+#include <set>
 #include <utility>
 
 struct mitk::SegWithPreviewTool::UpdatePass
@@ -60,17 +62,46 @@ struct mitk::SegWithPreviewTool::UpdatePass
   bool Failed = false;
   bool Computed = false;
 
+  /** Why the update failed. */
+  std::string Error;
+
   /** Set by Deactivated(): the update ends once its running work has, and
       leaves the state of the tool alone, which may be activated anew. */
   bool Abandoned = false;
 
-  /** What follows the update, like the transfer of a confirmation. */
+  /** The transfer of a confirmation that waits for the update. */
   std::function<void()> Then;
+
+  /** Who started the update, so that what follows it counts for the same. */
+  std::string Origin;
 
   // Declared in this order, so that the task is taken from the command before it ends.
   std::unique_ptr<ProgressTask> Task;
   std::optional<ScopedProgressTask<ToolCommand>> ScopedTask;
 };
+
+namespace
+{
+  std::string DescribeError(std::exception_ptr error)
+  {
+    try
+    {
+      std::rethrow_exception(error);
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      return e.GetDescription();
+    }
+    catch (const std::exception& e)
+    {
+      return e.what();
+    }
+    catch (...)
+    {
+      return "An unknown error occurred.";
+    }
+  }
+}
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -216,10 +247,7 @@ void mitk::SegWithPreviewTool::Deactivated()
   // true until then, which tells derived tools that the work still uses what
   // they would otherwise release now.
   if (m_UpdatePass != nullptr)
-  {
     m_UpdatePass->Abandoned = true;
-    m_UpdatePass->Then = nullptr;
-  }
 
   try
   {
@@ -247,6 +275,8 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
   if (m_IsUpdating || m_WorkRunning)
     mitkThrow() << this->GetName() << ": the preview cannot be confirmed while the tool is busy.";
 
+  this->SetLastConfirmationOutcome(ConfirmationOutcome::None);
+
   bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
 
   // A lazy tool has computed the current time step only, which is all that is
@@ -268,19 +298,45 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
 
 void mitk::SegWithPreviewTool::FinishConfirmation(std::optional<TimePointType> timePoint)
 {
-  this->CreateResultSegmentationFromPreview(timePoint);
-
-  // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
-  // hook ends up flagged again.
-  m_HasUnconfirmedPreview = false;
-
-  RenderingManager::GetInstance()->RequestUpdateAll();
-
-  if (!m_KeepActiveAfterAccept)
+  try
   {
-    this->GetToolManager()->ActivateTool(-1);
+    this->CreateResultSegmentationFromPreview(timePoint);
+
+    // Cleared before ConfirmCleanUp() so a tool that regenerates a preview in that
+    // hook ends up flagged again.
+    m_HasUnconfirmedPreview = false;
+
+    RenderingManager::GetInstance()->RequestUpdateAll();
+
+    if (!m_KeepActiveAfterAccept)
+    {
+      this->GetToolManager()->ActivateTool(-1);
+    }
+    this->ConfirmCleanUp();
   }
-  this->ConfirmCleanUp();
+  catch (...)
+  {
+    this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, DescribeError(std::current_exception()));
+    throw;
+  }
+
+  this->SetLastConfirmationOutcome(ConfirmationOutcome::Transferred);
+}
+
+void mitk::SegWithPreviewTool::SetLastConfirmationOutcome(ConfirmationOutcome outcome, const std::string& error)
+{
+  m_LastConfirmationOutcome = outcome;
+  m_LastConfirmationError = error;
+}
+
+mitk::SegWithPreviewTool::ConfirmationOutcome mitk::SegWithPreviewTool::GetLastConfirmationOutcome() const
+{
+  return m_LastConfirmationOutcome;
+}
+
+const std::string& mitk::SegWithPreviewTool::GetLastConfirmationError() const
+{
+  return m_LastConfirmationError;
 }
 
 void  mitk::SegWithPreviewTool::InitiateToolByInput()
@@ -307,6 +363,13 @@ const mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetPreviewSegmenta
   }
 
   return dynamic_cast<MultiLabelSegmentation*>(m_PreviewSegmentationNode->GetData());
+}
+
+mitk::TimePointType mitk::SegWithPreviewTool::GetTimePointOfPreview() const
+{
+  return m_LazyDynamicPreviews && !m_IsTimePointChangeAware
+    ? m_LastTimePointOfUpdate
+    : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 }
 
 mitk::DataNode* mitk::SegWithPreviewTool::GetPreviewSegmentationNode()
@@ -499,13 +562,23 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
 
   LabelMappingType labelMapping = {};
 
+  // Targets beyond the highest label value would wrap around to used values.
+  std::vector<std::size_t> wrappingTargets;
+
+  const auto addWithOffset = [&labelMapping, &wrappingTargets, offset](Label::PixelType source) {
+    if (static_cast<std::size_t>(source) + offset > Label::MAX_LABEL_VALUE)
+      wrappingTargets.push_back(labelMapping.size());
+
+    labelMapping.push_back({ source, static_cast<Label::PixelType>(source + offset) });
+  };
+
   switch (this->m_LabelTransferScope)
   {
     case LabelTransferScope::SelectedLabels:
       {
         for (auto label : this->m_SelectedLabels)
         {
-          labelMapping.push_back({label, label + offset});
+          addWithOffset(label);
         }
       }
       break;
@@ -518,7 +591,7 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
 
         for (auto labelValue : labelValues)
         {
-        labelMapping.push_back({ labelValue, labelValue + offset});
+          addWithOffset(labelValue);
         }
       }
       break;
@@ -535,6 +608,36 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
         labelMapping.push_back({m_SelectedLabels.front(), this->GetUserDefinedActiveLabel()});
       }
       break;
+  }
+
+  if (!wrappingTargets.empty())
+  {
+    // Those labels get the lowest values that neither the segmentation nor
+    // another target uses, as GetUnusedLabelValue() does above the highest.
+    const auto usedValues = this->GetTargetSegmentation()->GetAllLabelValues();
+    std::set<Label::PixelType> takenValues(usedValues.begin(), usedValues.end());
+
+    for (std::size_t i = 0; i < labelMapping.size(); ++i)
+    {
+      if (std::find(wrappingTargets.begin(), wrappingTargets.end(), i) == wrappingTargets.end())
+        takenValues.insert(labelMapping[i].second);
+    }
+
+    Label::PixelType candidate = MultiLabelSegmentation::UNLABELED_VALUE + 1;
+
+    for (const auto index : wrappingTargets)
+    {
+      while (takenValues.count(candidate) != 0)
+      {
+        if (candidate == Label::MAX_LABEL_VALUE)
+          mitkThrowException(LabelValuesExhaustedException) << "The segmentation has no unused label value.";
+
+        ++candidate;
+      }
+
+      labelMapping[index].second = candidate;
+      takenValues.insert(candidate);
+    }
   }
 
   return labelMapping;
@@ -607,14 +710,8 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview(std::optional
 
     if (resultSegmentationNode.IsNotNull())
     {
-      // A lazy tool that ignores time point changes holds the preview of the
-      // time point of its last update only, wherever the user has gone since.
       if (!timePoint.has_value())
-      {
-        timePoint = m_LazyDynamicPreviews && !m_IsTimePointChangeAware
-          ? m_LastTimePointOfUpdate
-          : RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-      }
+        timePoint = this->GetTimePointOfPreview();
 
       auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
       if (nullptr == resultSegmentation)
@@ -822,6 +919,7 @@ void mitk::SegWithPreviewTool::StartUpdate(bool ignoreLazyPreviewSetting, std::f
   pass->WorkingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
   pass->TimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
   pass->Then = std::move(then);
+  pass->Origin = ActionOriginScope::GetCurrent();
 
   if (nullptr != pass->Input && nullptr != pass->Preview)
   {
@@ -864,7 +962,7 @@ void mitk::SegWithPreviewTool::ContinueUpdate()
 {
   auto& pass = *m_UpdatePass;
 
-  while (!pass.Abandoned && pass.NextTimeStep < pass.TimeSteps.size())
+  while (!pass.Abandoned && !pass.Failed && pass.NextTimeStep < pass.TimeSteps.size())
   {
     const auto index = pass.NextTimeStep++;
     const auto timeStep = pass.TimeSteps[index];
@@ -957,10 +1055,20 @@ void mitk::SegWithPreviewTool::ContinueUpdate()
   if (!pass.Abandoned && !pass.TimeSteps.empty())
   {
     RenderingManager::GetInstance()->RequestUpdateAll();
-    pass.Computed = true;
+    pass.Computed = !pass.Failed;
   }
 
   this->EndUpdate();
+}
+
+void mitk::SegWithPreviewTool::MarkUpdateFailed(std::exception_ptr error)
+{
+  if (m_UpdatePass == nullptr)
+    return;
+
+  m_UpdatePass->Failed = true;
+  m_UpdatePass->Cancelled = m_UpdatePass->Task->IsCancelRequested();
+  m_UpdatePass->Error = DescribeError(error);
 }
 
 void mitk::SegWithPreviewTool::HandleUpdateError(std::exception_ptr error)
@@ -971,6 +1079,7 @@ void mitk::SegWithPreviewTool::HandleUpdateError(std::exception_ptr error)
 
   // Whether cancelled or failed, there is no result to transfer.
   m_UpdatePass->Failed = true;
+  m_UpdatePass->Error = DescribeError(error);
 
   try
   {
@@ -1048,11 +1157,25 @@ void mitk::SegWithPreviewTool::EndUpdate()
   }
 
   // A confirmation of a cancelled or failed update would transfer a preview
-  // that is empty or half written.
-  std::function<void()> then;
+  // that is empty or half written. Whoever waits for the confirmation learns
+  // why it did not take place.
+  std::function<void()> then = std::move(pass->Then);
 
-  if (!pass->Failed)
-    then = std::move(pass->Then);
+  if (then && (pass->Abandoned || pass->Failed || cleanUpError != nullptr))
+  {
+    if (pass->Abandoned)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Abandoned);
+    else if (pass->Cancelled)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Canceled);
+    else if (pass->Failed)
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, pass->Error);
+    else
+      this->SetLastConfirmationOutcome(ConfirmationOutcome::Failed, DescribeError(cleanUpError));
+
+    then = nullptr;
+  }
+
+  const std::string origin = pass->Origin;
 
   pass.reset();
 
@@ -1065,7 +1188,10 @@ void mitk::SegWithPreviewTool::EndUpdate()
     std::rethrow_exception(cleanUpError);
 
   if (then)
+  {
+    const ActionOriginScope scope(origin);
     then();
+  }
 }
 
 void mitk::SegWithPreviewTool::SetGUIThreadPoster(GUIThreadPoster poster)
@@ -1102,9 +1228,12 @@ void mitk::SegWithPreviewTool::StartWork(std::function<void()> work, std::functi
   // Runs the done of the work, which is the end of the work for the caller.
   // What it throws, like a failed transfer that followed an update, has no
   // caller left to go to, so it goes to the user.
-  const auto finish = [this](const std::function<void(std::exception_ptr)>& done, std::exception_ptr error) {
+  const auto origin = ActionOriginScope::GetCurrent();
+
+  const auto finish = [this, origin](const std::function<void(std::exception_ptr)>& done, std::exception_ptr error) {
     try
     {
+      const ActionOriginScope scope(origin);
       done(error);
     }
     catch (const itk::ExceptionObject& e)
@@ -1145,11 +1274,12 @@ void mitk::SegWithPreviewTool::StartWork(std::function<void()> work, std::functi
 
   // Set once the thread exists, which may fail. Its done cannot reset it
   // before: that runs on this thread, after this function has returned.
-  m_WorkThread = std::thread([this, poster, finish, alive = std::weak_ptr<int>(m_Alive), work = std::move(work), done = std::move(done)]() mutable {
+  m_WorkThread = std::thread([this, poster, finish, origin, alive = std::weak_ptr<int>(m_Alive), work = std::move(work), done = std::move(done)]() mutable {
     std::exception_ptr error;
 
     try
     {
+      const ActionOriginScope scope(origin);
       work();
     }
     catch (...)
@@ -1207,6 +1337,11 @@ bool mitk::SegWithPreviewTool::IsCancelable() const
   // No filter that a tool currently hands to ToolCommand reads the abort
   // flag, so nothing in the tree overrides this yet.
   return false;
+}
+
+bool mitk::SegWithPreviewTool::HasResultToConfirm() const
+{
+  return true;
 }
 
 bool mitk::SegWithPreviewTool::IsUpdating() const

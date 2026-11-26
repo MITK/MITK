@@ -55,6 +55,8 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   MITK_TEST(PutDataWithoutDataStorage);
   MITK_TEST(PutDataNodeNotFound);
   MITK_TEST(PutDataEmptyBody);
+  MITK_TEST(PutDataFormatHeaderMustBeAnExtension);
+  MITK_TEST(PutDataThatRefersToFilesNeedsFileAccess);
   MITK_TEST(PutDataUnsupportedContentType);
   MITK_TEST(PutDataMissingContentType);
   MITK_TEST(PutDataInvalidJson);
@@ -77,8 +79,11 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   // Full round-trip tests (requires serializers to be available)
   MITK_TEST(GetImageDataDirect);
   MITK_TEST(GetImageDataFileReference);
+  MITK_TEST(GetDataAsFileNeedsFileAccess);
   MITK_TEST(PutImageDataDirect);
   MITK_TEST(PutImageDataFileReference);
+  MITK_TEST(AllowedRootAllowsFilesBelowIt);
+  MITK_TEST(EmptyAllowedDirectoryAllowsNothing);
 
   // POST /nodes with data transfer
   MITK_TEST(PostNodeWithDataFileReference);
@@ -330,6 +335,99 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutDataFormatHeaderMustBeAnExtension()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("TestNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    for (const std::string format : { "x/../../outside.nrrd", "x\\..\\outside.nrrd", "..", "nrrd " })
+    {
+      const httplib::Headers headers = {{"Content-Type", "application/octet-stream"}, {"X-MITK-Data-Format", format}};
+      auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", "data", {{"uid", uid}}, {}, headers);
+      httplib::Response res;
+
+      m_Controller->HandlePUT_nodes_uid_data(req, res);
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(format, 400, res.status);
+      const auto json = nlohmann::json::parse(res.body);
+      CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+    }
+  }
+
+  int PutData(const std::string& uid, const std::string& format, const std::string& body)
+  {
+    const httplib::Headers headers = {{"Content-Type", "application/octet-stream"}, {"X-MITK-Data-Format", format}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body, {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+
+    return res.status;
+  }
+
+  void PutDataThatRefersToFilesNeedsFileAccess()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("TestNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    const std::string nrrdHeader = "NRRD0004\ntype: unsigned char\ndimension: 2\nsizes: 2 2\nencoding: raw\n";
+    const std::string detachedNrrd = nrrdHeader + "Data File: ../secret.raw\n\n";
+    const std::string completeNrrd = nrrdHeader + "\n" + std::string(4, '\1');
+
+    const std::string metaHeader = "ObjectType = Image\nNDims = 2\nDimSize = 2 2\nElementType = MET_UCHAR\n";
+    const std::string detachedMeta = metaHeader + "ElementDataFile = ../secret.raw\n";
+    const std::string completeMeta = metaHeader + "ElementDataFile = LOCAL\n" + std::string(4, '\1');
+
+    // Without restrictions, the readers decide.
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", detachedNrrd));
+
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, {}, m_TempDirectory);
+
+    // The extension does not matter to the NRRD reader, so it does not matter here.
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", detachedNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nhdr", detachedNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mhd", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "pvti", "<VTKFile/>"));
+
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", completeNrrd));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "mha", completeMeta));
+
+    // Line ends and separators that the readers take as well.
+    const std::string crNrrd = "NRRD0004\rtype: unsigned char\rdimension: 2\rsizes: 2 2\rencoding: raw\rdata file: ../secret.raw\r\r";
+    const std::string colonMeta = metaHeader + "ElementDataFile: ../secret.raw\n";
+    const std::string commentedMeta = metaHeader + "Comment = ElementDataFile = LOCAL\nElementDataFile = ../secret.raw\n";
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", crNrrd));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", colonMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mha", commentedMeta));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "mha", metaHeader + "ElementDataFile: LOCAL\r\n" + std::string(4, '\1')));
+
+    // Scenes name the files of their data.
+    const std::string jsonScene = R"({"type":"org.mitk.scene","version":1,"nodes":[{"uid":"a","transfer":{"mode":"file-reference","file_path":"../secret.nrrd"}}]})";
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "mitkscene.json", jsonScene));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "MITK", "PK"));
+
+    // A reader is chosen by the end of the file name.
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.mha", detachedMeta));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.pvti", "<VTKFile/>"));
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "x.mitkscene.json", jsonScene));
+
+    // A client without the right to name files, on a server without restrictions.
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::Unrestricted, {}, m_TempDirectory);
+    m_Controller->SetFileAccessCheck([](const httplib::Request&) { return false; });
+
+    CPPUNIT_ASSERT_EQUAL(403, this->PutData(uid, "nrrd", detachedNrrd));
+    CPPUNIT_ASSERT(403 != this->PutData(uid, "nrrd", completeNrrd));
   }
 
   void PutDataUnsupportedContentType()
@@ -806,6 +904,60 @@ public:
     }
   }
 
+  void GetDataAsFileNeedsFileAccess()
+  {
+    auto withData = mitk::DataNode::New();
+    withData->SetName("ImageNode");
+    withData->SetData(this->CreateTestImage());
+    m_DataStorage->Add(withData);
+
+    auto withoutData = mitk::DataNode::New();
+    withoutData->SetName("EmptyNode");
+    m_DataStorage->Add(withoutData);
+
+    const std::string uid = this->GetUid(withData.GetPointer());
+    const std::string emptyUid = this->GetUid(withoutData.GetPointer());
+
+    bool hasFileAccess = false;
+    m_Controller->SetFileAccessCheck([&hasFileAccess](const httplib::Request&) { return hasFileAccess; });
+
+    const auto get = [this](const std::string& nodeUid, const httplib::Headers& headers) {
+      auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + nodeUid + "/data", "", {{"uid", nodeUid}}, {}, headers);
+      httplib::Response res;
+      m_Controller->HandleGET_nodes_uid_data(req, res);
+      return res;
+    };
+
+    const httplib::Headers fileReference = {{"X-MITK-Transfer-Mode", "file-reference"}};
+    const httplib::Headers acceptJson = {{"Accept", "application/json"}};
+
+    // A client without the right to files gets no path of a file, whatever the node holds or whether it exists,
+    // and no file is written for it.
+    for (const auto& headers : { fileReference, acceptJson })
+    {
+      for (const auto& nodeUid : { uid, emptyUid, std::string("unknown") })
+      {
+        const auto res = get(nodeUid, headers);
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(nodeUid, 403, res.status);
+        CPPUNIT_ASSERT_EQUAL(std::string("FILE_ACCESS_DENIED"), nlohmann::json::parse(res.body)["error"]["code"].get<std::string>());
+      }
+    }
+
+    CPPUNIT_ASSERT(m_TempDirectory.empty() || !fs::exists(fs::path(m_TempDirectory)) || fs::is_empty(fs::path(m_TempDirectory)));
+
+    // The data itself is not a file: it is open to them.
+    const auto direct = get(uid, {});
+    CPPUNIT_ASSERT(direct.status == 200 || direct.status == 415);
+
+    hasFileAccess = true;
+    const auto allowed = get(uid, fileReference);
+    CPPUNIT_ASSERT(allowed.status == 200 || allowed.status == 415);
+
+    if (allowed.status == 200)
+      CPPUNIT_ASSERT_EQUAL(std::string("file-reference"), nlohmann::json::parse(allowed.body)["transfer"]["mode"].get<std::string>());
+  }
+
   void GetImageDataFileReference()
   {
     // Create the original test image
@@ -937,6 +1089,79 @@ public:
     {
       CPPUNIT_FAIL("Unexpected status code: " + std::to_string(res.status));
     }
+  }
+
+  void AllowedRootAllowsFilesBelowIt()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("EmptyNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    std::string tempFilePath;
+    try
+    {
+      tempFilePath = mitk::IOUtil::CreateTemporaryFile("testimage_XXXXXX.nrrd", m_TempDirectory);
+      mitk::IOUtil::Save(this->CreateTestImage(), tempFilePath);
+    }
+    catch (const std::exception&)
+    {
+      MITK_WARN << "AllowedRootAllowsFilesBelowIt skipped: could not save test image (serializer not available)";
+      return;
+    }
+
+    // Like "E:\" or "/", whose canonical form ends with a separator.
+    const auto root = fs::path(tempFilePath).root_path().string();
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, { root }, m_TempDirectory);
+
+    nlohmann::json body;
+    body["transfer"]["file_path"] = tempFilePath;
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body.dump(), {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+    fs::remove(fs::path(tempFilePath));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(root, 200, res.status);
+  }
+
+  void EmptyAllowedDirectoryAllowsNothing()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("EmptyNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    std::string tempFilePath;
+    try
+    {
+      tempFilePath = mitk::IOUtil::CreateTemporaryFile("testimage_XXXXXX.nrrd", m_TempDirectory);
+      mitk::IOUtil::Save(this->CreateTestImage(), tempFilePath);
+    }
+    catch (const std::exception&)
+    {
+      MITK_WARN << "EmptyAllowedDirectoryAllowsNothing skipped: could not save test image (serializer not available)";
+      return;
+    }
+
+    // A split setting with a trailing separator yields an empty entry.
+    m_Controller->SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, { "" }, m_TempDirectory);
+
+    nlohmann::json body;
+    body["transfer"]["file_path"] = tempFilePath;
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body.dump(), {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+    fs::remove(fs::path(tempFilePath));
+
+    CPPUNIT_ASSERT_EQUAL(403, res.status);
   }
 
   void PutImageDataFileReference()

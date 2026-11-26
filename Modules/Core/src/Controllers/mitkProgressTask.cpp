@@ -175,6 +175,14 @@ bool mitk::ProgressTask::IsCancelRequested() const
   return m_State && m_State->CancelRequested.load(std::memory_order_relaxed);
 }
 
+std::string mitk::ProgressTask::GetCancelOrigin() const
+{
+  if (!m_State || !m_State->CancelRequested.load(std::memory_order_acquire))
+    return {};
+
+  return m_State->CancelOrigin;
+}
+
 void mitk::ProgressTask::Finish() noexcept
 {
   if (m_Report)

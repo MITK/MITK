@@ -114,6 +114,15 @@ public:
    */
   mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
 
+  /** \brief Whether the window is shown alone, as the full screen button toggles it. */
+  bool IsFullScreen() const;
+
+  /**
+   * \brief Shows the window alone, or brings back the layout it was shown in
+   * before, as the full screen button does.
+   */
+  void SetFullScreen(bool fullScreen);
+
   /**
    * \brief Docks the bars to their corners after the window was resized, and
    * shows or hides them depending on whether the mouse cursor is over the

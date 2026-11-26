@@ -64,6 +64,13 @@ namespace mitk
     /** \brief Human-readable name of the operation, shown to the user. */
     std::string Name;
 
+    /**
+     * \brief Who started the task: the ActionOriginScope name of the starting thread.
+     *
+     * Empty for the user.
+     */
+    std::string Origin;
+
     /** \brief Total number of steps, or 0 if the task is indeterminate. */
     unsigned int StepsToDo = 0;
 
@@ -75,6 +82,13 @@ namespace mitk
 
     /** \brief Whether cancellation was requested but the task is still running. */
     bool CancelRequested = false;
+
+    /**
+     * \brief Who asked to cancel: the ActionOriginScope name of the requesting thread.
+     *
+     * Empty for the user, and while no cancellation was requested.
+     */
+    std::string CancelOrigin;
 
     /** \brief Whether this is the final snapshot of the task. */
     bool Finished = false;
@@ -99,6 +113,9 @@ namespace mitk
 
     const ProgressTaskId Id;
     std::atomic<bool> CancelRequested;
+
+    /** \brief Written once before CancelRequested is set, read only after it was seen set. */
+    std::string CancelOrigin;
   };
 }
 

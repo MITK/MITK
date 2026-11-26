@@ -66,11 +66,49 @@ namespace mitk
      * the update has run off the GUI thread (see RunOffGUIThread()). A transfer
      * that follows such work reports a failure through ErrorMessage. If the
      * update is cancelled or fails, nothing is transferred.
+     * GetLastConfirmationOutcome() tells how the confirmation ended.
      *
      * \throw mitk::Exception if an update of the preview or other work off the
      *        GUI thread is running.
      */
     void ConfirmSegmentation();
+
+    /** \brief How the last confirmation ended. */
+    enum class ConfirmationOutcome
+    {
+      /** No confirmation has ended since ConfirmSegmentation() was called last. */
+      None,
+      /** The preview was transferred into the segmentation. */
+      Transferred,
+      /** The update before the transfer, or the transfer, failed; see GetLastConfirmationError(). */
+      Failed,
+      /** The update before the transfer was canceled. Nothing was transferred. */
+      Canceled,
+      /** The tool was deactivated during the update before the transfer. Nothing was transferred. */
+      Abandoned
+    };
+
+    /**
+     * \brief Tells how the last confirmation ended.
+     *
+     * For whoever waits for a confirmation whose transfer follows an update,
+     * which reports a failure through ErrorMessage only: once IsUpdating() is
+     * false, this tells whether the transfer took place. Updates that follow
+     * the confirmation leave it unchanged.
+     */
+    ConfirmationOutcome GetLastConfirmationOutcome() const;
+
+    /** \brief Why the last confirmation failed, or empty unless its outcome is Failed. */
+    const std::string& GetLastConfirmationError() const;
+
+    /** \brief Tells whether the tool has a result that ConfirmSegmentation() would transfer.
+     *
+     * For whoever offers the confirmation, like the tool's GUI or a program:
+     * confirming without a result transfers an empty preview, which can
+     * erase the label it is transferred to. The default is true; tools that
+     * know when they have no result override it.
+     */
+    virtual bool HasResultToConfirm() const;
 
     /** \brief Posts a function to the GUI thread, to run there after the current event.
      *
@@ -224,6 +262,15 @@ namespace mitk
     bool IsUpdating() const;
 
     /**
+     * \brief Whether work started with RunOffGUIThread() has not reached its \p done yet.
+     *
+     * Also work that is no update, like starting a model, during which the
+     * tool refuses updates and confirmations. False while \p done runs, so
+     * \p done can start further work.
+     */
+    bool IsRunningOffGUIThread() const;
+
+    /**
      * \brief Indicate whether an update of the preview can be stopped again.
      *
      * ToolCommand turns a cancel request into
@@ -257,6 +304,15 @@ namespace mitk
      * Returns null if the node is not set or does not contain an image.*/
     MultiLabelSegmentation* GetPreviewSegmentation();
     const MultiLabelSegmentation* GetPreviewSegmentation() const;
+
+    /**
+     * \brief The time point that the preview is for, which a confirmation transfers.
+     *
+     * A lazy tool that ignores time point changes holds the preview of the
+     * time point of its last update only, wherever the user has gone since.
+     * For any other tool it is the selected time point.
+     */
+    TimePointType GetTimePointOfPreview() const;
     DataNode* GetPreviewSegmentationNode();
 
     /** Sets the opacity (0.0 - 1.0) used to render the preview
@@ -434,18 +490,24 @@ namespace mitk
     void RunOffGUIThread(std::function<void()> work, std::function<void(std::exception_ptr)> done);
 
     /**
+     * \brief Ends the running update as failed, for a tool that does not throw its failures.
+     *
+     * For DoUpdatePreview(), or the \p done of its work, when it catches a
+     * failure and reports it its own way instead of through ErrorMessage.
+     * The update then computes no further time steps, and nothing follows it,
+     * like the transfer of a confirmation, which GetLastConfirmationOutcome()
+     * reports as Canceled if the progress task of the update was asked to
+     * stop, else as Failed with the description of \p error. Does nothing
+     * outside an update.
+     */
+    void MarkUpdateFailed(std::exception_ptr error);
+
+    /**
      * \brief Runs a function on the GUI thread, for example to report the progress of work.
      *
      * Callable from any thread. Without a GUI thread poster, \p function runs at once.
      */
     void PostToGUIThread(std::function<void()> function);
-
-    /**
-     * \brief Whether work started with RunOffGUIThread() has not reached its \p done yet.
-     *
-     * False while \p done runs, so \p done can start further work.
-     */
-    bool IsRunningOffGUIThread() const;
 
     /**
      * \brief Waits until work started with RunOffGUIThread() has finished.
@@ -539,6 +601,8 @@ namespace mitk
      */
     void FinishConfirmation(std::optional<TimePointType> timePoint = {});
 
+    void SetLastConfirmationOutcome(ConfirmationOutcome outcome, const std::string& error = {});
+
     void TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
     /** \param timePoint The time point to transfer instead of the one the tool would choose. */
@@ -598,6 +662,9 @@ namespace mitk
 
     /** The running update, from UpdatePreview() until it has ended. */
     std::unique_ptr<UpdatePass> m_UpdatePass;
+
+    ConfirmationOutcome m_LastConfirmationOutcome = ConfirmationOutcome::None;
+    std::string m_LastConfirmationError;
 
     /** Set while DoUpdatePreview() runs, whose work RunOffGUIThread() defers. */
     bool m_DefersWork = false;

@@ -1,12 +1,29 @@
 set(H_FILES
   include/mitkRestServerConfig.h
   include/mitkNodeQueryParams.h
+  include/mitkRestGuiThread.h
+  include/mitkRestHelpers.h
+  include/mitkRestJob.h
+  include/mitkRestPoints.h
+  include/mitkRestRendering.h
+  include/mitkRestRoute.h
+  include/mitkRestTime.h
+  include/mitkRestWorkbench.h
 )
 
 set(CPP_FILES
   mitkRestServerConfig.cpp
   mitkIRestServerService.cpp
+  mitkRestHelpers.cpp
+  mitkRestJob.cpp
+  mitkRestPoints.cpp
+  mitkRestRendering.cpp
+  mitkRestRoute.cpp
+  mitkRestRouter.cpp
+  mitkRestTime.cpp
+  mitkRestWorkbench.cpp
   mitkRestServer.cpp
+  mitkRestStopGate.cpp
   mitkDataStorageBridge.cpp
   mitkNodeUidMapper.cpp
   mitkErrorResponse.cpp

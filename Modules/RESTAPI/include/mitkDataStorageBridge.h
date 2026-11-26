@@ -33,6 +33,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class RestStopGate;
+
   /**
    * \brief Thread-safe bridge between the REST API layer and MITK DataStorage.
    *
@@ -115,6 +117,14 @@ namespace mitk
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     /**
+     * \brief Set the gate that ends waits for the dispatcher when the server stops.
+     *
+     * To be called before requests arrive. Operations that wait for the
+     * dispatcher then throw a RestException (503) instead.
+     */
+    void SetStopGate(std::shared_ptr<RestStopGate> gate);
+
+    /**
      * \brief Set the DataStorage to operate on.
      *
      * \param[in] dataStorage The DataStorage, or \c nullptr to disconnect.
@@ -157,10 +167,13 @@ namespace mitk
     /**
      * \brief Get the UID for a DataNode.
      *
-     * Creates a UID if the node doesn't have one yet.
+     * Creates a UID if the node doesn't have one yet. That changes the node,
+     * so it happens on the dispatcher's thread, for which this call waits
+     * then. Can be called from any thread.
      *
      * \param[in] node The node to get the UID for. Must not be \c nullptr.
-     * \return The UID string for this node.
+     * \return The UID string for this node; empty for a node that is not in
+     *         the data storage (any more), which gets none.
      * \throw std::invalid_argument if \p node is \c nullptr.
      */
     std::string GetNodeUid (DataNode* node) const;
@@ -281,19 +294,14 @@ namespace mitk
     GetNodeDataResult GetNodeData(const std::string& uid) const;
 
     /**
-     * \brief Look up a DataNode by UID.
+     * \brief Look up a DataNode by UID, without waiting for the dispatch thread.
      *
-     * Returns a const strong reference to the node, keeping it alive for
-     * the duration of the caller's use. Returns null if the UID is not registered.
+     * Can be called from any thread, also while other requests hold the
+     * bridge and wait for the dispatch thread.
      *
-     * Intended for read-only access (e.g. inspecting geometry, properties).
-     * Do not retain the returned pointer beyond the immediate call site without
-     * understanding the threading implications.
-     *
-     * \param uid The node UID.
-     * \return DataNode::ConstPointer to the node, or null if not found.
+     * \return The node, or null if the UID is not registered.
      */
-    DataNode::ConstPointer FindDataNode(const std::string& uid) const;
+    DataNode::Pointer FindNode(const std::string& uid) const;
 
     /**
      * \brief Set or replace the data on a node.
@@ -341,15 +349,30 @@ namespace mitk
       const PropertyQueryParams& params = {}) const;
 
     /**
+     * \brief Result of a single property write or delete.
+     */
+    struct PropertyOperationResult
+    {
+      OperationStatus status = OperationStatus::InternalError;
+      std::string reason = {};  /**< Why the request was refused; set for InvalidInput. */
+    };
+
+    /**
      * \brief Set a single property on a node.
+     *
+     * A context names a render window, or a property list that the node has
+     * already, like that of a render window that is closed by now. Any other
+     * name is refused; for a render window the node gets its property list,
+     * if it has none yet.
      *
      * \param uid The node UID.
      * \param key The property key.
      * \param value The property value as JSON.
      * \param params Query parameters for scope and context.
-     * \return OperationStatus::Success, ::NodeNotFound, ::InvalidInput, or ::InternalError.
+     * \return Status (Success, NodeNotFound, InvalidInput, or InternalError) and,
+     *         for InvalidInput, the reason.
      */
-    OperationStatus SetNodeProperty(
+    PropertyOperationResult SetNodeProperty(
       const std::string& uid,
       const std::string& key,
       const Json& value,
@@ -361,9 +384,10 @@ namespace mitk
      * \param uid The node UID.
      * \param key The property key.
      * \param params Query parameters for scope and context.
-     * \return OperationStatus::Success, ::NodeNotFound, ::PropertyNotFound, ::InvalidInput, or ::InternalError.
+     * \return Status (Success, NodeNotFound, PropertyNotFound, InvalidInput, or
+     *         InternalError) and, for InvalidInput, the reason.
      */
-    OperationStatus DeleteNodeProperty(
+    PropertyOperationResult DeleteNodeProperty(
       const std::string& uid,
       const std::string& key,
       const PropertyQueryParams& params);
@@ -374,11 +398,16 @@ namespace mitk
     struct ReplacePropertiesResult
     {
       OperationStatus status = OperationStatus::InternalError;
-      Json result = {};  ///< {"replaced": [...], "removed": [...]} - valid only on Success
+      Json result = {};     /**< {"replaced": [...], "removed": [...]}; valid only on Success. */
+      std::string reason = {};  /**< Why the request was refused, naming the key of a refused value; set for InvalidInput. */
     };
 
     /**
      * \brief Replace all properties on a node (PUT semantics).
+     *
+     * All or nothing: every value is converted first. If one is refused, the
+     * result is InvalidInput with the key and the reason, and the node is not
+     * changed. A context is handled as in SetNodeProperty().
      *
      * \param uid The node UID.
      * \param properties JSON object with all properties (replaces existing).
@@ -436,11 +465,18 @@ namespace mitk
 
     WeakPointer<DataStorage> m_DataStorage;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+    std::shared_ptr<RestStopGate> m_StopGate;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
     /** Remark: Important to ensure that this mutex is always acquired before interacting with m_UidMapper
      * (and its mutex).*/
     mutable std::mutex m_Mutex;
+
+    /**
+     * Guards m_DataStorage for readers that do not hold m_Mutex; never held
+     * while waiting for the dispatch thread. A writer takes it inside m_Mutex.
+     */
+    mutable std::mutex m_DataStorageMutex;
   };
 }
 

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "mitkProgressService.h"
 
+#include <mitkActionOriginScope.h>
+
 #include <algorithm>
 
 namespace
@@ -192,7 +194,9 @@ void mitk::ProgressService::RequestCancel(ProgressTaskId id)
     if (it == m_Tasks.end() || !it->second.Info.Cancelable || it->second.Info.CancelRequested)
       return;
 
-    it->second.State->CancelRequested.store(true, std::memory_order_relaxed);
+    it->second.Info.CancelOrigin = ActionOriginScope::GetCurrent();
+    it->second.State->CancelOrigin = it->second.Info.CancelOrigin;
+    it->second.State->CancelRequested.store(true, std::memory_order_release);
     it->second.Info.CancelRequested = true;
     it->second.Info.Sequence = ++m_NextSequence;
 
@@ -220,6 +224,7 @@ std::shared_ptr<mitk::ProgressTaskState> mitk::ProgressService::StartTask(const 
     info.Id = id;
     info.Sequence = ++m_NextSequence;
     info.Name = name;
+    info.Origin = ActionOriginScope::GetCurrent();
     info.StepsToDo = steps;
     info.Cancelable = cancelable;
 

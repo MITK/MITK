@@ -15,6 +15,7 @@ found in the LICENSE file.
 #define QmitkCommonActivator_h
 
 #include <ctkPluginActivator.h>
+#include "QmitkPartLockFollower.h"
 #include "QmitkViewCoordinator.h"
 
 namespace mitk
@@ -55,6 +56,7 @@ private:
   static ctkPluginContext* m_Context;
 
   QScopedPointer<QmitkViewCoordinator> m_ViewCoordinator;
+  QScopedPointer<QmitkUncreatedViewLockFollower> m_UncreatedViewLockFollower;
 };
 
 #endif

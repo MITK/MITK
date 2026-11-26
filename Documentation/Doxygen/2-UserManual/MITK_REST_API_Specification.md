@@ -2,6 +2,7 @@
 
 **Version:** 1.2.0
 **Date:** May 2, 2026
+**Status:** Experimental, see [Versioning Strategy](#sec-3-base-url-and-versioning)
 
 ---
 
@@ -100,9 +101,8 @@ http(s)://{host}:{port}/api/v{major}
 ### Versioning Strategy
 
 - Major version in URL path: `/api/v1/`, `/api/v2/`
-- Minor/patch versions are backwards-compatible (no URL change)
-- Breaking changes require new major version
-- Deprecation period: minimum 6 months
+- The API is experimental in this release of MITK: endpoints, answers and error codes may change from one MITK release to the next without a new major version and without a deprecation period
+- The release notes of MITK list such changes
 
 ### Version Discovery
 
@@ -111,6 +111,20 @@ GET /api/v1/info
 ```
 
 Returns API metadata including supported versions and deprecation notices.
+
+### Plugin Endpoints
+
+Besides the endpoints of this specification, the Workbench and its plugins add endpoints below `/api/v1`, like `/api/v1/workbench/views` or `/api/v1/segmentation/session`. This specification does not describe them, and like its own endpoints they may change or go away without a new major version. The plugins offer these prefixes: Segmentation `/segmentation`, Measurement Toolbox `/statistics` and `/planar-figures`, Reports `/reports`, the REST API plugin `/workbench`, `/manual` and the window, crosshair and layout endpoints below `/rendering`. The endpoints of a prefix exist once their plugin is active, so a prefix can be missing from a Workbench that has not activated the plugin yet. An open Agent view adds `/mcp` for its own agent, which only that agent's token can use. They describe themselves:
+
+```http
+GET /api/v1/endpoints
+```
+
+lists all endpoints with method, path and summary, and marks the plugin endpoints, those that this specification does not describe, with `"experimental": true`. The query parameter `path` limits the list to paths that start with it; `details=true` adds what each endpoint takes and returns.
+
+Plugin endpoints refuse requests that a web page could send (403 `ACCESS_DENIED`): requests that carry an `Origin` header, requests with a `Sec-Fetch-Site` header other than `none` and `same-origin`, and requests whose `Host` header names neither `localhost`, an IP address, the host the server is configured with, the host name of the machine nor, over HTTPS, a name that the server's certificate covers (a browser reaches an HTTPS server only under such a name). Over HTTP, address the machine by its IP address or host name, or configure the server with its domain name as host. Browsers send these headers, other clients do not, so web pages cannot use these endpoints through the user's browser. A request without a `Host` header is not refused.
+
+Long-running work of these endpoints, like running a model, is a job below `/api/v1/jobs`. Jobs are shared by all clients of the server: every client can list and cancel them. A canceled job ends at once, while its work may still finish the step it is in, a download for example; it starts no further step. Until then the tool answers 409 `BUSY`, and `/api/v1/workbench/tasks` shows the work.
 
 ---
 
@@ -252,7 +266,7 @@ GET /api/v1/datastorage/nodes?filter.visible=true&context=stdmulti.widget0&prope
 
 The API follows standard REST conventions with the following deliberate deviations:
 
-**404 for "operation not applicable" on a valid resource.** When a sub-resource path is well-formed and the addressed resource exists, but the requested operation does not apply to that particular resource variant, the API returns **404 `UNSUPPORTED_OPERATION`** rather than 405 / 409 / 422. Example: `GET /rendering/editors/stdmulti/windows/3d/selected-slice` returns 404 `UNSUPPORTED_OPERATION` because slice navigation is meaningless on the 3D window. Rationale: the conceptual sub-resource (`selected-slice` of the `3d` window) does not exist for that variant, so 404 communicates absence consistently with `RENDER_WINDOW_NOT_FOUND`. Clients should treat any 404 from a per-window sub-resource as "this variant does not expose this operation" and inspect `error.code` to disambiguate from genuine "window not found".
+**404 for "operation not applicable" on a valid resource.** When a sub-resource path is well-formed and the addressed resource exists, but the requested operation does not apply to that particular resource variant, the API returns **404 `UNSUPPORTED_OPERATION`** rather than 405 / 409 / 422. Example: a screenshot of an editor that shows no render window canvas returns 404 `UNSUPPORTED_OPERATION`. Rationale: the conceptual sub-resource does not exist for that variant, so 404 communicates absence consistently with `RENDER_WINDOW_NOT_FOUND`. Clients should treat any 404 from a per-window sub-resource as "this variant does not expose this operation" and inspect `error.code` to disambiguate from genuine "window not found". A request that needs a 2D window but names the 3D window, such as `GET /rendering/editors/stdmulti/windows/3d/selected-slice`, is a mistake of the request and returns 400 `INVALID_REQUEST`.
 
 **DELETE returns 200 with body, not 204 No Content.** `DELETE /datastorage/nodes/{uid}` and `DELETE /datastorage/nodes/{uid}/properties/{name}` return **200** with a JSON body rather than the conventional 204. Rationale: the response body carries client-useful information (node deletes return `deleted_uid` and `deleted_children`; property deletes echo the resolved `meta.property_scope`) that lets the client confirm what was actually removed without an extra round-trip. Clients should not assume any DELETE in this API returns 204.
 
@@ -466,6 +480,8 @@ X-MITK-Transfer-Mode: file-reference
 
 **Use case:** Large data, co-located processes, existing file I/O workflows.
 
+**File access:** File references need file access, in both directions. A path outside the allowed directories (see `GET /api/v1/config/file-access`) answers 403 `FILE_ACCESS_DENIED`. So does every file reference of a client that the server gave a token without file access, like the agent of the Agent view; such a client uses the direct mode. Access is checked before the file is looked for: 422 `FILE_NOT_FOUND` only tells a client with access that a file is missing.
+
 **File lifetime and per-client quota:** Exported files are stored in a server-managed temporary directory. Each client (identified by its IP address) may hold at most **N active file-reference results simultaneously** (default: 5; configurable by the server operator). When a client exceeds this limit, the server automatically deletes its *oldest* active temp directory to make room for the new one. Files are additionally cleaned up when the server stops.
 
 > **Implication for clients:** Fetch or copy the file referenced by `transfer.file_path` before issuing more than N subsequent file-reference requests from the same IP. Clients from different IP addresses do not affect each other's quotas.
@@ -536,6 +552,8 @@ Content-Type: application/json
 **File ownership:** When uploading via file-reference mode, the sender (client) always retains ownership of the source file. The server reads the file but does not delete it. The sender can assume the file is no longer needed by the server after receiving the response, and is responsible for cleanup if desired.
 
 The server accepts any file format supported by MITK I/O. Format detection is based on file extension.
+
+**Uploads that refer to other files:** Some data makes its reader open further files: an NRRD or MetaImage header with a detached data file, the parallel VTK formats (`.pvti`, `.pvtp`) and MITK scenes (`.mitk`, `.mitkscene.json`). Such a direct upload names files on the server like a file reference does. It answers 403 `FILE_ACCESS_DENIED` unless file access is unrestricted and the client has file access. Upload data that is complete in one file instead.
 
 ---
 
@@ -810,7 +828,8 @@ If some properties in the request could not be deserialized, the node is still c
 | Status | Code | Description |
 |--------|------|-------------|
 | 201 | — | Node created |
-| 400 | `INVALID_REQUEST` | Malformed JSON body or invalid parameters |
+| 400 | `INVALID_REQUEST` | Malformed JSON body or invalid parameters, or an `X-MITK-Data-Format` that is no file extension |
+| 403 | `FILE_ACCESS_DENIED` | The client may not use the referenced file path, or the upload refers to other files (see [Section 7.3](#sec-73-mode-file-reference) and Section 7.6) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 415 | `UNSUPPORTED_FORMAT` | Content-Type or data format not supported |
 | 422 | `FILE_NOT_FOUND` / `FILE_READ_ERROR` | Referenced file path could not be loaded |
@@ -982,7 +1001,7 @@ Replace or set node data. This endpoint can be used on nodes that currently have
 |--------|----------|-------------|
 | `Content-Type` | Yes | `application/json` for file-reference, `application/octet-stream` for direct |
 | `Content-Disposition` | For direct | Filename with extension for format detection |
-| `X-MITK-Data-Format` | No | Explicit format identifier (optional) |
+| `X-MITK-Data-Format` | No | File extension of the format, like `nrrd` or `nii.gz`, for a direct upload without a filename; anything else answers 400 `INVALID_REQUEST` |
 
 **Request (file reference):**
 ```http
@@ -1147,6 +1166,15 @@ Content-Type: application/json
 
 #### 8.2.4 Node Properties {#sec-824-node-properties}
 
+Requests give property values in the form GET returns them. A simple value
+(boolean, number, string) takes the type of the property it changes, so `3`
+sets a `FloatProperty` like `opacity` to 3.0: JSON does not tell `3` from
+`3.0`, and clients in JavaScript send `3` for both. A `{type, value}` object
+has to name the type of the property it changes, as a property keeps its
+type; a value of another type fails for that property. A new property gets
+its type from the value: a whole number makes an `IntProperty`, any other
+number a `FloatProperty`, and other types need a `{type, value}` object.
+
 ##### GET /api/v1/datastorage/nodes/{uid}/properties
 
 Get all properties of a node.
@@ -1275,13 +1303,13 @@ GET /api/v1/datastorage/nodes/node-001/properties?context=stdmulti.widget0&prope
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties
 
-Replace all properties of a node (full replacement).
+Replace all properties of a node (full replacement). All or nothing: if a value is refused (it does not fit the type of the property it changes, or cannot be converted), the answer is 400 and names the key and the reason; no property is changed or removed.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1328,13 +1356,13 @@ Content-Type: application/json
 
 ##### PATCH /api/v1/datastorage/nodes/{uid}/properties
 
-Update multiple properties at once (merge semantics).
+Update multiple properties at once (merge semantics). A refused value is listed in `failed` with the reason in `error`; the other values are applied.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for is listed in `failed` with the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request:**
@@ -1379,11 +1407,11 @@ Content-Type: application/json
 ```json
 {
   "data": {
-    "updated": ["visible", "opacity"],
+    "updated": ["visible", "color"],
     "failed": [
       {
-        "property": "color",
-        "error": "Invalid color value: expected array of 3 floats"
+        "property": "opacity",
+        "error": "Property \"opacity\" of type FloatProperty cannot take the value \"half\"."
       }
     ]
   },
@@ -1454,13 +1482,13 @@ Get a single property value.
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
-Set a single property value (create or replace).
+Set a single property value (create or replace). A refused value answers 400 with the reason in the message.
 
 **Query Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Request (simple property):**
@@ -1515,7 +1543,7 @@ Remove a property from a node.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). |
+| `context` | string | (none) | Renderer context. The context is only relevant/valid at property_scope `node` and will be ignored at data scope (always default). A name that is neither an existing render window nor a context that the node has properties for answers 400 and lists the known ones. |
 | `property_scope` | string | `node` | `node`, `data` |
 
 **Response (200 OK):**
@@ -1589,7 +1617,7 @@ Fit all render windows to the bounding box of all currently visible data, or to 
 
 Three operating modes:
 - **No body**: fits all render windows to the bounding box of all visible data.
-- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry.
+- **`{"uids": ["node-001"]}`**: fits render windows to that node's geometry. If the node's data is image-like (sliced data), the views adopt the data's own time geometry, as the Data Manager does, which rectifies askew geometries. For other data, the bounding geometry of the node is used.
 - **`{"uids": ["node-001", "node-002"]}`**: fits render windows to the combined bounding geometry of all listed nodes.
 
 Every UID in the `uids` array must identify an existing node with data and a valid time geometry; the first failure returns an error.
@@ -2027,9 +2055,11 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice
 
-Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
+Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. The 3D window has no slices and is answered with 400.
 
-**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+The step is the position of the window's slice stepper. Depending on the orientation of the image, it can run opposite to the slice index that the Image Navigator shows. The plugin endpoints below `/api/v1/rendering/windows` count slices like the Image Navigator.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 400 `INVALID_REQUEST`).
 
 **Response 200 (`application/json`):**
 
@@ -2051,8 +2081,8 @@ When no geometry is loaded, `bounds.min_position` and `bounds.max_position` seri
 
 | Status | Code | Description |
 |--------|------|-------------|
+| 400 | `INVALID_REQUEST` | `{id}` is `3d`, which has no slices |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
@@ -2063,7 +2093,7 @@ When no geometry is loaded, `bounds.min_position` and `bounds.max_position` seri
 
 For StdMulti only `{"step": N}` is accepted — the three 2D slices are coupled, so moving by world coordinate is done via `PUT /rendering/selected-position`. Sending a `position` field returns 400 with a hint. `step` is not range-checked; out-of-range values are clamped/snapped by MITK.
 
-**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 400 `INVALID_REQUEST`).
 
 **Request body (required, `application/json`):**
 
@@ -2086,9 +2116,8 @@ Content-Type: application/json
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field |
+| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field; `{id}` is `3d`, which has no slices |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 422 | `RENDERING_ERROR` | MITK raised an error while applying the step |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
@@ -2223,7 +2252,6 @@ Their values may legitimately diverge — an unsynced MxN cell can have a differ
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | The bridge callback is not registered (headless / Qt plugin not loaded), or the registered editor list does not expose the `mxn` alias |
 | 400 | `INVALID_REQUEST` | The cell `{id}` is malformed — does not match the canonical fully-qualified form `<prefix>__<bare>` with URL-segment-safe characters. Rejected controller-side before any bridge dispatch |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | The cell `id` is well-formed but unknown to the editor |
-| 404 | `UNSUPPORTED_OPERATION` | The sub-resource does not apply to this cell (reserved for future 3D MxN cells on `/selected-slice`) |
 
 Per-endpoint error tables list any additional codes (400 for bad bodies, 422 for engine-side rendering failures, etc.).
 
@@ -2394,7 +2422,7 @@ Partial update. At least one camera field must be present. `standard_view` is ap
 
 #### GET /api/v1/rendering/editors/mxn/windows/{id}/selected-slice
 
-Returns the cell's selected-slice state: integer step, the live world position on the slice plane, and navigator bounds (`steps`, `min_position`, `max_position`). `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded.
+Returns the cell's selected-slice state: integer step, the live world position on the slice plane, and navigator bounds (`steps`, `min_position`, `max_position`). `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded. As for StdMulti, the step is the position of the cell's slice stepper, which can run opposite to the slice index that the Image Navigator shows.
 
 **Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
 
@@ -2593,18 +2621,18 @@ Following RFC 9457 (Problem Details for HTTP APIs):
 | 400 | `INVALID_REQUEST` | Malformed request body or parameters |
 | 400 | `PROPERTY_PROTECTED` | Cannot modify/delete protected property |
 | 401 | `UNAUTHORIZED` | Missing or invalid authentication |
-| 403 | `ACCESS_DENIED` | Client IP not permitted to access the server |
-| 403 | `FILE_ACCESS_DENIED` | Requested file path is outside the allowed directories |
+| 403 | `ACCESS_DENIED` | Client IP not permitted to access the server, or a request to a plugin endpoint that a web page could send (see [Plugin Endpoints](#sec-3-base-url-and-versioning)) |
+| 403 | `FILE_ACCESS_DENIED` | Requested file path is outside the allowed directories, the client has no file access, or an upload refers to other files |
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window id is not known to the editor |
-| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed window (e.g. `selected-slice` on `3d`) |
+| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed editor (e.g. a screenshot of an editor without a render window canvas) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
 | 415 | `UNSUPPORTED_FORMAT` | Data format not supported |
-| 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
+| 422 | `FILE_NOT_FOUND` | Referenced file path does not exist; told only to clients that may use the path, others get 403 `FILE_ACCESS_DENIED` |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
 | 422 | `NO_GEOMETRY` | Node data has no usable time geometry |
 | 422 | `RENDERING_ERROR` | Rendering the requested view failed |

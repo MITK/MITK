@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/org.mitk.gui.qt.reports">
+    <file>OpenInBrowser.svg</file>
+    <file>Report.svg</file>
+    <file>SaveAsHtml.svg</file>
+    <file>ReportGuide.txt</file>
+  </qresource>
+</RCC>

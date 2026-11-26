@@ -111,6 +111,28 @@ public:
   mitk::VtkPropRenderer::LightingMode GetPreferredLightingMode() const;
 
   /**
+   * \brief Whether the window is shown alone, as the full screen button of its menu toggles it.
+   *
+   * This is the state of that button. A layout chosen in the layout menu (for
+   * example "This big") is not seen by it, and only displays that connect
+   * LayoutDesignChanged support the pair of IsFullScreen() and SetFullScreen().
+   */
+  bool IsFullScreen() const;
+
+  /**
+   * \brief Shows the window alone, or brings back the layout it was shown in
+   *        before, as the full screen button of its menu does.
+   *
+   * Sets the state of that button; a layout chosen in the layout menu (for
+   * example "This big") is not seen by it, and only displays that connect
+   * LayoutDesignChanged support it.
+   *
+   * \throw mitk::Exception if the window has no menu or the menu is
+   *        deactivated, as while the window's editor is hidden.
+   */
+  void SetFullScreen(bool fullScreen);
+
+  /**
    * \brief Shows or hides the geometry violation warning overlay.
    * \param[in] show True to show, false to hide.
    */

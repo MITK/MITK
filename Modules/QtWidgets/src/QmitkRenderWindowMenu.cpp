@@ -388,16 +388,20 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LightingMenu = new QMenu(m_TopLeftBar);
   connect(m_LightingMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnLightingMenuAboutToShow);
   m_LightingModeButton = m_TopLeftBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/lighting.svg")), m_LightingMenu);
+  m_LightingModeButton->setAccessibleName("Lighting");
 
   m_CrosshairMenu = new QMenu(m_TopRightBar);
   connect(m_CrosshairMenu, &QMenu::aboutToShow, this, &QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow);
   m_CrosshairModeButton = m_TopRightBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/crosshair.svg")), m_CrosshairMenu);
+  m_CrosshairModeButton->setAccessibleName("Crosshair");
 
   m_FullScreenButton = m_TopRightBar->AddButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/fullscreen.svg")));
+  m_FullScreenButton->setAccessibleName("Full screen");
   connect(m_FullScreenButton, &QToolButton::clicked, this, &QmitkRenderWindowMenu::OnFullScreenButton);
 
   this->CreateSettingsWidget();
   m_LayoutDesignButton = m_TopRightBar->AddMenuButton(QmitkIconTheme::GetIcon(QStringLiteral(":/Qmitk/layout.svg")), m_LayoutActionsMenu);
+  m_LayoutDesignButton->setAccessibleName("Layout");
 
   for (auto* menu : { m_LightingMenu, m_CrosshairMenu, m_LayoutActionsMenu })
   {
@@ -791,23 +795,35 @@ void QmitkRenderWindowMenu::OnLightingModeSelected(QAction *action)
   emit LightingModeChanged(mode);
 }
 
-void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
+bool QmitkRenderWindowMenu::IsFullScreen() const
 {
-  if (!m_FullScreenMode)
-  {
-    m_FullScreenMode = true;
-    m_OldLayoutDesign = m_LayoutDesign;
+  return m_FullScreenMode;
+}
 
+void QmitkRenderWindowMenu::SetFullScreen(bool fullScreen)
+{
+  if (fullScreen == m_FullScreenMode)
+    return;
+
+  m_FullScreenMode = fullScreen;
+
+  if (fullScreen)
+  {
+    m_OldLayoutDesign = m_LayoutDesign;
     emit LayoutDesignChanged(LayoutDesign::ONE_BIG);
   }
   else
   {
-    m_FullScreenMode = false;
     emit LayoutDesignChanged(m_OldLayoutDesign);
   }
 
   MoveWidgetToCorrectPos();
   ChangeFullScreenIcon();
+}
+
+void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
+{
+  this->SetFullScreen(!m_FullScreenMode);
   ShowMenu();
 }
 

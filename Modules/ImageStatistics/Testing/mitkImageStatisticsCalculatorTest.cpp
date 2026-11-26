@@ -15,8 +15,10 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 #include <mitkPlanarPolygon.h>
 
+#include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkITKImageImport.h>
+#include <mitkLabelSetImage.h>
 
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
@@ -32,6 +34,7 @@ found in the LICENSE file.
 #include <itkRGBPixel.h>
 #include <itkVectorImage.h>
 
+#include <algorithm>
 #include <cmath>
 #include <numeric>
 #include <sstream>
@@ -166,7 +169,9 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestUS4DCroppedMultilabelMaskTimeStep1);
   MITK_TEST(TestUS4DCroppedPlanarFigureTimeStep1);
   MITK_TEST(TestUS4DCroppedAllTimesteps);
+  MITK_TEST(TestUS4DCroppedRestrictedTimeSteps);
   MITK_TEST(TestUS4DCropped3DMask);
+  MITK_TEST(TestMaskWithoutDataAtATimePointOfTheImage);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -218,7 +223,9 @@ public:
   void TestUS4DCroppedMultilabelMaskTimeStep1();
   void TestUS4DCroppedPlanarFigureTimeStep1();
   void TestUS4DCroppedAllTimesteps();
+  void TestUS4DCroppedRestrictedTimeSteps();
   void TestUS4DCropped3DMask();
+  void TestMaskWithoutDataAtATimePointOfTheImage();
 private:
   mitk::Image::ConstPointer m_TestImage;
 
@@ -1928,6 +1935,43 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
   }
 }
 
+void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedRestrictedTimeSteps()
+{
+  std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
+  m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
+
+  const auto allTimeSteps = ComputeStatistics(m_US4DCroppedImage);
+  const auto& expected = allTimeSteps->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1);
+
+  mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
+  calculator->SetInputImage(m_US4DCroppedImage);
+  calculator->SetTimeSteps({1});
+  const auto restricted = calculator->GetStatistics();
+
+  CPPUNIT_ASSERT(restricted->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1));
+  for (mitk::TimeStepType timeStep : {0, 2, 3})
+  {
+    CPPUNIT_ASSERT_MESSAGE("A time step outside the restriction was computed",
+      !restricted->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, timeStep));
+  }
+
+  const auto& actual = restricted->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1);
+  const std::vector<std::string> names = {mitk::ImageStatisticsConstants::MEAN(), mitk::ImageStatisticsConstants::MINIMUM(),
+                                          mitk::ImageStatisticsConstants::MAXIMUM(), mitk::ImageStatisticsConstants::MEDIAN()};
+  for (const auto& name : names)
+  {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(name),
+                                 actual.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(name), mitk::eps);
+  }
+
+  calculator->SetTimeSteps({});
+  CPPUNIT_ASSERT(calculator->GetStatistics()->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0));
+
+  calculator->SetTimeSteps({4});
+  CPPUNIT_ASSERT_THROW(calculator->GetStatistics(), mitk::Exception);
+}
+
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
 {
   MITK_INFO << std::endl << "Test US4D cropped with 3D binary Mask:-----------------------------------------------------------------------------------";
@@ -1983,6 +2027,41 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
     expected_RMS,
     expected_minIndex,
     expected_maxIndex);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestMaskWithoutDataAtATimePointOfTheImage()
+{
+  // Three time steps, of which the segmentation covers the first two only.
+  unsigned int dimensions[4] = { 4, 4, 4, 3 };
+  auto image = mitk::Image::New();
+  image->Initialize(mitk::MakeScalarPixelType<short>(), 4, dimensions);
+
+  for (mitk::TimeStepType timeStep = 0; timeStep < 3; ++timeStep)
+  {
+    mitk::ImageWriteAccessor accessor(image, image->GetVolumeData(timeStep));
+    std::fill_n(static_cast<short*>(accessor.GetData()), 4 * 4 * 4, short(0));
+  }
+
+  dimensions[3] = 2;
+  auto segmentationTemplate = mitk::Image::New();
+  segmentationTemplate->Initialize(mitk::MakeScalarPixelType<short>(), 4, dimensions);
+
+  auto segmentation = mitk::MultiLabelSegmentation::New();
+  segmentation->Initialize(segmentationTemplate);
+  segmentation->AddLabel(mitk::Label::New(1, "Label"), 0);
+
+  auto* groupImage = segmentation->GetGroupImage(0);
+
+  for (mitk::TimeStepType timeStep = 0; timeStep < 2; ++timeStep)
+  {
+    mitk::ImageWriteAccessor accessor(groupImage, groupImage->GetVolumeData(timeStep));
+    static_cast<mitk::Label::PixelType*>(accessor.GetData())[0] = 1;
+  }
+
+  auto maskGenerator = mitk::MultiLabelMaskGenerator::New();
+  maskGenerator->SetMultiLabelSegmentation(segmentation);
+
+  CPPUNIT_ASSERT_THROW(ComputeStatistics(image.GetPointer(), maskGenerator.GetPointer()), mitk::Exception);
 }
 
 mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points)

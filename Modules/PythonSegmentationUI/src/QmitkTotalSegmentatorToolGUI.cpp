@@ -87,11 +87,7 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
     auto tool = this->GetTool();
-    if (tool == nullptr)
-      return false;
-
-    auto preview = tool->GetPreviewSegmentation();
-    if (preview == nullptr || preview->GetAllLabelValues().empty())
+    if (tool == nullptr || !tool->HasResultToConfirm())
       return false;
 
     return enabled;

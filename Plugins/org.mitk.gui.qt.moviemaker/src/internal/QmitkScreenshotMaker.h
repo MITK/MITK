@@ -34,7 +34,6 @@ class QButtonGroup;
 class QEvent;
 class QObject;
 class QShortcut;
-class vtkRenderer;
 
 /**
  * \brief View for taking screenshots of render windows.
@@ -42,8 +41,9 @@ class vtkRenderer;
  * Works with any editor that provides render windows via mitk::IRenderWindowPart
  * (Standard Display and MxN Display). Screenshots can be taken of a single render
  * window picked by clicking it, or of all render windows of the active editor at
- * once. An optional upsampling factor produces higher-resolution screenshots and
- * the background color of the screenshot can be chosen (including transparent).
+ * once. An optional upsampling factor produces higher-resolution screenshots,
+ * the background color of the screenshot can be chosen (including transparent),
+ * and screenshots can be cropped to the part of the scene that is not background.
  */
 class QmitkScreenshotMaker : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -95,17 +95,10 @@ private:
   \param scale upsampling factor (1 = on-screen resolution)
   \param fileName file location and name where the screenshot is saved
   \param filter selected file-type filter, used to derive the suffix when missing
+  \return Why no file was saved (the window could not be captured, the file could not be written, a crop found
+          only background), or an empty string if the screenshot was saved.
   */
-  void TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter = QString());
-
-  /*!
-  \brief Write a screenshot with a transparent background.
-
-  vtkRenderLargeImage produces opaque RGB and MITK's render windows have no alpha
-  buffer, so alpha is recovered by rendering the scene over black and over white
-  and computing the per-pixel opacity from the difference.
-  */
-  void WriteTransparentScreenshot(vtkRenderer* renderer, unsigned int scale, const QString& fileName);
+  QString TakeScreenshot(QmitkRenderWindow* window, unsigned int scale, const QString& fileName, const QString& filter = QString());
 
   QWidget* m_Parent = nullptr;
   std::unique_ptr<Ui::QmitkScreenshotMakerControls> m_Controls;

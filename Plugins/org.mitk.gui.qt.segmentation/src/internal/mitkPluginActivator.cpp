@@ -30,6 +30,15 @@ found in the LICENSE file.
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
+#include <mitkSegmentationPluginConfig.h>
+
+#if MITK_HAS_RESTAPI
+#include "QmitkSegmentationRestRoutes.h"
+
+#include <mitkLog.h>
+#include <mitkRestHelpers.h>
+#endif
+
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE
@@ -69,10 +78,30 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelSegmentationAction, context)
   this->m_context = context;
+
+#if MITK_HAS_RESTAPI
+  m_RestRoutes = std::make_unique<RestRouteRegistration>();
+
+  if (m_RestRoutes->GetServer() != nullptr)
+  {
+    try
+    {
+      m_RestRoutes->Add(CreateSegmentationRoutes(m_RestRoutes->GetServer()));
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Cannot offer the segmentation's REST endpoints: " << e.GetDescription();
+    }
+  }
+#endif
 }
 
 void PluginActivator::stop(ctkPluginContext *)
 {
+#if MITK_HAS_RESTAPI
+  m_RestRoutes.reset();
+#endif
+
   this->m_context = nullptr;
 }
 

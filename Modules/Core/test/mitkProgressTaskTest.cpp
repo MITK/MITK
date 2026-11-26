@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkProgressTask.h>
 
+#include <mitkActionOriginScope.h>
 #include <mitkCoreServices.h>
 #include <mitkIProgressListener.h>
 #include <mitkIProgressService.h>
@@ -67,6 +68,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkProgressTaskTestSuite);
   MITK_TEST(TaskLifecycle_Success);
+  MITK_TEST(TaskOrigin_IsTheOriginOfTheStartingThread_Success);
   MITK_TEST(ConcurrentTasks_AreIndependent_Success);
   MITK_TEST(Progress_ClampsAtTotal_Success);
   MITK_TEST(AddStepsToDo_ExtendsTotal_Success);
@@ -76,6 +78,7 @@ class mitkProgressTaskTestSuite : public mitk::TestFixture
   MITK_TEST(TaskUnwoundByException_Finishes_Success);
   MITK_TEST(MovedTask_FinishesOnce_Success);
   MITK_TEST(Cancel_OnlyAffectsCancelableTasks_Success);
+  MITK_TEST(CancelOrigin_IsTheOriginOfTheFirstRequestingThread_Success);
   MITK_TEST(ListenerAddedMidFlight_LearnsRunningTasks_Success);
   MITK_TEST(RemovedListener_IsNotNotified_Success);
   MITK_TEST(ConcurrentReporting_KeepsSequencesMonotonic_Success);
@@ -133,6 +136,26 @@ public:
 
     CPPUNIT_ASSERT(snapshots.back().Finished);
     CPPUNIT_ASSERT_EQUAL(4u, snapshots.back().Progress);
+  }
+
+  void TaskOrigin_IsTheOriginOfTheStartingThread_Success()
+  {
+    mitk::ProgressTaskId ownId = 0;
+    mitk::ProgressTaskId userId = 0;
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      mitk::ProgressTask own("Own", 1);
+      ownId = own.GetId();
+    }
+
+    {
+      mitk::ProgressTask user("User", 1);
+      userId = user.GetId();
+    }
+
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), m_Listener->GetSnapshots(ownId).front().Origin);
+    CPPUNIT_ASSERT(m_Listener->GetSnapshots(userId).front().Origin.empty());
   }
 
   void ConcurrentTasks_AreIndependent_Success()
@@ -267,6 +290,29 @@ public:
 
     CPPUNIT_ASSERT(m_Listener->GetSnapshots(cancelable.GetId()).back().CancelRequested);
     CPPUNIT_ASSERT(!m_Listener->GetSnapshots(plain.GetId()).back().CancelRequested);
+  }
+
+  void CancelOrigin_IsTheOriginOfTheFirstRequestingThread_Success()
+  {
+    mitk::ProgressTask byClient("By client", 10, true);
+    mitk::ProgressTask byUser("By user", 10, true);
+
+    CPPUNIT_ASSERT(byClient.GetCancelOrigin().empty());
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      m_Service->RequestCancel(byClient.GetId());
+    }
+
+    m_Service->RequestCancel(byUser.GetId());
+
+    // A later request changes nothing.
+    m_Service->RequestCancel(byClient.GetId());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), byClient.GetCancelOrigin());
+    CPPUNIT_ASSERT_EQUAL(std::string("client"), m_Listener->GetSnapshots(byClient.GetId()).back().CancelOrigin);
+    CPPUNIT_ASSERT(byUser.IsCancelRequested());
+    CPPUNIT_ASSERT(byUser.GetCancelOrigin().empty());
   }
 
   void ListenerAddedMidFlight_LearnsRunningTasks_Success()

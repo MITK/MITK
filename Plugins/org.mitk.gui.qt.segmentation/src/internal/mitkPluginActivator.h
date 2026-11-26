@@ -15,6 +15,14 @@ found in the LICENSE file.
 // Parent classes
 #include <berryAbstractUICTKPlugin.h>
 
+#include <mitkSegmentationPluginConfig.h>
+
+#include <memory>
+
+#if MITK_HAS_RESTAPI
+#include <mitkRestHelpers.h>
+#endif
+
 namespace mitk
 {
   class PluginActivator : public berry::AbstractUICTKPlugin
@@ -39,6 +47,11 @@ namespace mitk
 
     static ctkPluginContext* m_context;
     static PluginActivator* m_Instance;
+
+#if MITK_HAS_RESTAPI
+    /** \brief Offers the plugin's REST endpoints, if the application has a server. */
+    std::unique_ptr<RestRouteRegistration> m_RestRoutes;
+#endif
   };
 }
 

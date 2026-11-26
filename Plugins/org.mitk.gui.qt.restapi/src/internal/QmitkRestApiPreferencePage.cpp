@@ -110,7 +110,7 @@ bool QmitkRestApiPreferencePage::PerformOk()
   prefs->PutBool("autoStart", m_Ui->m_AutoStartCheckBox->isChecked());
   prefs->Put("host", m_Ui->m_HostLineEdit->text().toStdString());
   prefs->PutInt("port", m_Ui->m_PortSpinBox->value());
-  prefs->PutInt("threadPoolSize", m_Ui->m_ThreadPoolSizeSpinBox->value());
+  prefs->PutInt("workerThreads", m_Ui->m_ThreadPoolSizeSpinBox->value());
   prefs->PutInt("readTimeoutSeconds", m_Ui->m_ReadTimeoutSpinBox->value());
   prefs->PutInt("writeTimeoutSeconds", m_Ui->m_WriteTimeoutSpinBox->value());
   prefs->PutBool("logLimitEnabled", m_Ui->m_LogLimitEnabledCheckBox->isChecked());
@@ -235,7 +235,7 @@ void QmitkRestApiPreferencePage::Update()
   m_Ui->m_AutoStartCheckBox->setChecked(prefs->GetBool("autoStart", false));
   m_Ui->m_HostLineEdit->setText(QString::fromStdString(prefs->Get("host", defaults.host)));
   m_Ui->m_PortSpinBox->setValue(prefs->GetInt("port", defaults.port));
-  m_Ui->m_ThreadPoolSizeSpinBox->setValue(prefs->GetInt("threadPoolSize", defaults.threadPoolSize));
+  m_Ui->m_ThreadPoolSizeSpinBox->setValue(prefs->GetInt("workerThreads", defaults.threadPoolSize));
   m_Ui->m_ReadTimeoutSpinBox->setValue(prefs->GetInt("readTimeoutSeconds", defaults.readTimeoutSeconds));
   m_Ui->m_WriteTimeoutSpinBox->setValue(prefs->GetInt("writeTimeoutSeconds", defaults.writeTimeoutSeconds));
 

@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitknnInteractivePointInteractor.h>
 
+#include <mitkExceptionMacro.h>
+#include <mitkImage.h>
 #include <mitkPointSetDataInteractor.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -49,11 +51,9 @@ namespace mitk::nnInteractive
     {
     }
 
-    void CreatePointSetNode()
+    void CreatePointSetNode(PromptType promptType)
     {
-      const auto promptType = m_Owner->GetCurrentPromptType();
-
-      // Check if a point set node for the current prompt type has already been created.
+      // Check if a point set node for the prompt type has already been created.
       if (this->PointSetNodes.find(promptType) != this->PointSetNodes.end())
         return;
 
@@ -70,7 +70,7 @@ namespace mitk::nnInteractive
       pointSet->AddObserver(PointSetAddEvent(), command);
 
       // Style the point set using data node properties, taking into account
-      // the current prompt type.
+      // the prompt type.
       auto node = DataNode::New();
       node->SetData(pointSet);
       node->SetName(GetPromptTypeAsString(promptType) + " points");
@@ -87,8 +87,8 @@ namespace mitk::nnInteractive
       HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
-      // storing the point set data node for the current prompt type as a
-      // persistent class member and adding it to the data storage.
+      // storing the point set data node for the prompt type as a persistent
+      // class member and adding it to the data storage.
       this->PointSetNodes[promptType] = node;
       m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
     }
@@ -156,6 +156,42 @@ std::optional<mitk::Point3D> mitk::nnInteractive::PointInteractor::GetLastPoint(
   return pointSet->GetPoint(pointSet->GetSize() - 1);
 }
 
+void mitk::nnInteractive::PointInteractor::AddPoint(const Point3D& point, PromptType promptType)
+{
+  auto* toolManager = this->GetToolManager();
+  const auto* referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+
+  if (referenceNode == nullptr || referenceNode->GetDataAs<Image>() == nullptr)
+    mitkThrow() << "A point needs a reference image.";
+
+  // The render windows show a point only within a fraction of a pixel of
+  // their plane, which lies at the center of a slice. Drawn at the center of
+  // its voxel, which is what nnInteractive is prompted with, a point given
+  // anywhere in the voxel shows in its slice.
+  const auto* geometry = referenceNode->GetDataAs<Image>()->GetGeometry();
+  itk::Index<3> index;
+  geometry->WorldToIndex(point, index);
+
+  Point3D voxelCenter;
+  geometry->IndexToWorld(index, voxelCenter);
+
+  m_Impl->CreatePointSetNode(promptType);
+
+  // Unlike the point set interactor, this emits no PointSetAddEvent, which
+  // would prompt nnInteractive a second time.
+  auto* pointSet = m_Impl->PointSetNodes.at(promptType)->GetDataAs<PointSet>();
+  const auto id = pointSet->InsertPoint(voxelCenter);
+
+  // Only the enabled interactor highlights its latest point, and OnDisable()
+  // clears that highlight again, in the point set of its prompt type only.
+  // Nothing would clear one made in another.
+  for (const auto& [type, node] : m_Impl->PointSetNodes)
+    node->GetDataAs<PointSet>()->ClearSelection();
+
+  if (this->IsEnabled() && promptType == this->GetCurrentPromptType())
+    pointSet->SetSelectInfo(id, true);
+}
+
 void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType promptType)
 {
   auto iter = m_Impl->PointSetNodes.find(promptType);
@@ -167,12 +203,19 @@ void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType prom
 
   if (!pointSet->IsEmpty())
     pointSet->RemovePointAtEnd(0);
+
+  // The enabled interactor adds to its point set, also to an empty one.
+  // Nothing else would clean up an empty one before the next reset.
+  const bool isInUse = this->IsEnabled() && promptType == this->GetCurrentPromptType();
+
+  if (pointSet->IsEmpty() && !isInUse)
+    m_Impl->DestroyPointSetNode(promptType);
 }
 
 void mitk::nnInteractive::PointInteractor::OnEnable()
 {
   // Create a point set for the current prompt type if it doesn't already exist.
-  m_Impl->CreatePointSetNode();
+  m_Impl->CreatePointSetNode(this->GetCurrentPromptType());
 
   // Enable the actual interactor for the appropriate point set and restrict
   // points to the bounds of the reference image.

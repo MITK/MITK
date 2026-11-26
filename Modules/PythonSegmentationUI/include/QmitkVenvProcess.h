@@ -92,7 +92,9 @@ namespace QmitkVenvProcess
    * after the step shows it and offers to cancel, which stops the step. A step
    * that reports nothing, because it has nothing to do, ends without one.
    *
-   * Runs a local event loop, during which the caller can be deleted.
+   * Runs a local event loop, during which the caller can be deleted. What the
+   * loop dispatches has the user as origin (see mitk::ActionOriginScope), as
+   * in the main loop; the progress notification has the caller's.
    *
    * \param[in] venvName The virtual environment to run the step in.
    * \param[in] step The step. Whether it is optional does not matter here.

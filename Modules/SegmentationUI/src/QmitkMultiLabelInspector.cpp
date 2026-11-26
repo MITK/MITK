@@ -1168,6 +1168,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
 
+        QAction* splitAction = new QAction("&Split into instances", this);
+        splitAction->setEnabled(instanceIsAllowed);
+        QObject::connect(splitAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSplitLabel);
+        menu->addAction(splitAction);
+
         const auto selectedLabelIndex = m_Model->indexOfLabel(selectedLabelValues.front());
 
         if (m_Model->GetLabelInstancesOfSameLabelClass(selectedLabelIndex).size() > 1) // Only labels that actually appear as instance (having additional instances)
@@ -1495,6 +1500,90 @@ void QmitkMultiLabelInspector::OnAddLabelInstance()
     return;
 
   this->AddNewLabelInstanceInternal(currentLabel);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkMultiLabelInspector::OnSplitLabel()
+{
+  auto currentLabel = this->GetFirstSelectedLabelObject();
+  if (nullptr == currentLabel)
+    return;
+
+  const auto labelValue = currentLabel->GetValue();
+  mitk::TimeStepType timeStep = 0;
+
+  if (1 < m_Segmentation->GetTimeSteps())
+  {
+    const auto* timeGeometry = m_Segmentation->GetTimeGeometry();
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    if (!timeGeometry->IsValidTimePoint(timePoint))
+    {
+      QMessageBox::information(this->window(), "Split into instances",
+        "The segmentation has no data at the selected time point. There is nothing to split.");
+      return;
+    }
+
+    timeStep = timeGeometry->TimePointToTimeStep(timePoint);
+  }
+
+  const auto labelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel);
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(labelValue) },
+    false, timeStep, false, false, true);
+
+  mitk::MultiLabelSegmentation::LabelValueVectorType instances;
+
+  this->WaitCursorOn();
+  m_ModelManipulationOngoing = true;
+
+  try
+  {
+    instances = mitk::LabelSetImageHelper::SplitLabelIntoConnectedComponents(m_Segmentation, labelValue, timeStep);
+  }
+  catch (const std::exception& e)
+  {
+    m_ModelManipulationOngoing = false;
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.what();
+    QMessageBox::information(this->window(), "Split into instances", "Could not split the label. See error log for details.");
+    return;
+  }
+
+  m_ModelManipulationOngoing = false;
+  this->WaitCursorOff();
+
+  if (instances.size() < 2)
+  {
+    QMessageBox::information(this->window(), "Split into instances",
+      "Label \"" + QString::fromStdString(labelName) + "\" does not consist of separate parts. There is nothing to split.");
+    return;
+  }
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Split label \"" + labelName + "\" into " + std::to_string(instances.size()) + " instances");
+
+  // Not SetSelectedLabel(), which does nothing for an unchanged value: the
+  // value is still selected, but its row is a new one if the label had no
+  // other instance, as its label row stood for the instance until now.
+  this->UpdateSelectionModel({ labelValue });
+  m_LastValidSelectedLabels = { labelValue };
+
+  auto index = m_Model->indexOfLabel(labelValue);
+  if (index.isValid())
+  {
+    m_Controls->view->expand(index.parent());
+    m_Controls->view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+  }
+
+  emit ModelUpdated();
 
   // this is needed as workaround for (T27307). It circumvents the fact that modifications
   // of data (here the segmentation) does not directly trigger the modification of the

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QEvent>
 #include <QPainter>
 #include <QTextDocument>
+#include <QTextDocumentFragment>
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
   : QPushButton(parent)
@@ -82,6 +83,7 @@ void QmitkNodeSelectionButton::OnNodeModified(const itk::Object * /*caller*/, co
 {
   if (itk::ModifiedEvent().CheckEvent(&event))
   {
+    this->UpdateAccessibleName();
     this->update();
   }
 }
@@ -101,13 +103,24 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
     this->AddNodeObserver();
   }
 
+  this->UpdateAccessibleName();
   this->update();
 }
 
 void QmitkNodeSelectionButton::SetNodeInfo(QString info)
 {
   this->m_Info = info;
+  this->UpdateAccessibleName();
   this->update();
+}
+
+void QmitkNodeSelectionButton::UpdateAccessibleName()
+{
+  // The button paints its text itself, so it has none that screen readers
+  // could read.
+  this->setAccessibleName(m_SelectedNode.IsNotNull()
+    ? QString::fromStdString(m_SelectedNode->GetName())
+    : QTextDocumentFragment::fromHtml(m_Info).toPlainText());
 }
 
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)

@@ -11,6 +11,7 @@ set(H_FILES
   Colortables/Viridis.h
   itkImportMitkImageContainer.h
   itkVtkAbstractTransform.h
+  mitkActionOriginScope.h
   mitkAnatomicalPlanes.h
   mitkAntiAliasing.h
   mitkArray.h
@@ -104,6 +105,7 @@ set(CPP_FILES
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
 
+  Controllers/mitkActionOriginScope.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

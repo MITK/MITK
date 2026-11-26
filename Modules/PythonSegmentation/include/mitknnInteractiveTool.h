@@ -90,11 +90,12 @@ namespace mitk
       {
         RemoteConnection, /**< \brief The lease expired, or the server is at capacity or unreachable. */
         WorkerExited,     /**< \brief The worker process that hosted the session ended unexpectedly. */
-        Cancelled         /**< \brief The user cancelled a prompt, which ended the worker process of the session. */
+        Cancelled         /**< \brief A prompt was canceled, which ended the worker process of the session. */
       };
 
       Cause Reason;
       std::string Details; /**< \brief What was reported, e.g. the exit code and last output of the worker. */
+      bool ByProgram = false; /**< \brief A program canceled its own work, like a prompt of AddPrompt() or the update that seeds a session it started; false if the user or another program canceled it. */
     };
 
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
@@ -192,7 +193,8 @@ namespace mitk
      *
      * All interaction data (points, boxes, scribbles, contours) is removed
      * and the Python session's interaction state is reset. Also clears any
-     * initial segmentation mask.
+     * initial segmentation mask. The enabled interactor, if any, is
+     * disabled.
      */
     void ResetInteractions();
 
@@ -205,6 +207,9 @@ namespace mitk
      *         \c false otherwise.
      */
     bool HasInteractions() const;
+
+    /** \brief Tells that a session runs and has interactions, whose result can be confirmed. */
+    bool HasResultToConfirm() const override;
 
     /** \brief Reverts the most recent interaction (single-level undo).
      *
@@ -233,6 +238,25 @@ namespace mitk
      * \sa UndoLastInteraction(), SupportsUndo()
      */
     bool CanUndo() const;
+
+    /** \brief A prompt as AddPrompt() takes it, without its points.
+     */
+    struct Prompt
+    {
+      nnInteractive::InteractionType InteractionType;
+      nnInteractive::PromptType PromptType;
+    };
+
+    /** \brief Returns the prompt of AddPrompt() that was the last interaction,
+     *         while it is.
+     *
+     * Lets a GUI tell the prompts of a program from those of the user.
+     * Empty after a prompt of an interactor or an initial mask, after the
+     * prompt was undone, after a reset, and after the session has ended.
+     *
+     * \sa InteractionsChangedEvent
+     */
+    std::optional<Prompt> GetLastProgramPrompt() const;
 
     /** \brief Returns whether the running session's backend supports undo.
      *
@@ -346,7 +370,8 @@ namespace mitk
      *            if the session setup fails (local or remote), was cancelled or
      *            was aborted. Runs on the GUI thread, before this returns if
      *            the start fails right away, e.g. while the tool is busy or
-     *            no server is configured.
+     *            no server is configured. Not called if the tool is destroyed
+     *            first.
      *
      * \pre nnInteractive must be installed in the virtual environment.
      * \pre A reference image must be available through the ToolManager.
@@ -397,6 +422,21 @@ namespace mitk
      * AbortSession() meanwhile ends the start once its work has stopped.
      */
     bool IsSessionStarting() const;
+
+    /** \brief Whether the session was asked to end, by AbortSession() or a
+     *         deactivation, while work still used it.
+     *
+     * IsSessionRunning() stays \c true until the teardown, which follows the
+     * work, in a call posted to the GUI thread.
+     */
+    bool IsSessionEnding() const;
+
+    /** \brief Why the session that StartSession() started last was lost, if it was.
+     *
+     * Set with SessionLostEvent, also when no GUI listens, and kept until the
+     * next StartSession().
+     */
+    std::optional<SessionLoss> GetLastSessionLoss() const;
 
     /** \brief Tells that a prompt can be cancelled, which ends the session. */
     bool IsCancelable() const override;
@@ -451,6 +491,60 @@ namespace mitk
      */
     void InitializeSessionWithMask(Image* mask);
 
+    /** \brief Prompts the model as an interactor does, from points instead
+     *         of mouse input, and updates the preview.
+     *
+     * For programs that know where to prompt, like scripts or an AI agent.
+     * The interactor of the interaction type draws the prompt as if the
+     * mouse had drawn it in a render window that shows \p plane, and the
+     * model gets what that drawing gives. UndoLastInteraction() undoes it
+     * like any other.
+     *
+     * \param[in] interactionType What the points describe:
+     *            - Point: one point, in or outside the structure;
+     *            - Box: two opposite corners of a box around the structure;
+     *            - Scribble: a line of at least two and at most 100 points,
+     *              painted with the brush of the scribble interactor;
+     *            - Lasso: a closed contour of at least three and at most 100
+     *              points, whose inside is the prompt.
+     * \param[in] points In world coordinates, inside the reference image.
+     * \param[in] promptType Whether the prompt marks the structure or what
+     *            does not belong to it.
+     * \param[in] plane The plane the points were drawn in, like that of a
+     *            render window, onto which they are projected. Without it,
+     *            the points must lie in one slice of the reference image,
+     *            as a render window lays it out.
+     * \param[in] done Receives null once the prediction is in the preview, or
+     *            a mitk::Exception if it failed. Runs on the GUI thread once
+     *            the update has ended, which is after this returns unless the
+     *            prompt failed right away. Not called if this throws or if
+     *            the tool is destroyed first. The tool keeps it until then,
+     *            so it must not own the tool.
+     *
+     * \throw mitk::Exception if no session runs, a prompt still computes, the
+     *        model does not support the interaction, or the points do not
+     *        fit it.
+     */
+    void AddPrompt(nnInteractive::InteractionType interactionType,
+                   const std::vector<Point3D>& points,
+                   nnInteractive::PromptType promptType,
+                   const PlaneGeometry* plane,
+                   std::function<void(std::exception_ptr error)> done);
+
+    /**
+     * \brief Tells whether a prompt of AddPrompt() has not reported to its \p done yet.
+     *
+     * Also for a moment after the update of the prompt has ended, until the
+     * report runs on the GUI thread. AddPrompt() refuses another prompt
+     * meanwhile.
+     */
+    bool IsPromptPending() const;
+
+    /** \brief Event triggered when a session has started, by StartSession()
+     *         from whatever caller.
+     */
+    Message<> SessionStartedEvent;
+
     /** \brief Event triggered when the tool requests cleanup confirmation.
      *
      * Emitted when the segmentation is confirmed and the tool needs to
@@ -459,16 +553,31 @@ namespace mitk
      */
     Message1<bool> ConfirmCleanUpEvent;
 
-    /** \brief Event triggered after the preview has been updated from a user interaction.
+    /** \brief Event triggered after the preview has been updated from a prompt.
      *
      * Emitted on the GUI thread once the prediction of an update driven by an
-     * enabled interactor (i.e., the user placed a point/box/scribble/lasso) has
-     * been written to the preview image. That is after DoUpdatePreview() has
-     * returned, as the prediction runs off the GUI thread.
+     * enabled interactor (i.e., the user placed a point/box/scribble/lasso) or
+     * by AddPrompt() has been written to the preview image. That is after
+     * DoUpdatePreview() has returned, as the prediction runs off the GUI
+     * thread. GetLastProgramPrompt() tells the two apart.
      *
      * Not emitted for initial-mask-based updates or reset operations.
      */
     Message<> PreviewUpdatedEvent;
+
+    /** \brief Event triggered when the interactions have changed, by whatever
+     *         caller: a prompt or an initial mask was added, the last
+     *         interaction was undone, the interactions were reset, or the
+     *         teardown of the session cleared them.
+     *
+     * \sa CanUndo(), GetLastProgramPrompt()
+     */
+    Message<> InteractionsChangedEvent;
+
+    /** \brief Event triggered when auto-zoom or auto-refine has changed, by
+     *         whatever caller.
+     */
+    Message<> OptionsChangedEvent;
 
     /** \brief Event triggered at the end of Deactivated().
      *
@@ -604,8 +713,16 @@ namespace mitk
 
     /** \brief Reports why a prompt failed: a lost or cancelled session goes to
      *         SessionLostEvent, any other error is rethrown.
+     *
+     * Runs in the scope of the origin of the update, see RunOffGUIThread().
      */
     void EndFailedPrompt(std::exception_ptr error, const ProgressTask* task);
+
+    /** \brief Records the loss and sends SessionLostEvent. */
+    void ReportSessionLoss(const SessionLoss& loss);
+
+    /** \brief Tells the caller of AddPrompt() what became of its prompt. */
+    void EndProgramPrompt();
 
     /** \brief If an error means the session is lost, request teardown and
      *         report it as handled.

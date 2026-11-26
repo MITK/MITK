@@ -39,6 +39,10 @@ PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
   //super(partReference.getId());
   this->partReference = partReference;
   this->page = workbenchPage;
+
+  // From the start, not only once the part is created: the tab of a part
+  // that does not exist yet shows the title of the reference as well.
+  partReference->AddPropertyListener(this);
 }
 
 void PartPane::CreateControl(QWidget* parent) {
@@ -46,8 +50,6 @@ void PartPane::CreateControl(QWidget* parent) {
   {
     return;
   }
-
-  partReference.Lock()->AddPropertyListener(this);
 
   // Create view form.
   control = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreatePaneControl(parent);

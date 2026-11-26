@@ -49,6 +49,8 @@ Shows the current host and port configuration (e.g., <tt>:::8080</tt> for the de
 
 Click the <b>Start Server</b> / <b>Stop Server</b> button to control the server lifecycle. The button text changes based on the current server state.
 
+A server that another view started for itself, like the Agent view, runs with that view's own settings and is stopped by closing that view. The button is disabled meanwhile.
+
 \section org_mitk_views_restapi_activity Request Activity
 
 The Request Activity section provides information about client connections and requests:
@@ -118,7 +120,7 @@ The REST API preferences can be accessed via <b>Window > Preferences > REST API<
 
 \subsection org_mitk_views_restapi_prefs_performance Performance Settings
 
-- <b>Thread Pool Size</b>: Number of threads for handling concurrent requests (default: 4)
+- <b>Thread Pool Size</b>: Number of threads for handling concurrent requests (default: 8)
 - <b>Read Timeout</b>: Maximum time in seconds to wait for incoming request data (default: 30)
 - <b>Write Timeout</b>: Maximum time in seconds to wait for sending response data (default: 30)
 
@@ -133,6 +135,9 @@ The REST API preferences can be accessed via <b>Window > Preferences > REST API<
 
 \subsection org_mitk_views_restapi_usage_endpoints API Endpoints
 
+The REST API is experimental in this release: its endpoints and answers may change with the next
+release of MITK, which the release notes then list.
+
 The REST API provides the following main endpoints (base URL: <tt>http://host:port/api/v1</tt>):
 
 <table>
@@ -146,6 +151,14 @@ The REST API provides the following main endpoints (base URL: <tt>http://host:po
 <tr><td>GET</td><td><tt>/datastorage/nodes/{uid}/properties</tt></td><td>Get node properties</td></tr>
 <tr><td>PUT</td><td><tt>/datastorage/nodes/{uid}/properties/{key}</tt></td><td>Set a property</td></tr>
 </table>
+
+Plugins add further endpoints, which the specification does not describe: Segmentation <tt>/segmentation</tt>, Measurement
+Toolbox <tt>/statistics</tt> and <tt>/planar-figures</tt>, Reports <tt>/reports</tt>, this plugin
+<tt>/workbench</tt>, <tt>/manual</tt> and the window, crosshair and layout endpoints below
+<tt>/rendering</tt>. The endpoints of a prefix exist once their plugin is active, so a prefix can be
+missing from a Workbench that has not activated the plugin yet. <tt>GET /api/v1/endpoints</tt> lists
+what exists now. An open Agent view adds <tt>/mcp</tt> for its own agent, which only that agent's
+token can use.
 
 \subsection org_mitk_views_restapi_usage_python Python Example
 

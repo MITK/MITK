@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkIOUtil.h>
 #include <mitkMouseMoveEvent.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarFigureVisibilityProperty.h>
@@ -26,18 +27,90 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 
 #include <vtkActor2D.h>
+#include <vtkImageData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkPropCollection.h>
+#include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
+#include <vtkWindowToImageFilter.h>
+
+#include <algorithm>
+#include <array>
+#include <utility>
 
 namespace
 {
   const std::vector<std::string> TypeIds = { "line", "arrow", "angle", "four_point_angle", "cross", "circle", "ellipse",
                                              "double_ellipse", "rectangle", "polygon", "path", "subdivision_polygon",
                                              "bezier_curve" };
+
+  bool IsMagenta(const unsigned char *pixel)
+  {
+    return pixel[0] >= 200 && pixel[1] <= 60 && pixel[2] >= 200;
+  }
+
+  /** The text of labels on black. */
+  bool IsWhite(const unsigned char *pixel)
+  {
+    return pixel[0] >= 200 && pixel[1] >= 200 && pixel[2] >= 200;
+  }
+
+  /** Calls \p visit with x, y and the pixel for every pixel of an image. */
+  template <typename Visit>
+  void VisitPixels(vtkImageData *image, Visit visit)
+  {
+    int dimensions[3];
+    image->GetDimensions(dimensions);
+
+    const auto components = image->GetNumberOfScalarComponents();
+    const auto *pixels = static_cast<const unsigned char *>(image->GetScalarPointer());
+
+    for (int y = 0; y < dimensions[1]; ++y)
+    {
+      for (int x = 0; x < dimensions[0]; ++x)
+        visit(x, y, pixels + (static_cast<std::size_t>(y) * dimensions[0] + x) * components);
+    }
+  }
+
+  /** The bounding box {min x, max x, min y, max y} of the pixels of an image that \p is; all -1 without any. */
+  std::array<int, 4> GetBoxOf(vtkImageData *image, bool (*is)(const unsigned char *))
+  {
+    std::array<int, 4> box = { -1, -1, -1, -1 };
+
+    VisitPixels(image, [&box, is](int x, int y, const unsigned char *pixel) {
+      if (!is(pixel))
+        return;
+
+      box = box[0] < 0
+        ? std::array<int, 4>{ x, x, y, y }
+        : std::array<int, 4>{ std::min(box[0], x), std::max(box[1], x), std::min(box[2], y), std::max(box[3], y) };
+    });
+
+    return box;
+  }
+
+  /** The white pixels of an image left of its magenta box and right of it. */
+  std::pair<int, int> CountLabelPixelsBesideFigure(vtkImageData *image)
+  {
+    const auto box = GetBoxOf(image, IsMagenta);
+    std::pair<int, int> counts = { 0, 0 };
+
+    VisitPixels(image, [&box, &counts](int x, int, const unsigned char *pixel) {
+      if (!IsWhite(pixel))
+        return;
+
+      if (x < box[0])
+        ++counts.first;
+      else if (x > box[1])
+        ++counts.second;
+    });
+
+    return counts;
+  }
 }
 
 class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
@@ -57,6 +130,8 @@ class mitkPlanarFigureVtkMapper2DTestSuite : public mitk::TestFixture
   MITK_TEST(Handles_OfSelectedBezierCurves_AreShown);
   MITK_TEST(MovedPlane_IsDrawnAgain);
   MITK_TEST(UnchangedFigure_IsNotDrawnAgain);
+  MITK_TEST(MagnifiedImage_ShowsTheFigureInItsPlace);
+  MITK_TEST(MagnifiedImage_ShowsTheLabelOnceOnItsSide);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::RenderingTestHelper m_RenderingTestHelper;
@@ -425,6 +500,127 @@ public:
 
     this->GetRenderer()->GetCameraController()->Zoom(2.0, P(5, 0.5, 0.5));
     CPPUNIT_ASSERT_MESSAGE("A zoomed figure is drawn again", drawTime != this->RenderAndGetDrawing(node)->GetMTime());
+  }
+
+  void MagnifiedImage_ShowsTheFigureInItsPlace()
+  {
+    const auto node = this->AddFigure("rectangle", 5);
+    node->SetColor(1.0f, 0.0f, 1.0f);
+    node->SetBoolProperty("planarfigure.drawcontrastoutline", false);
+    m_RenderingTestHelper.Render();
+
+    const auto box = GetBoxOf(this->GetWindowImage(), IsMagenta);
+    CPPUNIT_ASSERT_MESSAGE("The figure is drawn", box[0] >= 0);
+
+    for (const int magnification : { 2, 3 })
+    {
+      const auto magnifiedBox = GetBoxOf(this->GetMagnifiedImage(magnification), IsMagenta);
+
+      // A tile that reused the drawing of another one would put the figure in a place of its own, far off. Within
+      // the growth of the line, which is drawn as much wider, and the rasterization of drivers.
+      for (std::size_t i = 0; i < 4; ++i)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+          "Side " + std::to_string(i) + " of the box of the figure at " + std::to_string(magnification) + "x",
+          magnification * box[i], static_cast<double>(magnifiedBox[i]), magnification + 1.0);
+      }
+    }
+  }
+
+  void MagnifiedImage_ShowsTheLabelOnceOnItsSide()
+  {
+    // Black around the figure, so that the white of the text is the label's alone.
+    m_RenderingTestHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Image"))->SetVisibility(false);
+
+    // In the middle, the label goes right of the figure, while the middle tile of a threefold
+    // image, whose camera is the window's, would by its own edges have room only on the left.
+    this->CheckLabelSideInMagnifiedImages(0.50, 0.75, false);
+
+    // So close to the right edge that the label goes left of the figure, while some tiles would
+    // by their own edges have room for it on the right.
+    this->CheckLabelSideInMagnifiedImages(0.70, 0.93, true);
+  }
+
+  /**
+   * Shows a figure between two fractions of the width of the plane, alone with its label, and checks
+   * that magnified images show the label once, on its side in the window and as much larger.
+   */
+  void CheckLabelSideInMagnifiedImages(double from, double to, bool labelIsLeft)
+  {
+    auto figure = mitk::CreatePlanarFigure("rectangle");
+    figure->SetPlaneGeometry(m_Plane);
+    mitk::Point2D first, second;
+    first[0] = from * m_Plane->GetExtentInMM(0);
+    first[1] = 0.40 * m_Plane->GetExtentInMM(1);
+    second[0] = to * m_Plane->GetExtentInMM(0);
+    second[1] = 0.60 * m_Plane->GetExtentInMM(1);
+    figure->SetFromSpan(first, second);
+
+    auto node = mitk::DataNode::New();
+    node->SetName("Liver");
+    node->SetData(figure);
+    node->SetColor(1.0f, 0.0f, 1.0f);
+    node->SetBoolProperty("planarfigure.drawcontrastoutline", false);
+    node->SetBoolProperty("planarfigure.drawquantities", false);
+    node->SetProperty("planarfigure.label", mitk::PlanarFigureVisibilityProperty::New(mitk::PlanarFigureVisibilityProperty::Visibility::Always));
+    m_RenderingTestHelper.GetDataStorage()->Add(node);
+    m_RenderingTestHelper.Render();
+
+    const auto side = std::string(labelIsLeft ? "left" : "right") + " of the figure from " + std::to_string(from);
+    const auto isOnItsSide = [labelIsLeft](const std::pair<int, int> &counts) {
+      return labelIsLeft ? counts.first > 0 && 0 == counts.second : 0 == counts.first && counts.second > 0;
+    };
+
+    const auto windowImage = this->GetWindowImage();
+    CPPUNIT_ASSERT_MESSAGE("In the window, the label is " + side, isOnItsSide(CountLabelPixelsBesideFigure(windowImage)));
+
+    const auto labelBox = GetBoxOf(windowImage, IsWhite);
+
+    for (const int magnification : { 2, 3, 4 })
+    {
+      const auto image = this->GetMagnifiedImage(magnification);
+      const auto at = " at " + std::to_string(magnification) + "x";
+
+      CPPUNIT_ASSERT_MESSAGE("The label is " + side + ", once" + at, isOnItsSide(CountLabelPixelsBesideFigure(image)));
+
+      // The text is drawn as much larger as the image, within a pixel of the glyphs per magnification.
+      const auto magnifiedLabelBox = GetBoxOf(image, IsWhite);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The height of the label" + at,
+        magnification * (labelBox[3] - labelBox[2]), static_cast<double>(magnifiedLabelBox[3] - magnifiedLabelBox[2]),
+        2.0 * magnification);
+    }
+
+    m_RenderingTestHelper.GetDataStorage()->Remove(node);
+    m_RenderingTestHelper.Render();
+  }
+
+  /** The window as it renders now. */
+  vtkSmartPointer<vtkImageData> GetWindowImage()
+  {
+    auto window = vtkSmartPointer<vtkWindowToImageFilter>::New();
+    window->SetInput(m_RenderingTestHelper.GetVtkRenderWindow());
+    window->ReadFrontBufferOff();
+    window->Update();
+
+    vtkSmartPointer<vtkImageData> image = window->GetOutput();
+    return image;
+  }
+
+  /** The window rendered in tiles of an image this many times its size, as magnified screenshots are. */
+  vtkSmartPointer<vtkImageData> GetMagnifiedImage(int magnification)
+  {
+    auto *renderer = this->GetRenderer();
+    renderer->SetTileMagnification(magnification);
+
+    auto magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
+    magnifier->SetInput(m_RenderingTestHelper.GetVtkRenderer());
+    magnifier->SetMagnification(magnification);
+    magnifier->Update();
+
+    renderer->SetTileMagnification(1);
+
+    vtkSmartPointer<vtkImageData> image = magnifier->GetOutput();
+    return image;
   }
 
   /** The geometry drawn for a figure. */

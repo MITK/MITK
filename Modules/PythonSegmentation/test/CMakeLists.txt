@@ -1,3 +1,4 @@
+include_directories(../src)
 MITK_CREATE_MODULE_TESTS(EXTRA_DEPENDS MitkPython)
 
 if(TARGET ${TESTDRIVER})

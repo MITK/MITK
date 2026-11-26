@@ -39,7 +39,7 @@ namespace mitk
   enum class FileAccessMode
   {
     Unrestricted,       ///< \brief No file path restrictions (default).
-    AllowedDirectories  ///< \brief Only allow paths under configured directories.
+    AllowedDirectories  ///< \brief Only allow paths under configured directories; none without any.
   };
 
   /**
@@ -74,7 +74,7 @@ namespace mitk
     std::string host = "::";
     int port = 8080;                       ///< \brief TCP port to listen on.
     bool enabled = false;                  ///< \brief Whether the server should be started automatically.
-    int threadPoolSize = 4;                ///< \brief Number of worker threads for handling requests.
+    int threadPoolSize = 8;                ///< \brief Number of worker threads for handling requests, at least 2.
     int readTimeoutSeconds = 30;           ///< \brief Socket read timeout in seconds.
     int writeTimeoutSeconds = 30;          ///< \brief Socket write timeout in seconds.
 

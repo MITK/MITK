@@ -123,6 +123,12 @@ It is just the plain pixel value of the label instance, which is unique across a
 
 \imageMacro{QmitkSegmentation_LabelInstances.png,"Label instances",16.00}
 
+Tools like TotalSegmentator or VoxTell put all findings of a kind, for example lung nodules, into a single label.
+To get one label instance per finding, choose <em>Split into instances</em> from the context menu of the label.
+The label keeps its largest separate part and every further part becomes a new instance, ordered by size.
+Voxels belong to the same part if they touch at a face, an edge or a corner.
+In a segmentation with several time steps, only the current time step is split.
+
 \section org_mitk_views_segmentationlock_color_visibility Unlocking, changing color of, and hiding label instances
 
 Label instances are locked by default: label instances from the same group cannot accidentally override pixels from other label instances.
@@ -575,6 +581,12 @@ To discard all current interactions and start over, use <b>Reset</b> (or press <
 
 Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
 Two automation options on the preferences page streamline this workflow: <i>Auto-create next label</i> prepares a new empty label as soon as you confirm one, so you can keep segmenting, and <i>Auto-confirm after single interaction</i> confirms automatically after your first interaction, which is convenient when a single interaction per label is enough.
+
+With <i>Auto-create next label</i>, confirming adds a new, empty label to the same group and selects it, so that your next interactions segment the next structure.
+It gets the default label name, which you can change at any time.
+If you uncheck <i>Ignore label naming preferences</i> on the preferences page, the label naming preferences of the Segmentation view apply instead, so that you may be asked for a name.
+If the label is still empty when you close nnInteractive or switch to another tool, it is removed again and the label you confirmed last becomes active.
+The label is kept if you select a different label or click <b>Reset</b> in the meantime, or once it has content.
 
 The tool's <b>Undo</b> and the application-wide undo work at different levels, and both stay available while the tool is active.
 The tool's <b>Undo</b> (<tt>U</tt>) reverts only your most recent interaction within the current, unconfirmed result; there is no further interaction history to step back through.

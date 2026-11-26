@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkContourModel.h>
 #include <mitkContourModelUtils.h>
 #include <mitkEventStateMachine.h>
+#include <mitkExceptionMacro.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkMatrixConvert.h>
@@ -26,6 +27,9 @@ found in the LICENSE file.
 #include <mitkToolManager.h>
 
 #include <usModuleRegistry.h>
+
+#include <memory>
+#include <optional>
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
 #include "mitknnInteractiveRenderingHelpers.h"
@@ -81,12 +85,102 @@ namespace
     mitk::nnInteractive::InteractionBoundingBox m_BoundingBox{};
   };
 
-  // Paints brushstrokes directly into a 2D uint8 Image sized to the current
-  // slicing plane of the reference image. Replaces the former
-  // DrawPaintbrushTool wrapper -- no 3D working segmentation is required,
-  // which eliminates the full-volume ScribbleNode allocation. Brush circle
-  // and gap-fill geometry are obtained from PaintbrushTool::CreateBrushContour
-  // and CreateGapContour so the two stay in sync.
+  // The diameter of the brush in pixels of the slice.
+  constexpr int BrushSize = 3;
+
+  // A brushstroke, painted directly into a 2D uint8 Image sized to a slice of
+  // the reference image along a plane. No 3D working segmentation is
+  // required, which eliminates the full-volume ScribbleNode allocation.
+  // Brush circle and gap-fill geometry are obtained from
+  // PaintbrushTool::CreateBrushContour and CreateGapContour so the two stay
+  // in sync. The brush interactor paints strokes along the mouse, and
+  // ScribbleInteractor::AddScribble() along given points.
+  class BrushStroke
+  {
+  public:
+    // Returns nullptr if the plane does not cut the reference image.
+    static std::unique_ptr<BrushStroke> Begin(const mitk::Image* referenceImage,
+                                              const mitk::PlaneGeometry* plane,
+                                              mitk::TimeStepType timeStep)
+    {
+      // Extract a slice of the reference image to capture the correct 2D
+      // extent and world geometry for the plane. The reference image is
+      // already resident (user data), so the only new allocation is the
+      // small 2D uint8 painting slice.
+      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(plane, referenceImage, timeStep);
+      if (refSlice.IsNull())
+        return nullptr;
+
+      return std::unique_ptr<BrushStroke>(new BrushStroke(refSlice, plane));
+    }
+
+    // Stamps the brush at a point and fills the gap to the previous one.
+    void PaintAt(const mitk::Point3D& worldCoord)
+    {
+      mitk::Point3D indexCoord;
+      m_Slice->GetGeometry()->WorldToIndex(worldCoord, indexCoord);
+      indexCoord[0] = std::round(indexCoord[0]);
+      indexCoord[1] = std::round(indexCoord[1]);
+      indexCoord[2] = 0;
+
+      auto stamp = mitk::ContourModel::New();
+      stamp->SetClosed(true);
+      for (auto it = m_BrushContour->Begin(); it != m_BrushContour->End(); ++it)
+      {
+        auto p = (*it)->Coordinates;
+        p[0] += indexCoord[0];
+        p[1] += indexCoord[1];
+        stamp->AddVertex(p);
+      }
+      mitk::ContourModelUtils::FillContourInSlice2(stamp, m_Slice, 1);
+
+      const double radius = static_cast<double>(BrushSize) / 2.0;
+      if (m_LastPosition.has_value() && indexCoord.EuclideanDistanceTo(m_LastPosition.value()) > radius)
+      {
+        auto gap = mitk::PaintbrushTool::CreateGapContour(m_LastPosition.value(), indexCoord, radius);
+        mitk::ContourModelUtils::FillContourInSlice2(gap, m_Slice, 1);
+      }
+
+      m_LastPosition = indexCoord;
+    }
+
+    // Computes a tight bounding box by mapping the stroke's non-zero 2D
+    // footprint through the slice's geometry into the reference's index
+    // space. Works for any orientation; on axial/coronal/sagittal it
+    // collapses to one voxel along the slicing axis automatically. Empty if
+    // nothing was painted inside the image.
+    std::optional<mitk::nnInteractive::InteractionBoundingBox> ComputeBoundingBox(const mitk::Image* referenceImage) const
+    {
+      mitk::nnInteractive::InteractionBoundingBox boundingBox{};
+
+      if (!mitk::nnInteractive::ComputeStrokeBoundingBox(m_Slice, referenceImage, boundingBox))
+        return std::nullopt;
+
+      return boundingBox;
+    }
+
+    mitk::Image* GetSlice() const { return m_Slice; }
+    const mitk::PlaneGeometry* GetPlane() const { return m_Plane; }
+
+  private:
+    BrushStroke(const mitk::Image* refSlice, const mitk::PlaneGeometry* plane)
+      : m_Slice(mitk::Image::New()),
+        // Cloned so that a later change of a renderer-owned plane cannot
+        // desync the plane the stroke is written back with.
+        m_Plane(plane->Clone()),
+        m_BrushContour(mitk::PaintbrushTool::CreateBrushContour(BrushSize))
+    {
+      m_Slice->Initialize(mitk::MakePixelType<unsigned char, unsigned char, 1>(), *(refSlice->GetTimeGeometry()));
+      m_Slice->AllocateZeroedVolume();
+    }
+
+    mitk::Image::Pointer m_Slice;
+    mitk::PlaneGeometry::ConstPointer m_Plane;
+    mitk::ContourModel::Pointer m_BrushContour;
+    std::optional<mitk::Point3D> m_LastPosition;
+  };
+
+  // Paints brushstrokes along the mouse and shows them while they are drawn.
   class ScribbleBrushInteractor : public mitk::EventStateMachine
   {
   public:
@@ -94,7 +188,6 @@ namespace
     itkFactorylessNewMacro(Self)
 
     void SetReferenceImage(const mitk::Image* image) { m_ReferenceImage = image; }
-    void SetBrushSize(int size) { m_Size = size; }
     void SetBrushColor(const mitk::Color& color)
     {
       m_BrushColor = color;
@@ -113,10 +206,7 @@ namespace
         m_DataStorage->Remove(m_PaintingNode);
 
       m_PaintingNode = nullptr;
-      m_PaintingSlice = nullptr;
-      m_CurrentPlane = nullptr;
-      m_MasterContour = nullptr;
-      m_LastContourSize = 0;
+      m_Stroke.reset();
     }
 
   protected:
@@ -155,20 +245,19 @@ namespace
       if (positionEvent == nullptr || m_ReferenceImage == nullptr)
         return;
 
-      if (!this->ResetPaintingSlice(positionEvent))
+      if (!this->BeginStroke(positionEvent))
         return;
 
-      m_PaintingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
       m_PaintingNode->SetVisibility(true);
 
-      this->PaintBrushAt(positionEvent, true);
+      m_Stroke->PaintAt(positionEvent->GetPositionInWorld());
       this->RequestRendererUpdate(positionEvent);
     }
 
     void OnMouseMoved(mitk::StateMachineAction*, mitk::InteractionEvent* event)
     {
       auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(event);
-      if (positionEvent == nullptr || m_PaintingSlice.IsNull())
+      if (positionEvent == nullptr || m_Stroke == nullptr)
         return;
 
       // Scrolling to a different slice mid-stroke finalizes the current
@@ -177,13 +266,11 @@ namespace
       {
         this->FinalizeCurrentStroke();
 
-        if (!this->ResetPaintingSlice(positionEvent))
+        if (!this->BeginStroke(positionEvent))
           return;
-
-        m_PaintingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
       }
 
-      this->PaintBrushAt(positionEvent, true);
+      m_Stroke->PaintAt(positionEvent->GetPositionInWorld());
       this->RequestRendererUpdate(positionEvent);
     }
 
@@ -195,7 +282,7 @@ namespace
     void OnMouseReleased(mitk::StateMachineAction*, mitk::InteractionEvent* event)
     {
       auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(event);
-      if (positionEvent == nullptr || m_PaintingSlice.IsNull())
+      if (positionEvent == nullptr || m_Stroke == nullptr)
         return;
 
       this->FinalizeCurrentStroke();
@@ -210,30 +297,20 @@ namespace
 
     void FinalizeCurrentStroke()
     {
-      if (m_PaintingSlice.IsNull() || m_CurrentPlane.IsNull() || m_ReferenceImage == nullptr)
+      if (m_Stroke == nullptr || m_ReferenceImage == nullptr)
         return;
 
-      // Compute a tight bounding box by mapping the stroke's non-zero 2D
-      // footprint through the slice's geometry into the reference's index
-      // space. Works for any orientation; on axial/coronal/sagittal it
-      // collapses to one voxel along the slicing axis automatically.
-      mitk::nnInteractive::InteractionBoundingBox boundingBox{};
-      const bool haveBoundingBox = mitk::nnInteractive::ComputeStrokeBoundingBox(
-        m_PaintingSlice, m_ReferenceImage, boundingBox);
-
-      const auto handoffSlice = m_PaintingSlice;
-      const auto handoffPlane = m_CurrentPlane;
-      m_PaintingSlice = nullptr;
+      const auto boundingBox = m_Stroke->ComputeBoundingBox(m_ReferenceImage);
+      const auto stroke = std::move(m_Stroke);
 
       if (m_PaintingNode.IsNotNull())
       {
         m_PaintingNode->SetData(nullptr);
         m_PaintingNode->SetVisibility(false);
       }
-      m_CurrentPlane = nullptr;
 
-      if (haveBoundingBox)
-        this->InvokeEvent(ScribbleStrokeEvent(handoffSlice, handoffPlane, boundingBox));
+      if (boundingBox.has_value())
+        this->InvokeEvent(ScribbleStrokeEvent(stroke->GetSlice(), stroke->GetPlane(), boundingBox.value()));
     }
 
     bool CheckIfCurrentSliceHasChanged(const mitk::InteractionPositionEvent* event)
@@ -242,40 +319,27 @@ namespace
       if (planeGeometry == nullptr)
         return false;
 
-      if (m_CurrentPlane.IsNull() || m_PaintingSlice.IsNull())
+      if (m_Stroke == nullptr)
         return true;
 
+      const auto* strokePlane = m_Stroke->GetPlane();
+
       return !mitk::MatrixEqualElementWise(planeGeometry->GetIndexToWorldTransform()->GetMatrix(),
-                                            m_CurrentPlane->GetIndexToWorldTransform()->GetMatrix()) ||
+                                            strokePlane->GetIndexToWorldTransform()->GetMatrix()) ||
              !mitk::Equal(planeGeometry->GetIndexToWorldTransform()->GetOffset(),
-                          m_CurrentPlane->GetIndexToWorldTransform()->GetOffset());
+                          strokePlane->GetIndexToWorldTransform()->GetOffset());
     }
 
-    bool ResetPaintingSlice(const mitk::InteractionPositionEvent* event)
+    bool BeginStroke(const mitk::InteractionPositionEvent* event)
     {
-      const auto* planeGeometry = event->GetSender()->GetCurrentWorldPlaneGeometry();
-      if (planeGeometry == nullptr || m_ReferenceImage == nullptr)
+      const auto* renderer = event->GetSender();
+
+      m_Stroke = BrushStroke::Begin(m_ReferenceImage, renderer->GetCurrentWorldPlaneGeometry(), renderer->GetTimeStep(m_ReferenceImage));
+      if (m_Stroke == nullptr)
         return false;
-
-      // Extract a slice of the reference image to capture the correct 2D
-      // extent and world geometry for the current plane. The reference image
-      // is already resident (user data), so the only new allocation is the
-      // small 2D uint8 painting slice.
-      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(event, m_ReferenceImage);
-      if (refSlice.IsNull())
-        return false;
-
-      const auto uint8Type = mitk::MakePixelType<unsigned char, unsigned char, 1>();
-      m_PaintingSlice = mitk::Image::New();
-      m_PaintingSlice->Initialize(uint8Type, *(refSlice->GetTimeGeometry()));
-      m_PaintingSlice->AllocateZeroedVolume();
-
-      // Clone the renderer-owned plane so a later renderer-side mutation
-      // cannot desync the plane we hand to WriteSliceToVolume on release.
-      m_CurrentPlane = planeGeometry->Clone();
 
       this->EnsurePaintingNode();
-      m_PaintingNode->SetData(m_PaintingSlice);
+      m_PaintingNode->SetData(m_Stroke->GetSlice());
 
       return true;
     }
@@ -300,51 +364,6 @@ namespace
         m_DataStorage->Add(m_PaintingNode, m_ReferenceNode);
     }
 
-    void UpdateMasterContourIfNeeded()
-    {
-      if (m_LastContourSize == m_Size && m_MasterContour.IsNotNull())
-        return;
-
-      m_MasterContour = mitk::PaintbrushTool::CreateBrushContour(m_Size);
-      m_LastContourSize = m_Size;
-    }
-
-    void PaintBrushAt(const mitk::InteractionPositionEvent* positionEvent, bool buttonPressed)
-    {
-      if (!buttonPressed)
-        return;
-
-      this->UpdateMasterContourIfNeeded();
-
-      mitk::Point3D worldCoord = positionEvent->GetPositionInWorld();
-      mitk::Point3D indexCoord;
-      m_PaintingSlice->GetGeometry()->WorldToIndex(worldCoord, indexCoord);
-      indexCoord[0] = std::round(indexCoord[0]);
-      indexCoord[1] = std::round(indexCoord[1]);
-      indexCoord[2] = 0;
-
-      auto stamp = mitk::ContourModel::New();
-      stamp->SetClosed(true);
-      for (auto it = m_MasterContour->Begin(); it != m_MasterContour->End(); ++it)
-      {
-        auto p = (*it)->Coordinates;
-        p[0] += indexCoord[0];
-        p[1] += indexCoord[1];
-        stamp->AddVertex(p);
-      }
-      mitk::ContourModelUtils::FillContourInSlice2(stamp, m_PaintingSlice, 1);
-
-      const double dist = indexCoord.EuclideanDistanceTo(m_LastPosition);
-      const double radius = static_cast<double>(m_Size) / 2.0;
-      if (dist > radius)
-      {
-        auto gap = mitk::PaintbrushTool::CreateGapContour(m_LastPosition, indexCoord, radius);
-        mitk::ContourModelUtils::FillContourInSlice2(gap, m_PaintingSlice, 1);
-      }
-
-      m_LastPosition = indexCoord;
-    }
-
     void RequestRendererUpdate(const mitk::InteractionPositionEvent* positionEvent)
     {
       if (positionEvent->GetSender() != nullptr && positionEvent->GetSender()->GetRenderWindow() != nullptr)
@@ -355,14 +374,8 @@ namespace
     mitk::DataStorage* m_DataStorage = nullptr;
     mitk::DataNode::Pointer m_ReferenceNode;
 
-    mitk::Image::Pointer m_PaintingSlice;
+    std::unique_ptr<BrushStroke> m_Stroke;
     mitk::DataNode::Pointer m_PaintingNode;
-    mitk::PlaneGeometry::ConstPointer m_CurrentPlane;
-    mitk::ContourModel::Pointer m_MasterContour;
-    mitk::Point3D m_LastPosition{};
-
-    int m_Size = 3;
-    int m_LastContourSize = 0;
     mitk::Color m_BrushColor;
   };
 }
@@ -431,23 +444,14 @@ namespace mitk::nnInteractive
       m_LastStrokeBoundingBox.reset();
     }
 
-    ScribbleBrushInteractor::Pointer Interactor;
-    std::unordered_map<PromptType, std::vector<DataNode::Pointer>> m_StrokeNodes;
-    Image::Pointer m_LastStrokeMask;
-    std::optional<InteractionBoundingBox> m_LastStrokeBoundingBox;
-
-  private:
-    void OnScribbleStrokeEvent(itk::Object*, const itk::EventObject& event)
+    // Makes a completed brushstroke the last scribble and shows it. Returns
+    // false if it is not inside the reference image.
+    bool AddStroke(Image* slice, const PlaneGeometry* plane, const InteractionBoundingBox& boundingBox, PromptType promptType)
     {
-      const auto* strokeEvent = static_cast<const ScribbleStrokeEvent*>(&event);
-      auto slice = strokeEvent->GetSlice();
-      if (slice == nullptr)
-        return;
-
       auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
       auto referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
       if (referenceImage == nullptr)
-        return;
+        return false;
 
       // Build the small 3D bounding-box-sized mask. This serves dual duty:
       // it is forwarded to nnInteractive (as the scribble image alongside
@@ -456,15 +460,30 @@ namespace mitk::nnInteractive
       // slice -- for persistence ensures correct rendering for oblique
       // planes (the 3D mask carries reference-aligned geometry that MITK
       // can compose on any view).
-      auto mask = BuildBoundingBoxMaskImage(slice, strokeEvent->GetPlane(), referenceImage, strokeEvent->GetBoundingBox());
+      auto mask = BuildBoundingBoxMaskImage(slice, plane, referenceImage, boundingBox);
       if (mask.IsNull())
-        return;
+        return false;
 
-      // Persist the mask as an overlay DataNode (visible until OnReset).
-      const auto promptType = m_Owner->GetCurrentPromptType();
+      this->AddStrokeNode(mask, promptType, referenceNode);
+
+      m_LastStrokeMask = mask;
+      m_LastStrokeBoundingBox = boundingBox;
+
+      return true;
+    }
+
+    ScribbleBrushInteractor::Pointer Interactor;
+    std::unordered_map<PromptType, std::vector<DataNode::Pointer>> m_StrokeNodes;
+    Image::Pointer m_LastStrokeMask;
+    std::optional<InteractionBoundingBox> m_LastStrokeBoundingBox;
+
+  private:
+    // Persists the mask as an overlay DataNode (visible until OnReset).
+    void AddStrokeNode(Image* mask, PromptType promptType, DataNode* referenceNode)
+    {
       auto node = DataNode::New();
       node->SetData(mask);
-      node->SetName(this->CreateStrokeNodeName());
+      node->SetName(this->CreateStrokeNodeName(promptType));
       node->SetColor(GetColor(promptType, ColorIntensity::Vibrant));
       node->SetProperty("binary", BoolProperty::New(true));
       node->SetProperty("outline binary", BoolProperty::New(false));
@@ -476,17 +495,22 @@ namespace mitk::nnInteractive
 
       m_StrokeNodes[promptType].push_back(node);
       m_Owner->GetDataStorage()->Add(node, referenceNode);
-
-      m_LastStrokeMask = mask;
-      m_LastStrokeBoundingBox = strokeEvent->GetBoundingBox();
-
-      m_Owner->UpdatePreviewEvent(false);
     }
 
-    std::string CreateStrokeNodeName()
+    void OnScribbleStrokeEvent(itk::Object*, const itk::EventObject& event)
     {
-      const auto& promptType = GetPromptTypeAsString(m_Owner->GetCurrentPromptType());
-      return m_Owner->GetDataStorage()->GetUniqueName(promptType + " scribble");
+      const auto* strokeEvent = static_cast<const ScribbleStrokeEvent*>(&event);
+      auto slice = strokeEvent->GetSlice();
+      if (slice == nullptr)
+        return;
+
+      if (this->AddStroke(slice, strokeEvent->GetPlane(), strokeEvent->GetBoundingBox(), m_Owner->GetCurrentPromptType()))
+        m_Owner->UpdatePreviewEvent(false);
+    }
+
+    std::string CreateStrokeNodeName(PromptType promptType)
+    {
+      return m_Owner->GetDataStorage()->GetUniqueName(GetPromptTypeAsString(promptType) + " scribble");
     }
 
     ScribbleInteractor* m_Owner;
@@ -519,6 +543,33 @@ const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::Scribble
   return m_Impl->m_LastStrokeBoundingBox.has_value() ? &m_Impl->m_LastStrokeBoundingBox.value() : nullptr;
 }
 
+void mitk::nnInteractive::ScribbleInteractor::AddScribble(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType)
+{
+  if (plane == nullptr)
+    mitkThrow() << "A scribble needs a plane.";
+
+  auto toolManager = this->GetToolManager();
+  auto referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+  const auto* referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+
+  if (referenceImage == nullptr)
+    mitkThrow() << "A scribble needs a reference image.";
+
+  const auto timeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(toolManager->GetCurrentTimePoint());
+
+  auto stroke = BrushStroke::Begin(referenceImage, plane, timeStep);
+  if (stroke == nullptr)
+    mitkThrow() << "The plane of the scribble does not cut the image.";
+
+  for (const auto& point : points)
+    stroke->PaintAt(point);
+
+  const auto boundingBox = stroke->ComputeBoundingBox(referenceImage);
+
+  if (!boundingBox.has_value() || !m_Impl->AddStroke(stroke->GetSlice(), stroke->GetPlane(), boundingBox.value(), promptType))
+    mitkThrow() << "The scribble does not cover any voxel of the image.";
+}
+
 void mitk::nnInteractive::ScribbleInteractor::RemoveLastInteraction(PromptType promptType)
 {
   m_Impl->RemoveLastStroke(promptType);
@@ -543,7 +594,6 @@ void mitk::nnInteractive::ScribbleInteractor::OnEnable()
   m_Impl->Interactor->SetReferenceNode(referenceNode);
   m_Impl->Interactor->SetReferenceImage(referenceNode->GetDataAs<Image>());
   m_Impl->Interactor->SetBrushColor(color);
-  m_Impl->Interactor->SetBrushSize(3);
 }
 
 void mitk::nnInteractive::ScribbleInteractor::OnDisable()

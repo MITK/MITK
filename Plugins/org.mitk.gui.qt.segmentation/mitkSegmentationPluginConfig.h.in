@@ -14,5 +14,6 @@ found in the LICENSE file.
 #define mitkSegmentationPluginConfig_h
 
 #cmakedefine01 MITK_HAS_PYTHON
+#cmakedefine01 MITK_HAS_RESTAPI
 
 #endif

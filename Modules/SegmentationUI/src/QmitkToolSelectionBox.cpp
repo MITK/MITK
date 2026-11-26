@@ -367,6 +367,11 @@ void QmitkToolSelectionBox::setEnabled(bool enable)
   }
 }
 
+bool QmitkToolSelectionBox::HasTool(int toolId) const
+{
+  return m_ButtonIDForToolID.count(toolId) != 0;
+}
+
 void QmitkToolSelectionBox::UpdateButtonsEnabledState()
 {
   auto buttons = m_ToolButtonGroup->buttons();

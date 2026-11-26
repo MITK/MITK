@@ -308,6 +308,8 @@ mitk::PlanarFigureVtkMapper2D::BuildKey mitk::PlanarFigureVtkMapper2D::GetBuildK
   std::copy_n(camera->GetFocalPoint(), 3, key.CameraFocalPoint.begin());
   std::copy_n(camera->GetViewUp(), 3, key.CameraViewUp.begin());
   key.CameraParallelScale = camera->GetParallelScale();
+  std::copy_n(camera->GetWindowCenter(), 2, key.CameraWindowCenter.begin());
+  key.TileMagnification = renderer->GetTileMagnification();
   key.ViewportWidth = viewportSize[0];
   key.ViewportHeight = viewportSize[1];
   key.DPI = renderer->GetRenderWindow()->GetDPI();
@@ -361,7 +363,9 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
   float logicalLineWidth = 2.0f;
   node->GetFloatProperty("line width", logicalLineWidth, renderer);
 
-  const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer);
+  // Tiles of a magnified image draw everything as much larger as the image is.
+  const auto magnification = renderer->GetTileMagnification();
+  const auto scale = PlanarFigureViewHelpers::GetPixelScale(renderer) * magnification;
   const auto lineWidth = logicalLineWidth * scale;
 
   const auto feedback = GetFeedback(node, renderer);
@@ -648,7 +652,7 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       node->GetIntProperty("font.size", fontSize, renderer);
 
       auto *textProperty = textActor->GetTextProperty();
-      textProperty->SetFontSize(fontSize);
+      textProperty->SetFontSize(fontSize * static_cast<int>(magnification));
       textProperty->SetLineSpacing(Style::LabelLineSpacing);
       textProperty->SetColor(1.0, 1.0, 1.0);
       textProperty->SetOpacity(opacity);
@@ -672,15 +676,52 @@ void mitk::PlanarFigureVtkMapper2D::Draw(BaseRenderer *renderer, LocalStorage *l
       const auto right = (*rightmost)[0] + offset;
       const auto left = (*leftmost)[0] - offset;
 
-      auto plateLeft = right;
-      auto anchorHeight = (*rightmost)[1];
+      // A tile of a magnified image would place the label by its own edges, so each tile could put
+      // it elsewhere: tiles keep the placement of the last render of the whole window, which, with
+      // everything magnified alike, is the placement for the whole image as well.
+      const bool isTile = 1 < magnification;
 
-      if (right + plateWidth > viewportWidth)
+      LabelPlacement placement;
+
+      if (isTile && localStorage->m_LabelPlacement.has_value())
+      {
+        placement = *localStorage->m_LabelPlacement;
+      }
+      else if (right + plateWidth > viewportWidth)
       {
         if (left - plateWidth >= 0.0)
         {
-          plateLeft = left - plateWidth;
-          anchorHeight = (*leftmost)[1];
+          placement.Placement = LabelPlacement::Side::Left;
+        }
+        else
+        {
+          Point2D fixed;
+          fixed[0] = std::max(0.0, viewportWidth - plateWidth);
+          fixed[1] = (*rightmost)[1];
+
+          placement.Placement = LabelPlacement::Side::Fixed;
+          renderer->DisplayToWorld(fixed, placement.FixedPlateLeft);
+        }
+      }
+
+      if (!isTile)
+        localStorage->m_LabelPlacement = placement;
+
+      auto plateLeft = right;
+      auto anchorHeight = (*rightmost)[1];
+
+      if (LabelPlacement::Side::Left == placement.Placement)
+      {
+        plateLeft = left - plateWidth;
+        anchorHeight = (*leftmost)[1];
+      }
+      else if (LabelPlacement::Side::Fixed == placement.Placement)
+      {
+        if (isTile)
+        {
+          Point2D fixed;
+          renderer->WorldToView(placement.FixedPlateLeft, fixed);
+          plateLeft = fixed[0];
         }
         else
         {

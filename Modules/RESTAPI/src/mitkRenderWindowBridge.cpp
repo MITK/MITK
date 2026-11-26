@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkRenderWindowBridge.h"
+#include "mitkRestStopGate.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -25,33 +26,9 @@ namespace
    * remains valid regardless of how the dispatcher schedules execution.
    */
   template<typename Callable>
-  void Dispatch(const mitk::StorageThreadDispatcherBase::Pointer& dispatcher, Callable callable)
+  void Dispatch(const std::shared_ptr<mitk::RestStopGate>& gate, const mitk::StorageThreadDispatcherBase::Pointer& dispatcher, Callable callable)
   {
-    std::exception_ptr error;
-
-    auto task = [callable, &error]()
-    {
-      try
-      {
-        callable();
-      }
-      catch (...)
-      {
-        error = std::current_exception();
-      }
-    };
-
-    if (dispatcher.IsNotNull())
-    {
-      dispatcher->Execute(std::move(task));
-    }
-    else
-    {
-      task();
-    }
-
-    if (error)
-      std::rethrow_exception(error);
+    mitk::RestStopGate::Run(gate, dispatcher, callable);
   }
 }
 
@@ -99,6 +76,11 @@ void RenderWindowBridge::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Dispatcher = dispatcher;
+}
+
+void RenderWindowBridge::SetStopGate(std::shared_ptr<RestStopGate> gate)
+{
+  m_StopGate = std::move(gate);
 }
 
 void RenderWindowBridge::SetScreenshotProvider(ScreenshotProvider provider)
@@ -408,7 +390,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeScreenshot(
     throw std::runtime_error("No screenshot provider is connected to the RenderWindowBridge");
 
   std::vector<unsigned char> result;
-  Dispatch(dispatcher, [&]() { result = provider(size, format); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(size, format); });
   return result;
 }
 
@@ -427,7 +409,7 @@ SelectedPositionInfo RenderWindowBridge::GetSelectedPosition() const
 
   SelectedPositionInfo result;
   result.position.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(); });
   return result;
 }
 
@@ -444,7 +426,7 @@ void RenderWindowBridge::SetSelectedPosition(const Point3D& pos) const
   if (!setter)
     throw std::runtime_error("No position setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(pos); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(pos); });
 }
 
 std::vector<EditorInfo> RenderWindowBridge::ListEditors() const
@@ -461,7 +443,7 @@ std::vector<EditorInfo> RenderWindowBridge::ListEditors() const
     throw std::runtime_error("No editor list provider is connected to the RenderWindowBridge");
 
   std::vector<EditorInfo> result;
-  Dispatch(dispatcher, [&]() { result = provider(); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(); });
   return result;
 }
 
@@ -479,7 +461,7 @@ std::vector<WindowInfo> RenderWindowBridge::ListStdMultiWindows() const
     throw std::runtime_error("No StdMulti window list provider is connected to the RenderWindowBridge");
 
   std::vector<WindowInfo> result;
-  Dispatch(dispatcher, [&]() { result = provider(); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(); });
   return result;
 }
 
@@ -499,7 +481,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeStdMultiEditorScreenshot(
     throw std::runtime_error("No StdMulti editor screenshot provider is connected to the RenderWindowBridge");
 
   std::vector<unsigned char> result;
-  Dispatch(dispatcher, [&]() { result = provider(size, format); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(size, format); });
   return result;
 }
 
@@ -520,7 +502,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeStdMultiWindowScreenshot(
     throw std::runtime_error("No StdMulti window screenshot provider is connected to the RenderWindowBridge");
 
   std::vector<unsigned char> result;
-  Dispatch(dispatcher, [&]() { result = provider(windowName, size, format); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(windowName, size, format); });
   return result;
 }
 
@@ -541,7 +523,7 @@ CameraState RenderWindowBridge::GetStdMultiCamera(const std::string& windowName)
   result.position.Fill(0.0);
   result.focalPoint.Fill(0.0);
   result.viewUp.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(windowName); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(windowName); });
   return result;
 }
 
@@ -558,7 +540,7 @@ void RenderWindowBridge::SetStdMultiCamera(const std::string& windowName, const 
   if (!setter)
     throw std::runtime_error("No StdMulti camera setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(windowName, patch); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(windowName, patch); });
 }
 
 SliceState RenderWindowBridge::GetStdMultiSelectedSlice(const std::string& windowName) const
@@ -576,7 +558,7 @@ SliceState RenderWindowBridge::GetStdMultiSelectedSlice(const std::string& windo
 
   SliceState result;
   result.position.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(windowName); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(windowName); });
   return result;
 }
 
@@ -593,7 +575,7 @@ void RenderWindowBridge::SetStdMultiSelectedSliceStep(const std::string& windowN
   if (!setter)
     throw std::runtime_error("No StdMulti selected-slice step setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(windowName, step); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(windowName, step); });
 }
 
 std::vector<MxNWindowInfo> RenderWindowBridge::ListMxNWindows() const
@@ -610,7 +592,7 @@ std::vector<MxNWindowInfo> RenderWindowBridge::ListMxNWindows() const
     throw std::runtime_error("No MxN window list provider is connected to the RenderWindowBridge");
 
   std::vector<MxNWindowInfo> result;
-  Dispatch(dispatcher, [&]() { result = provider(); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(); });
   return result;
 }
 
@@ -630,7 +612,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeMxNEditorScreenshot(
     throw std::runtime_error("No MxN editor screenshot provider is connected to the RenderWindowBridge");
 
   std::vector<unsigned char> result;
-  Dispatch(dispatcher, [&]() { result = provider(size, format); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(size, format); });
   return result;
 }
 
@@ -651,7 +633,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeMxNWindowScreenshot(
     throw std::runtime_error("No MxN window screenshot provider is connected to the RenderWindowBridge");
 
   std::vector<unsigned char> result;
-  Dispatch(dispatcher, [&]() { result = provider(windowId, size, format); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = provider(windowId, size, format); });
   return result;
 }
 
@@ -672,7 +654,7 @@ CameraState RenderWindowBridge::GetMxNCamera(const std::string& windowId) const
   result.position.Fill(0.0);
   result.focalPoint.Fill(0.0);
   result.viewUp.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(windowId); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(windowId); });
   return result;
 }
 
@@ -689,7 +671,7 @@ void RenderWindowBridge::SetMxNCamera(const std::string& windowId, const CameraP
   if (!setter)
     throw std::runtime_error("No MxN camera setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(windowId, patch); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(windowId, patch); });
 }
 
 SliceState RenderWindowBridge::GetMxNSelectedSlice(const std::string& windowId) const
@@ -707,7 +689,7 @@ SliceState RenderWindowBridge::GetMxNSelectedSlice(const std::string& windowId) 
 
   SliceState result;
   result.position.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(windowId); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(windowId); });
   return result;
 }
 
@@ -724,7 +706,7 @@ void RenderWindowBridge::SetMxNSelectedSliceStep(const std::string& windowId, un
   if (!setter)
     throw std::runtime_error("No MxN selected-slice step setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(windowId, step); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(windowId, step); });
 }
 
 SelectedPositionInfo RenderWindowBridge::GetMxNSelectedPosition(const std::string& windowId) const
@@ -742,7 +724,7 @@ SelectedPositionInfo RenderWindowBridge::GetMxNSelectedPosition(const std::strin
 
   SelectedPositionInfo result;
   result.position.Fill(0.0);
-  Dispatch(dispatcher, [&]() { result = getter(windowId); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(windowId); });
   return result;
 }
 
@@ -759,7 +741,7 @@ void RenderWindowBridge::SetMxNSelectedPosition(const std::string& windowId, con
   if (!setter)
     throw std::runtime_error("No MxN selected-position setter is connected to the RenderWindowBridge");
 
-  Dispatch(dispatcher, [&]() { setter(windowId, position); });
+  Dispatch(m_StopGate, dispatcher,[&]() { setter(windowId, position); });
 }
 
 std::string RenderWindowBridge::GetMxNLayout() const
@@ -776,7 +758,7 @@ std::string RenderWindowBridge::GetMxNLayout() const
     throw std::runtime_error("No MxN layout getter is connected to the RenderWindowBridge");
 
   std::string result;
-  Dispatch(dispatcher, [&]() { result = getter(); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = getter(); });
   return result;
 }
 
@@ -794,7 +776,7 @@ std::string RenderWindowBridge::SetMxNLayout(const std::string& layoutJson) cons
     throw std::runtime_error("No MxN layout setter is connected to the RenderWindowBridge");
 
   std::string result;
-  Dispatch(dispatcher, [&]() { result = setter(layoutJson); });
+  Dispatch(m_StopGate, dispatcher,[&]() { result = setter(layoutJson); });
   return result;
 }
 

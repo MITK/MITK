@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QmitkMultiLabelManager.h>
 
 #include <memory>
+#include <string>
 
 namespace mitk
 {
@@ -66,6 +67,16 @@ public:
 
   QmitkSegmentationView();
   ~QmitkSegmentationView() override;
+
+  /**
+   * \brief Tells why the segmentation tools cannot be used now, or nothing if they can.
+   *
+   * For whoever activates tools without the tool boxes of the view, like a
+   * program: while the boxes are disabled, as the view shows with its
+   * overlays, the tool manager has no client, so an activated tool would not
+   * be set up and would not work.
+   */
+  std::string GetToolsUnusableReason() const;
 
 private Q_SLOTS:
 
@@ -119,6 +130,14 @@ private:
   * to listen to 'SegmentationInteractionEvent's.
   */
   void OnActiveToolChanged();
+
+  /**
+  * \brief Shows the tab with the active tool and its GUI.
+  *
+  * A tool can become active without a click on its tab, for example through
+  * a shortcut or the REST API.
+  */
+  void ShowActiveToolTab();
 
   void OnActiveWorkingLabelSelectionChanged();
 

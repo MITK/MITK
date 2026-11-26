@@ -13,7 +13,10 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImage_h
 #define mitkLabelSetImage_h
 
+#include <cstdint>
+#include <map>
 #include <shared_mutex>
+#include <mitkExceptionMacro.h>
 #include <mitkImage.h>
 #include <mitkLabel.h>
 #include <mitkLookupTable.h>
@@ -25,6 +28,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Thrown when a segmentation has no label value left for a further label. */
+  class LabelValuesExhaustedException : public Exception
+  {
+  public:
+    mitkExceptionClassMacro(LabelValuesExhaustedException, Exception);
+  };
+
   /** \brief MultiLabelSegmentation class for handling labels and layers in a segmentation session.
   *
   * Events that are potentially sent by the class in regard to groups or labels:
@@ -415,8 +425,9 @@ namespace mitk
 
     /** Helper that returns an unused label value, that could be used e.g. if one wants to define a label externally
     * before adding it.
-    * \return A label value currently not in use.
-    * \remark is no unused label value can be provided an exception will be thrown.*/
+    * \return A label value currently not in use: the one after the highest value in use, or, if that is
+    * the highest possible value, the lowest unused one.
+    * \throw LabelValuesExhaustedException if every label value is in use.*/
     LabelValueType GetUnusedLabelValue() const;
 
     itkGetConstMacro(UnlabeledLabelLock, bool);
@@ -632,6 +643,32 @@ namespace mitk
       */
     bool IsEmpty(const Label* label, TimeStepType t = 0) const;
     bool IsEmpty(LabelValueType pixelValue, TimeStepType t = 0) const;
+
+    /** The pixels of a label at one time step. */
+    struct LabelMeasure
+    {
+      /** The number of pixels with the value of the label. */
+      std::uint64_t VoxelCount = 0;
+
+      /** The continuous index of the centroid of these pixels. */
+      Point3D CentroidIndex;
+    };
+
+    using LabelMeasureMapType = std::map<LabelValueType, LabelMeasure>;
+
+    /**
+     * \brief Counts the pixels of all labels of a group at one time step and locates their centroids in a single pass.
+     *
+     * The stored centers of mass of the labels stay as they are: they have no time step, and storing them
+     * would modify the labels and with them the segmentation. Use GetGeometry(timeStep)->IndexToWorld() to
+     * convert a centroid index into world coordinates.
+     * \param groupIndex The group whose labels are measured.
+     * \param timeStep The time step whose pixels are considered.
+     * \return One entry for each label of the group that has pixels at the time step.
+     * \exception mitk::Exception if the group or the time step is invalid, or if the group image is locked
+     * for writing; the function never waits for a writer.
+     */
+    LabelMeasureMapType MeasureLabels(GroupIndexType groupIndex, TimeStepType timeStep) const;
 
     /**
      * \brief Gets the ID of the currently active group

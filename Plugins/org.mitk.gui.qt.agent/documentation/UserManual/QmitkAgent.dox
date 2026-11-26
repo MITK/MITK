@@ -1,0 +1,195 @@
+/**
+\page org_mitk_views_agent The Agent
+
+The Agent view is a chat with an AI agent that works in the Workbench for you. You describe what you
+want, for example "segment the liver in this CT and report its volume", and watch the Workbench while
+the agent does it: it opens views, changes how data is displayed, segments, measures and writes
+reports. The agent is your own installation of Claude Code; the Workbench starts it in the background
+and gives it a set of tools that reach the Workbench through its REST API.
+
+What the agent does is the work of a language model. Look at its results as you would at those of a
+colleague you do not know yet: check them, and see the section \ref org_mitk_views_agent_limits.
+
+\section org_mitk_views_agent_requirements Requirements and sign-in
+
+The agent needs Claude Code on your computer, and an account that Claude Code signs in with: a Claude
+subscription, an Anthropic Console account, or an API key. The Workbench does not install Claude
+Code and never sees your credentials; signing in is done by Claude Code itself.
+
+The line at the top of the view tells where you stand. If Claude Code was not found, or you are not
+signed in, it offers a link that opens the preferences.
+
+\subsection org_mitk_views_agent_preferences Preferences
+
+The preference page "Agent" has these settings:
+
+- <b>Claude Code</b> is the program the agent runs on. Leave it empty to look for it on the PATH and in
+  <tt>~/.local/bin</tt>, where its installer puts it. "Browse..." chooses another file.
+- The <b>Sign-in</b> box shows how Claude Code signs in now. "Sign In with a Claude Subscription..." and
+  "Sign In with an Anthropic Console Account..." start the sign-in of Claude Code, which continues in
+  your web browser; if no browser opens, the dialog offers the address of the sign-in page, and if the
+  page shows a code, you paste it into the dialog. "Sign Out"
+  ends the sign-in with a subscription or a Console account. It does not remove an API key that is set
+  in the environment. Signing in or out ends the conversation of an open Agent view, so that it does
+  not go on under another account; while the agent works, this follows when it is done.
+- <b>Ignore ANTHROPIC_API_KEY</b>: Claude Code prefers an API key in the environment variable
+  <tt>ANTHROPIC_API_KEY</tt> over a Claude subscription, and the key is billed per token. If you want
+  the agent to use your subscription although the variable is set, check this box: the agent does not
+  get the variable then.
+
+\subsection org_mitk_views_agent_cost Cost
+
+A Claude subscription is not charged per token, but the conversation counts toward its usage limits.
+With an API key or a Console account, usage is billed per token. Under the conversation, the view shows
+"Conversation: $x", what the conversation would cost with an API key, and each answer ends with its own
+"API-equivalent cost". These are the only figures the view shows; what you actually pay or use up is
+told by your account.
+
+The model and the effort that the agent works with are chosen below the input. More effort takes longer
+and uses more of the usage limits. A change applies from the next message on, and the conversation
+continues.
+
+\section org_mitk_views_agent_data What leaves the computer
+
+The agent is a language model that does not run on your computer. What it reads goes to the provider of
+the account that Claude Code is signed in with, as in any session of Claude Code:
+
+- your messages,
+- what the agent asks the Workbench for, and gets: the names and properties of data, measurements,
+  statistics, DICOM tags and the like, and
+- the screenshots of the render windows that it takes to look at the images.
+
+The images themselves and the files on your computer stay where they are: the agent cannot read files,
+and it has no shell and no access to the internet. It sees an image only through the screenshots and the
+numbers that it asks for. Whatever is visible in a screenshot, or written in a name or a DICOM tag,
+leaves the computer if the agent asks for it, so do not use the agent on data that must not be sent to
+the provider of your account.
+
+The notes the agent keeps (see \ref org_mitk_views_agent_memory) are sent at the start of each
+conversation as well.
+
+\section org_mitk_views_agent_server The REST API server
+
+The agent works through the REST API of the Workbench, which the REST API view monitors. If no server is
+running when the view starts, the Agent view starts one for itself. It listens on this computer only,
+on a port that the system chooses, requires a token, and gives clients no access to your files. It is
+stopped when the Agent view closes. The token is created for the agent alone and handed to Claude Code
+in a configuration file in the Agent folder of the Workbench's local application data, which only you
+can open; the token and the file are removed when the view closes.
+
+If a server is already running, for example one that you started in the REST API view, the Agent view
+uses it, with a token of its own and without access to your files. If that server is open to others,
+the view first tells you how, and asks whether to continue:
+
+- Programs on this computer can use it without a token, and web pages in your browser can use parts
+  of it.
+- Other computers can reach it.
+- These clients can load any file you can read into the Workbench.
+
+If you continue, others can use the server while the agent works, as they could before. "Do not show
+again for these risks" remembers your answer for these risks. If you cancel, the agent does not work in
+the Workbench for now. To let the Agent view start a server of its own, stop the running one, or let it
+require a token and restart it, and then start a new conversation. If the server is restarted with
+other settings or stopped while the view is open, reopen the Agent view.
+
+\section org_mitk_views_agent_lock While the agent works
+
+While the agent works, the Workbench is locked so that you and the agent do not change the same things:
+
+- Views and editors do not react to the mouse or the keyboard, but keep showing what happens. Their
+  tabs show a lock instead of their icon; its tool tip says why.
+- Undo, Redo and Close Project are disabled.
+- Menus and tool bars otherwise stay usable, as do parts that do not follow the lock, like the Welcome
+  page.
+- The Agent view stays usable. Its Memory button, the model and the effort are disabled meanwhile.
+
+The lock ends when the agent has finished its answer. You can end it earlier:
+
+- <b>Stop</b> interrupts the agent. Its calls to the Workbench are refused from then on, and the view
+  shows "Stopping".
+- If the agent does not stop, <b>Stop</b> a second time ends Claude Code. Your next message continues
+  the conversation.
+- <b>New conversation</b> ends the conversation and starts a new one, in which the agent does not know
+  the earlier messages. The conversation on screen is cleared, and so is its cost.
+
+If you close the Agent view or the Workbench while the agent works, you are asked whether to stop it.
+Between its answers the Workbench is yours: change what you like. The agent is told to look at the
+current state again at the start of each turn.
+
+\section org_mitk_views_agent_conversation The conversation
+
+Your messages and the agent's answers appear in the conversation. Enter sends a message,
+Shift+Enter starts a new line. Links in the answers open in your web browser.
+
+The work the agent does between your message and its answer is shown as steps. By default, each run of
+steps is one line, for example "12 steps", that you can click to show the steps with their results. The
+check box "Show steps" shows them all the time. Screenshots that the agent took appear in the steps as
+small images; click one to see it larger in a window of its own.
+
+An answer ends with a note, for example "Done in 42.0 s (API-equivalent cost $0.35)", or with "Stopped."
+or "Failed." If Claude Code cannot continue the conversation, the view says so; your next message
+then starts a new conversation, in which the agent does not know the earlier messages, and you have to
+send the message again.
+
+\section org_mitk_views_agent_memory Memory
+
+The agent can save short notes about how the Workbench works, which it learned from you or by trying,
+so that it does not have to find it out again. It gets all notes at the start of every conversation.
+It is told not to save patient data, image contents or findings. Each note it saves or deletes is
+mentioned in the steps.
+
+The Memory button shows how many notes there are:
+
+- "Show..." opens a dialog with the notes. Double-click a note to edit it; "Delete" removes the selected
+  note.
+- "Clear..." deletes all notes after a question.
+
+A note has at most 500 characters, and there are at most 50 notes. Changes apply from the next
+message on. The notes are kept in the file <tt>memory.json</tt> in the Agent folder of the Workbench's
+local application data. A note can be wrong or outdated; delete those that are.
+
+\section org_mitk_views_agent_does What the agent can do
+
+The agent uses what the REST API of the Workbench offers. It is told to look an endpoint up before it
+uses it, so it can do whatever the API offers, among other things:
+
+- list, show and hide data and change its properties, for example opacity, color and contrast,
+- open and close views, scroll through the slices of the render windows, zoom, turn the 3D window and
+  change the layout,
+- segment with nnInteractive, VoxTell and TotalSegmentator, manage the labels and groups of a
+  segmentation, and split a label into its components (as the Segmentation view does),
+- measure the labels, compute statistics and draw and measure planar figures (as the Measurement and
+  Image Statistics views do),
+- work with the time points of 4D data,
+- undo its own steps in the history that it shares with you, and
+- write reports (see below).
+
+What the agent can do depends on the plugins of your build; the view tells you if there is no
+segmentation or no measurement.
+
+It cannot load, save or export data, as its token has no access to your files: if a task needs that,
+it asks you. It cannot save or print a report either, and it can undo only its own steps, not yours. It
+leaves installing the segmentation tools to you, for example through the panel of nnInteractive.
+
+\section org_mitk_views_agent_reports Reports
+
+After a segmentation, the agent can write a report: a page with text, tables, charts and images of the
+render windows. A report opens in an editor of its own, the Report Editor, where you
+can save it as HTML or open it in your web browser. You can ask the agent for a report, or it offers one.
+
+\section org_mitk_views_agent_limits Limits and safety
+
+- What the agent segments or measures is a model's estimate, like the tools it uses. A volume, a count
+  or a statement of a report is no result of a validated procedure. Check the images yourself.
+- The agent is told to ask you before it deletes or overwrites data, like removing data or labels, and
+  to say what it left changed, like a contrast or a hidden crosshair. This is an instruction to a
+  language model and no safeguard of the Workbench. Some changes cannot be undone, as the history
+  covers changes of segmentations, but not adding or removing data. Save your data before you let the
+  agent work on it.
+- Text in data, like names of data and labels, DICOM tags or the text of a report, is no instruction
+  for the agent, but a language model can be misled by it. Be careful with data from sources that you
+  do not know.
+- Answers of a language model can be wrong, and the same request may be answered differently the next
+  time.
+
+*/

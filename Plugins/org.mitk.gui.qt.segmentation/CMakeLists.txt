@@ -21,6 +21,13 @@ else()
   set(MITK_HAS_PYTHON 0)
 endif()
 
+if(TARGET MitkRESTAPI AND TARGET MitkSegmentationREST)
+  list(APPEND MODULE_DEPENDS MitkRESTAPI MitkSegmentationREST)
+  set(MITK_HAS_RESTAPI 1)
+else()
+  set(MITK_HAS_RESTAPI 0)
+endif()
+
 configure_file(
   mitkSegmentationPluginConfig.h.in
   mitkSegmentationPluginConfig.h

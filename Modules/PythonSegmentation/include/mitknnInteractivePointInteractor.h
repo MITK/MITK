@@ -59,11 +59,29 @@ namespace mitk::nnInteractive
      */
     std::optional<Point3D> GetLastPoint() const;
 
+    /** \brief Adds a point to the point set of its prompt type, as a click
+     *         with the mouse does.
+     *
+     * The point is drawn at the center of the voxel of the reference image it
+     * lies in, which is what nnInteractive takes, so that the slice of that
+     * voxel shows it. It counts among the interactions, and
+     * RemoveLastInteraction() removes it. UpdatePreviewEvent is not emitted.
+     * While the interactor is enabled, the point is the selected one, which
+     * the mouse does as well.
+     *
+     * The point must lie inside the reference image: this is not checked here,
+     * nnInteractiveTool rejects a prompt with a point outside before it draws it.
+     *
+     * \throw mitk::Exception if the tool manager has no reference image.
+     */
+    void AddPoint(const Point3D& point, PromptType promptType);
+
     /** \brief Removes the most recently placed point for the given prompt type.
      *
      * A no-op if no point set exists for \p promptType or it is already empty.
-     * The point set node is left in place (it may be the actively bound node);
-     * empty sets are cleaned up by OnDisable() / OnReset() as before.
+     * A point set that becomes empty is removed with its node, unless it is
+     * the one the enabled interactor adds points to; OnDisable() and OnReset()
+     * clean up that one.
      *
      * \param[in] promptType The prompt type whose last point should be removed.
      */

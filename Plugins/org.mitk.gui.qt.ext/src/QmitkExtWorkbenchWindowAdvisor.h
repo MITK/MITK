@@ -115,6 +115,9 @@ private:
 
   void OnUndoStackChanged();
 
+  /** \brief Disables Undo, Redo and Close Project while QmitkPartLock is held. */
+  void OnPartLockChanged();
+
   static QString QT_SETTINGS_FILENAME;
 
   QScopedPointer<berry::IPartListener> titlePartListener;

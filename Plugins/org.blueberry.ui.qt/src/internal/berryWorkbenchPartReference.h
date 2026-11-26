@@ -130,6 +130,12 @@ public:
 
   int GetSizeFlags(bool width) override;
 
+  /**
+   * Sets the image of the part's tab. It follows the title image of the part
+   * once the part exists; until then, it is the image of the descriptor.
+   */
+  virtual void SetImageDescriptor(const QIcon& descriptor);
+
 protected:
 
   IWorkbenchPart::Pointer part;
@@ -143,8 +149,6 @@ protected:
   virtual void SetPartName(const QString& newPartName);
 
   virtual void SetContentDescription(const QString& newContentDescription);
-
-  virtual void SetImageDescriptor(const QIcon& descriptor);
 
   virtual void SetToolTip(const QString& newToolTip);
 

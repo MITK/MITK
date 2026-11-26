@@ -550,19 +550,20 @@ namespace mitk
 
   void from_json(const nlohmann::json& j, LevelWindow& lw)
   {
+    // at() throws for a missing key, where the operator[] of a const JSON value is undefined.
     lw.SetRangeMinMax(
-      j["CurrentRange"]["Min"].get<ScalarType>(),
-      j["CurrentRange"]["Max"].get<ScalarType>());
+      j.at("CurrentRange").at("Min").get<ScalarType>(),
+      j.at("CurrentRange").at("Max").get<ScalarType>());
 
     lw.SetDefaultLevelWindow(
-      j["DefaultSettings"]["Level"].get<ScalarType>(),
-      j["DefaultSettings"]["Window"].get<ScalarType>());
+      j.at("DefaultSettings").at("Level").get<ScalarType>(),
+      j.at("DefaultSettings").at("Window").get<ScalarType>());
 
     lw.SetLevelWindow(
-      j["CurrentSettings"]["Level"].get<ScalarType>(),
-      j["CurrentSettings"]["Window"].get<ScalarType>());
+      j.at("CurrentSettings").at("Level").get<ScalarType>(),
+      j.at("CurrentSettings").at("Window").get<ScalarType>());
 
-    lw.SetFixed(j["Fixed"].get<bool>());
-    lw.SetFloatingValues(j["IsFloatingImage"].get<bool>());
+    lw.SetFixed(j.at("Fixed").get<bool>());
+    lw.SetFloatingValues(j.at("IsFloatingImage").get<bool>());
   }
 }

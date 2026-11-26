@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkAgentPreferencePage</class>
+ <widget class="QWidget" name="QmitkAgentPreferencePage">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="introLabel">
+     <property name="text">
+      <string>The agent runs on your own installation of Claude Code, which signs in by itself; the Workbench never sees your credentials.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="executableLayout">
+     <item>
+      <widget class="QLabel" name="executableLabel">
+       <property name="text">
+        <string>Claude Code:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="executableEdit">
+       <property name="toolTip">
+        <string>Leave empty to look for Claude Code on the PATH and in ~/.local/bin, where its installer puts it.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browseButton">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="signInGroup">
+     <property name="title">
+      <string>Sign-in</string>
+     </property>
+     <layout class="QVBoxLayout" name="signInLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="statusLayout" stretch="1,0">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QmitkInfoCard" name="statusCard"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="signOutButton">
+          <property name="toolTip">
+           <string>Signs Claude Code out of its Claude subscription or Anthropic Console account. An API key in the environment stays.</string>
+          </property>
+          <property name="text">
+           <string>Sign Out</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="buttonsLayout" stretch="1,1">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="subscriptionButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Sign In with a Claude Subscription...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="consoleButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Without a subscription, billed per token.</string>
+          </property>
+          <property name="text">
+           <string>Sign In with an Anthropic Console Account...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="ignoreApiKeyCheckBox">
+        <property name="toolTip">
+         <string>Claude Code prefers an API key in the environment variable ANTHROPIC_API_KEY over a Claude subscription, and the key is billed per token. With this, the agent does not get the variable.</string>
+        </property>
+        <property name="text">
+         <string>Ignore ANTHROPIC_API_KEY</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkInfoCard</class>
+   <extends>QFrame</extends>
+   <header location="global">QmitkInfoCard.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

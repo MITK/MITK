@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>
 
+#include <algorithm>
 #include <map>
 
 namespace
@@ -67,6 +68,20 @@ namespace mitk
       m_MaskGenerator = mask;
       this->Modified();
     }
+  }
+
+  void ImageStatisticsCalculator::SetTimeSteps(const std::vector<TimeStepType>& timeSteps)
+  {
+    if (timeSteps != m_TimeSteps)
+    {
+      m_TimeSteps = timeSteps;
+      this->Modified();
+    }
+  }
+
+  const std::vector<TimeStepType>& ImageStatisticsCalculator::GetTimeSteps() const
+  {
+    return m_TimeSteps;
   }
 
   void ImageStatisticsCalculator::SetNBinsForHistogramStatistics(unsigned int nBins)
@@ -118,15 +133,26 @@ namespace mitk
       mitkThrow() << "Image not initialized!";
     }
 
+    for (const auto timeStep : m_TimeSteps)
+    {
+      if (timeStep >= m_Image->GetTimeSteps())
+      {
+        mitkThrow() << "Time step " << timeStep << " is not a time step of the image, which has "
+                    << m_Image->GetTimeSteps() << ".";
+      }
+    }
+
     if (IsUpdateRequired())
     {
       auto timeGeometry = m_Image->GetTimeGeometry();
       m_StatisticContainer = ImageStatisticsContainer::New();
       m_StatisticContainer->SetTimeGeometry(timeGeometry->Clone());
 
-      // always compute statistics on all timesteps
       for (TimeStepType timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
       {
+        if (!m_TimeSteps.empty() && std::find(m_TimeSteps.begin(), m_TimeSteps.end(), timeStep) == m_TimeSteps.end())
+          continue;
+
         const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
         auto timePoint = timeGeometry->TimeStepToTimePoint(timeStep);
 
@@ -141,6 +167,10 @@ namespace mitk
           {
             m_MaskGenerator->SetTimePoint(timePoint);
             m_InternalMask = m_MaskGenerator->GetMask(maskID);
+
+            // Like a dynamic segmentation that covers fewer time points than the image.
+            if (m_InternalMask.IsNull())
+              mitkThrow() << "The mask has no data at the time point " << timePoint << " ms of the image.";
 
             const auto referenceImage = m_MaskGenerator->GetReferenceImage();
 

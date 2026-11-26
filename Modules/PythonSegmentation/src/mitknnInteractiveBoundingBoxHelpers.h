@@ -13,9 +13,13 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveBoundingBoxHelpers_h
 #define mitknnInteractiveBoundingBoxHelpers_h
 
+#include <MitkPythonSegmentationExports.h>
+
 #include <mitkImage.h>
 #include <mitkPlaneGeometry.h>
 #include <mitknnInteractiveBoundingBox.h>
+
+#include <vector>
 
 namespace mitk::nnInteractive
 {
@@ -57,6 +61,20 @@ namespace mitk::nnInteractive
                                            const PlaneGeometry* slicingPlane,
                                            const Image* referenceImage,
                                            const InteractionBoundingBox& boundingBox);
+
+  // Returns the plane of the slice of an image that points in world
+  // coordinates lie in, through the centers of its voxels. The points lie
+  // in one slice along an index axis if their voxels do, as nnInteractive
+  // takes them. Of such axes, the slice is along the one on which the points
+  // spread least, the last of equal ones, which makes a line along an axis
+  // axial for most images. Only the position of the plane is that of the
+  // slice: its in-plane axes and the direction of its normal can differ from
+  // those of a render window that shows the slice.
+  //
+  // \throw mitk::Exception if the points do not lie in one slice, i.e. their
+  //        voxels lie in different slices along each axis.
+  MITKPYTHONSEGMENTATION_EXPORT PlaneGeometry::Pointer CreateSlicePlane(const std::vector<Point3D>& points,
+                                                                        const BaseGeometry* geometry);
 }
 
 #endif

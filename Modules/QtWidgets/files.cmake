@@ -46,6 +46,7 @@ set(CPP_FILES
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
+  QmitkPartLock.cpp
   QmitkProgressNotification.cpp
   QmitkProgressNotificationOverlay.cpp
   QmitkPropertiesTableEditor.cpp
@@ -69,6 +70,7 @@ set(CPP_FILES
   QmitkSingleNodeSelectionWidget.cpp
   QmitkSliceNavigationWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
+  QmitkSpeechBubbleFrame.cpp
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
   QmitkMxN3DCamera.cpp

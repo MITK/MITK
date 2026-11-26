@@ -629,6 +629,18 @@ namespace mitk
      */
     virtual void SetConstrainZoomingAndPanning(bool constrain);
 
+    /**
+     * \brief Tell that the window is rendered in tiles of an image this many
+     *        times its size, like a magnified screenshot; 1 otherwise.
+     *
+     * Renders of tiles look like renders of the window, as each tile has its
+     * size. Mappers that size things in pixels, or place them by the edges of
+     * the window, follow this to keep the image in proportion and of one piece.
+     */
+    void SetTileMagnification(unsigned int magnification);
+
+    unsigned int GetTileMagnification() const;
+
   protected:
 
     ~BaseRenderer() override;
@@ -729,6 +741,9 @@ namespace mitk
     std::list<BaseLocalStorageHandler*> m_RegisteredLocalStorageHandlers;
 
     bool m_ConstrainZoomingAndPanning;
+
+  private:
+    unsigned int m_TileMagnification = 1;
   };
 } // namespace mitk
 

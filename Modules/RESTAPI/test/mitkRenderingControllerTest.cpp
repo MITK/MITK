@@ -179,12 +179,12 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
 
   // StdMulti selected-slice tests
   MITK_TEST(GetSliceUnknownWindowReturns404);
-  MITK_TEST(GetSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(GetSliceOn3dReturns400);
   MITK_TEST(GetSliceWithoutGetterReturns503);
   MITK_TEST(GetSliceForAxialReturns200);
   MITK_TEST(GetSliceNoGeometryBoundsNull);
   MITK_TEST(PutSliceUnknownWindowReturns404);
-  MITK_TEST(PutSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(PutSliceOn3dReturns400);
   MITK_TEST(PutSliceInvalidJsonReturns400);
   MITK_TEST(PutSliceEmptyBodyReturns400);
   MITK_TEST(PutSliceMissingStepReturns400);
@@ -2400,7 +2400,7 @@ public:
                          json["error"]["code"].get<std::string>());
   }
 
-  void GetSliceOn3dReturns404UnsupportedOperation()
+  void GetSliceOn3dReturns400()
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice", "",
@@ -2408,9 +2408,9 @@ public:
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
-    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
                          json["error"]["code"].get<std::string>());
   }
 
@@ -2478,7 +2478,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(404, res.status);
   }
 
-  void PutSliceOn3dReturns404UnsupportedOperation()
+  void PutSliceOn3dReturns400()
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice",
@@ -2486,9 +2486,9 @@ public:
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
-    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
                          json["error"]["code"].get<std::string>());
   }
 

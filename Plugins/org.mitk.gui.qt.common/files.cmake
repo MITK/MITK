@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
   QmitkDnDFrameWidget.cpp
+  QmitkRenderWindowScreenshot.cpp
   QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
   QmitkMultiWidgetDecorationManager.cpp
@@ -13,6 +14,7 @@ set(INTERNAL_CPP_FILES
   QmitkCommonActivator.cpp
   QmitkDataNodeItemModel.cpp
   QmitkDataNodeSelection.cpp
+  QmitkPartLockFollower.cpp
   QmitkViewCoordinator.cpp
   QmitkNodeSelectionPreferencePage.cpp
 )
@@ -29,6 +31,7 @@ set(MOC_H_FILES
   src/QmitkSliceNavigationListener.h
   src/internal/QmitkCommonActivator.h
   src/internal/QmitkNodeSelectionPreferencePage.h
+  src/internal/QmitkPartLockFollower.h
 )
 
 set(CACHED_RESOURCE_FILES

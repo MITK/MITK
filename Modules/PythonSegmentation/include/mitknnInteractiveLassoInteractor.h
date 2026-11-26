@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
 
+#include <vector>
+
 namespace mitk::nnInteractive
 {
   /** \brief %nnInteractive interactor for drawing contours.
@@ -80,6 +82,26 @@ namespace mitk::nnInteractive
      *         been drawn yet.
      */
     const InteractionBoundingBox* GetLastLassoBoundingBox() const;
+
+    /** \brief Draws a contour through given points as the mouse draws one in
+     *         a render window that shows \p plane.
+     *
+     * The contour becomes the last one, whose mask and bounding box
+     * nnInteractive gets. It counts among the interactions, and
+     * RemoveLastInteraction() removes it. UpdatePreviewEvent is not emitted.
+     *
+     * \param[in] plane The plane the contour lies in, like that of a render
+     *            window.
+     * \param[in] points The closed contour in world coordinates, which is
+     *            projected onto \p plane. The points must lie inside the reference
+     *            image: this is not checked here, nnInteractiveTool rejects
+     *            a prompt with a point outside before it draws it.
+     * \param[in] promptType The prompt type of the contour.
+     *
+     * \throw mitk::Exception if \p plane is null, the tool manager has no
+     *        reference image, or the contour encloses no voxel of the image.
+     */
+    void AddLasso(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType);
 
     /** \brief Removes the most recently drawn contour for the given prompt type.
      *

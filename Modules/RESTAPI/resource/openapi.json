@@ -3,7 +3,7 @@
   "info": {
     "title": "MITK Workbench REST API",
     "version": "1.2.0",
-    "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 9457 Problem Details format.\n",
+    "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\nThe API is experimental in this release of MITK: endpoints, answers and error codes\nmay change from one MITK release to the next without a new major version.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 9457 Problem Details format.\n",
     "license": {
       "name": "BSD-3-Clause",
       "url": "https://opensource.org/licenses/BSD-3-Clause"
@@ -1378,7 +1378,7 @@
           "Properties"
         ],
         "summary": "Replace all properties",
-        "description": "Replaces all properties on a node (PUT semantics).\nExisting properties not in the request are removed (except protected properties).\nDefault scope is `node`.\n",
+        "description": "Replaces all properties on a node (PUT semantics).\nExisting properties not in the request are removed (except protected properties).\nAll or nothing: if a value is refused (it does not fit the type of the property it changes, or cannot be converted), the answer is 400 with the key and the reason, and nothing is changed.\nA `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "replaceNodeProperties",
         "parameters": [
           {
@@ -1506,7 +1506,7 @@
           "Properties"
         ],
         "summary": "Update properties (merge)",
-        "description": "Updates multiple properties on a node (merge semantics).\nOnly specified properties are modified; others remain unchanged.\nDefault scope is `node`.\n",
+        "description": "Updates multiple properties on a node (merge semantics).\nOnly specified properties are modified; others remain unchanged.\nA refused value is listed in `failed` with the reason in `error`; the other values are applied.\nA `context` that is neither an existing render window nor one that the node has properties for is refused the same way, with the known ones listed.\nDefault scope is `node`.\n",
         "operationId": "updateNodeProperties",
         "parameters": [
           {
@@ -1757,7 +1757,7 @@
           "Properties"
         ],
         "summary": "Set a single property",
-        "description": "Sets a single property value. Creates the property if it doesn't exist.\nDefault scope is `node`.\n",
+        "description": "Sets a single property value. Creates the property if it doesn't exist.\nA refused value answers 400 with the reason in the message. A `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "setNodeProperty",
         "parameters": [
           {
@@ -1867,7 +1867,7 @@
           "Properties"
         ],
         "summary": "Delete a property",
-        "description": "Deletes a property from a node.\nThe `name` property is protected and cannot be deleted in node scope.\nDefault scope is `node`.\n",
+        "description": "Deletes a property from a node.\nThe `name` property is protected and cannot be deleted in node scope.\nA `context` that is neither an existing render window nor one that the node has properties for answers 400 and lists the known ones.\nDefault scope is `node`.\n",
         "operationId": "deleteNodeProperty",
         "parameters": [
           {
@@ -2059,7 +2059,7 @@
           "Rendering"
         ],
         "summary": "Fit all views to visible data or specific nodes",
-        "description": "Three operating modes: (1) No body -- fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs -- fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to 'Fit views to all data' (no body) and 'Fit views to selection' (with UIDs) in the Data Manager context menu of the Workbench.",
+        "description": "Three operating modes: (1) No body -- fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- fits render windows to the geometry of that node. If the node's data is image-like (sliced data), the views adopt its own time geometry, as the Data Manager does, which rectifies askew geometries; for other data the bounding geometry of the node is used. (3) Body with `uids` containing multiple UIDs -- fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to 'Fit views to all data' (no body) and 'Fit views to selection' (with UIDs) in the Data Manager context menu of the Workbench.",
         "operationId": "postRenderingReinit",
         "requestBody": {
           "required": false,
@@ -2546,7 +2546,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get selected slice of a StdMultiWidget 2D window",
-        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported -- under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. The 3D window has no slices: the request is answered with 400. No `plane` field is reported -- under crosshair rotation or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
         "operationId": "getRenderingStdmultiSelectedSlice",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowId" }
@@ -2569,7 +2569,11 @@
               }
             }
           },
-          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "400": {
+            "description": "The window is the 3D window, which has no slices.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "500": { "$ref": "#/components/responses/InternalError" },
           "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
           "401": {
@@ -2586,7 +2590,7 @@
       "put": {
         "tags": ["Rendering"],
         "summary": "Set selected slice of a StdMultiWidget 2D window",
-        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked -- out-of-range values are clamped/snapped by MITK.",
+        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. The 3D window has no slices: the request is answered with 400. `step` is not range-checked -- out-of-range values are clamped/snapped by MITK.",
         "operationId": "putRenderingStdmultiSelectedSlice",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowId" }
@@ -2610,7 +2614,7 @@
         "responses": {
           "204": { "description": "Slice updated" },
           "400": {
-            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti -- use /rendering/selected-position).",
+            "description": "Invalid body, missing/negative/non-integer step, unknown field, a `position` field was supplied (not accepted for StdMulti -- use /rendering/selected-position), or the window is the 3D window.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
@@ -2626,7 +2630,7 @@
               }
             }
           },
-          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "422": {
             "description": "MITK rendering framework raised an error while applying the step.",
             "content": {
@@ -3603,7 +3607,7 @@
         }
       },
       "PropertyValue": {
-        "description": "Property value. Simple types are returned as-is (boolean, number, string).\nComplex types are returned as `{type, value}` objects.\n",
+        "description": "Property value. Simple types are returned as-is (boolean, number, string).\nComplex types are returned as `{type, value}` objects.\n\nIn requests, a simple value takes the type of the property it changes, so `3` sets a FloatProperty to 3.0, and a `{type, value}` object has to name that type. A new property gets its type from the value: a whole number makes an IntProperty, any other number a FloatProperty, and other types need a `{type, value}` object.\n",
         "oneOf": [
           {
             "type": "boolean"
@@ -4052,7 +4056,7 @@
       "Context": {
         "name": "context",
         "in": "query",
-        "description": "Renderer context for property lookup (e.g., a specific render window name).",
+        "description": "Renderer context for property lookup (e.g., a specific render window name). Property writes refuse a name that is neither an existing render window nor a context that the node has properties for.",
         "schema": {
           "type": "string"
         }
@@ -4069,7 +4073,7 @@
       "DataFormat": {
         "name": "X-MITK-Data-Format",
         "in": "header",
-        "description": "File format extension (without leading dot) for binary uploads.\nAlternative to providing a filename via Content-Disposition.\nExamples: `nrrd`, `nii.gz`, `stl`, `vtp`\n",
+        "description": "File format extension (without leading dot) for binary uploads.\nAlternative to providing a filename via Content-Disposition.\nExamples: `nrrd`, `nii.gz`, `stl`, `vtp`\nAnything that is no file extension answers 400.\n",
         "schema": {
           "type": "string"
         },
@@ -4293,7 +4297,7 @@
         }
       },
       "AccessDenied": {
-        "description": "Client IP is not allowed to access the server. Applied by pre-routing middleware to all endpoints when clientAccessMode is LocalhostOnly or Whitelist.",
+        "description": "Client IP is not allowed to access the server. Applied by pre-routing middleware to all endpoints when clientAccessMode is LocalhostOnly or Whitelist. The endpoints that plugins add also answer it to a request that a web page could send (an Origin header, a cross-site Sec-Fetch-Site header, or a Host header that names no accepted host). The data endpoints answer 403 with the code FILE_ACCESS_DENIED as well, see the response FileAccessDenied.",
         "content": {
           "application/json": {
             "schema": {
@@ -4354,7 +4358,7 @@
         }
       },
       "FileAccessDenied": {
-        "description": "File path is outside allowed directories. Applied by middleware when fileAccessMode=AllowedDirectories and the requested path is not under an allowed directory.",
+        "description": "The client may not use files this way: a referenced file path is outside the allowed directories (fileAccessMode=AllowedDirectories), the client's token has no file access, or a direct upload refers to other files (an NRRD or MetaImage header with a detached data file, .pvti, .pvtp, .mitk, .mitkscene.json) without unrestricted file access. Checked before the file is looked for.",
         "content": {
           "application/json": {
             "schema": {
@@ -4479,7 +4483,7 @@
         }
       },
       "WindowNotFoundOrUnsupported": {
-        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window -- e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
+        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed editor, for example because it shows no render window canvas (UNSUPPORTED_OPERATION).",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/Error" },
@@ -4504,9 +4508,9 @@
                     "type": "https://rest-api.mitk.org/errors/UNSUPPORTED_OPERATION",
                     "code": "UNSUPPORTED_OPERATION",
                     "title": "Unsupported Operation",
-                    "message": "selected-slice is not applicable to the 3D window.",
+                    "message": "Active editor does not expose a QmitkAbstractMultiWidget canvas",
                     "status": 404,
-                    "instance": "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice"
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
                   }
                 }
               }

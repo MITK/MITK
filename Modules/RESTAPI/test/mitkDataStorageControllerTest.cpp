@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorageController.h"
 #include <mitkDataStorageBridge.h>
+#include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
@@ -65,6 +66,10 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteProtectedProperty);
   MITK_TEST(PatchNodeProperties);
   MITK_TEST(PutNodeProperties);
+  MITK_TEST(RefusedPropertyValuesTellTheReason);
+  MITK_TEST(PutOfTheListWithARefusedValueChangesNothing);
+  MITK_TEST(PropertiesInLatin1KeepTheirCharacters);
+  MITK_TEST(ContextIsIgnoredAtDataScope);
   // Special character tests (percent-encoding)
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
@@ -487,6 +492,52 @@ public:
 
   // ===== Property tests =====
 
+  void ContextIsIgnoredAtDataScope()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetData(mitk::PointSet::New());
+    node->GetData()->SetProperty("study", mitk::StringProperty::New("CT"));
+    m_DataStorage->Add(node);
+
+    const auto uid = this->GetFirstNodeUid();
+    const std::multimap<std::string, std::string> query = { { "property_scope", "data" }, { "context", "no window" } };
+
+    httplib::Response read;
+    m_Controller->HandleGET_nodes_uid_properties(
+      this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", "", { { "uid", uid } }, query), read);
+
+    CPPUNIT_ASSERT_EQUAL(200, read.status);
+    CPPUNIT_ASSERT(nlohmann::json::parse(read.body)["data"]["properties"].contains("study"));
+
+    httplib::Response write;
+    m_Controller->HandlePUT_nodes_uid_properties_key(this->CreateRequest("/api/v1/datastorage/nodes/" + uid +
+      "/properties/study", R"({"value": "MR"})", { { "uid", uid }, { "property_key", "study" } }, query), write);
+
+    CPPUNIT_ASSERT_EQUAL(200, write.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("MR"), node->GetData()->GetProperty("study")->GetValueAsString());
+  }
+
+  void PropertiesInLatin1KeepTheirCharacters()
+  {
+    // As DICOM tags in ISO_IR 100 arrive: Latin-1 bytes, which are no UTF-8.
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetStringProperty("DICOM.0008.1030", "MR untere Extremit\xE4ten");
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", "", {{"uid", uid}});
+    httplib::Response res;
+
+    m_Controller->HandleGET_nodes_uid_properties(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("MR untere Extremit\xC3\xA4ten"), json["data"]["properties"]["DICOM.0008.1030"].get<std::string>());
+  }
+
   void GetNodeProperties()
   {
     auto node = mitk::DataNode::New();
@@ -704,6 +755,91 @@ public:
     CPPUNIT_ASSERT(json["data"].contains("replaced"));
     CPPUNIT_ASSERT(json["meta"].contains("node_uid"));
     CPPUNIT_ASSERT(json["meta"].contains("property_scope"));
+  }
+
+  void PutOfTheListWithARefusedValueChangesNothing()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetFloatProperty("keep.me", 1.0f);
+    node->SetFloatProperty("line.width", 2.0f);
+    node->SetBoolProperty("old", true);
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    // One of the values fits, the other does not, and the list leaves out a property that exists.
+    const nlohmann::json body = { { "keep.me", 5.0 }, { "line.width", "wide" } };
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties", body.dump(), {{"uid", uid}});
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_properties(req, res);
+
+    // The client gets a 400 that names the key and the reason; the node is as it was, nothing removed.
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+
+    const auto message = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(message.find("\"line.width\"") != std::string::npos);
+    CPPUNIT_ASSERT(message.find("FloatProperty") != std::string::npos);
+
+    float value = 0.0f;
+    CPPUNIT_ASSERT(node->GetFloatProperty("keep.me", value));
+    CPPUNIT_ASSERT_EQUAL(1.0f, value);
+    CPPUNIT_ASSERT(node->GetFloatProperty("line.width", value));
+    CPPUNIT_ASSERT_EQUAL(2.0f, value);
+
+    bool old = false;
+    CPPUNIT_ASSERT(node->GetBoolProperty("old", old));
+    CPPUNIT_ASSERT(old);
+  }
+
+  void RefusedPropertyValuesTellTheReason()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    node->SetFloatProperty("line.width", 2.0f);
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    // PATCH lists the refused value with the reason
+    nlohmann::json body;
+    body["line.width"] = "wide";
+
+    auto patchReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+                                        body.dump(), {{"uid", uid}});
+    httplib::Response patchRes;
+    m_Controller->HandlePATCH_nodes_uid_properties(patchReq, patchRes);
+
+    CPPUNIT_ASSERT_EQUAL(200, patchRes.status);
+    auto json = nlohmann::json::parse(patchRes.body);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), json["data"]["failed"].size());
+    CPPUNIT_ASSERT(json["data"]["failed"][0]["error"].get<std::string>().find("FloatProperty") != std::string::npos);
+
+    // PUT of the list answers 400 with the key, and changes nothing
+    body["other"] = true;
+    auto putReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+                                      body.dump(), {{"uid", uid}});
+    httplib::Response putRes;
+    m_Controller->HandlePUT_nodes_uid_properties(putReq, putRes);
+
+    CPPUNIT_ASSERT_EQUAL(400, putRes.status);
+    json = nlohmann::json::parse(putRes.body);
+    CPPUNIT_ASSERT(json["error"]["message"].get<std::string>().find("line.width") != std::string::npos);
+    CPPUNIT_ASSERT(node->GetProperty("other") == nullptr);
+
+    // PUT of one property answers 400 with the reason
+    auto putOneReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/line.width",
+                                         nlohmann::json("wide").dump(),
+                                         {{"uid", uid}, {"property_key", "line.width"}});
+    httplib::Response putOneRes;
+    m_Controller->HandlePUT_nodes_uid_properties_key(putOneReq, putOneRes);
+
+    CPPUNIT_ASSERT_EQUAL(400, putOneRes.status);
+    json = nlohmann::json::parse(putOneRes.body);
+    CPPUNIT_ASSERT(json["error"]["message"].get<std::string>().find("FloatProperty") != std::string::npos);
   }
 
   // ===== Special character tests (percent-encoding) =====

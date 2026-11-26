@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkContourModel.h>
 #include <mitkContourModelUtils.h>
 #include <mitkEventStateMachine.h>
+#include <mitkExceptionMacro.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -25,28 +26,28 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
+#include <optional>
+
 #include "mitknnInteractiveBoundingBoxHelpers.h"
 #include "mitknnInteractiveRenderingHelpers.h"
 
 namespace
 {
-  // Aligns a single-time-step ContourModel's time bounds with the time step
-  // the renderer is currently displaying for the reference image. Without
-  // this, ContourModel::New() produces a default time geometry that only
-  // covers time point 0, so the contour stays invisible at any other time
-  // step of a 4D reference image.
-  void AlignContourToCurrentTimeStep(mitk::ContourModel* contour,
-                                     const mitk::Image* referenceImage,
-                                     const mitk::BaseRenderer* renderer)
+  // Aligns a single-time-step ContourModel's time bounds with a time step of
+  // the reference image. Without this, ContourModel::New() produces a
+  // default time geometry that only covers time point 0, so the contour
+  // stays invisible at any other time step of a 4D reference image.
+  void AlignContourToTimeStep(mitk::ContourModel* contour,
+                              const mitk::Image* referenceImage,
+                              mitk::TimeStepType timeStep)
   {
-    if (contour == nullptr || referenceImage == nullptr || renderer == nullptr)
+    if (contour == nullptr || referenceImage == nullptr)
       return;
 
     const auto* refTimeGeometry = referenceImage->GetTimeGeometry();
     if (refTimeGeometry == nullptr)
       return;
 
-    const auto timeStep = renderer->GetTimeStep(referenceImage);
     if (!refTimeGeometry->IsValidTimeStep(timeStep))
       return;
 
@@ -114,6 +115,50 @@ namespace
     mitk::PlaneGeometry::ConstPointer m_Plane;
     mitk::nnInteractive::InteractionBoundingBox m_BoundingBox{};
   };
+
+  // A closed contour filled into a 2D uint8 slice of the reference image.
+  struct FilledContour
+  {
+    mitk::Image::Pointer Slice;
+    mitk::nnInteractive::InteractionBoundingBox BoundingBox{};
+  };
+
+  // Fills a closed contour into a slice of the reference image along the
+  // plane it is drawn in. The contour interactor fills the contours drawn
+  // with the mouse, and LassoInteractor::AddLasso() those of given points.
+  // Empty if no pixel of the image is inside, as for a contour without area.
+  std::optional<FilledContour> FillContour(const mitk::ContourModel* contour,
+                                           const mitk::PlaneGeometry* plane,
+                                           mitk::TimeStepType timeStep,
+                                           const mitk::Image* referenceImage)
+  {
+    auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(plane, referenceImage, timeStep);
+    if (refSlice.IsNull())
+      return std::nullopt;
+
+    const auto uint8Type = mitk::MakePixelType<unsigned char, unsigned char, 1>();
+    auto paintingSlice = mitk::Image::New();
+    paintingSlice->Initialize(uint8Type, *(refSlice->GetTimeGeometry()));
+    paintingSlice->AllocateZeroedVolume();
+
+    // Project the 3D world contour into the slice's 2D index space so
+    // VTK's stencil (used by FillContourInSlice2) operates in the same
+    // frame as the slice's vtkImageData.
+    auto projected = mitk::ContourModelUtils::ProjectContourTo2DSlice(paintingSlice, contour);
+    if (projected.IsNull())
+      return std::nullopt;
+
+    mitk::ContourModelUtils::FillContourInSlice2(projected, paintingSlice, 1);
+
+    // Tight stroke bounding box in MITK index space; works for any
+    // orientation thanks to the slice-geometry-aware projection.
+    FilledContour filled{ paintingSlice };
+
+    if (!mitk::nnInteractive::ComputeStrokeBoundingBox(paintingSlice, referenceImage, filled.BoundingBox))
+      return std::nullopt;
+
+    return filled;
+  }
 
   // Replaces the AddContourTool wrapper. Builds a live ContourModel in 3D
   // world coordinates while the user drags, renders it via a feedback
@@ -202,8 +247,8 @@ namespace
       // contour's default time bounds cover only time point 0 and it stays
       // invisible whenever the user views any other time step of a 4D
       // reference image.
-      AlignContourToCurrentTimeStep(m_LiveContour, m_ReferenceImage,
-                                    positionEvent->GetSender());
+      AlignContourToTimeStep(m_LiveContour, m_ReferenceImage,
+                             positionEvent->GetSender()->GetTimeStep(m_ReferenceImage));
 
       this->EnsureFeedbackNode();
       m_FeedbackNode->SetData(m_LiveContour);
@@ -260,58 +305,21 @@ namespace
 
     void FinalizeContour(const mitk::InteractionPositionEvent* positionEvent)
     {
-      // Extract a uint8 2D slice of the reference image at the current
-      // renderer's time point. The event-based overload picks up the
-      // correct time step for 4D data; the previous time-point-based
-      // overload was hardcoded to 0.0.
-      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(positionEvent, m_ReferenceImage);
-      if (refSlice.IsNull())
-      {
-        this->DiscardCurrentContour();
-        return;
-      }
-
-      const auto uint8Type = mitk::MakePixelType<unsigned char, unsigned char, 1>();
-      auto paintingSlice = mitk::Image::New();
-      paintingSlice->Initialize(uint8Type, *(refSlice->GetTimeGeometry()));
-      paintingSlice->AllocateZeroedVolume();
-
-      // Project the 3D world contour into the slice's 2D index space so
-      // VTK's stencil (used by FillContourInSlice2) operates in the same
-      // frame as the slice's vtkImageData.
-      auto projected = mitk::ContourModelUtils::ProjectContourTo2DSlice(paintingSlice, m_LiveContour);
-      if (projected.IsNull())
-      {
-        this->DiscardCurrentContour();
-        return;
-      }
-
-      mitk::ContourModelUtils::FillContourInSlice2(projected, paintingSlice, 1);
-
-      // Tight stroke bounding box in MITK index space; works for any
-      // orientation thanks to the slice-geometry-aware projection.
-      mitk::nnInteractive::InteractionBoundingBox boundingBox{};
-      const bool haveBoundingBox = mitk::nnInteractive::ComputeStrokeBoundingBox(
-        paintingSlice, m_ReferenceImage, boundingBox);
+      // The renderer's time step picks the correct time step for 4D data.
+      const auto filled = FillContour(m_LiveContour, m_CurrentPlane,
+        positionEvent->GetSender()->GetTimeStep(m_ReferenceImage), m_ReferenceImage);
 
       const auto contourCopy = m_LiveContour;
       const auto handoffPlane = m_CurrentPlane;
-      m_LiveContour = nullptr;
-      m_CurrentPlane = nullptr;
-
-      if (m_FeedbackNode.IsNotNull())
-      {
-        m_FeedbackNode->SetData(nullptr);
-        m_FeedbackNode->SetVisibility(false);
-      }
+      this->DiscardCurrentContour();
 
       // Degenerate rasterization (e.g. zero-area contour) drops silently.
-      if (!haveBoundingBox)
+      if (!filled.has_value())
         return;
 
       // Hand off slice + plane + bbox to the outer Impl, which builds the
       // bbox-sized 3D mask. Mirrors ScribbleStrokeEvent.
-      this->InvokeEvent(LassoContourEvent(contourCopy, paintingSlice, handoffPlane, boundingBox));
+      this->InvokeEvent(LassoContourEvent(contourCopy, filled->Slice, handoffPlane, filled->BoundingBox));
     }
 
     void DiscardCurrentContour()
@@ -423,39 +431,43 @@ namespace mitk::nnInteractive
       m_LastLassoBoundingBox.reset();
     }
 
+    // Makes a filled contour the last lasso and shows it. Returns false if
+    // it is not inside the reference image.
+    bool AddContour(ContourModel* contour, Image* slice, const PlaneGeometry* plane, const InteractionBoundingBox& boundingBox, PromptType promptType)
+    {
+      auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
+      auto referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+      if (referenceImage == nullptr)
+        return false;
+
+      // Build the small 3D bounding-box-sized mask here (in the outer Impl)
+      // rather than inside the inner state machine, mirroring the Scribble
+      // path so both interactors keep mask construction symmetrical.
+      auto mask = BuildBoundingBoxMaskImage(slice, plane, referenceImage, boundingBox);
+      if (mask.IsNull())
+        return false;
+
+      this->AddLassoNode(contour, promptType, referenceNode);
+
+      m_LastLassoMask = mask;
+      m_LastLassoBoundingBox = boundingBox;
+
+      return true;
+    }
+
     LassoContourInteractor::Pointer Interactor;
     std::unordered_map<PromptType, std::vector<DataNode::Pointer>> m_LassoNodes;
     Image::Pointer m_LastLassoMask;
     std::optional<InteractionBoundingBox> m_LastLassoBoundingBox;
 
   private:
-    void OnLassoContourEvent(itk::Object*, const itk::EventObject& event)
+    // Persists the contour as a vector overlay (cheap, renders correctly on
+    // any view because it's vector geometry).
+    void AddLassoNode(ContourModel* contour, PromptType promptType, DataNode* referenceNode)
     {
-      const auto* contourEvent = static_cast<const LassoContourEvent*>(&event);
-      auto contour = contourEvent->GetContour();
-      auto slice = contourEvent->GetSlice();
-      if (contour == nullptr || slice == nullptr)
-        return;
-
-      auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
-      auto referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
-      if (referenceImage == nullptr)
-        return;
-
-      // Build the small 3D bounding-box-sized mask here (in the outer Impl)
-      // rather than inside the inner state machine, mirroring the Scribble
-      // path so both interactors keep mask construction symmetrical.
-      auto mask = BuildBoundingBoxMaskImage(slice, contourEvent->GetPlane(), referenceImage, contourEvent->GetBoundingBox());
-      if (mask.IsNull())
-        return;
-
-      const auto promptType = m_Owner->GetCurrentPromptType();
-
-      // Persist the contour as a vector overlay (cheap, renders correctly
-      // on any view because it's vector geometry).
       auto node = DataNode::New();
       node->SetData(contour);
-      node->SetName(this->CreateLassoNodeName());
+      node->SetName(this->CreateLassoNodeName(promptType));
       node->SetColor(GetColor(promptType, ColorIntensity::Muted));
       node->SetFloatProperty("contour.width", 3.0f);
       node->SetBoolProperty("helper object", true);
@@ -464,17 +476,23 @@ namespace mitk::nnInteractive
 
       m_LassoNodes[promptType].push_back(node);
       m_Owner->GetDataStorage()->Add(node, referenceNode);
-
-      m_LastLassoMask = mask;
-      m_LastLassoBoundingBox = contourEvent->GetBoundingBox();
-
-      m_Owner->UpdatePreviewEvent(false);
     }
 
-    std::string CreateLassoNodeName()
+    void OnLassoContourEvent(itk::Object*, const itk::EventObject& event)
     {
-      const auto& promptType = GetPromptTypeAsString(m_Owner->GetCurrentPromptType());
-      return m_Owner->GetDataStorage()->GetUniqueName(promptType + " lasso");
+      const auto* contourEvent = static_cast<const LassoContourEvent*>(&event);
+      auto contour = contourEvent->GetContour();
+      auto slice = contourEvent->GetSlice();
+      if (contour == nullptr || slice == nullptr)
+        return;
+
+      if (this->AddContour(contour, slice, contourEvent->GetPlane(), contourEvent->GetBoundingBox(), m_Owner->GetCurrentPromptType()))
+        m_Owner->UpdatePreviewEvent(false);
+    }
+
+    std::string CreateLassoNodeName(PromptType promptType)
+    {
+      return m_Owner->GetDataStorage()->GetUniqueName(GetPromptTypeAsString(promptType) + " lasso");
     }
 
     LassoInteractor* m_Owner;
@@ -505,6 +523,41 @@ mitk::Image::ConstPointer mitk::nnInteractive::LassoInteractor::GetLastLassoMask
 const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const
 {
   return m_Impl->m_LastLassoBoundingBox.has_value() ? &m_Impl->m_LastLassoBoundingBox.value() : nullptr;
+}
+
+void mitk::nnInteractive::LassoInteractor::AddLasso(const PlaneGeometry* plane, const std::vector<Point3D>& points, PromptType promptType)
+{
+  if (plane == nullptr)
+    mitkThrow() << "A lasso needs a plane.";
+
+  auto toolManager = this->GetToolManager();
+  auto referenceNode = toolManager != nullptr ? toolManager->GetReferenceData(0) : nullptr;
+  const auto* referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+
+  if (referenceImage == nullptr)
+    mitkThrow() << "A lasso needs a reference image.";
+
+  const auto timeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(toolManager->GetCurrentTimePoint());
+
+  // As the contour interactor builds one from the positions of the mouse,
+  // which lie in the plane. The render windows draw a contour only close to
+  // their plane, and it is filled only within half a voxel of it.
+  auto contour = ContourModel::New();
+  contour->SetClosed(true);
+
+  for (const auto& point : points)
+  {
+    Point3D projected;
+    plane->Project(point, projected);
+    contour->AddVertex(projected);
+  }
+
+  AlignContourToTimeStep(contour, referenceImage, timeStep);
+
+  const auto filled = FillContour(contour, plane, timeStep, referenceImage);
+
+  if (!filled.has_value() || !m_Impl->AddContour(contour, filled->Slice, plane, filled->BoundingBox, promptType))
+    mitkThrow() << "The contour does not enclose any voxel of the image.";
 }
 
 void mitk::nnInteractive::LassoInteractor::RemoveLastInteraction(PromptType promptType)

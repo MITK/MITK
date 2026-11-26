@@ -23,6 +23,10 @@ set(INTERNAL_CPP_FILES
   QmitkVoxTellPreferencePage.cpp
 )
 
+if(MITK_HAS_RESTAPI)
+  list(APPEND INTERNAL_CPP_FILES QmitkSegmentationRestRoutes.cpp)
+endif()
+
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
   src/QmitkNewSegmentationDialog.ui

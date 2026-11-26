@@ -129,6 +129,10 @@ QmitkSegmentationView::~QmitkSegmentationView()
 {
   if (nullptr != m_Controls)
   {
+    // Before deactivating the tools: the widgets may be gone already.
+    m_ToolManager->ActiveToolChanged -=
+      mitk::MessageDelegate<Self>(this, &Self::ShowActiveToolTab);
+
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
 
@@ -564,6 +568,10 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
+
+  // The tool manager only reports changes of its copy of the active label: one
+  // left behind by a click here would swallow a later request for its label.
+  m_ToolManager->SetActiveWorkingLabel(labelValue);
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType /*label*/, const mitk::Point3D& pos)
@@ -708,6 +716,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->toolSelectionBox3D->SetMultiLabelInspector(multiLabelInspector);
 
+   m_ToolManager->ActiveToolChanged +=
+     mitk::MessageDelegate<Self>(this, &Self::ShowActiveToolTab);
+
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
    this->UpdateLabelSuggestions();
@@ -810,6 +821,27 @@ void QmitkSegmentationView::OnActiveToolChanged()
   m_RenderWindowPart->SetInteractionReferenceGeometry(interactionReferenceGeometry);
 }
 
+void QmitkSegmentationView::ShowActiveToolTab()
+{
+  const auto id = m_ToolManager->GetActiveToolID();
+  const bool is2D = m_Controls->toolSelectionBox2D->HasTool(id);
+  const bool is3D = m_Controls->toolSelectionBox3D->HasTool(id);
+  const bool isCurrent2D = m_Controls->tabWidgetSegmentationTools->currentWidget() == m_Controls->tab2DTools;
+
+  // A tool of both tabs, like Selection, stays where the user activated it.
+  if (isCurrent2D ? is2D : is3D)
+    return;
+
+  if (is2D)
+  {
+    m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab2DTools);
+  }
+  else if (is3D)
+  {
+    m_Controls->tabWidgetSegmentationTools->setCurrentWidget(m_Controls->tab3DTools);
+  }
+}
+
 void QmitkSegmentationView::OnActiveWorkingLabelSelectionChanged()
 {
   auto segmentation = this->GetCurrentSegmentation();
@@ -856,6 +888,17 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     }
     m_ToolManager->ActiveWorkingLabelChanged +=
       mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
+
+    // Without a render window part, the inspector and the interpolator did not
+    // follow the active label, which the REST API sets on the segmentation then.
+    // Selecting it in the inspector updates the interpolator, too.
+    const auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+    const auto* segmentation = workingNode.IsNotNull()
+      ? dynamic_cast<const mitk::MultiLabelSegmentation*>(workingNode->GetData())
+      : nullptr;
+
+    if (nullptr != segmentation && nullptr != segmentation->GetActiveLabel())
+      m_Controls->multiLabelWidget->SetSelectedLabel(segmentation->GetActiveLabel()->GetValue());
   }
 }
 
@@ -1188,6 +1231,32 @@ void QmitkSegmentationView::CheckForReferenceVisibilityWarnings() const
   {
     m_Controls->visibilityRefWarningLabel->hide();
   }
+}
+
+std::string QmitkSegmentationView::GetToolsUnusableReason() const
+{
+  if (nullptr == m_Controls)
+    return "The Segmentation view is not set up yet.";
+
+  // A box registers as client of the tool manager while it is enabled by itself,
+  // so that state is the gate. A disabled parent, like the lock of the view while
+  // the agent works, leaves it open. The overlays only tell why it is closed.
+  const auto isEnabledByItself = [](const QWidget* widget) { return !widget->testAttribute(Qt::WA_ForceDisabled); };
+
+  if (isEnabledByItself(m_Controls->toolSelectionBox2D) || isEnabledByItself(m_Controls->toolSelectionBox3D))
+    return {};
+
+  if (nullptr == m_RenderWindowPart)
+    return "The render windows are not available, for example while their editor is hidden. Bring the editor to the front first.";
+
+  // Hidden, not invisible: the overlays are invisible while the view is.
+  if (!m_GeometryViolationOverlay->isHidden())
+    return "The render windows are not aligned to the slices of the segmentation. Reinit them on the image of the session alone.";
+
+  if (!m_VisibleSegViolationOverlay->isHidden())
+    return "The segmentation is invisible. Set its visible property to true.";
+
+  return "The Segmentation view needs an image and a segmentation.";
 }
 
 void QmitkSegmentationView::CheckForToolViolations() const

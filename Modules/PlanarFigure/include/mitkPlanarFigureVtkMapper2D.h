@@ -97,6 +97,9 @@ namespace mitk
       std::array<double, 3> CameraFocalPoint = {};
       std::array<double, 3> CameraViewUp = {};
       double CameraParallelScale = 0.0;
+      // Tiled rendering, as of magnified screenshots, moves it for each tile.
+      std::array<double, 2> CameraWindowCenter = {};
+      unsigned int TileMagnification = 1;
       int ViewportWidth = 0;
       int ViewportHeight = 0;
       int DPI = 0;
@@ -104,6 +107,20 @@ namespace mitk
       double AnimationTime = 0.0;
 
       bool operator==(const BuildKey &) const = default;
+    };
+
+    /** \brief Where the label went: beside the figure, or at a point of the world where the viewport ran out. */
+    struct LabelPlacement
+    {
+      enum class Side
+      {
+        Right,
+        Left,
+        Fixed
+      };
+
+      Side Placement = Side::Right;
+      Point3D FixedPlateLeft;
     };
 
     class LocalStorage : public Mapper::BaseLocalStorage
@@ -117,6 +134,9 @@ namespace mitk
       vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
       vtkSmartPointer<vtkTextActor> m_TextActor;
       std::optional<BuildKey> m_BuildKey;
+
+      /** \brief The placement of the last render that drew the whole window, which tiles of a magnified image keep. */
+      std::optional<LabelPlacement> m_LabelPlacement;
     };
 
     BuildKey GetBuildKey(BaseRenderer *renderer) const;

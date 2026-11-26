@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkAgentWidget</class>
+ <widget class="QWidget" name="QmitkAgentWidget">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="textFormat">
+      <enum>Qt::TextFormat::RichText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <item>
+      <widget class="QCheckBox" name="showStepsCheckBox">
+       <property name="toolTip">
+        <string>Show the tools the agent uses, their results, and screenshots. Otherwise each run of steps is one line that you can click to show it.</string>
+       </property>
+       <property name="text">
+        <string>Show steps</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="headerSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="memoryButton">
+       <property name="toolTip">
+        <string>Notes that the agent saved to remember in later conversations.</string>
+       </property>
+       <property name="text">
+        <string>Memory</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="newConversationButton">
+       <property name="text">
+        <string>New conversation</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QmitkAgentConversationWidget" name="conversation">
+     <property name="placeholderText">
+      <string>The conversation appears here.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="activityLayout" stretch="1,0">
+     <item>
+      <widget class="QLabel" name="activityLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="costLabel">
+       <property name="toolTip">
+        <string>What the conversation would cost with an API key. A subscription is not charged per token, but the conversation counts toward its usage limits.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QmitkSpeechBubbleFrame" name="inputBubble">
+     <layout class="QVBoxLayout" name="inputLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPlainTextEdit" name="messageInput">
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Describe what you want to do. Enter sends, Shift+Enter starts a new line.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonsLayout">
+     <item>
+      <widget class="QComboBox" name="modelBox">
+       <property name="toolTip">
+        <string>The model the agent runs on. A change applies from the next message on, and the conversation continues.</string>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+       </property>
+       <property name="placeholderText">
+        <string>Model</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="effortBox">
+       <property name="toolTip">
+        <string>How thoroughly the model thinks before it acts. More effort takes longer and uses more of the usage limits.</string>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+       </property>
+       <property name="placeholderText">
+        <string>Effort</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="buttonsSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopButton">
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="sendButton">
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkAgentConversationWidget</class>
+   <extends>QTextBrowser</extends>
+   <header location="global">QmitkAgentConversationWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSpeechBubbleFrame</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSpeechBubbleFrame.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

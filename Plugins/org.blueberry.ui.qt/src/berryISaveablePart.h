@@ -26,7 +26,11 @@ namespace berry {
 /**
  * Workbench parts implement or adapt to this interface to participate
  * in the enablement and execution of the <code>Save</code> and
- * <code>Save As</code> actions.
+ * <code>Save As</code> actions, and to have a say when they are about to be
+ * closed while they are dirty.
+ *
+ * Only IsDirty() has to be implemented. A part that does nothing else is
+ * closed without a question, like a part that is not saveable.
  *
  * @see IEditorPart
  */
@@ -39,6 +43,21 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object
      * The property id for <code>isDirty</code>.
      */
     static const int PROP_DIRTY; // = IWorkbenchPartConstants.PROP_DIRTY;
+
+    /**
+     * What to do with a dirty part that is about to be closed.
+     */
+    enum class CloseAnswer
+    {
+      /** Save the part with DoSave() and close it. */
+      Save,
+      /** Close the part without saving it. */
+      Discard,
+      /** Keep the part open. */
+      Cancel,
+      /** The part did not ask. It is closed without saving. */
+      NotAsked
+    };
 
     /**
      * Saves the contents of this part.
@@ -55,8 +74,11 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object
      * This method is long-running; progress and cancellation are provided
      * by the given progress monitor.
      * </p>
+     * <p>
+     * The default does nothing.
+     * </p>
      */
-    virtual void DoSave(/*IProgressMonitor monitor*/) = 0;
+    virtual void DoSave(/*IProgressMonitor monitor*/) {}
 
     /**
      * Saves the contents of this part to another object.
@@ -70,8 +92,11 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object
      * If the save is successful, the part fires a property changed event
      * reflecting the new dirty state (<code>PROP_DIRTY</code> property).
      * </p>
+     * <p>
+     * The default does nothing.
+     * </p>
      */
-    virtual void DoSaveAs() = 0;
+    virtual void DoSaveAs() {}
 
     /**
      * Returns whether the contents of this part have changed since the last save
@@ -93,18 +118,35 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object
      * Returns whether the "Save As" operation is supported by this part.
      *
      * @return <code>true</code> if "Save As" is supported, and <code>false</code>
-     *  if not supported
+     *  if not supported, which is the default
      */
-    virtual bool IsSaveAsAllowed() const = 0;
+    virtual bool IsSaveAsAllowed() const { return false; }
 
     /**
      * Returns whether the contents of this part should be saved when the part
      * is closed.
      *
      * @return <code>true</code> if the contents of the part should be saved on
-     *   close, and <code>false</code> if the contents are expendable
+     *   close, which is the default, and <code>false</code> if the contents
+     *   are expendable
      */
-    virtual bool IsSaveOnCloseNeeded() const = 0;
+    virtual bool IsSaveOnCloseNeeded() const { return true; }
+
+    /**
+     * Asks the user what to do with the dirty part that is about to be closed.
+     * <p>
+     * The workbench calls this when a view or an editor is closed, or when a
+     * perspective is reset, and the part is dirty and IsSaveOnCloseNeeded()
+     * returns <code>true</code>. A part that is still dirty after the
+     * DoSave() that follows <code>CloseAnswer::Save</code> stays open.
+     * Closing the whole workbench does not ask the parts. A part that needs
+     * a say there implements IWorkbenchListener.
+     * </p>
+     * <p>
+     * The default does not ask and returns <code>CloseAnswer::NotAsked</code>.
+     * </p>
+     */
+    virtual CloseAnswer PromptToSaveOnClose() { return CloseAnswer::NotAsked; }
 };
 
 }

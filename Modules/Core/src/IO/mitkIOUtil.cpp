@@ -848,14 +848,20 @@ namespace mitk
             continue;
           }
 
-          // The reader has already handed this node to the data storage, so the
-          // thread that owns the storage may be rendering it by now. Writing to
-          // it has to happen there, exactly as the save side below does.
-          RunWhereTheDataLives([&data, &loadInfo]()
+          const auto setPath = [&data, &loadInfo]()
             {
               data->SetProperty("path",
                 mitk::StringProperty::New(Utf8Util::Local8BitToUtf8(loadInfo.m_Path)));
-            });
+            };
+
+          // A reader that read into the data storage has already handed this
+          // node to it, so the thread that owns the storage may be rendering it
+          // by now. Writing to it has to happen there, exactly as the save side
+          // below does. Without a storage nobody else knows the data yet.
+          if (ds != nullptr)
+            RunWhereTheDataLives(setPath);
+          else
+            setPath();
 
           loadInfo.m_Output.push_back(data);
           if (nodeResult)

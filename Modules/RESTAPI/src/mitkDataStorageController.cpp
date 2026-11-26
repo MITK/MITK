@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkErrorResponse.h>
 #include <mitkNodeQueryParams.h>
 #include <mitkExceptionMacro.h>
+#include <mitkRestRoute.h>
 #include <mitkLog.h>
 
 #include <mitkBaseDataSerializer.h>
@@ -260,6 +261,88 @@ namespace
    * @param allowedDirs The list of allowed directories.
    * @return Empty string on success, or error message on failure.
    */
+  std::string ToLower(std::string text)
+  {
+    std::transform(text.begin(), text.end(), text.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    return text;
+  }
+
+  /**
+   * @brief Tell whether uploaded data makes its reader open other files.
+   *
+   * Such an upload names files on the server's file system like a file
+   * reference does, just out of sight of the checks for those: a detached
+   * NRRD or MetaImage header, whatever the extension is, the parallel VTK
+   * formats, which list their pieces, and MITK scenes, which name the files
+   * of their data.
+   *
+   * @param body The uploaded data.
+   * @param extension The extension that selects the reader, with its dot.
+   * @return What refers to other files, or an empty string.
+   */
+  std::string FindFileReference(const std::string& body, const std::string& extension)
+  {
+    const auto lowerExtension = ToLower(extension);
+
+    // As the reader is chosen, see CustomMimeType: "x.mha" is read as MetaImage.
+    const auto endsWith = [&lowerExtension](const std::string& suffix) {
+      return lowerExtension.size() >= suffix.size() &&
+        lowerExtension.compare(lowerExtension.size() - suffix.size(), suffix.size(), suffix) == 0;
+    };
+
+    if (endsWith(".pvti") || endsWith(".pvtp"))
+      return "Parallel VTK files refer to their pieces by file name.";
+
+    if (endsWith(".mitk") || endsWith(".mitkscene.json"))
+      return "Scene files refer to the files of their data by name.";
+
+    const bool isNrrd = body.compare(0, 4, "NRRD") == 0;
+    const bool isMetaImage = endsWith(".mha") || endsWith(".mhd");
+
+    if (!isNrrd && !isMetaImage)
+      return "";
+
+    // The readers do not split their headers into lines as one would expect:
+    // NrrdIO also ends a line at a lone '\r', MetaIO ends a key at '=' or ':'
+    // and reads a value up to '\n'. So the whole body is searched, which may
+    // also refuse an upload that merely mentions a data file.
+    const auto find = [&body](const std::string& lowerText, std::size_t from) {
+      const auto found = std::search(body.begin() + from, body.end(), lowerText.begin(), lowerText.end(),
+        [](char a, char b) { return std::tolower(static_cast<unsigned char>(a)) == b; });
+
+      return found == body.end() ? std::string::npos : static_cast<std::size_t>(found - body.begin());
+    };
+
+    if (isNrrd)
+    {
+      // NrrdIO matches the field name before ": " without case.
+      return find("data file:", 0) != std::string::npos || find("datafile:", 0) != std::string::npos
+        ? "The NRRD header refers to a data file."
+        : "";
+    }
+
+    const std::string key = "elementdatafile";
+
+    for (auto position = find(key, 0); position != std::string::npos; position = find(key, position + key.size()))
+    {
+      const auto separator = body.find_first_not_of(" \t", position + key.size());
+
+      if (separator == std::string::npos || (body[separator] != '=' && body[separator] != ':'))
+        return "The MetaImage header refers to a data file.";
+
+      const auto valueStart = std::min(body.find_first_not_of("=: \t", separator), body.size());
+      const auto valueEnd = std::min(body.find('\n', valueStart), body.size());
+      auto value = body.substr(valueStart, valueEnd - valueStart);
+      value.erase(value.find_last_not_of(" \t\r\v\f") + 1);
+
+      // The values for which MetaIO reads the pixels from the header's file.
+      if (value != "LOCAL" && value != "Local" && value != "local")
+        return "The MetaImage header refers to a data file.";
+    }
+
+    return "";
+  }
+
   std::string ValidateFilePath(const std::string& filePath,
                                FileAccessMode mode,
                                const std::vector<std::string>& allowedDirs)
@@ -269,29 +352,34 @@ namespace
       return "";
     }
 
-    // Canonicalize the requested path
+    // A path that does not exist has to get the answer of one that does:
+    // a different one would tell which files exist outside of the allowed
+    // directories.
     std::error_code ec;
-    const fs::path canonicalPath = fs::canonical(filePath, ec);
+    const fs::path canonicalPath = fs::weakly_canonical(fs::absolute(filePath, ec), ec);
     if (ec)
     {
-      return "Cannot resolve file path: " + filePath;
+      return "File path is not within any allowed directory: " + filePath;
     }
 
-    const std::string canonicalStr = canonicalPath.string();
-
-    // Check allowed directories
+    // Check allowed directories, by components: the canonical form of a
+    // root, like "E:\" or "/", ends with a separator already.
     for (const auto& allowedDir : allowedDirs)
     {
+      // The standard libraries disagree on canonical(""): an error, the
+      // current directory, or (MSVC) an empty path that matches every path.
+      if (allowedDir.empty())
+      {
+        continue;
+      }
+
       const fs::path canonicalAllowed = fs::canonical(allowedDir, ec);
       if (ec)
       {
         continue;
       }
-      const std::string allowedStr = canonicalAllowed.string();
-      if (canonicalStr.rfind(allowedStr, 0) == 0 &&
-          (canonicalStr.length() == allowedStr.length() ||
-           canonicalStr[allowedStr.length()] == '/' ||
-           canonicalStr[allowedStr.length()] == '\\'))
+
+      if (std::mismatch(canonicalAllowed.begin(), canonicalAllowed.end(), canonicalPath.begin(), canonicalPath.end()).first == canonicalAllowed.end())
       {
         return "";
       }
@@ -313,14 +401,14 @@ void DataStorageController::SetTempDirectory(const std::string& tempDir)
 
 void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory)
 {
-  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
-  {
-    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
-  }
-
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
   m_TempDirectory = tempDirectory;
+}
+
+void DataStorageController::SetFileAccessCheck(std::function<bool(const httplib::Request&)> check)
+{
+  m_FileAccessCheck = std::move(check);
 }
 
 void DataStorageController::SetMaxActiveTempDirsPerIp(size_t max)
@@ -585,8 +673,9 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
     }
   }
 
-  // Context (for renderer-specific properties)
-  if (req.has_param("context"))
+  // Context (for renderer-specific properties). Data has the default context
+  // only, so scope data ignores it, as specified.
+  if (req.has_param("context") && params.propertyScope != PropertyScope::Data)
   {
     params.context = req.get_param_value("context");
   }
@@ -684,8 +773,9 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
     }
   }
 
-  // Context (for renderer-specific properties)
-  if (req.has_param("context"))
+  // Context (for renderer-specific properties). Data has the default context
+  // only, so scope data ignores it, as specified.
+  if (req.has_param("context") && params.scope != PropertyScope::Data)
   {
     params.context = req.get_param_value("context");
   }
@@ -709,13 +799,13 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
 void DataStorageController::SendJsonResponse(httplib::Response& res, int status, const nlohmann::json& body)
 {
   res.status = status;
-  res.set_content(body.dump(), "application/json");
+  res.set_content(DumpRestJson(body), "application/json");
 }
 
 void DataStorageController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error)
 {
   res.status = status;
-  res.set_content(error.dump(), "application/json");
+  res.set_content(DumpRestJson(error), "application/json");
 }
 
 DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataPath(
@@ -768,10 +858,13 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
 
     const fs::path filePath(body[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH].get<std::string>());
 
-    if (!fs::exists(filePath))
+    // Both access checks come before the existence check, which would tell a
+    // client which files exist where it may not look.
+    if (m_FileAccessCheck && !m_FileAccessCheck(req))
     {
-      result.errorStatus = 422;
-      result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
+      result.errorStatus = 403;
+      result.errorResponse = ErrorResponse::FileAccessDenied(
+        "This client may not load data from files. Send the data in the request body instead.", req.path);
       return result;
     }
 
@@ -781,6 +874,13 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     {
       result.errorStatus = 403;
       result.errorResponse = ErrorResponse::FileAccessDenied(validationError, req.path);
+      return result;
+    }
+
+    if (!fs::exists(filePath))
+    {
+      result.errorStatus = 422;
+      result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
       return result;
     }
 
@@ -811,7 +911,21 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
 
     if (extension.empty() && req.has_header(HEADER_DATA_FORMAT))
     {
-      extension = "." + req.get_header_value(HEADER_DATA_FORMAT);
+      const auto format = req.get_header_value(HEADER_DATA_FORMAT);
+
+      // The format becomes part of a file name: anything like a path separator would lead out of the temp directory.
+      const bool isExtension = !format.empty() && std::all_of(format.begin(), format.end(),
+        [](unsigned char c) { return std::isalnum(c) != 0 || c == '.'; });
+
+      if (!isExtension || format.find("..") != std::string::npos)
+      {
+        result.errorStatus = 400;
+        result.errorResponse = ErrorResponse::InvalidRequest(
+          "The X-MITK-Data-Format header must be a file extension like nrrd or nii.gz.", req.path);
+        return result;
+      }
+
+      extension = "." + format;
     }
 
     if (extension.empty())
@@ -821,6 +935,23 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
         "Cannot determine file format. Provide filename in Content-Disposition header "
         "or use X-MITK-Data-Format header.", req.path);
       return result;
+    }
+
+    // An upload that makes its reader open other files names files as a file
+    // reference does, so it needs the same rights. Under allowed directories
+    // it is refused for everyone: what it refers to is not known here.
+    const bool mayNameFiles = m_FileAccessMode == FileAccessMode::Unrestricted &&
+      (!m_FileAccessCheck || m_FileAccessCheck(req));
+
+    if (!mayNameFiles)
+    {
+      if (const auto reference = FindFileReference(req.body, extension); !reference.empty())
+      {
+        result.errorStatus = 403;
+        result.errorResponse = ErrorResponse::FileAccessDenied(
+          reference + " This client may not load data from files. Send data that is complete in one file.", req.path);
+        return result;
+      }
     }
 
     // Create temp file
@@ -1503,6 +1634,13 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     return;
   }
 
+  if (transferMode == TRANSFER_MODE_FILE_REFERENCE && m_FileAccessCheck && !m_FileAccessCheck(req))
+  {
+    this->SendErrorResponse(res, 403, ErrorResponse::FileAccessDenied(
+      "This client may not get data as files. Use the direct transfer mode instead.", req.path));
+    return;
+  }
+
   // Get a clone of the node's data for thread-safe serialization
   // The result distinguishes between "node not found" and "node has no data"
   const auto dataResult = m_Bridge.GetNodeData(uid);
@@ -1976,19 +2114,18 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Get previous value if exists
   auto previousProperty = m_Bridge.GetNodeProperty(uid, key, params);
 
-  const auto setStatus = m_Bridge.SetNodeProperty(uid, key, value, params);
-  if (setStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  const auto setResult = m_Bridge.SetNodeProperty(uid, key, value, params);
+  if (setResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
     return;
   }
-  else if (setStatus == DataStorageBridge::OperationStatus::InvalidInput)
+  else if (setResult.status == DataStorageBridge::OperationStatus::InvalidInput)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
-      "Failed to deserialize property value or no data for requested scope", req.path));
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(setResult.reason, req.path));
     return;
   }
-  else if (setStatus != DataStorageBridge::OperationStatus::Success)
+  else if (setResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to set property value", req.path));
     return;
@@ -2066,18 +2203,23 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  const auto deleteStatus = m_Bridge.DeleteNodeProperty(uid, key, params);
-  if (deleteStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  const auto deleteResult = m_Bridge.DeleteNodeProperty(uid, key, params);
+  if (deleteResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
     return;
   }
-  else if (deleteStatus == DataStorageBridge::OperationStatus::PropertyNotFound)
+  else if (deleteResult.status == DataStorageBridge::OperationStatus::PropertyNotFound)
   {
     this->SendErrorResponse(res, 404, ErrorResponse::PropertyNotFound(key, uid, req.path));
     return;
   }
-  else if (deleteStatus != DataStorageBridge::OperationStatus::Success)
+  else if (deleteResult.status == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(deleteResult.reason, req.path));
+    return;
+  }
+  else if (deleteResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to delete property", req.path));
     return;
@@ -2182,7 +2324,7 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
   else if (replaceResult.status == DataStorageBridge::OperationStatus::InvalidInput)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to replace properties", req.path));
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(replaceResult.reason, req.path));
     return;
   }
   else if (replaceResult.status != DataStorageBridge::OperationStatus::Success)
@@ -2287,7 +2429,8 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
       continue;
     }
 
-    if (m_Bridge.SetNodeProperty(uid, key, value, params) == DataStorageBridge::OperationStatus::Success)
+    const auto setResult = m_Bridge.SetNodeProperty(uid, key, value, params);
+    if (setResult.status == DataStorageBridge::OperationStatus::Success)
     {
       updated.push_back(key);
     }
@@ -2295,7 +2438,7 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
     {
       nlohmann::json failure;
       failure[JSON_KEY_PROPERTY] = key;
-      failure[JSON_KEY_ERROR] = "Failed to set property value";
+      failure[JSON_KEY_ERROR] = setResult.reason.empty() ? "Failed to set property value" : setResult.reason;
       failed.push_back(failure);
     }
   }

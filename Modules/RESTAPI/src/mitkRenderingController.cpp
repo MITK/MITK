@@ -11,11 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRenderingController.h>
+#include "mitkRestStopGate.h"
 #include <mitkRenderWindowBridge.h>
 #include <mitkErrorResponse.h>
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
+#include <mitkRestRoute.h>
+#include <mitkSlicedData.h>
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
@@ -220,28 +223,29 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
   if (!uids.empty())
   {
     // Node-scoped: fit views to the bounding geometry of the specified nodes.
-    // Pre-dispatch: validate all UIDs and capture node pointers (no cloning).
-    std::vector<DataNode::ConstPointer> nodes;
-    nodes.reserve(uids.size());
-    for (const auto& uid : uids)
-    {
-      const auto node = m_Bridge.FindDataNode(uid);
-      if (node == nullptr)
-      {
-        this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
-        return;
-      }
-      nodes.push_back(node);
-    }
-
-    // Dispatch: validate geometry and compute bounding box on the UI thread.
+    // The nodes are looked up and released on the UI thread: a node removed
+    // meanwhile must not be destroyed on this thread.
     const auto dataStorage = m_Bridge.GetDataStorage();
     std::optional<std::pair<int, nlohmann::json>> dispatchError;
 
     try
     {
-      this->Dispatch([dataStorage, nodes, uids, &req, &dispatchError]()
+      this->Dispatch([this, dataStorage, &uids, &req, &dispatchError]()
       {
+        std::vector<DataNode::ConstPointer> nodes;
+        nodes.reserve(uids.size());
+
+        for (const auto& uid : uids)
+        {
+          auto node = m_Bridge.FindNode(uid);
+          if (node.IsNull())
+          {
+            dispatchError = {404, ErrorResponse::NodeNotFound(uid, req.path)};
+            return;
+          }
+          nodes.push_back(node.GetPointer());
+        }
+
         auto nodeSet = DataStorage::ConstSetOfObjects::New();
         for (std::size_t i = 0; i < nodes.size(); ++i)
         {
@@ -257,6 +261,18 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
             return;
           }
           nodeSet->InsertElement(nodeSet->Size(), nodes[i]);
+        }
+
+        // As the Data Manager does it: the views adopt the geometry of a single image-like
+        // node, which rectifies askew geometries.
+        if (nodes.size() == 1)
+        {
+          if (const auto* const slicedData = dynamic_cast<const SlicedData*>(nodes[0]->GetData()))
+          {
+            RenderingManager::GetInstance()->InitializeViews(
+              slicedData->GetTimeGeometry(), RenderingManager::REQUEST_UPDATE_ALL, true);
+            return;
+          }
         }
 
         const auto geometry = dataStorage->ComputeBoundingGeometry3D(nodeSet);
@@ -350,7 +366,7 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
   }
 
   res.status = 200;
-  res.set_content(SerializeSelectedPositionInfoToJson(posInfo).dump(), "application/json");
+  res.set_content(DumpRestJson(SerializeSelectedPositionInfoToJson(posInfo)), "application/json");
 }
 
 void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const
@@ -470,7 +486,7 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
   response["bounds"]["steps"] = steps;
 
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(DumpRestJson(response), "application/json");
 }
 
 void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const
@@ -1014,7 +1030,7 @@ void RenderingController::HandleGET_editors(const httplib::Request& req, httplib
     arr.push_back(EditorInfoToJson(ed, /*includeWindowList=*/false));
 
   res.status = 200;
-  res.set_content(arr.dump(), "application/json");
+  res.set_content(DumpRestJson(arr), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const
@@ -1051,7 +1067,7 @@ void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, ht
       }
       const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
       res.status = 200;
-      res.set_content(j.dump(), "application/json");
+      res.set_content(DumpRestJson(j), "application/json");
       return;
     }
   }
@@ -1095,7 +1111,7 @@ void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req,
   }
 
   res.status = 200;
-  res.set_content(arr.dump(), "application/json");
+  res.set_content(DumpRestJson(arr), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
@@ -1157,7 +1173,7 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
   j["has_selected_slice"] = !is3d;
 
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
@@ -1192,7 +1208,7 @@ void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, 
 
   const auto j = CameraStateToJson(state);
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
@@ -1271,9 +1287,9 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
   if (IsStdMulti3dWindow(id))
   {
-    const auto error = ErrorResponse::UnsupportedOperation(
-      "selected-slice is not applicable to the 3D window.", req.path);
-    this->SendErrorResponse(res, 404, error);
+    const auto error = ErrorResponse::InvalidRequest(
+      "The 3D window has no slices. selected-slice needs a 2D window (axial, sagittal or coronal).", req.path);
+    this->SendErrorResponse(res, 400, error);
     return;
   }
 
@@ -1298,7 +1314,7 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
   const auto j = SliceStateToJson(state);
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
@@ -1314,9 +1330,9 @@ void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request
 
   if (IsStdMulti3dWindow(id))
   {
-    const auto error = ErrorResponse::UnsupportedOperation(
-      "selected-slice is not applicable to the 3D window.", req.path);
-    this->SendErrorResponse(res, 404, error);
+    const auto error = ErrorResponse::InvalidRequest(
+      "The 3D window has no slices. selected-slice needs a 2D window (axial, sagittal or coronal).", req.path);
+    this->SendErrorResponse(res, 400, error);
     return;
   }
 
@@ -1629,7 +1645,7 @@ void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib
       }
       const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
       res.status = 200;
-      res.set_content(j.dump(), "application/json");
+      res.set_content(DumpRestJson(j), "application/json");
       return;
     }
   }
@@ -1678,7 +1694,7 @@ void RenderingController::HandleGET_mxnWindows(const httplib::Request& req, http
   }
 
   res.status = 200;
-  res.set_content(MxNWindowInfoToWindowsListJson(windows).dump(), "application/json");
+  res.set_content(DumpRestJson(MxNWindowInfoToWindowsListJson(windows)), "application/json");
 }
 
 void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httplib::Response& res) const
@@ -1774,7 +1790,7 @@ void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httpl
   j["has_selected_position"] = true;
 
   res.status = 200;
-  res.set_content(j.dump(), "application/json");
+  res.set_content(DumpRestJson(j), "application/json");
 }
 
 // ----------------------------------------------------------------------
@@ -1907,7 +1923,7 @@ void RenderingController::HandleGET_mxnCamera(const httplib::Request& req, httpl
   }
 
   res.status = 200;
-  res.set_content(CameraStateToJson(state).dump(), "application/json");
+  res.set_content(DumpRestJson(CameraStateToJson(state)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnCamera(const httplib::Request& req, httplib::Response& res) const
@@ -2019,7 +2035,7 @@ void RenderingController::HandleGET_mxnSelectedSlice(const httplib::Request& req
   }
 
   res.status = 200;
-  res.set_content(SliceStateToJson(state).dump(), "application/json");
+  res.set_content(DumpRestJson(SliceStateToJson(state)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const
@@ -2136,7 +2152,7 @@ void RenderingController::HandleGET_mxnSelectedPosition(const httplib::Request& 
   }
 
   res.status = 200;
-  res.set_content(SerializeSelectedPositionInfoToJson(info).dump(), "application/json");
+  res.set_content(DumpRestJson(SerializeSelectedPositionInfoToJson(info)), "application/json");
 }
 
 void RenderingController::HandlePUT_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const
@@ -2298,20 +2314,18 @@ void RenderingController::Dispatch(std::function<void()> task) const
     std::lock_guard<std::mutex> lock(m_DispatcherMutex);
     dispatcher = m_Dispatcher.Lock();
   }
-  if (dispatcher.IsNull())
-  {
-    task();
-  }
-  else
-  {
-    dispatcher->Execute(std::move(task));
-  }
+  RestStopGate::Run(m_StopGate, dispatcher, task);
+}
+
+void RenderingController::SetStopGate(std::shared_ptr<RestStopGate> gate)
+{
+  m_StopGate = std::move(gate);
 }
 
 void RenderingController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const
 {
   res.status = status;
-  res.set_content(error.dump(), "application/json");
+  res.set_content(DumpRestJson(error), "application/json");
 }
 
 bool RenderingController::IsValidStdMultiWindowId(const std::string& id)

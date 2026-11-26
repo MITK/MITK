@@ -324,6 +324,7 @@ private Q_SLOTS:
 
   void OnAddLabel();
   void OnAddLabelInstance();
+  void OnSplitLabel();
   void OnDeleteGroup();
   void OnDeleteAffectedLabel();
   void OnDeleteLabels(bool);

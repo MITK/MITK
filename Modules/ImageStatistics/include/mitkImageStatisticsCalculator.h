@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkMaskGenerator.h>
 #include <mitkImageStatisticsContainer.h>
 
+#include <vector>
+
 namespace mitk
 {
     /**
@@ -87,6 +89,24 @@ namespace mitk
          * \param[in] mask Pointer to a MaskGenerator, or nullptr.
          */
         void SetMask(mitk::MaskGenerator* mask);
+
+        /**
+         * \brief Restrict the computation to the given time steps of the input image.
+         *
+         * The result container then holds statistics only for these time steps; for
+         * the others StatisticsExist() is false. An empty list, the default, computes
+         * all time steps. Changing the restriction makes the next GetStatistics() call
+         * compute again.
+         *
+         * \param[in] timeSteps Time steps of the input image to compute.
+         *            GetStatistics() throws if one of them is not a time step of the image.
+         */
+        void SetTimeSteps(const std::vector<TimeStepType>& timeSteps);
+
+        /**
+         * \brief Get the time steps the computation is restricted to (empty: all).
+         */
+        const std::vector<TimeStepType>& GetTimeSteps() const;
 
         /**
          * \brief Set the number of histogram bins for histogram statistics.
@@ -178,6 +198,8 @@ namespace mitk
         unsigned int m_nBinsForHistogramStatistics;
         double m_binSizeForHistogramStatistics;
         bool m_UseBinSizeOverNBins;
+
+        std::vector<TimeStepType> m_TimeSteps;
 
         ImageStatisticsContainer::Pointer m_StatisticContainer;
     };

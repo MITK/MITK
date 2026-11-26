@@ -721,9 +721,6 @@ namespace mitk
     rwb->SetMxNSelectedSliceGetter(
       [](const std::string& id) -> mitk::SliceState
       {
-        // Defensive: v2 has no 3D MxN cell; if a v3 3D cell ever shows up here,
-        // surface as UNSUPPORTED_OPERATION so the controller maps to 404.
-        // (Matches the StdMulti pattern for /selected-slice on the 3D window.)
         auto* const renderer = ResolveMxNRenderer(id);
         auto* const snc = renderer->GetSliceNavigationController();
         if (snc == nullptr)

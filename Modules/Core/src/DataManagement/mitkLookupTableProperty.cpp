@@ -117,39 +117,40 @@ bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
 {
   auto lut = vtkSmartPointer<vtkLookupTable>::New();
 
-  lut->SetNumberOfTableValues(j["NumberOfColors"].get<int>());
-  lut->SetScale(j["Scale"].get<int>());
-  lut->SetRamp(j["Ramp"].get<int>());
+  // at() throws for a missing key or index, where the operator[] of a const JSON value is undefined.
+  lut->SetNumberOfTableValues(j.at("NumberOfColors").get<int>());
+  lut->SetScale(j.at("Scale").get<int>());
+  lut->SetRamp(j.at("Ramp").get<int>());
 
   std::array<double, 2> range;
 
-  j["HueRange"][0].get_to(range[0]);
-  j["HueRange"][1].get_to(range[1]);
+  j.at("HueRange").at(0).get_to(range[0]);
+  j.at("HueRange").at(1).get_to(range[1]);
   lut->SetHueRange(range.data());
 
-  j["ValueRange"][0].get_to(range[0]);
-  j["ValueRange"][1].get_to(range[1]);
+  j.at("ValueRange").at(0).get_to(range[0]);
+  j.at("ValueRange").at(1).get_to(range[1]);
   lut->SetValueRange(range.data());
 
-  j["SaturationRange"][0].get_to(range[0]);
-  j["SaturationRange"][1].get_to(range[1]);
+  j.at("SaturationRange").at(0).get_to(range[0]);
+  j.at("SaturationRange").at(1).get_to(range[1]);
   lut->SetSaturationRange(range.data());
 
-  j["AlphaRange"][0].get_to(range[0]);
-  j["AlphaRange"][1].get_to(range[1]);
+  j.at("AlphaRange").at(0).get_to(range[0]);
+  j.at("AlphaRange").at(1).get_to(range[1]);
   lut->SetAlphaRange(range.data());
 
-  j["TableRange"][0].get_to(range[0]);
-  j["TableRange"][1].get_to(range[1]);
+  j.at("TableRange").at(0).get_to(range[0]);
+  j.at("TableRange").at(1).get_to(range[1]);
   lut->SetTableRange(range.data());
 
   std::array<double, 4> rgba;
   vtkIdType i = 0;
 
-  for (const auto& value : j["Table"])
+  for (const auto& value : j.at("Table"))
   {
     for (size_t j = 0; j < 4; ++j)
-      value[j].get_to(rgba[j]);
+      value.at(j).get_to(rgba[j]);
 
     lut->SetTableValue(i++, rgba.data());
   }

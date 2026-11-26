@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkActionOriginScope.h>
 #include <mitkInteractionConst.h>
 #include <mitkOperation.h>
 #include <mitkUndoController.h>
@@ -107,6 +108,17 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
   myUndoController->Clear();
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0, "checking deleting all operations in UndoModel");
 
+  // An undo that empties the undo list is an undo all the same.
+  myUndoController->SetOperationEvent(
+    new mitk::OperationEvent(nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+  mitk::OperationEvent::IncCurrObjectEventId();
+
+  MITK_TEST_CONDITION_REQUIRED(myUndoController->Undo(), "checking that undoing the only operation is reported");
+  MITK_TEST_CONDITION_REQUIRED(!myUndoController->Undo(), "checking that nothing is left to undo");
+
+  myUndoController->Clear();
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0, "checking deleting all operations in UndoModel");
+
   // sending two new OperationEvents
   for (int i = 0; i < 2; i++)
   {
@@ -125,6 +137,86 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
   // after deleting UndoController g_GlobalCounter will still be 4 because m_CurrentUndoModel inside myUndoModel is a
   // static singleton
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking singleton UndoModel");
+
+  // The origin of a step is the one that was current when it was made.
+  auto originModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addStep = [&originModel]() {
+      originModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+      mitk::OperationEvent::IncCurrObjectEventId();
+    };
+
+    addStep();
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addStep();
+      const mitk::ActionOriginScope inner("inner");
+      addStep();
+    }
+
+    addStep();
+  }
+
+  const auto origins = originModel->GetUndoOrigins();
+  MITK_TEST_CONDITION_REQUIRED(origins.size() == originModel->GetUndoDescriptions().size(),
+                               "checking one origin per undo entry");
+  MITK_TEST_CONDITION_REQUIRED(origins.size() == 4 && origins[0].empty() && origins[1] == "inner" &&
+                                 origins[2] == "client" && origins[3].empty(),
+                               "checking origins of steps made inside and outside of scopes");
+  MITK_TEST_CONDITION_REQUIRED(mitk::ActionOriginScope::GetCurrent().empty(), "checking scopes are left again");
+
+  originModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(originModel->GetRedoOrigins().size() == 1 && originModel->GetRedoOrigins()[0].empty(),
+                               "checking origin of a redo entry");
+
+  // A client's item and a later one of the user's that share an ObjectEventId.
+  auto mixedModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addItem = [&mixedModel]() {
+      mixedModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+    };
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addItem();
+    }
+
+    addItem();
+    mitk::OperationEvent::IncCurrObjectEventId();
+  }
+
+  MITK_TEST_CONDITION_REQUIRED(mixedModel->GetUndoOrigins().size() == 1 && mixedModel->GetUndoOrigins()[0].empty(),
+                               "checking a mixed undo entry is the user's");
+  mixedModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(mixedModel->GetRedoOrigins().size() == 1 && mixedModel->GetRedoOrigins()[0].empty(),
+                               "checking a mixed redo entry is the user's");
+
+  // The reverse order, where the newest item is the client's.
+  auto reverseModel = mitk::VerboseLimitedLinearUndo::New();
+  {
+    const auto addItem = [&reverseModel]() {
+      reverseModel->SetOperationEvent(new mitk::OperationEvent(
+        nullptr, new mitk::TestOperation(mitk::OpTEST), new mitk::TestOperation(mitk::OpTEST), "Test"));
+    };
+
+    addItem();
+
+    {
+      const mitk::ActionOriginScope scope("client");
+      addItem();
+    }
+
+    mitk::OperationEvent::IncCurrObjectEventId();
+  }
+
+  MITK_TEST_CONDITION_REQUIRED(reverseModel->GetUndoOrigins().size() == 1 && reverseModel->GetUndoOrigins()[0].empty(),
+                               "checking a mixed undo entry with the client's item last is the user's");
+  reverseModel->Undo();
+  MITK_TEST_CONDITION_REQUIRED(reverseModel->GetRedoOrigins().size() == 1 && reverseModel->GetRedoOrigins()[0].empty(),
+                               "checking a mixed redo entry with the client's item last is the user's");
 
   // always end with this!
   MITK_TEST_END()

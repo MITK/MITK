@@ -25,6 +25,16 @@ found in the LICENSE file.
 #include <QPalette>
 #include <QTimer>
 
+namespace
+{
+  QString TimeStepToolTip(mitk::TimeStepType timeStep)
+  {
+    return QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
+                   "wheel to change the timestep.\n\nTimeStep:\t%1")
+      .arg(timeStep);
+  }
+}
+
 QmitkPointListView::QmitkPointListView(QWidget *parent)
   : QListView(parent),
     m_PointListModel(new QmitkPointListModel()),
@@ -37,10 +47,7 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
   QListView::setSelectionBehavior(QAbstractItemView::SelectItems);
   QListView::setSelectionMode(QAbstractItemView::SingleSelection);
   QListView::setModel(m_PointListModel);
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
-                            "wheel to change the timestep.\n\nTimeStep:\t%1")
-                      .arg(0);
-  QListView::setToolTip(tooltip);
+  QListView::setToolTip(TimeStepToolTip(0));
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   this->setMinimumHeight(40);
@@ -68,6 +75,10 @@ QmitkPointListView::~QmitkPointListView()
 void QmitkPointListView::SetPointSetNode(mitk::DataNode *pointSetNode)
 {
   m_PointListModel->SetPointSetNode(pointSetNode);
+
+  const auto timeStep = m_PointListModel->GetTimeStep();
+  this->setToolTip(TimeStepToolTip(timeStep));
+  emit this->SignalTimeStepChanged(static_cast<int>(timeStep));
 }
 
 const mitk::PointSet *QmitkPointListView::GetPointSet() const
@@ -242,10 +253,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
     this->m_PointListModel->SetTimeStep(--currentTS);
   }
 
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
-                            "wheel to change the timestep.\n\nTimeStep:\t%1")
-                      .arg(currentTS);
-  this->setToolTip(tooltip);
+  this->setToolTip(TimeStepToolTip(currentTS));
 
   emit SignalTimeStepChanged(static_cast<int>(currentTS));
 }
@@ -287,7 +295,8 @@ void QmitkPointListView::ClearPointList()
   if (!m_PointListModel->GetPointSet())
     return;
   mitk::PointSet::Pointer curPS = m_PointListModel->GetPointSet();
-  if (curPS->GetSize() == 0)
+  const auto timeStep = m_PointListModel->GetTimeStep();
+  if (curPS->GetSize(timeStep) == 0)
     return;
 
   switch (QMessageBox::question(this,
@@ -300,11 +309,11 @@ void QmitkPointListView::ClearPointList()
     {
       mitk::PointSet::PointsIterator it;
       mitk::PointSet::PointsContainer *curPsPoints;
-      while (!curPS->IsEmptyTimeStep(0))
+      while (!curPS->IsEmptyTimeStep(timeStep))
       {
-        curPsPoints = curPS->GetPointSet()->GetPoints();
+        curPsPoints = curPS->GetPointSet(timeStep)->GetPoints();
         it = curPsPoints->Begin();
-        curPS->SetSelectInfo(it->Index(), true);
+        curPS->SetSelectInfo(it->Index(), true, timeStep);
         m_PointListModel->RemoveSelectedPoint();
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

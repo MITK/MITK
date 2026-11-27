@@ -16,12 +16,68 @@ found in the LICENSE file.
 #include <mitkIOMimeTypes.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkLexicalCast.h>
 
 // STL
+#include <charconv>
 #include <fstream>
 #include <iostream>
+#include <string_view>
+#include <type_traits>
 
 #include <tinyxml2.h>
+
+namespace
+{
+  template <typename T>
+  T ParseNumber(const tinyxml2::XMLElement *parent, const char *name)
+  {
+    const auto *child = parent->FirstChildElement(name);
+    const std::string_view text = child != nullptr && child->GetText() != nullptr ? child->GetText() : "";
+
+    const auto first = text.find_first_not_of(" \t\r\n");
+    if (first == std::string_view::npos)
+      mitkThrow() << "Missing or empty <" << name << "> element.";
+
+    const auto number = text.substr(first, text.find_last_not_of(" \t\r\n") - first + 1);
+
+    // Floating-point std::from_chars is missing from older libc++ (macOS), while
+    // LexicalCast wraps negative input around for unsigned types.
+    if constexpr (std::is_floating_point_v<T>)
+    {
+      try
+      {
+        return mitk::LexicalCast<T>(std::string(number));
+      }
+      catch (const mitk::BadLexicalCast &)
+      {
+        mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+      }
+    }
+    else
+    {
+      const char *end = number.data() + number.size();
+
+      T value{};
+      const auto [last, error] = std::from_chars(number.data(), end, value);
+
+      if (error != std::errc() || last != end)
+        mitkThrow() << "Invalid <" << name << "> \"" << number << "\".";
+
+      return value;
+    }
+  }
+
+  mitk::TimeStepType ReadTimeStep(const tinyxml2::XMLElement *timeSeries)
+  {
+    const auto timeStep = ParseNumber<mitk::TimeStepType>(timeSeries, "time_series_id");
+
+    if (timeStep == mitk::TIMESTEP_INVALID)
+      mitkThrow() << "Invalid <time_series_id> \"" << timeStep << "\".";
+
+    return timeStep;
+  }
+}
 
 mitk::PointSetReaderService::PointSetReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()), "MITK Point Set Reader")
@@ -52,7 +108,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
     for (auto *currentPointSetElement =
            docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
          currentPointSetElement != nullptr;
-         currentPointSetElement = currentPointSetElement->NextSiblingElement())
+         currentPointSetElement = currentPointSetElement->NextSiblingElement("point_set"))
     {
       mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
 
@@ -64,12 +120,9 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
       {
         for (auto *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
              currentTimeSeries != nullptr;
-             currentTimeSeries = currentTimeSeries->NextSiblingElement())
+             currentTimeSeries = currentTimeSeries->NextSiblingElement("time_series"))
         {
-          mitk::TimeStepType currentTimeStep(0);
-          auto *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
-
-          currentTimeStep = atoi(currentTimeSeriesID->GetText());
+          const mitk::TimeStepType currentTimeStep = ReadTimeStep(currentTimeSeries);
 
           timeGeometry->Expand(currentTimeStep + 1); // expand (default to identity) in any case
           auto *geometryElem = currentTimeSeries->FirstChildElement("Geometry3D");
@@ -95,6 +148,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
       }
       else
       {
+        timeGeometry->Expand(1);
         newPointSet = this->ReadPoints(newPointSet, currentPointSetElement, 0);
       }
 
@@ -119,22 +173,16 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
   if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {
     for (auto *currentPoint = currentTimeSeries->FirstChildElement("point"); currentPoint != nullptr;
-         currentPoint = currentPoint->NextSiblingElement())
+         currentPoint = currentPoint->NextSiblingElement("point"))
     {
-      unsigned int id(0);
-      auto spec((mitk::PointSpecificationType)0);
-      double x(0.0);
-      double y(0.0);
-      double z(0.0);
+      const auto id = ParseNumber<mitk::PointSet::PointIdentifier>(currentPoint, "id");
 
-      id = atoi(currentPoint->FirstChildElement("id")->GetText());
+      auto spec = mitk::PTUNDEFINED;
       if (currentPoint->FirstChildElement("specification") != nullptr)
-      {
-        spec = (mitk::PointSpecificationType)atoi(currentPoint->FirstChildElement("specification")->GetText());
-      }
-      x = atof(currentPoint->FirstChildElement("x")->GetText());
-      y = atof(currentPoint->FirstChildElement("y")->GetText());
-      z = atof(currentPoint->FirstChildElement("z")->GetText());
+        spec = static_cast<mitk::PointSpecificationType>(ParseNumber<int>(currentPoint, "specification"));
+      const auto x = ParseNumber<double>(currentPoint, "x");
+      const auto y = ParseNumber<double>(currentPoint, "y");
+      const auto z = ParseNumber<double>(currentPoint, "z");
 
       mitk::Point3D point;
       mitk::FillVector3D(point, x, y, z);
@@ -143,10 +191,7 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
   }
   else
   {
-    if (currentTimeStep != newPointSet->GetTimeSteps() + 1)
-    {
-      newPointSet->Expand(currentTimeStep + 1); // expand time step series with empty time step
-    }
+    newPointSet->Expand(currentTimeStep + 1); // expand time step series with empty time step
   }
   return newPointSet;
 }

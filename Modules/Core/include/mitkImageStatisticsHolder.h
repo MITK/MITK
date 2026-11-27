@@ -34,6 +34,11 @@ namespace mitk
    *
    * Minimum or maximum might be infinite values. 2nd minimum and maximum are guaranteed to be finite values.
    *
+   * The getters for minimum, maximum, their second values and their voxel counts throw
+   * mitk::InvalidTimeStepException for a time step the image does not have. Their NoRecompute variants
+   * only read what was computed before and return the fallback value given in their
+   * documentation instead.
+   *
    * All values, the histogram included, may be cached. They follow changes of the image only once its
    * modification time moves, so a caller that changes voxels, e.g. through an ImageWriteAccessor, has to
    * call Modified() on the image afterwards.

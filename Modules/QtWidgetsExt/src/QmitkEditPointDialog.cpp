@@ -96,6 +96,7 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
   {
     MITK_WARN << "Pointset is 0.";
     this->reject();
+    return;
   }
   // check if digits of input value exceed double precision
   auto x = d->m_XCoord->text().toDouble();
@@ -108,7 +109,7 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
     point.SetElement(0, x);
     point.SetElement(1, y);
     point.SetElement(2, z);
-    d->m_PointSet->SetPoint(d->m_PointId, point);
+    d->m_PointSet->SetPoint(d->m_PointId, point, d->m_Timestep);
     this->accept();
   }
 }

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <itksys/SystemTools.hxx>
+#include <cmath>
 #include <random>
 #include <ctime>
 #include <vector>
@@ -70,14 +71,21 @@ public:
 
   void PointSetCompare(mitk::PointSet::Pointer pointSet2, mitk::PointSet::Pointer pointSet1, bool & /*identical*/)
   {
-    MITK_TEST_CONDITION(pointSet1->GetSize() == pointSet2->GetSize(), "Testing if PointSet size is correct");
+    // Not MITK_TEST_CONDITION_REQUIRED: its exception would end in the caller's
+    // catch, which only logs it, and the test would pass.
+    const bool sameTimeSteps = pointSet1->GetTimeSteps() == pointSet2->GetTimeSteps();
+    MITK_TEST_CONDITION(sameTimeSteps, "Testing if the number of time steps is correct");
+    if (!sameTimeSteps)
+      return;
 
     for (mitk::TimeStepType t = 0; t < numberOfTimeSeries; t++)
     {
+      MITK_TEST_CONDITION(pointSet1->GetSize(t) == pointSet2->GetSize(t), "Testing if PointSet size is correct");
+
       for (unsigned int i = 0; i < (unsigned int)pointSet1->GetSize(t); ++i)
       {
-        mitk::Point3D p1 = pointSet1->GetPoint(i);
-        mitk::Point3D p2 = pointSet2->GetPoint(i);
+        mitk::Point3D p1 = pointSet1->GetPoint(i, t);
+        mitk::Point3D p2 = pointSet2->GetPoint(i, t);
 
         // test
         std::cout << "r point: " << p2 << std::endl;
@@ -85,18 +93,17 @@ public:
 
         // test end
 
-        MITK_TEST_CONDITION((p1[0] - p2[0]) <= 0.0001,
+        MITK_TEST_CONDITION(std::abs(p1[0] - p2[0]) <= 0.0001,
                             "Testing if X coordinates of the Point are at the same Position");
-        MITK_TEST_CONDITION((p1[1] - p2[1]) <= 0.0001,
+        MITK_TEST_CONDITION(std::abs(p1[1] - p2[1]) <= 0.0001,
                             "Testing if Y coordinates of the Point are at the same Position");
-        MITK_TEST_CONDITION((p1[2] - p2[2]) <= 0.0001,
+        MITK_TEST_CONDITION(std::abs(p1[2] - p2[2]) <= 0.0001,
                             "Testing if Z coordinates of the Point are at the same Position");
       }
-    }
 
-    // testing geometry
-    MITK_TEST_CONDITION(mitk::Equal(*(pointSet1->GetGeometry()), *(pointSet2->GetGeometry()), 0.000001, true),
-                        "Restored geometry must equal original one.");
+      MITK_TEST_CONDITION(mitk::Equal(*(pointSet1->GetGeometry(t)), *(pointSet2->GetGeometry(t)), 0.000001, true),
+                          "Restored geometry must equal original one.");
+    }
   }
 
   bool PointSetWrite(mitk::BaseGeometry *geometry = nullptr)

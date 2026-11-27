@@ -10,7 +10,10 @@
 #
 # ============================================================================
 
+import gzip
+
 import numpy as np
+import pytest
 
 import mitk
 
@@ -75,3 +78,84 @@ def test_image_array_protocol():
 
     array_float = np.asarray(image, dtype=np.float32)
     assert array_float.dtype == np.float32
+
+
+def _make_4d_array():
+    # Every voxel holds its own position, so a swapped axis changes the values.
+    t, z, y, x = np.indices((5, 3, 4, 6))
+    return (t * 1000 + z * 100 + y * 10 + x).astype(np.int32)
+
+
+def _read_nrrd_int32(path):
+    raw = path.read_bytes()
+    header_end = raw.index(b"\n\n") + 2
+    header = raw[:header_end].decode("ascii")
+    fields = dict(line.split(": ", 1) for line in header.splitlines() if ": " in line)
+
+    assert fields["type"] == "int"
+    assert fields["endian"] == "little"
+    assert fields["encoding"] in ("raw", "gzip")
+
+    payload = raw[header_end:]
+
+    if fields["encoding"] == "gzip":
+        payload = gzip.decompress(payload)
+
+    # NRRD lists the fastest axis first.
+    sizes = [int(size) for size in fields["sizes"].split()]
+    return np.frombuffer(payload, dtype="<i4").reshape(sizes[::-1])
+
+
+def test_image_4d_whole_views():
+    array = _make_4d_array()
+    image = mitk.Image.from_numpy(array)
+
+    np.testing.assert_array_equal(image.as_numpy(), array)
+    np.testing.assert_array_equal(image.array, array)
+    np.testing.assert_array_equal(np.asarray(image), array)
+
+    accessor_view = image.as_numpy(use_accessor=True, writeable=False)
+    np.testing.assert_array_equal(accessor_view, array)
+
+
+def test_image_4d_time_step_views():
+    array = _make_4d_array()
+    image = mitk.Image.from_numpy(array)
+
+    for t in range(array.shape[0]):
+        np.testing.assert_array_equal(image.as_numpy(time_step=t), array[t])
+
+        accessor_view = image.as_numpy(use_accessor=True, writeable=False, time_step=t)
+        np.testing.assert_array_equal(accessor_view, array[t])
+        del accessor_view
+
+    image.as_numpy(time_step=2)[0, 0, 0] = -1
+    assert image.as_numpy()[2, 0, 0, 0] == -1
+
+    with pytest.raises(mitk.Exception):
+        image.as_numpy(time_step=array.shape[0])
+
+
+def test_image_4d_filled_per_time_step():
+    array = _make_4d_array()
+    image = mitk.Image()
+    image.initialize("int32", list(reversed(array.shape)))
+
+    for t in range(array.shape[0]):
+        image.as_numpy(time_step=t)[...] = array[t]
+
+    np.testing.assert_array_equal(np.asarray(image), array)
+
+
+def test_image_4d_layout_matches_nrrd(tmp_path):
+    array = _make_4d_array()
+    path = tmp_path / "image4d.nrrd"
+    mitk.Image.from_numpy(np.asfortranarray(array)).save(str(path))
+
+    np.testing.assert_array_equal(_read_nrrd_int32(path), array)
+
+    loaded = mitk.Image.load(str(path))
+    np.testing.assert_array_equal(loaded.as_numpy(), array)
+
+    for t in range(array.shape[0]):
+        np.testing.assert_array_equal(loaded.as_numpy(time_step=t), array[t])

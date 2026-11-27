@@ -107,7 +107,7 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
   for (TimeStepType sourceTimestep = 0; sourceTimestep < numberOfTimesteps; ++sourceTimestep)
   {
     unsigned int lowerMZeroIndex = static_cast<unsigned int>(mZeroIndices[0]);
-    unsigned int upperMZeroIndex = static_cast<unsigned int>(mZeroIndices[0]);
+    unsigned int upperMZeroIndex = static_cast<unsigned int>(mZeroIndices.back());
     for (unsigned int loop = 0; loop < mZeroIndices.size(); ++loop)
     {
       if (mZeroIndices[loop] <= sourceTimestep)

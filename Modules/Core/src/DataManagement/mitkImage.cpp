@@ -697,6 +697,13 @@ void mitk::Image::AllocateZeroedVolume(TimeStepType t, int n)
     mitkThrow() << "AllocateZeroedVolume: unsupported image dimension " << m_Dimension
                 << " (expected 1 to 3).";
 
+  if (!this->IsValidTimeStep(t))
+    mitkThrowException(mitk::InvalidTimeStepException)
+      << "AllocateZeroedVolume: time step " << t << " is outside the image.";
+
+  if (!this->IsValidChannel(n))
+    mitkThrow() << "AllocateZeroedVolume: channel " << n << " is outside the image.";
+
   if (this->IsVolumeSet(t, n))
     mitkThrow() << "AllocateZeroedVolume: volume at t=" << t << ", n=" << n
                 << " is already allocated.";
@@ -1067,7 +1074,7 @@ void mitk::Image::ComputeOffsetTable()
 
 bool mitk::Image::IsValidTimeStep(TimeStepType t) const
 {
-  return ((m_Dimension >= 4 && t <= m_Dimensions[3]) || (t == 0));
+  return ((m_Dimension >= 4 && t < m_Dimensions[3]) || (t == 0));
 }
 
 void mitk::Image::Expand(TimeStepType timeSteps)

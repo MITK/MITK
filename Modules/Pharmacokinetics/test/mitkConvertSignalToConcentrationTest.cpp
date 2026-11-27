@@ -26,10 +26,14 @@ class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkConvertSignalToConcentrationTestSuite);
   MITK_TEST(GetConvertedImageAbsoluteEnhancementTest);
   MITK_TEST(GetConvertedImageAbsoluteEnhancementAveragedBaselineTest);
+  MITK_TEST(GetConvertedImageAbsoluteEnhancementSingleLaterBaselineTest);
   MITK_TEST(GetConvertedImageRelativeEnhancementTest);
   MITK_TEST(GetConvertedImageturboFLASHTest);
   MITK_TEST(GetConvertedImageVFATest);
   MITK_TEST(GetConvertedImageT2Test);
+  MITK_TEST(GetConvertedImageBaselineEndPastLastTimeStepTest);
+  MITK_TEST(GetConvertedImageBaselineStartAfterEndTest);
+  MITK_TEST(GetConvertedImageSingleBaselinePastLastTimeStepTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -47,7 +51,7 @@ public:
     itk::Index<4> testIndex0 = { { 0, 0, 0, 0 } };
     itk::Index<4> testIndex1 = { { 0, 2, 2, 3 } };
     itk::Index<4> testIndex2 = { { 2, 2, 1, 9 } };
-    itk::Index<4> testIndex3 = { { 0, 3, 2, 1 } };
+    itk::Index<4> testIndex3 = { { 0, 2, 2, 1 } };
     itk::Index<4> testIndex4 = { { 2, 2, 2, 4 } };
     m_testIndices.push_back(testIndex0);
     m_testIndices.push_back(testIndex1);
@@ -72,7 +76,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(90.0);
     refValues.push_back(360.0);
-    refValues.push_back(0.0);
+    refValues.push_back(30.0);
     refValues.push_back(160.0);
 
     std::stringstream ss;
@@ -96,7 +100,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(30.0);
     refValues.push_back(280.0);
-    refValues.push_back(0.0);
+    refValues.push_back(-30.0);
     refValues.push_back(80.0);
 
     std::stringstream ss;
@@ -107,6 +111,30 @@ public:
       CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
     }
  }
+
+  void GetConvertedImageAbsoluteEnhancementSingleLaterBaselineTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(2);
+    m_concentrationGen->SetBaselineEndTimeStep(2);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(30.0);
+    refValues.push_back(280.0);
+    refValues.push_back(-30.0);
+    refValues.push_back(80.0);
+
+    std::stringstream ss;
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using absolute enhancement with a single later baseline time step at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+  }
 
   void GetConvertedImageRelativeEnhancementTest()
   {
@@ -120,7 +148,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(3.461538);
     refValues.push_back(20.0);
-    refValues.push_back(0.0);
+    refValues.push_back(1.153846);
     refValues.push_back(5.714286);
 
     std::stringstream ss;
@@ -179,7 +207,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(7871.5616001);
     refValues.push_back(-1059.012343);
-    refValues.push_back(0.0);
+    refValues.push_back(335.628488);
     refValues.push_back(-3251.392613);
 
     std::stringstream ss;
@@ -204,7 +232,7 @@ public:
     refValues.push_back(0.0);
     refValues.push_back(-1.495494);
     refValues.push_back(-3.044522);
-    refValues.push_back(0.0);
+    refValues.push_back(-0.767255);
     refValues.push_back(-1.904237);
 
     std::stringstream ss;
@@ -215,6 +243,36 @@ public:
       CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
     }
  }
+
+  void GetConvertedImageBaselineEndPastLastTimeStepTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(10);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::InvalidTimeStepException);
+  }
+
+  void GetConvertedImageBaselineStartAfterEndTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(3);
+    m_concentrationGen->SetBaselineEndTimeStep(1);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::Exception);
+  }
+
+  void GetConvertedImageSingleBaselinePastLastTimeStepTest()
+  {
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(10);
+    m_concentrationGen->SetBaselineEndTimeStep(10);
+
+    CPPUNIT_ASSERT_THROW(m_concentrationGen->GetConvertedImage(), mitk::InvalidTimeStepException);
+  }
 
 };
 MITK_TEST_SUITE_REGISTRATION(mitkConvertSignalToConcentration)

@@ -71,9 +71,14 @@ void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
     if (nullptr == activeLabel)
       return;
     auto slice = this->GenerateSliceWithContourUpdate(workingSeg, m_PlaneGeometry, contour, activeLabel->GetValue(), currentTimePoint, m_AddMode);
-    sliceInfos.emplace_back(slice, m_PlaneGeometry, workingImageTimeStep);
 
-    this->WriteBackSegmentationResults(sliceInfos);
+    // Past the end of the segmentation's time range there is no slice. Nothing is written then, so
+    // no tool use or contour marker is recorded, and the contour is discarded.
+    if (slice.IsNotNull())
+    {
+      sliceInfos.emplace_back(slice, m_PlaneGeometry, workingImageTimeStep);
+      this->WriteBackSegmentationResults(sliceInfos);
+    }
   }
 
   this->ReleaseHelperObjects();
@@ -126,6 +131,13 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
+  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(positionEvent);
+  if (m_ReferenceDataSlice.IsNull())
+  {
+    this->ResetToStartState();
+    return;
+  }
+
   auto contour = this->CreateNewContour();
   m_ContourNode = mitk::DataNode::New();
   m_ContourNode->SetData(contour);
@@ -164,8 +176,6 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_PreviewContourNode, workingDataNode);
   dataStorage->Add(m_ClosureContourNode, workingDataNode);
-
-  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(positionEvent);
 
   auto origin = m_ReferenceDataSlice->GetSlicedGeometry()->GetOrigin();
   m_ReferenceDataSlice->GetSlicedGeometry()->WorldToIndex(origin, origin);
@@ -329,7 +339,7 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
 
   const TimeStepType numberOfTimesteps = contour->GetTimeSteps();
 
-  for (TimeStepType i = 0; i <= numberOfTimesteps; ++i)
+  for (TimeStepType i = 0; i < numberOfTimesteps; ++i)
     contour->Close(i);
 
   this->ReleaseHelperObjects(false);

@@ -66,7 +66,6 @@ public:
   /**
    * \brief Sets the image nodes whose statistics should be displayed.
    *
-   * Internally resolves each image's time steps for the hierarchical model.
    * Triggers a model reset and rebuild.
    *
    * \param[in] nodes Vector of image data nodes.
@@ -76,7 +75,6 @@ public:
   /**
    * \brief Sets the mask nodes whose statistics should be displayed.
    *
-   * Handles the special case where a single-timestep mask is applied to a multi-timestep image.
    * Triggers a model reset and rebuild.
    *
    * \param[in] nodes Vector of mask data nodes.
@@ -306,16 +304,8 @@ private:
 
     /** Relevant images set by the user.*/
     std::vector<mitk::DataNode::ConstPointer> m_ImageNodes;
-    /** Helper that is constructed when m_ImageNodes is set. It has the same order
-    like m_ImageNodes, but each image is represented n times, while n is the number
-    of time steps the respective image has. This structure makes the business logic
-    to select the correct image given a QIndex much simpler and therefore easy to
-    understand/maintain. */
-    std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> m_TimeStepResolvedImageNodes;
     /** relevant masks set by the user.*/
     std::vector<mitk::DataNode::ConstPointer> m_MaskNodes;
-    /** @sa m_TimeStepResolvedImageNodes */
-    std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
     /** True once m_StatisticNames stem from complete statistics of the current inputs. Computing
     them again, e.g. after an edit of the mask, does not change which statistics they have, so the

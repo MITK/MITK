@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <mitkException.h>
 #include <mitkInteractionConst.h>
 #include <mitkNumericTypes.h>
 #include <mitkPointOperation.h>
@@ -42,6 +43,7 @@ class mitkPointSetTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemovePointInterface);
   MITK_TEST(TestMaxIdAccess);
   MITK_TEST(TestInsertPointAtEnd);
+  MITK_TEST(TestWriteToInvalidTimeStep_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -491,6 +493,22 @@ std::cout<<"[PASSED]"<<std::endl;
 
     pointSet->InsertPoint(in4, 7);
     MITK_ASSERT_EQUAL(pointSet, refPs4, "Check point insertion for time step 7.");
+  }
+
+  void TestWriteToInvalidTimeStep_Throws()
+  {
+    mitk::Point3D point;
+    point.Fill(1);
+
+    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->SetPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID),
+                         mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(pointSet->InsertPoint(0, point, mitk::PTUNDEFINED, mitk::TIMESTEP_INVALID),
+                         mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed writes changed the number of time steps", mitk::TimeStepType{1},
+                                 pointSet->GetTimeSteps());
   }
 };
 

@@ -33,6 +33,11 @@ class mitkSurfaceEqualTestSuite : public mitk::TestFixture
   MITK_TEST(Equal_TwoTimeStepsDifferentPoints_ReturnsFalse);
   MITK_TEST(Equal_DifferentPoints_ReturnsFalse);
   MITK_TEST(Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse);
+  MITK_TEST(Equal_TwoEmptySurfaces_ReturnsTrue);
+  MITK_TEST(Equal_EmptyAndFilledSurface_ReturnsFalse);
+  MITK_TEST(Equal_TwoTimeStepsVSOneTimeStepLargeEps_ReturnsFalse);
+  MITK_TEST(Equal_TwoPolyDatasWithoutPoints_ReturnsTrue);
+  MITK_TEST(Equal_DifferentNumberOfPointsLargeEps_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -182,6 +187,51 @@ public:
     MITK_ASSERT_NOT_EQUAL(m_Surface3D,
                           surfaceWithADifferentPoint,
                           "A surface with a single timestep and different points should not be equal.");
+  }
+
+  void Equal_TwoEmptySurfaces_ReturnsTrue()
+  {
+    const auto emptySurface = mitk::Surface::New();
+    const auto otherEmptySurface = mitk::Surface::New();
+
+    MITK_ASSERT_EQUAL(emptySurface, otherEmptySurface, "Two empty surfaces should be equal.");
+  }
+
+  void Equal_EmptyAndFilledSurface_ReturnsFalse()
+  {
+    const auto emptySurface = mitk::Surface::New();
+
+    MITK_ASSERT_NOT_EQUAL(emptySurface, m_Surface3D, "An empty and a filled surface should not be equal.");
+  }
+
+  void Equal_TwoTimeStepsVSOneTimeStepLargeEps_ReturnsFalse()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Surfaces with different numbers of timesteps should not be equal, whatever the epsilon.",
+                           !mitk::Equal(*m_Surface3DTwoTimeSteps, *m_Surface3D, 2.0, true));
+  }
+
+  void Equal_TwoPolyDatasWithoutPoints_ReturnsTrue()
+  {
+    const auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    const auto otherPolyData = vtkSmartPointer<vtkPolyData>::New();
+
+    CPPUNIT_ASSERT_MESSAGE("Two poly datas without points should be equal.",
+                           mitk::Equal(*polyData, *otherPolyData, mitk::eps, true));
+  }
+
+  void Equal_DifferentNumberOfPointsLargeEps_ReturnsFalse()
+  {
+    const auto threePoints = vtkSmartPointer<vtkPoints>::New();
+    for (vtkIdType i = 0; i < 3; ++i)
+      threePoints->InsertNextPoint(m_PointsOne->GetPoint(i));
+
+    const auto fourPointPolyData = vtkSmartPointer<vtkPolyData>::New();
+    fourPointPolyData->SetPoints(m_PointsOne);
+    const auto threePointPolyData = vtkSmartPointer<vtkPolyData>::New();
+    threePointPolyData->SetPoints(threePoints);
+
+    CPPUNIT_ASSERT_MESSAGE("Poly datas with different numbers of points should not be equal, whatever the epsilon.",
+                           !mitk::Equal(*fourPointPolyData, *threePointPolyData, 2.0, true));
   }
 };
 

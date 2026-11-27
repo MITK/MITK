@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkException.h>
 #include <mitkImage.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkImageWriteAccessor.h>
@@ -132,6 +133,16 @@ namespace
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong count of maximum", static_cast<double>(expected.MaxCount),
                                  statistics->GetCountOfMaxValuedVoxels(t));
   }
+
+  void AssertInvalidTimeStepThrows(mitk::ImageStatisticsHolder *statistics, mitk::TimeStepType t)
+  {
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMin(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMin(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValueMax(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetScalarValue2ndMax(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMinValuedVoxels(t), mitk::InvalidTimeStepException);
+    CPPUNIT_ASSERT_THROW(statistics->GetCountOfMaxValuedVoxels(t), mitk::InvalidTimeStepException);
+  }
 }
 
 class mitkImageStatisticsHolderTestSuite : public mitk::TestFixture
@@ -143,6 +154,8 @@ class mitkImageStatisticsHolderTestSuite : public mitk::TestFixture
   MITK_TEST(AllNaN_ReportsZero);
   MITK_TEST(ConstantImage_SecondExtremaAreTheValue);
   MITK_TEST(TimeSeries_ExtremaPerTimeStep);
+  MITK_TEST(TimeStepPastEnd_Throws);
+  MITK_TEST(NonZeroTimeStepOf3DImage_Throws);
   MITK_TEST(ModifiedImage_Recomputes);
   MITK_TEST(ConcurrentRequests_AgreeWithDefinition);
   CPPUNIT_TEST_SUITE_END();
@@ -210,6 +223,22 @@ public:
 
     AssertExtrema(ComputeExpectedExtrema(first), image->GetStatistics(), 0);
     AssertExtrema(ComputeExpectedExtrema(second), image->GetStatistics(), 1);
+  }
+
+  void TimeStepPastEnd_Throws()
+  {
+    auto image = CreateImage(std::vector<short>(2000, 7), {10, 10, 10, 2});
+
+    AssertInvalidTimeStepThrows(image->GetStatistics(), 2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistics changed the number of time steps", mitk::TimeStepType{2},
+                                 image->GetTimeSteps());
+  }
+
+  void NonZeroTimeStepOf3DImage_Throws()
+  {
+    auto image = CreateImage(std::vector<short>(1000, 7), {10, 10, 10});
+
+    AssertInvalidTimeStepThrows(image->GetStatistics(), 1);
   }
 
   void ModifiedImage_Recomputes()

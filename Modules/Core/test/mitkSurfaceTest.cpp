@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 // MITK includes
 #include <mitkCommon.h>
+#include <mitkException.h>
 #include <mitkNumericTypes.h>
 #include <mitkSurface.h>
 
@@ -43,6 +44,7 @@ class mitkSurfaceTestSuite : public mitk::TestFixture
 
   MITK_TEST(SetVtkPolyDataNotNullPointer_Failure);
   MITK_TEST(SetClonedVtkPolyDataNotNullPointer_Failure);
+  MITK_TEST(SetVtkPolyDataInvalidTimeStep_Throws);
 
   MITK_TEST(GetBoundingBox_Success);
   MITK_TEST(GetBoundingBox_EmptyTimeStep_BoundsOfOtherTimeSteps);
@@ -120,6 +122,12 @@ public:
     m_Surface->SetVtkPolyData(polys);
     m_CloneSurface = m_Surface->Clone();
     CPPUNIT_ASSERT_MESSAGE("Testing set vtkPolyData of cloned surface!", m_CloneSurface->GetVtkPolyData() != nullptr);
+  }
+
+  void SetVtkPolyDataInvalidTimeStep_Throws()
+  {
+    vtkSmartPointer<vtkPolyData> polys = m_SphereSource->GetOutput();
+    CPPUNIT_ASSERT_THROW(m_Surface->SetVtkPolyData(polys, mitk::TIMESTEP_INVALID), mitk::InvalidTimeStepException);
   }
 
   void GetBoundingBox_Success()

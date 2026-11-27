@@ -87,15 +87,15 @@ void mitk::LiveWireTool2D::OnTimePointChanged()
     return;
 
   const auto timePoint = this->GetLastTimePointTriggered();
-  if (!reference->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    return;
-
   const auto timeStep = reference->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-  m_ReferenceDataSlice = this->GetAffectedReferenceSlice(m_PlaneGeometry, timeStep);
-  if (m_ReferenceDataSlice.IsNull())
+  // Without a slice at this time point, keep the previous one: the contour being
+  // drawn still reads it.
+  const auto referenceSlice = this->GetAffectedReferenceSlice(m_PlaneGeometry, timeStep);
+  if (referenceSlice.IsNull())
     return;
 
+  m_ReferenceDataSlice = referenceSlice;
   m_LiveWireFilter->SetInput(m_ReferenceDataSlice);
 
   m_LiveWireFilter->Update();

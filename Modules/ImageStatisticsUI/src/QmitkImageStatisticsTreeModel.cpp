@@ -516,22 +516,7 @@ QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation 
 
 void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes)
 {
-  std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> tempNodes;
-  for (const auto &node : nodes)
-  {
-    auto data = node->GetData();
-    if (data)
-    {
-      auto timeSteps = data->GetTimeSteps();
-      for (mitk::TimeStepType i = 0; i < timeSteps; i++)
-      {
-        tempNodes.push_back(std::make_pair(node, i));
-      }
-    }
-  }
-
   emit beginResetModel();
-  m_TimeStepResolvedImageNodes = std::move(tempNodes);
   m_ImageNodes = nodes;
   m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
@@ -543,27 +528,7 @@ void QmitkImageStatisticsTreeModel::SetImageNodes(const std::vector<mitk::DataNo
 
 void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes)
 {
-  std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::TimeStepType>> tempNodes;
-  for (const auto &node : nodes)
-  {
-    auto data = node->GetData();
-    if (data)
-    {
-      auto timeSteps = data->GetTimeSteps();
-      // special case: apply one mask to each time step of an 4D image
-      if (timeSteps == 1 && m_TimeStepResolvedImageNodes.size() > 1)
-      {
-        timeSteps = m_TimeStepResolvedImageNodes.size();
-      }
-      for (mitk::TimeStepType i = 0; i < timeSteps; i++)
-      {
-        tempNodes.push_back(std::make_pair(node, i));
-      }
-    }
-  }
-
   emit beginResetModel();
-  m_TimeStepResolvedMaskNodes = std::move(tempNodes);
   m_MaskNodes = nodes;
   m_InputStatisticNamesKnown = false;
   m_CheckedLabelValues.reset();
@@ -580,9 +545,7 @@ void QmitkImageStatisticsTreeModel::Clear()
   m_Statistics.clear();
   m_OutdatedStatistics.clear();
   m_ImageNodes.clear();
-  m_TimeStepResolvedImageNodes.clear();
   m_MaskNodes.clear();
-  m_TimeStepResolvedMaskNodes.clear();
   m_StatisticNames.clear();
   m_InputStatisticNamesKnown = false;
   m_ColumnDecimals.clear();

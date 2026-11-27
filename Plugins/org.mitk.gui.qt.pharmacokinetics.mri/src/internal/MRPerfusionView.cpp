@@ -162,6 +162,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->checkDedicatedAIFImage, SLOT(setEnabled(bool)));
   connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setEnabled(bool)));
   connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setVisible(bool)));
   connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->aifFilePath, SLOT(setEnabled(bool)));
@@ -290,6 +291,22 @@ void MRPerfusionView::UpdateGUIControls()
                                       && (m_selectedMaskNode.IsNull() || (m_selectedMaskNode.IsNotNull() && !m_Controls->maskLabelSelector->GetSelectedLabels().empty()))
                                       && m_selectedModelFactory.IsNotNull()
                                       && !m_FittingInProgress && CheckModelSettings());
+
+  if (m_selectedImage.IsNotNull())
+  {
+    // A dedicated AIF image is converted with the same baseline, so the baseline
+    // has to fit the shorter of both images.
+    auto timeSteps = m_selectedImage->GetDimension(3);
+    if (m_Controls->radioAIFImage->isChecked() && m_Controls->checkDedicatedAIFImage->isChecked())
+    {
+      const auto aifNode = m_Controls->AIFImageNodeSelector->GetSelectedNode();
+      const auto *aifImage = aifNode.IsNotNull() ? dynamic_cast<const mitk::Image *>(aifNode->GetData()) : nullptr;
+      if (aifImage != nullptr)
+        timeSteps = std::min(timeSteps, aifImage->GetDimension(3));
+    }
+    m_Controls->spinBox_baselineStartTimeStep->setMaximum(timeSteps - 1);
+    m_Controls->spinBox_baselineEndTimeStep->setMaximum(timeSteps - 1);
+  }
 
   m_Controls->spinBox_baselineStartTimeStep->setEnabled( m_Controls->radioButton_absoluteEnhancement->isChecked() || m_Controls->radioButton_relativeEnchancement->isChecked() || m_Controls->radioButtonUsingT1viaVFA->isChecked());
   m_Controls->spinBox_baselineEndTimeStep->setEnabled(m_Controls->radioButton_absoluteEnhancement->isChecked() || m_Controls->radioButton_relativeEnchancement->isChecked() || m_Controls->radioButtonUsingT1viaVFA->isChecked());
@@ -488,12 +505,6 @@ void MRPerfusionView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>
     this->m_selectedNode = nullptr;
     this->m_selectedImage = nullptr;
     this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
-  }
-
-  if (this->m_selectedImage.IsNotNull())
-  {
-    m_Controls->spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
-    m_Controls->spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
   }
 
   UpdateGUIControls();

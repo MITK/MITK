@@ -116,6 +116,10 @@ void mitk::Surface::InitializeEmpty()
 
 void mitk::Surface::SetVtkPolyData(vtkPolyData *polyData, TimeStepType t)
 {
+  // Expand(t + 1) would wrap around to Expand(0) and leave t out of range.
+  if (t == TIMESTEP_INVALID)
+    mitkThrowException(mitk::InvalidTimeStepException) << "Cannot set poly data for an invalid time step.";
+
   this->Expand(t + 1);
 
   if (m_PolyDatas[t] != nullptr)
@@ -402,59 +406,67 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
 {
   bool noDifferenceFound = true;
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfCells(), rightHandSide.GetNumberOfCells(), eps, verbose))
+  if (leftHandSide.GetNumberOfCells() != rightHandSide.GetNumberOfCells())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of cells not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of cells not equal: "
+                << leftHandSide.GetNumberOfCells() << " vs. " << rightHandSide.GetNumberOfCells() << ".";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfVerts(), rightHandSide.GetNumberOfVerts(), eps, verbose))
+  if (leftHandSide.GetNumberOfVerts() != rightHandSide.GetNumberOfVerts())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of vertices not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of vertices not equal: "
+                << leftHandSide.GetNumberOfVerts() << " vs. " << rightHandSide.GetNumberOfVerts() << ".";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfLines(), rightHandSide.GetNumberOfLines(), eps, verbose))
+  if (leftHandSide.GetNumberOfLines() != rightHandSide.GetNumberOfLines())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of lines not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of lines not equal: "
+                << leftHandSide.GetNumberOfLines() << " vs. " << rightHandSide.GetNumberOfLines() << ".";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfPolys(), rightHandSide.GetNumberOfPolys(), eps, verbose))
+  if (leftHandSide.GetNumberOfPolys() != rightHandSide.GetNumberOfPolys())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of polys not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of polys not equal: "
+                << leftHandSide.GetNumberOfPolys() << " vs. " << rightHandSide.GetNumberOfPolys() << ".";
     noDifferenceFound = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetNumberOfStrips(), rightHandSide.GetNumberOfStrips(), eps, verbose))
+  if (leftHandSide.GetNumberOfStrips() != rightHandSide.GetNumberOfStrips())
   {
     if (verbose)
-      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of strips not equal";
+      MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of strips not equal: "
+                << leftHandSide.GetNumberOfStrips() << " vs. " << rightHandSide.GetNumberOfStrips() << ".";
     noDifferenceFound = false;
   }
 
   {
-    unsigned int numberOfPointsRight = rightHandSide.GetPoints()->GetNumberOfPoints();
-    unsigned int numberOfPointsLeft = leftHandSide.GetPoints()->GetNumberOfPoints();
-    if (!mitk::Equal(numberOfPointsLeft, numberOfPointsRight, eps, verbose))
+    const vtkPoints *pointsRight = rightHandSide.GetPoints();
+    const vtkPoints *pointsLeft = leftHandSide.GetPoints();
+    const vtkIdType numberOfPointsRight = nullptr != pointsRight ? pointsRight->GetNumberOfPoints() : 0;
+    const vtkIdType numberOfPointsLeft = nullptr != pointsLeft ? pointsLeft->GetNumberOfPoints() : 0;
+    if (numberOfPointsLeft != numberOfPointsRight)
     {
       if (verbose)
-        MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of points not equal";
+        MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] Number of points not equal: " << numberOfPointsLeft
+                  << " vs. " << numberOfPointsRight << ".";
       noDifferenceFound = false;
     }
     else
     {
-      for (unsigned int i(0); i < numberOfPointsRight; i++)
+      for (vtkIdType i(0); i < numberOfPointsRight; i++)
       {
         bool pointFound = false;
         double pointOne[3];
         rightHandSide.GetPoints()->GetPoint(i, pointOne);
 
-        for (unsigned int j(0); j < numberOfPointsLeft; j++)
+        for (vtkIdType j(0); j < numberOfPointsLeft; j++)
         {
           double pointTwo[3];
           leftHandSide.GetPoints()->GetPoint(j, pointTwo);
@@ -491,13 +503,11 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
 {
   bool noDifferenceFound = true;
 
-  if (!mitk::Equal(static_cast<ScalarType>(leftHandSide.GetSizeOfPolyDataSeries()),
-                   static_cast<ScalarType>(rightHandSide.GetSizeOfPolyDataSeries()),
-                   eps,
-                   verbose))
+  if (leftHandSide.GetSizeOfPolyDataSeries() != rightHandSide.GetSizeOfPolyDataSeries())
   {
     if (verbose)
-      MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Size of PolyData series not equal.";
+      MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Size of PolyData series not equal: "
+                << leftHandSide.GetSizeOfPolyDataSeries() << " vs. " << rightHandSide.GetSizeOfPolyDataSeries() << ".";
     return false;
   }
 
@@ -511,7 +521,19 @@ bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk
 
   for (TimeStepType i(0); i < rightHandSide.GetSizeOfPolyDataSeries(); i++)
   {
-    if (!mitk::Equal(*leftHandSide.GetVtkPolyData(i), *rightHandSide.GetVtkPolyData(i), eps, verbose))
+    vtkPolyData *const leftPolyData = leftHandSide.GetVtkPolyData(i);
+    vtkPolyData *const rightPolyData = rightHandSide.GetVtkPolyData(i);
+
+    if (leftPolyData == nullptr || rightPolyData == nullptr)
+    {
+      if (leftPolyData != rightPolyData)
+      {
+        if (verbose)
+          MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Time step " << i << " is empty on one side only.";
+        noDifferenceFound = false;
+      }
+    }
+    else if (!mitk::Equal(*leftPolyData, *rightPolyData, eps, verbose))
     {
       if (verbose)
         MITK_INFO << "[Equal( mitk::surface&, mitk::surface& )] Poly datas not equal.";

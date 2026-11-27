@@ -235,6 +235,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
     for (const auto& sliceInfo : sliceInfos)
     {
+      if (nullptr == sliceInfo.plane || sliceInfo.slice.IsNull())
+        continue;
+
       // Test whether there is something to extract or whether the slice just contains intersections of others
 
       //Remark we cannot just erode the clone of sliceInfo.slice, because Erode currently only
@@ -271,6 +274,10 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   SurfaceInterpolationController::CPIVector cpis;
   for (const auto& sliceInfo : relevantSlices)
   {
+    // Past the end of the time range there is no slice; WriteBackSegmentationResults() skips it too.
+    if (nullptr == sliceInfo.plane || sliceInfo.slice.IsNull())
+      continue;
+
     contourExtractor->SetInput(sliceInfo.slice);
     contourExtractor->SetContourValue(activeLabelValue);
     contourExtractor->Update();
@@ -300,9 +307,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   }
 
   assert(positionEvent->GetSender()); // sure, right?
-  const auto timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
-
-  return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
+  // Same conversion as the mappers, so that tools edit the time step the views show.
+  const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
+  return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep,
+                                        component);
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry, const Image* image, TimePointType timePoint, unsigned int component /*= 0*/)
@@ -312,16 +320,13 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(
     return nullptr;
   }
 
-  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    return nullptr;
-
   return SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint), component);
 }
 
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry, const Image *image, TimeStepType timeStep, unsigned int component /*= 0*/)
 {
-  if (!image || !planeGeometry)
+  if (!image || !planeGeometry || !image->GetTimeGeometry()->IsValidTimeStep(timeStep))
   {
     return nullptr;
   }

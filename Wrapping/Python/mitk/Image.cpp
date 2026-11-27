@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <filesystem>
@@ -42,8 +43,15 @@ using namespace mitk;
 // Capsule helpers
 // ---------------------------------------------------------------------------
 
+struct ImagePin
+{
+  Image::Pointer image;
+  Image::ImageDataItemPointer item;
+};
+
 struct ImageAccessorHolder
 {
+  Image::ImageDataItemPointer item;
   std::unique_ptr<ImageReadAccessor> read;
   std::unique_ptr<ImageWriteAccessor> write;
 
@@ -70,7 +78,7 @@ void DeleteImageAccessorCapsule(PyObject* capsule)
 void DeleteImagePinCapsule(PyObject* capsule)
 {
   auto ptr = PyCapsule_GetPointer(capsule, "mitk.ImagePin");
-  delete static_cast<Image::Pointer*>(ptr);
+  delete static_cast<ImagePin*>(ptr);
 }
 
 // ---------------------------------------------------------------------------
@@ -109,11 +117,16 @@ std::string PixelTypeFormat(const PixelType& pt)
   }
 }
 
-std::vector<py::ssize_t> ComputeNumpyShape(const Image& img)
+/** Shape of the whole image or, without the time axis, of one time step. */
+std::vector<py::ssize_t> ComputeNumpyShape(const Image& img, std::optional<TimeStepType> time_step = std::nullopt)
 {
+  const auto dimension = time_step.has_value()
+    ? std::min(img.GetDimension(), 3u)
+    : img.GetDimension();
+
   std::vector<py::ssize_t> shape;
 
-  for (unsigned int i = 0; i < img.GetDimension(); ++i)
+  for (unsigned int i = 0; i < dimension; ++i)
     shape.push_back(img.GetDimension(i));
 
   if (img.GetPixelType().GetNumberOfComponents() > 1)
@@ -124,11 +137,34 @@ std::vector<py::ssize_t> ComputeNumpyShape(const Image& img)
   return shape;
 }
 
-py::array BuildNumpyArray(const Image& img, const void* data, bool writeable, py::capsule capsule)
+/** Returns the data item a view covers: the whole channel or one time step. */
+Image::ImageDataItemPointer GetViewDataItem(const Image& img, std::optional<TimeStepType> time_step)
+{
+  // The volumes of a 4D image may be separate allocations, for example after
+  // loading a DICOM series volume by volume. Requesting the channel merges them
+  // into one buffer first, so a view of the whole image is contiguous and no
+  // later merge moves a volume away from an existing view.
+  auto channel = img.GetChannelData();
+
+  if (channel.IsNull())
+    mitkThrow() << "Could not access image data";
+
+  if (!time_step.has_value())
+    return channel;
+
+  auto volume = img.GetVolumeData(*time_step);
+
+  if (volume.IsNull())
+    mitkThrow() << "Could not access image data at time step " << *time_step;
+
+  return volume;
+}
+
+py::array BuildNumpyArray(const Image& img, std::optional<TimeStepType> time_step, const void* data, bool writeable, py::capsule capsule)
 {
   auto dtype = PixelTypeToDType(img.GetPixelType());
   auto format = PixelTypeFormat(img.GetPixelType());
-  auto shape = ComputeNumpyShape(img);
+  auto shape = ComputeNumpyShape(img, time_step);
 
   std::vector<py::ssize_t> strides(shape.size());
   strides.back() = dtype.itemsize();
@@ -158,32 +194,35 @@ py::array BuildNumpyArray(const Image& img, const void* data, bool writeable, py
   return arr;
 }
 
-py::array AsNumpyDirect(Image& img, bool writeable, mitk::TimeStepType time_step)
+py::array AsNumpyDirect(Image& img, bool writeable, std::optional<TimeStepType> time_step)
 {
-  void* data = img.GetData(time_step);
+  auto item = GetViewDataItem(img, time_step);
 
-  if (data == nullptr)
-    mitkThrow() << "Could not access image data at time step " << time_step;
+  // Only reads the address of the data item; a direct view takes no lock.
+  const ImageReadAccessor probe(Image::ConstPointer(&img), item.GetPointer(), ImageAccessorBase::IgnoreLock);
 
-  // Pin the Image::Pointer in the capsule so the buffer outlives the
-  // numpy array regardless of who else holds a reference to the image.
-  auto* pin = new Image::Pointer(&img);
+  // The data item keeps the buffer alive even if the image drops it, for
+  // example when it is initialized again.
+  auto* pin = new ImagePin{&img, item};
   auto capsule = py::capsule(pin, "mitk.ImagePin", &DeleteImagePinCapsule);
 
-  return BuildNumpyArray(img, data, writeable, std::move(capsule));
+  return BuildNumpyArray(img, time_step, probe.GetData(), writeable, std::move(capsule));
 }
 
-py::array AsNumpyAccessor(Image& img, bool writeable)
+py::array AsNumpyAccessor(Image& img, bool writeable, std::optional<TimeStepType> time_step)
 {
   auto holder = std::make_unique<ImageAccessorHolder>();
 
   {
     py::gil_scoped_release release;
 
+    if (time_step.has_value())
+      holder->item = GetViewDataItem(img, time_step);
+
     if (writeable)
-      holder->write = std::make_unique<ImageWriteAccessor>(&img);
+      holder->write = std::make_unique<ImageWriteAccessor>(&img, holder->item.GetPointer());
     else
-      holder->read = std::make_unique<ImageReadAccessor>(&img);
+      holder->read = std::make_unique<ImageReadAccessor>(&img, holder->item.GetPointer());
   }
 
   const void* data = writeable
@@ -195,7 +234,7 @@ py::array AsNumpyAccessor(Image& img, bool writeable)
 
   auto capsule = py::capsule(holder.release(), "mitk.ImageAccessor", &DeleteImageAccessorCapsule);
 
-  return BuildNumpyArray(img, data, writeable, std::move(capsule));
+  return BuildNumpyArray(img, time_step, data, writeable, std::move(capsule));
 }
 
 // ---------------------------------------------------------------------------
@@ -234,19 +273,9 @@ Image::Pointer ImageFromNumpy(py::array array,
   auto img = Image::New();
   img->Initialize(pixelType, static_cast<unsigned int>(ndim), dims.data());
 
-  // Copy the buffer one volume at a time. For 2D/3D arrays this is a
-  // single SetVolume call; for 4D the slowest numpy dim becomes time.
-  if (ndim < 4)
-  {
-    img->SetVolume(arr.data());
-  }
-  else
-  {
-    const auto bytesPerVolume = static_cast<size_t>(arr.nbytes()) / dims[3];
-    const auto* base = static_cast<const unsigned char*>(arr.data());
-    for (mitk::TimeStepType t = 0; t < dims[3]; ++t)
-      img->SetVolume(base + t * bytesPerVolume, t);
-  }
+  // One buffer for all time steps, so the image needs no merge before a view
+  // of it as a whole.
+  img->SetChannel(arr.data());
 
   // Apply geometry overrides to every time step so a 4D image is not left
   // with inconsistent per-time-step geometries.
@@ -454,36 +483,30 @@ appended for the per-pixel component count.
 )")
     .def_property_readonly("dtype", [](const Image& img) { return PixelTypeToDType(img.GetPixelType()); },
       "NumPy dtype matching the MITK pixel type.")
-    .def_property_readonly("array", [](Image& img) { return AsNumpyDirect(img, false, 0); },
-      R"(Read-only NumPy view of the image buffer at time step 0.
+    .def_property_readonly("array", [](Image& img) { return AsNumpyDirect(img, false, std::nullopt); },
+      R"(Read-only NumPy view of the whole image buffer.
 
-Zero-copy. The view pins the image alive via a smart-pointer capsule.
-Equivalent to ``img.as_numpy(writeable=False, time_step=0)``.
+Zero-copy. The view keeps the image and its buffer alive.
+Equivalent to ``img.as_numpy(writeable=False)``.
 )")
 
     .def("as_numpy",
-      [](Image& img, bool use_accessor, bool writeable, mitk::TimeStepType time_step) {
-        if (use_accessor)
-        {
-          if (time_step != 0)
-            throw py::value_error(
-              "as_numpy: time_step != 0 is not supported with use_accessor=True; "
-              "use use_accessor=False to select a specific time step");
-          return AsNumpyAccessor(img, writeable);
-        }
-        return AsNumpyDirect(img, writeable, time_step);
+      [](Image& img, bool use_accessor, bool writeable, std::optional<mitk::TimeStepType> time_step) {
+        return use_accessor
+          ? AsNumpyAccessor(img, writeable, time_step)
+          : AsNumpyDirect(img, writeable, time_step);
       },
       py::arg("use_accessor") = false,
       py::arg("writeable") = true,
-      py::arg("time_step") = 0,
+      py::arg("time_step") = py::none(),
       R"(Return a NumPy view of the image buffer.
 
 Writeable by default (matching NumPy convention). For a read-only view
 pass ``writeable=False``, use :py:attr:`array`, or wrap with
 ``numpy.asarray(img)``.
 
-By default the view is *direct*: zero-copy, no locking. The view pins the
-image alive via a smart-pointer capsule. Pass ``use_accessor=True`` for a
+By default the view is *direct*: zero-copy, no locking. The view keeps the
+image and its buffer alive. Pass ``use_accessor=True`` for a
 view backed by ``ImageReadAccessor`` / ``ImageWriteAccessor``, which
 acquires MITK's read/write lock and releases it when the NumPy array is
 garbage-collected. Use the accessor-backed mode when other threads
@@ -495,20 +518,21 @@ Args:
         Defaults to False (direct, unlocked).
     writeable: If True, return a writable view; otherwise read-only.
         Defaults to True.
-    time_step: Time-step index for 4D images. Must be 0 when
-        ``use_accessor=True``; for time-step-specific access, use
-        ``use_accessor=False``. Defaults to 0.
+    time_step: If None (default), the view covers the whole image, with
+        the time axis first for 4D images. Otherwise it covers only this
+        time step and has no time axis.
 
 Returns:
     NumPy array sharing memory with the image buffer.
 
 Raises:
-    mitk.Exception: If the image data cannot be accessed.
-    ValueError: If ``use_accessor=True`` and ``time_step != 0``.
+    mitk.Exception: If the image data cannot be accessed, for example
+        because ``time_step`` is out of range.
 
 Examples:
     >>> arr = img.as_numpy()
     >>> arr[0, 0, 0] = 1.0
+    >>> frame = img4d.as_numpy(time_step=2)  # (z, y, x)
     >>> # Concurrency-safe write:
     >>> locked = img.as_numpy(use_accessor=True, writeable=True)
     >>> locked[5, 5, 5] = 7
@@ -517,7 +541,7 @@ Examples:
 
     .def("__array__",
       [](Image& img, py::object dtype, py::object copy) {
-        auto arr = AsNumpyDirect(img, false, 0);
+        auto arr = AsNumpyDirect(img, false, std::nullopt);
 
         if (!dtype.is_none())
           arr = arr.attr("astype")(dtype, py::arg("copy") = false);

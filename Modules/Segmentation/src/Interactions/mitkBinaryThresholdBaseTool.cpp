@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageRegionIterator.h>
 
+#include <cmath>
+
 mitk::BinaryThresholdBaseTool::BinaryThresholdBaseTool()
   : m_SensibleMinimumThreshold(-100),
     m_SensibleMaximumThreshold(+100),
@@ -65,8 +67,14 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
     Image::StatisticsHolderPointer statistics = referenceImage->GetStatistics();
     for (TimeStepType ts = 0; ts < referenceImage->GetTimeSteps(); ++ts)
     {
-      m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, static_cast<double>(statistics->GetScalarValueMin()));
-      m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, static_cast<double>(statistics->GetScalarValueMax()));
+      // A single infinite voxel would make the slider range infinite, so such a
+      // step contributes its second extremum, as in the level window.
+      const auto min = statistics->GetScalarValueMin(ts);
+      const auto max = statistics->GetScalarValueMax(ts);
+      const auto finiteMin = std::isfinite(min) ? min : statistics->GetScalarValue2ndMin(ts);
+      const auto finiteMax = std::isfinite(max) ? max : statistics->GetScalarValue2ndMax(ts);
+      m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, finiteMin);
+      m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, finiteMax);
     }
 
     if (m_LockedUpperThreshold)

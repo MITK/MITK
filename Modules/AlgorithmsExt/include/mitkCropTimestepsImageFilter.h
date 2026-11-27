@@ -59,13 +59,14 @@ namespace mitk
     void SetInput(unsigned int index, const InputImageType* image) override;
 
     /**
-     * \brief Set the last timestep to retain (exclusive upper bound).
+     * \brief Set the first timestep to drop at the end (exclusive upper bound).
      *
-     * Defaults to the maximum timestep of the input. If set to a value
-     * larger than the input's maximum timestep, it is clamped.
+     * Not set by default, which keeps all timesteps up to the end of the input.
+     * A larger value than the input's number of timesteps is clamped for the
+     * output; the setting itself is kept. Update() throws mitk::Exception if
+     * LowerBoundaryTimestep is not smaller than the clamped upper boundary.
      *
      * \param[in] _arg The upper boundary timestep (exclusive).
-     * \throw mitk::Exception if LowerBoundaryTimestep > UpperBoundaryTimestep.
      */
     itkSetMacro(UpperBoundaryTimestep, TimeStepType);
 
@@ -78,8 +79,10 @@ namespace mitk
     /**
      * \brief Set the first timestep to retain (inclusive lower bound, default: 0).
      *
+     * Update() throws mitk::Exception if it is not smaller than the clamped
+     * upper boundary.
+     *
      * \param[in] _arg The lower boundary timestep (inclusive).
-     * \throw mitk::Exception if LowerBoundaryTimestep > UpperBoundaryTimestep.
      */
     itkSetMacro(LowerBoundaryTimestep, TimeStepType);
 
@@ -99,7 +102,7 @@ namespace mitk
     void VerifyInputInformation() const override;
     void VerifyInputImage(const mitk::Image* inputImage) const;
     void GenerateOutputInformation() override;
-    mitk::SlicedData::RegionType ComputeDesiredRegion() const;
+    mitk::SlicedData::RegionType ComputeDesiredRegion(TimeStepType upperBoundary) const;
     mitk::TimeGeometry::Pointer AdaptTimeGeometry(mitk::TimeGeometry::ConstPointer sourceGeometry, TimeStepType startTimestep, TimeStepType endTimestep) const;
 
     TimeStepType m_UpperBoundaryTimestep = std::numeric_limits<TimeStepType>::max();

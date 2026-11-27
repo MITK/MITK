@@ -89,6 +89,7 @@ void QmitkPointListWidget::SetupConnections()
 
 void QmitkPointListWidget::OnTimeStepChanged(int timeStep)
 {
+  m_TimeStep = static_cast<mitk::TimeStepType>(timeStep);
   m_TimeStepLabel->setText(QString("%1").arg(timeStep));
 }
 
@@ -208,21 +209,20 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
     return;
 
   this->m_PointSetNode->SetData(newPs);
-  dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(m_PointSetNode);
-  ObserveNewNode(m_PointSetNode);
+  this->SetPointSetNode(m_PointSetNode);
 }
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
   ObserveNewNode(newNode);
-  dynamic_cast<QmitkPointListModel *>(this->m_PointListView->model())->SetPointSetNode(newNode);
+  m_PointListView->SetPointSetNode(newNode);
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()
 {
   if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData())) == nullptr)
     return; // don't write empty point sets. If application logic requires something else then do something else.
-  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData()))->GetSize() == 0)
+  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData()))->IsEmpty())
     return;
 
   // take the previously defined name of node as proposal for filename
@@ -300,7 +300,7 @@ void QmitkPointListWidget::RemoveSelectedPoint()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());
@@ -315,7 +315,7 @@ void QmitkPointListWidget::MoveSelectedPointDown()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());
@@ -330,7 +330,7 @@ void QmitkPointListWidget::MoveSelectedPointUp()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
   if (!pointSet)
     return;
-  if (pointSet->GetSize() == 0)
+  if (pointSet->GetSize(m_TimeStep) == 0)
     return;
 
   QmitkPointListModel *pointListModel = dynamic_cast<QmitkPointListModel *>(m_PointListView->model());
@@ -391,14 +391,14 @@ void QmitkPointListWidget::OnBtnAddPointManually()
   mitk::PointSet *pointSet = this->GetPointSet();
   QmitkEditPointDialog editPointDialog(this);
 
-  if (this->GetPointSet()->IsEmpty())
+  if (this->GetPointSet()->IsEmptyTimeStep(m_TimeStep))
   {
       editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
   }
 
   else
   {
-      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId(m_TimeStep);
       mitk::PointSet::PointIdentifier maxId = maxIt->Index();
       editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
   }

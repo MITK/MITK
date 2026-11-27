@@ -282,14 +282,13 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positio
 
 void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if (m_WorkingSlice.IsNull())
-    return;
-
   auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (!positionEvent)
     return;
 
   this->ResetWorkingSlice(positionEvent);
+  if (m_WorkingSlice.IsNull())
+    return;
 
   m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
   this->m_PaintingNode->SetVisibility(true);
@@ -322,6 +321,8 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   {
     this->ResetWorkingSlice(positionEvent);
   }
+  if (m_WorkingSlice.IsNull())
+    return;
 
   if (m_LastContourSize != m_Size)
   {
@@ -418,7 +419,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
 {
   // When mouse is released write segmentation result back into image
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-  if (!positionEvent)
+  if (!positionEvent || m_WorkingSlice.IsNull())
     return;
 
   auto workingSeg = this->GetWorkingData();

@@ -29,6 +29,8 @@ class mitkCropTimestepsImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(Filter_OnlyUpperBoundary);
   MITK_TEST(Filter_BothBoundaries);
   MITK_TEST(Filter_BothBoundaries2Dt);
+  MITK_TEST(Filter_ReusedWithLongerInput_KeepsAllTimesteps);
+  MITK_TEST(Filter_InvalidRange_Throws);
 	CPPUNIT_TEST_SUITE_END();
 private:
     std::string m_ImageFilename2D, m_ImageFilename3D, m_ImageFilename2Dt, m_ImageFilename3Dt;
@@ -86,7 +88,8 @@ public:
     m_cropTimestepsFilter->SetUpperBoundaryTimestep(upperTimeStep);
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), upperTimeStep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
-    CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), refImage2Dt->GetTimeSteps());
+    CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), upperTimeStep);
+    CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetOutput()->GetTimeSteps(), refImage2Dt->GetTimeSteps());
   }
 
   void Filter_Default()
@@ -101,7 +104,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), expectedUpperTimestep);
     CPPUNIT_ASSERT_NO_THROW(m_cropTimestepsFilter->Update());
     CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetLowerBoundaryTimestep(), expectedLowerTimestep);
-    CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), refImage3Dt->GetTimeSteps());
+    CPPUNIT_ASSERT_EQUAL(m_cropTimestepsFilter->GetUpperBoundaryTimestep(), expectedUpperTimestep);
     auto result = m_cropTimestepsFilter->GetOutput();
     auto timeGeometry = result->GetTimeGeometry();
     CPPUNIT_ASSERT_EQUAL(timeGeometryBefore->GetMinimumTimePoint(), timeGeometry->GetMinimumTimePoint());
@@ -176,6 +179,37 @@ public:
     CPPUNIT_ASSERT_EQUAL(mitk::TimePointType(upperTimestep), timeGeometry->GetMaximumTimePoint());
     CPPUNIT_ASSERT_EQUAL(mitk::TimePointType(lowerTimestep), timeGeometry->GetMinimumTimePoint());
     CPPUNIT_ASSERT_EQUAL(upperTimestep - lowerTimestep, result->GetTimeSteps());
+  }
+
+  void Filter_ReusedWithLongerInput_KeepsAllTimesteps()
+  {
+    // Upper boundary not set: each input keeps all of its own timesteps.
+    auto refImage2Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename2Dt);
+    auto refImage3Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename3Dt);
+
+    m_cropTimestepsFilter->SetInput(refImage2Dt);
+    m_cropTimestepsFilter->Update();
+    m_cropTimestepsFilter->SetInput(refImage3Dt);
+    m_cropTimestepsFilter->Update();
+
+    CPPUNIT_ASSERT_EQUAL(refImage3Dt->GetTimeSteps(), m_cropTimestepsFilter->GetOutput()->GetTimeSteps());
+  }
+
+  void Filter_InvalidRange_Throws()
+  {
+    // 3 timesteps: a lower boundary at or behind the clamped upper boundary leaves nothing to keep.
+    auto refImage2Dt = mitk::IOUtil::Load<mitk::Image>(m_ImageFilename2Dt);
+    m_cropTimestepsFilter->SetInput(refImage2Dt);
+
+    m_cropTimestepsFilter->SetLowerBoundaryTimestep(5);
+    CPPUNIT_ASSERT_THROW(m_cropTimestepsFilter->Update(), mitk::Exception);
+
+    m_cropTimestepsFilter->SetUpperBoundaryTimestep(10);
+    CPPUNIT_ASSERT_THROW(m_cropTimestepsFilter->Update(), mitk::Exception);
+
+    m_cropTimestepsFilter->SetLowerBoundaryTimestep(1);
+    m_cropTimestepsFilter->SetUpperBoundaryTimestep(1);
+    CPPUNIT_ASSERT_THROW(m_cropTimestepsFilter->Update(), mitk::Exception);
   }
 
 };

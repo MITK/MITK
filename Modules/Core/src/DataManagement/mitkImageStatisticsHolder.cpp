@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkImageStatisticsHolder.h>
 
+#include <mitkExceptionMacro.h>
 #include <mitkHistogramGenerator.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageReadAccessor.h>
@@ -357,9 +358,9 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
 /// \endcond SKIP_DOXYGEN
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(TimeStepType t, unsigned int component)
 {
-  // timestep valid?
   if (!m_Image->IsValidTimeStep(t))
-    return;
+    mitkThrowException(mitk::InvalidTimeStepException)
+      << "Invalid time step " << t << " for an image with " << m_Image->GetTimeSteps() << " time steps.";
 
   // image modified?
   if (this->m_Image->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())

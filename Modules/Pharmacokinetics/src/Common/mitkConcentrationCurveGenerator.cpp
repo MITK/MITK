@@ -95,9 +95,9 @@ void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
   {
     if (m_BaselineStartTimeStep >= this->m_DynamicImage->GetTimeSteps())
     {
-      mitkThrow() << "Baseline time step " << m_BaselineStartTimeStep
-                  << " is out of range; the image has "
-                  << this->m_DynamicImage->GetTimeSteps() << " time steps.";
+      mitkThrowException(mitk::InvalidTimeStepException)
+        << "Baseline time step " << m_BaselineStartTimeStep << " is out of range; the image has "
+        << this->m_DynamicImage->GetTimeSteps() << " time steps.";
     }
     this->m_BaselineImage = mitk::SelectImageByTimeStep(this->m_DynamicImage, m_BaselineStartTimeStep);
   }
@@ -133,9 +133,9 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
 
   if (m_BaselineEndTimeStep >= region_input.GetSize()[3])
   {
-    mitkThrow() << "Baseline end time step " << m_BaselineEndTimeStep
-                << " is out of range; the image has "
-                << region_input.GetSize()[3] << " time steps.";
+    mitkThrowException(mitk::InvalidTimeStepException)
+      << "Baseline end time step " << m_BaselineEndTimeStep << " is out of range; the image has "
+      << region_input.GetSize()[3] << " time steps.";
   }
 
   typename ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();

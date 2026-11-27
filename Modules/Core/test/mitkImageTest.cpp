@@ -156,6 +156,74 @@ public:
 
     MITK_ASSERT_EQUAL(imageGeometry, planegeometry, "Matrix elements of cloned matrix equal original matrix");
   }
+
+  void RequestedRegion_VolumeMissingInSecondChannel_IsOutside()
+  {
+    // 2 channels with 4 time steps; only the volume of time step 1 in channel 1 is missing.
+    unsigned int dimensions[] = {2, 2, 2, 4};
+    auto image = mitk::Image::New();
+    image->Initialize(mitk::MakeScalarPixelType<char>(), 4, dimensions, 2);
+
+    const std::vector<char> volume(2 * 2 * 2, 0);
+    for (mitk::TimeStepType t = 0; t < 4; ++t)
+      for (int c = 0; c < 2; ++c)
+        if (t != 1 || c != 1)
+          image->SetVolume(volume.data(), t, c);
+
+    // Request whole volumes of time steps 0-2 in both channels.
+    auto region = image->GetLargestPossibleRegion();
+    region.SetSize(3, 3);
+    image->SetRequestedRegion(&region);
+
+    MITK_TEST_CONDITION(image->RequestedRegionIsOutsideOfTheBufferedRegion(),
+                        "Missing volume in the second channel is detected");
+
+    image->SetVolume(volume.data(), 1, 1);
+    MITK_TEST_CONDITION(!image->RequestedRegionIsOutsideOfTheBufferedRegion(),
+                        "Complete requested region is not reported as missing");
+  }
+
+  void RequestedRegion_SliceMissingInSecondTimeStep_IsOutside()
+  {
+    // 3 time steps with 4 slices each; only slice 1 of time step 1 is missing.
+    unsigned int dimensions[] = {2, 2, 4, 3};
+    auto image = mitk::Image::New();
+    image->Initialize(mitk::MakeScalarPixelType<char>(), 4, dimensions);
+
+    const std::vector<char> slice(2 * 2, 0);
+    for (mitk::TimeStepType t = 0; t < 3; ++t)
+      for (int s = 0; s < 4; ++s)
+        if (t != 1 || s != 1)
+          image->SetSlice(slice.data(), s, t);
+
+    // Request slices 0-1 of time steps 0-1.
+    auto region = image->GetLargestPossibleRegion();
+    region.SetSize(2, 2);
+    region.SetSize(3, 2);
+    image->SetRequestedRegion(&region);
+
+    MITK_TEST_CONDITION(image->RequestedRegionIsOutsideOfTheBufferedRegion(),
+                        "Missing slice in the second time step is detected");
+
+    image->SetSlice(slice.data(), 1, 1);
+    MITK_TEST_CONDITION(!image->RequestedRegionIsOutsideOfTheBufferedRegion(),
+                        "Complete requested slices are not reported as missing");
+  }
+
+  void AllocateZeroedVolume_PositionOutsideImage_Throws()
+  {
+    unsigned int dimensions[] = {2, 2, 2};
+    auto image = mitk::Image::New();
+    image->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::InvalidTimeStepException);
+    image->AllocateZeroedVolume(1);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::InvalidTimeStepException);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
+    image->AllocateZeroedVolume(0, 1);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
+  }
 };
 
 int mitkImageTest(int argc, char *argv[])
@@ -164,6 +232,9 @@ int mitkImageTest(int argc, char *argv[])
 
   mitkImageTestClass tester;
   tester.SetClonedGeometry_None_ClonedEqualInput();
+  tester.RequestedRegion_VolumeMissingInSecondChannel_IsOutside();
+  tester.RequestedRegion_SliceMissingInSecondTimeStep_IsOutside();
+  tester.AllocateZeroedVolume_PositionOutsideImage_Throws();
 
   // Create Image out of nowhere
   mitk::Image::Pointer imgMem = mitk::Image::New();

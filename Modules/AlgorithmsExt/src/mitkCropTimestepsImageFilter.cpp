@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageReadAccessor.h>
 
+#include <algorithm>
+
 
   void mitk::CropTimestepsImageFilter::VerifyInputImage(const mitk::Image* inputImage) const
   {
@@ -47,17 +49,17 @@ found in the LICENSE file.
   {
     Image::ConstPointer input = this->GetInput();
     Image::Pointer output = this->GetOutput();
-    if (m_LowerBoundaryTimestep > m_UpperBoundaryTimestep) {
-      mitkThrow() << "lower timestep is larger than upper timestep.";
-    }
-    if (m_UpperBoundaryTimestep == std::numeric_limits<TimeStepType>::max()) {
-      m_UpperBoundaryTimestep = input->GetTimeSteps();
-    }
-    else if (m_UpperBoundaryTimestep > input->GetTimeSteps()) {
-      m_UpperBoundaryTimestep = input->GetTimeSteps();
-      MITK_WARN << "upper boundary timestep set to " << m_UpperBoundaryTimestep;
-    }
-    m_DesiredRegion = ComputeDesiredRegion();
+    const auto timeSteps = input->GetTimeSteps();
+    const auto upperBoundary = std::min(m_UpperBoundaryTimestep, timeSteps);
+
+    if (m_UpperBoundaryTimestep != std::numeric_limits<TimeStepType>::max() && m_UpperBoundaryTimestep > timeSteps)
+      MITK_WARN << "upper boundary timestep " << m_UpperBoundaryTimestep << " exceeds the input's " << timeSteps
+                << " timesteps; clamped to " << upperBoundary << " for the output";
+
+    if (m_LowerBoundaryTimestep >= upperBoundary)
+      mitkThrow() << "lower timestep " << m_LowerBoundaryTimestep << " is not smaller than upper timestep "
+                  << upperBoundary << ".";
+    m_DesiredRegion = this->ComputeDesiredRegion(upperBoundary);
     unsigned int dimension = input->GetDimension();
     auto dimensions = new unsigned int[dimension];
     for (unsigned int i = 0; i < 3; ++i)
@@ -65,24 +67,24 @@ found in the LICENSE file.
     if (dimension > 3)
       memcpy(dimensions + 3, input->GetDimensions() + 3, (dimension - 3) * sizeof(unsigned int));
 
-    dimensions[3] = static_cast<unsigned int>(m_UpperBoundaryTimestep - m_LowerBoundaryTimestep);
+    dimensions[3] = static_cast<unsigned int>(upperBoundary - m_LowerBoundaryTimestep);
 
     // create basic slicedGeometry that will be initialized below
     output->Initialize(mitk::PixelType(input->GetPixelType()), dimension, dimensions);
     delete[] dimensions;
-    auto newTimeGeometry = AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, m_UpperBoundaryTimestep);
+    auto newTimeGeometry = this->AdaptTimeGeometry(input->GetTimeGeometry(), m_LowerBoundaryTimestep, upperBoundary);
     output->SetTimeGeometry(newTimeGeometry);
     output->SetPropertyList(input->GetPropertyList()->Clone());
   }
 
-  mitk::SlicedData::RegionType mitk::CropTimestepsImageFilter::ComputeDesiredRegion() const
+  mitk::SlicedData::RegionType mitk::CropTimestepsImageFilter::ComputeDesiredRegion(TimeStepType upperBoundary) const
   {
     auto desiredRegion = this->GetInput()->GetLargestPossibleRegion();
     auto index = desiredRegion.GetIndex();
     auto size = desiredRegion.GetSize();
     unsigned int timeDimension = 3;
     index[timeDimension] = static_cast<itk::IndexValueType>(m_LowerBoundaryTimestep);
-    size[timeDimension] = m_UpperBoundaryTimestep - m_LowerBoundaryTimestep;
+    size[timeDimension] = upperBoundary - m_LowerBoundaryTimestep;
     desiredRegion.SetIndex(index);
     desiredRegion.SetSize(size);
     return desiredRegion;

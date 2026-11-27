@@ -43,6 +43,11 @@ QmitkPointListModel::~QmitkPointListModel()
 void QmitkPointListModel::SetPointSetNode(mitk::DataNode *pointSetNode)
 {
   this->ObserveNewPointSet(pointSetNode);
+
+  const auto *pointSet = this->GetPointSet();
+  if (nullptr != pointSet && m_TimeStep >= pointSet->GetTimeSteps())
+    m_TimeStep = 0;
+
   QAbstractListModel::beginResetModel();
   QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();

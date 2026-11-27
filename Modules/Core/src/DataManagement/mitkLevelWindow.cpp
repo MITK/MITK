@@ -16,7 +16,39 @@ found in the LICENSE file.
 #include <mitkImageStatisticsHolder.h>
 
 #include <algorithm>
+#include <limits>
 #include <nlohmann/json.hpp>
+#include <utility>
+
+namespace
+{
+  /* Extrema over the given time steps, an infinite extremum of a step replaced by its
+     second one. A step without a finite value needs no special case: ImageStatisticsHolder
+     leaves its second extrema at their initial values, the largest number for the minimum
+     and the lowest for the maximum, so they never win against a value of another step. */
+  std::pair<mitk::ScalarType, mitk::ScalarType> GetFiniteMinMax(const mitk::Image *image,
+                                                                 mitk::TimeStepType firstTimeStep,
+                                                                 mitk::TimeStepType timeStepCount)
+  {
+    auto minValue = std::numeric_limits<mitk::ScalarType>::infinity();
+    auto maxValue = -std::numeric_limits<mitk::ScalarType>::infinity();
+
+    for (auto t = firstTimeStep; t < firstTimeStep + timeStepCount; ++t)
+    {
+      auto stepMin = image->GetStatistics()->GetScalarValueMin(t);
+      if (!std::isfinite(stepMin))
+        stepMin = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
+      minValue = std::min(minValue, stepMin);
+
+      auto stepMax = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
+      if (!std::isfinite(stepMax))
+        stepMax = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+      maxValue = std::max(maxValue, stepMax);
+    }
+
+    return {minValue, maxValue};
+  }
+}
 
 void mitk::LevelWindow::EnsureConsistency()
 {
@@ -283,6 +315,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   ScalarType maxValue = 0.0;
   ScalarType min2ndValue = 0.0;
   ScalarType max2ndValue = 0.0;
+  TimeStepType firstCountedTimeStep = 0;
+  TimeStepType countedTimeSteps = 1;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   if (guessByCentralSlice)
   {
@@ -321,6 +355,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
             maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
             min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
             max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+            firstCountedTimeStep = t;
 
             if (minValue != maxValue)
               break; // We found a time step with valid data
@@ -332,10 +367,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   else
   {
     const_cast<Image *>(image)->Update();
+    countedTimeSteps = image->GetDimension(3);
     minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
-    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (TimeStepType i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
@@ -344,13 +378,37 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
       if (maxValue < maxValueTemp)
         maxValue = maxValueTemp;
-      ScalarType min2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
-      if (min2ndValue > min2ndValueTemp)
-        min2ndValue = min2ndValueTemp;
-      ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
-      if (max2ndValue > max2ndValueTemp)
-        max2ndValue = max2ndValueTemp;
     }
+
+    // The second value of the whole image can be another time step's own minimum or
+    // maximum. A constant time step reports its only value as its second one, which
+    // must not count as a second value of the whole image.
+    min2ndValue = maxValue;
+    max2ndValue = minValue;
+    for (TimeStepType i = 0; i < image->GetDimension(3); ++i)
+    {
+      const auto stepMin = image->GetStatistics()->GetScalarValueMinNoRecompute(i);
+      const auto aboveMin =
+        stepMin > minValue ? stepMin : image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
+      if (aboveMin > minValue)
+        min2ndValue = std::min(min2ndValue, aboveMin);
+
+      const auto stepMax = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
+      const auto belowMax =
+        stepMax < maxValue ? stepMax : image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
+      if (belowMax < maxValue)
+        max2ndValue = std::max(max2ndValue, belowMax);
+    }
+  }
+
+  std::size_t minCount = 0;
+  std::size_t maxCount = 0;
+  for (auto t = firstCountedTimeStep; t < firstCountedTimeStep + countedTimeSteps; ++t)
+  {
+    if (image->GetStatistics()->GetScalarValueMinNoRecompute(t) == minValue)
+      minCount += image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute(t);
+    if (image->GetStatistics()->GetScalarValueMaxNoRecompute(t) == maxValue)
+      maxCount += image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute(t);
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
@@ -381,25 +439,22 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     maxValue += additionalRange;
   }
 
-  if (!std::isfinite(minValue))
+  if (!std::isfinite(minValue) || !std::isfinite(maxValue))
   {
-    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-  }
-  if (!std::isfinite(maxValue))
-  {
-    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+    const auto [finiteMin, finiteMax] = GetFiniteMinMax(image, firstCountedTimeStep, countedTimeSteps);
+    if (!std::isfinite(minValue))
+      minValue = finiteMin;
+    if (!std::isfinite(maxValue))
+      maxValue = finiteMax;
   }
 
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
 
-  size_t numPixelsInDataset = image->GetDimensions()[0];
-  for (decltype(image->GetDimension()) k = 1; k < image->GetDimension(); ++k)
-    numPixelsInDataset *= image->GetDimensions()[k];
-  const auto minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
-  const auto maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  const auto minCountFraction = minCount / static_cast<ScalarType>(numPixelsInDataset);
-  const auto maxCountFraction = maxCount / static_cast<ScalarType>(numPixelsInDataset);
+  const auto numCountedPixels = static_cast<ScalarType>(image->GetDimension(0)) * image->GetDimension(1) *
+                                image->GetDimension(2) * countedTimeSteps;
+  const auto minCountFraction = minCount / numCountedPixels;
+  const auto maxCountFraction = maxCount / numCountedPixels;
 
   //// binary image
   if (min2ndValue == maxValue)
@@ -452,16 +507,7 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);
-  if (!std::isfinite(minValue))
-  {
-    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-  }
-  ScalarType maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
-  if (!std::isfinite(maxValue))
-  {
-    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
-  }
+  const auto [minValue, maxValue] = GetFiniteMinMax(image, 0, image->GetDimension(3));
 
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);

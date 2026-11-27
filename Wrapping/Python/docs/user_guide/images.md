@@ -85,7 +85,8 @@ faster and simpler.
 
 ## Time-resolved data
 
-For 4D images, `time_step` selects the time index in `as_numpy()`:
+A view of a 4D image as a whole has the time axis first, `(t, z, y, x)`.
+`time_step` selects a single time step in `as_numpy()`, a `(z, y, x)` view:
 
 ```python
 for t in range(img.time_steps):

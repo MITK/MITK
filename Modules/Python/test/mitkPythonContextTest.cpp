@@ -12,12 +12,15 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkFileSystem.h>
+#include <mitkImage.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -65,6 +68,11 @@ namespace
   private:
     std::string m_Name;
   };
+
+  int PositionValue(unsigned int t, unsigned int z, unsigned int y, unsigned int x)
+  {
+    return static_cast<int>(t * 1000 + z * 100 + y * 10 + x);
+  }
 }
 
 class mitkPythonContextTestSuite : public mitk::TestFixture
@@ -74,6 +82,7 @@ class mitkPythonContextTestSuite : public mitk::TestFixture
   MITK_TEST(TestUserSetupIsIgnored);
   MITK_TEST(TestExecuteFile);
   MITK_TEST(TestBindImageToPython);
+  MITK_TEST(TestNumpyViewsOfImageWithSeparateVolumes);
   MITK_TEST(TestBindFunctionToPython);
   MITK_TEST(TestPythonContextExclusivity);
   MITK_TEST(TestSeveralVirtualEnvs);
@@ -180,6 +189,73 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Variable 'dims' should exist", dims.has_value());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image should have 3 dimensions", 3, dims.value());
+  }
+
+  void TestNumpyViewsOfImageWithSeparateVolumes()
+  {
+    // Setting one volume per time step, as the DICOM reader and many filters
+    // with 4D output do, leaves every volume a separate allocation.
+    constexpr unsigned int dimensions[] = { 6, 4, 3, 5 };
+    const auto [sizeX, sizeY, sizeZ, sizeT] = dimensions;
+    const auto voxelsPerVolume = sizeX * sizeY * sizeZ;
+
+    auto image = mitk::Image::New();
+    image->Initialize(mitk::MakeScalarPixelType<int>(), 4, dimensions);
+
+    std::vector<int> volume(voxelsPerVolume);
+
+    for (unsigned int t = 0; t < sizeT; ++t)
+    {
+      auto value = volume.begin();
+
+      for (unsigned int z = 0; z < sizeZ; ++z)
+        for (unsigned int y = 0; y < sizeY; ++y)
+          for (unsigned int x = 0; x < sizeX; ++x)
+            *value++ = PositionValue(t, z, y, x);
+
+      image->SetVolume(volume.data(), t);
+    }
+
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+    pythonContext.BindImage(image, "image");
+
+    try
+    {
+      pythonContext.Execute(R"(
+import numpy as np
+
+t, z, y, x = np.indices((5, 3, 4, 6))
+expected = (t * 1000 + z * 100 + y * 10 + x).astype(np.int32)
+
+for step in range(expected.shape[0]):
+    np.testing.assert_array_equal(image.as_numpy(time_step=step), expected[step])
+    view = image.as_numpy(use_accessor=True, writeable=False, time_step=step)
+    np.testing.assert_array_equal(view, expected[step])
+    del view
+
+np.testing.assert_array_equal(image.as_numpy(), expected)
+np.testing.assert_array_equal(image.array, expected)
+np.testing.assert_array_equal(np.asarray(image), expected)
+
+for step in range(expected.shape[0]):
+    image.as_numpy(time_step=step)[...] = -(step + 1)
+)");
+    }
+    catch (const mitk::Exception& e)
+    {
+      CPPUNIT_FAIL(e.GetDescription());
+    }
+
+    for (unsigned int t = 0; t < sizeT; ++t)
+    {
+      const mitk::ImageReadAccessor accessor(image, image->GetVolumeData(t).GetPointer());
+      const auto* data = static_cast<const int*>(accessor.GetData());
+      const auto expected = -static_cast<int>(t + 1);
+
+      CPPUNIT_ASSERT_MESSAGE("Writes through the view of time step " + std::to_string(t) + " should reach the image",
+        std::all_of(data, data + voxelsPerVolume, [expected](int value) { return value == expected; }));
+    }
   }
 
   void TestBindFunctionToPython()

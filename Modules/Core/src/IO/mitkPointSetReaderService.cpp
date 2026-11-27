@@ -148,6 +148,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
       }
       else
       {
+        timeGeometry->Expand(1);
         newPointSet = this->ReadPoints(newPointSet, currentPointSetElement, 0);
       }
 

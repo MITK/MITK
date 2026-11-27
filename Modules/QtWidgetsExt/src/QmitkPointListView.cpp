@@ -295,7 +295,8 @@ void QmitkPointListView::ClearPointList()
   if (!m_PointListModel->GetPointSet())
     return;
   mitk::PointSet::Pointer curPS = m_PointListModel->GetPointSet();
-  if (curPS->GetSize() == 0)
+  const auto timeStep = m_PointListModel->GetTimeStep();
+  if (curPS->GetSize(timeStep) == 0)
     return;
 
   switch (QMessageBox::question(this,
@@ -308,11 +309,11 @@ void QmitkPointListView::ClearPointList()
     {
       mitk::PointSet::PointsIterator it;
       mitk::PointSet::PointsContainer *curPsPoints;
-      while (!curPS->IsEmptyTimeStep(0))
+      while (!curPS->IsEmptyTimeStep(timeStep))
       {
-        curPsPoints = curPS->GetPointSet()->GetPoints();
+        curPsPoints = curPS->GetPointSet(timeStep)->GetPoints();
         it = curPsPoints->Begin();
-        curPS->SetSelectInfo(it->Index(), true);
+        curPS->SetSelectInfo(it->Index(), true, timeStep);
         m_PointListModel->RemoveSelectedPoint();
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

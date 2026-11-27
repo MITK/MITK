@@ -87,6 +87,23 @@ private:
   /** \brief Offers the tools and lets the session start Claude Code ahead of the first message. */
   void PrepareAgent();
 
+  /** \brief Whether the user accepted this version of the notice on what leaves the computer. */
+  bool IsDataNoticeAccepted() const;
+
+  /**
+   * \brief Whether the user accepted the notice on what leaves the computer.
+   *
+   * Asks, unless the user accepted this version of the notice before. Nothing
+   * reaches the provider before the first message, so asking then is in time.
+   */
+  bool AcceptDataNotice();
+
+  /** \brief Shows the notice again, or asks as before the first message if it was not accepted yet. */
+  void ShowDataNotice();
+
+  /** \brief Shows the reminder of the notice, with its link in the colors of the current theme. */
+  void UpdateDataNoticeCard();
+
   /**
    * \brief Whether the agent may use a REST server that runs already with these risks.
    *

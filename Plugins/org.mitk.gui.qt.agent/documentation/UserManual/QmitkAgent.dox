@@ -65,6 +65,13 @@ numbers that it asks for. Whatever is visible in a screenshot, or written in a n
 leaves the computer if the agent asks for it, so do not use the agent on data that must not be sent to
 the provider of your account.
 
+Whether you may send data, in particular data that can identify a patient, depends on the laws and rules
+that apply to you and on the terms of your account: consumer subscriptions and commercial accounts differ
+in how the provider keeps and uses data. Before your first message, the view tells you what leaves the
+computer and asks you to confirm that you use the agent only on data that you are allowed to send. It
+asks once, and again if this notice changes. The note at the bottom of the view is a reminder: "Details"
+shows the notice again, and its close button hides the note until you open the view again.
+
 The notes the agent keeps (see \ref org_mitk_views_agent_memory) are sent at the start of each
 conversation as well.
 
@@ -179,6 +186,7 @@ can save it as HTML or open it in your web browser. You can ask the agent for a 
 
 \section org_mitk_views_agent_limits Limits and safety
 
+- The agent is not for use in diagnosis or treatment of patients.
 - What the agent segments or measures is a model's estimate, like the tools it uses. A volume, a count
   or a statement of a report is no result of a validated procedure. Check the images yourself.
 - The agent is told to ask you before it deletes or overwrites data, like removing data or labels, and

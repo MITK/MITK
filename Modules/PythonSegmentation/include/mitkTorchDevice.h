@@ -46,7 +46,7 @@ namespace mitk
       int TotalMemoryMB = 0; /**< \brief Total device memory in megabytes. */
     };
 
-    /** \brief A CUDA compute capability, e.g. 6.1 for Pascal. */
+    /** \brief A CUDA compute capability, e.g. 7.5 for Turing. */
     struct ComputeCapability
     {
       int Major;
@@ -55,8 +55,7 @@ namespace mitk
 
     /** \brief Returns the lowest compute capability the installed PyTorch build has kernels for.
      *
-     * Pascal (6.1) below CPython 3.14, Turing (7.5) from 3.14 on, following the
-     * torch release the install requests.
+     * Turing (7.5), following the torch release the install requests.
      *
      * \sa mitk::Torch::Requirements()
      */

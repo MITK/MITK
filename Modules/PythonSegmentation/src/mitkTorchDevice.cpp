@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 #include <mitkMemoryUtilities.h>
-#include <mitkPythonHelper.h>
 #include <mitkPythonWorker.h>
 
 #include <charconv>
@@ -31,15 +30,11 @@ namespace
   }
 }
 
-// The architectures follow the PyTorch build the install requests: torch 2.8
-// still runs on Pascal, while the 2.10 required from CPython 3.14 on starts at
-// Turing. Keep in sync with Requirements() in mitkTorchInstall.cpp.
+// Turing, the oldest architecture the CUDA builds of torch 2.10 have kernels
+// for. Keep in sync with Requirements() in mitkTorchInstall.cpp.
 mitk::Torch::ComputeCapability mitk::Torch::MinimumComputeCapability()
 {
-  if constexpr (PythonHelper::VERSION_MINOR >= 14)
-    return { 7, 5 };
-  else
-    return { 6, 1 };
+  return { 7, 5 };
 }
 
 std::optional<int> mitk::Torch::ParseCUDADeviceIndex(const std::string& deviceString)

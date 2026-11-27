@@ -22,10 +22,10 @@ found in the LICENSE file.
 
 namespace mitk::Torch
 {
-  /** \brief Returns the torch and torchvision requirements matching the embedded CPython.
+  /** \brief Returns the torch and torchvision requirements of the torch-based tools.
    *
-   * torch 2.8 for CPython below 3.14, torch 2.10 from 3.14 on. The requirements
-   * carry upper bounds so torchvision stays on the minor that matches torch.
+   * torch 2.10. The requirements carry upper bounds so torchvision stays on the
+   * minor that matches torch.
    *
    * \sa MinimumComputeCapability()
    */

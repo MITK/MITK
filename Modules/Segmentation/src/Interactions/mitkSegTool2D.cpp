@@ -235,6 +235,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
     for (const auto& sliceInfo : sliceInfos)
     {
+      if (nullptr == sliceInfo.plane || sliceInfo.slice.IsNull())
+        continue;
+
       // Test whether there is something to extract or whether the slice just contains intersections of others
 
       //Remark we cannot just erode the clone of sliceInfo.slice, because Erode currently only
@@ -271,6 +274,10 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   SurfaceInterpolationController::CPIVector cpis;
   for (const auto& sliceInfo : relevantSlices)
   {
+    // Past the end of the time range there is no slice; WriteBackSegmentationResults() skips it too.
+    if (nullptr == sliceInfo.plane || sliceInfo.slice.IsNull())
+      continue;
+
     contourExtractor->SetInput(sliceInfo.slice);
     contourExtractor->SetContourValue(activeLabelValue);
     contourExtractor->Update();

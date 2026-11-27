@@ -71,9 +71,14 @@ void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
     if (nullptr == activeLabel)
       return;
     auto slice = this->GenerateSliceWithContourUpdate(workingSeg, m_PlaneGeometry, contour, activeLabel->GetValue(), currentTimePoint, m_AddMode);
-    sliceInfos.emplace_back(slice, m_PlaneGeometry, workingImageTimeStep);
 
-    this->WriteBackSegmentationResults(sliceInfos);
+    // Past the end of the segmentation's time range there is no slice. Nothing is written then, so
+    // no tool use or contour marker is recorded, and the contour is discarded.
+    if (slice.IsNotNull())
+    {
+      sliceInfos.emplace_back(slice, m_PlaneGeometry, workingImageTimeStep);
+      this->WriteBackSegmentationResults(sliceInfos);
+    }
   }
 
   this->ReleaseHelperObjects();

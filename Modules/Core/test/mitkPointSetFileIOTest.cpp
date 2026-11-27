@@ -71,8 +71,12 @@ public:
 
   void PointSetCompare(mitk::PointSet::Pointer pointSet2, mitk::PointSet::Pointer pointSet1, bool & /*identical*/)
   {
-    MITK_TEST_CONDITION(pointSet1->GetTimeSteps() == pointSet2->GetTimeSteps(),
-                        "Testing if the number of time steps is correct");
+    // Not MITK_TEST_CONDITION_REQUIRED: its exception would end in the caller's
+    // catch, which only logs it, and the test would pass.
+    const bool sameTimeSteps = pointSet1->GetTimeSteps() == pointSet2->GetTimeSteps();
+    MITK_TEST_CONDITION(sameTimeSteps, "Testing if the number of time steps is correct");
+    if (!sameTimeSteps)
+      return;
 
     for (mitk::TimeStepType t = 0; t < numberOfTimeSeries; t++)
     {

@@ -115,7 +115,7 @@ int mitkPointSetReaderTest(int argc, char *argv[])
                               "<point><id>-1</id><x>10</x><y>20</y><z>30</z></point>"})
       CPPUNIT_ASSERT_THROW(Read(reader, CreatePointSetFile(timeStep0, "", point)), mitk::Exception);
 
-    // Spaces around numbers are tolerated, so files that loaded before still load.
+    // Whitespace around numbers is allowed.
     data = Read(reader, CreatePointSetFile("<time_series_id> 0 </time_series_id>", "",
                                            "<point><id> 0 </id><x> 10 </x><y>20</y><z>30</z></point>"));
     resultPS = dynamic_cast<mitk::PointSet *>(data.front().GetPointer());

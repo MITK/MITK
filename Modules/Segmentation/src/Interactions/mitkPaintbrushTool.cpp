@@ -282,9 +282,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positio
 
 void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if (m_WorkingSlice.IsNull())
-    return;
-
   auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (!positionEvent)
     return;

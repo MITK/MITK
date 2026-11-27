@@ -114,13 +114,13 @@ void mitk::FeedbackContourTool::InitializeFeedbackContour(bool isClosed)
 
 void mitk::FeedbackContourTool::ClearsCurrentFeedbackContour(bool isClosed)
 {
-  if (!m_FeedbackContour->GetTimeGeometry()->IsValidTimePoint(this->GetLastTimePointTriggered()))
+  const auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
+  if (!m_FeedbackContour->GetTimeGeometry()->IsValidTimeStep(feedbackTimeStep))
   {
-    MITK_WARN << "Cannot clear feedback contour at current time step. Feedback contour is in invalid state as its time geometry does not support current selected time point. Invalid time point: " << this->GetLastTimePointTriggered();
+    MITK_WARN << "Cannot clear feedback contour at current time step. Feedback contour time geometry does not support current selected time point. Invalid time point: " << this->GetLastTimePointTriggered();
     return;
   }
 
-  auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
   m_FeedbackContour->Clear(feedbackTimeStep);
   m_FeedbackContour->SetClosed(isClosed, feedbackTimeStep);
 }
@@ -130,13 +130,7 @@ void mitk::FeedbackContourTool::UpdateCurrentFeedbackContour(const ContourModel*
   if (nullptr == sourceModel)
     return;
 
-  if (!m_FeedbackContour->GetTimeGeometry()->IsValidTimePoint(this->GetLastTimePointTriggered()))
-  {
-    MITK_WARN << "Cannot update feedback contour. Feedback contour is in invalid state as its time geometry does not support current selected time point. Invalid time point: "<<this->GetLastTimePointTriggered();
-    return;
-  }
-
-  auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
+  const auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
   this->UpdateFeedbackContour(sourceModel, feedbackTimeStep, sourceTimeStep);
 }
 
@@ -162,13 +156,7 @@ void mitk::FeedbackContourTool::UpdateFeedbackContour(const ContourModel* source
 
 void mitk::FeedbackContourTool::AddVertexToCurrentFeedbackContour(const Point3D& point)
 {
-  if (!m_FeedbackContour->GetTimeGeometry()->IsValidTimePoint(this->GetLastTimePointTriggered()))
-  {
-    MITK_WARN << "Cannot add vertex to feedback contour. Feedback contour is in invalid state as its time geometry does not support current selected time point. Invalid time point: " << this->GetLastTimePointTriggered();
-    return;
-  }
-
-  auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
+  const auto feedbackTimeStep = m_FeedbackContour->GetTimeGeometry()->TimePointToTimeStep(this->GetLastTimePointTriggered());
   this->AddVertexToFeedbackContour(point, feedbackTimeStep);
 };
 

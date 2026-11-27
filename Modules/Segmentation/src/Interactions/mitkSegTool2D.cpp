@@ -313,9 +313,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(
     return nullptr;
   }
 
-  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    return nullptr;
-
   return SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint), component);
 }
 

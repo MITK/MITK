@@ -121,6 +121,8 @@ namespace mitk
     /**
      * \brief Extract the slice of an image cut by the given plane at a specified time point.
      *
+     * A time point before the image's first time point gives its first time step, as in the views.
+     *
      * \param[in] planeGeometry Geometry defining the slice that should be cut out.
      * \param[in] image Image that should be sliced.
      * \param[in] timePoint Time point of the image that should be sliced.

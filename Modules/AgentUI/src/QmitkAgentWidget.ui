@@ -2,7 +2,7 @@
 <ui version="4.0">
  <class>QmitkAgentWidget</class>
  <widget class="QWidget" name="QmitkAgentWidget">
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0,0,0">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -170,6 +170,13 @@
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QmitkInfoCard" name="dataNoticeCard">
+     <property name="toolTip">
+      <string>They are sent to the provider of the account that Claude Code uses, usually Anthropic. Use the agent only on data that you are allowed to send there.</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -177,6 +184,11 @@
    <class>QmitkAgentConversationWidget</class>
    <extends>QTextBrowser</extends>
    <header location="global">QmitkAgentConversationWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkInfoCard</class>
+   <extends>QFrame</extends>
+   <header location="global">QmitkInfoCard.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkSpeechBubbleFrame</class>

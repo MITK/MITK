@@ -13,10 +13,13 @@ found in the LICENSE file.
 #include <QmitkAgentWidget.h>
 #include <ui_QmitkAgentWidget.h>
 
+#include "QmitkAgentDataNoticeDialog.h"
+
 #include <QmitkAgentMemory.h>
 #include <QmitkAgentMemoryDialog.h>
 #include <QmitkAgentToolServer.h>
 #include <QmitkIconTheme.h>
+#include <QmitkInfoCard.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
@@ -71,11 +74,16 @@ QmitkAgentWidget::QmitkAgentWidget(QmitkAgentSession* session, mitk::IPreference
 {
   m_Ui->setupUi(this);
 
+  this->UpdateDataNoticeCard();
+  m_Ui->dataNoticeCard->SetClosable(true);
+  connect(m_Ui->dataNoticeCard, &QmitkInfoCard::LinkActivated, this, &QmitkAgentWidget::ShowDataNotice);
+
   connect(m_Ui->statusLabel, &QLabel::linkActivated, this, &QmitkAgentWidget::OpenSettings);
   this->SetStatus("Looking for Claude Code...");
 
   connect(QmitkIconTheme::GetInstance(), &QmitkIconTheme::Changed, this, [this]() {
     this->SetStatus(m_Status, m_StatusLinkText);
+    this->UpdateDataNoticeCard();
   });
 
   m_Ui->showStepsCheckBox->setChecked(m_Preferences->GetBool("showSteps", false));
@@ -236,6 +244,45 @@ bool QmitkAgentWidget::eventFilter(QObject* watched, QEvent* event)
   return QWidget::eventFilter(watched, event);
 }
 
+bool QmitkAgentWidget::IsDataNoticeAccepted() const
+{
+  return m_Preferences->GetInt("acceptedDataNotice", 0) >= QmitkAgentDataNoticeDialog::VERSION;
+}
+
+bool QmitkAgentWidget::AcceptDataNotice()
+{
+  if (this->IsDataNoticeAccepted())
+    return true;
+
+  QmitkAgentDataNoticeDialog dialog(QmitkAgentDataNoticeDialog::Mode::Ask, this->window());
+
+  if (dialog.exec() != QDialog::Accepted)
+    return false;
+
+  m_Preferences->PutInt("acceptedDataNotice", QmitkAgentDataNoticeDialog::VERSION);
+  return true;
+}
+
+void QmitkAgentWidget::ShowDataNotice()
+{
+  if (!this->IsDataNoticeAccepted())
+  {
+    this->AcceptDataNotice();
+    return;
+  }
+
+  QmitkAgentDataNoticeDialog dialog(QmitkAgentDataNoticeDialog::Mode::Show, this->window());
+  dialog.exec();
+}
+
+void QmitkAgentWidget::UpdateDataNoticeCard()
+{
+  // In the accent color of the theme, like the link of the status.
+  m_Ui->dataNoticeCard->SetMessage(QString("Your messages, what the agent reads and its screenshots leave this "
+    "computer. <a href=\"details\"><span style=\"color: %1;\">Details</span></a>")
+    .arg(QmitkIconTheme::GetAccentColor()), QmitkInfoCard::Severity::Warning);
+}
+
 bool QmitkAgentWidget::AcceptRunningServer(const QStringList& risks)
 {
   // The texts of the risks that the user accepted without being asked again.
@@ -337,6 +384,9 @@ void QmitkAgentWidget::Send()
   const auto text = m_Ui->messageInput->toPlainText().trimmed();
 
   if (text.isEmpty())
+    return;
+
+  if (!this->AcceptDataNotice())
     return;
 
   // Asks again if the tools were not offered, for example after the question

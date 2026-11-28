@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/AgentUI">
+    <file>DataNotice/sent.svg</file>
+    <file>DataNotice/identity.svg</file>
+    <file>DataNotice/research.svg</file>
+  </qresource>
+</RCC>
